@@ -1,0 +1,1515 @@
+WEBVTT
+
+NOTE S5 E20: Building an AI Inside Sales Agent That Passes the Human Test with Nate Joens of Structurely
+
+1
+00:00:00.000 --> 00:00:08.740
+<v Nate Joens>We probably have been through three or four iterations of our core AI model that we've been building in-house.
+
+2
+00:00:08.960 --> 00:00:17.320
+<v Nate Joens>I think at one point we went from having each part of the pipeline, each part of the machine learning pipeline in one API,
+
+3
+00:00:17.660 --> 00:00:21.240
+<v Nate Joens>where we just send a text and it sends a response back.
+
+4
+00:00:21.500 --> 00:00:26.980
+<v Nate Joens>And then we decoupled everything and moved it towards individual microservices.
+
+5
+00:00:26.980 --> 00:00:29.500
+<v Nate Joens>And then we're like, okay, we're happy with that.
+
+6
+00:00:29.600 --> 00:00:31.220
+<v Nate Joens>And then we put it all back together.
+
+7
+00:00:32.140 --> 00:00:34.500
+<v Nate Joens>From an efficiency standpoint, building this,
+
+8
+00:00:34.600 --> 00:00:37.300
+<v Nate Joens>we probably shouldn't have second-guessed ourself.
+
+9
+00:00:37.660 --> 00:00:38.820
+<v Nate Joens>My name is Nate Joens.
+
+10
+00:00:39.060 --> 00:00:42.160
+<v Nate Joens>I am the co-founder and head of innovation at Structurely.
+
+11
+00:00:47.620 --> 00:00:49.320
+<v Noah Labhart>This is Code Story,
+
+12
+00:00:49.560 --> 00:00:52.900
+<v Noah Labhart>the podcast bringing you interviews with tech visionaries
+
+13
+00:00:52.900 --> 00:00:55.260
+<v Noah Labhart>who share in the critical moments
+
+14
+00:00:56.980 --> 00:01:03.900
+<v Noah Labhart>the street and build and lead a team that has your back. I'm your host, Noah Labhart,
+
+15
+00:01:04.080 --> 00:01:11.800
+<v Noah Labhart>and today how Nate Joens built the tool to help you spend more time closing and less time qualifying.
+
+16
+00:01:13.420 --> 00:01:15.760
+<v Noah Labhart>All this and more on Code Story.
+
+17
+00:01:20.440 --> 00:01:25.740
+<v Noah Labhart>Nate Joens was born and raised in Iowa, and in fact, he plans to spend out the rest of his days
+
+18
+00:01:26.520 --> 00:01:32.820
+<v Noah Labhart>it. He playfully calls it the Silicon Prairie, though he admits that most people don't call it
+
+19
+00:01:32.820 --> 00:01:38.540
+<v Noah Labhart>that. He studied at Iowa State University, majoring in geographic information systems
+
+20
+00:01:38.540 --> 00:01:44.640
+<v Noah Labhart>and urban planning, which is basically mapping on steroids. He learned how to map topography
+
+21
+00:01:44.640 --> 00:01:49.500
+<v Noah Labhart>three-dimensionally using tools like ArcGIS. Outside of tech, he loves to hike, kayak,
+
+22
+00:01:49.760 --> 00:01:55.660
+<v Noah Labhart>golf, and generally be outdoors. In college, he was very interested and connected to the
+
+23
+00:01:56.980 --> 00:01:59.180
+<v Noah Labhart>as Urban Planning works closely with realtors.
+
+24
+00:02:00.020 --> 00:02:04.080
+<v Noah Labhart>He figured out that lead follow-up was a huge pain point for realtors,
+
+25
+00:02:04.220 --> 00:02:08.700
+<v Noah Labhart>which piqued his interest and led him to build some tech to solve the problem.
+
+26
+00:02:11.260 --> 00:02:14.220
+<v Noah Labhart>This is the creation story of Structurely.
+
+27
+00:02:17.820 --> 00:02:20.740
+<v Nate Joens>Structurely is a conversational AI company.
+
+28
+00:02:21.020 --> 00:02:25.520
+<v Nate Joens>We follow up, qualify, and nurture leads of all sorts, basically.
+
+29
+00:02:26.980 --> 00:02:32.160
+<v Nate Joens>Most people here listening probably work at a business or have a business, and they most
+
+30
+00:02:32.160 --> 00:02:37.840
+<v Nate Joens>likely have leads, and they have to convert those leads into sales to grow revenue.
+
+31
+00:02:38.020 --> 00:02:40.280
+<v Nate Joens>So that's where our product kind of fits in.
+
+32
+00:02:40.560 --> 00:02:46.760
+<v Nate Joens>It texts and emails leads, follows up with them for a long period of time, and then when
+
+33
+00:02:46.760 --> 00:02:53.380
+<v Nate Joens>they respond, actually has a two-way conversation with them to ideally qualify them, ask if
+
+34
+00:02:53.380 --> 00:02:57.060
+<v Nate Joens>if they're interested in buying, answer their questions and set an appointment or demo,
+
+35
+00:02:57.980 --> 00:03:01.620
+<v Nate Joens>or disqualify them or set them for longer-term nurture if necessary.
+
+36
+00:03:01.880 --> 00:03:05.220
+<v Nate Joens>So that's all done using conversational AI that we've built.
+
+37
+00:03:06.820 --> 00:03:09.680
+<v Nate Joens>Structurely, it's my first job, first and only job ever.
+
+38
+00:03:10.140 --> 00:03:12.020
+<v Nate Joens>I started it straight out of college.
+
+39
+00:03:12.240 --> 00:03:13.720
+<v Nate Joens>I went to Iowa State University.
+
+40
+00:03:15.240 --> 00:03:16.620
+<v Nate Joens>We got our start there.
+
+41
+00:03:16.620 --> 00:03:24.140
+<v Nate Joens>Um, and we, we basically ended up, uh, you know, urban planning, uh, community regional planning.
+
+42
+00:03:24.260 --> 00:03:30.240
+<v Nate Joens>What I studied works pretty closely with like realtors, real estate agents. Um, obviously you
+
+43
+00:03:30.240 --> 00:03:36.320
+<v Nate Joens>have to have a real estate developers and agents to build a city at some point. Um, so I was super
+
+44
+00:03:36.320 --> 00:03:41.760
+<v Nate Joens>interested in real estate just generally in my time at school. Um, and I spent a lot of time
+
+45
+00:03:41.760 --> 00:03:48.480
+<v Nate Joens>like talking to realtors and this problem of lead follow-up was like number one priority on their
+
+46
+00:03:48.480 --> 00:03:55.820
+<v Nate Joens>list of like hate they hate doing it uh so that really piqued my interest and i said okay maybe
+
+47
+00:03:55.820 --> 00:04:00.260
+<v Nate Joens>i'm not super into like real estate or i don't want to go like be a realtor or anything but like
+
+48
+00:04:00.260 --> 00:04:05.060
+<v Nate Joens>i like the tech side i like solving this problem side of things so let's go solve it with technology
+
+49
+00:04:05.060 --> 00:04:27.340
+<v Nate Joens>So we actually sought out some, they were then PhD graduate students in statistics and mathematics at Iowa State, which has a phenomenal graduate program in stats and math, and said, you know, can you help us with this basically AI problem, which is just math and stats.
+
+50
+00:04:27.340 --> 00:04:33.660
+<v Nate Joens>stats. And it just happened that they were specifically studying like computational
+
+51
+00:04:33.660 --> 00:04:39.640
+<v Nate Joens>linguistics. And that's perfect for things like natural language processing and conversational
+
+52
+00:04:39.640 --> 00:04:46.680
+<v Nate Joens>AI as a whole. And we said, hey, let's try and solve this lead follow-up and qualification problem
+
+53
+00:04:46.680 --> 00:04:51.660
+<v Nate Joens>with technology rather than like a human call center, which has been done for 20 years.
+
+54
+00:04:51.660 --> 00:05:00.120
+<v Nate Joens>And that's really where we got started with some of that core team of basically AI engineers, myself and my co-founder, Andrew.
+
+55
+00:05:00.740 --> 00:05:04.820
+<v Nate Joens>That was kind of the core, you know, founding team with our engineers.
+
+56
+00:05:06.280 --> 00:05:14.400
+<v Noah Labhart>Well, tell me about the MVP. So that first product you built, what sort of tools did you use to bring it to life and how long it took you to bring it to life?
+
+57
+00:05:16.880 --> 00:05:23.080
+<v Nate Joens>The very, very first one was built by me. I decided I was going to use a chatbot builder.
+
+58
+00:05:23.340 --> 00:05:34.440
+<v Nate Joens>So this was like 2015, 2016 ish. That was a big thing. Chatbots were on the real top of their
+
+59
+00:05:34.980 --> 00:05:42.140
+<v Nate Joens>hype curve, I'll say, at that time. So that was part of what was kind of pushing us, I think,
+
+60
+00:05:42.140 --> 00:05:49.480
+<v Nate Joens>in this direction. So, you know, I'm not a software engineer by any means. So I was like,
+
+61
+00:05:49.540 --> 00:05:56.940
+<v Nate Joens>can I prove this idea with an MVP and validate that someone finds it useful without spending a
+
+62
+00:05:56.940 --> 00:06:01.360
+<v Nate Joens>bunch of resources to build it, which is, I guess, how you define an MVP, basically.
+
+63
+00:06:01.700 --> 00:06:08.240
+<v Nate Joens>So I ended up building it with a few chatbot builders. I tried, I think I ended up going with
+
+64
+00:06:08.240 --> 00:06:18.140
+<v Nate Joens>like one called Maya back in the day. And another company called Smooch, which was now actually
+
+65
+00:06:18.140 --> 00:06:25.100
+<v Nate Joens>acquired by Zendesk. They help with omni-channel messaging essentially. So really easy out of the
+
+66
+00:06:25.100 --> 00:06:32.320
+<v Nate Joens>box, like Twilio integration and web messenger, so live chat integration that they built natively.
+
+67
+00:06:32.320 --> 00:06:37.660
+<v Nate Joens>So I like stitched those together and demoed it to realtors like in office.
+
+68
+00:06:38.040 --> 00:06:39.060
+<v Nate Joens>They liked it.
+
+69
+00:06:39.100 --> 00:06:41.700
+<v Nate Joens>They saw like a super rudimentary conversation.
+
+70
+00:06:42.020 --> 00:06:47.480
+<v Nate Joens>And then we actually took it to two conferences in the real estate space that are like the
+
+71
+00:06:47.480 --> 00:06:48.960
+<v Nate Joens>biggest in the space.
+
+72
+00:06:49.120 --> 00:06:55.400
+<v Nate Joens>One's called Inman News and the other is called obviously National Association of Realtors,
+
+73
+00:06:55.440 --> 00:06:56.620
+<v Nate Joens>NAR, so the big ones.
+
+74
+00:06:57.280 --> 00:06:59.720
+<v Nate Joens>No product other than the MVP.
+
+75
+00:06:59.720 --> 00:07:08.700
+<v Nate Joens>took it out there, bought like the startup row, like super cheap booth and got a ton of feedback
+
+76
+00:07:08.700 --> 00:07:16.860
+<v Nate Joens>on that really basic demo, basically MVP from Realtors Live in Action. And that was really how
+
+77
+00:07:16.860 --> 00:07:21.720
+<v Nate Joens>we got things started. Real estate happened to be a really great kind of niche starting point
+
+78
+00:07:21.720 --> 00:07:28.020
+<v Nate Joens>because there's lots of leads in that market, lots of salespeople who hate following up with leads.
+
+79
+00:07:29.720 --> 00:07:33.540
+<v Nate Joens>where we got our initial footing so
+
+80
+00:07:33.540 --> 00:07:38.440
+<v Noah Labhart>in that mvp you probably had to make certain decisions and
+
+81
+00:07:38.440 --> 00:07:43.240
+<v Noah Labhart>trade-offs so you know you mentioned different products different vendors to use how to stitch
+
+82
+00:07:43.240 --> 00:07:49.600
+<v Noah Labhart>it together essentially to get it working to prove it and you know there's there's obviously you know
+
+83
+00:07:49.600 --> 00:07:54.880
+<v Noah Labhart>thoughts around what features you do first what's important in the core and then even technical
+
+84
+00:07:54.880 --> 00:07:58.440
+<v Noah Labhart>debt so there's some of that what you were describing too so tell me about some of those
+
+85
+00:07:59.720 --> 00:08:02.540
+<v Noah Labhart>that you had to make and how you coped with those decisions?
+
+86
+00:08:04.860 --> 00:08:06.900
+<v Nate Joens>I think like really early on,
+
+87
+00:08:07.020 --> 00:08:11.960
+<v Nate Joens>one of the things that was just absolutely necessary
+
+88
+00:08:12.480 --> 00:08:14.900
+<v Nate Joens>with our product that we felt like was,
+
+89
+00:08:15.510 --> 00:08:17.380
+<v Nate Joens>we didn't actually realize was so important,
+
+90
+00:08:17.500 --> 00:08:19.660
+<v Nate Joens>but looking back at it was like necessary
+
+91
+00:08:19.660 --> 00:08:21.760
+<v Nate Joens>for the real MVP was a mobile app.
+
+92
+00:08:22.200 --> 00:08:24.660
+<v Nate Joens>Just out of the box, you know, realtors are on the go.
+
+93
+00:08:25.580 --> 00:08:27.040
+<v Nate Joens>Salespeople as a whole are on the go.
+
+94
+00:08:27.040 --> 00:08:32.520
+<v Nate Joens>they need to be able to see our conversations happening in real time and jump into them which
+
+95
+00:08:32.520 --> 00:08:38.440
+<v Nate Joens>is now a core feature of our product but for the longest time we didn't have a mobile app for
+
+96
+00:08:38.440 --> 00:08:46.480
+<v Nate Joens>ios or android but we needed one so i think like early on had i kind of looked back at what i was
+
+97
+00:08:46.480 --> 00:08:52.980
+<v Nate Joens>prioritizing product wise i would have built a mobile apps first we ended up going with
+
+98
+00:08:54.200 --> 00:08:59.480
+<v Nate Joens>React Native, which is amazing because we can just kind of spin it up pretty easily.
+
+99
+00:09:00.640 --> 00:09:06.660
+<v Nate Joens>So I think that was a huge trade off that we did the wrong way. One that we've kind of looked at
+
+100
+00:09:08.980 --> 00:09:14.760
+<v Nate Joens>now, moving forward from where we're at, and where we started, kind of coming back to your tech debt
+
+101
+00:09:14.760 --> 00:09:23.040
+<v Nate Joens>that question. One of the best advice I got from a local kind of dev shop here in Iowa was when
+
+102
+00:09:23.040 --> 00:09:28.740
+<v Nate Joens>you're building a product, build generally and market specifically. I think we did the inverse
+
+103
+00:09:28.740 --> 00:09:35.720
+<v Nate Joens>where we built our product really real estate specific. All the terminology in there was
+
+104
+00:09:35.720 --> 00:09:42.700
+<v Nate Joens>real estate based. And then like two years ago, we had to rip it all out and basically generalize
+
+105
+00:09:42.700 --> 00:09:50.040
+<v Nate Joens>every part of our product. Had we just started with a more general kind of framework and approach
+
+106
+00:09:50.040 --> 00:09:54.900
+<v Nate Joens>in building our product from day one, I think we would have saved at least six months of debt work,
+
+107
+00:09:55.060 --> 00:10:01.560
+<v Nate Joens>which was basically just like, you know, renaming everything and refactoring everything
+
+108
+00:10:01.560 --> 00:10:04.060
+<v Nate Joens>because it was way too real estate specific.
+
+109
+00:10:05.840 --> 00:10:08.220
+<v Noah Labhart>Well, from that point, then you've got your MVP,
+
+110
+00:10:08.220 --> 00:10:09.480
+<v Noah Labhart>You've made your trade-offs.
+
+111
+00:10:09.480 --> 00:10:10.440
+<v Noah Labhart>You've proved the model.
+
+112
+00:10:11.020 --> 00:10:13.620
+<v Noah Labhart>How did you progress the product from there?
+
+113
+00:10:13.780 --> 00:10:14.980
+<v Noah Labhart>How did you mature it?
+
+114
+00:10:15.020 --> 00:10:20.440
+<v Noah Labhart>And I'm interested in how you built your roadmap and decided, okay, this is the next most important thing to build.
+
+115
+00:10:22.540 --> 00:10:33.540
+<v Nate Joens>There was actually like a really big inflection point in our company maybe two or so years ago where we had this idea of...
+
+116
+00:10:34.000 --> 00:10:41.300
+<v Nate Joens>So with our product, we have to integrate really well with CRMs and lead gen companies and lead management tools.
+
+117
+00:10:41.780 --> 00:10:45.840
+<v Nate Joens>Because, you know, salespeople as a whole, like, don't want to log into another product.
+
+118
+00:10:46.320 --> 00:10:50.620
+<v Nate Joens>And our product works really well with leads.
+
+119
+00:10:50.800 --> 00:10:51.820
+<v Nate Joens>We have to get leads.
+
+120
+00:10:51.960 --> 00:10:54.180
+<v Nate Joens>We have to have the two-way back-and-forth conversation.
+
+121
+00:10:55.920 --> 00:11:01.880
+<v Nate Joens>So our salespeople want to see that conversation in their CRM and take it over and manage it.
+
+122
+00:11:03.540 --> 00:11:07.180
+<v Nate Joens>So we've spent a lot of time building integrations with CRMs and lead gen tools.
+
+123
+00:11:07.720 --> 00:11:18.000
+<v Nate Joens>And what we actually found was we went to these companies, these other tech companies directly and said, we really need a really strong integration with you guys.
+
+124
+00:11:18.220 --> 00:11:19.100
+<v Nate Joens>What can we do?
+
+125
+00:11:19.300 --> 00:11:23.140
+<v Nate Joens>And they just kept saying, well, what if we could like white label your product?
+
+126
+00:11:23.540 --> 00:11:31.900
+<v Nate Joens>You guys can use our messaging infrastructure like Twilio and things like that because they already are have like texting built in, but not the AI piece.
+
+127
+00:11:33.880 --> 00:11:39.080
+<v Nate Joens>you know, we become your customer and resell it to our customers who you're already getting
+
+128
+00:11:39.080 --> 00:11:45.100
+<v Nate Joens>one way or the other. So we call that more like we call that more of a platform as a service,
+
+129
+00:11:45.180 --> 00:11:52.300
+<v Nate Joens>like a PaaS offering. And that really took off like two years ago, which was a totally different
+
+130
+00:11:52.300 --> 00:11:57.260
+<v Nate Joens>product than this like agent facing dashboard where they log in and manage kind of our product
+
+131
+00:11:57.260 --> 00:11:58.600
+<v Nate Joens>through our dashboard.
+
+132
+00:11:59.000 --> 00:12:02.480
+<v Nate Joens>So we actually had to build a whole nother PaaS
+
+133
+00:12:02.480 --> 00:12:05.560
+<v Nate Joens>like API product that was essentially just
+
+134
+00:12:06.520 --> 00:12:11.160
+<v Nate Joens>our conversational AI engine as a service, nothing else.
+
+135
+00:12:11.220 --> 00:12:14.420
+<v Nate Joens>It was just you sent, you, the technology provider
+
+136
+00:12:14.420 --> 00:12:17.200
+<v Nate Joens>sends us a lead, sends us their message
+
+137
+00:12:17.200 --> 00:12:19.480
+<v Nate Joens>and we send you a response with other data
+
+138
+00:12:19.480 --> 00:12:21.860
+<v Nate Joens>that we've extracted and so on and so forth.
+
+139
+00:12:21.980 --> 00:12:23.940
+<v Nate Joens>And then it's just built into their product.
+
+140
+00:12:23.940 --> 00:12:32.940
+<v Nate Joens>So that is really like where things evolved in pushing a lot more into that API platform as a service product.
+
+141
+00:12:33.380 --> 00:12:35.520
+<v Nate Joens>And that's where we're going to continue to push.
+
+142
+00:12:35.900 --> 00:12:43.900
+<v Nate Joens>So right now we're trying to always figure out how to support both products and make it feel like one product that it really is.
+
+143
+00:12:44.260 --> 00:12:52.420
+<v Noah Labhart>I would imagine when you built the platform as a service, you had to consider a lot of scaling in how you built that,
+
+144
+00:12:53.940 --> 00:12:56.940
+<v Noah Labhart>of the big guys, but I'll come back to that.
+
+145
+00:12:57.100 --> 00:13:00.620
+<v Noah Labhart>What I want to make sure, before we go too far, is to talk about team.
+
+146
+00:13:01.200 --> 00:13:05.420
+<v Noah Labhart>So how did you go about building your team in the early days and even now?
+
+147
+00:13:05.800 --> 00:13:10.040
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses
+
+148
+00:13:10.040 --> 00:13:10.820
+<v Noah Labhart>to join you?
+
+149
+00:13:13.000 --> 00:13:15.500
+<v Nate Joens>It really came back, it came to luck.
+
+150
+00:13:15.500 --> 00:13:38.780
+<v Nate Joens>I mean, in college, when we were looking for these AI engineers first, since that was like our core need that we needed up and running, since our product was literally conversations, conversational AI, we lucked out and we found these really bright people in the PhD program at Iowa State.
+
+151
+00:13:38.780 --> 00:13:44.760
+<v Nate Joens>state. I think looking back at that, one thing that stood out about our really successful
+
+152
+00:13:45.780 --> 00:13:52.020
+<v Nate Joens>AI engineers and engineers as a whole and team was just a bias towards action.
+
+153
+00:13:52.560 --> 00:13:58.640
+<v Nate Joens>One of the things that like I have a love-hate relationship with like PhDs as a whole, because
+
+154
+00:13:58.640 --> 00:14:03.980
+<v Nate Joens>sometimes when you go down that path, you basically are setting yourself up to be in
+
+155
+00:14:03.980 --> 00:14:09.480
+<v Nate Joens>school for life. You're probably going to graduate to become a professor. And that is a whole
+
+156
+00:14:09.480 --> 00:14:16.620
+<v Nate Joens>different world than startup land. Because in startups, you know, you have to deliver and change
+
+157
+00:14:16.620 --> 00:14:23.180
+<v Nate Joens>and release and productize and commercialize. Like every single day, you should be releasing
+
+158
+00:14:23.180 --> 00:14:30.680
+<v Nate Joens>to production. In academia and research land, you can work on a research project for three years,
+
+159
+00:14:30.680 --> 00:14:32.340
+<v Nate Joens>and no one's going to bat an eye.
+
+160
+00:14:32.600 --> 00:14:35.480
+<v Nate Joens>So one thing that like we look for,
+
+161
+00:14:35.540 --> 00:14:37.600
+<v Nate Joens>especially in those like really senior roles
+
+162
+00:14:37.600 --> 00:14:40.640
+<v Nate Joens>that are, you know, really important
+
+163
+00:14:40.640 --> 00:14:43.380
+<v Nate Joens>for like pushing product, especially,
+
+164
+00:14:44.280 --> 00:14:46.560
+<v Nate Joens>even across, you know, not just engineers,
+
+165
+00:14:46.640 --> 00:14:47.940
+<v Nate Joens>even in marketing and sales,
+
+166
+00:14:48.020 --> 00:14:49.700
+<v Nate Joens>like is a bias towards action.
+
+167
+00:14:49.780 --> 00:14:52.000
+<v Nate Joens>Are you going to try and release small bits
+
+168
+00:14:52.000 --> 00:14:54.180
+<v Nate Joens>of whatever you're working on daily?
+
+169
+00:14:54.540 --> 00:14:56.000
+<v Nate Joens>Or are you going to sit here
+
+170
+00:14:56.000 --> 00:14:57.500
+<v Nate Joens>and try and make a perfect plan
+
+171
+00:14:57.500 --> 00:15:00.320
+<v Nate Joens>and spend two weeks, you know,
+
+172
+00:15:00.680 --> 00:15:06.560
+<v Nate Joens>this perfect Google Doc or slide deck or something, because that just doesn't work in startups. So
+
+173
+00:15:06.560 --> 00:15:13.040
+<v Nate Joens>looking for people who have side projects that they push constantly was was one way that we
+
+174
+00:15:13.040 --> 00:15:15.160
+<v Nate Joens>found like really successful engineers and still do.
+
+175
+00:15:18.480 --> 00:15:20.900
+<v Noah Labhart>Well, let's dig into scalability a little bit.
+
+176
+00:15:21.040 --> 00:15:26.160
+<v Noah Labhart>So did you build this to scale efficiently from day one? And I kind of have a feel where you're
+
+177
+00:15:27.160 --> 00:15:29.720
+<v Noah Labhart>Or were you fighting this as you grew?
+
+178
+00:15:31.840 --> 00:15:34.920
+<v Nate Joens>I think we were relatively scalable to start.
+
+179
+00:15:35.700 --> 00:15:47.700
+<v Nate Joens>I think that one of the things like we probably have been through three or four iterations of our like core AI model that we've been building in-house.
+
+180
+00:15:48.920 --> 00:15:55.440
+<v Nate Joens>I think at one point we went from like having each part of the pipeline in each part of the
+
+181
+00:15:55.440 --> 00:16:01.540
+<v Nate Joens>like machine learning pipeline in like one API where we just like send a text and it sends a
+
+182
+00:16:01.540 --> 00:16:08.180
+<v Nate Joens>response back and then we like decoupled everything and moved it towards like individual micro
+
+183
+00:16:08.180 --> 00:16:12.680
+<v Nate Joens>services and then we're like okay we're happy with that and then we put it all back together
+
+184
+00:16:12.680 --> 00:16:33.580
+<v Nate Joens>So I would say like from an efficiency standpoint building this like we probably shouldn't shouldn't have second-guessed ourself as much as we did because we ended up like coming back to the original solution we had but in terms of like scale of scalability of our API.
+
+185
+00:16:33.600 --> 00:16:41.980
+<v Nate Joens>So this comes back to the different products our typical like SaaS offering where agents are logging into this dashboard.
+
+186
+00:16:42.680 --> 00:16:54.160
+<v Nate Joens>That has always kind of had some scalability issues just because there's a lot of data that has to be fed in terms of leads that they're ingesting,
+
+187
+00:16:54.760 --> 00:17:01.420
+<v Nate Joens>syncing back to other CRMs, bringing in all sorts of teams and users that they're bringing in.
+
+188
+00:17:02.580 --> 00:17:07.660
+<v Nate Joens>So that one I would say was far less scalable and we're still working towards that now.
+
+189
+00:17:07.660 --> 00:17:12.700
+<v Nate Joens>where the PaaS offering was almost immediately scalable.
+
+190
+00:17:13.000 --> 00:17:16.440
+<v Nate Joens>I think it was just the simplicity of the product.
+
+191
+00:17:16.580 --> 00:17:20.240
+<v Nate Joens>It was just literally whittled down to its core.
+
+192
+00:17:21.400 --> 00:17:25.500
+<v Nate Joens>Our partners will send us text and we will send text back.
+
+193
+00:17:25.660 --> 00:17:28.180
+<v Nate Joens>And it all happens through our API.
+
+194
+00:17:28.700 --> 00:17:32.080
+<v Nate Joens>So I feel like that one scaled really well from the beginning.
+
+195
+00:17:32.080 --> 00:17:33.240
+<v Nate Joens>Does
+
+196
+00:17:33.240 --> 00:17:38.860
+<v Noah Labhart>the agent-facing version utilize your own, essentially eat your own dog food?
+
+197
+00:17:39.020 --> 00:17:40.480
+<v Noah Labhart>Kind of what utilized the PaaS?
+
+198
+00:17:41.240 --> 00:17:45.820
+<v Nate Joens>That is a big gap that we did not think through.
+
+199
+00:17:46.000 --> 00:17:51.280
+<v Nate Joens>They're kind of two disparate APIs, and that is kind of causing headaches right now.
+
+200
+00:17:51.710 --> 00:17:58.100
+<v Nate Joens>So looking back at how we built them, so basically the PaaS offering is like accountless.
+
+201
+00:17:58.340 --> 00:18:01.640
+<v Nate Joens>We have no concept of like a user, an agent user.
+
+202
+00:18:02.080 --> 00:18:03.740
+<v Nate Joens>It's just a conversational engine.
+
+203
+00:18:03.940 --> 00:18:12.860
+<v Nate Joens>And this other one obviously has a whole bunch of security and permissions and authentication, you know, things built into it.
+
+204
+00:18:13.140 --> 00:18:14.480
+<v Nate Joens>They don't talk to each other.
+
+205
+00:18:14.540 --> 00:18:18.520
+<v Nate Joens>They're two different products as a whole, and they shouldn't be.
+
+206
+00:18:18.640 --> 00:18:20.460
+<v Nate Joens>And that's something that we're working on now.
+
+207
+00:18:21.720 --> 00:18:27.060
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+208
+00:18:28.200 --> 00:18:41.400
+<v Nate Joens>So I would say from a product perspective, since I love all things product, our script customization builder has been something that I'm extremely proud of.
+
+209
+00:18:41.520 --> 00:18:50.240
+<v Nate Joens>If you talk to our team across the board, I was the biggest skeptic that that could ever be built.
+
+210
+00:18:50.240 --> 00:19:02.440
+<v Nate Joens>From day one, I said, I don't think there's any way you could build the complexity of scripting an entire conversation from scratch in a product, at least not in the way that we wanted to.
+
+211
+00:19:03.200 --> 00:19:11.140
+<v Nate Joens>So the big differentiation between us and just like a typical chatbot is just having a human-like conversation.
+
+212
+00:19:11.460 --> 00:19:17.540
+<v Nate Joens>I'm sure you've probably experienced all sorts of button-based chatbots, or if you say the wrong thing, it says I'm confused.
+
+213
+00:19:17.620 --> 00:19:18.640
+<v Nate Joens>I'm sorry, I don't understand.
+
+214
+00:19:20.240 --> 00:19:32.900
+<v Nate Joens>That cannot happen in like really high ticket markets like software, insurance, real estate, where we have a lot of focus, especially like in real estate or insurance or something like that.
+
+215
+00:19:32.980 --> 00:19:44.960
+<v Nate Joens>You know, if people, you know, buy those things because of a big life event, a new child, a divorce, things like that, you know, they want to feel heard, understood and valued.
+
+216
+00:19:44.960 --> 00:19:52.880
+<v Nate Joens>And so we set out really hard from the beginning to say we're going to have lifelike conversations through AI.
+
+217
+00:19:53.200 --> 00:20:01.240
+<v Nate Joens>And that was our goal. And that put a ton of complexity and stress on our kind of conversational engine.
+
+218
+00:20:02.460 --> 00:20:08.840
+<v Nate Joens>And then what we learned over time working with salespeople was, hey, I want to tweak.
+
+219
+00:20:08.980 --> 00:20:12.060
+<v Nate Joens>I want to tweak this script. I want to tweak what you said here.
+
+220
+00:20:12.060 --> 00:20:15.580
+<v Nate Joens>I want to adjust the answer that your bot used here.
+
+221
+00:20:16.480 --> 00:20:22.700
+<v Nate Joens>So we heard that so many times we had to build script customization, or I don't think we'd be here today.
+
+222
+00:20:23.940 --> 00:20:36.520
+<v Nate Joens>And trying to take that engine that has really lifelike conversations and turn it into something that can be customized was a huge, huge challenge.
+
+223
+00:20:36.520 --> 00:20:41.440
+<v Nate Joens>in terms of both like UI UX, product, conversational AI,
+
+224
+00:20:41.740 --> 00:20:44.440
+<v Nate Joens>and even just like CS and onboarding.
+
+225
+00:20:44.540 --> 00:20:49.240
+<v Nate Joens>So it was a full team effort to really get this script
+
+226
+00:20:49.240 --> 00:20:50.880
+<v Nate Joens>customization off the ground.
+
+227
+00:20:51.080 --> 00:20:54.000
+<v Nate Joens>And it's been working phenomenally against my better
+
+228
+00:20:54.000 --> 00:20:56.660
+<v Nate Joens>judgment many years ago when I said it wasn't possible.
+
+229
+00:20:58.080 --> 00:21:00.020
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+230
+00:21:00.180 --> 00:21:02.960
+<v Noah Labhart>So tell me about a mistake you made and how you and your
+
+231
+00:21:02.960 --> 00:21:04.400
+<v Noah Labhart>team responded to it.
+
+232
+00:21:06.520 --> 00:21:17.360
+<v Nate Joens>One of the biggest mistakes we made from a product perspective was not thinking about how we productize the PaaS offering early, early enough.
+
+233
+00:21:17.900 --> 00:21:30.300
+<v Nate Joens>So I think that like we there was a bunch of writing on the wall when we were talking to our integration partners saying like, oh, I wish we could just have this product and resell it.
+
+234
+00:21:30.420 --> 00:21:36.140
+<v Nate Joens>But we kind of took the first one, the first customer that we actually launched with that.
+
+235
+00:21:36.520 --> 00:21:39.640
+<v Nate Joens>Um, you know, we, we kind of took it easy.
+
+236
+00:21:39.800 --> 00:21:41.400
+<v Nate Joens>We didn't build it the right way.
+
+237
+00:21:41.480 --> 00:21:49.720
+<v Nate Joens>We kind of hacked it together and we're still today, uh, struggling with that first customer
+
+238
+00:21:49.720 --> 00:21:54.020
+<v Nate Joens>we got because we did not build the API as an actual like core product.
+
+239
+00:21:54.140 --> 00:21:55.520
+<v Nate Joens>There wasn't enough discovery done.
+
+240
+00:21:55.700 --> 00:21:57.320
+<v Nate Joens>There wasn't enough scoping done.
+
+241
+00:21:57.660 --> 00:22:01.480
+<v Nate Joens>It was just really hacked together and we're still paying the price on it.
+
+242
+00:22:01.480 --> 00:22:07.560
+<v Nate Joens>Um, so what I think we're learning now is, uh, as we do this customer discovery, you
+
+243
+00:22:07.560 --> 00:22:13.400
+<v Nate Joens>know, be really deliberate with our questions, um, especially in a PaaS like offering, um,
+
+244
+00:22:13.560 --> 00:22:17.320
+<v Nate Joens>try and get customers to essentially pay upfront.
+
+245
+00:22:17.720 --> 00:22:24.300
+<v Nate Joens>Otherwise, uh, every, everyone here probably listening can attest to developers and engineers
+
+246
+00:22:24.300 --> 00:22:26.020
+<v Nate Joens>are some of the busiest people in the world.
+
+247
+00:22:26.480 --> 00:22:29.840
+<v Nate Joens>Uh, they are constantly in demand.
+
+248
+00:22:31.480 --> 00:22:36.920
+<v Nate Joens>into this like sales cycle when we are selling our PaaS offering we usually hit a wall where
+
+249
+00:22:36.920 --> 00:22:42.200
+<v Nate Joens>our partners are saying oh we can't offer developer resources to get this into our product
+
+250
+00:22:43.050 --> 00:22:48.760
+<v Nate Joens>uh so if we if we were to have taken an approach a little bit earlier where we where we made it
+
+251
+00:22:48.760 --> 00:22:57.020
+<v Nate Joens>like super dead simple to get our code essentially our PaaS offering into our partners offerings
+
+252
+00:22:57.020 --> 00:23:03.380
+<v Nate Joens>I think we'd see our sales cycle accelerate a lot more quickly right now than we have today.
+
+253
+00:23:05.160 --> 00:23:07.000
+<v Noah Labhart>Well, this is exciting to ask.
+
+254
+00:23:07.140 --> 00:23:10.760
+<v Noah Labhart>What does the future look like for Structurely, the product and for your team?
+
+255
+00:23:12.300 --> 00:23:15.760
+<v Nate Joens>One thing that we're focused on right now is just expanding our markets.
+
+256
+00:23:16.300 --> 00:23:25.560
+<v Nate Joens>You know, we've gotten a lot of traction and really ate up the market in kind of financial services, mortgage, real estate, leasing, insurance, things like that.
+
+257
+00:23:27.020 --> 00:23:31.560
+<v Nate Joens>of the day, every company has leads and every company needs to convert leads into sales.
+
+258
+00:23:32.860 --> 00:23:38.740
+<v Nate Joens>Our, you know, our product works over text and email. And so even any software company
+
+259
+00:23:38.740 --> 00:23:42.620
+<v Nate Joens>can use our product. We use our own product to sell our product as a SaaS company,
+
+260
+00:23:43.500 --> 00:23:47.640
+<v Nate Joens>which is really fun. And now we're trying to figure out how to take that,
+
+261
+00:23:48.680 --> 00:23:55.500
+<v Nate Joens>that script customization that we are so proud of and put it to the test to say,
+
+262
+00:23:57.020 --> 00:24:02.980
+<v Nate Joens>you know, a little, a small shop down the road who should be using conversational AI to qualify
+
+263
+00:24:02.980 --> 00:24:08.840
+<v Nate Joens>their leads. And then there's a huge behemoth SaaS company who has a ton of leads with a ton
+
+264
+00:24:08.840 --> 00:24:14.020
+<v Nate Joens>of different use cases. Can we stretch our product? Did we build it generally enough,
+
+265
+00:24:14.680 --> 00:24:19.420
+<v Nate Joens>either through the PaaS offering or the SaaS offering? Doesn't matter to us how they use it.
+
+266
+00:24:19.500 --> 00:24:25.740
+<v Nate Joens>Is it built general enough to solve their, you know, lead conversion problem for sales and
+
+267
+00:24:27.020 --> 00:24:34.900
+<v Nate Joens>So that's where we're headed right now is, you know, a little bit more of a general approach to expanding our markets.
+
+268
+00:24:35.180 --> 00:24:37.360
+<v Noah Labhart>You know, a question popped into my head around integration.
+
+269
+00:24:37.540 --> 00:24:44.060
+<v Noah Labhart>So to Structurely integrate with, you know, no code type solutions or Zapier or things of that nature.
+
+270
+00:24:44.520 --> 00:24:45.940
+<v Noah Labhart>Can you tell me a little bit about that?
+
+271
+00:24:47.040 --> 00:24:49.900
+<v Nate Joens>I don't think we would exist without Zapier today.
+
+272
+00:24:50.340 --> 00:24:56.140
+<v Nate Joens>So we are religious users of it and we integrate with it.
+
+273
+00:24:57.020 --> 00:25:02.860
+<v Nate Joens>Yeah, and essentially, you could probably argue that our product is somewhat no code.
+
+274
+00:25:03.300 --> 00:25:09.300
+<v Nate Joens>You could build a chatbot with code using some more intense kind of chatbot builders if you want,
+
+275
+00:25:09.400 --> 00:25:13.280
+<v Nate Joens>or out-of-the-box kind of natural language processing and AI tools.
+
+276
+00:25:14.120 --> 00:25:15.920
+<v Nate Joens>But ours is point-and-click.
+
+277
+00:25:16.020 --> 00:25:22.080
+<v Nate Joens>You can use the script customization builder and launch it live over text, email, and live chat instantly.
+
+278
+00:25:23.380 --> 00:25:25.320
+<v Nate Joens>So it's kind of no code.
+
+279
+00:25:27.020 --> 00:25:33.300
+<v Nate Joens>Zapier, especially to get all of those CRMs and lead gen tools talking to us and us talking back
+
+280
+00:25:33.300 --> 00:25:38.860
+<v Nate Joens>to them. It's a huge connector for us. And integration wise, it actually goes back to
+
+281
+00:25:38.860 --> 00:25:46.180
+<v Nate Joens>what's next for Structurely. When I talked about expanding our markets, we are taking a little bit
+
+282
+00:25:46.180 --> 00:25:51.500
+<v Nate Joens>more of a deliberate approach with who we integrate with and who their customers are.
+
+283
+00:25:51.500 --> 00:26:00.580
+<v Nate Joens>So we call it internally kind of a integration first market expansion strategy versus an industry by industry.
+
+284
+00:26:01.920 --> 00:26:08.120
+<v Nate Joens>Because each industry actually has like very niche CRMs and lead gen tools.
+
+285
+00:26:08.360 --> 00:26:11.260
+<v Nate Joens>Like real estate has their own really niche CRMs.
+
+286
+00:26:11.260 --> 00:26:12.160
+<v Nate Joens>Insurance does.
+
+287
+00:26:12.340 --> 00:26:12.960
+<v Nate Joens>Auto does.
+
+288
+00:26:12.960 --> 00:26:37.700
+<v Nate Joens>Because rather than trying to integrate with each one of those CRMs across every industry, we decided to say, hey, let's just go to the big CRMs and get an integration like HubSpot and Salesforce, who cut across multiple markets and just knock down whoever comes in the door that way, regardless of what industry they're in.
+
+289
+00:26:37.700 --> 00:26:41.000
+<v Nate Joens>because we know we have an integration with their CRM and that's key.
+
+290
+00:26:41.760 --> 00:26:46.060
+<v Nate Joens>That's where we are going to focus our go-to-market strategy basically moving forward.
+
+291
+00:26:48.460 --> 00:26:49.740
+<v Noah Labhart>Well, let's switch to you, Nate.
+
+292
+00:26:49.820 --> 00:26:51.820
+<v Noah Labhart>Who influences the way that you work?
+
+293
+00:26:51.940 --> 00:26:56.240
+<v Noah Labhart>Name a CEO, CTO, startup person, anyone really.
+
+294
+00:26:56.420 --> 00:26:58.400
+<v Noah Labhart>Name a person you look up to and why.
+
+295
+00:27:00.220 --> 00:27:01.000
+<v Nate Joens>There's a lot.
+
+296
+00:27:01.080 --> 00:27:03.800
+<v Nate Joens>I kind of take bits and pieces from a lot of folks.
+
+297
+00:27:04.280 --> 00:27:05.160
+<v Nate Joens>Our board.
+
+298
+00:27:05.160 --> 00:27:26.440
+<v Nate Joens>So, you know, a little bit about myself. I was the CEO at Structurely. I was co-founder and CEO. And we recently brought in a new CEO, Cliff Smith, who has been on our board since day one. He's been a veteran CEO of software companies, mostly around Iowa and the Midwest.
+
+299
+00:27:26.440 --> 00:27:33.720
+<v Nate Joens>West. And we said, you know, we want someone who's been there and seen the movie basically before
+
+300
+00:27:34.700 --> 00:27:39.940
+<v Nate Joens>to take Structurely from where it is to where we want to be in the next five years or so.
+
+301
+00:27:40.820 --> 00:27:46.600
+<v Nate Joens>So Cliff is someone I look up to as a CEO for sure, as well as the other members of our board.
+
+302
+00:27:47.360 --> 00:27:55.600
+<v Nate Joens>I would probably say from just like a more like influencer type person that I look up to is
+
+303
+00:27:56.440 --> 00:28:04.340
+<v Nate Joens>Lemkin from SaaStr. I personally love his content. I think he's, you know, for probably a totally
+
+304
+00:28:04.340 --> 00:28:11.620
+<v Nate Joens>different world than me as a like Midwest tech founder. Sometimes coastal SaaS companies like
+
+305
+00:28:11.620 --> 00:28:18.480
+<v Nate Joens>are a whole different story than how we operate. But I feel like deep down a lot of his content,
+
+306
+00:28:18.600 --> 00:28:26.040
+<v Nate Joens>a lot of what he puts out there is very practical. It's very reasonable. And it's at the same time,
+
+307
+00:28:26.440 --> 00:28:31.820
+<v Nate Joens>big and lofty because, you know, SaaStr is always about unicorns and trying to get to the next
+
+308
+00:28:31.820 --> 00:28:38.420
+<v Nate Joens>billion dollar valuation. But obviously there's so much work that gets there and not every company
+
+309
+00:28:38.420 --> 00:28:43.740
+<v Nate Joens>is going to be a unicorn. That's how they got their name. And I think, you know, he realizes
+
+310
+00:28:43.740 --> 00:28:49.980
+<v Nate Joens>that. And a lot of the content they put out is for folks of all different sizes that can
+
+311
+00:28:49.980 --> 00:28:55.460
+<v Nate Joens>ultimately try and shoot towards being a unicorn, which we all ultimately want to do.
+
+312
+00:28:57.120 --> 00:29:00.340
+<v Noah Labhart>Well, we talked about a mistake, but a little bit different spin.
+
+313
+00:29:00.720 --> 00:29:03.700
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+314
+00:29:03.740 --> 00:29:05.820
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+315
+00:29:09.160 --> 00:29:14.520
+<v Nate Joens>I think it comes back to build a general product and market specifically.
+
+316
+00:29:16.000 --> 00:29:24.460
+<v Nate Joens>There's so much to Structurely that probably to the outside in screams financial services,
+
+317
+00:29:27.540 --> 00:29:33.780
+<v Nate Joens>leasing. And, you know, even internally, our team probably feels that too, since that's where we've
+
+318
+00:29:33.780 --> 00:29:41.100
+<v Nate Joens>gotten our start. That's where we've gotten a lot of our revenue to date. But that's not our future.
+
+319
+00:29:41.800 --> 00:29:46.840
+<v Nate Joens>It is a part of our future. It's just not where we're betting the farm ultimately forever.
+
+320
+00:29:47.820 --> 00:29:53.920
+<v Nate Joens>So I would say that it is somewhat, you know, bit us in the butt a little bit today,
+
+321
+00:29:53.920 --> 00:29:56.940
+<v Nate Joens>where now we're trying to expand markets,
+
+322
+00:29:57.160 --> 00:30:00.000
+<v Nate Joens>but maybe our marketing hasn't caught up
+
+323
+00:30:00.000 --> 00:30:02.360
+<v Nate Joens>or our current position hasn't caught up.
+
+324
+00:30:02.600 --> 00:30:05.960
+<v Nate Joens>So when we're selling outside of our core markets,
+
+325
+00:30:06.600 --> 00:30:08.620
+<v Nate Joens>these new customers are coming in and say,
+
+326
+00:30:08.700 --> 00:30:09.580
+<v Nate Joens>oh, you're not for me.
+
+327
+00:30:10.340 --> 00:30:11.440
+<v Nate Joens>You're not for my market.
+
+328
+00:30:11.620 --> 00:30:13.340
+<v Nate Joens>It doesn't look like you service me.
+
+329
+00:30:13.480 --> 00:30:18.460
+<v Nate Joens>When in reality, we do with flying colors.
+
+330
+00:30:18.580 --> 00:30:21.460
+<v Nate Joens>We can definitely bring on and have brought on
+
+331
+00:30:21.460 --> 00:30:25.120
+<v Nate Joens>people from other industries, from all sorts of industries.
+
+332
+00:30:25.860 --> 00:30:31.240
+<v Nate Joens>But it's kind of like we're fighting ourselves in that sales process and customer journey
+
+333
+00:30:31.240 --> 00:30:31.740
+<v Nate Joens>process.
+
+334
+00:30:32.420 --> 00:30:35.420
+<v Nate Joens>And I think that obviously that's our own doing.
+
+335
+00:30:35.540 --> 00:30:36.380
+<v Nate Joens>That's our own mistake.
+
+336
+00:30:37.340 --> 00:30:44.140
+<v Nate Joens>I won't necessarily say like regret it because in order to have gotten our footing as well
+
+337
+00:30:44.140 --> 00:30:49.260
+<v Nate Joens>as we have in these markets, you have to have a really strong positioning and say like,
+
+338
+00:30:49.260 --> 00:30:54.440
+<v Nate Joens>Like this is for this specific reason in this specific industry, which is great.
+
+339
+00:30:54.580 --> 00:31:00.820
+<v Nate Joens>But now it's like, how can we kind of still support that, but not shoot ourself in the foot?
+
+340
+00:31:02.360 --> 00:31:03.400
+<v Noah Labhart>Last question, Nate.
+
+341
+00:31:03.820 --> 00:31:08.460
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+342
+00:31:08.620 --> 00:31:09.820
+<v Noah Labhart>They're jazzed about it.
+
+343
+00:31:09.840 --> 00:31:10.980
+<v Noah Labhart>They can't wait to show it off to the world.
+
+344
+00:31:11.000 --> 00:31:13.000
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+345
+00:31:13.440 --> 00:31:16.420
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+346
+00:31:17.760 --> 00:31:22.400
+<v Nate Joens>I don't know who coined this term, but I love it as a first time founder.
+
+347
+00:31:23.320 --> 00:31:25.440
+<v Nate Joens>First time founders obsess over product.
+
+348
+00:31:25.540 --> 00:31:27.480
+<v Nate Joens>Second time founders obsess over distribution.
+
+349
+00:31:29.020 --> 00:31:32.980
+<v Nate Joens>So I would say that to myself in the early days.
+
+350
+00:31:33.200 --> 00:31:39.140
+<v Nate Joens>And I would say that to any person who, you know, just got their their new startup off the ground.
+
+351
+00:31:39.940 --> 00:31:41.700
+<v Nate Joens>You know, it's great.
+
+352
+00:31:41.820 --> 00:31:43.020
+<v Nate Joens>I'd love to see the product.
+
+353
+00:31:43.200 --> 00:31:44.360
+<v Nate Joens>That's what I would say to them.
+
+354
+00:31:45.080 --> 00:31:49.920
+<v Nate Joens>but you know I might sit here and focus on like who are your you know who are your competitors
+
+355
+00:31:49.920 --> 00:31:54.240
+<v Nate Joens>not that that's something I obsess over every day but how are you going to position yourself
+
+356
+00:31:54.240 --> 00:32:01.460
+<v Nate Joens>against them to carve out your moats to carve out your niche to differentiate yourself in the market
+
+357
+00:32:01.460 --> 00:32:09.240
+<v Nate Joens>which essentially lends itself well itself to distribution so one of the key moats to our
+
+358
+00:32:09.240 --> 00:32:12.340
+<v Nate Joens>our distribution strategy is that PaaS offering.
+
+359
+00:32:12.520 --> 00:32:15.900
+<v Nate Joens>As soon as we sell into a CRM or lead gen tool,
+
+360
+00:32:16.140 --> 00:32:19.100
+<v Nate Joens>like we really lock out a huge part of the market
+
+361
+00:32:19.100 --> 00:32:22.560
+<v Nate Joens>because no other entrant can sell into a product
+
+362
+00:32:22.560 --> 00:32:26.140
+<v Nate Joens>that already offers conversational AI natively built in.
+
+363
+00:32:26.600 --> 00:32:31.340
+<v Nate Joens>So that was like a huge inflection point to Structurely,
+
+364
+00:32:31.440 --> 00:32:34.100
+<v Nate Joens>like I said, but it also kind of has locked down
+
+365
+00:32:34.100 --> 00:32:36.160
+<v Nate Joens>a lot of the market and will continue to do so.
+
+366
+00:32:36.160 --> 00:32:45.380
+<v Nate Joens>And, you know, it was our product that got us there, but it was really a change in our distribution strategy that accelerated us.
+
+367
+00:32:45.480 --> 00:32:53.460
+<v Nate Joens>So I always love that phrase, you know, first time founders obsess over product, second time over distribution.
+
+368
+00:32:55.040 --> 00:32:56.620
+<v Noah Labhart>That's awesome. I love that advice.
+
+369
+00:32:57.220 --> 00:32:59.220
+<v Noah Labhart>Well, Nate, thank you for being on the show today.
+
+370
+00:32:59.320 --> 00:33:02.160
+<v Noah Labhart>Thank you for telling the creation story of Structurely.
+
+371
+00:33:03.320 --> 00:33:04.340
+<v Nate Joens>Yeah, I appreciate it.
+
+372
+00:33:04.360 --> 00:33:05.020
+<v Nate Joens>Thanks for having me on.
+
+373
+00:33:06.560 --> 00:33:09.340
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+374
+00:33:09.340 --> 00:33:15.680
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+375
+00:33:15.820 --> 00:33:20.580
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+376
+00:33:21.060 --> 00:33:26.080
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+377
+00:33:26.500 --> 00:33:28.120
+<v Noah Labhart>And when you get a chance, leave a...
+
+378
+00:33:28.120 --> 00:33:34.780
+<v Noah Labhart>And thanks again for listening.

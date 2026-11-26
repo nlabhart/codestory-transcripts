@@ -1,0 +1,1263 @@
+WEBVTT
+
+NOTE S4 E10: Re-Engineering Live Concerts: How Mandolin Scaled Ultra-Low Latency Streaming with Steve Caldwell
+
+1
+00:00:01.680 --> 00:00:16.580
+<v Steve Caldwell>Firebase has a million concurrent client connection limits. As we started talking to some larger artists and promoters, we realized that some of these may have the potential to have over a million fans coming in concurrently to watch the stream.
+
+2
+00:00:16.780 --> 00:00:25.520
+<v Steve Caldwell>And we knew that as we were going to scale, no matter if it was at a single artist level or across the platform, we wanted to be able to support millions and millions of simultaneous connections.
+
+3
+00:00:25.520 --> 00:00:35.380
+<v Steve Caldwell>So what we found was there aren't a ton of like guides or a ton of resources out there for how to scale your Firebase project or how to port it to like AWS.
+
+4
+00:00:37.740 --> 00:00:41.420
+<v Steve Caldwell>I'm Steve Caldwell, co-founder and CTO at Mandolin.
+
+5
+00:00:47.500 --> 00:01:00.840
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+6
+00:01:02.200 --> 00:01:11.260
+<v Noah Labhart>I'm your host Noah Labhart and today how Steve Caldwell created a new way for musicians to perform and fans to connect online.
+
+7
+00:01:13.420 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+8
+00:01:20.200 --> 00:01:25.760
+<v Noah Labhart>Steve Caldwell lives in Louisville, Kentucky but grew up in South Louisiana in the Cajun country.
+
+9
+00:01:25.760 --> 00:01:32.100
+<v Noah Labhart>In the 90s, he loved seeing things he typed on the screen come to life as he built websites in FrontPage 95.
+
+10
+00:01:33.180 --> 00:01:40.280
+<v Noah Labhart>He's got three kids in elementary school, and he's relatively new to Kentucky, but hopes to get out and do the bourbon trail when the timing is right.
+
+11
+00:01:40.440 --> 00:01:43.640
+<v Noah Labhart>He also enjoys playing music, composing, and DJing.
+
+12
+00:01:43.880 --> 00:01:49.160
+<v Noah Labhart>As he puts it, he enjoys combining his passion for music with his passion for technology.
+
+13
+00:01:49.840 --> 00:01:57.000
+<v Noah Labhart>In startup land, you have to be able to ad-lib and be flexible to change, understand your customers, and skate where the puck is, so to speak.
+
+14
+00:01:57.420 --> 00:02:04.160
+<v Noah Labhart>It's the same with music, feeling the crowd, responding to your band, etc., which is a really interesting parallel, as he puts it.
+
+15
+00:02:05.120 --> 00:02:10.500
+<v Noah Labhart>As the COVID pandemic decimated live music events, Steve was caught in a related riff.
+
+16
+00:02:10.500 --> 00:02:21.160
+<v Noah Labhart>He found himself networking for his next gig and while doing so, started to chat with his now co-founders about a new opportunity where musicians could interact with fans in new ways.
+
+17
+00:02:22.180 --> 00:02:25.020
+<v Noah Labhart>This is the creation story of Mandolin.
+
+18
+00:02:28.520 --> 00:02:35.200
+<v Steve Caldwell>Mandolin's helping artists and venues create connections with fans and ultimately prosper through the music that they produce.
+
+19
+00:02:35.540 --> 00:02:39.600
+<v Steve Caldwell>We started out with live streams, but we're pushing the boundaries there.
+
+20
+00:02:40.500 --> 00:02:45.700
+<v Steve Caldwell>the right tools to create content, to share that content widely, and then to better understand how
+
+21
+00:02:45.700 --> 00:02:52.400
+<v Steve Caldwell>fans engage. It ultimately boils down to a digital strategy. You know, frankly, artists have been
+
+22
+00:02:52.400 --> 00:02:57.900
+<v Steve Caldwell>forced into needing to think about their digital strategy, especially as it relates to new media
+
+23
+00:02:57.900 --> 00:03:03.760
+<v Steve Caldwell>and live performances. In this last year, we want to give fans unprecedented access to those artists.
+
+24
+00:03:04.980 --> 00:03:13.100
+<v Steve Caldwell>Last spring, obviously, as the COVID pandemic set in, the live music industry was pretty much decimated, exposed a lot of pain points.
+
+25
+00:03:13.620 --> 00:03:28.600
+<v Steve Caldwell>I was actually in another job last April and, you know, was part of a riff due to COVID and started talking to folks in my network and had a conversation with one of my co-founders through a venture studio who's an entertainment attorney.
+
+26
+00:03:28.600 --> 00:03:34.260
+<v Steve Caldwell>He'd been in the business for 25 years, represents tons of Grammy award-winning artists, and
+
+27
+00:03:34.260 --> 00:03:38.980
+<v Steve Caldwell>saw an opportunity to create a new kind of platform that could engage with artists and
+
+28
+00:03:38.980 --> 00:03:43.560
+<v Steve Caldwell>fans in new ways and put the business back in the music business, as we said in the early
+
+29
+00:03:43.560 --> 00:03:44.060
+<v Steve Caldwell>days.
+
+30
+00:03:44.180 --> 00:03:48.380
+<v Steve Caldwell>So we started doing some market research, talking to artists, talking to management
+
+31
+00:03:48.380 --> 00:03:53.760
+<v Steve Caldwell>companies, and just started getting some validation that what we wanted to do in the industry
+
+32
+00:03:53.760 --> 00:03:56.040
+<v Steve Caldwell>deserved to exist and started building a prototype.
+
+33
+00:03:58.600 --> 00:04:06.700
+<v Noah Labhart>So tell me about the MVP. Tell me about that first product you built, how long it took you to build, and what sort of tools you used to bring it to life.
+
+34
+00:04:09.000 --> 00:04:13.080
+<v Steve Caldwell>As I mentioned, we were partnering with a venture studio to get this off the ground.
+
+35
+00:04:13.240 --> 00:04:17.620
+<v Steve Caldwell>So High Alpha, based in Indianapolis, has started about 20 companies over the last five years.
+
+36
+00:04:17.860 --> 00:04:25.940
+<v Steve Caldwell>And we went through their sprint week process, which is like four days, working around the clock, doing market research,
+
+37
+00:04:25.940 --> 00:04:30.800
+<v Steve Caldwell>search, building a prototype, trying to get something out the door. And in the span of a
+
+38
+00:04:30.800 --> 00:04:36.100
+<v Steve Caldwell>couple of weeks, we actually put together an MVP and hosted our first concert there at the end of
+
+39
+00:04:36.100 --> 00:04:40.480
+<v Steve Caldwell>Sprint Week. Obviously, in the early days, you're just trying to get product market fit. So you're
+
+40
+00:04:40.480 --> 00:04:46.200
+<v Steve Caldwell>not super focused on scalability or developing some crazy IP. You just want to get something
+
+41
+00:04:46.200 --> 00:04:50.960
+<v Steve Caldwell>out there that people can get their hands on and test. So we chose some off-the-shelf platforms.
+
+42
+00:04:50.960 --> 00:04:58.160
+<v Steve Caldwell>forms. Basically wanted to pull together a stream with a chat function for the fans and build a
+
+43
+00:04:58.160 --> 00:05:03.600
+<v Steve Caldwell>digital merch table. The fans can go out and go to different e-commerce sites and basically a
+
+44
+00:05:03.600 --> 00:05:09.820
+<v Steve Caldwell>light ticketing function to actually sell access to the pay-per-view stream. So we put that together
+
+45
+00:05:09.820 --> 00:05:15.880
+<v Steve Caldwell>in about two weeks and the first concert had about 250 or so people in attendance.
+
+46
+00:05:15.880 --> 00:05:16.380
+<v Steve Caldwell>notes.
+
+47
+00:05:17.580 --> 00:05:23.400
+<v Noah Labhart>Okay, so with any MVP, you have to make certain decisions and trade-offs, right? The cut
+
+48
+00:05:23.400 --> 00:05:28.660
+<v Noah Labhart>features or you have to take on technical debt. What decisions and trade-offs did you have to make
+
+49
+00:05:28.660 --> 00:05:32.940
+<v Noah Labhart>in the short term for this first version of the product and how did you cope with those decisions?
+
+50
+00:05:34.280 --> 00:05:40.000
+<v Steve Caldwell>As I mentioned, we started on just a Create React app on Firebase. We wanted to get something up
+
+51
+00:05:40.000 --> 00:05:46.240
+<v Steve Caldwell>and running very quickly. Nine months later, we look at what we've got today and it looks very
+
+52
+00:05:46.240 --> 00:05:50.860
+<v Steve Caldwell>different than what we started with. I've built a few startups in the past, built a few technology
+
+53
+00:05:50.860 --> 00:05:56.120
+<v Steve Caldwell>platforms and had the opportunity to scale those platforms. And I think one of the biggest things
+
+54
+00:05:56.120 --> 00:06:01.880
+<v Steve Caldwell>that we considered early on was like, how is what we're doing today going to need to transition to
+
+55
+00:06:01.880 --> 00:06:07.280
+<v Steve Caldwell>a different platform for scale? Obviously, you don't know what you don't know in those early
+
+56
+00:06:07.280 --> 00:06:12.720
+<v Steve Caldwell>days. And a lot of what we built ended up kind of just being throwaway, but because we were able to
+
+57
+00:06:12.720 --> 00:06:18.200
+<v Steve Caldwell>raise some money and hire additional engineers to come in and think about different architecture,
+
+58
+00:06:18.320 --> 00:06:22.380
+<v Steve Caldwell>as we're learning more about the market and the needs of our customers, we were able to,
+
+59
+00:06:22.380 --> 00:06:29.060
+<v Steve Caldwell>like in iterative steps, take the front end and start migrating it towards a more scalable pattern.
+
+60
+00:06:29.400 --> 00:06:35.300
+<v Noah Labhart>What were those patterns of scalability you were after? Was it hosting based or was it how you
+
+61
+00:06:37.280 --> 00:06:38.040
+<v Noah Labhart>bit more about that.
+
+62
+00:06:38.580 --> 00:06:44.500
+<v Steve Caldwell>A specific example is Firebase has a million concurrent client connection limits.
+
+63
+00:06:44.940 --> 00:06:50.600
+<v Steve Caldwell>As we started talking to some larger artists and promoters, we realized that some of these may have
+
+64
+00:06:50.600 --> 00:06:56.780
+<v Steve Caldwell>the potential to have over a million fans coming in concurrently to watch the stream. And we knew
+
+65
+00:06:56.780 --> 00:07:01.000
+<v Steve Caldwell>that as we were going to scale, no matter if it was at a single artist level or across the platform,
+
+66
+00:07:01.160 --> 00:07:05.780
+<v Steve Caldwell>we wanted to be able to support millions and millions of simultaneous connections. So the
+
+67
+00:07:07.280 --> 00:07:11.440
+<v Steve Caldwell>is you're connecting the client code directly to the real-time Firestore
+
+68
+00:07:11.440 --> 00:07:14.240
+<v Steve Caldwell>and configuring security with security rules,
+
+69
+00:07:14.500 --> 00:07:18.680
+<v Steve Caldwell>but you don't really have to worry about much middleware or much server code,
+
+70
+00:07:18.920 --> 00:07:21.840
+<v Steve Caldwell>which is really nice and great for getting something up and running quickly.
+
+71
+00:07:22.400 --> 00:07:24.820
+<v Steve Caldwell>And what we found was there aren't a ton of guides
+
+72
+00:07:24.820 --> 00:07:28.440
+<v Steve Caldwell>or a ton of resources out there for how to scale your Firebase project
+
+73
+00:07:28.440 --> 00:07:30.460
+<v Steve Caldwell>or how to port it to AWS.
+
+74
+00:07:31.020 --> 00:07:36.500
+<v Steve Caldwell>So we started building some microservices on ECS Fargate and AWS
+
+75
+00:07:37.280 --> 00:07:42.420
+<v Steve Caldwell>And basically developed an SDK that the front end would begin connecting to.
+
+76
+00:07:42.520 --> 00:07:46.860
+<v Steve Caldwell>And then just started taking that page by page or even component by component.
+
+77
+00:07:47.020 --> 00:07:53.940
+<v Steve Caldwell>So, you know, we started with the service around tickets and anything that's related to tickets instead of connecting directly to Firestore.
+
+78
+00:07:54.180 --> 00:08:03.400
+<v Steve Caldwell>We're now going to start connecting those to our SDK and then just kind of taking it sprint by sprint, slowly chipping away at those components and how they get their data and how they interact with the back end.
+
+79
+00:08:05.760 --> 00:08:12.340
+<v Noah Labhart>my next question is around product progression and how you have matured the product and i think
+
+80
+00:08:12.340 --> 00:08:17.140
+<v Noah Labhart>it'll probably be a combination of you know what you're saying with scalability and then perhaps
+
+81
+00:08:17.140 --> 00:08:24.660
+<v Noah Labhart>what sort of feedback you're getting from artists from fans etc so how have you progressed the
+
+82
+00:08:24.660 --> 00:08:30.400
+<v Noah Labhart>product and matured it and i think also be interesting is how do you build your roadmap
+
+83
+00:08:30.400 --> 00:08:34.600
+<v Noah Labhart>map? How do you figure out what's the next most important thing to build? So
+
+84
+00:08:34.600 --> 00:08:35.380
+<v Steve Caldwell>as I mentioned before,
+
+85
+00:08:35.600 --> 00:08:40.740
+<v Steve Caldwell>the live streaming was just kind of the opening act. And we do use a lot of music puns around here,
+
+86
+00:08:40.800 --> 00:08:47.860
+<v Steve Caldwell>which is part of the fun. So we purpose built Mandolin out of the gate for a high quality
+
+87
+00:08:47.860 --> 00:08:53.320
+<v Steve Caldwell>concert experience. And we purpose built it for the music industry. And that's based on the needs
+
+88
+00:08:53.320 --> 00:08:59.500
+<v Steve Caldwell>of fans and artists today. As we built the team, we brought in a nice combination of music experience
+
+89
+00:09:00.500 --> 00:09:04.980
+<v Steve Caldwell>to start addressing that broader digital engagement strategy beyond live stream.
+
+90
+00:09:05.120 --> 00:09:07.880
+<v Steve Caldwell>So that's through data, through content, and through marketing.
+
+91
+00:09:08.140 --> 00:09:10.820
+<v Steve Caldwell>And we raised the $5 million seed round back in September,
+
+92
+00:09:10.980 --> 00:09:15.280
+<v Steve Caldwell>so that's helped fuel growth and help us push boundaries as we launch new features.
+
+93
+00:09:16.060 --> 00:09:19.700
+<v Steve Caldwell>So really digging deeper into real-time analytics that we're getting out of shows,
+
+94
+00:09:19.940 --> 00:09:23.200
+<v Steve Caldwell>considering how we might influence new music releases,
+
+95
+00:09:23.360 --> 00:09:26.900
+<v Steve Caldwell>new types of fan interactions with some of these different features.
+
+96
+00:09:27.300 --> 00:09:29.480
+<v Steve Caldwell>And so how the roadmap comes to life, you know,
+
+97
+00:09:30.400 --> 00:09:38.500
+<v Steve Caldwell>what we see in the market, what we're hearing from our customers, whether that's an iconic venue like the Ryman Auditorium or a large promoter.
+
+98
+00:09:38.560 --> 00:09:41.860
+<v Steve Caldwell>They've all got similar needs, but they also have unique needs.
+
+99
+00:09:42.020 --> 00:09:47.700
+<v Steve Caldwell>So using their ideas and their requests as a big part of how we build the roadmap.
+
+100
+00:09:47.980 --> 00:09:55.680
+<v Steve Caldwell>And then we also have established our own point of view on what we think is important and what we think maybe the industry doesn't know they need yet.
+
+101
+00:09:56.600 --> 00:10:02.100
+<v Steve Caldwell>You know, Steve Jobs used to say, did Alexander Graham Bell do any market research before he invented the telephone?
+
+102
+00:10:02.500 --> 00:10:10.120
+<v Steve Caldwell>No. And so there is value in talking to the market and understanding the market and bringing in really smart people who have been in the industry for a while.
+
+103
+00:10:10.180 --> 00:10:22.780
+<v Steve Caldwell>There's also value in coupling that with the prowess of the folks who have worked in tech and in SaaS and in digital marketing who have seen this work in other industries and have a point of view on how to apply it to the music business.
+
+104
+00:10:24.100 --> 00:10:40.220
+<v Noah Labhart>You know, you're kind of combining maybe some feedback, maybe some, you know, some, some information you're getting back from those specific stakeholders, but you're also applying a lot of intuition from the people who know the industry and for the people that have the vision for the product. Is that right?
+
+105
+00:10:40.220 --> 00:10:40.720
+<v Noah Labhart>Right.
+
+106
+00:10:40.460 --> 00:10:46.120
+<v Steve Caldwell>Exactly. Yeah. And I think that because this really is a marketplace business, you know,
+
+107
+00:10:46.120 --> 00:10:51.840
+<v Steve Caldwell>there's a ton of B2B elements here and the data and analytics and insights that we can provide
+
+108
+00:10:51.840 --> 00:10:58.200
+<v Steve Caldwell>to the industry. But there's also a huge focus on creating a new and novel fan experience. So
+
+109
+00:10:58.200 --> 00:11:03.580
+<v Steve Caldwell>bringing in people who have worked in strong B2C companies and just seeing the energy of those
+
+110
+00:11:03.580 --> 00:11:08.820
+<v Steve Caldwell>dynamics come together while getting to work with some really cool artists is a really nice
+
+111
+00:11:10.220 --> 00:11:22.480
+<v Noah Labhart>So thinking about your model, do you consider it a marketplace and do you face the kind of same marketplace chicken and egg kind of problems or do you consider it a different model?
+
+112
+00:11:22.900 --> 00:11:27.500
+<v Steve Caldwell>Yeah, I think we definitely would consider it in line with the marketplace approach.
+
+113
+00:11:27.660 --> 00:11:40.020
+<v Steve Caldwell>So obviously the challenges in direct to consumer and in consumer marketing, we seek to establish Mandolin as a brand and as a brand that becomes a household name to consumers.
+
+114
+00:11:40.220 --> 00:11:43.940
+<v Steve Caldwell>in this industry. At some point, imagine being able to kick back on your couch,
+
+115
+00:11:44.100 --> 00:11:49.120
+<v Steve Caldwell>pull up the Mandolin app on your Apple TV and browse hundreds of beautiful concerts any night
+
+116
+00:11:49.120 --> 00:11:55.840
+<v Steve Caldwell>of the week. That obviously requires B2C strategies and branding to pull off. But on the other side,
+
+117
+00:11:55.940 --> 00:12:00.120
+<v Steve Caldwell>there are established artists and established brands that have gigantic followings who want
+
+118
+00:12:00.120 --> 00:12:04.440
+<v Steve Caldwell>to do live stream and who are realizing the importance of not only live stream, but also
+
+119
+00:12:04.440 --> 00:12:11.340
+<v Steve Caldwell>just the ability to engage with their fans in new ways. So they're helping build the rising tide and
+
+120
+00:12:11.340 --> 00:12:15.960
+<v Steve Caldwell>bring fans on board. And so yeah, you do have that chicken and egg a little bit, but
+
+121
+00:12:15.960 --> 00:12:22.700
+<v Steve Caldwell>I think eventually the B2B side, the growth there will create enough momentum with consumers that
+
+122
+00:12:22.700 --> 00:12:28.200
+<v Steve Caldwell>they know that Mandolin is a destination to go find really high quality exclusive content
+
+123
+00:12:28.200 --> 00:12:29.600
+<v Steve Caldwell>and to engage with artists.
+
+124
+00:12:31.220 --> 00:12:32.620
+<v Noah Labhart>Well, let's switch to team.
+
+125
+00:12:34.440 --> 00:12:39.420
+<v Noah Labhart>your team? And I think one of the most interested in is, you know, what did you look for in those
+
+126
+00:12:39.420 --> 00:12:43.040
+<v Noah Labhart>people to indicate that they were the winning horses to join you?
+
+127
+00:12:44.760 --> 00:12:47.080
+<v Steve Caldwell>So it's in line with what I
+
+128
+00:12:47.080 --> 00:12:54.360
+<v Steve Caldwell>talked about earlier in the B2C, B2B dynamic. You know, we built our team out and we've organized
+
+129
+00:12:54.360 --> 00:13:00.420
+<v Steve Caldwell>our team around product themes. So our fan experience team has a lot of great experience
+
+130
+00:13:00.420 --> 00:13:03.880
+<v Steve Caldwell>with consumer apps and building for scale
+
+131
+00:13:03.880 --> 00:13:07.220
+<v Steve Caldwell>and scalable architecture patterns in the consumer world.
+
+132
+00:13:07.720 --> 00:13:11.660
+<v Steve Caldwell>And then on the back end, our presenter team for artists
+
+133
+00:13:11.660 --> 00:13:13.820
+<v Steve Caldwell>and for venues and for management teams
+
+134
+00:13:13.820 --> 00:13:16.320
+<v Steve Caldwell>has a lot of good B2B SaaS experience.
+
+135
+00:13:16.480 --> 00:13:18.500
+<v Steve Caldwell>So building out analytics paradigms,
+
+136
+00:13:18.580 --> 00:13:21.720
+<v Steve Caldwell>understanding the challenges of ETL and data mapping
+
+137
+00:13:21.720 --> 00:13:24.460
+<v Steve Caldwell>and data warehouses and how to build great systems
+
+138
+00:13:24.460 --> 00:13:27.300
+<v Steve Caldwell>that will scale to billions and billions of data points.
+
+139
+00:13:27.300 --> 00:13:30.480
+<v Steve Caldwell>So those are kind of the two primary buckets.
+
+140
+00:13:31.640 --> 00:13:35.460
+<v Steve Caldwell>It's also a combination of domain expertise.
+
+141
+00:13:35.580 --> 00:13:51.920
+<v Steve Caldwell>So people who have worked at companies like Live Nation or Ticketmaster, you know, they understand the event space, understand how to scale different aspects of event infrastructure and how to build data architecture that will support more use cases beyond just basic live streaming.
+
+142
+00:13:52.140 --> 00:13:54.800
+<v Steve Caldwell>So that combination of folks there.
+
+143
+00:13:54.800 --> 00:13:59.200
+<v Steve Caldwell>I mean, we're also, we're putting the team together on the evolution of all these different industries.
+
+144
+00:13:59.340 --> 00:14:04.700
+<v Steve Caldwell>So, you know, diversity, not only in personality type and in background, but diversity in skills.
+
+145
+00:14:04.880 --> 00:14:09.220
+<v Steve Caldwell>And ultimately trying to foster a team that values direct and honest communication.
+
+146
+00:14:10.320 --> 00:14:13.380
+<v Steve Caldwell>Integrity, we're big on vulnerability, we're big on mental health.
+
+147
+00:14:13.560 --> 00:14:21.000
+<v Steve Caldwell>And making sure that this is a safe space, that folks feel like they're a part of the process, that they want to take initiative, they're excited about the vision.
+
+148
+00:14:21.000 --> 00:14:25.080
+<v Steve Caldwell>and I think we've done a good job of fostering a lot of those elements so far.
+
+149
+00:14:26.380 --> 00:14:30.480
+<v Noah Labhart>So you mentioned perhaps looking for some industry type experience,
+
+150
+00:14:30.620 --> 00:14:33.440
+<v Noah Labhart>maybe Live Nation or Ticketmaster.
+
+151
+00:14:33.720 --> 00:14:38.480
+<v Noah Labhart>Do you find it's helpful if people have experience with like Reverb
+
+152
+00:14:38.480 --> 00:14:41.220
+<v Noah Labhart>or Musician's Friend or something like that?
+
+153
+00:14:41.580 --> 00:14:45.620
+<v Noah Labhart>And are those potential partners in some way too?
+
+154
+00:14:46.120 --> 00:14:46.700
+<v Noah Labhart>Yeah,
+
+155
+00:14:46.700 --> 00:14:48.580
+<v Steve Caldwell>so on the production side,
+
+156
+00:14:48.580 --> 00:14:54.720
+<v Steve Caldwell>we do have a team that will consult with artists and venues to help them understand equipment
+
+157
+00:14:54.720 --> 00:15:00.020
+<v Steve Caldwell>selections, different packages that would make the most sense for putting on the streams. In some
+
+158
+00:15:00.020 --> 00:15:04.600
+<v Steve Caldwell>cases, we'll actually white glove the entire experience through a network of contractors
+
+159
+00:15:04.600 --> 00:15:09.760
+<v Steve Caldwell>that we've built in different markets. So an example of this would be City Winery, one of our
+
+160
+00:15:09.760 --> 00:15:16.320
+<v Steve Caldwell>partners. They are leveraging Mandolin to stream concerts from all of their locations. And we
+
+161
+00:15:16.320 --> 00:15:22.080
+<v Steve Caldwell>We actually provide staff on site, provide equipment, and we'll handle everything from
+
+162
+00:15:22.080 --> 00:15:27.360
+<v Steve Caldwell>installing that equipment to running the stream and switching the cameras, obviously, then
+
+163
+00:15:27.360 --> 00:15:31.100
+<v Steve Caldwell>through to the platform side of the house to make sure that it's a quality experience.
+
+164
+00:15:31.480 --> 00:15:33.380
+<v Steve Caldwell>That's kind of the services side of our business.
+
+165
+00:15:33.560 --> 00:15:38.220
+<v Steve Caldwell>It's obviously, you know, in any SaaS business, you will have some element of services.
+
+166
+00:15:38.600 --> 00:15:41.500
+<v Steve Caldwell>I mean, I think that you mentioned Musician's Friend.
+
+167
+00:15:41.600 --> 00:15:45.160
+<v Steve Caldwell>There are certainly tons of companies out there who could be interesting candidates
+
+168
+00:15:46.320 --> 00:15:51.960
+<v Steve Caldwell>put together gear packs and things that we can ship out to artists and they plug in and push a button and they're live.
+
+169
+00:15:52.160 --> 00:15:53.940
+<v Steve Caldwell>So definitely a lot of interest in that area.
+
+170
+00:15:55.180 --> 00:15:56.080
+<v Noah Labhart>That's really cool.
+
+171
+00:15:56.320 --> 00:15:59.080
+<v Noah Labhart>I also thought about it from a, so I'm a musician myself.
+
+172
+00:15:59.140 --> 00:16:06.760
+<v Noah Labhart>If I'm watching a show on Mandolin, I'm curious about what's that guitar player using to make that sound?
+
+173
+00:16:06.880 --> 00:16:13.120
+<v Noah Labhart>And, you know, I can check it through Mandolin and then order it straight from Mandolin because it's integrated with Reverb or something like that.
+
+174
+00:16:13.240 --> 00:16:13.740
+<v Noah Labhart>That's a
+
+175
+00:16:13.480 --> 00:16:13.980
+<v Steve Caldwell>good idea.
+
+176
+00:16:13.920 --> 00:16:15.960
+<v Steve Caldwell>I'll have to drop that one in the product request channel.
+
+177
+00:16:19.960 --> 00:16:22.020
+<v Noah Labhart>You touched on scalability already.
+
+178
+00:16:22.200 --> 00:16:25.220
+<v Noah Labhart>And I think you're tackling this right now.
+
+179
+00:16:25.360 --> 00:16:30.560
+<v Noah Labhart>So you built the prototype and then you hit some, maybe not hit some scaling issues, but
+
+180
+00:16:30.560 --> 00:16:33.320
+<v Noah Labhart>you noticed some scaling issues or perhaps you hit them.
+
+181
+00:16:33.400 --> 00:16:36.040
+<v Noah Labhart>And then you started to fight those as you grew.
+
+182
+00:16:36.200 --> 00:16:39.920
+<v Noah Labhart>But it sounds like you've kind of got a good handle on that right now with microservices
+
+183
+00:16:39.920 --> 00:16:40.640
+<v Noah Labhart>and architecture.
+
+184
+00:16:40.960 --> 00:16:41.520
+<v Noah Labhart>Is that correct?
+
+185
+00:16:41.580 --> 00:16:43.800
+<v Noah Labhart>Or is there still problems you're trying to figure out?
+
+186
+00:16:44.600 --> 00:16:54.820
+<v Steve Caldwell>We have a good handle on it now. I mean, we went through about a six-week exercise, September to November, where we were kind of all hands on deck, focusing on scalability.
+
+187
+00:16:55.740 --> 00:17:04.440
+<v Steve Caldwell>And that was leading up to the iVoted Festival, actually, that we did on Election Day, which was, at the time, like the largest digital festival ever held.
+
+188
+00:17:04.440 --> 00:17:09.740
+<v Steve Caldwell>We had 450 artists across 18 stages, 14 hours with the content.
+
+189
+00:17:10.280 --> 00:17:17.680
+<v Steve Caldwell>And, you know, we were orchestrating all of those streams and, you know, preparing for upwards of a million simultaneous connections.
+
+190
+00:17:17.880 --> 00:17:25.140
+<v Steve Caldwell>So, you know, a big event like that, a big opportunity like that, you know, is always risky to take on when you're at that point.
+
+191
+00:17:25.180 --> 00:17:30.140
+<v Steve Caldwell>We were four months in, but we were up to the challenge and started building out the new architecture.
+
+192
+00:17:30.340 --> 00:17:32.500
+<v Steve Caldwell>So, you know, we still got a ways to go.
+
+193
+00:17:34.440 --> 00:17:43.100
+<v Steve Caldwell>to continue to tighten up. An example would be ECS Fargate with auto scale is great, but you have to
+
+194
+00:17:43.100 --> 00:17:48.620
+<v Steve Caldwell>kind of continuously fine tune that and set those parameters to ensure that you're able to hit the
+
+195
+00:17:48.620 --> 00:17:54.360
+<v Steve Caldwell>scale that you want. But moving some of those services to like Lambda@Edge can provide
+
+196
+00:17:54.360 --> 00:18:02.940
+<v Steve Caldwell>not only worldwide low latency on some of the most high traffic endpoints, but also can create
+
+197
+00:18:04.440 --> 00:18:13.100
+<v Steve Caldwell>Thinking about scale, thinking about global performance, also thinking about how we continue to grow and scale while keeping our margins increasing.
+
+198
+00:18:13.360 --> 00:18:15.220
+<v Steve Caldwell>So lowering those infrastructure costs.
+
+199
+00:18:16.340 --> 00:18:21.280
+<v Noah Labhart>Are you talking about Lambda and then about some other components as well?
+
+200
+00:18:21.440 --> 00:18:26.180
+<v Noah Labhart>So is the platform primarily serverless or is it kind of half and half?
+
+201
+00:18:26.300 --> 00:18:28.960
+<v Noah Labhart>Do you have Kubernetes and containers in there?
+
+202
+00:18:29.280 --> 00:18:30.840
+<v Noah Labhart>How is that structured?
+
+203
+00:18:30.840 --> 00:18:31.880
+<v Noah Labhart>We're
+
+204
+00:18:31.880 --> 00:18:38.220
+<v Steve Caldwell>probably 25% serverless at this point, looking to improve that number.
+
+205
+00:18:38.520 --> 00:18:45.760
+<v Steve Caldwell>The nice thing about ECS Fargate is that it will manage all the underlying metal for your Docker containers to scale.
+
+206
+00:18:45.780 --> 00:18:48.720
+<v Steve Caldwell>So you don't have to worry about managing any of the EC2 instances.
+
+207
+00:18:49.240 --> 00:18:56.480
+<v Steve Caldwell>So, yeah, I mean, we're leveraging Terraform for orchestration and trying to do everything in a don't repeat yourself pattern.
+
+208
+00:18:56.480 --> 00:19:02.340
+<v Steve Caldwell>Kubernetes is not in the mix yet, but we're always looking at new ways to make things
+
+209
+00:19:02.980 --> 00:19:03.800
+<v Steve Caldwell>scale better.
+
+210
+00:19:05.300 --> 00:19:10.700
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built with
+
+211
+00:19:10.700 --> 00:19:12.560
+<v Noah Labhart>Mandolin, what are you most proud of?
+
+212
+00:19:14.220 --> 00:19:19.440
+<v Steve Caldwell>It's definitely the team, especially given the amount of time that we have under
+
+213
+00:19:19.440 --> 00:19:20.780
+<v Steve Caldwell>our belt with Mandolin.
+
+214
+00:19:20.920 --> 00:19:22.120
+<v Steve Caldwell>We're eight months in.
+
+215
+00:19:22.120 --> 00:19:26.080
+<v Steve Caldwell>We built quite the school hot across product and design and engineering.
+
+216
+00:19:26.780 --> 00:19:38.720
+<v Steve Caldwell>I think just the speed at which we were able to bring all those folks together and the culture that we set out to build and that has started to gel is something that I'm very proud of.
+
+217
+00:19:39.040 --> 00:19:51.780
+<v Steve Caldwell>You know, technology wise, I would say that our API and integration strategy and just how we've been able to connect to some of the largest ticketing platforms in the world is also very exciting.
+
+218
+00:19:52.120 --> 00:19:56.700
+<v Steve Caldwell>That's something that we, when we started, you know, we didn't want to be a ticketing platform.
+
+219
+00:19:57.080 --> 00:20:03.820
+<v Steve Caldwell>There are a million of them out there and most venues and artists already have contracts in place with those ticketing platforms.
+
+220
+00:20:04.140 --> 00:20:10.120
+<v Steve Caldwell>So we started with the mentality that we're going to be the best live stream platform in the world.
+
+221
+00:20:10.180 --> 00:20:15.100
+<v Steve Caldwell>And you can bring your own ticketing provider and you can plug that into our existing infrastructure.
+
+222
+00:20:15.100 --> 00:20:25.520
+<v Steve Caldwell>So yeah, really proud of how quickly we built sort of an enterprise architecture and integration platform, along with the 90 other features that we've gotten across the line to date.
+
+223
+00:20:26.160 --> 00:20:32.560
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+224
+00:20:33.720 --> 00:20:42.120
+<v Steve Caldwell>Chat is a really important component of the livestream experience for fan-to-fan engagement, but also for artist-to-fan engagement.
+
+225
+00:20:42.120 --> 00:20:48.120
+<v Steve Caldwell>engagement. Early on, you know, we decided that we would go with a third-party platform for our
+
+226
+00:20:48.120 --> 00:20:53.280
+<v Steve Caldwell>chat functionality, and we're still using them today at Twilio, and they've got a good chat
+
+227
+00:20:53.280 --> 00:20:58.020
+<v Steve Caldwell>product. But, you know, as we were building and we had a very small team, we just sort of stood it up
+
+228
+00:20:58.020 --> 00:21:03.020
+<v Steve Caldwell>and got it out there and, you know, didn't take a lot of time to think about things like moderation.
+
+229
+00:21:03.840 --> 00:21:08.160
+<v Steve Caldwell>You know, it was every night, every weekend, it was, all right, we got a couple more shows, a couple
+
+230
+00:21:08.160 --> 00:21:12.740
+<v Steve Caldwell>couple more shows and I'm sitting there watching every single show, watching the chat and just
+
+231
+00:21:12.740 --> 00:21:16.540
+<v Steve Caldwell>in the back of my mind, I'm like, which one of these shows is going to be the night that,
+
+232
+00:21:16.560 --> 00:21:20.720
+<v Steve Caldwell>you know, we get chat bombed. And it happened, you know, and say a couple months in for like
+
+233
+00:21:20.720 --> 00:21:25.740
+<v Steve Caldwell>a free event. It was actually, it was a bunch of high school students who were doing a concert
+
+234
+00:21:26.280 --> 00:21:32.280
+<v Steve Caldwell>and leave it to the 10th and 11th graders to be the ones to show the flaws in your platform. But
+
+235
+00:21:32.280 --> 00:21:37.180
+<v Steve Caldwell>yeah, just lots of inappropriate language. And, you know, we had to kind of quickly get in there
+
+236
+00:21:38.160 --> 00:21:40.080
+<v Steve Caldwell>to delete messages and ban people,
+
+237
+00:21:40.300 --> 00:21:42.020
+<v Steve Caldwell>but we didn't have just like a kill switch.
+
+238
+00:21:42.640 --> 00:21:44.980
+<v Steve Caldwell>You know, that kill switch within a day,
+
+239
+00:21:45.080 --> 00:21:47.920
+<v Steve Caldwell>you can have it built, tested, reviewed, and merged.
+
+240
+00:21:48.920 --> 00:21:50.300
+<v Steve Caldwell>But, you know, we didn't do it.
+
+241
+00:21:50.320 --> 00:21:51.420
+<v Steve Caldwell>We focused on other things
+
+242
+00:21:51.420 --> 00:21:54.180
+<v Steve Caldwell>and it learned a lesson the hard way on a real show.
+
+243
+00:21:55.000 --> 00:21:56.260
+<v Steve Caldwell>I mean, luckily, you know,
+
+244
+00:21:56.320 --> 00:21:58.740
+<v Steve Caldwell>damage control around it was good.
+
+245
+00:21:58.860 --> 00:22:00.600
+<v Steve Caldwell>And, you know, many of the students
+
+246
+00:22:00.600 --> 00:22:04.180
+<v Steve Caldwell>were trying to encourage the other students to stop.
+
+247
+00:22:04.300 --> 00:22:05.900
+<v Steve Caldwell>And, you know, live and learn
+
+248
+00:22:05.900 --> 00:22:07.900
+<v Steve Caldwell>definitely could have been a lot worse.
+
+249
+00:22:09.920 --> 00:22:13.880
+<v Noah Labhart>well what does the future look like for the product and for your team
+
+250
+00:22:14.920 --> 00:22:21.740
+<v Steve Caldwell>moving from just a pay-per-view live stream company to a company that connects artists and
+
+251
+00:22:21.740 --> 00:22:28.500
+<v Steve Caldwell>fans directly you know the um the music industry over the last 50 years think about how we've
+
+252
+00:22:28.500 --> 00:22:35.200
+<v Steve Caldwell>promoted music we've gone from paper flyers to mp3 players you know to to facebook for promotion
+
+253
+00:22:35.200 --> 00:22:39.920
+<v Steve Caldwell>And we've gone from vinyl to tapes to Spotify for how we consume music.
+
+254
+00:22:40.020 --> 00:22:44.260
+<v Steve Caldwell>But in that time frame, artists haven't really grown any closer to fans.
+
+255
+00:22:45.220 --> 00:22:52.620
+<v Steve Caldwell>So we think that by creating a platform that artists can use year-round to create new exclusive content,
+
+256
+00:22:52.840 --> 00:22:57.300
+<v Steve Caldwell>to do new album releases, VIP meet and greets with fans,
+
+257
+00:22:57.940 --> 00:23:03.120
+<v Steve Caldwell>and then leverage the Mandolin platform to understand who their fans are
+
+258
+00:23:03.120 --> 00:23:08.040
+<v Steve Caldwell>and to expand their audience and expand their reach is something that we're really excited about.
+
+259
+00:23:08.180 --> 00:23:11.100
+<v Steve Caldwell>So that's the direction that we're heading broadly.
+
+260
+00:23:12.000 --> 00:23:16.700
+<v Steve Caldwell>Livestream is still very much front and center, still a very important part of our strategy,
+
+261
+00:23:16.820 --> 00:23:20.880
+<v Steve Caldwell>but we're really excited about how we can drive deeper engagement for artists
+
+262
+00:23:20.880 --> 00:23:22.880
+<v Steve Caldwell>and ultimately grow their fan base.
+
+263
+00:23:24.300 --> 00:23:25.620
+<v Noah Labhart>Well, let's switch to you, Steve.
+
+264
+00:23:26.000 --> 00:23:28.440
+<v Noah Labhart>Who influences the way that you work?
+
+265
+00:23:28.600 --> 00:23:31.960
+<v Noah Labhart>Name a CEO or CTO or really any person.
+
+266
+00:23:33.120 --> 00:23:34.220
+<v Noah Labhart>look up to and why?
+
+267
+00:23:35.560 --> 00:23:40.100
+<v Steve Caldwell>So I was thinking about this and there are a lot of names that come to mind,
+
+268
+00:23:40.140 --> 00:23:44.460
+<v Steve Caldwell>but keeping it kind of in the music industry, you know, I look at, I look at like what Logic has
+
+269
+00:23:44.460 --> 00:23:50.880
+<v Steve Caldwell>done over the last 10 years. I mean, he really started with nothing and built a music career
+
+270
+00:23:50.880 --> 00:23:56.820
+<v Steve Caldwell>pretty, pretty epically and pretty quickly. But then, you know, he decided that it really wasn't
+
+271
+00:23:56.820 --> 00:24:01.140
+<v Steve Caldwell>the lifestyle that he wanted and he stayed true to himself there. And once I spend more time with
+
+272
+00:24:03.120 --> 00:24:08.300
+<v Steve Caldwell>a little bit of everything and he's shifted gears now in his early 30s you know signed a deal with
+
+273
+00:24:08.300 --> 00:24:14.340
+<v Steve Caldwell>Twitch so he's getting into streaming he's just set himself up in a way that he's able to spend
+
+274
+00:24:14.340 --> 00:24:20.760
+<v Steve Caldwell>time with his family still create and do the things that he loves but kind of doing it his
+
+275
+00:24:20.760 --> 00:24:25.840
+<v Steve Caldwell>way and doing it differently so got a lot of respect for logic and and just love his story
+
+276
+00:24:27.220 --> 00:24:32.300
+<v Noah Labhart>well if you could go back to the beginning what would you do differently or where would you
+
+277
+00:24:33.120 --> 00:24:34.500
+<v Noah Labhart>taking another approach.
+
+278
+00:24:35.500 --> 00:24:39.180
+<v Steve Caldwell>Yeah, it's tough because, you know, we're only eight or nine months in and
+
+279
+00:24:39.180 --> 00:24:46.440
+<v Steve Caldwell>we're kind of all systems go up and to the right at this point. I feel good about overall how we've
+
+280
+00:24:46.440 --> 00:24:52.600
+<v Steve Caldwell>structured the teams and the architectural decisions that we've made. You know, I mentioned
+
+281
+00:24:52.600 --> 00:24:56.700
+<v Steve Caldwell>earlier that, you know, we started out, we didn't build a ticketing system. We were just going to
+
+282
+00:24:56.700 --> 00:25:02.180
+<v Steve Caldwell>integrate with what's out there. And it turns out actually that about 60% of our ticket sales have
+
+283
+00:25:03.200 --> 00:25:07.380
+<v Steve Caldwell>box office in true startup fashion. Instead of building our own ticketing platform,
+
+284
+00:25:07.680 --> 00:25:12.780
+<v Steve Caldwell>we used Shopify and built an app that would connect between Shopify and Mandolin to create
+
+285
+00:25:12.780 --> 00:25:16.480
+<v Steve Caldwell>tickets to shows. And I think some of the challenges we've seen with that are just,
+
+286
+00:25:16.520 --> 00:25:20.960
+<v Steve Caldwell>you know, Shopify is a flexible platform, but it's not really geared for the music industry.
+
+287
+00:25:21.160 --> 00:25:26.640
+<v Steve Caldwell>Some of the unique reporting needs, for example, for doing settlements just aren't intuitive or
+
+288
+00:25:26.640 --> 00:25:30.980
+<v Steve Caldwell>friendly with Shopify. So if I had the crystal ball when we first started, probably would have
+
+289
+00:25:30.980 --> 00:25:35.640
+<v Steve Caldwell>have spent a little more time building out some elements of a native e-commerce layer
+
+290
+00:25:35.640 --> 00:25:37.020
+<v Steve Caldwell>and would have led with
+
+291
+00:25:37.020 --> 00:25:37.520
+<v Noah Labhart>that.
+
+292
+00:25:38.240 --> 00:25:39.460
+<v Noah Labhart>Well, last question, Steve.
+
+293
+00:25:40.400 --> 00:25:45.140
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the
+
+294
+00:25:45.140 --> 00:25:46.080
+<v Noah Labhart>next big thing.
+
+295
+00:25:46.440 --> 00:25:47.820
+<v Noah Labhart>They're jazzed about it.
+
+296
+00:25:47.960 --> 00:25:49.920
+<v Noah Labhart>They can't wait to show it off to the world.
+
+297
+00:25:50.020 --> 00:25:52.380
+<v Noah Labhart>They can't wait to show it off to you right there on the plane.
+
+298
+00:25:52.780 --> 00:25:56.600
+<v Noah Labhart>What advice do you give this person having gone down this road a bit?
+
+299
+00:25:56.600 --> 00:25:57.100
+<v Noah Labhart>it.
+
+300
+00:25:58.000 --> 00:26:04.960
+<v Steve Caldwell>Don't lose sight of why you got into this in the first place. Don't lose the passion for
+
+301
+00:26:04.960 --> 00:26:12.160
+<v Steve Caldwell>actually building the thing, the art, the craft. As you grow and scale and raise money,
+
+302
+00:26:12.320 --> 00:26:17.020
+<v Steve Caldwell>you're going to hire a lot of people. Your job is probably going to change quite a bit.
+
+303
+00:26:17.380 --> 00:26:25.740
+<v Steve Caldwell>You're probably going to be building less and hiring more. So buckle up. It's a fun ride.
+
+304
+00:26:26.600 --> 00:26:31.960
+<v Steve Caldwell>don't lose sight of the parts that you really enjoy and stay true to yourself.
+
+305
+00:26:33.440 --> 00:26:37.680
+<v Noah Labhart>That's great advice. Well, Steve, thank you for being on Code Story. Thank you for telling
+
+306
+00:26:37.680 --> 00:26:39.780
+<v Noah Labhart>the creation story of Mandolin.
+
+307
+00:26:39.920 --> 00:26:41.740
+<v Steve Caldwell>Thanks for having me, Noah. Have a great one.
+
+308
+00:26:43.980 --> 00:26:47.100
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+309
+00:26:48.400 --> 00:26:54.220
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts,
+
+310
+00:26:54.220 --> 00:26:56.620
+<v Noah Labhart>Spotify, or the podcasting app of your choice.
+
+311
+00:26:57.100 --> 00:27:00.340
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+312
+00:27:00.340 --> 00:27:02.100
+<v Noah Labhart>for just five to ten bucks a month.
+
+313
+00:27:02.520 --> 00:27:04.700
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+314
+00:27:05.020 --> 00:27:06.920
+<v Noah Labhart>Both things help us out tremendously.
+
+315
+00:27:09.620 --> 00:27:11.040
+<v Noah Labhart>And thanks again for listening.

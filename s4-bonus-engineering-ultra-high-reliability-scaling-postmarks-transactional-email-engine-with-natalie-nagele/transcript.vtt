@@ -1,0 +1,2319 @@
+WEBVTT
+
+NOTE S4 Bonus: Engineering Ultra-High Reliability: Scaling Postmark’s Transactional Email Engine with Natalie Nagele
+
+1
+00:00:00.000 --> 00:00:05.780
+<v Natalie Nagele>What we found over 20 years is that our job is to create the space for brilliant
+
+2
+00:00:05.780 --> 00:00:09.840
+<v Natalie Nagele>people to do brilliant work. There's this deep empathy that teams help each other
+
+3
+00:00:09.840 --> 00:00:14.960
+<v Natalie Nagele>achieve more. You know, this just truly understanding that work is collaborative
+
+4
+00:00:14.960 --> 00:00:20.240
+<v Natalie Nagele>and we can't work on our own and we care deeply about each other's fulfillment.
+
+5
+00:00:21.120 --> 00:00:25.640
+<v Natalie Nagele>Talk about a large mistake, you know, we built Conveyor. We started working on
+
+6
+00:00:25.640 --> 00:00:29.340
+<v Natalie Nagele>Conveyor five years before we shut it down and so it's not the money that's
+
+7
+00:00:30.340 --> 00:00:37.000
+<v Natalie Nagele>The mistake was not following my own true principles and pretending like this one was different.
+
+8
+00:00:38.620 --> 00:00:42.180
+<v Natalie Nagele>I'm Natalie Nagele, co-founder and CEO of Wildbit.
+
+9
+00:00:47.680 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+10
+00:00:52.920 --> 00:00:57.220
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+11
+00:00:57.220 --> 00:01:00.940
+<v Noah Labhart>and build and lead a team that has your back.
+
+12
+00:01:02.120 --> 00:01:03.880
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+13
+00:01:04.060 --> 00:01:07.620
+<v Noah Labhart>and today, how Natalie Nagele created a product business
+
+14
+00:01:07.620 --> 00:01:11.760
+<v Noah Labhart>that has supported human beings for 20 years.
+
+15
+00:01:13.420 --> 00:01:15.960
+<v Noah Labhart>All this and more on Code Story.
+
+16
+00:01:19.000 --> 00:01:22.040
+<v Noah Labhart>Natalie Nagele came to the States in 1989
+
+17
+00:01:22.040 --> 00:01:24.480
+<v Noah Labhart>as a Jewish refugee from Russia.
+
+18
+00:01:24.480 --> 00:01:33.160
+<v Noah Labhart>She watched her parents go from nothing and utilizing furniture from the trash to building big businesses and supporting their family.
+
+19
+00:01:33.920 --> 00:01:41.260
+<v Noah Labhart>She met Chris, her husband, when she was 18, and they have been working together ever since as he is the co-founder of their business.
+
+20
+00:01:41.900 --> 00:01:49.200
+<v Noah Labhart>They have two kids together and love to travel, specifically to the Caribbean since it's a quick flight from Philly, and of course it's warm.
+
+21
+00:01:49.460 --> 00:01:52.940
+<v Noah Labhart>Despite that, though, she would love to live in Italy one day.
+
+22
+00:01:54.480 --> 00:01:58.800
+<v Noah Labhart>started off as a remote consulting company, but launched their first product in 2003,
+
+23
+00:01:59.020 --> 00:02:04.920
+<v Noah Labhart>and they were immediately hooked. In 2009, they stopped doing client work and focused
+
+24
+00:02:04.920 --> 00:02:12.440
+<v Noah Labhart>solely on products, and haven't looked back for 20 years. This is the creation story of Wildbit.
+
+25
+00:02:14.600 --> 00:02:18.240
+<v Natalie Nagele>So Wildbit started off as a consulting company. So you know, those first couple years,
+
+26
+00:02:18.480 --> 00:02:23.040
+<v Natalie Nagele>Chris was on his own. We've always been remote. So the first person Chris ever hired was in Romania
+
+27
+00:02:24.480 --> 00:02:28.900
+<v Natalie Nagele>You have to imagine like remote was not, didn't have a name yet back then, but it started
+
+28
+00:02:28.900 --> 00:02:31.860
+<v Natalie Nagele>as a consulting company early, early days with brochure stuff.
+
+29
+00:02:32.080 --> 00:02:35.640
+<v Natalie Nagele>By the time Chris and I were together and working together, we were building social
+
+30
+00:02:35.640 --> 00:02:40.760
+<v Natalie Nagele>networks for other companies and then kind of launched our first product in 2003.
+
+31
+00:02:40.920 --> 00:02:45.200
+<v Natalie Nagele>It was an email marketing product and then just got bit by the bug, by the product bug.
+
+32
+00:02:45.380 --> 00:02:51.200
+<v Natalie Nagele>And eventually around 2009, I think we stopped doing all client work and just doubled down
+
+33
+00:02:51.200 --> 00:02:51.800
+<v Natalie Nagele>on products.
+
+34
+00:02:51.800 --> 00:02:53.880
+<v Natalie Nagele>So we have had a bunch of products.
+
+35
+00:02:54.120 --> 00:02:56.220
+<v Natalie Nagele>Some right now we have four.
+
+36
+00:02:56.460 --> 00:02:59.760
+<v Natalie Nagele>We have had a few that we sold, shut down, things like that.
+
+37
+00:02:59.780 --> 00:03:01.140
+<v Natalie Nagele>But Postmark is our largest product.
+
+38
+00:03:01.320 --> 00:03:04.460
+<v Natalie Nagele>And that was born out of a personal need.
+
+39
+00:03:04.580 --> 00:03:11.760
+<v Natalie Nagele>I think of a lot of patterns that we found in how we build software is a lot of times we're dogfooding or building things that make our lives easier.
+
+40
+00:03:11.960 --> 00:03:16.740
+<v Natalie Nagele>So at the time when we built Postmark, which is almost 11 years old, in April it'll be 11.
+
+41
+00:03:17.240 --> 00:03:20.800
+<v Natalie Nagele>We have a product called Beanstalk that was sending a lot of transactional email.
+
+42
+00:03:21.800 --> 00:03:26.740
+<v Natalie Nagele>kind of sign up emails, your comment notifications, you know, any emails like the app actually sends.
+
+43
+00:03:27.020 --> 00:03:32.060
+<v Natalie Nagele>Back then, you know, 11 years ago, those emails, we would like manage the mail servers and we would
+
+44
+00:03:32.060 --> 00:03:37.320
+<v Natalie Nagele>have no visible dashboards or UI to see, you know, if those emails were getting through,
+
+45
+00:03:37.380 --> 00:03:42.020
+<v Natalie Nagele>if our customers were getting them. Support would come in and back then I also did support. We were
+
+46
+00:03:42.020 --> 00:03:46.800
+<v Natalie Nagele>a much smaller team and support would come in and it would be like, hey, I invited my client to use
+
+47
+00:03:46.800 --> 00:03:50.440
+<v Natalie Nagele>Beanstalk and they never got the email. What's up? You know, like what's going on? And we had
+
+48
+00:03:51.800 --> 00:03:57.740
+<v Natalie Nagele>idea, like let's build you a product that sends those emails. We had had the experience in sending
+
+49
+00:03:57.740 --> 00:04:02.340
+<v Natalie Nagele>emails and managing email infrastructure from our very first product, Newsberry, but build a UI over
+
+50
+00:04:02.340 --> 00:04:07.400
+<v Natalie Nagele>it. So I think our first tagline, you know, 11 or 12 years ago, we did the MVP was because you're
+
+51
+00:04:07.400 --> 00:04:14.320
+<v Natalie Nagele>blind, because there were no ESPs like that, no API based email service providers that would give
+
+52
+00:04:14.320 --> 00:04:17.780
+<v Natalie Nagele>you visibility into what your applications were sending. You had email marketing stuff, right,
+
+53
+00:04:17.780 --> 00:04:23.900
+<v Natalie Nagele>MailChimp and Campaign Monitor. So our first MVP took three months and we have that as a
+
+54
+00:04:23.900 --> 00:04:27.200
+<v Natalie Nagele>consistent theme. It's really funny. We were just talking about this internally. We're thinking
+
+55
+00:04:27.200 --> 00:04:30.320
+<v Natalie Nagele>about another product and we were talking about this internally, how everything we've ever built,
+
+56
+00:04:30.380 --> 00:04:34.900
+<v Natalie Nagele>the first MVP took three months. It was never a goal. It's just kind of how it turned out. I think
+
+57
+00:04:34.900 --> 00:04:38.820
+<v Natalie Nagele>we really like to go scrappy in that first time around. Everything but Conveyor, but we don't
+
+58
+00:04:38.820 --> 00:04:42.080
+<v Natalie Nagele>have to talk about that. We had a product that we built for two years and then threw out, or for
+
+59
+00:04:42.080 --> 00:04:45.660
+<v Natalie Nagele>five years and then kind of never launched it. But for the most part, all of our successful products
+
+60
+00:04:45.660 --> 00:04:54.000
+<v Natalie Nagele>took three months to build. And the MVP was, can we build a UI on top of an API that sends
+
+61
+00:04:54.000 --> 00:04:58.880
+<v Natalie Nagele>transactional emails for apps? Would people find it useful? You know, would they use it? And so
+
+62
+00:04:58.880 --> 00:05:03.580
+<v Natalie Nagele>built like a really simple product that did all the core functionalities and it took off really
+
+63
+00:05:03.580 --> 00:05:04.080
+<v Natalie Nagele>quickly.
+
+64
+00:05:06.380 --> 00:05:10.620
+<v Noah Labhart>So you're doing, you know, early days, you're doing some consulting and then you build
+
+65
+00:05:10.620 --> 00:05:16.620
+<v Noah Labhart>some products and you put away the consulting hat. What made you continue to be more of a
+
+66
+00:05:16.620 --> 00:05:20.160
+<v Noah Labhart>product shop instead of centering your company around that one product?
+
+67
+00:05:21.940 --> 00:05:26.340
+<v Natalie Nagele>There's a lot of deep introspection I think we've done to, I think, understand that better. It's
+
+68
+00:05:26.340 --> 00:05:31.940
+<v Natalie Nagele>always been a question because for a long time, the best practice, you know, or the sage advice
+
+69
+00:05:31.940 --> 00:05:37.580
+<v Natalie Nagele>was double down on one, right? Put all of your eggs in one basket. Chris and I, I think for a
+
+70
+00:05:37.580 --> 00:05:42.760
+<v Natalie Nagele>a couple reasons never like that approach. The main one is because we get bored. We have ideas,
+
+71
+00:05:42.940 --> 00:05:47.640
+<v Natalie Nagele>right? And because Wildbit doesn't exist simply to make money, it exists for a lot of other reasons,
+
+72
+00:05:47.860 --> 00:05:52.100
+<v Natalie Nagele>you know, fulfillment being one of them, an important part of it. We just always had ideas
+
+73
+00:05:52.100 --> 00:05:57.300
+<v Natalie Nagele>and we're always curious to explore what else can we build. And that same thing goes to our team,
+
+74
+00:05:57.360 --> 00:06:01.920
+<v Natalie Nagele>right? We are very grateful and humbled by how long folks stay with Wildbit. We have somebody
+
+75
+00:06:01.920 --> 00:06:06.440
+<v Natalie Nagele>who just celebrated their 16th anniversary with Wildbit, 14 years with Wildbit. So people stay,
+
+76
+00:06:07.580 --> 00:06:12.440
+<v Natalie Nagele>team. I think we have over half the team is here for more than four years. A lot of why that occurs
+
+77
+00:06:12.440 --> 00:06:18.840
+<v Natalie Nagele>at Wildbit is not magic. It's because we have multiple products which allow individuals to
+
+78
+00:06:18.840 --> 00:06:24.080
+<v Natalie Nagele>almost reinvent themselves or change jobs within an organization. So I think like at the core of
+
+79
+00:06:24.080 --> 00:06:29.360
+<v Natalie Nagele>it, one of our operating principles as a company is this belief that a business is not a product.
+
+80
+00:06:29.620 --> 00:06:34.620
+<v Natalie Nagele>You know, a company is a collection of human beings and the products enable the work of those
+
+81
+00:06:34.620 --> 00:06:40.160
+<v Natalie Nagele>people. And so it's just allowed us to really look at products as a way of providing value in the
+
+82
+00:06:40.160 --> 00:06:44.660
+<v Natalie Nagele>world, value to ourselves and value to our customers. Currently, this year, we're working
+
+83
+00:06:44.660 --> 00:06:50.740
+<v Natalie Nagele>on a kind of a more operating framework around the different phases of products, products, lives,
+
+84
+00:06:50.940 --> 00:06:55.400
+<v Natalie Nagele>how we, you know, how we start an idea, how we test it, how we, you know, validate it and that
+
+85
+00:06:55.400 --> 00:06:59.760
+<v Natalie Nagele>kind of thing. But it's just the core of who we are. We, we really enjoy it. And this was not
+
+86
+00:06:59.760 --> 00:07:04.740
+<v Natalie Nagele>not intentional, but now seems really obvious. Having multiple products has allowed us to be
+
+87
+00:07:04.740 --> 00:07:09.720
+<v Natalie Nagele>who we are and allowed us to be around for 20 years. You know, markets change pretty dramatically
+
+88
+00:07:09.720 --> 00:07:16.160
+<v Natalie Nagele>and Beanstalk was this product. It is a version control product at its core. It started as a
+
+89
+00:07:16.160 --> 00:07:23.340
+<v Natalie Nagele>Subversion and Git hosting and, you know, that market dramatically changed in front of our eyes
+
+90
+00:07:23.340 --> 00:07:28.340
+<v Natalie Nagele>and really our options were to grow really big and go compete against the, you know, 800 pound
+
+91
+00:07:29.760 --> 00:07:31.120
+<v Natalie Nagele>or try to compete on some other ways.
+
+92
+00:07:31.240 --> 00:07:33.100
+<v Natalie Nagele>And because we also had Postmark in the works,
+
+93
+00:07:33.200 --> 00:07:34.440
+<v Natalie Nagele>we were able to kind of say, you know what,
+
+94
+00:07:34.460 --> 00:07:35.440
+<v Natalie Nagele>we don't wanna go that route.
+
+95
+00:07:35.760 --> 00:07:38.040
+<v Natalie Nagele>We can invest our effort and energy into Postmark.
+
+96
+00:07:38.180 --> 00:07:40.340
+<v Natalie Nagele>And so it's really given us a lot of cushion
+
+97
+00:07:40.340 --> 00:07:44.080
+<v Natalie Nagele>around market conditions and more flexibility
+
+98
+00:07:44.860 --> 00:07:46.900
+<v Natalie Nagele>even in our operating structure to be able to say,
+
+99
+00:07:47.020 --> 00:07:48.240
+<v Natalie Nagele>hey, if this product doesn't work out,
+
+100
+00:07:48.260 --> 00:07:49.460
+<v Natalie Nagele>if something changes in the market,
+
+101
+00:07:49.620 --> 00:07:51.460
+<v Natalie Nagele>we still have opportunities in other places.
+
+102
+00:07:51.980 --> 00:07:53.700
+<v Noah Labhart>You know, it's interesting, I'm thinking back.
+
+103
+00:07:53.900 --> 00:07:57.680
+<v Noah Labhart>I used Beanstalk before and I didn't remember.
+
+104
+00:07:57.680 --> 00:08:07.080
+<v Noah Labhart>I remember I was thinking about the first time I actually started to use as kind of a, you know, code manager, you know, things like that.
+
+105
+00:08:07.240 --> 00:08:12.940
+<v Noah Labhart>I was introduced to Beanstalk and one of the early projects I was doing and really enjoyed it.
+
+106
+00:08:13.000 --> 00:08:14.460
+<v Noah Labhart>So it's a great product.
+
+107
+00:08:14.680 --> 00:08:15.540
+<v Natalie Nagele>It's really cool.
+
+108
+00:08:15.680 --> 00:08:21.600
+<v Natalie Nagele>I mean, and that's one of those, you know, we were really young when that launched and it was a different world back then.
+
+109
+00:08:21.660 --> 00:08:26.000
+<v Natalie Nagele>I think as business people, we were not really, we didn't consider ourselves business people.
+
+110
+00:08:27.680 --> 00:08:33.020
+<v Natalie Nagele>was fun. But you're like Beanstalk in the early days, when Chris had the idea for it, we went out
+
+111
+00:08:33.020 --> 00:08:37.960
+<v Natalie Nagele>to all of our friends and we were like, hey, would you, you know, go to a hosted solution? Because
+
+112
+00:08:37.960 --> 00:08:42.080
+<v Natalie Nagele>in fact, this is 2007, like there were no hosted solutions, right? And people look at us like,
+
+113
+00:08:42.100 --> 00:08:46.220
+<v Natalie Nagele>are you crazy? I'm not giving you my source code. That's insane. You know, now like who on earth
+
+114
+00:08:46.220 --> 00:08:50.540
+<v Natalie Nagele>would not, you know, just host it somewhere. But it was, it's an interesting, you know, there's a
+
+115
+00:08:50.540 --> 00:08:54.180
+<v Natalie Nagele>lot of learnings that we've had from there because it was one of the first, we had some of the
+
+116
+00:08:54.180 --> 00:08:59.680
+<v Natalie Nagele>the biggest brands in the world using it. And, you know, it became not GitHub, you know, not
+
+117
+00:08:59.680 --> 00:09:05.700
+<v Natalie Nagele>Bitbucket. And so there's a lot of learnings that Chris and I have taken from that experience and
+
+118
+00:09:05.700 --> 00:09:12.080
+<v Natalie Nagele>just realizing who we are as people and what we took for granted back then and try to not have
+
+119
+00:09:12.080 --> 00:09:13.080
+<v Natalie Nagele>that happen to us again.
+
+120
+00:09:13.900 --> 00:09:17.280
+<v Noah Labhart>Well, tell me about some of the MVPs and I'll let you choose which one,
+
+121
+00:09:17.280 --> 00:09:22.060
+<v Noah Labhart>you know, you talk about, but tell me about some of those MVPs. What decisions and trade-offs did
+
+122
+00:09:22.060 --> 00:09:27.820
+<v Noah Labhart>you have to make in the short term while building those and what sort of tools did you use to bring
+
+123
+00:09:27.820 --> 00:09:28.320
+<v Noah Labhart>them to life?
+
+124
+00:09:29.040 --> 00:09:37.220
+<v Natalie Nagele>We're really big on being scrappy. It's almost like a sick kind of obsession with
+
+125
+00:09:37.220 --> 00:09:41.980
+<v Natalie Nagele>how little can we make it. We built custom software, unfortunately, most of the time.
+
+126
+00:09:42.080 --> 00:09:46.160
+<v Natalie Nagele>And when we built Postmark, we didn't even have a Stripe. All our billing was always custom. So
+
+127
+00:09:46.160 --> 00:09:50.760
+<v Natalie Nagele>things are much easier now when we throw something together. But all custom software. But
+
+128
+00:09:52.060 --> 00:09:56.560
+<v Natalie Nagele>we get rid of the things that aren't necessary. So people laugh, but like we didn't have an ability
+
+129
+00:09:56.560 --> 00:10:02.440
+<v Natalie Nagele>to cancel in the app. No user permissions, you know, no two-factor. I mean, back then, now I
+
+130
+00:10:02.440 --> 00:10:06.420
+<v Natalie Nagele>wouldn't launch an app without two-factor, but like no two-factor, right? Like the simplest of login.
+
+131
+00:10:06.780 --> 00:10:11.920
+<v Natalie Nagele>Billing was really simple. Like I think our invoices were really basic. We look at it from
+
+132
+00:10:12.320 --> 00:10:16.820
+<v Natalie Nagele>what are we promising our user and what's going to obviously delight them, right? What's going to be
+
+133
+00:10:16.820 --> 00:10:21.840
+<v Natalie Nagele>enough for them to take it and switch to it. We didn't have cancel, I think, honestly,
+
+134
+00:10:22.040 --> 00:10:25.620
+<v Natalie Nagele>Noah, for maybe a year. And it was like not an issue, right? Most people weren't canceling.
+
+135
+00:10:25.680 --> 00:10:28.540
+<v Natalie Nagele>It wasn't a month. One of the reasons we were able to get away with it was because it wasn't
+
+136
+00:10:28.540 --> 00:10:32.580
+<v Natalie Nagele>a recurring revenue product in the beginning. It was a kind of transaction based product. So you
+
+137
+00:10:32.580 --> 00:10:36.220
+<v Natalie Nagele>weren't going to get billed unless you used it. So, you know, you could kind of keep an account
+
+138
+00:10:36.220 --> 00:10:41.220
+<v Natalie Nagele>and just email the team. We still take that to heart. We launched a product called DMARC Digest
+
+139
+00:10:41.220 --> 00:10:46.080
+<v Natalie Nagele>recently and obviously took advantage of a lot of what exists now. You know, we could use Stripe
+
+140
+00:10:46.820 --> 00:10:50.780
+<v Natalie Nagele>billing through there. And now we're able to reuse some of our own stuff, you know, like,
+
+141
+00:10:50.820 --> 00:10:54.100
+<v Natalie Nagele>should we try to create consistency across multiple products? But in the same vein,
+
+142
+00:10:54.160 --> 00:10:57.180
+<v Natalie Nagele>there was a lot of features that we just didn't like user permissions. As an example,
+
+143
+00:10:57.220 --> 00:11:00.780
+<v Natalie Nagele>we don't spend a lot of time in there. User permissions is one of those things we go through
+
+144
+00:11:00.780 --> 00:11:04.820
+<v Natalie Nagele>later down the line. Nobody's not going to sign up unless you look up big team-based product,
+
+145
+00:11:04.880 --> 00:11:08.480
+<v Natalie Nagele>but we, our view is like, nobody's going to not sign up because they need to invite 40 different
+
+146
+00:11:08.480 --> 00:11:12.180
+<v Natalie Nagele>users and different levels of permissions. What they want to know is does this thing work?
+
+147
+00:11:12.180 --> 00:11:16.900
+<v Natalie Nagele>work. So we, you know, that was another example where we did have cancellation because it was a
+
+148
+00:11:16.900 --> 00:11:21.340
+<v Natalie Nagele>monthly plan, but we didn't have like proration, for example, or like little things like that,
+
+149
+00:11:21.380 --> 00:11:22.940
+<v Natalie Nagele>just kind of made it as simple as possible.
+
+150
+00:11:23.240 --> 00:11:25.400
+<v Noah Labhart>That makes sense. Get the product out there,
+
+151
+00:11:25.460 --> 00:11:29.800
+<v Noah Labhart>delight them with the product. And then as it takes off or as people are interested,
+
+152
+00:11:29.920 --> 00:11:31.960
+<v Noah Labhart>maybe add some of those things in later.
+
+153
+00:11:32.460 --> 00:11:34.620
+<v Natalie Nagele>Yeah. I mean, the alternative is Conveyor,
+
+154
+00:11:34.700 --> 00:11:39.860
+<v Natalie Nagele>which we worked on for five years as an MVP, spent $3 million and then just turned it off.
+
+155
+00:11:39.860 --> 00:11:42.340
+<v Natalie Nagele>Yeah, I prefer not to work that way.
+
+156
+00:11:42.420 --> 00:11:45.500
+<v Natalie Nagele>That was a bad call for a variety of reasons.
+
+157
+00:11:45.620 --> 00:11:48.160
+<v Natalie Nagele>With every other product, we really like that three-month mark.
+
+158
+00:11:48.540 --> 00:11:49.880
+<v Natalie Nagele>What can you build in a quarter?
+
+159
+00:11:50.140 --> 00:11:52.100
+<v Natalie Nagele>How fast can you get to value in a quarter?
+
+160
+00:11:52.640 --> 00:11:57.000
+<v Noah Labhart>So on the payment stuff, you mentioned kind of rolling your own in the beginning.
+
+161
+00:11:57.120 --> 00:12:02.200
+<v Noah Labhart>And then as later products you built, you used Stripe and used frameworks that were available.
+
+162
+00:12:02.500 --> 00:12:06.060
+<v Noah Labhart>Did you have any competitive advantages with rolling your own?
+
+163
+00:12:06.060 --> 00:12:09.540
+<v Noah Labhart>like a better fee structure or more control?
+
+164
+00:12:09.960 --> 00:12:12.340
+<v Noah Labhart>Obviously, speed of deployment comes into play
+
+165
+00:12:12.340 --> 00:12:13.840
+<v Noah Labhart>whenever you're using Stripe or something,
+
+166
+00:12:13.960 --> 00:12:16.880
+<v Noah Labhart>but did you have anything that was better by rolling your own?
+
+167
+00:12:16.980 --> 00:12:19.060
+<v Natalie Nagele>Sure. I mean, I think there's a couple of things.
+
+168
+00:12:19.300 --> 00:12:21.260
+<v Natalie Nagele>I have a little bit of a control issue,
+
+169
+00:12:21.620 --> 00:12:23.120
+<v Natalie Nagele>especially when it comes to customer data.
+
+170
+00:12:23.260 --> 00:12:25.220
+<v Natalie Nagele>And so we really want to be as, you know,
+
+171
+00:12:25.240 --> 00:12:27.840
+<v Natalie Nagele>we're really privacy focused and to really try to make sure
+
+172
+00:12:27.840 --> 00:12:30.080
+<v Natalie Nagele>that we're not sending our customer data all over the place.
+
+173
+00:12:30.160 --> 00:12:32.360
+<v Natalie Nagele>So I like to own our own as much as we can.
+
+174
+00:12:32.420 --> 00:12:33.900
+<v Natalie Nagele>But I think in the early days of Postmark,
+
+175
+00:12:33.900 --> 00:12:40.180
+<v Natalie Nagele>we had the only product that charged by usage but not a monthly recurring price
+
+176
+00:12:40.180 --> 00:12:44.660
+<v Natalie Nagele>which is really hard to even roll out in Stripe i mean you can't we use Stripe for all of our
+
+177
+00:12:44.660 --> 00:12:48.080
+<v Natalie Nagele>products now and they worked with us and we were able to build some custom stuff but like in the
+
+178
+00:12:48.080 --> 00:12:53.260
+<v Natalie Nagele>early days we were a dollar fifty per thousand emails sent which the only competition we had
+
+179
+00:12:53.260 --> 00:12:57.720
+<v Natalie Nagele>back then you know they had minimum monthly plans we have that now because of just kind of
+
+180
+00:12:57.720 --> 00:13:02.520
+<v Natalie Nagele>restructuring things but in the early days it really helped us grow our customer base as having
+
+181
+00:13:03.900 --> 00:13:07.620
+<v Natalie Nagele>a more simplified structure. To answer your question, that was a competitive advantage for us,
+
+182
+00:13:07.680 --> 00:13:12.440
+<v Natalie Nagele>but we didn't do that with DMARC, for example. We definitely launched DMARC Digest using Stripe
+
+183
+00:13:12.440 --> 00:13:17.320
+<v Natalie Nagele>right away. Things are just more complicated now. We have sales tax as an example. I didn't have
+
+184
+00:13:17.320 --> 00:13:21.280
+<v Natalie Nagele>sales tax requirements 11 years ago. If you would have told me I have to build sales tax from
+
+185
+00:13:21.280 --> 00:13:24.440
+<v Natalie Nagele>scratch, I would be like, forget it. I'm not building a product anymore. That stuff is just
+
+186
+00:13:24.440 --> 00:13:25.400
+<v Natalie Nagele>so complicated.
+
+187
+00:13:26.700 --> 00:13:32.360
+<v Noah Labhart>So in the product portfolio, how do you go about progressing a product? So you
+
+188
+00:13:33.900 --> 00:13:38.540
+<v Noah Labhart>you get it out there, you get some traction. And you mentioned, you know, then adding maybe like,
+
+189
+00:13:38.620 --> 00:13:43.540
+<v Noah Labhart>you know, inviting users or certain billing features or things after the fact. But how do
+
+190
+00:13:43.540 --> 00:13:48.440
+<v Noah Labhart>you go about that product progression process? And I'm kind of most interested in how do you
+
+191
+00:13:48.440 --> 00:13:53.220
+<v Noah Labhart>build your roadmap? How do you determine what's the next most important thing to build?
+
+192
+00:13:54.040 --> 00:13:58.940
+<v Natalie Nagele>I will tell you that it's a constantly evolving answer. I'll give you our current answer to it,
+
+193
+00:13:59.000 --> 00:14:02.580
+<v Natalie Nagele>but I can't say that that's how it's always worked. Right now, we're very focused as a
+
+194
+00:14:03.900 --> 00:14:08.140
+<v Natalie Nagele>that question a little bit in a more organized fashion, a more operational fashion. I mean,
+
+195
+00:14:08.160 --> 00:14:12.580
+<v Natalie Nagele>a lot of gut will always go into our decision making because I believe the simplest things
+
+196
+00:14:12.580 --> 00:14:15.800
+<v Natalie Nagele>are always the better things. So sometimes you just know and you don't need to measure it or
+
+197
+00:14:15.800 --> 00:14:21.160
+<v Natalie Nagele>test it or do all that stuff. But we look at products at different phases of their life.
+
+198
+00:14:21.400 --> 00:14:26.260
+<v Natalie Nagele>So we've kind of got like a phase one through five. And phase one is that idea phase. And phase
+
+199
+00:14:26.260 --> 00:14:30.380
+<v Natalie Nagele>five is maybe the product's done and it's just kind of living its life. And then you have all
+
+200
+00:14:30.380 --> 00:14:31.380
+<v Natalie Nagele>all these phases in between.
+
+201
+00:14:31.620 --> 00:14:36.220
+<v Natalie Nagele>So there's a lot of validation that happens in the middle phases of understanding what
+
+202
+00:14:36.220 --> 00:14:41.660
+<v Natalie Nagele>is our value proposition and then how do we keep nailing it until our customers are saying
+
+203
+00:14:41.660 --> 00:14:42.540
+<v Natalie Nagele>it back to us, right?
+
+204
+00:14:42.600 --> 00:14:44.480
+<v Natalie Nagele>They get it and we solved it.
+
+205
+00:14:44.580 --> 00:14:47.300
+<v Natalie Nagele>And then it's kind of, we move into this like delight phase.
+
+206
+00:14:47.540 --> 00:14:51.740
+<v Natalie Nagele>So the next thing to build heavily depends on which phase a product is in.
+
+207
+00:14:51.940 --> 00:14:54.220
+<v Natalie Nagele>We have very small teams that work on products.
+
+208
+00:14:54.320 --> 00:14:59.820
+<v Natalie Nagele>Like we try to keep them very, very small so they can be autonomous and so they can
+
+209
+00:15:00.380 --> 00:15:05.600
+<v Natalie Nagele>together. So our customer success team is constantly in connection with our product
+
+210
+00:15:05.600 --> 00:15:10.620
+<v Natalie Nagele>team to make sure that there's a single conversation going between the customer and the,
+
+211
+00:15:10.640 --> 00:15:15.300
+<v Natalie Nagele>you know, the end user and the person building the thing. And we look at a spectrum of,
+
+212
+00:15:15.400 --> 00:15:19.680
+<v Natalie Nagele>is this going to improve the product? Is this going to maintain the product? This is going
+
+213
+00:15:19.680 --> 00:15:23.020
+<v Natalie Nagele>to delight the user, right? And there's a spectrum. So it depends on the life cycle.
+
+214
+00:15:23.020 --> 00:15:30.780
+<v Natalie Nagele>I can say, for example, with Postmark, we spent two plus years on two very big projects.
+
+215
+00:15:30.920 --> 00:15:35.660
+<v Natalie Nagele>Not something I normally do, but it was to completely change the structure of the product, right?
+
+216
+00:15:35.720 --> 00:15:36.680
+<v Natalie Nagele>The product was in phase three.
+
+217
+00:15:36.720 --> 00:15:40.140
+<v Natalie Nagele>We needed to deliver on the value proposition of we can send all of your emails.
+
+218
+00:15:40.320 --> 00:15:44.240
+<v Natalie Nagele>We were only transactional for a long time and we wanted to build it so we could send all your emails.
+
+219
+00:15:44.680 --> 00:15:48.500
+<v Natalie Nagele>That was a very clearly defined roadmap because it was such a big undertaking.
+
+220
+00:15:48.500 --> 00:15:54.280
+<v Natalie Nagele>taking. Now we're in a phase where like, we need to delight our users. What are the pain points for
+
+221
+00:15:54.280 --> 00:15:58.920
+<v Natalie Nagele>them? What hurts? We like to do this thing where we send out a survey to customers and say, what
+
+222
+00:15:58.920 --> 00:16:04.020
+<v Natalie Nagele>annoys you? Not what features do you want? Not like, what's the thing that bought, like, what
+
+223
+00:16:04.020 --> 00:16:08.800
+<v Natalie Nagele>else can I do for you? But like, what annoys you when you use the product? And then we just will
+
+224
+00:16:08.800 --> 00:16:13.320
+<v Natalie Nagele>take like an iteration, an entire quarter and just like crush all of those little annoyances.
+
+225
+00:16:13.320 --> 00:16:19.060
+<v Natalie Nagele>you know so i think it's it's not like the simplest of answers because i don't think there
+
+226
+00:16:19.060 --> 00:16:23.540
+<v Natalie Nagele>is like one singular answer it just depends on this really tight collaboration between
+
+227
+00:16:23.540 --> 00:16:28.740
+<v Natalie Nagele>our customers and what they need and our product team and their understanding of what what where
+
+228
+00:16:28.740 --> 00:16:33.300
+<v Natalie Nagele>is this product right now are we growing it are we trying to figure out what our value prop is
+
+229
+00:16:33.300 --> 00:16:37.060
+<v Natalie Nagele>and trying to reach it you know or are we still validating that this is even a thing
+
+230
+00:16:37.060 --> 00:16:41.920
+<v Natalie Nagele>so there's just a lot of interaction and collaboration in that amongst those teams
+
+231
+00:16:43.940 --> 00:16:52.500
+<v Natalie Nagele>One of the things we're extremely proud of as a company is we have a nonlinear correlation between our customers growing and our support team growing because we build really solid products.
+
+232
+00:16:52.580 --> 00:16:56.060
+<v Natalie Nagele>We prioritize, you know, the product working on its own without needing support.
+
+233
+00:16:56.280 --> 00:16:59.580
+<v Natalie Nagele>And then we have this amazing customer support team that's just phenomenal.
+
+234
+00:16:59.740 --> 00:17:03.360
+<v Natalie Nagele>But it's nonlinear, which I'm really proud of, right, because you want to kind of have that economies of scale.
+
+235
+00:17:03.520 --> 00:17:09.640
+<v Natalie Nagele>Part of making sure that they grow nonlinearly is making sure we carve out time to make their lives better.
+
+236
+00:17:09.780 --> 00:17:13.100
+<v Natalie Nagele>So like little internal tools, small product improvements, right?
+
+237
+00:17:13.320 --> 00:17:18.160
+<v Natalie Nagele>always have the thing that annoys the CS team because it's the same answer over and over again.
+
+238
+00:17:18.240 --> 00:17:21.860
+<v Natalie Nagele>And what it, you know, if we just had a better explanation in the app, right. Or if we just made
+
+239
+00:17:21.860 --> 00:17:26.240
+<v Natalie Nagele>this button, you know, work fast. And what we do is that the CS team, you know, to answer your
+
+240
+00:17:26.240 --> 00:17:31.740
+<v Natalie Nagele>question, what we work on the CS team every month does a summary for the entire team, for the entire
+
+241
+00:17:31.740 --> 00:17:37.520
+<v Natalie Nagele>company of number of tickets and by theme or by, by issue there, they know that their job is to
+
+242
+00:17:37.520 --> 00:17:41.080
+<v Natalie Nagele>advocate for the customer. Like that's their number one priority. So they will come in and
+
+243
+00:17:41.080 --> 00:17:46.060
+<v Natalie Nagele>be very direct with what they think needs to change. And so we will frequently squeeze in
+
+244
+00:17:46.060 --> 00:17:49.340
+<v Natalie Nagele>little things like that. Like if they come in, they're like, look, we had, you know, 300 support
+
+245
+00:17:49.340 --> 00:17:53.820
+<v Natalie Nagele>tickets and it just keeps going up for this one thing. Like we had an issue with like a DNS update
+
+246
+00:17:53.820 --> 00:17:58.500
+<v Natalie Nagele>where customers would create an account and they would be waiting, sitting around and waiting for
+
+247
+00:17:58.500 --> 00:18:01.740
+<v Natalie Nagele>this DNS to update so that they could use Postmark. And it just, sometimes it wouldn't work.
+
+248
+00:18:01.880 --> 00:18:04.780
+<v Natalie Nagele>And it would generate like a ton of support because how long are you going to sit there and
+
+249
+00:18:04.780 --> 00:18:08.080
+<v Natalie Nagele>wait, right? You're going to think it's broken. You're going to email support. It's obviously
+
+250
+00:18:08.080 --> 00:18:11.740
+<v Natalie Nagele>ruining the customer experience, but it's also really creating a lot of load on the CS team.
+
+251
+00:18:12.140 --> 00:18:17.380
+<v Natalie Nagele>And that's the kind of stuff that they surface it to the team on a regular basis. And the team
+
+252
+00:18:17.380 --> 00:18:20.820
+<v Natalie Nagele>reads it. And sometimes they'll be like, hey, I can grab this. I have an extra couple of days,
+
+253
+00:18:20.900 --> 00:18:24.380
+<v Natalie Nagele>or I'll do this in a couple hours. And they'll grab a small thing and they'll change it. Or
+
+254
+00:18:24.380 --> 00:18:28.180
+<v Natalie Nagele>sometimes we'll do like we did last quarter where we said, all right, what are the top of that list?
+
+255
+00:18:28.280 --> 00:18:30.540
+<v Natalie Nagele>And how can we crush it? How can we just get rid of it?
+
+256
+00:18:31.920 --> 00:18:35.240
+<v Noah Labhart>Well, let's switch to team. So how do you
+
+257
+00:18:35.240 --> 00:18:41.520
+<v Noah Labhart>How do you go about building your team and, you know, across products really, but across team culture, company culture?
+
+258
+00:18:41.680 --> 00:18:48.440
+<v Noah Labhart>I know you have a very specific and unique view on company culture and how you go about it with people based.
+
+259
+00:18:48.840 --> 00:18:51.020
+<v Noah Labhart>How do you go about building that team?
+
+260
+00:18:51.120 --> 00:18:56.420
+<v Noah Labhart>And what do you look for in those people to indicate that they are the winning horses to join
+
+261
+00:18:56.420 --> 00:18:56.920
+<v Natalie Nagele>you?
+
+262
+00:18:56.740 --> 00:19:00.700
+<v Natalie Nagele>You know, it's funny when you say winning horse, I almost like, oh, they're not horses, they're people.
+
+263
+00:19:00.920 --> 00:19:02.440
+<v Natalie Nagele>It really comes down to people.
+
+264
+00:19:02.440 --> 00:19:07.140
+<v Natalie Nagele>I think the thing that makes Wildbit a little unique, well, two things that make Wildbit unique.
+
+265
+00:19:07.320 --> 00:19:09.960
+<v Natalie Nagele>One is the fact that neither Chris nor I are software developers.
+
+266
+00:19:10.840 --> 00:19:15.740
+<v Natalie Nagele>So Chris coded very early in his career when he was 19, realized very quickly it wasn't for him.
+
+267
+00:19:15.820 --> 00:19:18.900
+<v Natalie Nagele>So we've never been in the position where like, I can do this.
+
+268
+00:19:18.980 --> 00:19:27.620
+<v Natalie Nagele>You know, so from day one or day two, call it, we always prioritize the experience that every employee has at Wildbit.
+
+269
+00:19:27.740 --> 00:19:29.100
+<v Natalie Nagele>It was always the most important thing.
+
+270
+00:19:29.100 --> 00:19:37.660
+<v Natalie Nagele>So for us, culture is about understanding who we are as a company and where we want to go and then finding folks who feel really passionately about going there with us.
+
+271
+00:19:38.000 --> 00:19:42.780
+<v Natalie Nagele>And, you know, we're a small but mighty software company with multiple products. Right.
+
+272
+00:19:42.820 --> 00:19:53.060
+<v Natalie Nagele>So we're a team that can't be filled with people who are possessive over their work, for example, or who who aren't interested in changing direction or changing what they work on.
+
+273
+00:19:53.060 --> 00:20:02.540
+<v Natalie Nagele>One of the ways in which we find the right people is we're looking for individuals who understand that a peaceful, fulfilling work requires work.
+
+274
+00:20:02.680 --> 00:20:04.860
+<v Natalie Nagele>Right. So it's like it's a it's a mutual agreement.
+
+275
+00:20:05.000 --> 00:20:09.540
+<v Natalie Nagele>One of our core operating principles is that fulfilling work will push you, but not break you.
+
+276
+00:20:09.840 --> 00:20:20.840
+<v Natalie Nagele>You know, and so it's this idea that people come here curious and passionate about their craft and appreciating the fact that work is not the most important thing in the world.
+
+277
+00:20:20.840 --> 00:20:27.880
+<v Natalie Nagele>so we have values and principles we actually just updated a set of principles that rules by which
+
+278
+00:20:27.880 --> 00:20:32.980
+<v Natalie Nagele>we live and then values by which we work our behaviors and we use them very much as a framework
+
+279
+00:20:32.980 --> 00:20:38.460
+<v Natalie Nagele>for how we identify individuals who we think will really thrive here and be really successful here
+
+280
+00:20:39.020 --> 00:20:44.900
+<v Noah Labhart>it's interesting too you know it is about people but i i hear you saying too it's about people that
+
+281
+00:20:44.900 --> 00:20:48.840
+<v Noah Labhart>are coming in that are not going to be possessive of their work they need to be able to work
+
+282
+00:20:50.840 --> 00:20:55.040
+<v Noah Labhart>that mixed, it seems like they're probably hungry, they're excited.
+
+283
+00:20:55.260 --> 00:20:59.040
+<v Noah Labhart>Given the right fulfilling opportunity that you were mentioning,
+
+284
+00:20:59.840 --> 00:21:03.060
+<v Noah Labhart>they'll come and turn somersaults for you.
+
+285
+00:21:03.360 --> 00:21:08.880
+<v Natalie Nagele>What we found over 20 years is that our job is to create the space
+
+286
+00:21:08.880 --> 00:21:10.900
+<v Natalie Nagele>for brilliant people to do brilliant work.
+
+287
+00:21:11.300 --> 00:21:14.980
+<v Natalie Nagele>I don't think they do somersaults for us as much as they do it for each other.
+
+288
+00:21:15.260 --> 00:21:19.040
+<v Natalie Nagele>There's this deep empathy that teams help each other achieve more.
+
+289
+00:21:20.840 --> 00:21:27.260
+<v Natalie Nagele>understanding that work is collaborative and we can't work in our, on our own. And we care deeply
+
+290
+00:21:27.260 --> 00:21:32.080
+<v Natalie Nagele>about each other's fulfillment in their, in their job. You know, if you kind of look at like our
+
+291
+00:21:32.080 --> 00:21:36.080
+<v Natalie Nagele>principles, right? Like our, these five rules, these things that we believe will never change,
+
+292
+00:21:36.180 --> 00:21:39.580
+<v Natalie Nagele>no matter how much, how, how long the company has been in business, no matter how big we get,
+
+293
+00:21:39.680 --> 00:21:46.740
+<v Natalie Nagele>we have these core essential beliefs that we all have to share. And they are this empathy for each
+
+294
+00:21:46.740 --> 00:21:52.200
+<v Natalie Nagele>other. There's this idea that work is a commitment. There's a compact almost between the company
+
+295
+00:21:52.200 --> 00:21:57.760
+<v Natalie Nagele>and the employee. I, as your company, promise to create a space where you can have deep work,
+
+296
+00:21:57.980 --> 00:22:02.220
+<v Natalie Nagele>meaningful work, where work does not become the center of your world. It becomes an integration
+
+297
+00:22:02.220 --> 00:22:08.340
+<v Natalie Nagele>into your world. And then you, as employee, make a compact to us that says, and I'm going to,
+
+298
+00:22:08.880 --> 00:22:13.660
+<v Natalie Nagele>for us, it's stay calm and keep perspective. I'm going to be guided by purpose. I'm going to
+
+299
+00:22:13.660 --> 00:22:18.020
+<v Natalie Nagele>to celebrate opportunities to learn. I'm not going to fight against taking risks, calculated risks,
+
+300
+00:22:18.120 --> 00:22:22.500
+<v Natalie Nagele>but then I'm going to be team oriented while also self-motivated, right? So it's like,
+
+301
+00:22:22.560 --> 00:22:28.060
+<v Natalie Nagele>I look at it as a compact between each other, right? You can't expect your team to do all
+
+302
+00:22:28.060 --> 00:22:31.200
+<v Natalie Nagele>these things if you're not creating the space for them to do it. And I think that's where most of
+
+303
+00:22:31.200 --> 00:22:36.440
+<v Natalie Nagele>the time culture breaks. Employers and companies, you know, whatever, however you want to look at
+
+304
+00:22:36.440 --> 00:22:41.780
+<v Natalie Nagele>it, really look at it. My gift to you is money and your gift to me is your time and attention.
+
+305
+00:22:43.660 --> 00:22:49.820
+<v Natalie Nagele>That's right. Like I don't, money is just a piece of a bigger equation. And so if you can believe
+
+306
+00:22:49.820 --> 00:22:55.260
+<v Natalie Nagele>that people are really do want to be fulfilled in their work, you just aren't, you have to give
+
+307
+00:22:55.260 --> 00:23:01.140
+<v Natalie Nagele>them the space to do that. Then they will respond with creating great products, right? Caring for
+
+308
+00:23:01.140 --> 00:23:05.720
+<v Natalie Nagele>each other, caring for their customers, caring for you as an owner, right? I mean, all of that
+
+309
+00:23:05.720 --> 00:23:07.580
+<v Natalie Nagele>comes as a result of creating that space.
+
+310
+00:23:10.120 --> 00:23:12.540
+<v Noah Labhart>Well, this will be interesting because, you know,
+
+311
+00:23:14.000 --> 00:23:16.020
+<v Noah Labhart>about scalability normally.
+
+312
+00:23:16.240 --> 00:23:22.860
+<v Noah Labhart>And I hear you saying that your product company is scrappy.
+
+313
+00:23:22.960 --> 00:23:25.660
+<v Noah Labhart>You want to have only a handful of people on each product.
+
+314
+00:23:25.860 --> 00:23:30.260
+<v Noah Labhart>The products, we can talk about how you scaled some of the products if you'd like.
+
+315
+00:23:30.320 --> 00:23:38.260
+<v Noah Labhart>But I'm interested in that and also how you effectively scale your company as you're
+
+316
+00:23:38.260 --> 00:23:41.920
+<v Noah Labhart>bringing on new ideas, new products, and things like that.
+
+317
+00:23:42.000 --> 00:23:43.120
+<v Noah Labhart>So talk to me about scalability.
+
+318
+00:23:45.020 --> 00:23:49.740
+<v Natalie Nagele>Scalability is like my favorite topic right now because I am super excited to understand
+
+319
+00:23:49.740 --> 00:23:51.400
+<v Natalie Nagele>how you scale a company like ours.
+
+320
+00:23:51.840 --> 00:23:57.400
+<v Natalie Nagele>I've been spending a lot of time researching and looking into other organizations to see
+
+321
+00:23:57.400 --> 00:23:57.900
+<v Natalie Nagele>how it works.
+
+322
+00:23:58.220 --> 00:24:00.260
+<v Natalie Nagele>My perspectives changed a little bit.
+
+323
+00:24:00.440 --> 00:24:07.140
+<v Natalie Nagele>For a long time, I looked at private bootstrapped companies as wanting to prove the opposite
+
+324
+00:24:07.140 --> 00:24:11.880
+<v Natalie Nagele>of venture capital in that it's not about maximizing your expenses and hiring as many
+
+325
+00:24:13.660 --> 00:24:17.100
+<v Natalie Nagele>than the company that a product grows to like reach some growth milestone.
+
+326
+00:24:17.300 --> 00:24:20.440
+<v Natalie Nagele>And the opposite in my mind was as efficient as possible, right?
+
+327
+00:24:20.520 --> 00:24:24.140
+<v Natalie Nagele>Hire the least amount of people to do the most amount of work, you know, to do, I guess,
+
+328
+00:24:24.140 --> 00:24:26.120
+<v Natalie Nagele>to do the most amount of work, to see the most results, right?
+
+329
+00:24:26.160 --> 00:24:26.780
+<v Natalie Nagele>The biggest results.
+
+330
+00:24:26.920 --> 00:24:31.720
+<v Natalie Nagele>My mind has shifted a little bit in that I'm not really sure the opposite of growth at
+
+331
+00:24:31.720 --> 00:24:35.900
+<v Natalie Nagele>all costs is maybe slow growth or minimizing team size.
+
+332
+00:24:36.080 --> 00:24:38.980
+<v Natalie Nagele>I'm looking a lot at maximizing impact.
+
+333
+00:24:39.300 --> 00:24:43.580
+<v Natalie Nagele>So how can you scale a business like ours with maximizing impact, right?
+
+334
+00:24:43.660 --> 00:24:44.400
+<v Natalie Nagele>So scaling impact.
+
+335
+00:24:44.620 --> 00:24:48.060
+<v Natalie Nagele>And the biggest impact I think I can have as a company is hiring people because the
+
+336
+00:24:48.060 --> 00:24:50.920
+<v Natalie Nagele>more people that get to work at Wildbit, I think of it as ripples.
+
+337
+00:24:51.140 --> 00:24:53.340
+<v Natalie Nagele>You know, like if you drop a pebble in water, it creates ripples.
+
+338
+00:24:53.440 --> 00:24:57.020
+<v Natalie Nagele>And the employees at first ripple, but then they have their families, their communities,
+
+339
+00:24:57.240 --> 00:25:00.160
+<v Natalie Nagele>you know, all the ways in which they contribute and create positive impact.
+
+340
+00:25:00.320 --> 00:25:01.840
+<v Natalie Nagele>So like, you know, that's how you scale that.
+
+341
+00:25:02.500 --> 00:25:05.020
+<v Natalie Nagele>So, you know, Postmark is an interesting example.
+
+342
+00:25:05.020 --> 00:25:09.160
+<v Natalie Nagele>It's our biggest product that has the most people, but we have other products and people
+
+343
+00:25:09.160 --> 00:25:09.680
+<v Natalie Nagele>move around.
+
+344
+00:25:09.680 --> 00:25:35.420
+<v Natalie Nagele>So for us, scale a lot of times is where can we be efficient, but not at a cost, right? Not for the sake of efficiency, but for the sake of other things. We think about the CS team as a good example of where Postmark is going to take up a lot of our resources, but we have other products to support. Does that mean I have to get a dedicated customer success team for each product? Or can my one customer success team find ways to support all the products so I don't have to scale that disproportionately?
+
+345
+00:25:35.420 --> 00:25:40.160
+<v Natalie Nagele>proportionately. And we've been looking at that and saying, well, where can we have consistency
+
+346
+00:25:40.160 --> 00:25:45.920
+<v Natalie Nagele>across our products? Account level permission or account level things come as an example, right?
+
+347
+00:25:45.980 --> 00:25:49.620
+<v Natalie Nagele>If all our user permissions look more or less the same, if all of our billing is the same,
+
+348
+00:25:49.680 --> 00:25:56.560
+<v Natalie Nagele>if all of login is the same, a CS person on our team can be a generalist, right? They can know
+
+349
+00:25:56.560 --> 00:26:01.760
+<v Natalie Nagele>how a lot of products work versus making them specialize in each product. So we're thinking a
+
+350
+00:26:01.760 --> 00:26:09.580
+<v Natalie Nagele>a lot about how you scale a company for positive impact, but not just for the sake of maximizing
+
+351
+00:26:09.580 --> 00:26:14.700
+<v Natalie Nagele>profits. I love profits, but it can't just be the means to the end, right? There's got to be more to
+
+352
+00:26:14.700 --> 00:26:15.260
+<v Natalie Nagele>it than that.
+
+353
+00:26:16.440 --> 00:26:22.180
+<v Noah Labhart>So as you step out on the balcony and you look across all you've built product-wise,
+
+354
+00:26:22.440 --> 00:26:25.960
+<v Noah Labhart>company-wise with Wildbit, what are you most proud of?
+
+355
+00:26:26.800 --> 00:26:30.320
+<v Natalie Nagele>Most proud of the people. I am daily
+
+356
+00:26:31.760 --> 00:26:38.860
+<v Natalie Nagele>just how brilliant and caring and just wonderful they are as human beings. And, you know, I'm proud
+
+357
+00:26:38.860 --> 00:26:44.520
+<v Natalie Nagele>of the fact that we've built a place where they can be those people. Lately, especially I've been
+
+358
+00:26:44.520 --> 00:26:52.380
+<v Natalie Nagele>hiring folks who are coming from, you know, your typical Silicon Valley startup world, and they
+
+359
+00:26:52.380 --> 00:26:57.500
+<v Natalie Nagele>share how much they're able to be more of themselves at Wildbit because they don't have to
+
+360
+00:26:57.500 --> 00:27:10.400
+<v Natalie Nagele>to protect their work at all costs so it doesn't get stolen by somebody else, you know, or because they're respected, even though they're a woman on the engineering team, you know, or because they are respected to move slower, but with intention.
+
+361
+00:27:10.940 --> 00:27:20.040
+<v Natalie Nagele>You know, there's just, I'm proud that we gave, we've created that space. I can't say that it was always intentional. I think it's just part of that is just who we are and how we view the world.
+
+362
+00:27:20.040 --> 00:27:26.500
+<v Natalie Nagele>but that watching really beautiful human beings do amazing things for themselves, for each other,
+
+363
+00:27:26.660 --> 00:27:30.820
+<v Natalie Nagele>for their communities is definitely what I'm most proud of.
+
+364
+00:27:31.180 --> 00:27:37.480
+<v Noah Labhart>You know, it's kind of a sad state of the world that elsewhere that is not the norm,
+
+365
+00:27:37.560 --> 00:27:42.840
+<v Noah Labhart>you know, that people have to protect their work or they have to be worried about their gender or
+
+366
+00:27:42.840 --> 00:27:47.780
+<v Noah Labhart>their skin color or anything. I'm glad Wildbit is creating a great home for people there.
+
+367
+00:27:47.780 --> 00:27:48.420
+<v Natalie Nagele>Yeah,
+
+368
+00:27:48.540 --> 00:27:49.440
+<v Natalie Nagele>it's like so disappointing.
+
+369
+00:27:49.560 --> 00:27:52.780
+<v Natalie Nagele>We launched People First Jobs because a little bit like,
+
+370
+00:27:52.820 --> 00:27:54.600
+<v Natalie Nagele>while it's not unique, you know,
+
+371
+00:27:54.620 --> 00:27:56.200
+<v Natalie Nagele>there's a lot of companies out there that are really,
+
+372
+00:27:56.260 --> 00:27:57.720
+<v Natalie Nagele>that put people first.
+
+373
+00:27:58.220 --> 00:28:00.160
+<v Natalie Nagele>And that was kind of the guiding principles.
+
+374
+00:28:00.220 --> 00:28:01.540
+<v Natalie Nagele>Like a lot of the team was like,
+
+375
+00:28:01.560 --> 00:28:02.660
+<v Natalie Nagele>there's other companies like us.
+
+376
+00:28:02.720 --> 00:28:03.660
+<v Natalie Nagele>We got to bring us all together.
+
+377
+00:28:03.800 --> 00:28:05.240
+<v Natalie Nagele>And we have to help people who care.
+
+378
+00:28:05.360 --> 00:28:07.060
+<v Natalie Nagele>We have to help them find more organizations
+
+379
+00:28:07.060 --> 00:28:09.920
+<v Natalie Nagele>that prioritize people, human beings,
+
+380
+00:28:10.060 --> 00:28:12.720
+<v Natalie Nagele>over some of this other crap that we've been convinced
+
+381
+00:28:12.720 --> 00:28:14.660
+<v Natalie Nagele>is the purpose of business,
+
+382
+00:28:14.880 --> 00:28:16.580
+<v Natalie Nagele>which is just old way of thinking.
+
+383
+00:28:17.780 --> 00:28:23.540
+<v Noah Labhart>Well, let's flip the script a little bit. So tell me about a mistake you made and how you and your team responded to it.
+
+384
+00:28:23.660 --> 00:28:25.560
+<v Natalie Nagele>I've never made mistakes. I don't know what you're talking about.
+
+385
+00:28:27.380 --> 00:28:30.540
+<v Natalie Nagele>I tell my team, I know I'm always right. You guys, what are you talking about?
+
+386
+00:28:30.980 --> 00:28:36.760
+<v Natalie Nagele>I have made so many mistakes. I mean, if we want to talk about a large mistake, you know, we built Conveyor.
+
+387
+00:28:37.220 --> 00:28:42.520
+<v Natalie Nagele>We started working on Conveyor five years before we shut it down. And so it's not the money that's the mistake.
+
+388
+00:28:42.520 --> 00:28:49.060
+<v Natalie Nagele>the mistake was not following my own like true principles and pretending like this one was
+
+389
+00:28:49.060 --> 00:28:53.820
+<v Natalie Nagele>different. I always love that idea that the world is, I think it's Ray Dalio, right? Everything is
+
+390
+00:28:53.820 --> 00:28:58.120
+<v Natalie Nagele>another one of those. The mistake that Chris and I made was looking at Conveyor as this product
+
+391
+00:28:58.120 --> 00:29:03.660
+<v Natalie Nagele>and believing that like you don't need to reach some minimal and, you know, MVP is a loaded thing
+
+392
+00:29:03.660 --> 00:29:09.080
+<v Natalie Nagele>now or whatever, but you got to reach some kind of value sooner than five years and you gotta, you
+
+393
+00:29:09.080 --> 00:29:14.140
+<v Natalie Nagele>know, you got to look at your team and be honest that you can fail at things.
+
+394
+00:29:14.280 --> 00:29:14.860
+<v Natalie Nagele>And that's OK.
+
+395
+00:29:14.940 --> 00:29:16.320
+<v Natalie Nagele>We've never had a product fail.
+
+396
+00:29:16.480 --> 00:29:21.420
+<v Natalie Nagele>So I think we just were operating under this idea that it's just one more feature, just
+
+397
+00:29:21.420 --> 00:29:23.180
+<v Natalie Nagele>one more thing, just something.
+
+398
+00:29:23.320 --> 00:29:25.380
+<v Natalie Nagele>And, you know, in hindsight, that's a huge mistake.
+
+399
+00:29:25.760 --> 00:29:30.500
+<v Natalie Nagele>We have this ability to make a giant mistake like that at Wildbit and nobody gets fired.
+
+400
+00:29:31.620 --> 00:29:36.360
+<v Natalie Nagele>And that is, you know, extremely important to be able to take risks, to be able to make
+
+401
+00:29:36.360 --> 00:29:41.440
+<v Natalie Nagele>mistakes to not be so fragile that you know a mistake even of that size you know i think we
+
+402
+00:29:41.440 --> 00:29:46.820
+<v Natalie Nagele>mistakes, to not be so fragile that, you know, a mistake even of that size, you know, I think we
+
+403
+00:29:47.370 --> 00:29:50.860
+<v Natalie Nagele>did the math and we spent three million dollars on it, that a mistake of that size wouldn't crush us,
+
+404
+00:29:50.860 --> 00:29:57.640
+<v Natalie Nagele>you know, wouldn't have anybody laid off. So the team that had been working on it had been
+
+405
+00:29:57.640 --> 00:30:01.820
+<v Natalie Nagele>working on it for a while and they were in a spot too, feeling bad about, you know, why we're not
+
+406
+00:30:01.820 --> 00:30:02.920
+<v Natalie Nagele>contributing to Wildbit, right? We're working on this thing that hasn't made us any money. And
+
+407
+00:30:03.080 --> 00:30:05.960
+<v Natalie Nagele>Like, you know, there's just like the motivation just is really hard.
+
+408
+00:30:06.140 --> 00:30:08.480
+<v Natalie Nagele>And what we ended up doing was we brought the team in.
+
+409
+00:30:08.900 --> 00:30:12.020
+<v Natalie Nagele>You know, they thought they were coming in to figure out what we're working on next.
+
+410
+00:30:12.140 --> 00:30:13.360
+<v Natalie Nagele>And we said, who's still excited?
+
+411
+00:30:15.920 --> 00:30:16.640
+<v Natalie Nagele>Who's still here?
+
+412
+00:30:16.980 --> 00:30:18.680
+<v Natalie Nagele>And Chris was like, I'll go first.
+
+413
+00:30:18.860 --> 00:30:19.940
+<v Natalie Nagele>I'm not, you know.
+
+414
+00:30:19.940 --> 00:30:25.260
+<v Natalie Nagele>And we went around the room and we found the opportunity to say, this isn't it for us, you know, and it's okay.
+
+415
+00:30:25.400 --> 00:30:26.760
+<v Natalie Nagele>And nobody's going to be fired.
+
+416
+00:30:26.900 --> 00:30:29.860
+<v Natalie Nagele>And let's just say it's done and it's over and it's going to be okay.
+
+417
+00:30:31.820 --> 00:30:40.540
+<v Natalie Nagele>Everyone obviously put so much work into something, but I think there was a lot of relief that, okay, it's okay to work on something and realize it's not the thing.
+
+418
+00:30:40.560 --> 00:30:41.140
+<v Natalie Nagele>It didn't work.
+
+419
+00:30:41.460 --> 00:30:44.740
+<v Natalie Nagele>And to put it on the shelf and move on to the next thing.
+
+420
+00:30:46.380 --> 00:30:50.940
+<v Noah Labhart>So what does the future look like for Wildbit, for your products, and for your team?
+
+421
+00:30:51.980 --> 00:30:53.000
+<v Natalie Nagele>Future is bright.
+
+422
+00:30:54.180 --> 00:30:58.220
+<v Natalie Nagele>You know, Wildbit's 20, and Chris and I have said we've got at least another 10 in us.
+
+423
+00:30:58.540 --> 00:31:01.240
+<v Natalie Nagele>So we're on this new 10-year strategic plan.
+
+424
+00:31:01.820 --> 00:31:04.860
+<v Natalie Nagele>This is year one. We've been preparing for it for two years, and this is year one.
+
+425
+00:31:05.200 --> 00:31:12.020
+<v Natalie Nagele>The goal is to really double down on impact, what impact Wildbit has on the world.
+
+426
+00:31:12.160 --> 00:31:14.060
+<v Natalie Nagele>I look at impact as outside of us, right?
+
+427
+00:31:14.340 --> 00:31:23.180
+<v Natalie Nagele>And then to understand how a company like ours can be a collection of human beings working on cool stuff and not necessarily a software company.
+
+428
+00:31:23.180 --> 00:31:33.600
+<v Natalie Nagele>So really, really, really operationalizing experimentation and multi-product and how teams organize around multiple products.
+
+429
+00:31:33.840 --> 00:31:40.780
+<v Natalie Nagele>What are the life cycles of these products and how can we do more with our products and with ourselves to provide positive impact on the world?
+
+430
+00:31:41.140 --> 00:31:47.260
+<v Natalie Nagele>It's a big undertaking. I think one of my measures of success in the next 10 years is to have a non-software product.
+
+431
+00:31:47.260 --> 00:31:53.280
+<v Natalie Nagele>I think that would be really good proof to me that it really is just about really caring,
+
+432
+00:31:53.420 --> 00:31:57.640
+<v Natalie Nagele>thoughtful people, really smart people, putting them in a room together, giving them a problem
+
+433
+00:31:57.640 --> 00:32:00.460
+<v Natalie Nagele>to solve and watching them just magically solve it.
+
+434
+00:32:00.520 --> 00:32:01.400
+<v Natalie Nagele>It's not magic, right?
+
+435
+00:32:01.480 --> 00:32:03.440
+<v Natalie Nagele>But it looks like magic when you look from the outside.
+
+436
+00:32:03.800 --> 00:32:05.120
+<v Natalie Nagele>So that's kind of the goal.
+
+437
+00:32:05.320 --> 00:32:06.080
+<v Natalie Nagele>It's big.
+
+438
+00:32:06.360 --> 00:32:08.060
+<v Natalie Nagele>I think we're going to grow in size.
+
+439
+00:32:08.460 --> 00:32:12.120
+<v Natalie Nagele>Really looking forward to seeing how we can operate as a bigger team.
+
+440
+00:32:12.200 --> 00:32:15.000
+<v Natalie Nagele>I don't think we're going to be a thousand people, but I'd like to see us maybe get to
+
+441
+00:32:15.000 --> 00:32:21.820
+<v Natalie Nagele>to 50 or 100 and really see how we can use Wildbit as this. I think of businesses as tools,
+
+442
+00:32:22.000 --> 00:32:26.400
+<v Natalie Nagele>like how do I use Wildbit as a tool to maximize impact for human beings? That's really at the
+
+443
+00:32:26.400 --> 00:32:31.400
+<v Natalie Nagele>core of how I look at the business. And we've got four constituents. We've got the shareholders,
+
+444
+00:32:31.800 --> 00:32:35.840
+<v Natalie Nagele>which are Chris and I, we're the only owners of the business. We've got the employees,
+
+445
+00:32:35.980 --> 00:32:40.180
+<v Natalie Nagele>the customers and the community. And so I'm like, okay, how do I use Wildbit as a tool to maximize
+
+446
+00:32:40.180 --> 00:32:44.820
+<v Natalie Nagele>positive impact on all four of those? That's where it gets really fun for me and really
+
+447
+00:32:45.000 --> 00:32:49.120
+<v Natalie Nagele>interesting and looking at our products as a way to enable those for constituents to really thrive.
+
+448
+00:32:49.440 --> 00:32:53.640
+<v Noah Labhart>That is a bright future. And that is a big goal. I wish you all the luck in the world. I really
+
+449
+00:32:53.640 --> 00:33:00.240
+<v Noah Labhart>love the idea of a non-software product too, as a tech guy for 15, 16 years, I've always been drawn
+
+450
+00:33:00.240 --> 00:33:04.720
+<v Noah Labhart>to creating something, you know, in the world of atoms, not the world of ones and zeros.
+
+451
+00:33:04.960 --> 00:33:05.620
+<v Natalie Nagele>I mean,
+
+452
+00:33:05.640 --> 00:33:09.000
+<v Natalie Nagele>we're not a unique, right? There's so many folks, especially software folks who are like
+
+453
+00:33:09.620 --> 00:33:14.180
+<v Natalie Nagele>tinkerers, right? Chris is like baking bread or making soap or, you know, whatever,
+
+454
+00:33:15.000 --> 00:33:18.940
+<v Natalie Nagele>tinkering, racing cars, whatever he can do to just like be out there in the physical world.
+
+455
+00:33:19.160 --> 00:33:23.740
+<v Natalie Nagele>It's because nothing we do is tangible. It's tangible in the people, but, and then our
+
+456
+00:33:23.740 --> 00:33:28.540
+<v Natalie Nagele>customers that we meet and we talk to, but I can't touch it. And I think we all yearn for,
+
+457
+00:33:28.560 --> 00:33:33.380
+<v Natalie Nagele>or a lot of us yearn for something we can actually feel with our hands and that can be done. I think
+
+458
+00:33:33.380 --> 00:33:38.060
+<v Natalie Nagele>that's the other big thing I've learned about myself is I search for products that have an end
+
+459
+00:33:38.060 --> 00:33:42.480
+<v Natalie Nagele>because our work is never done, you know, especially in web software, right? Like I'm
+
+460
+00:33:42.480 --> 00:33:42.980
+<v Natalie Nagele>I'm not shipping.
+
+461
+00:33:43.000 --> 00:33:44.440
+<v Natalie Nagele>I almost like, I wish sometimes I'd laugh.
+
+462
+00:33:44.520 --> 00:33:46.200
+<v Natalie Nagele>I'm like, can't we be like in the CD business?
+
+463
+00:33:46.340 --> 00:33:47.180
+<v Natalie Nagele>Like, here's the version.
+
+464
+00:33:47.260 --> 00:33:48.440
+<v Natalie Nagele>I'm going to ship everybody a CD.
+
+465
+00:33:48.960 --> 00:33:51.740
+<v Natalie Nagele>Ship like a downloadable software.
+
+466
+00:33:52.000 --> 00:33:53.260
+<v Natalie Nagele>Because then it's done, right?
+
+467
+00:33:53.380 --> 00:33:54.980
+<v Natalie Nagele>And you're like, okay, on to the next version.
+
+468
+00:33:56.760 --> 00:33:59.600
+<v Noah Labhart>Well, Natalie, who influences the way that you work?
+
+469
+00:34:00.400 --> 00:34:02.860
+<v Noah Labhart>CEO, CTO, architect, really any person.
+
+470
+00:34:03.000 --> 00:34:05.180
+<v Noah Labhart>Name a person that you look up to and tell me why.
+
+471
+00:34:05.560 --> 00:34:06.680
+<v Natalie Nagele>That's such a hard question.
+
+472
+00:34:06.740 --> 00:34:08.880
+<v Natalie Nagele>Because there's so many different people that I look up to.
+
+473
+00:34:08.880 --> 00:34:12.680
+<v Natalie Nagele>On the personal side, Peldi from Balsamiq is a friend of mine.
+
+474
+00:34:12.740 --> 00:34:15.380
+<v Natalie Nagele>And over the years, his name comes up to us all the time.
+
+475
+00:34:15.440 --> 00:34:19.200
+<v Natalie Nagele>And just a person who has perspective on why we do all of these things.
+
+476
+00:34:19.320 --> 00:34:23.780
+<v Natalie Nagele>Just a really clear thinker and understands the bigger picture of all of it.
+
+477
+00:34:24.060 --> 00:34:30.700
+<v Natalie Nagele>I've also been lately really fascinated or really interested in the work that Ben Chestnut has done at MailChimp.
+
+478
+00:34:30.780 --> 00:34:35.800
+<v Natalie Nagele>Because it's one of those examples of a product that the company stayed private, right, but grew really big.
+
+479
+00:34:35.960 --> 00:34:37.920
+<v Natalie Nagele>And I'm really fascinated by that.
+
+480
+00:34:38.880 --> 00:34:44.180
+<v Natalie Nagele>Just this week, I read an incredible interview with Toby from Shopify on the observer effect.
+
+481
+00:34:44.460 --> 00:34:46.380
+<v Natalie Nagele>Just this week, I read an incredible interview with Tobi from Shopify on The Observer Effect.
+
+482
+00:34:46.600 --> 00:34:52.600
+<v Natalie Nagele>He's also another, just somebody followed over the years from, you know, back when it was just like Rails conferences.
+
+483
+00:34:52.880 --> 00:34:57.940
+<v Natalie Nagele>But just watching his way of thinking and articulating the world really resonates with me.
+
+484
+00:34:58.260 --> 00:35:03.300
+<v Natalie Nagele>And there's like my mom, right, who came to this country with nothing and figured out how to build a thing.
+
+485
+00:35:03.460 --> 00:35:06.080
+<v Natalie Nagele>So there's kind of a lot of inspiration out there.
+
+486
+00:35:06.080 --> 00:35:06.640
+<v Noah Labhart>I
+
+487
+00:35:06.640 --> 00:35:16.960
+<v Noah Labhart>actually hear that a lot. Like, how do I pick one person? There's so many facets to people, you know, and you can find influence in different areas of your life.
+
+488
+00:35:18.020 --> 00:35:29.000
+<v Noah Labhart>So if you could go back to the beginning, the very beginning of Wildbit or even the beginning of a product you pick, what would you do differently or where would you consider taking a different approach?
+
+489
+00:35:29.680 --> 00:35:34.520
+<v Natalie Nagele>Chris and I have said over the years that one of our biggest flaws is not looking at
+
+490
+00:35:35.060 --> 00:35:39.300
+<v Natalie Nagele>opportunity from a business standpoint, like what we could do that goes past us.
+
+491
+00:35:39.380 --> 00:35:43.880
+<v Natalie Nagele>We took a really long time to switch from being a stupid business from a smart business
+
+492
+00:35:43.880 --> 00:35:46.700
+<v Natalie Nagele>or something like that, but a business that relies really heavily on Chris and Natalie
+
+493
+00:35:47.260 --> 00:35:52.560
+<v Natalie Nagele>to understanding that we can bring structure and operational excellence and not rely on
+
+494
+00:35:52.560 --> 00:35:53.060
+<v Natalie Nagele>us anymore.
+
+495
+00:35:53.020 --> 00:35:58.120
+<v Natalie Nagele>more. So one of the things we did really late was move from a flat org to having, you know,
+
+496
+00:35:58.120 --> 00:36:03.780
+<v Natalie Nagele>leads who help individual contributors grow and who help us think through problems and,
+
+497
+00:36:03.820 --> 00:36:09.080
+<v Natalie Nagele>you know, who take some of that work off of our plates. That took us a really long time to realize
+
+498
+00:36:09.080 --> 00:36:15.180
+<v Natalie Nagele>and at the cost of us really starting to not like our work. So, you know, one of the things that's
+
+499
+00:36:15.180 --> 00:36:18.220
+<v Natalie Nagele>really funny that I don't think people think about as much as they should. We've been doing
+
+500
+00:36:18.220 --> 00:36:22.400
+<v Natalie Nagele>this for 20 years. I have not woken up every morning for 20 years, like super excited to go
+
+501
+00:36:23.020 --> 00:36:29.700
+<v Natalie Nagele>There are moments, many moments, and sometimes they last a long time where owners, right, like founders hate their job.
+
+502
+00:36:31.020 --> 00:36:37.680
+<v Natalie Nagele>I think at that point is when a lot of people start to sell or start contemplating selling or raising, whatever, whatever those things are.
+
+503
+00:36:37.800 --> 00:36:42.900
+<v Natalie Nagele>Chris and I, when we hit those moments, start going really deep into introspection and like, OK, what do we change?
+
+504
+00:36:43.040 --> 00:36:44.580
+<v Natalie Nagele>Because the business belongs to us, right?
+
+505
+00:36:44.640 --> 00:36:49.500
+<v Natalie Nagele>So like we can change it in whatever direction we want to make it so it serves us, too, so we enjoy it.
+
+506
+00:36:49.500 --> 00:36:55.600
+<v Natalie Nagele>we spent way too long not realizing that and not making change. So, you know, there were
+
+507
+00:36:55.600 --> 00:37:01.400
+<v Natalie Nagele>some dark moments in our history around, you know, just hating the work or just feeling like it got
+
+508
+00:37:01.400 --> 00:37:06.880
+<v Natalie Nagele>too big or too complicated and things that once we brought really great experienced people into
+
+509
+00:37:06.880 --> 00:37:11.220
+<v Natalie Nagele>the mix, they showed us that it doesn't have to be that way and that they can share in some of
+
+510
+00:37:11.220 --> 00:37:16.000
+<v Natalie Nagele>that load and they can help us develop the things that we really care about and just keep opening up
+
+511
+00:37:16.000 --> 00:37:20.860
+<v Natalie Nagele>more and more opportunities for Chris and I to hone in on what we like, right? What is our unique
+
+512
+00:37:20.860 --> 00:37:25.500
+<v Natalie Nagele>ability? What are we bringing to the table? And every year we just keep cutting out the things
+
+513
+00:37:25.500 --> 00:37:30.640
+<v Natalie Nagele>that aren't that. Just keep honing in on it, right? Keep zeroing in on what do we bring to
+
+514
+00:37:30.640 --> 00:37:34.860
+<v Natalie Nagele>the table that's unique to us and then outsource everything else. Not outsource, but find other
+
+515
+00:37:34.860 --> 00:37:37.220
+<v Natalie Nagele>folks, delegate everything else to other people.
+
+516
+00:37:37.440 --> 00:37:40.620
+<v Noah Labhart>I think that's a great reminder and for, maybe not
+
+517
+00:37:40.620 --> 00:37:45.360
+<v Noah Labhart>reminder, but even piece of information for founders out there, for startup folks that are
+
+518
+00:37:46.000 --> 00:37:50.200
+<v Noah Labhart>like dark moment that it's, it's normal. It's a normalization of like, yeah, you're not going
+
+519
+00:37:50.200 --> 00:37:54.420
+<v Noah Labhart>to love it every day. And some days you're going to wake up and be like, man, I don't want to do
+
+520
+00:37:54.420 --> 00:38:00.320
+<v Noah Labhart>this today. And you can either make some changes or you can shuffle through it. And there's brighter
+
+521
+00:38:00.320 --> 00:38:01.180
+<v Noah Labhart>days on the other side.
+
+522
+00:38:01.700 --> 00:38:04.140
+<v Natalie Nagele>Yeah. I mean, especially, you know, one of the things that was really hard
+
+523
+00:38:04.140 --> 00:38:07.220
+<v Natalie Nagele>for us, like if you asked me like for a second mistake, I'll tell you that we didn't have
+
+524
+00:38:07.220 --> 00:38:13.420
+<v Natalie Nagele>marketing as a, as a process or as a discipline at Wildbit that, you know, I hear that a lot,
+
+525
+00:38:13.420 --> 00:38:16.720
+<v Natalie Nagele>especially from technical founders and then that's when they're like okay i gotta sell or i gotta
+
+526
+00:38:16.720 --> 00:38:19.860
+<v Natalie Nagele>find somebody else because i don't know how to scale this thing but there's this alternative
+
+527
+00:38:19.860 --> 00:38:24.280
+<v Natalie Nagele>where like you can just hire somebody really great who fits your culture and your vision of growth
+
+528
+00:38:24.280 --> 00:38:29.000
+<v Natalie Nagele>and let them run that piece of the business right like that's where i'm really starting to
+
+529
+00:38:29.000 --> 00:38:33.880
+<v Natalie Nagele>understand that it doesn't all fall on my lap i don't have to do it all i shouldn't do it all
+
+530
+00:38:33.880 --> 00:38:38.940
+<v Natalie Nagele>right i should find people who are much smarter than me to do it and it's such a trope right
+
+531
+00:38:38.940 --> 00:38:44.040
+<v Natalie Nagele>Everybody knows this, but somehow I can't tell you how many founders I talk to who just get stuck there.
+
+532
+00:38:44.620 --> 00:38:45.500
+<v Natalie Nagele>It's my job.
+
+533
+00:38:45.500 --> 00:38:46.180
+<v Natalie Nagele>I got to do it.
+
+534
+00:38:46.180 --> 00:38:46.880
+<v Natalie Nagele>No, you don't.
+
+535
+00:38:46.880 --> 00:38:47.600
+<v Natalie Nagele>You don't like it.
+
+536
+00:38:47.620 --> 00:38:48.320
+<v Natalie Nagele>You're not good at it.
+
+537
+00:38:48.520 --> 00:38:53.460
+<v Natalie Nagele>Bring somebody on who loves this stuff, who has the experience and who can get you to where you want to go.
+
+538
+00:38:54.000 --> 00:39:00.540
+<v Natalie Nagele>I'll tell you honestly, that learning feels so silly to have this late in the game, but it's been transformative for us.
+
+539
+00:39:01.520 --> 00:39:02.580
+<v Noah Labhart>Well, last question, Natalie.
+
+540
+00:39:02.580 --> 00:39:08.040
+<v Noah Labhart>Natalie. So you're getting on a plane and you're sitting next to a young entrepreneur who has built
+
+541
+00:39:08.040 --> 00:39:14.040
+<v Noah Labhart>the next big thing. They're jazzed about it. They can't wait to show it off to you. Can't wait to
+
+542
+00:39:14.040 --> 00:39:19.640
+<v Noah Labhart>show it off to the world. What advice do you give that person having gone down this road for 20
+
+543
+00:39:19.640 --> 00:39:20.140
+<v Noah Labhart>years now?
+
+544
+00:39:20.620 --> 00:39:24.440
+<v Natalie Nagele>I would tell them to write down exactly what they think the future should look like for
+
+545
+00:39:24.440 --> 00:39:29.620
+<v Natalie Nagele>them. Like write it down now. What do they want it to look like in the most practical sense as
+
+546
+00:39:29.620 --> 00:39:34.760
+<v Natalie Nagele>possible. What do you want out of life? Because a lot of people, and I meet them all the time,
+
+547
+00:39:35.240 --> 00:39:38.300
+<v Natalie Nagele>wake up 10 years later and they're like, I don't even like any of this shit anymore.
+
+548
+00:39:38.980 --> 00:39:45.580
+<v Natalie Nagele>Like it went in a totally different direction. It'll consume you. I think of business as the
+
+549
+00:39:45.580 --> 00:39:49.840
+<v Natalie Nagele>beast and those ideas, especially like the day the business is born, it turns into this beast
+
+550
+00:39:49.840 --> 00:39:55.020
+<v Natalie Nagele>and its only job is to get fatter and eat everything in its path, right? To just grow,
+
+551
+00:39:55.020 --> 00:39:59.860
+<v Natalie Nagele>grow, grow. It's what it exists for. And if we can't put our harness around it and really control
+
+552
+00:39:59.860 --> 00:40:05.060
+<v Natalie Nagele>it, it'll just take over. It'll take over every decision, your happiness, your direction, your
+
+553
+00:40:05.060 --> 00:40:08.320
+<v Natalie Nagele>everything. And then that's when you wake up 10 years later and you're like, what just happened
+
+554
+00:40:08.320 --> 00:40:13.320
+<v Natalie Nagele>to me? And so the thing that I wish we did, and we've been doing this for the last 10 years,
+
+555
+00:40:13.380 --> 00:40:17.060
+<v Natalie Nagele>I guess, but in the early days is every year we write down what do I want? And in the most
+
+556
+00:40:17.060 --> 00:40:21.820
+<v Natalie Nagele>tangible terms, not like this hypothetical. I love the hypothetical. I want to be a billionaire.
+
+557
+00:40:21.820 --> 00:40:25.300
+<v Natalie Nagele>or what are you going to do with a billion dollars? Write it down. You want results,
+
+558
+00:40:25.420 --> 00:40:28.500
+<v Natalie Nagele>you need to write them down, like tangible results. And then you start making better
+
+559
+00:40:28.500 --> 00:40:32.000
+<v Natalie Nagele>decisions because you were sitting on this amazing opportunity, let's say. And what are
+
+560
+00:40:32.000 --> 00:40:37.440
+<v Natalie Nagele>the options? You can go take it to a venture capital firm to really scale it quick. You can
+
+561
+00:40:37.440 --> 00:40:42.660
+<v Natalie Nagele>grow small and learn. You've got a spectrum in the middle. But you can't decide on that answer
+
+562
+00:40:42.660 --> 00:40:45.960
+<v Natalie Nagele>if you don't know what you want. The business will tell you what it wants, right? Maybe you're
+
+563
+00:40:45.960 --> 00:40:49.800
+<v Natalie Nagele>sitting on the coolest idea in the world, right? And you're like, well, the only way to bring it
+
+564
+00:40:49.800 --> 00:40:54.460
+<v Natalie Nagele>the world is through huge fundraising round. And maybe that's true. Make sure you write down like
+
+565
+00:40:54.460 --> 00:40:58.100
+<v Natalie Nagele>what you want in that process. Do you want, are you okay losing control, right? Are you okay,
+
+566
+00:40:58.100 --> 00:41:03.140
+<v Natalie Nagele>okay, getting on this rocket ship and riding it out for three years, right? Like putting a lot
+
+567
+00:41:03.140 --> 00:41:07.500
+<v Natalie Nagele>of things on hold to do that. If you don't enjoy the journey, it's not worth it. I know that sounds
+
+568
+00:41:07.500 --> 00:41:11.360
+<v Natalie Nagele>so ridiculous, so obvious, but like, it's true. The end results are going to be much better if
+
+569
+00:41:11.360 --> 00:41:13.920
+<v Natalie Nagele>you've really been honest with yourself on what you want to do with it.
+
+570
+00:41:14.560 --> 00:41:15.660
+<v Noah Labhart>That's excellent advice.
+
+571
+00:41:15.660 --> 00:41:21.960
+<v Noah Labhart>Well, Natalie, thank you for being on the show today. Thank you for telling the creation story of Wildbit.
+
+572
+00:41:22.120 --> 00:41:24.400
+<v Natalie Nagele>Thank you. No, this is really great. I appreciate being on here.
+
+573
+00:41:25.900 --> 00:41:28.840
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+574
+00:41:32.300 --> 00:41:35.340
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+575
+00:41:35.720 --> 00:41:40.500
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+576
+00:41:40.500 --> 00:41:45.980
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+577
+00:41:46.360 --> 00:41:48.560
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+578
+00:41:48.860 --> 00:41:50.780
+<v Noah Labhart>Both things help us out tremendously.
+
+579
+00:41:53.440 --> 00:41:54.940
+<v Noah Labhart>And thanks again for listening.

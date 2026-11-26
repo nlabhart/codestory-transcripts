@@ -1,0 +1,1435 @@
+WEBVTT
+
+NOTE S3 E10: The Stripe for Location Data: Building and Scaling Radar with CEO Nick Patrick
+
+1
+00:00:01.100 --> 00:00:15.180
+<v Nick Patrick>We obviously want to build a very big company, right? We want to be the location layer for any product or any service. I think in the early days, we needed to make some compromises and say, hey, what is that initial set of use cases or initial set of verticals that we want to go after?
+
+2
+00:00:15.180 --> 00:00:24.020
+<v Nick Patrick>We were just two people, small startup. Uber had spent, you know, hundreds and hundreds of man hours building, you know, location tracking and geofencing.
+
+3
+00:00:24.360 --> 00:00:32.200
+<v Nick Patrick>Whereas on the more consumer side of things, you know, so shopping and retail apps, food and dining apps, travel apps, there was a need for location awareness.
+
+4
+00:00:32.340 --> 00:00:36.480
+<v Nick Patrick>There was a need for location based features, but it wasn't as much of a core competency.
+
+5
+00:00:37.980 --> 00:00:41.560
+<v Nick Patrick>My name is Nick Patrick. I'm the CEO and co-founder of Radar.
+
+6
+00:00:47.440 --> 00:00:52.700
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+7
+00:00:52.700 --> 00:00:56.900
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+8
+00:00:56.900 --> 00:01:00.660
+<v Noah Labhart>and build and lead a team that has your back.
+
+9
+00:01:02.320 --> 00:01:07.900
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Nick Patrick set out to create the Stripe
+
+10
+00:01:07.900 --> 00:01:11.260
+<v Noah Labhart>for location services built just for developers.
+
+11
+00:01:13.420 --> 00:01:14.560
+<v Noah Labhart>All this and more.
+
+12
+00:01:15.180 --> 00:01:15.800
+<v Noah Labhart>On Code Story.
+
+13
+00:01:22.360 --> 00:01:25.760
+<v Noah Labhart>Nick Patrick has had his hands in tech for most of his life.
+
+14
+00:01:26.120 --> 00:01:30.060
+<v Noah Labhart>He's been dabbling in computer programming and hardware from an early age.
+
+15
+00:01:30.620 --> 00:01:37.300
+<v Noah Labhart>During college, he veered away from a focus in biology towards computer science and his love for building things.
+
+16
+00:01:38.220 --> 00:01:44.200
+<v Noah Labhart>He and his wife enjoy cooking, where his wife does the mise en place and Nick executes the cooking.
+
+17
+00:01:45.180 --> 00:01:47.200
+<v Noah Labhart>primarily baking pizzas and cornbread.
+
+18
+00:01:47.320 --> 00:01:50.920
+<v Noah Labhart>He calls this a great analog activity with a big payoff.
+
+19
+00:01:51.660 --> 00:01:54.060
+<v Noah Labhart>Four years ago, Nick was working at Handy,
+
+20
+00:01:54.220 --> 00:01:56.240
+<v Noah Labhart>which is an on-demand services platform.
+
+21
+00:01:56.880 --> 00:01:59.840
+<v Noah Labhart>There, he and his colleagues were tasked to build a map system
+
+22
+00:01:59.840 --> 00:02:03.860
+<v Noah Labhart>with real-time, transparent location info about a service technician.
+
+23
+00:02:04.700 --> 00:02:07.720
+<v Noah Labhart>He realized that this was a difficult problem to solve
+
+24
+00:02:07.720 --> 00:02:11.100
+<v Noah Labhart>and quickly found there were no third-party solutions out there,
+
+25
+00:02:11.200 --> 00:02:13.800
+<v Noah Labhart>i.e. he couldn't find the Stripe or Mixpanel
+
+26
+00:02:15.720 --> 00:02:22.140
+<v Noah Labhart>infrastructure. So he and his co-founder set out to build Radar to provide tools to quickly
+
+27
+00:02:22.140 --> 00:02:26.140
+<v Noah Labhart>develop location-based features right into your technology.
+
+28
+00:02:30.440 --> 00:02:35.360
+<v Nick Patrick>Radar is location data infrastructure. We offer tools to help technical teams build
+
+29
+00:02:35.360 --> 00:02:42.080
+<v Nick Patrick>location-based app experiences. So SDKs and APIs for things like geofencing or location search or
+
+30
+00:02:42.080 --> 00:02:46.260
+<v Nick Patrick>or geocoding or routing, and really got started about four years ago.
+
+31
+00:02:46.400 --> 00:02:49.340
+<v Nick Patrick>I had had the experience of working at a company called Handy,
+
+32
+00:02:49.500 --> 00:02:51.340
+<v Nick Patrick>which was an on-demand services platform.
+
+33
+00:02:51.600 --> 00:02:57.220
+<v Nick Patrick>And we wanted to build an Uber-style system to track our service providers on a map.
+
+34
+00:02:57.520 --> 00:03:02.220
+<v Nick Patrick>Uber has this amazing location-based experience where you can type in the name of a destination,
+
+35
+00:03:02.580 --> 00:03:05.280
+<v Nick Patrick>you can see your driver coming to you, you can see an ETA.
+
+36
+00:03:05.560 --> 00:03:09.160
+<v Nick Patrick>We basically set out to build a system like that at Handy.
+
+37
+00:03:09.160 --> 00:03:12.840
+<v Nick Patrick>And I think learned firsthand how challenging that was.
+
+38
+00:03:13.120 --> 00:03:15.460
+<v Nick Patrick>It seems sort of deceptively simple to start.
+
+39
+00:03:15.620 --> 00:03:18.220
+<v Nick Patrick>iOS and Android have a lot of built-in location services.
+
+40
+00:03:18.720 --> 00:03:22.200
+<v Nick Patrick>We found that it was kind of a pain to do, and it was hard to do it well.
+
+41
+00:03:22.460 --> 00:03:34.360
+<v Nick Patrick>So we put an iOS engineer, an Android engineer, a web engineer on this project, spent a couple months, and ended up with something that didn't work super well, wasn't super reliable, and ended up draining the battery and took a lot of iteration.
+
+42
+00:03:34.360 --> 00:03:39.520
+<v Nick Patrick>And kind of reflecting on it after the fact, you know, when we wanted to do payments, we just popped in Stripe.
+
+43
+00:03:39.520 --> 00:03:42.460
+<v Nick Patrick>When we wanted to do analytics, we just popped in Mixpanel.
+
+44
+00:03:42.560 --> 00:03:46.520
+<v Nick Patrick>But there was no great developer-friendly full-stack solution for locations.
+
+45
+00:03:46.840 --> 00:03:49.280
+<v Nick Patrick>That was the initial problem that inspired Radar.
+
+46
+00:03:49.380 --> 00:03:55.060
+<v Nick Patrick>Started the company with my co-founder, Kobe Berman, who I met pre-Handy at Foursquare.
+
+47
+00:03:55.180 --> 00:03:58.100
+<v Nick Patrick>And Foursquare is obviously one of the first big location-based apps.
+
+48
+00:03:58.180 --> 00:04:02.040
+<v Nick Patrick>That was sort of our first taste of all the cool experiences that you could build with location.
+
+49
+00:04:02.040 --> 00:04:06.540
+<v Nick Patrick>that informs how we built the company and the problem that we're solving as well.
+
+50
+00:04:08.340 --> 00:04:14.740
+<v Noah Labhart>Tell me about the MVP. Tell me about how long it took to build, what sort of tools you used
+
+51
+00:04:14.740 --> 00:04:19.200
+<v Noah Labhart>in the early days to bring to life that MVP, that first product.
+
+52
+00:04:20.020 --> 00:04:26.000
+<v Nick Patrick>Yeah, the MVP for us was really a couple different pieces. One was an iOS and Android SDK that you
+
+53
+00:04:26.000 --> 00:04:30.900
+<v Nick Patrick>as a developer could pop into your app to do location tracking in a very battery efficient,
+
+54
+00:04:32.040 --> 00:04:38.780
+<v Nick Patrick>The second part was a dashboard where you could visualize this data that you were collecting and do things like configure geofences.
+
+55
+00:04:38.920 --> 00:04:42.720
+<v Nick Patrick>What are the types of regions that you want to monitor depending on your use case?
+
+56
+00:04:42.920 --> 00:04:48.400
+<v Nick Patrick>And then some very basic integrations to send geofence entry and exit events to other systems.
+
+57
+00:04:48.720 --> 00:04:53.460
+<v Nick Patrick>Maybe you're building a system where you want to send a push notification with a reminder when somebody enters a geofence.
+
+58
+00:04:53.640 --> 00:04:59.920
+<v Nick Patrick>Maybe it's something more operational like delivery tracking and you want to send a notification when the delivery is almost there.
+
+59
+00:04:59.920 --> 00:05:03.680
+<v Nick Patrick>So really three pieces, the SDK, the dashboard, and integrations.
+
+60
+00:05:03.940 --> 00:05:08.520
+<v Nick Patrick>V1 was basically, hey, what can we pull together as a simple version?
+
+61
+00:05:08.800 --> 00:05:15.540
+<v Nick Patrick>Over time, the product has evolved a bunch, but it still does have that core of SDK, the dashboard, and the integration.
+
+62
+00:05:15.780 --> 00:05:20.680
+<v Nick Patrick>So V1 for us was, hey, what is the most basic MVP of each of those things that we can pull together?
+
+63
+00:05:21.200 --> 00:05:28.400
+<v Noah Labhart>Being the SDKs, I'm sure they were native, depending on timing, Objective-C or Swift or Java, Kotlin.
+
+64
+00:05:29.920 --> 00:05:33.980
+<v Nick Patrick>SDK is written in Objective-C, which kind of lets it run against any apps built in Objective-C
+
+65
+00:05:33.980 --> 00:05:35.280
+<v Nick Patrick>or any version of Swift.
+
+66
+00:05:35.500 --> 00:05:39.640
+<v Nick Patrick>The first Android SDK was in Java, although we just moved it over to Kotlin.
+
+67
+00:05:39.940 --> 00:05:42.120
+<v Nick Patrick>You know, in the early days, it was very simple.
+
+68
+00:05:42.280 --> 00:05:46.260
+<v Nick Patrick>We kind of had this, you know, one size fits all implementation approach where we, you
+
+69
+00:05:46.260 --> 00:05:52.200
+<v Nick Patrick>know, tried to find, you know, location tracking that was a balance of accuracy and battery
+
+70
+00:05:52.200 --> 00:05:56.060
+<v Nick Patrick>efficiency and frequency of updates that would kind of work for any use case, you know, any
+
+71
+00:05:56.060 --> 00:05:58.820
+<v Nick Patrick>consumer use case or any more operational use case.
+
+72
+00:05:59.920 --> 00:06:04.820
+<v Nick Patrick>days, it was a lot of trial and error, right? It was me sort of building prototypes and sample apps,
+
+73
+00:06:05.040 --> 00:06:08.920
+<v Nick Patrick>sending them out to family and friends, and just sort of like walking around and making sure it
+
+74
+00:06:08.920 --> 00:06:13.500
+<v Nick Patrick>works reliably. Over time, it's gotten a lot more sophisticated, but it was a lot of trial and error.
+
+75
+00:06:13.940 --> 00:06:16.620
+<v Noah Labhart>So you're touching on this a little bit. Let's go a little bit deeper into
+
+76
+00:06:16.620 --> 00:06:22.240
+<v Noah Labhart>what sort of decisions and trade-offs did you have to make in the early days? You know,
+
+77
+00:06:22.240 --> 00:06:27.680
+<v Noah Labhart>you're building an MVP. You can't build everything you want to build as a product person or an
+
+78
+00:06:27.680 --> 00:06:32.480
+<v Noah Labhart>an engineer out of the gate. You have to build just enough to prove your concept or just enough
+
+79
+00:06:32.480 --> 00:06:39.320
+<v Noah Labhart>to get the market going. How did you make those decisions and what were they and how did you cope
+
+80
+00:06:39.320 --> 00:06:39.820
+<v Noah Labhart>with them?
+
+81
+00:06:40.360 --> 00:06:44.480
+<v Nick Patrick>We obviously want to build a very big company, right? We want to be the location layer
+
+82
+00:06:44.480 --> 00:06:49.260
+<v Nick Patrick>for any product or any service. I think in the early days, we needed to make some compromises
+
+83
+00:06:49.260 --> 00:06:53.540
+<v Nick Patrick>and say, hey, what is that initial set of use cases or initial set of verticals that we want
+
+84
+00:06:53.540 --> 00:06:58.940
+<v Nick Patrick>to go after. We were just two people, small startup. Uber had spent hundreds and hundreds
+
+85
+00:06:58.940 --> 00:07:05.020
+<v Nick Patrick>of man hours building location tracking and geofencing. Whereas on the more consumer side
+
+86
+00:07:05.020 --> 00:07:09.760
+<v Nick Patrick>of things, so shopping and retail apps, food and dining apps, travel apps, there was a need for
+
+87
+00:07:09.760 --> 00:07:13.800
+<v Nick Patrick>location awareness. There was a need for location-based features, but it wasn't as much
+
+88
+00:07:13.800 --> 00:07:19.720
+<v Nick Patrick>of a core competency. And so there was more demand there with our very simple V1. So we kind of made
+
+89
+00:07:19.720 --> 00:07:25.840
+<v Nick Patrick>the choice to focus on more consumer use cases to start. And location really is all about trade-offs,
+
+90
+00:07:25.880 --> 00:07:30.660
+<v Nick Patrick>right? If you're thinking about trade-offs between accuracy and frequency and battery efficiency,
+
+91
+00:07:30.920 --> 00:07:35.220
+<v Nick Patrick>you might choose a different location services implementation depending on your use case.
+
+92
+00:07:35.420 --> 00:07:39.400
+<v Nick Patrick>We tried to pick a set of trade-offs that worked really well for consumer use cases,
+
+93
+00:07:39.460 --> 00:07:44.920
+<v Nick Patrick>but wouldn't box us out of more on-demand or operational use cases. So we kind of settled on
+
+94
+00:07:44.920 --> 00:07:47.660
+<v Nick Patrick>on what we thought was a smart V1.
+
+95
+00:07:48.120 --> 00:07:50.500
+<v Nick Patrick>And I think our journey over the past four years
+
+96
+00:07:50.500 --> 00:07:51.120
+<v Nick Patrick>has sort of been,
+
+97
+00:07:51.280 --> 00:07:53.800
+<v Nick Patrick>how do we make the product more sophisticated,
+
+98
+00:07:54.120 --> 00:07:55.580
+<v Nick Patrick>make the product more flexible,
+
+99
+00:07:55.760 --> 00:07:57.920
+<v Nick Patrick>while still keeping it simple, right?
+
+100
+00:07:58.000 --> 00:07:59.360
+<v Nick Patrick>While still giving you easy presets
+
+101
+00:07:59.360 --> 00:08:02.280
+<v Nick Patrick>and smart defaults that work with most use cases.
+
+102
+00:08:02.440 --> 00:08:03.780
+<v Nick Patrick>So kind of picking an initial niche,
+
+103
+00:08:04.020 --> 00:08:05.480
+<v Nick Patrick>designing an MVP accordingly,
+
+104
+00:08:05.680 --> 00:08:07.800
+<v Nick Patrick>and then very sort of deliberately
+
+105
+00:08:07.800 --> 00:08:10.240
+<v Nick Patrick>and carefully expanding the product surface
+
+106
+00:08:10.240 --> 00:08:12.140
+<v Nick Patrick>and making it more flexible over time.
+
+107
+00:08:12.680 --> 00:08:14.380
+<v Noah Labhart>I think that's a perfect segue
+
+108
+00:08:14.920 --> 00:08:19.400
+<v Noah Labhart>into my next question. How did you progress the product past that point? How have you
+
+109
+00:08:20.060 --> 00:08:22.460
+<v Noah Labhart>matured it past the MVP stage?
+
+110
+00:08:22.860 --> 00:08:25.140
+<v Nick Patrick>I think it's evolved in a couple of different ways. I think
+
+111
+00:08:25.140 --> 00:08:30.780
+<v Nick Patrick>the first way that it's evolved is we obviously supported custom geofences. So for those unfamiliar
+
+112
+00:08:30.780 --> 00:08:35.960
+<v Nick Patrick>with geofences, you can basically draw a virtual perimeter around a place or a region or a
+
+113
+00:08:35.960 --> 00:08:39.420
+<v Nick Patrick>neighborhood. It might be a circle, it might be a polygon, and you can listen for devices
+
+114
+00:08:39.420 --> 00:08:44.520
+<v Nick Patrick>devices entering or exiting those regions. And so we started off supporting custom geofences.
+
+115
+00:08:44.840 --> 00:08:49.500
+<v Nick Patrick>We also had customers asking us, hey, can you just tell us whenever somebody visits an airport?
+
+116
+00:08:49.740 --> 00:08:53.800
+<v Nick Patrick>Can you tell us whenever somebody visits a McDonald's? We don't necessarily know where
+
+117
+00:08:53.800 --> 00:08:58.760
+<v Nick Patrick>all of the airports or all the McDonald's are. Can you help us? And so we started adding additional,
+
+118
+00:08:58.940 --> 00:09:02.180
+<v Nick Patrick>what we call context types, but they're really just out of the box geofences.
+
+119
+00:09:02.540 --> 00:09:07.280
+<v Nick Patrick>So a place database that made it easy for folks to, if they didn't want to create custom geofences,
+
+120
+00:09:07.280 --> 00:09:12.280
+<v Nick Patrick>is just monitor specific chains or categories, depending on a use case. If I'm building a travel
+
+121
+00:09:12.280 --> 00:09:16.840
+<v Nick Patrick>app, you know, I might want to know if somebody is at a particular airport or at a hotel. If I'm
+
+122
+00:09:16.840 --> 00:09:21.420
+<v Nick Patrick>building a shopping app, I might want to know if somebody is at, you know, a Walmart or a Target.
+
+123
+00:09:21.600 --> 00:09:26.840
+<v Nick Patrick>And so just offering that out of the box for folks. We also had customers ask us, help them
+
+124
+00:09:26.840 --> 00:09:31.000
+<v Nick Patrick>understand when somebody is in a particular country or state or city. So we added a context
+
+125
+00:09:31.000 --> 00:09:35.140
+<v Nick Patrick>type called regions with some of those admin boundaries out of the box. So I think, you know,
+
+126
+00:09:35.140 --> 00:09:43.580
+<v Nick Patrick>One of the ways the product has evolved is basically just giving you additional things out of the box, whether that's boundaries or place data that you can tap into.
+
+127
+00:09:43.860 --> 00:09:50.780
+<v Nick Patrick>I think the second way that things have evolved is there's been an increasing focus on location data privacy over the last couple of years.
+
+128
+00:09:50.900 --> 00:09:56.860
+<v Nick Patrick>There are obviously amazing location-based app experiences that you can build that drive real value for end users.
+
+129
+00:09:57.120 --> 00:10:00.040
+<v Nick Patrick>But there's a right way to do it and there's a wrong way to do it.
+
+130
+00:10:00.040 --> 00:10:05.860
+<v Nick Patrick>And so thinking about tools that we can offer to help our customers build location-based experiences, but build it in the right way.
+
+131
+00:10:05.960 --> 00:10:10.740
+<v Nick Patrick>You know, how do you request location permissions in a responsible, ethical way?
+
+132
+00:10:10.980 --> 00:10:13.440
+<v Nick Patrick>How can you minimize the amount of data collected?
+
+133
+00:10:13.660 --> 00:10:19.140
+<v Nick Patrick>Maybe you're just geofencing or just doing tracking when it's absolutely needed for your use case.
+
+134
+00:10:19.340 --> 00:10:25.040
+<v Nick Patrick>Maybe you're pseudonymizing or anonymizing the data or you have really tight data retention policies.
+
+135
+00:10:25.040 --> 00:10:35.580
+<v Nick Patrick>So, you know, both from a product capabilities perspective and a business model perspective, you know, saw that there was an opportunity to help people build these great location-based experiences, but also do it in a very privacy-conscious way.
+
+136
+00:10:36.040 --> 00:10:43.760
+<v Nick Patrick>If you're going to take away two things about Radar, one is we want to be the most developer-friendly location data infrastructure, so, you know, powerful and flexible.
+
+137
+00:10:44.120 --> 00:10:48.920
+<v Nick Patrick>And the second is that we want to be the most privacy-conscious location data infrastructure.
+
+138
+00:10:48.980 --> 00:10:53.660
+<v Nick Patrick>And that's a function of our product offering, but also our business model and our approach to the space.
+
+139
+00:10:55.040 --> 00:11:00.400
+<v Noah Labhart>into the next question. How did you build your roadmap? How did you decide of all those things
+
+140
+00:11:00.400 --> 00:11:04.560
+<v Noah Labhart>that you progress their product? How did you decide what was most important to do next?
+
+141
+00:11:05.040 --> 00:11:10.540
+<v Nick Patrick>We try to be very customer driven in our product roadmap. I would say the most common,
+
+142
+00:11:10.700 --> 00:11:14.200
+<v Nick Patrick>most important input into our product roadmap is just sort of understanding, okay,
+
+143
+00:11:14.720 --> 00:11:18.780
+<v Nick Patrick>where is the product today? What are the gaps, the things that maybe we don't offer out of the box
+
+144
+00:11:18.780 --> 00:11:23.960
+<v Nick Patrick>or don't totally nail for folks that we can close, right? And we try to triangulate and say,
+
+145
+00:11:25.100 --> 00:11:29.140
+<v Nick Patrick>three customers, five different prospects asked for this in the last quarter.
+
+146
+00:11:29.440 --> 00:11:33.020
+<v Nick Patrick>What is a great product-driven solution to this that we can build this next quarter?
+
+147
+00:11:33.340 --> 00:11:39.380
+<v Nick Patrick>And that input comes from customers directly. It comes from our sales team, having conversations
+
+148
+00:11:39.380 --> 00:11:43.460
+<v Nick Patrick>with prospects. It comes from our customer success team, having conversations with our
+
+149
+00:11:43.460 --> 00:11:48.560
+<v Nick Patrick>existing customers. And we basically try to combine all of that and say, what can we build
+
+150
+00:11:48.560 --> 00:11:53.660
+<v Nick Patrick>to basically expand the value that we offer for our customers and also bring us one step closer
+
+151
+00:11:55.040 --> 00:12:01.240
+<v Nick Patrick>picture product vision. In Q1 of 2020, just sort of expanded outside of geofencing and launched a
+
+152
+00:12:01.240 --> 00:12:07.760
+<v Nick Patrick>bunch of new building blocks, APIs for things like geocoding and place search and distance or ETA
+
+153
+00:12:07.760 --> 00:12:11.920
+<v Nick Patrick>calculation. And a lot of that came out of things that our customers were asking for. And a lot of
+
+154
+00:12:11.920 --> 00:12:15.780
+<v Nick Patrick>that also came out of our vision to be this location layer for every product and service.
+
+155
+00:12:16.160 --> 00:12:20.560
+<v Nick Patrick>These are our gaps in our capabilities right now and are a very logical extension of our
+
+156
+00:12:20.560 --> 00:12:25.400
+<v Nick Patrick>our current offering to get us one step closer. So long story short, you know, try to very
+
+157
+00:12:25.400 --> 00:12:29.320
+<v Nick Patrick>deliberately expand the capabilities of our platform to enable us to be that universal
+
+158
+00:12:29.320 --> 00:12:33.980
+<v Nick Patrick>location layer. And a lot of that involves just sort of triangulating what our customers and
+
+159
+00:12:33.980 --> 00:12:37.580
+<v Nick Patrick>prospects are asking for and just sort of moving things forward every quarter.
+
+160
+00:12:38.900 --> 00:12:45.060
+<v Noah Labhart>So how did you build your team? How did you go about building your team? And what did you look
+
+161
+00:12:45.060 --> 00:12:49.900
+<v Noah Labhart>for in these people to know that they were the winning horses to join the Radar team?
+
+162
+00:12:51.140 --> 00:12:56.120
+<v Nick Patrick>In the very early days, it was me and my co-founder, Kobe. And I was the technical
+
+163
+00:12:56.120 --> 00:13:01.900
+<v Nick Patrick>co-founder. So I was basically playing CTO, head of products, lead designer all in one,
+
+164
+00:13:01.960 --> 00:13:08.140
+<v Nick Patrick>and also sales engineer. My co-founder, Kobe, has more of a sales and BD background. So he was
+
+165
+00:13:08.140 --> 00:13:12.380
+<v Nick Patrick>basically the account executive, the head of sales, the head of BD, all rolled into one.
+
+166
+00:13:12.520 --> 00:13:15.740
+<v Nick Patrick>So we had a very clean division of responsibilities and we're able to work
+
+167
+00:13:15.740 --> 00:13:19.880
+<v Nick Patrick>together to move fast, to build the product and find product market fit.
+
+168
+00:13:20.560 --> 00:13:25.580
+<v Nick Patrick>over time, you know, our technical needs became more complex. And so we were lucky enough to hire
+
+169
+00:13:25.580 --> 00:13:30.480
+<v Nick Patrick>Tim Juleen as our CTO. Tim actually worked with me and Kobe at Foursquare, has been in around
+
+170
+00:13:30.480 --> 00:13:35.100
+<v Nick Patrick>the location space for a while and, you know, basically helped us level up and really scale
+
+171
+00:13:35.100 --> 00:13:40.300
+<v Nick Patrick>the product. I think when we think about the types of folks that are successful at Radar,
+
+172
+00:13:40.360 --> 00:13:45.720
+<v Nick Patrick>I mentioned being very customer oriented, very product driven. I think entrepreneurial folks
+
+173
+00:13:45.720 --> 00:13:50.060
+<v Nick Patrick>who care about the big picture, who understand how all the pieces fit together and how the
+
+174
+00:13:50.560 --> 00:13:54.820
+<v Nick Patrick>If you're on the sales side of the house, ideally, you're very product driven and technical.
+
+175
+00:13:55.060 --> 00:14:00.320
+<v Nick Patrick>You know, you can understand how the platform solves problems for and adds value for our customers.
+
+176
+00:14:00.420 --> 00:14:04.700
+<v Nick Patrick>You can connect the dots on customer feedback and, you know, feed that back into the product roadmap.
+
+177
+00:14:04.920 --> 00:14:11.500
+<v Nick Patrick>And on the other side, you know, our engineering team, obviously building amazing features and scaling our product offering.
+
+178
+00:14:11.580 --> 00:14:16.680
+<v Nick Patrick>But, you know, our most successful engineers are engineers who also care about what's happening on the customer side of the house.
+
+179
+00:14:16.760 --> 00:14:19.980
+<v Nick Patrick>Right. How much revenue are we shooting to gain this quarter?
+
+180
+00:14:20.560 --> 00:14:25.260
+<v Nick Patrick>which customers are in the pipeline or piloting, and what do we need to build to make them successful?
+
+181
+00:14:25.780 --> 00:14:33.800
+<v Nick Patrick>So I think in general, entrepreneurial folks who are very product-oriented and kind of care about the big picture are most successful at Radar.
+
+182
+00:14:33.860 --> 00:14:36.160
+<v Nick Patrick>And we're about 35 people now.
+
+183
+00:14:36.480 --> 00:14:39.620
+<v Nick Patrick>The team basically tripled in size last year.
+
+184
+00:14:40.040 --> 00:14:44.720
+<v Nick Patrick>And just very lucky to have some tremendously talented folks across all different departments.
+
+185
+00:14:45.880 --> 00:14:48.200
+<v Noah Labhart>Let's talk about scalability a little bit.
+
+186
+00:14:48.200 --> 00:14:53.640
+<v Noah Labhart>But kind of bouncing back to the MVP, did you build this initially to scale efficiently?
+
+187
+00:14:53.900 --> 00:14:59.880
+<v Noah Labhart>Or was that something you were fighting as you grew or knew you were going to have to fight at a certain point?
+
+188
+00:15:00.500 --> 00:15:01.340
+<v Nick Patrick>It's a great question.
+
+189
+00:15:01.440 --> 00:15:04.120
+<v Nick Patrick>We didn't want to over-optimize early, right?
+
+190
+00:15:04.200 --> 00:15:13.360
+<v Nick Patrick>So I think having an API, having a platform that can stand up to millions or billions of API requests doesn't really matter if nobody's using it, right?
+
+191
+00:15:13.440 --> 00:15:18.020
+<v Nick Patrick>So I think in the early days, we were biased towards just how do we get any traction and throughput at all?
+
+192
+00:15:18.200 --> 00:15:24.500
+<v Nick Patrick>Thinking less about scalability and thinking more about what does the product need to look and feel like to get that initial traction.
+
+193
+00:15:24.840 --> 00:15:28.380
+<v Nick Patrick>And then kind of gradually shifting over time to scalability.
+
+194
+00:15:28.780 --> 00:15:34.360
+<v Nick Patrick>So we're now processing billions of locations per year from tens of millions of devices.
+
+195
+00:15:34.920 --> 00:15:41.820
+<v Nick Patrick>Q2 2020 in particular, we're almost exclusively focused on scalability, developer experience, product quality.
+
+196
+00:15:41.820 --> 00:16:00.600
+<v Nick Patrick>We are going to ship some new things as well. But this quarter in particular, almost exclusively focused on scalability. But in the early days, scalability doesn't matter if nobody's using your product. So I think it's just sort of a balance and kind of figuring out, given your level of traction, given where you are, just where on the spectrum do you need to fall to have the best business outcome?
+
+197
+00:16:02.060 --> 00:16:09.680
+<v Noah Labhart>So as you step out on the balcony and look across all you've built with Radar, what are you most proud of?
+
+198
+00:16:10.840 --> 00:16:16.320
+<v Nick Patrick>I think proud of a lot, you know, proud of the team that we've built, some of the use cases that we're unlocking for our customers.
+
+199
+00:16:16.680 --> 00:16:18.400
+<v Nick Patrick>I still feel like we're just getting started.
+
+200
+00:16:18.500 --> 00:16:27.000
+<v Nick Patrick>And I kind of feel this sense of restlessness where, you know, I look at a lot of the apps that I use every day do have some location component, but it might be very shallow.
+
+201
+00:16:27.100 --> 00:16:30.420
+<v Nick Patrick>And there are a lot of apps that I use that should be location aware that aren't.
+
+202
+00:16:30.680 --> 00:16:36.100
+<v Nick Patrick>I tend to focus more on the future and say, how do we make every app on every device location aware?
+
+203
+00:16:36.100 --> 00:16:44.200
+<v Nick Patrick>Or how do we help unlock the next generation of app experiences, not rest on our laurels too much and really just think about what can we unlock next?
+
+204
+00:16:44.340 --> 00:16:47.520
+<v Nick Patrick>And how do we make Radar truly synonymous with location?
+
+205
+00:16:48.020 --> 00:16:52.200
+<v Nick Patrick>What's interesting is, you know, the landscape seems to evolve every quarter or two.
+
+206
+00:16:52.580 --> 00:16:59.100
+<v Nick Patrick>You know, right now with the COVID-19 pandemic, you know, there's been an interesting shift in use cases, right?
+
+207
+00:16:59.100 --> 00:17:09.740
+<v Nick Patrick>The retailers and QSRs that we're working with are focused less on building in-store experiences and focused more on curbside pickup and delivery and contactless payment experiences.
+
+208
+00:17:10.460 --> 00:17:13.120
+<v Nick Patrick>Radar can help solve those use cases as well.
+
+209
+00:17:13.380 --> 00:17:18.460
+<v Nick Patrick>So it seems like every quarter, every year, we kind of find a new set of use cases.
+
+210
+00:17:18.520 --> 00:17:22.380
+<v Nick Patrick>The macro situation evolves and it feels like there's always more to do.
+
+211
+00:17:22.380 --> 00:17:33.380
+<v Nick Patrick>So I think we think about how we can continue to expand our product offering to unlock new types of experiences and really just sort of look to the future and kind of try to keep the ball moving forward.
+
+212
+00:17:34.020 --> 00:17:40.220
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+213
+00:17:40.220 --> 00:17:45.760
+<v Nick Patrick>You know, one thing that's been interesting is when we started Radar, we thought of Radar as a developer tool, right?
+
+214
+00:17:45.840 --> 00:17:50.020
+<v Nick Patrick>We envisioned that it was going to be developers signing up for Radar, enterprise sales cycles.
+
+215
+00:17:50.060 --> 00:17:53.540
+<v Nick Patrick>We'd be selling to the CTO as sort of the buying persona.
+
+216
+00:17:53.780 --> 00:18:03.920
+<v Nick Patrick>I think what we realized when we got out in market was we were often selling to, you know, a head of products or a head of marketing that wanted to build a location based product experience.
+
+217
+00:18:04.100 --> 00:18:05.980
+<v Nick Patrick>They wanted to run a location based campaign.
+
+218
+00:18:05.980 --> 00:18:10.360
+<v Nick Patrick>pain. While developers were always important stakeholders, we kind of got away from our
+
+219
+00:18:10.360 --> 00:18:15.180
+<v Nick Patrick>roots a little bit and focused on developer experience, but maybe not as much as we should
+
+220
+00:18:15.180 --> 00:18:19.900
+<v Nick Patrick>have. I think we've learned over time that where we're adding the most value for customers and
+
+221
+00:18:19.900 --> 00:18:24.240
+<v Nick Patrick>where we're the most successful is when we are focused on the technical persona. And so a lot
+
+222
+00:18:24.240 --> 00:18:28.020
+<v Nick Patrick>of our focus this year is going to be on sort of getting back to our roots that we maybe strayed
+
+223
+00:18:28.020 --> 00:18:34.120
+<v Nick Patrick>from a little bit and really focusing on value props, product surfaces, use cases for technical
+
+224
+00:18:35.980 --> 00:18:36.800
+<v Nick Patrick>over the next couple of quarters,
+
+225
+00:18:36.920 --> 00:18:38.320
+<v Nick Patrick>a bunch of new developer tools,
+
+226
+00:18:38.480 --> 00:18:40.880
+<v Nick Patrick>kind of rethinking developer experience on our platform,
+
+227
+00:18:41.120 --> 00:18:42.560
+<v Nick Patrick>thinking about ways that we can help folks
+
+228
+00:18:42.560 --> 00:18:43.960
+<v Nick Patrick>self-serve on the platform.
+
+229
+00:18:44.160 --> 00:18:46.060
+<v Nick Patrick>So, you know, not a mistake per se,
+
+230
+00:18:46.220 --> 00:18:48.680
+<v Nick Patrick>but something that we learned just kind of
+
+231
+00:18:48.680 --> 00:18:50.340
+<v Nick Patrick>through trial and error being in market.
+
+232
+00:18:50.520 --> 00:18:52.640
+<v Nick Patrick>And I think finding that our initial intuition
+
+233
+00:18:52.640 --> 00:18:55.700
+<v Nick Patrick>of being focused on adding value for developers,
+
+234
+00:18:55.900 --> 00:18:57.600
+<v Nick Patrick>adding value for technical teams
+
+235
+00:18:57.600 --> 00:18:59.140
+<v Nick Patrick>is our ultimate North Star.
+
+236
+00:18:59.300 --> 00:19:01.720
+<v Nick Patrick>And I think we're firmly back on that track now.
+
+237
+00:19:02.900 --> 00:19:04.440
+<v Noah Labhart>Tell me a little more specifically,
+
+238
+00:19:05.980 --> 00:19:07.380
+<v Noah Labhart>for the product and for your team?
+
+239
+00:19:07.760 --> 00:19:10.300
+<v Nick Patrick>We think about what other types of building blocks
+
+240
+00:19:10.300 --> 00:19:12.100
+<v Nick Patrick>can we add in the future, right?
+
+241
+00:19:12.160 --> 00:19:13.740
+<v Nick Patrick>So we went from geofencing
+
+242
+00:19:13.740 --> 00:19:16.680
+<v Nick Patrick>and kind of background tracking focused use cases
+
+243
+00:19:16.680 --> 00:19:19.120
+<v Nick Patrick>to offering new context types.
+
+244
+00:19:19.140 --> 00:19:20.620
+<v Nick Patrick>So out of the box use cases,
+
+245
+00:19:20.680 --> 00:19:22.520
+<v Nick Patrick>thinking more about app experiences
+
+246
+00:19:22.520 --> 00:19:24.540
+<v Nick Patrick>that change based on your current location.
+
+247
+00:19:24.740 --> 00:19:27.360
+<v Nick Patrick>Maybe you're sort of showing or unlocking content
+
+248
+00:19:27.360 --> 00:19:28.900
+<v Nick Patrick>based on the user's location.
+
+249
+00:19:29.240 --> 00:19:31.840
+<v Nick Patrick>And now sort of thinking about additional building blocks,
+
+250
+00:19:32.080 --> 00:19:33.800
+<v Nick Patrick>new APIs for search.
+
+251
+00:19:33.800 --> 00:19:44.700
+<v Nick Patrick>So things like address autocomplete or store locators, things like geocoding, if you want to drop a pin on a map and show the address that it corresponds to, things like routing and distance calculation.
+
+252
+00:19:44.960 --> 00:19:52.780
+<v Nick Patrick>How do I understand, am I five minutes away, 10 minutes away walking or driving from this point of interest or store or whatever?
+
+253
+00:19:53.020 --> 00:19:57.660
+<v Nick Patrick>So I think in the future, we're thinking about what additional building blocks can we introduce next?
+
+254
+00:19:57.820 --> 00:20:03.120
+<v Nick Patrick>Really all in service of helping technical teams build new types of location-based experiences.
+
+255
+00:20:03.800 --> 00:20:06.800
+<v Nick Patrick>So I think like one theme for the future is new building blocks.
+
+256
+00:20:06.960 --> 00:20:09.980
+<v Nick Patrick>I think another theme for the future is new integrations, right?
+
+257
+00:20:10.080 --> 00:20:13.400
+<v Nick Patrick>So we want Radar to be the best point solution for location,
+
+258
+00:20:13.640 --> 00:20:16.800
+<v Nick Patrick>but you can activate your location data in a bunch of different systems.
+
+259
+00:20:16.900 --> 00:20:19.220
+<v Nick Patrick>You might want to send this to a push notification platform
+
+260
+00:20:19.220 --> 00:20:23.160
+<v Nick Patrick>so you can trigger offers or reminders or alerts for folks.
+
+261
+00:20:23.360 --> 00:20:27.400
+<v Nick Patrick>Maybe you want to tie this up with a feature flagging or A/B testing platform
+
+262
+00:20:27.400 --> 00:20:30.260
+<v Nick Patrick>where you can more easily change the app experience
+
+263
+00:20:30.260 --> 00:20:32.120
+<v Nick Patrick>or show content based on location.
+
+264
+00:20:34.300 --> 00:20:39.360
+<v Nick Patrick>curbside pickup and delivery type use cases. Maybe there are order management systems that we can
+
+265
+00:20:39.360 --> 00:20:44.240
+<v Nick Patrick>plug into. So I think another possible direction is just sort of expanding our set of integrations
+
+266
+00:20:44.240 --> 00:20:49.040
+<v Nick Patrick>and the types of partners that we work with. And then I think another possible direction is
+
+267
+00:20:49.040 --> 00:20:54.380
+<v Nick Patrick>what can we help folks do from a data minimization and a privacy perspective, right? How can we help
+
+268
+00:20:54.380 --> 00:20:58.780
+<v Nick Patrick>you build location-based app experiences, but do it in the most privacy conscious way?
+
+269
+00:20:58.780 --> 00:21:05.000
+<v Nick Patrick>And this may be, you know, sort of new strategies for on-device processing, you know, where location data never leaves the phone.
+
+270
+00:21:05.160 --> 00:21:16.160
+<v Nick Patrick>It might be, you know, new ways to sort of control data minimization or data retention policies, you know, kind of think through, you know, new ways to anonymize or pseudonymize the data that you're collecting.
+
+271
+00:21:16.280 --> 00:21:24.740
+<v Nick Patrick>So just, you know, help people build amazing experiences and kind of route their data to wherever it needs to go, but also do it in a very privacy conscious way.
+
+272
+00:21:24.860 --> 00:21:28.300
+<v Nick Patrick>So that roughly is what I think the future looks like for the product.
+
+273
+00:21:28.780 --> 00:21:34.040
+<v Nick Patrick>in terms of the team, what's been fun is we've gone from having, you know, no dedicated folks
+
+274
+00:21:34.040 --> 00:21:39.580
+<v Nick Patrick>in a particular function to, you know, functions of one to, you know, each function sort of starting
+
+275
+00:21:39.580 --> 00:21:44.800
+<v Nick Patrick>to starting to scale. So, you know, Ryan, our director of marketing joined us about a year ago,
+
+276
+00:21:45.000 --> 00:21:48.740
+<v Nick Patrick>there was no marketing function to that point, right? We had written a bunch of blog posts,
+
+277
+00:21:48.820 --> 00:21:52.180
+<v Nick Patrick>but that was that was sort of the extent of it. Ryan is building just a really incredible,
+
+278
+00:21:52.320 --> 00:21:57.080
+<v Nick Patrick>you know, growth marketing and product marketing team at Radar. And that team will obviously,
+
+279
+00:21:58.780 --> 00:22:21.580
+<v Nick Patrick>Our engineering team is now eight people. They're building a tremendous amount of products for eight people. But as we continue to scale, build even more new products, growing that team as well. And then we're also about to start building out our product team. So we have a really talented product designer. We don't have any product managers yet. That's actually kind of my background. So I'm playing head of products. But over time, we'll build out a product management team as well.
+
+280
+00:22:21.880 --> 00:22:27.680
+<v Nick Patrick>So I have a very talented team right now, but continuing to scale functions that we've already started building.
+
+281
+00:22:27.740 --> 00:22:33.860
+<v Nick Patrick>And then also the last few net new functions, bringing in leaders to scale those functions over time.
+
+282
+00:22:34.720 --> 00:22:37.720
+<v Noah Labhart>So who influences the way you work, Nick?
+
+283
+00:22:37.880 --> 00:22:40.600
+<v Noah Labhart>CEO, CTO, architect, or any person?
+
+284
+00:22:40.680 --> 00:22:43.120
+<v Noah Labhart>Name a person you look up to and why.
+
+285
+00:22:44.040 --> 00:22:50.440
+<v Nick Patrick>Honestly, one of the people that influences my working style the most, and I think this is a sign of a very productive founder relationship,
+
+286
+00:22:51.580 --> 00:22:56.220
+<v Nick Patrick>is my co-founder, Kobe. And I think one thing that's been great about working with Kobe is
+
+287
+00:22:56.220 --> 00:23:00.440
+<v Nick Patrick>we tend to balance each other out, right? I tend to be more sort of technical and product-focused.
+
+288
+00:23:00.900 --> 00:23:05.640
+<v Nick Patrick>Kobe tends to be more sort of sales and go-to-market-focused. Kobe gets the product
+
+289
+00:23:05.640 --> 00:23:11.260
+<v Nick Patrick>side too. And Kobe's taught me a lot about sales and BD. Our skill sets complement each other well.
+
+290
+00:23:11.360 --> 00:23:17.500
+<v Nick Patrick>We often, I think, refocus each other when one of us gets off track. When I'm low, he's high,
+
+291
+00:23:17.500 --> 00:23:22.240
+<v Nick Patrick>and vice versa. And so we sort of tend to balance each other out. That's been a really great
+
+292
+00:23:22.240 --> 00:23:26.580
+<v Nick Patrick>partnership so far. And I think Kobe and I have both learned a lot from each other and grown a lot
+
+293
+00:23:26.580 --> 00:23:30.980
+<v Nick Patrick>over the last couple of years. I also think that, you know, my wife is a doctor. Obviously,
+
+294
+00:23:31.000 --> 00:23:36.060
+<v Nick Patrick>she's been sort of quite busy and stressed out during this COVID-19 pandemic. She's an OBGYN,
+
+295
+00:23:36.220 --> 00:23:41.840
+<v Nick Patrick>you know, so maybe not as much on the front lines as some other first responders and healthcare
+
+296
+00:23:41.840 --> 00:23:45.660
+<v Nick Patrick>providers. But that helps put everything in context for me too, right? You know, we're
+
+297
+00:23:47.500 --> 00:23:52.720
+<v Nick Patrick>product and unlocking all sorts of awesome product experiences. You know, matters of life and death
+
+298
+00:23:52.720 --> 00:23:57.180
+<v Nick Patrick>are a different story. And I think sort of seeing the way that she handles herself in stressful
+
+299
+00:23:57.180 --> 00:24:01.260
+<v Nick Patrick>situations and just kind of like being exposed to everything that she goes through at work on
+
+300
+00:24:01.260 --> 00:24:05.380
+<v Nick Patrick>a regular basis kind of helps put everything at Radar in perspective. So, you know, those are
+
+301
+00:24:05.380 --> 00:24:08.700
+<v Nick Patrick>sort of two people that I draw inspiration and learnings from a lot.
+
+302
+00:24:09.100 --> 00:24:10.880
+<v Noah Labhart>So if you could go back
+
+303
+00:24:10.880 --> 00:24:15.360
+<v Noah Labhart>to the beginning, what would you do differently or what would you consider taking a different
+
+304
+00:24:15.360 --> 00:24:16.000
+<v Noah Labhart>approach on.
+
+305
+00:24:16.500 --> 00:24:20.540
+<v Nick Patrick>And obviously we're excited about our enterprise business. I think about ways that
+
+306
+00:24:20.540 --> 00:24:25.280
+<v Nick Patrick>we can get not just big enterprises using Radar, but also tens or hundreds of thousands of
+
+307
+00:24:25.280 --> 00:24:30.000
+<v Nick Patrick>developers using Radar as well. And that's a function of, is your offering self-serve?
+
+308
+00:24:30.220 --> 00:24:34.700
+<v Nick Patrick>What is the product mix that you're offering? And I think if we're going to be really successful in
+
+309
+00:24:34.700 --> 00:24:39.120
+<v Nick Patrick>the longterm, we need to build a platform that is synonymous with location in the minds of all
+
+310
+00:24:39.120 --> 00:24:43.720
+<v Nick Patrick>developers, you know, in much the same way that I think Stripe has done with payments or Twilio
+
+311
+00:24:45.760 --> 00:24:54.260
+<v Nick Patrick>And so I think if I could go back to the beginning, hindsight being 20/20, I think I would prioritize some of those investments in developer experience a little bit earlier.
+
+312
+00:24:54.500 --> 00:25:01.320
+<v Nick Patrick>I think we've done a good job, but I think we could be doing an even better job and wish we could have gotten an earlier head start there.
+
+313
+00:25:02.020 --> 00:25:03.140
+<v Noah Labhart>Last question, Nick.
+
+314
+00:25:03.300 --> 00:25:09.080
+<v Noah Labhart>You're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+315
+00:25:09.240 --> 00:25:10.460
+<v Noah Labhart>They're jazzed about it.
+
+316
+00:25:10.520 --> 00:25:12.020
+<v Noah Labhart>They want to show it off to the world.
+
+317
+00:25:12.020 --> 00:25:15.380
+<v Noah Labhart>old. They can't wait to show it to you just sitting right next to them on the plane.
+
+318
+00:25:15.660 --> 00:25:19.760
+<v Noah Labhart>What advice would you give that person having gone down this road a bit?
+
+319
+00:25:20.020 --> 00:25:25.700
+<v Nick Patrick>One part of my story that I sort of skipped over was between Handy and Radar, I actually worked on
+
+320
+00:25:25.700 --> 00:25:30.600
+<v Nick Patrick>for about half a year, a couple other startup ideas that didn't work. These were a bunch of
+
+321
+00:25:30.600 --> 00:25:35.040
+<v Nick Patrick>different social app ideas that I had that just really didn't get any traction. What's been great
+
+322
+00:25:35.040 --> 00:25:41.600
+<v Nick Patrick>about Radar is two things. One, I think there's a high degree of founder market fit, meaning I
+
+323
+00:25:42.020 --> 00:25:47.920
+<v Nick Patrick>Kobe and I are uniquely well-suited to build this product, to build this business. I think in order
+
+324
+00:25:47.920 --> 00:25:52.040
+<v Nick Patrick>to be successful, I think in order to raise money from investors, you basically need to be able to
+
+325
+00:25:52.040 --> 00:25:56.160
+<v Nick Patrick>convince investors that you are like the best people in the world to build whatever it is you're
+
+326
+00:25:56.160 --> 00:26:00.820
+<v Nick Patrick>working on. And so I think the first piece of advice would be make sure there's a high degree
+
+327
+00:26:00.820 --> 00:26:06.540
+<v Nick Patrick>of founder product or founder market fit. It's going to let you tell the most effective story.
+
+328
+00:26:06.540 --> 00:26:08.800
+<v Nick Patrick>It's going to let you build the most successful business.
+
+329
+00:26:09.180 --> 00:26:11.420
+<v Nick Patrick>So I think that's one piece.
+
+330
+00:26:11.600 --> 00:26:14.680
+<v Nick Patrick>I think the second piece is, you know, build something that you would be proud of, even
+
+331
+00:26:14.680 --> 00:26:15.600
+<v Nick Patrick>if it didn't work out.
+
+332
+00:26:15.720 --> 00:26:17.480
+<v Nick Patrick>I don't know how Radar is going to end up.
+
+333
+00:26:17.500 --> 00:26:21.300
+<v Nick Patrick>You know, I'd like to think that we're going to build this iconic location layer for every
+
+334
+00:26:21.300 --> 00:26:23.020
+<v Nick Patrick>product and service on every device.
+
+335
+00:26:23.160 --> 00:26:24.840
+<v Nick Patrick>But there's certainly a chance that things don't work out.
+
+336
+00:26:24.940 --> 00:26:30.040
+<v Nick Patrick>But what I do know is that regardless of how things end, I'll be really proud that I spent,
+
+337
+00:26:30.080 --> 00:26:32.640
+<v Nick Patrick>you know, four plus years of my life working on this idea.
+
+338
+00:26:32.880 --> 00:26:35.600
+<v Nick Patrick>I think it's an important product and service.
+
+339
+00:26:36.540 --> 00:26:38.680
+<v Nick Patrick>It's a fascinating problem space.
+
+340
+00:26:39.020 --> 00:26:42.420
+<v Nick Patrick>And I'll have no regrets regardless of the way that it turns out.
+
+341
+00:26:42.620 --> 00:26:46.740
+<v Nick Patrick>So make sure you're working on something that you're uniquely well-suited to solve.
+
+342
+00:26:47.000 --> 00:26:50.980
+<v Nick Patrick>And make sure you're working on something that you'd be proud of regardless of how it ended.
+
+343
+00:26:51.140 --> 00:26:52.360
+<v Nick Patrick>Either way, you're going to learn a lot.
+
+344
+00:26:52.460 --> 00:26:54.100
+<v Nick Patrick>But I think those two things are really important.
+
+345
+00:26:54.240 --> 00:26:58.420
+<v Nick Patrick>And I've learned that firsthand working on Radar and a handful of other startup ideas as well.
+
+346
+00:26:59.220 --> 00:27:00.080
+<v Noah Labhart>That's great advice.
+
+347
+00:27:00.520 --> 00:27:02.620
+<v Noah Labhart>Well, Nick, thank you for being on the podcast.
+
+348
+00:27:02.700 --> 00:27:06.460
+<v Noah Labhart>Thank you for being on the show and telling the creation story of Radar.
+
+349
+00:27:06.540 --> 00:27:07.540
+<v Noah Labhart>Thanks, Noah.
+
+350
+00:27:08.140 --> 00:27:11.120
+<v Noah Labhart>And this concludes another chapter of Code Story
+
+351
+00:27:12.640 --> 00:27:15.780
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart
+
+352
+00:27:15.780 --> 00:27:18.780
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify
+
+353
+00:27:18.780 --> 00:27:20.920
+<v Noah Labhart>or the podcasting app of your choice
+
+354
+00:27:20.920 --> 00:27:24.600
+<v Noah Labhart>Support the show on Patreon.com slash Code Story
+
+355
+00:27:24.600 --> 00:27:26.420
+<v Noah Labhart>for just 5 to 10 bucks a month
+
+356
+00:27:26.420 --> 00:27:29.000
+<v Noah Labhart>And when you get a chance, leave us a review
+
+357
+00:27:29.000 --> 00:27:31.200
+<v Noah Labhart>Both things help us out tremendously
+
+358
+00:27:33.800 --> 00:27:35.340
+<v Noah Labhart>And thanks again for listening

@@ -1,0 +1,1663 @@
+WEBVTT
+
+NOTE S6 E18: Never Rebuild Permissions Again: Engineering Full-Stack Authorization and Policy-as-Code with Or Weis of Permit.io
+
+1
+00:00:00.580 --> 00:00:12.040
+<v Or Weis>So the idea is full-stack permissions. It's a solution you can bake into your software once and have it make your software elastic enough to meet the demands that come down the road.
+
+2
+00:00:12.600 --> 00:00:20.320
+<v Or Weis>Just like you don't want to build your authentication from scratch, just like you don't want to build your analytics from scratch, just like you don't want to build billing from scratch.
+
+3
+00:00:21.340 --> 00:00:25.340
+<v Or Weis>None of these things that I'm mentioning are new for you. You've seen them in a lot of applications.
+
+4
+00:00:25.340 --> 00:00:30.460
+<v Or Weis>But every time you saw them, some poor schlep of a developer had to build them from scratch.
+
+5
+00:00:31.160 --> 00:00:32.540
+<v Or Weis>The idea is really straightforward.
+
+6
+00:00:32.780 --> 00:00:37.340
+<v Or Weis>It's easy, it's future-proof, and it enables you to focus on actually building your own product.
+
+7
+00:00:37.960 --> 00:00:42.080
+<v Or Weis>My name is Or Weis, and I'm the co-founder and CEO of Permit.io.
+
+8
+00:00:47.520 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+9
+00:00:52.920 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+10
+00:00:57.100 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+11
+00:01:02.240 --> 00:01:08.140
+<v Noah Labhart>I'm your host, Noah Labhart, and today I'll help Or Weis create the last solution you'll need
+
+12
+00:01:08.140 --> 00:01:11.840
+<v Noah Labhart>to implement permissions in your application.
+
+13
+00:01:13.360 --> 00:01:15.840
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:19.580 --> 00:01:22.840
+<v Noah Labhart>Or Weis has been a programmer or engineer since the age of five.
+
+15
+00:01:23.040 --> 00:01:25.880
+<v Noah Labhart>He started playing with DOS commands super early in his life,
+
+16
+00:01:26.000 --> 00:01:30.180
+<v Noah Labhart>and he made a significant leap in his professional skills when he joined the IDF.
+
+17
+00:01:30.640 --> 00:01:34.900
+<v Noah Labhart>Post that, he worked for a startup to build containers, before they were commonplace,
+
+18
+00:01:35.080 --> 00:01:40.320
+<v Noah Labhart>followed by co-founding Rookout, a company who defined the production debugging space.
+
+19
+00:01:40.660 --> 00:01:43.920
+<v Noah Labhart>You might recognize the name as I interviewed his co-founder earlier on.
+
+20
+00:01:45.840 --> 00:01:48.920
+<v Noah Labhart>married to another software engineer, and dabbles in writing science fiction.
+
+21
+00:01:49.160 --> 00:01:53.820
+<v Noah Labhart>He hopes to eventually write a book that overlaps with his professional interests as well,
+
+22
+00:01:53.920 --> 00:01:55.340
+<v Noah Labhart>kind of like the Phoenix Project.
+
+23
+00:01:55.980 --> 00:02:00.640
+<v Noah Labhart>While he was building his startups, he quickly found himself annoyed with having to build
+
+24
+00:02:00.640 --> 00:02:05.220
+<v Noah Labhart>and rebuild permission sets or authorization into every solution he made.
+
+25
+00:02:05.780 --> 00:02:09.400
+<v Noah Labhart>Since he couldn't find someone building something like this,
+
+26
+00:02:09.580 --> 00:02:14.440
+<v Noah Labhart>he decided to create a permissions solution for the last time.
+
+27
+00:02:15.840 --> 00:02:18.000
+<v Noah Labhart>This is the creation story of Permit.
+
+28
+00:02:23.860 --> 00:02:28.060
+<v Or Weis>I've been building applications for as far as I can remember myself.
+
+29
+00:02:28.160 --> 00:02:29.260
+<v Or Weis>I kind of touched on that before.
+
+30
+00:02:29.640 --> 00:02:38.100
+<v Or Weis>As part of that, I've been building access control roles, approval flows, APIs with management.
+
+31
+00:02:38.260 --> 00:02:41.180
+<v Or Weis>A lot of those like a thousand times, if not more.
+
+32
+00:02:41.180 --> 00:02:47.260
+<v Or Weis>And I was already kind of aware of how annoying that is and not wanting to do it at any point
+
+33
+00:02:47.260 --> 00:02:52.480
+<v Or Weis>that I had to build a product. It was always the last thing I wanted to do, but I always had to.
+
+34
+00:02:53.380 --> 00:02:59.500
+<v Or Weis>In my previous company at Rookout, it really brought it to a crescendo for me, because I
+
+35
+00:02:59.500 --> 00:03:05.240
+<v Or Weis>ended up rebuilding access control five times for a company that wasn't even three years old at the
+
+36
+00:03:05.240 --> 00:03:10.660
+<v Or Weis>time. And I also remember being surprised at every turn, like every time I had to rebuild this, I was
+
+37
+00:03:11.500 --> 00:03:18.220
+<v Or Weis>I was firm in my belief in the previous iteration that, okay, now I've got this down to a bit.
+
+38
+00:03:18.320 --> 00:03:19.460
+<v Or Weis>I've got this right.
+
+39
+00:03:19.640 --> 00:03:21.700
+<v Or Weis>We won't have to rebuild this ever again.
+
+40
+00:03:21.800 --> 00:03:22.300
+<v Or Weis>It's perfect.
+
+41
+00:03:22.660 --> 00:03:26.700
+<v Or Weis>And then you get like a curveball from your customers or your compliance.
+
+42
+00:03:26.940 --> 00:03:32.080
+<v Or Weis>Like the last time was when Cisco, they came in and said, we want our own back office.
+
+43
+00:03:32.240 --> 00:03:34.340
+<v Or Weis>We want to be able to manage users on our own.
+
+44
+00:03:34.500 --> 00:03:36.320
+<v Or Weis>And I was like, crap.
+
+45
+00:03:36.320 --> 00:03:42.940
+<v Or Weis>ground. There's no technically feasible way that I can take this architecture and replicate the
+
+46
+00:03:42.940 --> 00:03:47.600
+<v Or Weis>back office and access control for it. I have essentially, my only option is to chuck it out
+
+47
+00:03:47.600 --> 00:03:52.380
+<v Or Weis>the window and start from scratch. And when I got together with my co-founder Asaf, who,
+
+48
+00:03:52.380 --> 00:03:57.700
+<v Or Weis>by the way, used to be a student of mine back in the intelligence corps, and he worked at Microsoft,
+
+49
+00:03:58.220 --> 00:04:04.440
+<v Or Weis>Clarity, and Facebook, he worked on their developer tools and platforms, and he got to see how it
+
+50
+00:04:06.320 --> 00:04:12.800
+<v Or Weis>really invest in this. It's really about using AI to translate access control back into organizational
+
+51
+00:04:12.800 --> 00:04:20.260
+<v Or Weis>flows. Like for example, if an employee queries the database too often, there's not a specific
+
+52
+00:04:20.260 --> 00:04:27.280
+<v Or Weis>rule for that, but there's an anomaly detection model that would detect that. And then that
+
+53
+00:04:27.280 --> 00:04:33.020
+<v Or Weis>translates to asking his team lead or her team lead if that makes sense or not. And if they
+
+54
+00:04:33.020 --> 00:04:36.400
+<v Or Weis>They should escalate privileges or maybe put a stop to that.
+
+55
+00:04:36.960 --> 00:04:40.160
+<v Or Weis>Just like you don't want to build your authentication from scratch,
+
+56
+00:04:40.400 --> 00:04:42.720
+<v Or Weis>just like you don't want to build your analytics from scratch,
+
+57
+00:04:42.900 --> 00:04:44.780
+<v Or Weis>just like you don't want to build billing from scratch.
+
+58
+00:04:45.260 --> 00:04:47.260
+<v Or Weis>So the idea is full stack permissions.
+
+59
+00:04:47.700 --> 00:04:50.720
+<v Or Weis>It's a solution you can bake into your software once
+
+60
+00:04:50.720 --> 00:04:56.740
+<v Or Weis>and have it make your software elastic enough to meet the demands that come down the road.
+
+61
+00:04:57.240 --> 00:05:01.560
+<v Or Weis>When I say full stack permissions, that includes essentially three parts.
+
+62
+00:05:03.020 --> 00:05:09.140
+<v Or Weis>infrastructure so the basic capabilities to bake into your product so it's mostly
+
+63
+00:05:09.140 --> 00:05:14.620
+<v Or Weis>a micro service for authorization an SDK that you can mix and match this into
+
+64
+00:05:14.620 --> 00:05:20.400
+<v Or Weis>various points in your code or into your API gateway or elsewhere we've adopted a
+
+65
+00:05:20.400 --> 00:05:26.020
+<v Or Weis>project called OPA, and we've created a project called Opal, which takes OPA,
+
+66
+00:05:26.020 --> 00:05:30.220
+<v Or Weis>which is a generic purpose decision engine we bring it to the application
+
+67
+00:05:30.220 --> 00:05:37.300
+<v Or Weis>layer by updating it in real time in an event-driven fashion. The two following parts are,
+
+68
+00:05:37.400 --> 00:05:43.080
+<v Or Weis>one, a back office. The organization or organization behind the product you're building
+
+69
+00:05:43.080 --> 00:05:48.480
+<v Or Weis>can manage it together in an easy way and enabling all the different stakeholders.
+
+70
+00:05:48.920 --> 00:05:54.320
+<v Or Weis>So it obviously starts with developers, but it quickly escalates to other players in the
+
+71
+00:05:54.320 --> 00:05:59.060
+<v Or Weis>organization. So when you're building a product, when you're an organization building a product,
+
+72
+00:06:00.220 --> 00:06:06.840
+<v Or Weis>to at least participate in this critical experience called access. And lastly, the customer-facing
+
+73
+00:06:06.840 --> 00:06:12.980
+<v Or Weis>interfaces themselves. So user management with the ability to assign roles, API key management,
+
+74
+00:06:13.280 --> 00:06:18.680
+<v Or Weis>secrets management, audit logs, the ability to see who did what within the system, and the ability
+
+75
+00:06:18.680 --> 00:06:25.140
+<v Or Weis>per tenant for each of those tenants to be able to see what they did within their silo. None of
+
+76
+00:06:25.140 --> 00:06:29.680
+<v Or Weis>these things that I'm mentioning are probably new for you. You've seen them in a lot of applications.
+
+77
+00:06:30.220 --> 00:06:34.820
+<v Or Weis>But every time you saw them, some poor schlep of a developer had to build them from scratch.
+
+78
+00:06:35.480 --> 00:06:37.100
+<v Or Weis>The idea here is really straightforward.
+
+79
+00:06:37.320 --> 00:06:41.920
+<v Or Weis>It's easy, it's future-proof, and it enables you to focus on actually building your own product.
+
+80
+00:06:43.400 --> 00:06:44.900
+<v Noah Labhart>Let's dive into the MVP.
+
+81
+00:06:45.240 --> 00:06:46.840
+<v Noah Labhart>So tell me about that MVP.
+
+82
+00:06:47.180 --> 00:06:50.860
+<v Noah Labhart>How long did it take to build and what sort of tools did you use to bring it to life?
+
+83
+00:06:52.860 --> 00:06:58.820
+<v Or Weis>We initially started with a few design partners, two kind of larger companies and a very small startup.
+
+84
+00:07:00.220 --> 00:07:03.500
+<v Or Weis>that we can find that kind of overlap,
+
+85
+00:07:03.780 --> 00:07:06.540
+<v Or Weis>that mutual space that both parties kind of suffer from.
+
+86
+00:07:06.880 --> 00:07:08.900
+<v Or Weis>We just started building it.
+
+87
+00:07:08.960 --> 00:07:11.860
+<v Or Weis>We really stuck to done is better than perfect.
+
+88
+00:07:12.280 --> 00:07:14.660
+<v Or Weis>But I think in the end we over-engineered it a bit.
+
+89
+00:07:14.840 --> 00:07:17.240
+<v Or Weis>The basic essence of the product was the same.
+
+90
+00:07:17.460 --> 00:07:19.660
+<v Or Weis>But we created two main things.
+
+91
+00:07:19.800 --> 00:07:22.680
+<v Or Weis>One, an interface where you can, through a UI,
+
+92
+00:07:22.980 --> 00:07:25.240
+<v Or Weis>change the policies for your application.
+
+93
+00:07:25.500 --> 00:07:28.720
+<v Or Weis>And we create a basic role-based access control interface.
+
+94
+00:07:30.220 --> 00:07:35.440
+<v Or Weis>The other one is the ability to combine it into an application and assign user management
+
+95
+00:07:35.440 --> 00:07:38.640
+<v Or Weis>within the application through the permit system.
+
+96
+00:07:38.960 --> 00:07:40.620
+<v Or Weis>The demo would go something like this.
+
+97
+00:07:40.700 --> 00:07:46.100
+<v Or Weis>You go to the back office, you define your policies, you connect this through an SDK
+
+98
+00:07:46.840 --> 00:07:50.020
+<v Or Weis>to the customer or demo application.
+
+99
+00:07:50.400 --> 00:07:55.140
+<v Or Weis>That application also embeds a user management interface that is provided by permit.
+
+100
+00:07:55.760 --> 00:07:58.540
+<v Or Weis>I mentioned before a lot of interfaces, right?
+
+101
+00:08:00.220 --> 00:08:01.660
+<v Or Weis>and audit logs and all of those.
+
+102
+00:08:01.780 --> 00:08:05.360
+<v Or Weis>So we tried to pick the core features,
+
+103
+00:08:05.580 --> 00:08:07.180
+<v Or Weis>the most basic ones that we thought
+
+104
+00:08:07.180 --> 00:08:08.800
+<v Or Weis>that would bring value to the table.
+
+105
+00:08:09.000 --> 00:08:11.720
+<v Or Weis>And that was, we felt, at least user management
+
+106
+00:08:11.720 --> 00:08:14.360
+<v Or Weis>and the ability to create roles for them.
+
+107
+00:08:15.100 --> 00:08:17.960
+<v Or Weis>When we built it, one of the most interesting things
+
+108
+00:08:17.960 --> 00:08:19.880
+<v Or Weis>is that we faced challenges ourselves.
+
+109
+00:08:20.660 --> 00:08:23.780
+<v Or Weis>We chose to adopt open source projects.
+
+110
+00:08:23.940 --> 00:08:26.400
+<v Or Weis>Like I mentioned before, we adopted a project called OPA.
+
+111
+00:08:26.540 --> 00:08:28.240
+<v Or Weis>But as we were adopting it,
+
+112
+00:08:30.220 --> 00:08:37.400
+<v Or Weis>specific challenge working with it. OPA was really built or really grew to focus on Kubernetes.
+
+113
+00:08:38.100 --> 00:08:42.900
+<v Or Weis>But when you take this to the application layer, the pace of change is a lot faster.
+
+114
+00:08:43.000 --> 00:08:48.780
+<v Or Weis>Like a user inviting another user or creating a new role changes the world picture dramatically
+
+115
+00:08:49.420 --> 00:08:54.620
+<v Or Weis>and impacts the data that is relevant for authorization and maybe even the policy that
+
+116
+00:08:54.620 --> 00:08:56.060
+<v Or Weis>that is relevant for authorization.
+
+117
+00:08:56.960 --> 00:08:59.380
+<v Or Weis>We had to find a way to make it run faster.
+
+118
+00:08:59.600 --> 00:09:02.800
+<v Or Weis>So we created a microservice architecture
+
+119
+00:09:02.800 --> 00:09:05.780
+<v Or Weis>within what's now called Permit
+
+120
+00:09:05.780 --> 00:09:09.240
+<v Or Weis>that enables you to use OPA in an event-driven fashion.
+
+121
+00:09:09.740 --> 00:09:12.200
+<v Or Weis>What was interesting is once we'd done that,
+
+122
+00:09:12.340 --> 00:09:15.360
+<v Or Weis>we realized this sub-part of the problem
+
+123
+00:09:15.360 --> 00:09:17.080
+<v Or Weis>is relevant for a lot of players.
+
+124
+00:09:17.500 --> 00:09:21.400
+<v Or Weis>So we decided to export it out as open source.
+
+125
+00:09:21.400 --> 00:09:25.720
+<v Or Weis>And that's what became Opal, Open Policy Administration Layer.
+
+126
+00:09:26.100 --> 00:09:32.380
+<v Or Weis>We're really happy we did that because that really enriched and sped up our conversation with the market.
+
+127
+00:09:33.360 --> 00:09:43.340
+<v Or Weis>Opal is not even a year old, but it's already used by dozens of companies and is in production in amazing companies like Tesla, Zapier, Accenture and others.
+
+128
+00:09:43.340 --> 00:09:53.560
+<v Or Weis>And those companies also provided a lot of feedback, a lot of requirements that really enabled us to both mature Opal and by proxy permit itself.
+
+129
+00:09:54.400 --> 00:10:01.640
+<v Or Weis>We wouldn't be able to move that quickly and get that feedback so quickly just focusing on the MVP and design partners.
+
+130
+00:10:01.840 --> 00:10:10.960
+<v Or Weis>That was basically a stepping stone or an acceleration path to working with the open source and starting to work with the overall wider market.
+
+131
+00:10:12.240 --> 00:10:17.780
+<v Noah Labhart>So then you've got your product working and then you've open sourced Opal, right?
+
+132
+00:10:17.880 --> 00:10:21.580
+<v Noah Labhart>How did you progress the product from there and how did you mature it?
+
+133
+00:10:21.600 --> 00:10:34.100
+<v Noah Labhart>And I'm curious, you know, from that point where you're getting the acceleration from open source and you have MVP partners, how did you build your roadmap and how did you decide, okay, this is the next most important thing to build or to address?
+
+134
+00:10:35.180 --> 00:10:42.720
+<v Or Weis>In general, I'd say our go-to-market motion is really connected and really based on product-led growth.
+
+135
+00:10:42.960 --> 00:10:44.680
+<v Or Weis>I'm really gung-ho about it.
+
+136
+00:10:45.080 --> 00:10:47.700
+<v Or Weis>And with developers, it's doubly so.
+
+137
+00:10:47.980 --> 00:10:51.080
+<v Or Weis>So product-led growth, maybe I should explain the term first.
+
+138
+00:10:51.260 --> 00:10:57.300
+<v Or Weis>Product-led growth means you put the product up front and you reduce friction as much as possible,
+
+139
+00:10:57.480 --> 00:11:02.080
+<v Or Weis>enabling people to get a taste and interact with your product as early as possible.
+
+140
+00:11:02.080 --> 00:11:06.100
+<v Or Weis>and you only layer sales on top of that.
+
+141
+00:11:06.220 --> 00:11:07.900
+<v Or Weis>You start with the bottom-ups motion,
+
+142
+00:11:08.380 --> 00:11:11.140
+<v Or Weis>getting the product to the hands of people as soon as possible.
+
+143
+00:11:12.060 --> 00:11:13.680
+<v Or Weis>With developers, that's key
+
+144
+00:11:13.680 --> 00:11:15.960
+<v Or Weis>because if there's one thing developers hate
+
+145
+00:11:15.960 --> 00:11:19.100
+<v Or Weis>is having their managers telling them what to do.
+
+146
+00:11:19.620 --> 00:11:21.920
+<v Or Weis>They want to pick their tech stack on their own.
+
+147
+00:11:22.020 --> 00:11:25.280
+<v Or Weis>So when they adopt it and bring it to their managers,
+
+148
+00:11:25.500 --> 00:11:27.080
+<v Or Weis>to the decision makers, to the buyers,
+
+149
+00:11:27.240 --> 00:11:29.020
+<v Or Weis>that's a very positive motion.
+
+150
+00:11:29.020 --> 00:11:33.680
+<v Or Weis>if it goes the other way around it's a very negative notion but by the way we
+
+151
+00:11:33.680 --> 00:11:38.140
+<v Or Weis>also explore this initially even before our design partners we talked to CISOs
+
+152
+00:11:38.140 --> 00:11:42.080
+<v Or Weis>we there was a period we thought maybe this is a kind of a classic Israeli
+
+153
+00:11:42.080 --> 00:11:46.720
+<v Or Weis>cybersecurity company selling to CISOs when we talked to them they were like
+
+154
+00:11:46.720 --> 00:11:51.280
+<v Or Weis>yeah we care a lot about this but we're not the decision makers the ones making
+
+155
+00:11:51.280 --> 00:11:57.360
+<v Or Weis>a decision about this is R&amp;D we can only float requirements to them so we really
+
+156
+00:11:58.980 --> 00:12:03.640
+<v Or Weis>developers, starting with developers and their impact on all the rest of their organization.
+
+157
+00:12:04.480 --> 00:12:10.660
+<v Or Weis>To sum that up, so we focus on product-led growth and we decided that our market interaction would
+
+158
+00:12:10.660 --> 00:12:15.720
+<v Or Weis>start with that. So we initially did most of our growth through that open source project.
+
+159
+00:12:16.300 --> 00:12:23.360
+<v Or Weis>Opal doesn't include a UI, but it's quite often that we find that people ask about a UI for Opal.
+
+160
+00:12:23.400 --> 00:12:27.640
+<v Or Weis>And we thought that's, okay, that's an interesting point for people to learn about Permit.
+
+161
+00:12:29.020 --> 00:12:33.840
+<v Or Weis>provide some UI as part of Opal in the future, but we know that that's a point where more questions
+
+162
+00:12:33.840 --> 00:12:39.260
+<v Or Weis>come in and enable us to kind of broaden the horizon and offer more things that we can bring
+
+163
+00:12:39.260 --> 00:12:45.480
+<v Or Weis>to the table. But then really quickly, we moved to self-service. As I said, again, with product-led
+
+164
+00:12:45.480 --> 00:12:51.260
+<v Or Weis>growth, it's really about putting the product up front. So we really early on built a self-service
+
+165
+00:12:51.260 --> 00:12:56.600
+<v Or Weis>where you can try Permit.io on your own. And we initially onboarded people in a kind of a sort of
+
+166
+00:12:56.600 --> 00:13:01.760
+<v Or Weis>beta program. People that sign up on our website, we would cherry pick or randomly pick a few of
+
+167
+00:13:01.760 --> 00:13:06.760
+<v Or Weis>them and give them access to the solution. And then most importantly, we just opened it up as
+
+168
+00:13:06.760 --> 00:13:11.820
+<v Or Weis>soon as we could for everyone. That's the main way we learn about how the product should evolve.
+
+169
+00:13:12.060 --> 00:13:16.480
+<v Or Weis>Seeing people interact with it, seeing what doesn't work for them, seeing what they're excited
+
+170
+00:13:16.480 --> 00:13:22.140
+<v Or Weis>about and what they're disappointed about. That really drives our strategy and our roadmap.
+
+171
+00:13:22.140 --> 00:13:29.680
+<v Or Weis>map. So we automatically prioritize things that come from customers on top. There's like a specific
+
+172
+00:13:30.700 --> 00:13:36.420
+<v Or Weis>echelon within the roadmap that is dedicated to that. Then there's another echelon dedicated
+
+173
+00:13:36.420 --> 00:13:41.660
+<v Or Weis>specifically to improving the onboarding experience. So looking at how people interact
+
+174
+00:13:41.660 --> 00:13:48.180
+<v Or Weis>with the product, even if they're not fully engaged yet, we constantly look at that and try
+
+175
+00:13:48.180 --> 00:13:53.080
+<v Or Weis>how to think how we can improve this, how we can reduce friction around those interactions.
+
+176
+00:13:53.580 --> 00:13:56.880
+<v Or Weis>And then we layer more strategic flows.
+
+177
+00:13:57.100 --> 00:14:01.920
+<v Or Weis>So adding more interfaces, adding more capabilities, connecting this better to GitOps,
+
+178
+00:14:02.160 --> 00:14:05.820
+<v Or Weis>connecting this better to the open source offering, creating more open source offering.
+
+179
+00:14:06.280 --> 00:14:09.440
+<v Or Weis>And at the end of the day, if I have to completely sum it up,
+
+180
+00:14:09.500 --> 00:14:13.220
+<v Or Weis>it's a balancing act between what we perceive as our strategy,
+
+181
+00:14:13.440 --> 00:14:17.120
+<v Or Weis>which is constantly being updated with our interaction with the market,
+
+182
+00:14:18.300 --> 00:14:25.760
+<v Or Weis>direct market requirements that we get from our most important source, the users and customers themselves.
+
+183
+00:14:27.300 --> 00:14:29.760
+<v Noah Labhart>Well, let's switch to team then.
+
+184
+00:14:29.900 --> 00:14:32.000
+<v Noah Labhart>So how did you go about building your team?
+
+185
+00:14:32.140 --> 00:14:37.540
+<v Noah Labhart>And what did you look for in those people that indicated to you that they were the winning horses to join you?
+
+186
+00:14:38.780 --> 00:14:47.080
+<v Or Weis>In general, in an early stage startup, I think at least what I'd want is people that can lead on their own.
+
+187
+00:14:48.180 --> 00:14:54.160
+<v Or Weis>by the cultural patterns, the culture essentially in the unit I served in, in the military,
+
+188
+00:14:54.360 --> 00:14:58.980
+<v Or Weis>you really get a sense of what I call being down in the trenches together.
+
+189
+00:14:59.300 --> 00:15:04.800
+<v Or Weis>So it's a sense of we're side by side, we're shoulder to shoulder, we're running against
+
+190
+00:15:04.800 --> 00:15:09.720
+<v Or Weis>our own goals and missions, but we always get each other's back.
+
+191
+00:15:09.920 --> 00:15:15.980
+<v Or Weis>And there's no hierarchy, like anyone wants to say something can, but while we're working
+
+192
+00:15:15.980 --> 00:15:20.620
+<v Or Weis>shoulder to shoulder, still each of us has his own goals and we run independently.
+
+193
+00:15:20.900 --> 00:15:24.600
+<v Or Weis>It's like you need to get there, if you don't get there people would die and
+
+194
+00:15:24.600 --> 00:15:28.640
+<v Or Weis>there's no one else that can do it besides you. You want those people that
+
+195
+00:15:28.640 --> 00:15:33.600
+<v Or Weis>will flourish in that environment, people that can charge forward and pave the way
+
+196
+00:15:33.600 --> 00:15:40.400
+<v Or Weis>and stick the flag at the objective and get it done while still having the back
+
+197
+00:15:40.400 --> 00:15:43.860
+<v Or Weis>of their colleagues. It's part of that I'm looking for people that can be that,
+
+198
+00:15:43.860 --> 00:15:48.220
+<v Or Weis>that can be team players, but can also move and charge on their own.
+
+199
+00:15:48.400 --> 00:15:52.160
+<v Or Weis>I don't know of a single person who likes to be micromanaged.
+
+200
+00:15:52.760 --> 00:15:57.940
+<v Or Weis>And as a manager, the thing that I dislike the most is micromanaging people.
+
+201
+00:15:58.300 --> 00:16:01.600
+<v Or Weis>And I think especially in an early startup, if you need to micromanage someone,
+
+202
+00:16:01.780 --> 00:16:04.200
+<v Or Weis>even a bit, it's basically doomed.
+
+203
+00:16:04.300 --> 00:16:07.620
+<v Or Weis>It would be better for the both of you if you split up early.
+
+204
+00:16:07.920 --> 00:16:11.680
+<v Or Weis>I even try to find people that have the ability to move more freely.
+
+205
+00:16:11.680 --> 00:16:16.480
+<v Or Weis>really. And I constantly try to push their boundaries. I say, okay, this is what you feel
+
+206
+00:16:16.480 --> 00:16:22.220
+<v Or Weis>comfortable with managing on your own. Next task I'm going to give you, I'm going to give you even
+
+207
+00:16:22.220 --> 00:16:27.220
+<v Or Weis>more space that you can maneuver in and see how far you can take it and gradually enable those
+
+208
+00:16:27.220 --> 00:16:34.060
+<v Or Weis>people. The easiest way I know of finding people like that is finding people that you already
+
+209
+00:16:34.060 --> 00:16:40.460
+<v Or Weis>worked with. People that you know that will be a good cultural fit. Our own personal networks were
+
+210
+00:16:41.680 --> 00:16:48.160
+<v Or Weis>one way we brought in our early employees. And another thing is, which I'm also, I'm always
+
+211
+00:16:48.760 --> 00:16:54.580
+<v Or Weis>positive about it. I'm really positive about finding opportunities. My kind of philosophy
+
+212
+00:16:54.580 --> 00:17:00.280
+<v Or Weis>on opportunities is you don't get to choose them. You can choose your preferred flavor,
+
+213
+00:17:00.440 --> 00:17:05.200
+<v Or Weis>but you can't expect the opportunity to align with that. You can try and then,
+
+214
+00:17:05.860 --> 00:17:09.240
+<v Or Weis>once you get an opportunity, you can see if you can adjust it to your flavor.
+
+215
+00:17:10.880 --> 00:17:15.560
+<v Or Weis>and when I come across opportunities I like to dive into them and I think I had
+
+216
+00:17:16.180 --> 00:17:21.760
+<v Or Weis>quite a bit of luck with that as well finding some people that are early on in their careers
+
+217
+00:17:21.760 --> 00:17:26.940
+<v Or Weis>they don't have a lot of experience but it's clear that they have a lot of passion
+
+218
+00:17:26.940 --> 00:17:33.440
+<v Or Weis>and they have a lot of the right empathy to kind of work with a team and kind of
+
+219
+00:17:33.440 --> 00:17:35.820
+<v Or Weis>fake it until they make it and actually make it eventually
+
+220
+00:17:38.320 --> 00:17:39.480
+<v Noah Labhart>Let's flip to scalability.
+
+221
+00:17:39.820 --> 00:17:43.380
+<v Noah Labhart>So did you build this to scale efficiently from day one?
+
+222
+00:17:43.480 --> 00:17:48.760
+<v Noah Labhart>And I think I may have a, my gut says the answer is yes, based on your early responses,
+
+223
+00:17:48.820 --> 00:17:49.660
+<v Noah Labhart>but I want to see where you go.
+
+224
+00:17:49.960 --> 00:17:54.520
+<v Noah Labhart>So did you scale this efficiently from day one or are you fighting this as you grow?
+
+225
+00:17:55.640 --> 00:18:00.240
+<v Or Weis>I think we scaled it or build it to scale too much even.
+
+226
+00:18:00.300 --> 00:18:06.040
+<v Or Weis>We knew that we were designing it maybe too well, but we still did it.
+
+227
+00:18:06.820 --> 00:18:13.980
+<v Or Weis>we tried to keep it simple. It's definitely more simple than some initial designs that we had on
+
+228
+00:18:13.980 --> 00:18:22.320
+<v Or Weis>paper. I think we kind of took it too far to the left. It was too built for scale. That being said,
+
+229
+00:18:22.380 --> 00:18:26.720
+<v Or Weis>I do think that there are some best practices that are always good to stick with. Still start
+
+230
+00:18:26.720 --> 00:18:32.580
+<v Or Weis>with microservices architecture, even if you have just one microservice. Use things like monitoring
+
+231
+00:18:32.580 --> 00:18:39.540
+<v Or Weis>tools and use cloud deployments like Fargate or Lambda. So you'll have elasticity kind of built
+
+232
+00:18:39.540 --> 00:18:45.360
+<v Or Weis>in even if you don't use it. Aside from adopting the right tools and best practices, we really
+
+233
+00:18:45.360 --> 00:18:50.360
+<v Or Weis>built it with an architecture that is aligned for scale and with features that were really aligned
+
+234
+00:18:50.360 --> 00:18:52.960
+<v Or Weis>for scale. And we could probably made it simpler.
+
+235
+00:18:54.640 --> 00:18:57.240
+<v Noah Labhart>Well, Or, as you step out on the balcony and you
+
+236
+00:18:57.240 --> 00:19:00.060
+<v Noah Labhart>you look across all that you've built, what are you most proud of?
+
+237
+00:19:00.920 --> 00:19:02.840
+<v Or Weis>I think in both companies,
+
+238
+00:19:03.040 --> 00:19:10.760
+<v Or Weis>both in Rookout and now in Permit, the thing I'm most proud about is the people. People that I'm
+
+239
+00:19:10.760 --> 00:19:18.400
+<v Or Weis>excited to work with, people that I feel are excited to be here and find value and passion
+
+240
+00:19:18.400 --> 00:19:25.340
+<v Or Weis>in what we do. And just, you know, most of the time as an entrepreneur, and I think I have a
+
+241
+00:19:27.240 --> 00:19:34.420
+<v Or Weis>The constant flow of events and challenges that arise, they basically blind you to what you're actually building.
+
+242
+00:19:34.640 --> 00:19:37.760
+<v Or Weis>It's really hard to stop and smell the roses.
+
+243
+00:19:37.940 --> 00:19:39.900
+<v Or Weis>It's almost impossible for me.
+
+244
+00:19:40.000 --> 00:19:42.580
+<v Or Weis>Like things are moving so fast and there's so much pressure.
+
+245
+00:19:43.200 --> 00:19:52.380
+<v Or Weis>But every now and then I find myself like sipping a cup of coffee and just looking around, seeing people smiling, working, running jokes together,
+
+246
+00:19:52.380 --> 00:19:57.480
+<v Or Weis>ever demonstrating a new feature or meeting with a customer and seeing the excitement in their eyes.
+
+247
+00:19:57.600 --> 00:20:05.960
+<v Or Weis>And then just for like a few microseconds, I get this flash of understanding. And those are like
+
+248
+00:20:05.960 --> 00:20:13.080
+<v Or Weis>the most amazing moments. I wish I knew how to grasp them for longer. And having those moments
+
+249
+00:20:13.080 --> 00:20:18.180
+<v Or Weis>and seeing that other people are experiencing them with me, if it's people in the company or
+
+250
+00:20:18.180 --> 00:20:22.320
+<v Or Weis>for customers too. When I have those moments, that's when I'm the most proud.
+
+251
+00:20:23.360 --> 00:20:27.060
+<v Noah Labhart>Well, let's flip the script a little bit. So tell me about a mistake you made
+
+252
+00:20:27.060 --> 00:20:29.360
+<v Noah Labhart>and how you and your team responded to it.
+
+253
+00:20:30.060 --> 00:20:35.620
+<v Or Weis>Honestly, we haven't done a lot of mistakes so far. Like we're pretty early on. I think also
+
+254
+00:20:35.620 --> 00:20:40.680
+<v Or Weis>there's like mistakes like the one I mentioned before with the overcomplicating the tech stack.
+
+255
+00:20:40.680 --> 00:20:55.200
+<v Or Weis>I think trying to be aware that we have that tendency and try to nurture the let's move fast and not necessarily dilly-dally around having it perfect as much as possible.
+
+256
+00:20:55.400 --> 00:21:04.400
+<v Or Weis>So we try to, both I and Michael Varner and other team members, we try to identify that and comment on, can we make this simpler?
+
+257
+00:21:04.580 --> 00:21:06.020
+<v Or Weis>Can we make it quicker?
+
+258
+00:21:06.200 --> 00:21:07.820
+<v Or Weis>Can we cut some corners here?
+
+259
+00:21:07.820 --> 00:21:17.080
+<v Or Weis>I think there were cases where we didn't respond fast enough or we didn't promote the feature
+
+260
+00:21:17.080 --> 00:21:19.560
+<v Or Weis>the customer wanted as fast enough.
+
+261
+00:21:20.000 --> 00:21:25.060
+<v Or Weis>And I think it's still early to say if it was in those cases, if it was a mistake on
+
+262
+00:21:25.060 --> 00:21:26.520
+<v Or Weis>our part, it's possibly a mistake.
+
+263
+00:21:26.720 --> 00:21:31.000
+<v Or Weis>Like there were cases where we missed out on having another adapter or another user.
+
+264
+00:21:31.000 --> 00:21:39.380
+<v Or Weis>and for some cases we didn't reshuffle the current sprint to adjust to that customer fast enough
+
+265
+00:21:39.380 --> 00:21:45.720
+<v Or Weis>but it's really hard to say if the alternative cost to shifting the focus at that moment was
+
+266
+00:21:45.720 --> 00:21:50.640
+<v Or Weis>worth it or not i do think there are some cases that i'm kind of more inclined to think that i
+
+267
+00:21:50.640 --> 00:21:54.940
+<v Or Weis>feel like they're missed opportunities we could have done better but i think it's kind of a
+
+268
+00:21:54.940 --> 00:22:01.560
+<v Or Weis>a constant struggle. Now we know that there are features like these that customers would want.
+
+269
+00:22:01.960 --> 00:22:07.860
+<v Or Weis>Some of them would find these as deal breakers. Some of them would find these as just nice to
+
+270
+00:22:07.860 --> 00:22:13.880
+<v Or Weis>have. And obviously, that's a spectrum. So recognizing these early on and having at least the
+
+271
+00:22:15.360 --> 00:22:20.640
+<v Or Weis>estimation of how much effort you need to put in to actually meet the customer demand,
+
+272
+00:22:20.640 --> 00:22:25.560
+<v Or Weis>enable us to react better and more quickly when a new requirement like that comes in
+
+273
+00:22:25.560 --> 00:22:30.480
+<v Or Weis>because we don't need to actually process it from scratch when it arrives
+
+274
+00:22:30.480 --> 00:22:33.820
+<v Or Weis>because we already kind of thought at least on the basic guidelines of it
+
+275
+00:22:33.820 --> 00:22:39.340
+<v Or Weis>and we can decide how to react in a more educated fashion as a result.
+
+276
+00:22:41.580 --> 00:22:46.440
+<v Noah Labhart>Well, what does the future look like for Permit, the product, and for your team?
+
+277
+00:22:47.460 --> 00:22:56.900
+<v Or Weis>What I'm really excited about this space is it's a huge problem now, like with microservices and more complex policies and compliance.
+
+278
+00:22:57.080 --> 00:23:02.860
+<v Or Weis>It's already a huge problem now for companies to build that modern access control into their products.
+
+279
+00:23:03.040 --> 00:23:08.880
+<v Or Weis>But what's really exciting is it's going to be even bigger several times over.
+
+280
+00:23:09.000 --> 00:23:13.300
+<v Or Weis>So software is obviously eating the world. That's well known.
+
+281
+00:23:13.300 --> 00:23:20.600
+<v Or Weis>own, but its software itself is also being automated. And if today when you're building
+
+282
+00:23:20.600 --> 00:23:26.240
+<v Or Weis>a product, you're thinking, oh, it's mostly human users using my system, more and more it's becoming
+
+283
+00:23:26.240 --> 00:23:32.140
+<v Or Weis>other applications acting on behalf of other applications on behalf of other applications
+
+284
+00:23:32.140 --> 00:23:38.000
+<v Or Weis>on behalf of those users. For someone who's in the tech space, you probably noticed that for
+
+285
+00:23:38.000 --> 00:23:43.120
+<v Or Weis>for every buzzword you pick, there's some startup or some company doing that buzzword with the
+
+286
+00:23:43.120 --> 00:23:50.740
+<v Or Weis>combination of machine learning or an AI. If, for example, you ask Siri or Google Assistant to
+
+287
+00:23:50.740 --> 00:23:55.880
+<v Or Weis>turn on the lights for you. So that's an application running on your phone, talking to
+
+288
+00:23:55.880 --> 00:24:01.460
+<v Or Weis>Google or Apple Cloud, potentially talking to something like IFTTT or Zapier, potentially
+
+289
+00:24:01.460 --> 00:24:05.040
+<v Or Weis>eventually talking to the cloud of the edge device vendor,
+
+290
+00:24:05.220 --> 00:24:08.800
+<v Or Weis>so let's say Xiaomi or Yeelight or some other kind of vendor,
+
+291
+00:24:08.940 --> 00:24:10.640
+<v Or Weis>eventually talking to the application
+
+292
+00:24:10.640 --> 00:24:13.440
+<v Or Weis>actually running on the smart light bulb.
+
+293
+00:24:13.620 --> 00:24:16.360
+<v Or Weis>So it's something like five to six different applications
+
+294
+00:24:16.360 --> 00:24:19.600
+<v Or Weis>talking to one another to actually get something done.
+
+295
+00:24:19.940 --> 00:24:23.640
+<v Or Weis>What those applications are permitted to do on our behalf
+
+296
+00:24:23.640 --> 00:24:25.960
+<v Or Weis>and how they're allowed to talk to one another
+
+297
+00:24:25.960 --> 00:24:27.380
+<v Or Weis>is already complex,
+
+298
+00:24:27.680 --> 00:24:30.500
+<v Or Weis>and it's going to be a lot more like that.
+
+299
+00:24:31.460 --> 00:24:35.880
+<v Or Weis>more automated machine learning agents talking to other machine learning agents. And so the
+
+300
+00:24:35.880 --> 00:24:40.740
+<v Or Weis>permissions of what we allow them to do on our behalf, what we allow them to do interacting with
+
+301
+00:24:40.740 --> 00:24:47.280
+<v Or Weis>other automated agents, that's just going to fill up the entire space. And to me, it's clear that
+
+302
+00:24:47.280 --> 00:24:54.300
+<v Or Weis>if we don't have better controls, visibility, and interfaces to manage this as people, we'll
+
+303
+00:24:54.300 --> 00:24:59.180
+<v Or Weis>basically be lost. And I'm really excited about building the basic building blocks for this,
+
+304
+00:24:59.180 --> 00:25:06.500
+<v Or Weis>but also the interfaces on top that would make this complex problem a simple problem for people to use on a daily basis.
+
+305
+00:25:07.320 --> 00:25:12.860
+<v Noah Labhart>Let's switch to you, Or. Who influences the way that you work? Name a person that you look up to and why.
+
+306
+00:25:14.060 --> 00:25:19.880
+<v Or Weis>The person that really inspires me is Richard Dawkins.
+
+307
+00:25:20.380 --> 00:25:26.140
+<v Or Weis>He's the author of The Selfish Gene and several other biology books.
+
+308
+00:25:26.140 --> 00:25:32.440
+<v Or Weis>and in general the more I learn about biology and the more I learn about
+
+309
+00:25:32.440 --> 00:25:39.140
+<v Or Weis>evolution the more I see similarities in how you do business and how you build
+
+310
+00:25:39.140 --> 00:25:46.380
+<v Or Weis>software and for example connecting this to that previous point of not building
+
+311
+00:25:46.850 --> 00:25:52.160
+<v Or Weis>things too complex or too perfect I think learning from evolution and how
+
+312
+00:25:52.160 --> 00:25:54.680
+<v Or Weis>how things should look like is a perfect example.
+
+313
+00:25:55.040 --> 00:25:57.620
+<v Or Weis>And I'll give an anecdote from evolution
+
+314
+00:25:57.620 --> 00:26:01.160
+<v Or Weis>and I'll try and translate how it looks in software development.
+
+315
+00:26:02.860 --> 00:26:05.120
+<v Or Weis>So that's an interesting bit of trivia.
+
+316
+00:26:05.440 --> 00:26:07.840
+<v Or Weis>So there's a, obviously you'd guess,
+
+317
+00:26:07.940 --> 00:26:11.520
+<v Or Weis>there's a piece of wire, neurons essentially,
+
+318
+00:26:11.760 --> 00:26:16.120
+<v Or Weis>a neural path that runs from your brain to your larynx,
+
+319
+00:26:16.180 --> 00:26:17.580
+<v Or Weis>enabling you to speak.
+
+320
+00:26:17.920 --> 00:26:20.060
+<v Or Weis>How would you guess that path,
+
+321
+00:26:20.060 --> 00:26:22.780
+<v Or Weis>how that wire goes from your brain to your
+
+322
+00:26:22.780 --> 00:26:23.320
+<v Noah Labhart>larynx.
+
+323
+00:26:23.340 --> 00:26:30.400
+<v Noah Labhart>In my head, I see a direct line, but I take in biology, so I don't think that's probably true.
+
+324
+00:26:30.860 --> 00:26:33.960
+<v Or Weis>Surprising or unsurprising, it's not a direct line.
+
+325
+00:26:34.060 --> 00:26:41.020
+<v Or Weis>So it goes from your brainstem down to your chest, almost to the middle of it,
+
+326
+00:26:41.060 --> 00:26:43.960
+<v Or Weis>and then climbs back to your throat and larynx.
+
+327
+00:26:44.680 --> 00:26:46.900
+<v Or Weis>And the same is true for a giraffe.
+
+328
+00:26:46.900 --> 00:26:52.440
+<v Or Weis>Actually, there are studies that indicate that giraffes actually have a lag time in
+
+329
+00:26:52.440 --> 00:26:56.300
+<v Or Weis>speech because of the length of the wire.
+
+330
+00:26:57.720 --> 00:27:02.660
+<v Or Weis>And the reason for that is evolution doesn't go for perfect.
+
+331
+00:27:02.800 --> 00:27:04.940
+<v Or Weis>It always optimizes locally.
+
+332
+00:27:05.780 --> 00:27:13.960
+<v Or Weis>Evolution creates a spectrum of organisms, each one slightly more adapted, slightly more
+
+333
+00:27:13.960 --> 00:27:15.260
+<v Or Weis>evolved than the previous one.
+
+334
+00:27:16.900 --> 00:27:21.340
+<v Or Weis>a fish to a giraffe, you go from a fish to a slightly less fishier
+
+335
+00:27:21.940 --> 00:27:28.320
+<v Or Weis>salamander thing and from that into kind of a lizard thing and you gradually go up the chain until you hit a giraffe or something else.
+
+336
+00:27:29.280 --> 00:27:32.920
+<v Or Weis>And at each point, every point on that spectrum,
+
+337
+00:27:33.080 --> 00:27:39.640
+<v Or Weis>there is an organism that is well suited and adapted for his environment and functions perfectly.
+
+338
+00:27:40.140 --> 00:27:43.500
+<v Or Weis>Otherwise, it wouldn't procreate and the chain would continue.
+
+339
+00:27:43.500 --> 00:27:54.760
+<v Or Weis>And as a result, every time evolution has to solve, obviously I'm putting solve in air quotes here, because it's not cognizant, obviously.
+
+340
+00:27:55.500 --> 00:28:02.300
+<v Or Weis>But every time evolution has to solve for something that works now, and that also includes cutting corners.
+
+341
+00:28:02.460 --> 00:28:10.400
+<v Or Weis>At no point can evolution go back and say, oh, I'll rewire that link to the larynx.
+
+342
+00:28:11.040 --> 00:28:16.320
+<v Or Weis>it doesn't have that option it doesn't have the ability to zoom out and think about it all from
+
+343
+00:28:16.320 --> 00:28:23.300
+<v Or Weis>scratch but it can continue to adopt that organism so it will continue to survive and work
+
+344
+00:28:23.300 --> 00:28:30.220
+<v Or Weis>and it and the bottom line is everything every damn thing you see around you every life form
+
+345
+00:28:30.220 --> 00:28:37.160
+<v Or Weis>every species everything was created this way and i always tell when we talk about this and
+
+346
+00:28:37.160 --> 00:28:43.740
+<v Or Weis>And that challenge I mentioned before, I always tell people, if it's good enough for evolution and if it's good enough for life, it's probably good enough for us.
+
+347
+00:28:45.480 --> 00:28:48.580
+<v Noah Labhart>We talked about mistake earlier, but a little bit different spin.
+
+348
+00:28:48.900 --> 00:28:53.880
+<v Noah Labhart>If you could go back to the beginning, what would you do differently or where would you consider taking a different approach?
+
+349
+00:28:55.940 --> 00:28:58.280
+<v Or Weis>I can talk maybe a bit about Rookout.
+
+350
+00:28:58.360 --> 00:29:03.100
+<v Or Weis>I didn't fully understand what go-to-market means at that point in time.
+
+351
+00:29:03.100 --> 00:29:09.700
+<v Or Weis>I had kind of a there like these really dangerous notions were spinning around
+
+352
+00:29:09.700 --> 00:29:13.360
+<v Or Weis>there like if you build it they will come if you have a great product
+
+353
+00:29:13.360 --> 00:29:21.100
+<v Or Weis>everything else would be great would be amazing that's such a high pile of of
+
+354
+00:29:21.100 --> 00:29:27.440
+<v Or Weis>dung that I don't have enough vocabulary to describe how stinky that is and how
+
+355
+00:29:27.440 --> 00:29:29.340
+<v Or Weis>How malicious that is for entrepreneurs.
+
+356
+00:29:29.680 --> 00:29:35.480
+<v Or Weis>And I always, when I find people that revert to that saying,
+
+357
+00:29:35.700 --> 00:29:42.500
+<v Or Weis>I try to gently but firmly wake them up from that notion.
+
+358
+00:29:44.920 --> 00:29:48.860
+<v Or Weis>And I think it's really important to understand that there's a reason why
+
+359
+00:29:48.860 --> 00:29:52.140
+<v Or Weis>we talk about both product market fit and go-to market fit.
+
+360
+00:29:52.360 --> 00:29:53.800
+<v Or Weis>They're not the same thing,
+
+361
+00:29:53.800 --> 00:29:57.640
+<v Or Weis>but they have a lot of repercussions and implications to one another.
+
+362
+00:29:58.060 --> 00:30:01.460
+<v Or Weis>And I think one of the things I failed with at Rookout was,
+
+363
+00:30:01.560 --> 00:30:06.380
+<v Or Weis>A, to understand that, distinguish, to distinguish between those two patterns
+
+364
+00:30:06.380 --> 00:30:12.740
+<v Or Weis>and to understand that it's my responsibility to not only understand this,
+
+365
+00:30:12.800 --> 00:30:19.980
+<v Or Weis>but to communicate this difference to my team, to my co-founder, to our investors,
+
+366
+00:30:19.980 --> 00:30:29.060
+<v Or Weis>and to understand that there are minute aspects in opinion and in strategy that are dramatically impacted by that.
+
+367
+00:30:30.200 --> 00:30:42.460
+<v Or Weis>And I think if I had the wisdom or that understanding, at that point in time, I would have made a lot of different choices.
+
+368
+00:30:42.460 --> 00:30:49.360
+<v Or Weis>and that's why for so I said in a few few earlier questions I think I mentioned
+
+369
+00:30:49.360 --> 00:30:58.060
+<v Or Weis>product led growth and how I'm gung-ho about it I I try to think that I'm doing
+
+370
+00:30:58.060 --> 00:31:03.580
+<v Or Weis>I'm trying to do it better and learning from those mistakes and misalignments
+
+371
+00:31:03.580 --> 00:31:09.560
+<v Or Weis>and misunderstanding of the market by sticking to the right go-to market and
+
+372
+00:31:09.560 --> 00:31:12.380
+<v Or Weis>And it's elements very early on.
+
+373
+00:31:13.460 --> 00:31:14.720
+<v Noah Labhart>Well, last question, Or.
+
+374
+00:31:15.160 --> 00:31:20.160
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+375
+00:31:20.540 --> 00:31:21.640
+<v Noah Labhart>They're jazzed about it.
+
+376
+00:31:21.660 --> 00:31:23.140
+<v Noah Labhart>They can't wait to show it off to the world.
+
+377
+00:31:23.180 --> 00:31:24.840
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+378
+00:31:25.240 --> 00:31:28.760
+<v Noah Labhart>What advice do you give that person having gone down this road several times?
+
+379
+00:31:30.040 --> 00:31:36.040
+<v Or Weis>So I won't mention names, but I saw a young entrepreneur that I thought has a lot of potential.
+
+380
+00:31:36.040 --> 00:31:51.420
+<v Or Weis>I saw them posting a lot on social, kind of bragging, kind of basking in immediate success stories like doing a call with YC or getting some initial success with customers.
+
+381
+00:31:51.720 --> 00:31:56.920
+<v Or Weis>And what I quickly saw is that it felt like Icarus.
+
+382
+00:31:56.940 --> 00:31:59.800
+<v Or Weis>It felt like they're flying a bit too close to the sun.
+
+383
+00:31:59.940 --> 00:32:01.600
+<v Or Weis>They're too excited about this.
+
+384
+00:32:01.600 --> 00:32:07.300
+<v Or Weis>they're celebrating it a bit too much in a slightly too public fashion.
+
+385
+00:32:07.940 --> 00:32:10.020
+<v Or Weis>In the end of the day, I think it correlates,
+
+386
+00:32:10.420 --> 00:32:15.320
+<v Or Weis>I'm kind of connecting this to the classic rollercoaster aspect of being an entrepreneur.
+
+387
+00:32:15.560 --> 00:32:17.220
+<v Or Weis>There's a lot of ups and downs.
+
+388
+00:32:17.560 --> 00:32:21.220
+<v Or Weis>And I think entrepreneurs, like a young entrepreneur in the beginning,
+
+389
+00:32:21.240 --> 00:32:25.700
+<v Or Weis>should really consider their psychology and the psychology of other people around them.
+
+390
+00:32:26.660 --> 00:32:28.980
+<v Or Weis>For that entrepreneur that I mentioned,
+
+391
+00:32:28.980 --> 00:32:35.520
+<v Or Weis>when things started to turn the other way around, when the roller coaster turned, they took it really
+
+392
+00:32:35.520 --> 00:32:42.360
+<v Or Weis>hard. One, it's their own expectations that they set, and B, it's the expectations that they set
+
+393
+00:32:42.360 --> 00:32:49.540
+<v Or Weis>for other people. And I actually think those are the most dramatic in impact here, because it's easy
+
+394
+00:32:49.540 --> 00:32:55.620
+<v Or Weis>to console yourself. It's almost impossible to console someone else, and on scale it doesn't work.
+
+395
+00:32:55.620 --> 00:33:04.000
+<v Or Weis>And if you, for example, if it's someone that you care about, if it's your partner, if it's your family, I always think of my mother.
+
+396
+00:33:04.160 --> 00:33:10.260
+<v Or Weis>Like letting down my mother is so much more painful for me than letting myself down.
+
+397
+00:33:11.100 --> 00:33:21.340
+<v Or Weis>I think it's really about managing the expectations for yourself, for your supporting environment and making it structured so you'd be able to do a long run.
+
+398
+00:33:21.340 --> 00:33:28.360
+<v Or Weis>It's not just about the now, it's about a long journey and, uh, and sticking out with it. So people
+
+399
+00:33:28.360 --> 00:33:35.100
+<v Or Weis>should pace themselves, should be aware that it's going to hurt, and they should be aware it's about
+
+400
+00:33:35.100 --> 00:33:40.780
+<v Or Weis>the experiences and relationships they build and how they balance them through, through and for this
+
+401
+00:33:40.780 --> 00:33:41.280
+<v Or Weis>experience.
+
+402
+00:33:41.120 --> 00:33:45.980
+<v Noah Labhart>That's great advice. Well, Or, thank you for being on the show today. Thank you for telling
+
+403
+00:33:45.980 --> 00:33:47.720
+<v Noah Labhart>on the creation story of Permit.
+
+404
+00:33:47.840 --> 00:33:48.600
+<v Noah Labhart>It was
+
+405
+00:33:48.600 --> 00:33:49.100
+<v Or Weis>a pleasure.
+
+406
+00:33:49.140 --> 00:33:50.320
+<v Or Weis>Thank you for having me.
+
+407
+00:33:52.000 --> 00:33:54.920
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+408
+00:33:58.080 --> 00:34:01.140
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+409
+00:34:01.280 --> 00:34:03.920
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+410
+00:34:04.120 --> 00:34:06.060
+<v Noah Labhart>or the podcasting app of your choice.
+
+411
+00:34:06.480 --> 00:34:09.780
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+412
+00:34:09.780 --> 00:34:11.560
+<v Noah Labhart>for just five to 10 bucks a month.
+
+413
+00:34:11.900 --> 00:34:14.140
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+414
+00:34:16.080 --> 00:34:16.660
+<v Noah Labhart>tremendously.
+
+415
+00:34:18.660 --> 00:34:20.260
+<v Noah Labhart>And thanks again for listening.

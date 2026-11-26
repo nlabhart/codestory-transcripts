@@ -1,0 +1,1363 @@
+WEBVTT
+
+NOTE S8 Bonus: Building High-Performance Metadata Processing Engines and Drag-and-Drop Mapping with Ibrahim Surani & Jay Mishra of Astera
+
+1
+00:00:01.700 --> 00:00:07.220
+<v Ibrahim Surani>Initially, we did not have much of an idea of where this would go. But the customers would nudge us.
+
+2
+00:00:07.340 --> 00:00:12.480
+<v Ibrahim Surani>Hey, you are missing this scheduler. Hey, you know, I need to be able to process a file that comes in.
+
+3
+00:00:12.640 --> 00:00:20.680
+<v Ibrahim Surani>Once we developed an understanding of many different use cases that customers had for data management, then we kind of, pictures started to emerge.
+
+4
+00:00:21.440 --> 00:00:28.100
+<v Jay Mishra>But one key thing that we always kept in mind was that it has to be a low-code, no-code solution.
+
+5
+00:00:30.320 --> 00:00:31.840
+<v Jay Mishra>Completely GUI-based solution.
+
+6
+00:00:32.120 --> 00:00:33.300
+<v Jay Mishra>It's a drag-and-drop interface.
+
+7
+00:00:33.900 --> 00:00:36.400
+<v Jay Mishra>We had a pretty good idea that what we want to build,
+
+8
+00:00:36.580 --> 00:00:41.020
+<v Jay Mishra>we want to have a full data stack from ingestion all the way to data publishing.
+
+9
+00:00:41.560 --> 00:00:43.320
+<v Jay Mishra>And we started to march towards that goal.
+
+10
+00:00:46.640 --> 00:00:48.360
+<v Clip>This is Code Story.
+
+11
+00:00:49.000 --> 00:00:52.140
+<v Noah Labhart>A podcast bringing you interviews with tech visionaries.
+
+12
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+13
+00:00:53.760 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+14
+00:00:55.480 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+15
+00:00:58.280 --> 00:00:59.860
+<v Clip>I don't exactly know what to do.
+
+16
+00:01:00.000 --> 00:01:02.500
+<v Clip>Who built
+
+17
+00:01:02.500 --> 00:01:04.560
+<v Noah Labhart>the teams that have their back.
+
+18
+00:01:08.840 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:15.000 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+20
+00:01:22.740 --> 00:01:25.860
+<v Noah Labhart>Ride the ups and downs of the startup life.
+
+21
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+22
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+23
+00:01:29.060 --> 00:01:29.680
+<v Clip>All this and more.
+
+24
+00:01:30.000 --> 00:01:37.480
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today, how Ibrahim Surani and Jay Mishra
+
+25
+00:01:37.480 --> 00:01:42.860
+<v Noah Labhart>are delivering a unified data management platform, code-free.
+
+26
+00:01:48.100 --> 00:01:52.640
+<v Noah Labhart>Ibrahim Surani grew up in Pakistan, dropped out of high school, and in his words,
+
+27
+00:01:52.660 --> 00:01:57.580
+<v Noah Labhart>stumbled around for a while. Eventually, he stumbled onto an IBM mainframe, taught himself
+
+28
+00:01:57.580 --> 00:02:02.960
+<v Noah Labhart>himself to code and has been in tech ever since. He moved to the States in 1988 and has been here
+
+29
+00:02:02.960 --> 00:02:08.500
+<v Noah Labhart>since then. Outside of tech, he's an avid hiker and enjoys a good fantasy read like Lord of the Rings.
+
+30
+00:02:09.120 --> 00:02:13.480
+<v Noah Labhart>Jay Mishra studied mathematics and computer science. He started out at his current venture
+
+31
+00:02:13.480 --> 00:02:19.400
+<v Noah Labhart>right out of college, post his master's program. Outside of tech, he's a dad of two boys who love
+
+32
+00:02:19.400 --> 00:02:25.240
+<v Noah Labhart>sports. He enjoys playing chess and golf and likes to hike and travel. And his favorite book is The
+
+33
+00:02:25.240 --> 00:02:26.480
+<v Noah Labhart>The Fountainhead by Ayn Rand.
+
+34
+00:02:28.340 --> 00:02:33.400
+<v Noah Labhart>Going back several years, Ibrahim started a consultancy in 2005 or so
+
+35
+00:02:33.400 --> 00:02:37.420
+<v Noah Labhart>and mentions working on successful products in the area of mortgage banking.
+
+36
+00:02:37.800 --> 00:02:40.280
+<v Noah Labhart>In 2008, the financial meltdown happened,
+
+37
+00:02:40.460 --> 00:02:43.400
+<v Noah Labhart>and all of their customers, save one, went out of business.
+
+38
+00:02:44.000 --> 00:02:48.540
+<v Noah Labhart>After struggling for a while, they decided to take a foundational utility they had built
+
+39
+00:02:48.540 --> 00:02:52.400
+<v Noah Labhart>and bridge the gap to the 2.0 version of their business.
+
+40
+00:02:53.840 --> 00:02:56.680
+<v Noah Labhart>This is the creation story of Astera.
+
+41
+00:02:59.440 --> 00:03:04.060
+<v Ibrahim Surani>When the mortgage meltdown happened, one of our key customers was one of the largest banks
+
+42
+00:03:04.060 --> 00:03:04.620
+<v Ibrahim Surani>in the country.
+
+43
+00:03:04.920 --> 00:03:09.380
+<v Ibrahim Surani>And they had this department, you know, servicing acquisition, loan servicing department.
+
+44
+00:03:09.700 --> 00:03:15.900
+<v Ibrahim Surani>This team had 40 people that was primarily focused on getting data files from all of
+
+45
+00:03:15.900 --> 00:03:20.400
+<v Ibrahim Surani>their customers and partners and lenders and importing that into their system.
+
+46
+00:03:20.540 --> 00:03:22.140
+<v Ibrahim Surani>That's all they did, these 40 people.
+
+47
+00:03:22.400 --> 00:03:27.680
+<v Ibrahim Surani>And so they use homegrown scripts, access databases, Excel files, a whole bunch of different things.
+
+48
+00:03:28.280 --> 00:03:35.760
+<v Ibrahim Surani>Customers wanted to consolidate all this in a single unified application because the current model was not working for them.
+
+49
+00:03:35.800 --> 00:03:37.440
+<v Ibrahim Surani>It was not scalable. It had lots of errors.
+
+50
+00:03:37.660 --> 00:03:44.660
+<v Ibrahim Surani>So they asked us if we could take a small piece that we had in our other product and build upon that.
+
+51
+00:03:45.180 --> 00:03:47.660
+<v Ibrahim Surani>We call it data transfer utility at that time.
+
+52
+00:03:47.720 --> 00:03:51.840
+<v Ibrahim Surani>And that is what formed the basis of our relationship with that customer.
+
+53
+00:03:52.440 --> 00:03:55.860
+<v Ibrahim Surani>Once we saw that success, we said, hey, maybe other customers need this.
+
+54
+00:03:56.160 --> 00:03:59.060
+<v Ibrahim Surani>So we tried to market that product outside.
+
+55
+00:03:59.400 --> 00:04:00.220
+<v Ibrahim Surani>It was a flop.
+
+56
+00:04:01.120 --> 00:04:06.400
+<v Ibrahim Surani>But in the process, what we did was we would talk to customers and they would say, hey, it's missing this or it's missing that.
+
+57
+00:04:07.000 --> 00:04:14.400
+<v Ibrahim Surani>And over time, the product kept getting better and improved in terms of the features that it provided and the usability that it provided.
+
+58
+00:04:14.720 --> 00:04:18.620
+<v Ibrahim Surani>And I think our 2.0, we call it Centerprise 2.0 in those days.
+
+59
+00:04:18.720 --> 00:04:20.080
+<v Ibrahim Surani>And that was our MVP.
+
+60
+00:04:20.080 --> 00:04:25.700
+<v Ibrahim Surani>That is where we started seeing traction with customers and enough customers were buying them to keep us in business.
+
+61
+00:04:26.220 --> 00:04:35.380
+<v Jay Mishra>That transition from mortgage to data, there was a link between the two phases and we were already working on a small utility.
+
+62
+00:04:35.760 --> 00:04:39.880
+<v Jay Mishra>And that utility was a link between the Astera 1.0 and Astera 2.0.
+
+63
+00:04:40.280 --> 00:04:45.960
+<v Jay Mishra>So we built the top of it and that's how we got started in the area of data management.
+
+64
+00:04:45.960 --> 00:04:51.480
+<v Jay Mishra>That was the first product and gave us some time to build and take it to market.
+
+65
+00:04:51.640 --> 00:04:53.600
+<v Jay Mishra>Of course, in the beginning, we had some failures.
+
+66
+00:04:53.860 --> 00:05:00.520
+<v Jay Mishra>But I believe after three or four years of toiling, we got a product out to the market that got some reception.
+
+67
+00:05:00.800 --> 00:05:04.780
+<v Jay Mishra>Based on that feedback, we improved certain areas, added some new features.
+
+68
+00:05:05.440 --> 00:05:12.900
+<v Jay Mishra>And in true sense, I think in the space of data management, our journey started around 2010-11 timeframe.
+
+69
+00:05:12.900 --> 00:05:13.400
+<v Jay Mishra>frame.
+
+70
+00:05:15.560 --> 00:05:20.200
+<v Noah Labhart>Let's dive into the what would be the MVP and maybe it's a little bit of that utility that
+
+71
+00:05:20.200 --> 00:05:25.640
+<v Noah Labhart>bridged the gap. Maybe it's the version you built after that to call, you know, Astera 2.0. You
+
+72
+00:05:25.640 --> 00:05:30.220
+<v Noah Labhart>decide. But tell me about that MVP, that first version of the product you created, how long it
+
+73
+00:05:30.220 --> 00:05:33.240
+<v Noah Labhart>took to build and what sort of tools were used to bring it to life.
+
+74
+00:05:34.060 --> 00:05:36.680
+<v Jay Mishra>The data mapper was a graphical
+
+75
+00:05:36.680 --> 00:05:42.800
+<v Jay Mishra>user interface based data mapping tool with no code and low code. And that we got from the customer
+
+76
+00:05:42.900 --> 00:05:48.940
+<v Jay Mishra>actually, because the scenario, the use case was that this customer, they had about 45 developers
+
+77
+00:05:49.740 --> 00:05:56.080
+<v Jay Mishra>working on incoming data and writing a lot of code. And they were spending a lot of time. And
+
+78
+00:05:56.080 --> 00:06:02.380
+<v Jay Mishra>of course, time that was taken to process those files was not ideal. They wanted to cut down on
+
+79
+00:06:02.380 --> 00:06:09.040
+<v Jay Mishra>that time. So that was our goal. We decided that, okay, how about we provide a solution where there
+
+80
+00:06:09.040 --> 00:06:10.460
+<v Jay Mishra>There's no coding at all needed.
+
+81
+00:06:10.620 --> 00:06:12.640
+<v Jay Mishra>And that was a novel concept at that time.
+
+82
+00:06:12.760 --> 00:06:14.240
+<v Jay Mishra>And that's how data mapping started.
+
+83
+00:06:14.580 --> 00:06:17.320
+<v Jay Mishra>So data mapping was essentially the core product.
+
+84
+00:06:17.400 --> 00:06:22.960
+<v Jay Mishra>And we believe in that philosophy to date, that no code solution without compromising on the depth of functionality.
+
+85
+00:06:23.700 --> 00:06:26.700
+<v Jay Mishra>So it was an ETL data mapping functionality.
+
+86
+00:06:27.000 --> 00:06:28.480
+<v Jay Mishra>And that was our first MVP.
+
+87
+00:06:28.840 --> 00:06:30.660
+<v Jay Mishra>And of course, we built at the top of it.
+
+88
+00:06:32.100 --> 00:06:33.300
+<v Noah Labhart>So you've got your MVP.
+
+89
+00:06:33.500 --> 00:06:34.100
+<v Noah Labhart>It's working.
+
+90
+00:06:34.200 --> 00:06:35.260
+<v Noah Labhart>You're getting some traction.
+
+91
+00:06:35.560 --> 00:06:36.920
+<v Noah Labhart>You're ready to take it forward.
+
+92
+00:06:36.920 --> 00:06:39.440
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+93
+00:06:39.480 --> 00:06:43.240
+<v Noah Labhart>And I think to wrap it in a box a little bit, what I'm looking for is how did you build your roadmap?
+
+94
+00:06:43.420 --> 00:06:49.680
+<v Noah Labhart>How did you go about deciding, OK, this is the next most important thing to build or to address with Astera?
+
+95
+00:06:51.300 --> 00:06:54.760
+<v Ibrahim Surani>Initially, we did not have much of an idea of where this would go.
+
+96
+00:06:54.900 --> 00:06:56.580
+<v Ibrahim Surani>But the customers would nudge us.
+
+97
+00:06:56.700 --> 00:06:58.520
+<v Ibrahim Surani>Hey, you are missing this scheduler.
+
+98
+00:06:58.540 --> 00:07:01.840
+<v Ibrahim Surani>Hey, you know, I need to be able to process a file that comes in.
+
+99
+00:07:01.980 --> 00:07:04.340
+<v Ibrahim Surani>Or I need to be able to map this easier.
+
+100
+00:07:04.340 --> 00:07:07.240
+<v Ibrahim Surani>or I need to be able to build a dimensional warehouse.
+
+101
+00:07:07.520 --> 00:07:11.540
+<v Ibrahim Surani>They would give us these ideas and we would explore those ideas.
+
+102
+00:07:12.440 --> 00:07:15.120
+<v Ibrahim Surani>Once we developed some insight into the space,
+
+103
+00:07:15.320 --> 00:07:18.280
+<v Ibrahim Surani>once we developed an understanding of many different use cases
+
+104
+00:07:18.280 --> 00:07:20.480
+<v Ibrahim Surani>that customers had for data management
+
+105
+00:07:20.480 --> 00:07:25.680
+<v Ibrahim Surani>and how different departments interacted with data in the customer organization,
+
+106
+00:07:26.380 --> 00:07:28.720
+<v Ibrahim Surani>then we kind of picture started to emerge.
+
+107
+00:07:28.980 --> 00:07:33.600
+<v Ibrahim Surani>You know, the customers need the ability to ingest different kinds of data.
+
+108
+00:07:34.340 --> 00:07:37.300
+<v Ibrahim Surani>would look at different kinds of what are the different kinds of data that we need to use
+
+109
+00:07:37.300 --> 00:07:42.000
+<v Ibrahim Surani>well it could be structured data which was the obvious thing then it would be you know
+
+110
+00:07:42.000 --> 00:07:49.780
+<v Ibrahim Surani>human readable data like printed reports and pdfs or edi or xml or web services or erp
+
+111
+00:07:50.260 --> 00:07:57.500
+<v Ibrahim Surani>we built connectors we built mappers for all these different types of data and then okay once you
+
+112
+00:07:57.500 --> 00:08:02.380
+<v Ibrahim Surani>ingest data what what do you need to do on that you need to do quality checks you need to do
+
+113
+00:08:04.360 --> 00:08:09.100
+<v Ibrahim Surani>You need to be able to then map that data into some other structures.
+
+114
+00:08:09.180 --> 00:08:12.780
+<v Ibrahim Surani>So what are the different kinds of mapping and transformations that you need to provide?
+
+115
+00:08:13.740 --> 00:08:18.900
+<v Ibrahim Surani>As that started happening, we built the beginnings of what we were calling an ETL tool.
+
+116
+00:08:19.340 --> 00:08:25.280
+<v Ibrahim Surani>Once that started evolving, then once you put ETL in front of customers and they start stressing it,
+
+117
+00:08:25.360 --> 00:08:28.260
+<v Ibrahim Surani>then they would say, hey, ETL is not good enough for me, my lakes.
+
+118
+00:08:28.360 --> 00:08:29.300
+<v Ibrahim Surani>I have too much data.
+
+119
+00:08:29.800 --> 00:08:32.760
+<v Ibrahim Surani>Then we built an ELT engine on top of that.
+
+120
+00:08:34.340 --> 00:08:39.820
+<v Ibrahim Surani>and they said, hey, I am building a data warehouse and my guys are very expensive SQL developers
+
+121
+00:08:39.820 --> 00:08:45.080
+<v Ibrahim Surani>and look, they are writing this repetitive SQL statements to load facts and dimensions
+
+122
+00:08:45.080 --> 00:08:46.600
+<v Ibrahim Surani>and manage all this warehouse.
+
+123
+00:08:47.260 --> 00:08:52.240
+<v Ibrahim Surani>And so we said, okay, fine, we will build a data warehouse product that was driven by
+
+124
+00:08:52.240 --> 00:08:57.320
+<v Ibrahim Surani>metadata where your data model and your dimensional model and data vault models are at the center
+
+125
+00:08:57.320 --> 00:08:57.820
+<v Ibrahim Surani>of attention.
+
+126
+00:08:57.880 --> 00:08:58.980
+<v Ibrahim Surani>And so we built that.
+
+127
+00:08:59.060 --> 00:09:02.680
+<v Ibrahim Surani>The customers came and said, I need to be able to extract data from human redevelopment.
+
+128
+00:09:04.340 --> 00:09:11.500
+<v Ibrahim Surani>So Roadmap evolved from listening to the market, from looking at where the market was going and what the customers were asking.
+
+129
+00:09:11.920 --> 00:09:19.160
+<v Ibrahim Surani>And, you know, over time, a picture started to emerge of a full stack data management platform, which is where we are today.
+
+130
+00:09:20.860 --> 00:09:25.080
+<v Jay Mishra>We work very closely with our customers, and that is from day one.
+
+131
+00:09:25.500 --> 00:09:28.920
+<v Jay Mishra>We listen to whatever feedback they're giving to us.
+
+132
+00:09:28.920 --> 00:09:32.520
+<v Jay Mishra>we are sometimes participating in the proof of concept,
+
+133
+00:09:32.660 --> 00:09:33.840
+<v Jay Mishra>actually the implementations,
+
+134
+00:09:34.500 --> 00:09:37.020
+<v Jay Mishra>and we got a lot of these ideas and feedback.
+
+135
+00:09:37.880 --> 00:09:40.960
+<v Jay Mishra>And we, of course, evaluated that which one makes sense,
+
+136
+00:09:40.960 --> 00:09:43.640
+<v Jay Mishra>which one doesn't, and if we add this feature,
+
+137
+00:09:43.840 --> 00:09:46.540
+<v Jay Mishra>is it going to be applicable to a larger group,
+
+138
+00:09:46.620 --> 00:09:48.680
+<v Jay Mishra>or is it only applicable to this specific customer?
+
+139
+00:09:48.920 --> 00:09:51.720
+<v Jay Mishra>So based on that, we decided that what should be added
+
+140
+00:09:51.720 --> 00:09:52.480
+<v Jay Mishra>and what should not be.
+
+141
+00:09:52.800 --> 00:09:55.640
+<v Jay Mishra>But one key thing that we always kept in mind
+
+142
+00:09:55.640 --> 00:09:59.340
+<v Jay Mishra>was that it has to be a low-code, no-code solution.
+
+143
+00:09:59.820 --> 00:10:02.900
+<v Jay Mishra>It has to be completely GUI-based solution.
+
+144
+00:10:03.160 --> 00:10:04.380
+<v Jay Mishra>It's a drag-and-drop interface.
+
+145
+00:10:05.080 --> 00:10:07.700
+<v Jay Mishra>The new functionality that has been added, of course,
+
+146
+00:10:07.800 --> 00:10:11.120
+<v Jay Mishra>based on feedback from the customers to a certain point,
+
+147
+00:10:11.220 --> 00:10:13.540
+<v Jay Mishra>and after that, of course, we had a pretty good idea
+
+148
+00:10:13.540 --> 00:10:16.840
+<v Jay Mishra>that what we want to build, we want to have a full data stack
+
+149
+00:10:16.840 --> 00:10:19.320
+<v Jay Mishra>from ingestion all the way to data publishing,
+
+150
+00:10:19.900 --> 00:10:21.660
+<v Jay Mishra>and we started to march towards that goal.
+
+151
+00:10:22.940 --> 00:10:25.100
+<v Noah Labhart>So here you're both saying we a lot.
+
+152
+00:10:25.640 --> 00:10:29.680
+<v Noah Labhart>you build your team and what did you look for in those people to indicate that they
+
+153
+00:10:29.680 --> 00:10:30.940
+<v Noah Labhart>were the winning horses to join you?
+
+154
+00:10:31.620 --> 00:10:37.740
+<v Ibrahim Surani>We actually started out by shedding the entire team. We had a significant size team in our
+
+155
+00:10:37.740 --> 00:10:43.760
+<v Ibrahim Surani>banking and mortgage banking operations. Once that market ceased completely, that market
+
+156
+00:10:44.200 --> 00:10:49.820
+<v Ibrahim Surani>would have ceased completely and stayed that way for many years. We started from a very
+
+157
+00:10:49.820 --> 00:10:55.260
+<v Ibrahim Surani>small team. At that time, the focus was not to build the team. The focus was, can we even
+
+158
+00:10:55.640 --> 00:11:00.920
+<v Ibrahim Surani>this downturn that was so severe. We were living from month to month to decide hey
+
+159
+00:11:00.920 --> 00:11:05.660
+<v Ibrahim Surani>should we stay in this business. So for a long time we actually did not hire.
+
+160
+00:11:05.820 --> 00:11:10.660
+<v Ibrahim Surani>Most of our hiring began about five or six years ago when we decided hey this
+
+161
+00:11:10.660 --> 00:11:14.140
+<v Ibrahim Surani>is the time to scale the company. To answer your question about who we look
+
+162
+00:11:14.140 --> 00:11:18.720
+<v Ibrahim Surani>for and how we hire, number one thing I look for in people is curiosity. Are they
+
+163
+00:11:18.720 --> 00:11:22.360
+<v Ibrahim Surani>curious? Do they read? Do they learn about? Do they know about the world around them?
+
+164
+00:11:22.360 --> 00:11:23.800
+<v Ibrahim Surani>and do they think about the world around them?
+
+165
+00:11:23.880 --> 00:11:26.000
+<v Ibrahim Surani>And the other is, do they work hard?
+
+166
+00:11:26.180 --> 00:11:27.400
+<v Ibrahim Surani>Do they have a work ethic?
+
+167
+00:11:27.720 --> 00:11:31.300
+<v Ibrahim Surani>Can they support the customer when the customer needs them?
+
+168
+00:11:31.820 --> 00:11:33.960
+<v Ibrahim Surani>Curiosity, courage, collaboration,
+
+169
+00:11:34.380 --> 00:11:36.700
+<v Ibrahim Surani>those are the things that we do on a creativity.
+
+170
+00:11:36.960 --> 00:11:38.640
+<v Ibrahim Surani>Those are the keys that we look for in people.
+
+171
+00:11:38.880 --> 00:11:42.580
+<v Ibrahim Surani>And that's what we emphasize in every hire,
+
+172
+00:11:42.720 --> 00:11:44.520
+<v Ibrahim Surani>in every promotion that we do.
+
+173
+00:11:44.900 --> 00:11:49.540
+<v Jay Mishra>We keep a very flat structure and also informal structure,
+
+174
+00:11:49.540 --> 00:11:53.560
+<v Jay Mishra>as in people are allowed to move from one area to other area,
+
+175
+00:11:53.720 --> 00:11:58.160
+<v Jay Mishra>depending on the right fit, they can go to a completely different area
+
+176
+00:11:58.160 --> 00:12:00.840
+<v Jay Mishra>compared to where they were actually originally hired.
+
+177
+00:12:01.160 --> 00:12:05.960
+<v Jay Mishra>That flexibility and autonomy, people are given full independence
+
+178
+00:12:06.410 --> 00:12:09.600
+<v Jay Mishra>to choose what they want to work on, how they want to go about it.
+
+179
+00:12:10.060 --> 00:12:15.320
+<v Jay Mishra>So, combined with the right talent and giving them freedom to do what they want to do,
+
+180
+00:12:15.460 --> 00:12:17.900
+<v Jay Mishra>this is the combination that we have seen has worked for us.
+
+181
+00:12:19.540 --> 00:12:24.140
+<v Jay Mishra>creating a structure where the instructions are coming to the people and they're just
+
+182
+00:12:24.140 --> 00:12:28.700
+<v Jay Mishra>following instructions. If we have that structure, then what is the point of hiring these highly
+
+183
+00:12:28.700 --> 00:12:29.360
+<v Jay Mishra>talented people?
+
+184
+00:12:33.380 --> 00:12:37.600
+<v Noah Labhart>Let's flip to scalability then. And this will be interesting given the folks that
+
+185
+00:12:37.600 --> 00:12:43.240
+<v Noah Labhart>you've been supporting and where you've headed with the product. Was this built to scale efficiently
+
+186
+00:12:44.100 --> 00:12:49.000
+<v Noah Labhart>from day one or with scale in mind from technology standpoints? Or are there any areas where you kind
+
+187
+00:12:49.540 --> 00:12:50.440
+<v Noah Labhart>fight it as you grew?
+
+188
+00:12:51.600 --> 00:12:58.300
+<v Ibrahim Surani>It's a combination of both. There were areas that we scaled. We always knew
+
+189
+00:12:58.300 --> 00:13:05.400
+<v Ibrahim Surani>the data volumes will keep increasing exponentially over time. So when we built the product, we focused
+
+190
+00:13:05.400 --> 00:13:12.440
+<v Ibrahim Surani>on that from day one. For example, our first 10 customers or 20 customers would run maybe 20, 30,
+
+191
+00:13:12.520 --> 00:13:18.520
+<v Ibrahim Surani>40, 50 jobs every night and it would be fine. Then a customer came along and says,
+
+192
+00:13:19.540 --> 00:13:21.160
+<v Ibrahim Surani>run 10,000 jobs every night.
+
+193
+00:13:22.480 --> 00:13:25.660
+<v Ibrahim Surani>Okay, that required a whole different level of scalability
+
+194
+00:13:25.660 --> 00:13:27.740
+<v Ibrahim Surani>that we had not thought about.
+
+195
+00:13:27.880 --> 00:13:29.220
+<v Ibrahim Surani>We did not even know that there were customers
+
+196
+00:13:29.220 --> 00:13:30.540
+<v Ibrahim Surani>who would do that.
+
+197
+00:13:31.640 --> 00:13:34.020
+<v Ibrahim Surani>So we had to rebuild the product
+
+198
+00:13:34.020 --> 00:13:35.400
+<v Ibrahim Surani>or some areas of the product
+
+199
+00:13:35.400 --> 00:13:37.540
+<v Ibrahim Surani>in how the job queue was managed,
+
+200
+00:13:37.700 --> 00:13:39.840
+<v Ibrahim Surani>in how all the other monitoring
+
+201
+00:13:39.840 --> 00:13:41.640
+<v Ibrahim Surani>and management of that thing done
+
+202
+00:13:41.640 --> 00:13:43.440
+<v Ibrahim Surani>to support that level of customers.
+
+203
+00:13:43.620 --> 00:13:44.400
+<v Ibrahim Surani>Then the other customers,
+
+204
+00:13:44.500 --> 00:13:45.820
+<v Ibrahim Surani>you know, customers would come and say,
+
+205
+00:13:45.860 --> 00:13:48.320
+<v Ibrahim Surani>you know what, I need to run 10 different servers
+
+206
+00:13:49.540 --> 00:13:54.620
+<v Ibrahim Surani>is that big. So then we created clustering. And so any, like any other product that evolves
+
+207
+00:13:54.620 --> 00:14:00.480
+<v Ibrahim Surani>to scale as the market demands, then we scale it and we built it and we kept scaling it.
+
+208
+00:14:00.760 --> 00:14:05.840
+<v Ibrahim Surani>And, you know, now we have customers that are running tens of thousands of jobs and billions
+
+209
+00:14:05.840 --> 00:14:06.700
+<v Ibrahim Surani>of records through it.
+
+210
+00:14:07.920 --> 00:14:11.540
+<v Jay Mishra>The way we designed the product, we always kept in mind that the scope
+
+211
+00:14:11.540 --> 00:14:16.860
+<v Jay Mishra>is going to change in future. So always build for flexibility. So for example, we are talking about
+
+212
+00:14:16.860 --> 00:14:24.000
+<v Jay Mishra>out the connectors that read or write data and that is basically the starting point when you're
+
+213
+00:14:24.000 --> 00:14:30.440
+<v Jay Mishra>ingesting data from outside. So the way we created the architecture is that you
+
+214
+00:14:31.040 --> 00:14:36.520
+<v Jay Mishra>are able to add a few that we thought would be good enough to get started, but to add more
+
+215
+00:14:36.520 --> 00:14:44.160
+<v Jay Mishra>connectors as demand grows should be easy. So we always kept in mind that flexibility and so
+
+216
+00:14:44.160 --> 00:14:46.580
+<v Jay Mishra>so that we should be able to scale in terms of functionality.
+
+217
+00:14:48.240 --> 00:14:51.880
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built,
+
+218
+00:14:52.040 --> 00:14:53.840
+<v Noah Labhart>what are you most proud of with Astera?
+
+219
+00:14:55.300 --> 00:14:57.160
+<v Ibrahim Surani>First of all, I'm proud that we survived.
+
+220
+00:14:57.420 --> 00:14:59.500
+<v Ibrahim Surani>That was never a sure thing.
+
+221
+00:15:00.640 --> 00:15:06.620
+<v Ibrahim Surani>We focused on building the product in a way that was designed for our customers.
+
+222
+00:15:06.940 --> 00:15:11.340
+<v Ibrahim Surani>And I think in the process, we ended up building quite an amazing platform
+
+223
+00:15:11.340 --> 00:15:17.440
+<v Ibrahim Surani>that can scale and can serve so many different needs of our customers where
+
+224
+00:15:17.440 --> 00:15:23.300
+<v Ibrahim Surani>our customers can actually focus on a single platform and meet most of their
+
+225
+00:15:23.300 --> 00:15:28.920
+<v Ibrahim Surani>needs from this one platform instead of having a vendor sprawl that is becoming
+
+226
+00:15:28.920 --> 00:15:35.060
+<v Ibrahim Surani>an issue for lots of our customers. We built this company without seeking
+
+227
+00:15:35.060 --> 00:15:40.720
+<v Ibrahim Surani>outside funding. We kept it profitable. We built our entire customer base
+
+228
+00:15:41.340 --> 00:15:42.960
+<v Ibrahim Surani>from the revenues of the company itself.
+
+229
+00:15:43.200 --> 00:15:45.660
+<v Ibrahim Surani>It gives us the freedom to experiment.
+
+230
+00:15:45.920 --> 00:15:48.560
+<v Ibrahim Surani>It gives us the freedom to pretty much move
+
+231
+00:15:48.560 --> 00:15:50.420
+<v Ibrahim Surani>in any way that we want,
+
+232
+00:15:50.580 --> 00:15:52.980
+<v Ibrahim Surani>and gives us the ability to do experiments
+
+233
+00:15:53.460 --> 00:15:55.320
+<v Ibrahim Surani>that we might not otherwise be able to do.
+
+234
+00:15:55.740 --> 00:15:58.060
+<v Jay Mishra>It's hard to imagine now standing here
+
+235
+00:15:58.060 --> 00:16:00.020
+<v Jay Mishra>that it's a small set of people.
+
+236
+00:16:00.220 --> 00:16:01.620
+<v Jay Mishra>We have built the entire thing here.
+
+237
+00:16:02.080 --> 00:16:05.420
+<v Jay Mishra>So I would say that is what makes me personally very proud
+
+238
+00:16:05.420 --> 00:16:07.220
+<v Jay Mishra>that the technology that we have put together,
+
+239
+00:16:07.400 --> 00:16:09.700
+<v Jay Mishra>it is the kind of feature set that typically
+
+240
+00:16:11.340 --> 00:16:14.540
+<v Jay Mishra>It's going to take much longer and much, much larger teams to build.
+
+241
+00:16:16.340 --> 00:16:17.700
+<v Noah Labhart>Let's flip the script a little bit.
+
+242
+00:16:17.880 --> 00:16:21.960
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+243
+00:16:23.120 --> 00:16:26.520
+<v Ibrahim Surani>We built some features that we should not have built.
+
+244
+00:16:26.780 --> 00:16:32.160
+<v Ibrahim Surani>We have taken on some customers that we should not have taken on.
+
+245
+00:16:32.260 --> 00:16:34.160
+<v Ibrahim Surani>We have hired people that we should not have hired.
+
+246
+00:16:34.360 --> 00:16:36.900
+<v Ibrahim Surani>We have started projects that did not finish.
+
+247
+00:16:37.560 --> 00:16:40.960
+<v Ibrahim Surani>But those are, I would say, par for the course in running a business.
+
+248
+00:16:41.340 --> 00:16:48.040
+<v Ibrahim Surani>The mistake that I still think that we did is we tried to do a lot more than we should have.
+
+249
+00:16:48.500 --> 00:16:54.760
+<v Ibrahim Surani>I think that whole thing about Steve Jobs focusing on a few products is something that we did not do.
+
+250
+00:16:54.920 --> 00:16:58.160
+<v Ibrahim Surani>And in the process, there were lots of wasted cycles for us.
+
+251
+00:16:58.600 --> 00:17:08.660
+<v Ibrahim Surani>If I were to go back and correct that, I would say, hey, let's just keep our focus on a small number of things that we can do very, very well and stay with that.
+
+252
+00:17:08.660 --> 00:17:12.960
+<v Jay Mishra>One more thing I would like to add to that is making the course correction quickly.
+
+253
+00:17:13.260 --> 00:17:15.680
+<v Jay Mishra>That is something that we learned the hard way.
+
+254
+00:17:15.780 --> 00:17:20.680
+<v Jay Mishra>Sometimes we'll commit and we'll go on for some time and then realize that, hey, it is not the right path.
+
+255
+00:17:20.900 --> 00:17:24.300
+<v Jay Mishra>So the time that we continue on that path is wasted time.
+
+256
+00:17:24.560 --> 00:17:32.040
+<v Jay Mishra>So making the course correction quickly is something that we did not do as well as we should have, at least in the beginning.
+
+257
+00:17:33.980 --> 00:17:37.280
+<v Noah Labhart>This will be fun to hear your passion.
+
+258
+00:17:38.660 --> 00:17:41.120
+<v Noah Labhart>what the future looks like for the product and your team.
+
+259
+00:17:41.220 --> 00:17:41.940
+<v Noah Labhart>Tell me about that.
+
+260
+00:17:42.820 --> 00:17:48.820
+<v Ibrahim Surani>We are making a lot of investment in creating an end-to-end data management platform.
+
+261
+00:17:49.220 --> 00:17:54.080
+<v Ibrahim Surani>That means in every customer organization, there are different levels of data experts.
+
+262
+00:17:54.280 --> 00:18:02.060
+<v Ibrahim Surani>There are people, for example, who know how to extract data from SAP or Oracle Financials and Oracle Business Suite.
+
+263
+00:18:02.220 --> 00:18:06.580
+<v Ibrahim Surani>There are people who know how to clean that data.
+
+264
+00:18:06.580 --> 00:18:13.480
+<v Ibrahim Surani>There are people who are good at analytics and how to build, you know, analytics and ML models or visualizations.
+
+265
+00:18:13.700 --> 00:18:16.540
+<v Ibrahim Surani>Then there are people who know how to build data warehouses and data models.
+
+266
+00:18:16.920 --> 00:18:21.340
+<v Ibrahim Surani>In most organizations, these people are not properly connected in any way.
+
+267
+00:18:21.720 --> 00:18:34.400
+<v Ibrahim Surani>So what we are building is we are building this data platform where the users within an organization can create data artifacts and publish them in a centralized catalog or centralized gallery.
+
+268
+00:18:34.400 --> 00:18:40.320
+<v Ibrahim Surani>and these data artifacts then are accessible and available to anyone who has permission to use them
+
+269
+00:18:40.320 --> 00:18:44.980
+<v Ibrahim Surani>and if they don't have permission to use them, they can ask and be granted the permission to use.
+
+270
+00:18:45.280 --> 00:18:50.200
+<v Ibrahim Surani>Somebody once creates, let's say, an SAP extract for customer or data.
+
+271
+00:18:50.560 --> 00:18:54.500
+<v Ibrahim Surani>Then, you know, they just publish it and now anyone who's building any other artifacts
+
+272
+00:18:54.500 --> 00:18:58.860
+<v Ibrahim Surani>like a data flow or a data warehouse can access that and put that in their thing.
+
+273
+00:18:58.860 --> 00:19:04.420
+<v Ibrahim Surani>They don't need to know the details of how to access SAP or how this extract was made.
+
+274
+00:19:04.600 --> 00:19:08.440
+<v Ibrahim Surani>To them, it's just a black box that provides them data for this.
+
+275
+00:19:08.560 --> 00:19:15.660
+<v Ibrahim Surani>And then they can in turn themselves publish some other artifact that can be used by someone else downstream to do something else.
+
+276
+00:19:15.820 --> 00:19:24.400
+<v Ibrahim Surani>The whole idea is that you are creating like a data ecosystem within an organization where you have tracking, you have compliance, you have security.
+
+277
+00:19:24.400 --> 00:19:29.240
+<v Ibrahim Surani>and you have the shareability of artifacts from across the organization.
+
+278
+00:19:29.600 --> 00:19:34.580
+<v Ibrahim Surani>So therefore, different people are sharing their expertise in the form of these data artifacts.
+
+279
+00:19:34.780 --> 00:19:41.240
+<v Ibrahim Surani>That is the work that we are doing and we are going to see this coming online early next year.
+
+280
+00:19:41.920 --> 00:19:47.820
+<v Jay Mishra>So what excites me, the use of artificial intelligence in automating
+
+281
+00:19:47.820 --> 00:19:51.880
+<v Jay Mishra>or actually enhancing the usability of data management products.
+
+282
+00:19:52.660 --> 00:19:59.280
+<v Jay Mishra>So data volumes are increasing, the complexity is increasing, so pretty much a lot more data is coming our way.
+
+283
+00:19:59.460 --> 00:20:04.860
+<v Jay Mishra>So data management tools are going to be there and the heavy lifting of the data is going to be done by those tools.
+
+284
+00:20:05.660 --> 00:20:14.740
+<v Jay Mishra>But where we need help is to configure the solutions that are going to be custom made or actually custom configured to your needs.
+
+285
+00:20:15.200 --> 00:20:18.140
+<v Jay Mishra>And the configuration is where time is spent.
+
+286
+00:20:18.140 --> 00:20:24.260
+<v Jay Mishra>So if we look at the cost of the entire solution, the licensing cost is only maybe one-fourth of it.
+
+287
+00:20:24.300 --> 00:20:26.840
+<v Jay Mishra>Remaining three-fourths is implementation of that solution.
+
+288
+00:20:27.280 --> 00:20:29.520
+<v Jay Mishra>And this is where we see a lot of time being spent.
+
+289
+00:20:29.800 --> 00:20:32.380
+<v Jay Mishra>And, of course, that translates to real dollar value.
+
+290
+00:20:32.540 --> 00:20:36.900
+<v Jay Mishra>And using artificial intelligence, we can shorten that.
+
+291
+00:20:36.900 --> 00:20:48.680
+<v Jay Mishra>We can make sure that instead of the decision making being done by the users and configuration of all the repetitive tasks, those can be eliminated and done actually by the AI.
+
+292
+00:20:48.920 --> 00:20:52.060
+<v Jay Mishra>So that is the area we started to work on beginning of this year.
+
+293
+00:20:52.260 --> 00:21:01.660
+<v Jay Mishra>And also, of course, not only the automation of repetitive tasks, also some help in decision making where a user has to pick that.
+
+294
+00:21:01.660 --> 00:21:05.680
+<v Jay Mishra>Do I go the route A or route B?
+
+295
+00:21:06.180 --> 00:21:08.700
+<v Jay Mishra>Can AI recommend that which one is a better route?
+
+296
+00:21:08.860 --> 00:21:12.860
+<v Jay Mishra>And all in the context of configuration of data management solutions.
+
+297
+00:21:15.320 --> 00:21:16.800
+<v Noah Labhart>Okay, gentlemen, last question.
+
+298
+00:21:17.000 --> 00:21:22.060
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+299
+00:21:22.180 --> 00:21:23.280
+<v Noah Labhart>They're jazzed about it.
+
+300
+00:21:23.320 --> 00:21:24.240
+<v Noah Labhart>They can't wait to talk to the world.
+
+301
+00:21:24.300 --> 00:21:26.820
+<v Noah Labhart>They can't wait to show it off to you right there on the plane.
+
+302
+00:21:27.240 --> 00:21:30.440
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+303
+00:21:31.540 --> 00:21:33.520
+<v Ibrahim Surani>Focus. Focus and release quickly.
+
+304
+00:21:33.900 --> 00:21:37.600
+<v Ibrahim Surani>Do not dwell on creating a perfect product.
+
+305
+00:21:37.800 --> 00:21:39.120
+<v Ibrahim Surani>You're never going to be able to do that.
+
+306
+00:21:39.420 --> 00:21:41.560
+<v Ibrahim Surani>You have to put this thing in front of people.
+
+307
+00:21:42.100 --> 00:21:44.380
+<v Ibrahim Surani>Your idea of what a product should have
+
+308
+00:21:44.380 --> 00:21:47.140
+<v Ibrahim Surani>and the customer idea of what a product should have,
+
+309
+00:21:47.160 --> 00:21:48.160
+<v Ibrahim Surani>they're not going to match.
+
+310
+00:21:49.000 --> 00:21:51.000
+<v Ibrahim Surani>Even the top companies in the world,
+
+311
+00:21:51.560 --> 00:21:53.900
+<v Ibrahim Surani>they will put something in front of customers
+
+312
+00:21:53.900 --> 00:21:56.220
+<v Ibrahim Surani>and the customers will take it to different directions.
+
+313
+00:21:56.340 --> 00:21:58.540
+<v Ibrahim Surani>Remember the Apple Watch was supposed to be a fashion accessory
+
+314
+00:21:58.540 --> 00:22:00.400
+<v Ibrahim Surani>and then it became a healthcare thing?
+
+315
+00:22:01.660 --> 00:22:06.740
+<v Ibrahim Surani>know i mean you know you don't know where the product is going to go and so the best thing that
+
+316
+00:22:06.740 --> 00:22:12.200
+<v Ibrahim Surani>you can do is to put it in the market and let you know see what the market tells you and then act
+
+317
+00:22:12.200 --> 00:22:12.700
+<v Ibrahim Surani>accordingly
+
+318
+00:22:12.540 --> 00:22:18.100
+<v Jay Mishra>listen to your customers listen to the people you're showing your product to very very
+
+319
+00:22:18.100 --> 00:22:24.380
+<v Jay Mishra>carefully no advice is bad advice it's up to you of course to to take it or not gather all the
+
+320
+00:22:24.380 --> 00:22:29.360
+<v Jay Mishra>information when you when you talk to your customers evaluate all feedback and see which
+
+321
+00:22:29.360 --> 00:22:30.220
+<v Jay Mishra>each one makes sense to you.
+
+322
+00:22:30.860 --> 00:22:33.180
+<v Jay Mishra>We have been through that phase
+
+323
+00:22:33.180 --> 00:22:35.680
+<v Jay Mishra>where sometimes customers recommended something
+
+324
+00:22:35.680 --> 00:22:37.360
+<v Jay Mishra>we did not implement, saying that,
+
+325
+00:22:37.380 --> 00:22:39.720
+<v Jay Mishra>okay, hey, this doesn't sound like a reasonable idea.
+
+326
+00:22:40.260 --> 00:22:41.580
+<v Jay Mishra>But a few years later,
+
+327
+00:22:41.720 --> 00:22:43.380
+<v Jay Mishra>we went back and actually implemented it.
+
+328
+00:22:43.560 --> 00:22:45.400
+<v Jay Mishra>So from the experience, we can say that
+
+329
+00:22:46.100 --> 00:22:48.280
+<v Jay Mishra>listening to your customers very, very careful
+
+330
+00:22:48.280 --> 00:22:50.320
+<v Jay Mishra>is of utmost importance.
+
+331
+00:22:50.440 --> 00:22:53.360
+<v Jay Mishra>If you want to take a product through the maturity cycle
+
+332
+00:22:53.360 --> 00:22:56.080
+<v Jay Mishra>and have a viable product in market and be successful,
+
+333
+00:22:56.640 --> 00:22:58.560
+<v Jay Mishra>be very, very close to your customer.
+
+334
+00:22:59.720 --> 00:23:05.980
+<v Noah Labhart>Fantastic advice. Well, gentlemen, thank you for being on the show today. Thank you for telling the creation story of Astera.
+
+335
+00:23:06.120 --> 00:23:06.620
+<v Noah Labhart>Thank
+
+336
+00:23:06.420 --> 00:23:07.300
+<v Jay Mishra>you. Thank you for having us.
+
+337
+00:23:09.320 --> 00:23:12.080
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+338
+00:23:16.320 --> 00:23:24.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+339
+00:23:24.280 --> 00:23:29.300
+<v Noah Labhart>and when you get a chance leave us a review both things help us out tremendously
+
+340
+00:23:31.800 --> 00:23:33.740
+<v Noah Labhart>and thanks again for listening

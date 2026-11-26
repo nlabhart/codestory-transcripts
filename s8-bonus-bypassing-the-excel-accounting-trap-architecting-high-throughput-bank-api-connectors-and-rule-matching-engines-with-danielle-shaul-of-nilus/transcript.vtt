@@ -1,0 +1,915 @@
+WEBVTT
+
+NOTE S8 Bonus: Bypassing the Excel Accounting Trap: Architecting High-Throughput Bank API Connectors and Rule Matching Engines with Danielle Shaul of Nilus
+
+1
+00:00:01.020 --> 00:00:12.440
+<v Danielle Shaul>The question is, how do you have this scalability mindset? So we chose just Riot in the first place to build our architecture as a microservices.
+
+2
+00:00:13.620 --> 00:00:20.740
+<v Danielle Shaul>You know, it was hard at the beginning because it takes some time to get it right. Also, you need a lot of tooling to make it happen.
+
+3
+00:00:20.900 --> 00:00:28.300
+<v Danielle Shaul>And at the beginning, like folks would ask me, like, why wouldn't you just build a monolith? You know, it's easier. It takes you so far.
+
+4
+00:00:30.000 --> 00:00:34.620
+<v Danielle Shaul>But I knew that I'm making this investment for a rainy day.
+
+5
+00:00:34.700 --> 00:00:38.460
+<v Danielle Shaul>I knew that at some point, like, it will hit us.
+
+6
+00:00:39.260 --> 00:00:43.320
+<v Danielle Shaul>I'm Danielle Shaul, and I'm the co-founder and CTO of Nilus.
+
+7
+00:00:46.740 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+8
+00:00:52.340 --> 00:00:53.680
+<v Clip>It's six months moonlighting.
+
+9
+00:00:53.720 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+10
+00:00:55.480 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+11
+00:00:58.280 --> 00:00:59.660
+<v Clip>I don't exactly know what to do.
+
+12
+00:01:00.000 --> 00:01:02.500
+<v Clip>Who built
+
+13
+00:01:02.500 --> 00:01:04.540
+<v Noah Labhart>the teams that have their back.
+
+14
+00:01:08.720 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+15
+00:01:14.900 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+16
+00:01:18.260 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+17
+00:01:22.260 --> 00:01:25.840
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+18
+00:01:26.980 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+19
+00:01:30.000 --> 00:01:37.880
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today how Danielle Shaul is making a way
+
+20
+00:01:37.880 --> 00:01:49.560
+<v Noah Labhart>for you to streamline your business cash ops powered by AI. Danielle Shaul was born and
+
+21
+00:01:49.560 --> 00:01:54.600
+<v Noah Labhart>raised in Tel Aviv as an only child with a dog she dearly loved. She has always been passionate
+
+22
+00:01:54.600 --> 00:01:58.640
+<v Noah Labhart>about building and creating things, often assembling and disassembling things in her home.
+
+23
+00:02:00.000 --> 00:02:03.020
+<v Noah Labhart>and spent many years in Asia, Europe, and in the U.S.
+
+24
+00:02:03.360 --> 00:02:05.740
+<v Noah Labhart>Outside of tech, she likes ceramics and reading,
+
+25
+00:02:05.880 --> 00:02:09.680
+<v Noah Labhart>specifically biohacking, mindset books, or learning to become a better leader.
+
+26
+00:02:09.940 --> 00:02:14.040
+<v Noah Labhart>When asked her favorite food, she says her mom's, who can cook anything well.
+
+27
+00:02:15.880 --> 00:02:22.120
+<v Noah Labhart>Prior to her current startup, Danielle had to build homegrown solutions for financial workflows.
+
+28
+00:02:22.580 --> 00:02:26.900
+<v Noah Labhart>Because back then, when she was at Fundbox, software for these workflows didn't exist.
+
+29
+00:02:26.900 --> 00:02:33.600
+<v Noah Labhart>Her and her co-founder clicked over the idea to build the software that she wished she had.
+
+30
+00:02:34.560 --> 00:02:37.440
+<v Noah Labhart>This is the creation story of Nilus.
+
+31
+00:02:39.620 --> 00:02:45.500
+<v Danielle Shaul>So Nilus is essentially a platform that helps finance teams to automate their workflows.
+
+32
+00:02:45.920 --> 00:02:52.220
+<v Danielle Shaul>Think of a company that has 100 employees, let's say, and has different subsidiaries.
+
+33
+00:02:52.240 --> 00:02:54.780
+<v Danielle Shaul>They're located across different places in the globe.
+
+34
+00:02:54.780 --> 00:02:58.200
+<v Danielle Shaul>So part of the team is in Europe and part of it in Israel, and they have different banks
+
+35
+00:02:58.200 --> 00:03:02.980
+<v Danielle Shaul>accounts and different payment providers, and they serve customers in Asia, for instance.
+
+36
+00:03:03.200 --> 00:03:08.660
+<v Danielle Shaul>And now their kind of financial and their payment workflow and lifestyle is becoming
+
+37
+00:03:08.660 --> 00:03:09.920
+<v Danielle Shaul>very complicated.
+
+38
+00:03:10.500 --> 00:03:17.340
+<v Danielle Shaul>Nilus is helping those companies to basically gather all this information across different
+
+39
+00:03:17.340 --> 00:03:22.980
+<v Danielle Shaul>payment provider processors and banks, getting insights and automate the workflows of the
+
+40
+00:03:24.780 --> 00:03:28.780
+<v Danielle Shaul>every day or every week or at the end of the month when closing their books.
+
+41
+00:03:28.940 --> 00:03:36.060
+<v Danielle Shaul>And we build algorithms that take all the data and create in a click of a button,
+
+42
+00:03:36.220 --> 00:03:40.320
+<v Danielle Shaul>all the reporting and all the data at the financial teams in the company.
+
+43
+00:03:41.000 --> 00:03:44.380
+<v Danielle Shaul>My background was always financial technology.
+
+44
+00:03:44.900 --> 00:03:51.900
+<v Danielle Shaul>Prior to Nilus, I was working at a company called Fundbox, which was doing SMB lending in the US.
+
+45
+00:03:51.900 --> 00:03:58.840
+<v Danielle Shaul>I started as an engineer and did my way up as a team lead, a group lead, and eventually as a software architect.
+
+46
+00:03:59.280 --> 00:04:02.820
+<v Danielle Shaul>And back then, we had to build everything by ourselves.
+
+47
+00:04:02.960 --> 00:04:07.960
+<v Danielle Shaul>Obviously, as a company that moves money as part of the product, we had a lot of complexity going on.
+
+48
+00:04:08.360 --> 00:04:13.940
+<v Danielle Shaul>There wasn't any software existing in the space that can help automate financial workflow.
+
+49
+00:04:14.180 --> 00:04:19.660
+<v Danielle Shaul>So I kind of now building the software I wish I had back in the days.
+
+50
+00:04:19.660 --> 00:04:22.440
+<v Danielle Shaul>we had to build everything internally for our finance team to operate.
+
+51
+00:04:22.820 --> 00:04:26.980
+<v Danielle Shaul>And obviously, I had a whole roadmap of what we can build.
+
+52
+00:04:27.020 --> 00:04:29.440
+<v Danielle Shaul>And now I'm making this roadmap come true.
+
+53
+00:04:30.120 --> 00:04:33.440
+<v Danielle Shaul>And together with my co-founder, Daniel, he came from PayPal.
+
+54
+00:04:33.520 --> 00:04:37.160
+<v Danielle Shaul>So it's another very famous big financial services company.
+
+55
+00:04:37.540 --> 00:04:38.800
+<v Danielle Shaul>We're longtime friends.
+
+56
+00:04:38.920 --> 00:04:44.620
+<v Danielle Shaul>And we kind of click over this idea where finance team don't have the right tools
+
+57
+00:04:44.620 --> 00:04:47.540
+<v Danielle Shaul>to basically do their everyday job.
+
+58
+00:04:47.540 --> 00:04:50.480
+<v Danielle Shaul>And we saw it closely in the companies we worked for.
+
+59
+00:04:50.860 --> 00:04:56.680
+<v Danielle Shaul>More than a year ago, we decided to kind of reunite and solve it for other companies as well.
+
+60
+00:04:59.040 --> 00:05:00.720
+<v Noah Labhart>Let's dive into the MVP then.
+
+61
+00:05:00.780 --> 00:05:06.200
+<v Noah Labhart>So that first version of the product you built, how long did it take to build and what sort of tools did you use to bring it to life?
+
+62
+00:05:08.500 --> 00:05:15.900
+<v Danielle Shaul>It took us about six months to build it, but we did a year long validation, I would say.
+
+63
+00:05:18.400 --> 00:05:19.820
+<v Danielle Shaul>understanding what they need,
+
+64
+00:05:19.960 --> 00:05:21.880
+<v Danielle Shaul>like building the thesis behind Nilus.
+
+65
+00:05:21.880 --> 00:05:25.000
+<v Danielle Shaul>So we make sure that we build the right thing.
+
+66
+00:05:25.340 --> 00:05:27.360
+<v Danielle Shaul>Obviously, we did some mistakes along the way,
+
+67
+00:05:27.440 --> 00:05:30.480
+<v Danielle Shaul>but we wanted to make sure that we are building the right tools
+
+68
+00:05:30.480 --> 00:05:33.820
+<v Danielle Shaul>and the right set of products that will help our customers
+
+69
+00:05:33.820 --> 00:05:35.300
+<v Danielle Shaul>with their day-to-day operations.
+
+70
+00:05:35.760 --> 00:05:37.180
+<v Danielle Shaul>And in order to do that,
+
+71
+00:05:37.240 --> 00:05:40.380
+<v Danielle Shaul>we had to build a lot of integrations to different data sources.
+
+72
+00:05:40.580 --> 00:05:45.200
+<v Danielle Shaul>To this day, we're connected to over 20,000 different banks
+
+73
+00:05:45.200 --> 00:05:51.240
+<v Danielle Shaul>across the globe, either by API or SFTP or different types of methods, screen scraping.
+
+74
+00:05:51.460 --> 00:05:55.100
+<v Danielle Shaul>And we combine all of those and build the algorithms on top of that.
+
+75
+00:05:55.180 --> 00:06:00.300
+<v Danielle Shaul>But the basic layer that we built during our MVP was gathering those informations, building
+
+76
+00:06:00.300 --> 00:06:06.020
+<v Danielle Shaul>those data pipelines, building validations and data completeness tools over the data.
+
+77
+00:06:06.100 --> 00:06:11.760
+<v Danielle Shaul>So we make sure we always give our customers data that is up to date, that is verified,
+
+78
+00:06:11.980 --> 00:06:12.680
+<v Danielle Shaul>that is validated.
+
+79
+00:06:12.680 --> 00:06:20.840
+<v Danielle Shaul>data. And it's also kind of helping them this workflow of gathering it across different banks.
+
+80
+00:06:22.640 --> 00:06:28.240
+<v Noah Labhart>Let's stay on the MVP. So with any MVP, you've got to make certain decisions and trade-offs around
+
+81
+00:06:28.240 --> 00:06:32.840
+<v Noah Labhart>how you build the product, technical debt, feature limitation, all those sorts of things.
+
+82
+00:06:33.060 --> 00:06:37.200
+<v Noah Labhart>You're alluding to some of those at a high level, but dive into one or two that really stand out to
+
+83
+00:06:37.200 --> 00:06:41.940
+<v Noah Labhart>you where you had to make those decisions and trade-offs and specifically how do you cope with
+
+84
+00:06:43.600 --> 00:06:50.960
+<v Danielle Shaul>so i think that the first decision that we do and as a company we stick with is always building an
+
+85
+00:06:50.960 --> 00:06:57.820
+<v Danielle Shaul>mvp of something so we need to build the smallest unit possible for this to be valuable and only
+
+86
+00:06:57.820 --> 00:07:03.460
+<v Danielle Shaul>then improve on that and i think for me it's the hardest thing as a perfectionist like not getting
+
+87
+00:07:03.460 --> 00:07:09.920
+<v Danielle Shaul>an integration let's say or a product or a feature to the finish line but it helps a lot because you
+
+88
+00:07:09.920 --> 00:07:15.620
+<v Danielle Shaul>can take it to the customers and then get their feedback and understand if that's helpful or not.
+
+89
+00:07:15.820 --> 00:07:21.760
+<v Danielle Shaul>So it's a huge trade-off, right? Like not doing everything, you know, all the layers that you need,
+
+90
+00:07:21.920 --> 00:07:26.740
+<v Danielle Shaul>not finishing as you imagine the product or this feature to be. But on the other hand,
+
+91
+00:07:26.800 --> 00:07:31.720
+<v Danielle Shaul>it's a trade-off that kind of helps you make sure that you build the right set of features
+
+92
+00:07:31.720 --> 00:07:34.400
+<v Danielle Shaul>and the right set of tools and you're building it correctly, right?
+
+93
+00:07:36.160 --> 00:08:00.320
+<v Noah Labhart>Okay, let's move forward then. So you've got your MVP. It's working. You're getting some traction. You're learning a ton. Tell me about how you progress the product from there and matured it. Right. So what I'm looking for there a bit to wrap that question in a box a little bit, what I'm looking for is how did you go about building your roadmap? And how did you decide, okay, this is the next most important thing to build or to address with Nilus?
+
+94
+00:08:01.440 --> 00:08:05.700
+<v Danielle Shaul>The first thing we always do is listen to our customers and what they need and what
+
+95
+00:08:05.700 --> 00:08:09.920
+<v Danielle Shaul>makes their life better and what will make their life better, obviously.
+
+96
+00:08:10.140 --> 00:08:13.760
+<v Danielle Shaul>So I think this is the first criteria to building our roadmap.
+
+97
+00:08:14.000 --> 00:08:20.020
+<v Danielle Shaul>Try to understand how we can improve on what we already built, how we can automate more,
+
+98
+00:08:20.200 --> 00:08:25.000
+<v Danielle Shaul>but then also kind of how this integrates with the vision of Nilus.
+
+99
+00:08:25.080 --> 00:08:28.100
+<v Danielle Shaul>Nilus is a financial operations platform.
+
+100
+00:08:28.100 --> 00:08:33.100
+<v Danielle Shaul>They want to be the financial team cash co-pilot.
+
+101
+00:08:33.260 --> 00:08:39.360
+<v Danielle Shaul>So we kind of want to be this tool where they go to every day and helps them with their operations.
+
+102
+00:08:39.560 --> 00:08:48.180
+<v Danielle Shaul>So the question we ask ourselves every day is how can we become more of that vision, how we can make more for our customers?
+
+103
+00:08:48.540 --> 00:08:51.680
+<v Danielle Shaul>And I think this is how we go and mature our products.
+
+104
+00:08:51.800 --> 00:08:56.280
+<v Danielle Shaul>Like we add layers that kind of cater to the stream or kind of cater to this vision.
+
+105
+00:08:58.100 --> 00:09:00.160
+<v Danielle Shaul>making sure that we'll build it the right thing.
+
+106
+00:09:02.500 --> 00:09:03.660
+<v Noah Labhart>I hear you saying we.
+
+107
+00:09:04.140 --> 00:09:05.380
+<v Noah Labhart>Let's talk about team.
+
+108
+00:09:05.660 --> 00:09:08.560
+<v Noah Labhart>So tell me about how you built your team.
+
+109
+00:09:08.660 --> 00:09:12.300
+<v Noah Labhart>What do you look for in those people to indicate that they are the winning horses to join you?
+
+110
+00:09:13.400 --> 00:09:14.540
+<v Danielle Shaul>First, I love my team.
+
+111
+00:09:14.640 --> 00:09:15.680
+<v Danielle Shaul>That's the first thing.
+
+112
+00:09:16.000 --> 00:09:21.680
+<v Danielle Shaul>And the second thing is that I had the luck to bring almost, I think, half of the team
+
+113
+00:09:21.680 --> 00:09:25.840
+<v Danielle Shaul>are people that work with me in my previous job or my previous jobs
+
+114
+00:09:25.840 --> 00:09:30.140
+<v Danielle Shaul>and just follow me because they are all kind of passionate about the space.
+
+115
+00:09:30.400 --> 00:09:37.500
+<v Danielle Shaul>So I think 99% of our team, we're about 20 people now, are coming from FinTech.
+
+116
+00:09:37.660 --> 00:09:43.520
+<v Danielle Shaul>And they all kind of are passionate about building those and doing those automations.
+
+117
+00:09:43.520 --> 00:09:48.480
+<v Danielle Shaul>And they live and breathe and understand the needs and the problems.
+
+118
+00:09:48.580 --> 00:09:55.540
+<v Danielle Shaul>And this is the most important thing for me as a founder to collect those people who share the same vision.
+
+119
+00:09:55.840 --> 00:10:04.760
+<v Danielle Shaul>as I do. We have this culture of working hard, but also celebrating our wins. And we have like a very
+
+120
+00:10:04.760 --> 00:10:10.560
+<v Danielle Shaul>in-office culture. So we got to the office, we meet every day. It's also kind of a trade-off we took
+
+121
+00:10:10.560 --> 00:10:16.640
+<v Danielle Shaul>because we could have, you know, hire globally, you have a larger talent pool, but we wanted to
+
+122
+00:10:16.640 --> 00:10:21.520
+<v Danielle Shaul>stay close to each other. We have this like brainstorm culture. We sit in a room, we take a
+
+123
+00:10:21.520 --> 00:10:23.960
+<v Danielle Shaul>whiteboard and the magic happens.
+
+124
+00:10:24.240 --> 00:10:29.020
+<v Danielle Shaul>And I think the most important thing for me is having the same of the people on
+
+125
+00:10:29.020 --> 00:10:31.980
+<v Danielle Shaul>board and kind of share the same vision and ideas.
+
+126
+00:10:32.200 --> 00:10:36.520
+<v Danielle Shaul>And we do that by having those things, having those brainstorms and working
+
+127
+00:10:36.520 --> 00:10:42.680
+<v Danielle Shaul>hard towards our goal, but also celebrating every week we say, who are
+
+128
+00:10:42.680 --> 00:10:48.120
+<v Danielle Shaul>the people that deserves, you know, kudos or high five or who are like, who are
+
+129
+00:10:48.120 --> 00:10:50.240
+<v Danielle Shaul>those team members that did exceptionally?
+
+130
+00:10:51.520 --> 00:10:55.860
+<v Danielle Shaul>And it's not just to, you know, celebrate just the wins.
+
+131
+00:10:56.040 --> 00:11:01.620
+<v Danielle Shaul>It's also acknowledge the hard work that the team is putting into making it happen.
+
+132
+00:11:01.700 --> 00:11:06.720
+<v Danielle Shaul>And I think I wouldn't get so far without this exceptional team that we gather.
+
+133
+00:11:08.860 --> 00:11:10.840
+<v Noah Labhart>Okay, let's flip to scalability.
+
+134
+00:11:11.140 --> 00:11:14.700
+<v Noah Labhart>And this will be interesting given the type of industry you're serving.
+
+135
+00:11:14.860 --> 00:11:18.700
+<v Noah Labhart>Did you build this to scale or with scale in mind from the very beginning?
+
+136
+00:11:18.700 --> 00:11:23.240
+<v Noah Labhart>or is this something you're fighting or you had to fight as you grew and gained traction?
+
+137
+00:11:24.020 --> 00:11:30.180
+<v Danielle Shaul>Our product is basically solving our customers' scalability problems, right?
+
+138
+00:11:30.300 --> 00:11:38.940
+<v Danielle Shaul>They are working with Excel or other tools that are not meant to hold all that information
+
+139
+00:11:38.940 --> 00:11:44.280
+<v Danielle Shaul>or systems that, you know, you go to make a coffee when you refresh the page.
+
+140
+00:11:44.480 --> 00:11:46.220
+<v Danielle Shaul>So we had no choice.
+
+141
+00:11:46.220 --> 00:11:48.440
+<v Danielle Shaul>How do they be something that is scalable?
+
+142
+00:11:49.620 --> 00:11:51.020
+<v Danielle Shaul>But we had a lot of concerns.
+
+143
+00:11:51.260 --> 00:11:53.200
+<v Danielle Shaul>We need to take security in mind.
+
+144
+00:11:53.260 --> 00:11:56.720
+<v Danielle Shaul>Like you said, we are in the financial services space.
+
+145
+00:11:56.860 --> 00:11:59.640
+<v Danielle Shaul>So this is something that is top of mind for our customers.
+
+146
+00:11:59.900 --> 00:12:04.360
+<v Danielle Shaul>We had to make sure that the data that we're presenting to our customers is validated.
+
+147
+00:12:04.560 --> 00:12:07.380
+<v Danielle Shaul>So it's another step in the chain that takes time.
+
+148
+00:12:07.380 --> 00:12:17.320
+<v Danielle Shaul>And, you know, you add another feature and every feature or every layer or every step is kind of taking scalability down or taking performance down.
+
+149
+00:12:17.520 --> 00:12:22.520
+<v Danielle Shaul>And then the question is, how do you have this scalability mindset?
+
+150
+00:12:22.820 --> 00:12:29.200
+<v Danielle Shaul>So we chose just Riot in the first place to build our architecture as a microservices.
+
+151
+00:12:29.540 --> 00:12:34.160
+<v Danielle Shaul>And, you know, it was hard at the beginning because it takes some time to get it right.
+
+152
+00:12:34.160 --> 00:12:37.020
+<v Danielle Shaul>Also, you need a lot of tooling to make it happen.
+
+153
+00:12:37.240 --> 00:12:41.900
+<v Danielle Shaul>And at the beginning, folks would ask me, why wouldn't you just build a monolith?
+
+154
+00:12:42.260 --> 00:12:43.080
+<v Danielle Shaul>It's easier.
+
+155
+00:12:43.260 --> 00:12:44.600
+<v Danielle Shaul>It takes you so far.
+
+156
+00:12:45.580 --> 00:12:50.720
+<v Danielle Shaul>But I knew that I'm making this investment for a rainy day.
+
+157
+00:12:50.800 --> 00:12:56.380
+<v Danielle Shaul>I knew that at some point, if I'll build a monolith or if the team would build this monolith,
+
+158
+00:12:56.680 --> 00:13:02.880
+<v Danielle Shaul>it will hit us and we'll get those, we'll hit this limitation of what the system can do.
+
+159
+00:13:04.160 --> 00:13:07.920
+<v Danielle Shaul>want to make sure that we have this mindset right at the beginning.
+
+160
+00:13:10.160 --> 00:13:15.260
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built,
+
+161
+00:13:15.400 --> 00:13:16.480
+<v Noah Labhart>what are you most proud of?
+
+162
+00:13:17.500 --> 00:13:21.960
+<v Danielle Shaul>Obviously the team. And then the second thing is the product.
+
+163
+00:13:22.260 --> 00:13:29.260
+<v Danielle Shaul>And I would say the third thing would be the experience for our customers. Like to see our
+
+164
+00:13:29.260 --> 00:13:36.940
+<v Danielle Shaul>customers and their day-to-day operations and work is getting easier by the day. And every time we
+
+165
+00:13:36.940 --> 00:13:42.400
+<v Danielle Shaul>develop a new feature, like it's something that changes the way they work and automate things for
+
+166
+00:13:42.400 --> 00:13:47.920
+<v Danielle Shaul>them. So I would say it's the magical triangle of having a good team, building the right product
+
+167
+00:13:47.920 --> 00:13:53.080
+<v Danielle Shaul>and having not just customers, but early adopters. I think that's something that is really important.
+
+168
+00:13:53.160 --> 00:13:58.660
+<v Danielle Shaul>And I'm not sure it's being like discussed much, but having people that support you and believe in
+
+169
+00:13:59.260 --> 00:14:04.100
+<v Danielle Shaul>even if it's not what you want it to be or what they want it to be from day one,
+
+170
+00:14:04.260 --> 00:14:09.860
+<v Danielle Shaul>they share the vision that they understand why it's going to solve a lot of their problems
+
+171
+00:14:09.860 --> 00:14:16.900
+<v Danielle Shaul>and they can support and go through the hiccups or even go through times where it's not necessarily what they wanted
+
+172
+00:14:16.900 --> 00:14:24.000
+<v Danielle Shaul>or not really what they need right now in order to help you and them in like, you know, a few months time.
+
+173
+00:14:24.100 --> 00:14:25.680
+<v Danielle Shaul>So that's an important one.
+
+174
+00:14:28.080 --> 00:14:33.560
+<v Noah Labhart>let's flip the script a little bit tell me about a mistake you made and how you and your team
+
+175
+00:14:33.560 --> 00:14:35.040
+<v Noah Labhart>responded to it you know
+
+176
+00:14:35.040 --> 00:14:39.100
+<v Danielle Shaul>it's something that we'd say a lot of startup are doing at the beginning is
+
+177
+00:14:39.100 --> 00:14:44.240
+<v Danielle Shaul>even though we did a lot of validation and a lot of you know discussing with our customers and
+
+178
+00:14:44.240 --> 00:14:51.540
+<v Danielle Shaul>understanding what they need it's different than doing or user customers or even just like general
+
+179
+00:14:51.540 --> 00:14:56.120
+<v Danielle Shaul>our research and trying to sell their product. So when you try to sell the product, you actually
+
+180
+00:14:56.720 --> 00:15:01.520
+<v Danielle Shaul>understand like, will people pay for it? How much will they pay for it? So I think for us,
+
+181
+00:15:01.580 --> 00:15:06.160
+<v Danielle Shaul>just like not having this discussion early on and being in their research kind of space,
+
+182
+00:15:06.420 --> 00:15:12.440
+<v Danielle Shaul>I would say that's something that we learned very quickly to improve. Like having this discussion
+
+183
+00:15:12.440 --> 00:15:17.960
+<v Danielle Shaul>right on, like not just like how much you value that, but also would it really help you when
+
+184
+00:15:17.960 --> 00:15:24.740
+<v Danielle Shaul>you're gonna use it on a day-to-day basis like how many hours a day will it save you so all of
+
+185
+00:15:24.740 --> 00:15:30.820
+<v Danielle Shaul>those questions and being very mindful about the questions and about the research you're conducting
+
+186
+00:15:30.820 --> 00:15:35.860
+<v Danielle Shaul>with your customers i would say those nuggets are the most important things when you're building
+
+187
+00:15:35.860 --> 00:15:41.240
+<v Danielle Shaul>the startup because it's all about learning obviously it's all about how fast can you learn
+
+188
+00:15:41.240 --> 00:15:46.440
+<v Danielle Shaul>How quickly can you navigate when you already did a mistake?
+
+189
+00:15:46.780 --> 00:15:54.720
+<v Danielle Shaul>Can you, you know, think about it and do this retrospective and learn for it in the future?
+
+190
+00:15:54.900 --> 00:16:05.480
+<v Danielle Shaul>So I think it's something that we adopt now and we do much better and hope that, you know, we won't see more of those coming in the future.
+
+191
+00:16:08.300 --> 00:16:10.300
+<v Noah Labhart>Okay, let's switch to you, Danielle.
+
+192
+00:16:11.240 --> 00:16:13.040
+<v Noah Labhart>Influences the way that you work.
+
+193
+00:16:13.180 --> 00:16:16.500
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+194
+00:16:17.100 --> 00:16:27.520
+<v Danielle Shaul>I would say the first one that comes to mind is my father, who always like pushed me into, you know, in schools or in my military service.
+
+195
+00:16:27.560 --> 00:16:34.640
+<v Danielle Shaul>Or even like in my early career, he always believed in me and tried to challenge me in doing more.
+
+196
+00:16:36.700 --> 00:16:42.820
+<v Danielle Shaul>I would say also the second person that comes to mind would be my first manager
+
+197
+00:16:42.820 --> 00:16:52.520
+<v Danielle Shaul>he was just very big influence on me in a way that I had this vision of this you know young
+
+198
+00:16:52.520 --> 00:16:59.720
+<v Danielle Shaul>entrepreneur who is very successful who can like lead an organization who share a vision with his
+
+199
+00:16:59.720 --> 00:17:05.420
+<v Danielle Shaul>co-founders and build a product from just like an idea that he had in mind.
+
+200
+00:17:06.320 --> 00:17:09.520
+<v Danielle Shaul>It was just something that was very, very excited for me.
+
+201
+00:17:09.580 --> 00:17:12.380
+<v Danielle Shaul>And I'm not sure he knows about this influence today,
+
+202
+00:17:13.620 --> 00:17:17.660
+<v Danielle Shaul>but that was something that really pushed me towards building Nilus.
+
+203
+00:17:19.420 --> 00:17:20.540
+<v Noah Labhart>Last question, Danielle.
+
+204
+00:17:20.660 --> 00:17:24.400
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur
+
+205
+00:17:24.400 --> 00:17:25.940
+<v Noah Labhart>who's built the next big thing.
+
+206
+00:17:26.200 --> 00:17:27.500
+<v Noah Labhart>They're jazzed about it.
+
+207
+00:17:27.560 --> 00:17:28.800
+<v Noah Labhart>They can't wait to show it off to the world.
+
+208
+00:17:29.720 --> 00:17:33.940
+<v Noah Labhart>right there on the plane. What advice do you give that person having gone down this road a bit?
+
+209
+00:17:36.580 --> 00:17:43.460
+<v Danielle Shaul>The first thing would be doing something that you're really passionate about. You really can
+
+210
+00:17:43.460 --> 00:17:48.620
+<v Danielle Shaul>see yourself solving for the long term because you know it's it's a long journey and it's a hard one.
+
+211
+00:17:49.000 --> 00:17:53.300
+<v Danielle Shaul>There are a lot of challenges and every day there is a challenge that you have to solve and
+
+212
+00:17:53.300 --> 00:17:57.780
+<v Danielle Shaul>you have to really be passionate not just about being a problem solver but also
+
+213
+00:17:59.720 --> 00:18:06.480
+<v Danielle Shaul>you're building and obviously it changes but you need to like imagine yourself doing it for a long
+
+214
+00:18:06.480 --> 00:18:14.340
+<v Danielle Shaul>time and think to yourself like what would help me endure and that can be you know your passion to
+
+215
+00:18:14.340 --> 00:18:21.820
+<v Danielle Shaul>the product or your passion to the space or your co-founders or your team or your investors but
+
+216
+00:18:21.820 --> 00:18:25.920
+<v Danielle Shaul>you have to have something you have to have a really good reason to endure because that's
+
+217
+00:18:25.920 --> 00:18:26.420
+<v Danielle Shaul>That's
+
+218
+00:18:25.920 --> 00:18:26.660
+<v Noah Labhart>fantastic advice.
+
+219
+00:18:26.920 --> 00:18:29.300
+<v Noah Labhart>Well, Danielle, thank you for being on the show today.
+
+220
+00:18:29.380 --> 00:18:31.960
+<v Noah Labhart>And thank you for telling the creation story of Nilus.
+
+221
+00:18:32.580 --> 00:18:33.380
+<v Danielle Shaul>Thank you, Noah.
+
+222
+00:18:33.420 --> 00:18:34.100
+<v Danielle Shaul>Much appreciated.
+
+223
+00:18:36.240 --> 00:18:39.040
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+224
+00:18:43.660 --> 00:18:46.660
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+225
+00:18:46.820 --> 00:18:51.560
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+226
+00:18:52.240 --> 00:18:54.400
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+227
+00:18:55.920 --> 00:18:56.600
+<v Noah Labhart>out tremendously.
+
+228
+00:18:59.460 --> 00:19:01.020
+<v Noah Labhart>And thanks again for listening.

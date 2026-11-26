@@ -1,0 +1,2159 @@
+WEBVTT
+
+NOTE S5 Bonus: Slashing the Cloud Bill in Half: Automated Kubernetes Optimization with Leon Kuperman of CAST.ai
+
+1
+00:00:01.680 --> 00:00:13.560
+<v Leon Kuperman>If you ask customers what they want, they will ask you for a better mousetrap. In other words, they only know what they know. They don't know what that leap is yet until they have it in their hands.
+
+2
+00:00:14.020 --> 00:00:24.400
+<v Leon Kuperman>We didn't start the product management process by going and interviewing a bunch of customers and saying, okay, we think that cost is a problem. Tell us about all of the pain points you have in your existing cost tooling.
+
+3
+00:00:24.400 --> 00:00:30.420
+<v Leon Kuperman>There needed to be some kind of radical shift in thinking that would create a 10x benefit.
+
+4
+00:00:31.000 --> 00:00:36.160
+<v Leon Kuperman>And that takes a leap of faith that takes sometimes months to validate. Months.
+
+5
+00:00:36.920 --> 00:00:42.540
+<v Leon Kuperman>My name is Leon Kuperman. I am the co-founder and CTO at Cast.ai.
+
+6
+00:00:47.420 --> 00:00:52.960
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+7
+00:00:54.400 --> 00:00:59.880
+<v Noah Labhart>in the critical moments of what it takes to change an industry and build and lead a team
+
+8
+00:00:59.880 --> 00:01:07.420
+<v Noah Labhart>that has your back. I'm your host, Noah Labhart, and today, how Leon Kuperman created a way
+
+9
+00:01:07.420 --> 00:01:15.840
+<v Noah Labhart>to optimize your Kubernetes and cut your cloud bill in half. All this and more on Code Story.
+
+10
+00:01:20.480 --> 00:01:26.200
+<v Noah Labhart>Leon Kuperman comes from an immigrant family who migrated to North America in the late 70s.
+
+11
+00:01:26.360 --> 00:01:30.660
+<v Noah Labhart>He was born in a city that is now part of the Ukraine, but grew up in Canada.
+
+12
+00:01:30.820 --> 00:01:39.220
+<v Noah Labhart>So he was brought up in Western society, but closely observed his parents and their immigrant background grinding as entrepreneurs throughout Leon's life.
+
+13
+00:01:40.200 --> 00:01:44.600
+<v Noah Labhart>He's a brown belt in Brazilian Jiu-Jitsu and has been training for over 15 years.
+
+14
+00:01:45.840 --> 00:01:50.240
+<v Noah Labhart>a lot of his time outside of tech. Funny enough though, when he was living in
+
+15
+00:01:50.240 --> 00:01:55.000
+<v Noah Labhart>Seattle he was part of a group of people from Oracle, Amazon, Microsoft, etc. who
+
+16
+00:01:55.000 --> 00:01:59.280
+<v Noah Labhart>all did martial arts and he finds that there is a correlation between jiu-jitsu
+
+17
+00:01:59.280 --> 00:02:04.000
+<v Noah Labhart>specifically and tech. He's married with three kids and of course likes to spend
+
+18
+00:02:04.000 --> 00:02:08.320
+<v Noah Labhart>time with his kids in different ways. His older son actually trains with him in
+
+19
+00:02:08.320 --> 00:02:12.300
+<v Noah Labhart>martial arts and also does tech, building Raspberry Pis and engineering different
+
+20
+00:02:12.300 --> 00:02:17.640
+<v Noah Labhart>things. Leon also plays the piano. Coming from a Russian family, it wasn't an
+
+21
+00:02:17.640 --> 00:02:23.080
+<v Noah Labhart>option not to. At his prior startup, Leon and his CEO would get into conversations
+
+22
+00:02:23.080 --> 00:02:28.780
+<v Noah Labhart>about, you guessed it, his cloud spending bill. He knew that the usage was
+
+23
+00:02:28.780 --> 00:02:32.300
+<v Noah Labhart>justified but could not point to why each piece of infrastructure was
+
+24
+00:02:32.300 --> 00:02:36.660
+<v Noah Labhart>allocated. And further, he could not automatically optimize it and reduce the
+
+25
+00:02:36.660 --> 00:02:42.060
+<v Noah Labhart>bill. This is the creation story of Cast AI.
+
+26
+00:02:45.640 --> 00:02:48.780
+<v Leon Kuperman>So Cast is a company that helps customers
+
+27
+00:02:48.780 --> 00:02:55.820
+<v Leon Kuperman>optimize their cloud environments in a very specific way. So we're optimizing for cost
+
+28
+00:02:55.820 --> 00:03:02.140
+<v Leon Kuperman>and performance, but we're optimizing in a fairly narrow scope. Whereas if you'll have
+
+29
+00:03:02.140 --> 00:03:06.060
+<v Leon Kuperman>some companies say, oh, we'll meter your costs, we'll give you some recommendations,
+
+30
+00:03:06.880 --> 00:03:09.340
+<v Leon Kuperman>and then you can take action on those recommendations
+
+31
+00:03:09.340 --> 00:03:11.120
+<v Leon Kuperman>and lower your overall cloud bill.
+
+32
+00:03:11.280 --> 00:03:13.380
+<v Leon Kuperman>We recognize that cloud bill is a huge problem,
+
+33
+00:03:13.540 --> 00:03:16.380
+<v Leon Kuperman>but we also recognize that nobody wants to do the work manually
+
+34
+00:03:16.380 --> 00:03:19.800
+<v Leon Kuperman>and nobody's going to take a set of written down recommendations
+
+35
+00:03:19.800 --> 00:03:22.520
+<v Leon Kuperman>and try to implement those through a manual DevOps process.
+
+36
+00:03:22.900 --> 00:03:26.520
+<v Leon Kuperman>So we've come at the problem from a first principles perspective,
+
+37
+00:03:26.740 --> 00:03:32.540
+<v Leon Kuperman>which is everything that we do has to be a fully automated or autonomous approach.
+
+38
+00:03:32.760 --> 00:03:36.080
+<v Leon Kuperman>So when a customer gives us their cloud computing environment
+
+39
+00:03:36.820 --> 00:03:43.640
+<v Leon Kuperman>we install our components in such a way that once they turn it on, we are driving from that point forward,
+
+40
+00:03:43.820 --> 00:03:49.740
+<v Leon Kuperman>we're rebalancing and reorchestrating their workloads such that they're the most cost effective that they can be
+
+41
+00:03:49.740 --> 00:03:53.140
+<v Leon Kuperman>within a set of guidance parameters that our customers give us.
+
+42
+00:03:53.460 --> 00:03:58.780
+<v Leon Kuperman>So we made this bet early on at Cast that the world will move to containers over time.
+
+43
+00:03:58.780 --> 00:04:06.500
+<v Leon Kuperman>So we already have the vast majority of kind of lean forward coders and engineers deploying their workloads on containers.
+
+44
+00:04:06.820 --> 00:04:10.200
+<v Leon Kuperman>And then the question becomes, well, OK, you're going to containerize your applications.
+
+45
+00:04:10.720 --> 00:04:12.660
+<v Leon Kuperman>How are you going to deploy them?
+
+46
+00:04:12.820 --> 00:04:23.880
+<v Leon Kuperman>And we see that the vast majority of organizations will move to Kubernetes over the next five to seven years or some version or flavor of Kubernetes that is yet to evolve out of our current ecosystem.
+
+47
+00:04:23.880 --> 00:04:27.040
+<v Leon Kuperman>system. So rather than saying, we're going to go and optimize all
+
+48
+00:04:27.040 --> 00:04:30.620
+<v Leon Kuperman>compute environments, all possible application scenarios, we said,
+
+49
+00:04:30.700 --> 00:04:34.920
+<v Leon Kuperman>alright, we're going to focus on Kubernetes specifically. And the
+
+50
+00:04:34.920 --> 00:04:37.680
+<v Leon Kuperman>reason we're going to do that is because the rules of engagement
+
+51
+00:04:37.680 --> 00:04:42.440
+<v Leon Kuperman>are extremely clear. Everything is defined in the K8s world
+
+52
+00:04:42.440 --> 00:04:46.680
+<v Leon Kuperman>nodes, pods, workloads, etc. And therefore, that gives us a chess
+
+53
+00:04:46.680 --> 00:04:49.840
+<v Leon Kuperman>game to play, as opposed to kind of so it's the difference
+
+54
+00:04:49.840 --> 00:04:54.900
+<v Leon Kuperman>between AI playing a game versus AI trying to solve a general world problem.
+
+55
+00:04:55.480 --> 00:05:00.800
+<v Leon Kuperman>So by focusing and being very specific on scope, we're able to be much more
+
+56
+00:05:00.800 --> 00:05:07.040
+<v Leon Kuperman>effective and actuate the changes that we want to make in a cluster versus just
+
+57
+00:05:07.040 --> 00:05:11.880
+<v Leon Kuperman>some written recommendation. So Cast is not our first startup. I guess you
+
+58
+00:05:11.880 --> 00:05:15.600
+<v Leon Kuperman>could call us serial entrepreneurs. I've been working in startup world for
+
+59
+00:05:15.600 --> 00:05:19.600
+<v Leon Kuperman>for almost my whole career, with the exception of two bookends.
+
+60
+00:05:19.740 --> 00:05:21.760
+<v Leon Kuperman>So my first job was at IBM.
+
+61
+00:05:22.000 --> 00:05:24.660
+<v Leon Kuperman>I lasted about 18 months, maybe 24 months.
+
+62
+00:05:25.060 --> 00:05:26.760
+<v Leon Kuperman>And then I went and started my own thing.
+
+63
+00:05:26.880 --> 00:05:34.140
+<v Leon Kuperman>And then my whole career has been startup life up until I was a vice president at Oracle Cloud Infrastructure.
+
+64
+00:05:34.280 --> 00:05:39.500
+<v Leon Kuperman>And I got to Oracle through an acquisition of one of our previous startups called ZenEdge.
+
+65
+00:05:39.500 --> 00:05:46.300
+<v Leon Kuperman>One of the things we've noticed both in that startup and afterwards at Oracle was cloud
+
+66
+00:05:46.300 --> 00:05:46.800
+<v Leon Kuperman>cloud.
+
+67
+00:05:47.260 --> 00:05:53.480
+<v Leon Kuperman>So I was the CTO and my CEO at the time would come to me every month with the AWS bill and
+
+68
+00:05:53.480 --> 00:06:01.520
+<v Leon Kuperman>say, WTF Leon, you said the bill was going to be X and it's X times two or whatever.
+
+69
+00:06:01.720 --> 00:06:06.380
+<v Leon Kuperman>And yes, I know we have customers that we're onboarding, but this is out of control.
+
+70
+00:06:06.380 --> 00:06:11.160
+<v Leon Kuperman>And so the end result was we started at a couple thousand dollars a month in expenses on AWS.
+
+71
+00:06:11.600 --> 00:06:16.360
+<v Leon Kuperman>And by the time we sold the company, we were close to $200,000 a month.
+
+72
+00:06:16.400 --> 00:06:19.160
+<v Leon Kuperman>So like 100x growth in the bill.
+
+73
+00:06:19.840 --> 00:06:23.120
+<v Leon Kuperman>Not only did I not know where the resources were going,
+
+74
+00:06:23.220 --> 00:06:27.060
+<v Leon Kuperman>and I couldn't allocate them to individual microservices or applications,
+
+75
+00:06:27.680 --> 00:06:31.380
+<v Leon Kuperman>I had no mechanism to automatically reduce the bill.
+
+76
+00:06:31.520 --> 00:06:34.200
+<v Leon Kuperman>I would have to do a manual DevOps effort to say,
+
+77
+00:06:34.200 --> 00:06:38.800
+<v Leon Kuperman>say, okay, we're going to stop working engineers. We're going to stop working on features. And today
+
+78
+00:06:38.800 --> 00:06:43.720
+<v Leon Kuperman>is going to be all about cost or this month is going to be all about cost crunching. We're going
+
+79
+00:06:43.720 --> 00:06:51.180
+<v Leon Kuperman>to bring that bill down. And we went through all of the kind of denial and, you know, all of, all
+
+80
+00:06:51.180 --> 00:06:56.660
+<v Leon Kuperman>of the, all of the cycles of grief, we moved to these things called reserved instances where we
+
+81
+00:06:56.660 --> 00:07:01.760
+<v Leon Kuperman>paid a bunch of money up front to AWS only to find out that that bill still kept growing,
+
+82
+00:07:01.760 --> 00:07:06.140
+<v Leon Kuperman>Although we kind of slowed the pace, we looked at other clouds, but then there was vendor
+
+83
+00:07:06.140 --> 00:07:09.200
+<v Leon Kuperman>lock-in so we couldn't easily move to other cloud environments.
+
+84
+00:07:09.660 --> 00:07:16.140
+<v Leon Kuperman>And so although the company did very well, I always had this kind of pit in my stomach
+
+85
+00:07:16.140 --> 00:07:18.640
+<v Leon Kuperman>as this is a part that we failed on.
+
+86
+00:07:19.300 --> 00:07:22.740
+<v Leon Kuperman>Resource allocation and cost management was a fail.
+
+87
+00:07:23.820 --> 00:07:28.940
+<v Leon Kuperman>And then I noticed these trends at Oracle with customers and with the inside of Oracle,
+
+88
+00:07:28.940 --> 00:07:30.960
+<v Leon Kuperman>I noticed all of these capacity crunches,
+
+89
+00:07:30.980 --> 00:07:33.920
+<v Leon Kuperman>especially around COVID when there were no more,
+
+90
+00:07:34.000 --> 00:07:37.840
+<v Leon Kuperman>like there was a chip shortage and it still exists.
+
+91
+00:07:38.200 --> 00:07:41.200
+<v Leon Kuperman>And so it was really hard for these cloud environments
+
+92
+00:07:41.200 --> 00:07:42.340
+<v Leon Kuperman>to order new capacity.
+
+93
+00:07:42.560 --> 00:07:44.580
+<v Leon Kuperman>Like they had to order chips to rack servers,
+
+94
+00:07:44.820 --> 00:07:46.900
+<v Leon Kuperman>to actually extend their compute capacity.
+
+95
+00:07:47.280 --> 00:07:49.580
+<v Leon Kuperman>And all clouds were having a hard time doing this
+
+96
+00:07:49.580 --> 00:07:50.340
+<v Leon Kuperman>across the board.
+
+97
+00:07:50.520 --> 00:07:54.580
+<v Leon Kuperman>And so a lot of the effort inside of these cloud
+
+98
+00:07:54.580 --> 00:07:57.340
+<v Leon Kuperman>organizations was, all right, all of our service teams,
+
+99
+00:07:58.940 --> 00:08:01.060
+<v Leon Kuperman>X million cores out in the universe,
+
+100
+00:08:01.440 --> 00:08:04.040
+<v Leon Kuperman>we want 30% of them back to give to customers.
+
+101
+00:08:04.220 --> 00:08:07.260
+<v Leon Kuperman>And that was again, a manual effort for most service teams.
+
+102
+00:08:07.540 --> 00:08:09.380
+<v Leon Kuperman>So I thought, okay, there has to be a better way.
+
+103
+00:08:09.600 --> 00:08:11.760
+<v Leon Kuperman>What if there was an autonomous system
+
+104
+00:08:11.760 --> 00:08:13.900
+<v Leon Kuperman>that automatically looked at your application,
+
+105
+00:08:14.280 --> 00:08:18.220
+<v Leon Kuperman>saw how it was deployed and reorganized that application
+
+106
+00:08:18.220 --> 00:08:20.040
+<v Leon Kuperman>to the best possible compute,
+
+107
+00:08:20.540 --> 00:08:23.200
+<v Leon Kuperman>and then just did the migration for you
+
+108
+00:08:23.200 --> 00:08:24.760
+<v Leon Kuperman>and then kept it up to date
+
+109
+00:08:25.080 --> 00:08:27.240
+<v Leon Kuperman>and fully optimized at all times.
+
+110
+00:08:29.420 --> 00:08:37.500
+<v Noah Labhart>Well, let's dive into the MVP. Tell me about that first product you built, how long it took to build, and what sort of tools you used to bring it to life.
+
+111
+00:08:39.160 --> 00:08:44.580
+<v Leon Kuperman>We started with the data science projects. We started by early analyzing cloud economics.
+
+112
+00:08:44.900 --> 00:08:50.680
+<v Leon Kuperman>So what are all of the computers that exist in the universe in the cloud world? How much do they cost?
+
+113
+00:08:50.680 --> 00:08:56.280
+<v Leon Kuperman>Is there a way of normalizing those costs so we can tell how much does a MIP cost?
+
+114
+00:08:56.640 --> 00:09:00.580
+<v Leon Kuperman>Million instructions per second cost across the clouds. Are they comparable?
+
+115
+00:09:01.220 --> 00:09:06.380
+<v Leon Kuperman>So we started with a massive benchmarking exercise and we basically ordered every single instance.
+
+116
+00:09:06.580 --> 00:09:17.020
+<v Leon Kuperman>We boiled all of that data into a set of benchmarks as well as some cluster analysis to determine in an ideal world what would be the best set of shapes that you would want to use.
+
+117
+00:09:17.680 --> 00:09:23.040
+<v Leon Kuperman>In our MVP, we really focused on a pretty narrow use case.
+
+118
+00:09:23.140 --> 00:09:24.760
+<v Leon Kuperman>So we had a couple of MVPs.
+
+119
+00:09:24.960 --> 00:09:28.520
+<v Leon Kuperman>The first one, we said, okay, to do everything we want to do,
+
+120
+00:09:28.720 --> 00:09:31.740
+<v Leon Kuperman>we are going to need to build a Kubernetes distribution
+
+121
+00:09:31.740 --> 00:09:33.860
+<v Leon Kuperman>that's going to allow us to optimize
+
+122
+00:09:33.860 --> 00:09:37.020
+<v Leon Kuperman>because we want to have control over the API service,
+
+123
+00:09:37.100 --> 00:09:38.220
+<v Leon Kuperman>the control plane itself.
+
+124
+00:09:38.620 --> 00:09:41.320
+<v Leon Kuperman>And so we built a cast version of Kubernetes.
+
+125
+00:09:41.540 --> 00:09:43.700
+<v Leon Kuperman>And that also had the added benefit
+
+126
+00:09:43.700 --> 00:09:48.220
+<v Leon Kuperman>that we could think about multi-cloud distribution at the same time.
+
+127
+00:09:48.380 --> 00:09:52.240
+<v Leon Kuperman>So our first MVP was actually a multi-cloud Kubernetes.
+
+128
+00:09:52.520 --> 00:09:57.340
+<v Leon Kuperman>It works amazing for HA and disaster recovery use cases
+
+129
+00:09:57.340 --> 00:09:59.760
+<v Leon Kuperman>where you don't want to be dependent on a single cloud.
+
+130
+00:09:59.860 --> 00:10:01.800
+<v Leon Kuperman>So you get the cost optimization benefits,
+
+131
+00:10:01.980 --> 00:10:07.660
+<v Leon Kuperman>but you also get this kind of ability to distribute workloads across clouds seamlessly
+
+132
+00:10:07.660 --> 00:10:10.200
+<v Leon Kuperman>as one logical Kubernetes cluster.
+
+133
+00:10:11.600 --> 00:10:39.100
+<v Noah Labhart>So let's dig into the process a little bit. So tell me about, you know, with any MVP, right, you've got to make certain decisions and trade offs about how you shape that MVP, right? And maybe it was around those first set of customers you were onboarding and things. And you kind of you kind of touched on it with your explanation. But tell me about some of those decisions and trade offs you had to make in the beginning around maybe feature cut or technical debt or anything like that, and how you coped with them.
+
+134
+00:10:41.180 --> 00:10:48.620
+<v Leon Kuperman>So remember, I'm coming from a kind of an enterprisey world where I've already have services at scale.
+
+135
+00:10:48.800 --> 00:10:53.320
+<v Leon Kuperman>And I have this all this operational pain in the back of my mind.
+
+136
+00:10:53.380 --> 00:10:59.600
+<v Leon Kuperman>Like, so if we don't build these services robustly, what is the technical debt load that we're going to have six months from now?
+
+137
+00:10:59.700 --> 00:11:03.420
+<v Leon Kuperman>And I didn't want to go there. I just wanted to start with a very clean slate.
+
+138
+00:11:03.420 --> 00:11:10.440
+<v Leon Kuperman>late. So even as a very early engineering team of only five or six people, we started with some
+
+139
+00:11:10.440 --> 00:11:16.800
+<v Leon Kuperman>pretty robust processes. So before we had customers, we were doing outage five whys analysis.
+
+140
+00:11:17.060 --> 00:11:21.640
+<v Leon Kuperman>So when our first microservices went live, we started doing postmortems like, okay, we don't
+
+141
+00:11:21.640 --> 00:11:25.960
+<v Leon Kuperman>have any customers right now. There were no customers impacted, but let's get to the root
+
+142
+00:11:25.960 --> 00:11:31.540
+<v Leon Kuperman>cause and figure out how do we make sure that we build services that are robust enough. And this is
+
+143
+00:11:33.420 --> 00:11:38.460
+<v Leon Kuperman>cause analysis process. So it's not about pointing fingers, it's about saying, all right, how can we
+
+144
+00:11:38.460 --> 00:11:42.680
+<v Leon Kuperman>collectively improve our process so that we have enough time to pay technical debt, we have enough
+
+145
+00:11:42.680 --> 00:11:47.840
+<v Leon Kuperman>test coverage, we have enough feature build at the same time, we're continuously improving. So
+
+146
+00:11:47.840 --> 00:11:52.800
+<v Leon Kuperman>here are some of the things that we did intrinsically at the almost at the base level
+
+147
+00:11:52.800 --> 00:12:00.040
+<v Leon Kuperman>to kind of ensure that operational stability. Heavily invested in a CI-CD pipeline. So we
+
+148
+00:12:00.040 --> 00:12:04.020
+<v Leon Kuperman>We started with kind of GitLab, and then we eventually introduced Argo CD.
+
+149
+00:12:04.520 --> 00:12:08.160
+<v Leon Kuperman>So we have a pipeline that works really well right now.
+
+150
+00:12:08.360 --> 00:12:13.400
+<v Leon Kuperman>And kind of a testament to that is, you know how a lot of engineering teams say, oh, we have continuous delivery.
+
+151
+00:12:14.020 --> 00:12:18.700
+<v Leon Kuperman>Cool. Until you actually look under the covers, it's not really continuous delivery.
+
+152
+00:12:19.140 --> 00:12:26.320
+<v Leon Kuperman>I'm proud of the fact that our team can deliver 10, 15, I think today we had something like 30 changes delivered to production automatically.
+
+153
+00:12:26.320 --> 00:12:31.580
+<v Leon Kuperman>automatically. So that's kind of one major tenet is there are no staging environments,
+
+154
+00:12:31.960 --> 00:12:36.200
+<v Leon Kuperman>there's a dev environment, and there's a production environment. And everything in
+
+155
+00:12:36.200 --> 00:12:41.680
+<v Leon Kuperman>between is just pipeline. The second kind of core principle that we have is any new engineer that we
+
+156
+00:12:41.680 --> 00:12:47.140
+<v Leon Kuperman>onboarded had to commit code in their first day. So you join cast on Monday, Monday afternoon,
+
+157
+00:12:47.300 --> 00:12:52.180
+<v Leon Kuperman>you're ready to head home, you have a commit, and it goes to production. I love that.
+
+158
+00:12:52.180 --> 00:12:58.320
+<v Leon Kuperman>We just onboarded an engineer two days ago, two actually, and we asked them about their onboarding experience.
+
+159
+00:12:58.660 --> 00:13:10.100
+<v Leon Kuperman>They're like, we've never worked at a place where we were actually able to, never mind getting an email address on a laptop, we were able to actually affect a customer-facing feature on day one or two.
+
+160
+00:13:10.300 --> 00:13:11.920
+<v Leon Kuperman>So I'm really proud of that fact.
+
+161
+00:13:13.040 --> 00:13:18.780
+<v Leon Kuperman>The other major piece or the underpinning, we don't have a QA team and we don't have a DevOps team.
+
+162
+00:13:18.920 --> 00:13:19.860
+<v Leon Kuperman>There's just engineers.
+
+163
+00:13:19.860 --> 00:13:24.740
+<v Leon Kuperman>engineers. You write your code, design your code, you test your code, you deploy your code,
+
+164
+00:13:24.900 --> 00:13:29.800
+<v Leon Kuperman>fix the tooling if you need to fix it. And by the way, everyone takes an on-call rotation. So
+
+165
+00:13:30.240 --> 00:13:34.640
+<v Leon Kuperman>once a month, once every six weeks, you're going to be on call for a week or two.
+
+166
+00:13:34.920 --> 00:13:41.200
+<v Leon Kuperman>That's a 24-7 operation. So there's a high incentive to generate quality code and not
+
+167
+00:13:41.200 --> 00:13:45.680
+<v Leon Kuperman>to take any shortcuts. Because guess what's going to bite you in the butt six weeks from now or four
+
+168
+00:13:45.680 --> 00:13:49.320
+<v Leon Kuperman>weeks from now when you go on call is that crappy code that you might have written two weeks ago.
+
+169
+00:13:50.580 --> 00:13:52.780
+<v Leon Kuperman>So everything is an automated test.
+
+170
+00:13:53.260 --> 00:13:55.280
+<v Leon Kuperman>Some of these things are end-to-end tests,
+
+171
+00:13:55.460 --> 00:13:57.020
+<v Leon Kuperman>which are more elaborate.
+
+172
+00:13:57.260 --> 00:13:59.860
+<v Leon Kuperman>And then we use those end-to-end tests in two places.
+
+173
+00:14:00.100 --> 00:14:02.120
+<v Leon Kuperman>The first place is in the pipeline itself.
+
+174
+00:14:02.240 --> 00:14:03.460
+<v Leon Kuperman>So the deployment pipeline
+
+175
+00:14:04.020 --> 00:14:05.980
+<v Leon Kuperman>runs all of the tooling and testing,
+
+176
+00:14:06.120 --> 00:14:08.420
+<v Leon Kuperman>but then we also run these canary tests.
+
+177
+00:14:08.640 --> 00:14:10.660
+<v Leon Kuperman>Every five minutes in production,
+
+178
+00:14:10.840 --> 00:14:12.880
+<v Leon Kuperman>a full cycle will get executed.
+
+179
+00:14:13.400 --> 00:14:15.780
+<v Leon Kuperman>In the case of a cast feature set,
+
+180
+00:14:15.880 --> 00:14:18.800
+<v Leon Kuperman>it would be a Kubernetes cluster gets created on Amazon.
+
+181
+00:14:19.860 --> 00:14:25.380
+<v Leon Kuperman>installed, statistics are gathered, onboarding is created, and then optimization occurs, and then we
+
+182
+00:14:25.380 --> 00:14:31.540
+<v Leon Kuperman>shut it all down. We do it again a few minutes later. The strict discipline in operational focus
+
+183
+00:14:31.540 --> 00:14:36.720
+<v Leon Kuperman>is extremely important, and that's what led to these engineering practices. And then for operations
+
+184
+00:14:36.720 --> 00:14:41.600
+<v Leon Kuperman>to be effective, you need tooling. So you need the basic things like PagerDuty, or we use OpsGenie,
+
+185
+00:14:41.700 --> 00:14:48.240
+<v Leon Kuperman>but you also need a very strong observability pipeline. So we use tools like Loki and Grafana
+
+186
+00:14:49.860 --> 00:14:57.100
+<v Leon Kuperman>tools as well. So we have a set of kind of cloud native observability tools we use. All of that
+
+187
+00:14:57.100 --> 00:15:02.720
+<v Leon Kuperman>makes it easy for engineers to troubleshoot issues because all of the tooling is readily
+
+188
+00:15:02.720 --> 00:15:04.320
+<v Leon Kuperman>available at their fingertips.
+
+189
+00:15:05.920 --> 00:15:10.400
+<v Noah Labhart>So from that point with your product, how did you progress it? How
+
+190
+00:15:10.400 --> 00:15:17.180
+<v Noah Labhart>did you mature it? And, you know, I'm looking to understand how you built your roadmap and how you
+
+191
+00:15:17.180 --> 00:15:20.800
+<v Noah Labhart>you decided, okay, this is the next most important thing to build in the product.
+
+192
+00:15:22.180 --> 00:15:27.740
+<v Leon Kuperman>One principle that you should know before I start, if you ask customers what they want,
+
+193
+00:15:27.900 --> 00:15:32.600
+<v Leon Kuperman>they will ask you for a better mousetrap. In other words, they only know what they know.
+
+194
+00:15:33.240 --> 00:15:39.140
+<v Leon Kuperman>They don't know what that leap is yet until they have it in their hands. We didn't start
+
+195
+00:15:39.140 --> 00:15:42.580
+<v Leon Kuperman>the product management process by going and interviewing a bunch of customers and saying,
+
+196
+00:15:42.580 --> 00:15:44.960
+<v Leon Kuperman>saying, okay, we think that cost is a problem.
+
+197
+00:15:45.180 --> 00:15:48.660
+<v Leon Kuperman>Tell us about all of the pain points you have in your existing cost tooling.
+
+198
+00:15:49.180 --> 00:15:52.140
+<v Leon Kuperman>There needed to be some kind of radical shift in thinking
+
+199
+00:15:52.140 --> 00:15:54.280
+<v Leon Kuperman>that would create a 10x benefit.
+
+200
+00:15:54.620 --> 00:15:58.460
+<v Leon Kuperman>And that takes a leap of faith that takes sometimes months to validate.
+
+201
+00:15:58.920 --> 00:15:59.420
+<v Leon Kuperman>Months.
+
+202
+00:15:59.400 --> 00:16:03.700
+<v Leon Kuperman>Because until you get to some MVP that has some 10x capability,
+
+203
+00:16:04.420 --> 00:16:05.880
+<v Leon Kuperman>everyone's going to tell you you're crazy.
+
+204
+00:16:06.040 --> 00:16:09.520
+<v Leon Kuperman>You're not on the right path until you actually prove out that value.
+
+205
+00:16:09.520 --> 00:16:14.600
+<v Leon Kuperman>Not building a better mousetrap was kind of the first underlying core principle.
+
+206
+00:16:14.800 --> 00:16:20.620
+<v Leon Kuperman>And we started the product management exercise with a very high level vision document.
+
+207
+00:16:20.960 --> 00:16:30.540
+<v Leon Kuperman>So rather than just starting to code, because that's expensive, we sat down and said, OK, in the fullness of time, what do we want the user journey to look like?
+
+208
+00:16:30.640 --> 00:16:34.020
+<v Leon Kuperman>So there's a great book. It's called Working Backwards.
+
+209
+00:16:34.020 --> 00:16:36.580
+<v Leon Kuperman>I forget the authors, but they're people who came from Amazon.
+
+210
+00:16:36.980 --> 00:16:39.620
+<v Leon Kuperman>And they really described the Amazonian process.
+
+211
+00:16:40.000 --> 00:16:44.560
+<v Leon Kuperman>And one of the things I will say about the Amazon team is they're fantastic writers.
+
+212
+00:16:44.840 --> 00:16:58.180
+<v Leon Kuperman>And so they work on this principle of we should be able to write a press release for the feature or the product that we're going to release and express the value of that product in basically a press release plus a frequently asked questions section.
+
+213
+00:16:58.980 --> 00:17:00.080
+<v Leon Kuperman>Forget about budgets.
+
+214
+00:17:00.180 --> 00:17:01.400
+<v Leon Kuperman>Forget about a number of engineers.
+
+215
+00:17:01.400 --> 00:17:06.040
+<v Leon Kuperman>engineers, this is the thing, the killer thing that we want to build. And in some detail,
+
+216
+00:17:06.500 --> 00:17:12.460
+<v Leon Kuperman>we describe the user journey and the experience. And then that is what we start breaking apart
+
+217
+00:17:12.460 --> 00:17:17.160
+<v Leon Kuperman>and saying, okay, we clearly can't do all of this. We cannot boil the ocean. We can't build this
+
+218
+00:17:17.160 --> 00:17:22.280
+<v Leon Kuperman>vision from day one. So what's the smallest part of this vision that we can extract out of that
+
+219
+00:17:22.280 --> 00:17:27.820
+<v Leon Kuperman>document to create value for our customer? And in the case of Cast, it was our autoscaler. So
+
+220
+00:17:27.820 --> 00:17:40.140
+<v Leon Kuperman>So we extracted out the auto-scaling feature and we said, look, if we could build an auto-scaler that actually took costs into account, that would be a first step to optimizing a customer's Kubernetes environment.
+
+221
+00:17:40.540 --> 00:17:43.760
+<v Leon Kuperman>And that's what we built and delivered to the market early on.
+
+222
+00:17:44.740 --> 00:17:46.140
+<v Leon Kuperman>But then you need to iterate.
+
+223
+00:17:46.340 --> 00:17:48.160
+<v Leon Kuperman>And this is where customer feedback starts.
+
+224
+00:17:48.160 --> 00:17:57.140
+<v Leon Kuperman>Once we have that minimal feature that we can actually take to a customer, we will go and pull from an audience of industry folks.
+
+225
+00:17:57.300 --> 00:18:03.280
+<v Leon Kuperman>Sometimes they're engineers, sometimes they're executives in technology, depending on where the feature set is targeted.
+
+226
+00:18:03.480 --> 00:18:11.040
+<v Leon Kuperman>Like, for example, for an autoscaler component, I really need a DevOps-focused engineer to test that piece out.
+
+227
+00:18:11.040 --> 00:18:22.740
+<v Leon Kuperman>But for a cost reporting module, something where I'm projecting forward cloud costs, I really need an executive that's thinking about financial controls or the CTO who is on the hook for the budget.
+
+228
+00:18:23.020 --> 00:18:30.940
+<v Leon Kuperman>So we do these user groups and our user experience team really try not to influence the engagement.
+
+229
+00:18:31.140 --> 00:18:38.500
+<v Leon Kuperman>We basically watch how that user interacts with the components of our product.
+
+230
+00:18:38.500 --> 00:18:41.240
+<v Leon Kuperman>product, we try not to lead the witness, so to speak.
+
+231
+00:18:41.660 --> 00:18:47.200
+<v Leon Kuperman>And then we gather data back and then everyone reviews that, including the engineers and
+
+232
+00:18:47.200 --> 00:18:48.200
+<v Leon Kuperman>the product management team.
+
+233
+00:18:48.280 --> 00:18:53.620
+<v Leon Kuperman>We actually spend a lot of time looking at the outcomes and there are kind of two immediate
+
+234
+00:18:54.180 --> 00:18:55.880
+<v Leon Kuperman>outcomes for those user sessions.
+
+235
+00:18:56.120 --> 00:19:00.500
+<v Leon Kuperman>The first outcome is, are we directionally in the right place?
+
+236
+00:19:00.740 --> 00:19:05.780
+<v Leon Kuperman>Because if we're rough directionally, if we're having a lot of friction and resistance, then
+
+237
+00:19:05.780 --> 00:19:06.680
+<v Leon Kuperman>we have to do something.
+
+238
+00:19:08.500 --> 00:19:13.260
+<v Leon Kuperman>might cause a pivot which it did in the case of cast which i can explain if that's interesting
+
+239
+00:19:13.900 --> 00:19:20.120
+<v Leon Kuperman>and then the sec and then the second um piece of feedback that we're getting is what are the things
+
+240
+00:19:20.120 --> 00:19:27.260
+<v Leon Kuperman>that we found intuitive but the user is absolutely finding confusing and those are easy usability
+
+241
+00:19:27.260 --> 00:19:32.920
+<v Leon Kuperman>fixes it's often just front end sometimes you don't even need a back-end feature to fix those
+
+242
+00:19:32.920 --> 00:19:39.860
+<v Leon Kuperman>usability glitches. So that process led to the pivot and I think I should maybe
+
+243
+00:19:39.860 --> 00:19:45.920
+<v Leon Kuperman>we should take a minute to describe that pivot. So when we started this vision
+
+244
+00:19:45.920 --> 00:19:51.740
+<v Leon Kuperman>like if you go back and you read that early document it said we believe the
+
+245
+00:19:51.740 --> 00:19:57.120
+<v Leon Kuperman>future of cloud computing is using multiple cloud vendors simultaneously
+
+246
+00:19:57.540 --> 00:20:02.800
+<v Leon Kuperman>to deliver an application so multi cloud kubernetes was our big vision and
+
+247
+00:20:02.920 --> 00:20:17.000
+<v Leon Kuperman>What we realized very early on is, and we talked to some very large customers, and the customer said, look, Leon, I love the components of your product that are helping me manage costs and reallocate resources.
+
+248
+00:20:18.060 --> 00:20:21.340
+<v Leon Kuperman>I don't need multi-cloud high availability.
+
+249
+00:20:21.780 --> 00:20:25.000
+<v Leon Kuperman>We're just starting our cloud journey and our Kubernetes journey.
+
+250
+00:20:25.240 --> 00:20:27.780
+<v Leon Kuperman>You're already talking about the next 10 years of evolution.
+
+251
+00:20:27.780 --> 00:20:49.000
+<v Leon Kuperman>I'm not there yet. And we found that most customers were not there yet for high availability use cases. Some were, but most were. And frankly, you're a startup. I don't trust you to run my Kubernetes control plane. I've already got an engagement with Amazon EKS or GKE in the case of Google or AKS in the case of Azure.
+
+252
+00:20:49.000 --> 00:20:51.280
+<v Leon Kuperman>Sure. So why don't you meet me there?
+
+253
+00:20:51.440 --> 00:20:55.740
+<v Leon Kuperman>Why don't you do all the magic that you want to do, but just do it inside of EKS?
+
+254
+00:20:56.120 --> 00:20:58.500
+<v Leon Kuperman>And then there's that first initial resistance.
+
+255
+00:20:58.700 --> 00:21:01.700
+<v Leon Kuperman>Well, we can't because of these technical limitations.
+
+256
+00:21:01.940 --> 00:21:04.280
+<v Leon Kuperman>But then your engineers are smart folks.
+
+257
+00:21:04.440 --> 00:21:05.240
+<v Leon Kuperman>They figure it out.
+
+258
+00:21:05.340 --> 00:21:10.780
+<v Leon Kuperman>We say, all right, how can we get this done in an environment that we don't fully control?
+
+259
+00:21:11.060 --> 00:21:14.180
+<v Leon Kuperman>And sure enough, the engineering solutions arise.
+
+260
+00:21:14.180 --> 00:21:20.720
+<v Leon Kuperman>rise. And that's how we led to our kind of first and probably the big pivot for the company was we
+
+261
+00:21:20.720 --> 00:21:24.780
+<v Leon Kuperman>said, all right, we're going to meet customers where they run Kubernetes. And we're going to
+
+262
+00:21:24.780 --> 00:21:30.500
+<v Leon Kuperman>start with Amazon because that's the largest cloud computing market. And we built our first
+
+263
+00:21:30.500 --> 00:21:38.400
+<v Leon Kuperman>EKS integration for all of our components. And we released it in the KubeCon Europe,
+
+264
+00:21:38.400 --> 00:21:41.280
+<v Leon Kuperman>Europe, which was in May of this year.
+
+265
+00:21:41.880 --> 00:21:47.880
+<v Leon Kuperman>And now in this KubeCon that's coming up, we have a bunch of really exciting announcements,
+
+266
+00:21:48.040 --> 00:21:53.160
+<v Leon Kuperman>including customers and product features that we're super stoked about.
+
+267
+00:21:53.740 --> 00:21:58.400
+<v Leon Kuperman>One of the interesting light bulbs that went off when we started kind of presenting the
+
+268
+00:21:58.400 --> 00:22:04.240
+<v Leon Kuperman>EKS product, so the Amazon Elastic Kubernetes Service product was, so how do we get folks
+
+269
+00:22:04.780 --> 00:22:09.600
+<v Leon Kuperman>onboarded and working with our product with almost no human interaction or zero
+
+270
+00:22:09.600 --> 00:22:14.400
+<v Leon Kuperman>human interaction and this is where kind of the savings estimator hook idea
+
+271
+00:22:14.400 --> 00:22:20.580
+<v Leon Kuperman>really crystallized so we created this one-line script that you can run that
+
+272
+00:22:20.580 --> 00:22:24.920
+<v Leon Kuperman>creates a read-only agent in your kubernetes environment and then reports
+
+273
+00:22:24.920 --> 00:22:29.060
+<v Leon Kuperman>back to you within a few seconds hey this is all of the waste that you have
+
+274
+00:22:29.060 --> 00:22:32.140
+<v Leon Kuperman>in your cluster and this is what we would do differently this is how we
+
+275
+00:22:32.140 --> 00:22:34.940
+<v Leon Kuperman>we would configure your infrastructure pool differently
+
+276
+00:22:35.300 --> 00:22:36.920
+<v Leon Kuperman>if we were running this automatically.
+
+277
+00:22:38.000 --> 00:22:40.340
+<v Leon Kuperman>And that hook was the eureka moment.
+
+278
+00:22:40.520 --> 00:22:42.220
+<v Leon Kuperman>And I highly recommend for anyone
+
+279
+00:22:42.220 --> 00:22:44.080
+<v Leon Kuperman>that's building a SaaS tool,
+
+280
+00:22:44.360 --> 00:22:46.340
+<v Leon Kuperman>you've got to have that early engagement
+
+281
+00:22:46.340 --> 00:22:48.840
+<v Leon Kuperman>that gives customers or prospects
+
+282
+00:22:48.840 --> 00:22:51.500
+<v Leon Kuperman>the sense of value super early.
+
+283
+00:22:52.040 --> 00:22:54.300
+<v Leon Kuperman>They can then dive into the detailed features.
+
+284
+00:22:54.520 --> 00:22:55.760
+<v Leon Kuperman>Okay, I get it.
+
+285
+00:22:55.840 --> 00:22:58.540
+<v Leon Kuperman>I'm going to save 50% on my cluster.
+
+286
+00:22:58.740 --> 00:22:59.560
+<v Leon Kuperman>I'm excited.
+
+287
+00:22:59.760 --> 00:23:00.740
+<v Leon Kuperman>How do I get started?
+
+288
+00:23:02.140 --> 00:23:07.920
+<v Leon Kuperman>to start the more complex set of interactions. But the first initial hook can't take very long
+
+289
+00:23:07.920 --> 00:23:11.600
+<v Leon Kuperman>and it has to provide immediate value to the consumer.
+
+290
+00:23:13.180 --> 00:23:13.680
+<v Noah Labhart>Well,
+
+291
+00:23:13.660 --> 00:23:17.400
+<v Noah Labhart>let's switch to team then. So how did you go about building your team? And you mentioned
+
+292
+00:23:17.400 --> 00:23:22.820
+<v Noah Labhart>that there's not been a product team, a QA team, it's primarily engineers. So how did you go about
+
+293
+00:23:22.820 --> 00:23:26.360
+<v Noah Labhart>building your team and what did you look for in those people to indicate that
+
+294
+00:23:26.360 --> 00:23:28.520
+<v Noah Labhart>they were the winning horses to join you?
+
+295
+00:23:29.200 --> 00:23:50.160
+<v Leon Kuperman>You know, you make so many mistakes in hiring. And I think the general rule is as entrepreneurs, as executives, we'll still continue to make hiring mistakes throughout the rest of our career. That's just a fact of where we are. But by this point, kind of 25 years later, I have an idea of the personality prototype.
+
+296
+00:23:50.160 --> 00:24:09.840
+<v Leon Kuperman>So we started with a very interesting premise. I said, OK, we can't afford to build this company in the United States. The salaries are too high. We didn't have endless budgets. So where are we going to build that team such that we can afford to at least get off the ground and then expand as we raise more capital?
+
+297
+00:24:09.840 --> 00:24:14.580
+<v Leon Kuperman>capital, we chose a country called Lithuania, which is a very unusual choice.
+
+298
+00:24:14.780 --> 00:24:18.920
+<v Leon Kuperman>I know that folks have engineering teams in India and China and Romania and Poland
+
+299
+00:24:18.920 --> 00:24:21.120
+<v Leon Kuperman>and many other different parts of the world.
+
+300
+00:24:21.200 --> 00:24:23.460
+<v Leon Kuperman>I think Italy is becoming an interesting
+
+301
+00:24:23.460 --> 00:24:26.860
+<v Leon Kuperman>hotspot, as well as many areas of the United States.
+
+302
+00:24:27.100 --> 00:24:30.120
+<v Leon Kuperman>But the truth is here in the US and Canada,
+
+303
+00:24:30.180 --> 00:24:33.720
+<v Leon Kuperman>we have a severe shortage of engineering talent.
+
+304
+00:24:34.000 --> 00:24:38.980
+<v Leon Kuperman>It's very hard to find those people and to keep them incentivized, especially when
+
+305
+00:24:39.840 --> 00:24:44.860
+<v Leon Kuperman>companies like Google and Microsoft and Amazon that you can work for as a top engineer.
+
+306
+00:24:45.160 --> 00:24:49.480
+<v Leon Kuperman>So we kind of had to compensate for that and we went outside of the country to do that.
+
+307
+00:24:50.660 --> 00:24:56.280
+<v Leon Kuperman>Once we kind of decided on our location, we made a very interesting technological choice.
+
+308
+00:24:56.420 --> 00:24:59.840
+<v Leon Kuperman>So Kubernetes is cloud native written in Golang.
+
+309
+00:25:00.000 --> 00:25:04.820
+<v Leon Kuperman>So we said, okay, we want to have engineers that are excited about Go.
+
+310
+00:25:05.020 --> 00:25:07.080
+<v Leon Kuperman>Maybe they haven't previously learned it,
+
+311
+00:25:07.080 --> 00:25:10.340
+<v Leon Kuperman>but they would have to be able to step up and learn very quickly.
+
+312
+00:25:11.080 --> 00:25:14.580
+<v Leon Kuperman>And it's not an object-oriented methodology.
+
+313
+00:25:14.640 --> 00:25:17.700
+<v Leon Kuperman>It's very different than scripting languages.
+
+314
+00:25:18.200 --> 00:25:22.300
+<v Leon Kuperman>That immediately kind of weeded out a whole section of folks
+
+315
+00:25:22.300 --> 00:25:27.300
+<v Leon Kuperman>that weren't interested in kind of going hardcore Go development.
+
+316
+00:25:27.820 --> 00:25:29.460
+<v Leon Kuperman>And it served two purposes.
+
+317
+00:25:29.660 --> 00:25:33.980
+<v Leon Kuperman>It kind of filtered out our potential pool of hires,
+
+318
+00:25:33.980 --> 00:25:41.280
+<v Leon Kuperman>but it also i know from previous experience that engineers working in go are very happy engineers
+
+319
+00:25:41.280 --> 00:25:47.140
+<v Leon Kuperman>so so because it's just a simpler more straightforward environment and there's a lot
+
+320
+00:25:47.140 --> 00:25:52.440
+<v Leon Kuperman>less crud and boilerplate so we kind of kill two birds with one stone in that decision
+
+321
+00:25:52.440 --> 00:26:01.320
+<v Leon Kuperman>and then the rest is we need the last ingredient to kind of an engineering personality is we need
+
+322
+00:26:01.320 --> 00:26:04.640
+<v Leon Kuperman>to have folks with an entrepreneurial spark in them.
+
+323
+00:26:04.760 --> 00:26:10.180
+<v Leon Kuperman>So I wasn't just interested in that engineer, maybe that's a few years out of school.
+
+324
+00:26:10.800 --> 00:26:15.660
+<v Leon Kuperman>I was interested in that engineer that wanted to take the red pill, if I want to use the
+
+325
+00:26:15.660 --> 00:26:17.760
+<v Leon Kuperman>matrix analogy for a second.
+
+326
+00:26:19.200 --> 00:26:25.660
+<v Leon Kuperman>I encourage people to have a vision, to want to start their own business, to want to start
+
+327
+00:26:25.660 --> 00:26:27.760
+<v Leon Kuperman>their own company in the future.
+
+328
+00:26:27.760 --> 00:26:33.420
+<v Leon Kuperman>and they may say well Leon I don't have all the skills that I need to do that and I'm great that's
+
+329
+00:26:33.420 --> 00:26:40.380
+<v Leon Kuperman>what I'm here for I'm here to show you the best path that I've learned learn from my mistakes
+
+330
+00:26:40.380 --> 00:26:46.980
+<v Leon Kuperman>learn from from our collective experience as founders and then eventually you will have what
+
+331
+00:26:46.980 --> 00:26:52.800
+<v Leon Kuperman>it takes to go off and create your own thing of beauty and so that's the mindset that I'm looking
+
+332
+00:26:52.800 --> 00:27:14.600
+<v Leon Kuperman>So it was a combination of kind of location for budget purposes and for competitiveness. It was a combination of technological choices that we made very early on in terms of the low level core skill sets. And then the third component was really the drive and personality to say, hey, I want to eventually be able to do this on my own.
+
+333
+00:27:17.300 --> 00:27:23.000
+<v Noah Labhart>the nature of your product is going to make this next question super interesting and i kind of know
+
+334
+00:27:23.000 --> 00:27:29.080
+<v Noah Labhart>where you're going to go but i'm going to ask it as generically as possible did you build this to
+
+335
+00:27:29.080 --> 00:27:32.600
+<v Noah Labhart>scale efficiently from day one or are you fighting this as you grow
+
+336
+00:27:32.600 --> 00:27:35.660
+<v Leon Kuperman>yeah i was super paranoid about
+
+337
+00:27:35.660 --> 00:27:42.360
+<v Leon Kuperman>building this to scale efficiently having said that we're entering a phase where
+
+338
+00:27:43.580 --> 00:27:47.780
+<v Leon Kuperman>where we're starting to do a lot of data analysis and the quantity of data.
+
+339
+00:27:47.980 --> 00:27:53.980
+<v Leon Kuperman>So like we take a snapshot per cluster every 15 seconds and that turns into a fully formed
+
+340
+00:27:54.520 --> 00:27:57.020
+<v Leon Kuperman>JSON blob that's a few megabytes in size.
+
+341
+00:27:57.160 --> 00:28:02.260
+<v Leon Kuperman>So now you multiply that by the number of customers, the number of clusters every 15
+
+342
+00:28:02.260 --> 00:28:05.220
+<v Leon Kuperman>seconds, that starts to get to be a lot of data.
+
+343
+00:28:05.440 --> 00:28:10.900
+<v Leon Kuperman>So we did have some interesting scale problems like, oh, our object storage costs are going
+
+344
+00:28:10.900 --> 00:28:11.580
+<v Leon Kuperman>through the roof.
+
+345
+00:28:12.360 --> 00:28:15.220
+<v Leon Kuperman>database costs are increasing on a daily basis.
+
+346
+00:28:15.440 --> 00:28:16.620
+<v Leon Kuperman>What are we doing here?
+
+347
+00:28:16.780 --> 00:28:19.200
+<v Leon Kuperman>I would say, yes, we're gonna have some kind
+
+348
+00:28:19.200 --> 00:28:20.920
+<v Leon Kuperman>of microservice scale issues,
+
+349
+00:28:21.620 --> 00:28:24.980
+<v Leon Kuperman>but I think by the nature of the early decisions we made
+
+350
+00:28:24.980 --> 00:28:28.480
+<v Leon Kuperman>and just the nature of Go's parallelism model,
+
+351
+00:28:29.240 --> 00:28:30.560
+<v Leon Kuperman>we're in pretty good shape.
+
+352
+00:28:30.720 --> 00:28:33.900
+<v Leon Kuperman>I think, and I was just talking to my engineering manager,
+
+353
+00:28:34.020 --> 00:28:35.820
+<v Leon Kuperman>like I think we've made some pretty good choices
+
+354
+00:28:36.420 --> 00:28:38.400
+<v Leon Kuperman>early on to help us facilitate.
+
+355
+00:28:38.700 --> 00:28:40.340
+<v Leon Kuperman>And the team has the right mindset
+
+356
+00:28:40.340 --> 00:28:43.300
+<v Leon Kuperman>set, because remember, they're going through all of the phases.
+
+357
+00:28:43.460 --> 00:28:45.640
+<v Leon Kuperman>They're not just designing and throwing over the fence.
+
+358
+00:28:45.800 --> 00:28:48.220
+<v Leon Kuperman>They're delivering it and supporting it in production.
+
+359
+00:28:48.980 --> 00:28:51.800
+<v Leon Kuperman>I think we're going to have other interesting scale challenges.
+
+360
+00:28:51.900 --> 00:28:57.440
+<v Leon Kuperman>Like one of our core tenets is to make a scaling decision every 15 seconds.
+
+361
+00:28:57.780 --> 00:29:01.140
+<v Leon Kuperman>Well, if we're going to keep that core tenet, we're going to need to have
+
+362
+00:29:01.640 --> 00:29:05.260
+<v Leon Kuperman>an interesting strategy for storage, storage costs, processing that
+
+363
+00:29:05.260 --> 00:29:06.320
+<v Leon Kuperman>data at scale and so forth.
+
+364
+00:29:07.480 --> 00:29:23.920
+<v Noah Labhart>I love it that you were paranoid, this is the word you used, about scale in the beginning, but you're approaching scale and having to think about scale, even in such a product that is built around scalability or scalable enterprise type systems.
+
+365
+00:29:24.060 --> 00:29:26.380
+<v Noah Labhart>So I think it's awesome and fascinating.
+
+366
+00:29:26.640 --> 00:29:31.100
+<v Leon Kuperman>And by the way, we had some interesting kind of scale issues in early days.
+
+367
+00:29:31.600 --> 00:29:33.100
+<v Leon Kuperman>I'll give you one example.
+
+368
+00:29:33.100 --> 00:29:43.960
+<v Leon Kuperman>So our autoscaler goes through all possible permutations of pod placements to potential nodes that we could order in the open market.
+
+369
+00:29:44.260 --> 00:29:52.140
+<v Leon Kuperman>If there's something like in the order of 10 or 15 pods to place in an open configuration on AWS,
+
+370
+00:29:52.600 --> 00:30:00.480
+<v Leon Kuperman>it's something like 10 to the 16th power possible permutations of computers that we could order to fulfill the capacity requirement.
+
+371
+00:30:00.480 --> 00:30:04.260
+<v Leon Kuperman>climate. Obviously, we can't go through every single permutation.
+
+372
+00:30:04.640 --> 00:30:13.800
+<v Leon Kuperman>So this is where some of the advanced data science and advanced algorithms come in, where we need to be able to very quickly predict and estimate the recommended configuration.
+
+373
+00:30:14.620 --> 00:30:16.880
+<v Leon Kuperman>And that turns out to be a pretty hard math problem.
+
+374
+00:30:17.160 --> 00:30:26.100
+<v Leon Kuperman>So there are interesting problems in scale that aren't necessarily just the typical problems, like, for example, you know, oh, it's Black Friday in a few weeks.
+
+375
+00:30:26.100 --> 00:30:30.420
+<v Leon Kuperman>How do we scale our shopping services to meet the demand of a million customers?
+
+376
+00:30:30.600 --> 00:30:31.700
+<v Leon Kuperman>Yeah, that's an interesting problem.
+
+377
+00:30:31.980 --> 00:30:35.680
+<v Leon Kuperman>Our problems are a little bit more nuanced at scale.
+
+378
+00:30:35.840 --> 00:30:41.160
+<v Leon Kuperman>How do we solve for a permutation problem of 10 to the 16th possible combinations?
+
+379
+00:30:43.560 --> 00:30:44.080
+<v Noah Labhart>Well,
+
+380
+00:30:44.100 --> 00:30:48.980
+<v Noah Labhart>as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+381
+00:30:50.540 --> 00:30:55.100
+<v Leon Kuperman>I'm most proud of the foundational team that we have.
+
+382
+00:30:56.100 --> 00:30:59.160
+<v Leon Kuperman>And I'm confident that they can build anything that comes at us.
+
+383
+00:30:59.460 --> 00:31:01.840
+<v Leon Kuperman>Like we could get the largest customer tomorrow.
+
+384
+00:31:02.020 --> 00:31:08.740
+<v Leon Kuperman>And as they increase in size, we would be able to tackle it both from an operational and maturity perspective,
+
+385
+00:31:08.880 --> 00:31:16.320
+<v Leon Kuperman>as well as we'll be able to deliver the features that customers really need as a Delta from what we have today.
+
+386
+00:31:16.420 --> 00:31:20.740
+<v Leon Kuperman>So like the foundation of growth and scale is there.
+
+387
+00:31:21.040 --> 00:31:23.320
+<v Leon Kuperman>And that's the thing that I'm most proud of.
+
+388
+00:31:23.320 --> 00:31:35.920
+<v Leon Kuperman>Do we have an absolutely perfect finished product? I don't think anybody does. But we have a path to get there and to continue to evolve. And the team is really the underpinning of that ability.
+
+389
+00:31:38.020 --> 00:31:44.160
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+390
+00:31:45.540 --> 00:31:49.640
+<v Leon Kuperman>let's talk about a run of a mill mistake and then i'll kind of give you a more epic mistake right so
+
+391
+00:31:49.640 --> 00:31:55.180
+<v Leon Kuperman>problems happen all the time right it's unrealistic to put up a gate that says
+
+392
+00:31:55.180 --> 00:32:02.200
+<v Leon Kuperman>we will never release a bug to production right we had one today we uncovered an old bug because
+
+393
+00:32:02.200 --> 00:32:07.800
+<v Leon Kuperman>of a brand new feature that we're delivering it manifested in production i'm okay with those
+
+394
+00:32:07.800 --> 00:32:14.400
+<v Leon Kuperman>mistakes if a couple of things are in place. One, the customer didn't tell us, we told the customer.
+
+395
+00:32:14.520 --> 00:32:21.020
+<v Leon Kuperman>That's really important. I don't want a customer saying, hey Leon, your stuff is down and you don't
+
+396
+00:32:21.020 --> 00:32:29.000
+<v Leon Kuperman>know. That's a huge problem for me. If we can go back and tell the customer, Mr. Customer, we have
+
+397
+00:32:29.000 --> 00:32:35.160
+<v Leon Kuperman>an API outage for five minutes from this time to this time, here's what the effect was, I'm okay
+
+398
+00:32:35.160 --> 00:32:41.120
+<v Leon Kuperman>with that. And the second thing is the ability to roll back. We have a rule that we have to be able
+
+399
+00:32:41.120 --> 00:32:47.220
+<v Leon Kuperman>to roll back any change within 30 minutes. A rollback procedure has to be available for every
+
+400
+00:32:47.220 --> 00:32:51.760
+<v Leon Kuperman>change that goes to production. And in this particular case, it was like 26 minutes from
+
+401
+00:32:51.760 --> 00:32:57.000
+<v Leon Kuperman>the time we deployed a change till the time we had an impact to the service, till the time when we're
+
+402
+00:32:57.000 --> 00:33:02.760
+<v Leon Kuperman>able to roll back. And under those two conditions, I'm okay with mistakes creeping into production,
+
+403
+00:33:02.760 --> 00:33:06.940
+<v Leon Kuperman>production, because if you're so paranoid about making a production error that you never
+
+404
+00:33:06.940 --> 00:33:08.860
+<v Leon Kuperman>release any code, it's a paradox.
+
+405
+00:33:09.040 --> 00:33:10.620
+<v Leon Kuperman>You actually make the problem a lot worse.
+
+406
+00:33:10.780 --> 00:33:15.180
+<v Leon Kuperman>A lot of people say, well, Leon, isn't it risky that you release 15 times a day to production?
+
+407
+00:33:15.340 --> 00:33:19.660
+<v Leon Kuperman>No, it's the opposite of risky because the change that's getting to production is so
+
+408
+00:33:19.660 --> 00:33:26.760
+<v Leon Kuperman>small and the rollback is so easy that the likely impact is exponentially diminished
+
+409
+00:33:27.340 --> 00:33:31.240
+<v Leon Kuperman>versus a team that will bunch up a bunch of changes and maybe release at the end of the
+
+410
+00:33:31.240 --> 00:33:31.740
+<v Leon Kuperman>week.
+
+411
+00:33:32.760 --> 00:33:39.960
+<v Leon Kuperman>lot pretty nervous about the 30 Jira tickets that make it into that batch. So I think from that
+
+412
+00:33:39.960 --> 00:33:46.080
+<v Leon Kuperman>perspective, the small mistakes, we make them all of the time, but we have good coping mechanisms
+
+413
+00:33:46.080 --> 00:33:52.680
+<v Leon Kuperman>and those two underpinning values are really important. The epic mistake, I think it's both
+
+414
+00:33:52.680 --> 00:33:59.800
+<v Leon Kuperman>a mistake and the reason for our pivot. Believing that the world was ready for multi-cloud way
+
+415
+00:33:59.800 --> 00:34:06.380
+<v Leon Kuperman>way before it was, is probably one of the big assumptions that we made and led to us building
+
+416
+00:34:06.380 --> 00:34:11.500
+<v Leon Kuperman>features that we could have spent our time building other things that would have added
+
+417
+00:34:11.500 --> 00:34:19.060
+<v Leon Kuperman>more customer value earlier on. In hindsight, probably a lot more customer research would
+
+418
+00:34:19.060 --> 00:34:27.740
+<v Leon Kuperman>have uncovered the product management direction more readily before we started writing a ton of
+
+419
+00:34:27.740 --> 00:34:28.380
+<v Leon Kuperman>of platform features.
+
+420
+00:34:28.520 --> 00:34:29.720
+<v Noah Labhart>It's interesting about mistakes.
+
+421
+00:34:29.800 --> 00:34:33.020
+<v Noah Labhart>And this is why I asked this question is that the learning from it is,
+
+422
+00:34:33.020 --> 00:34:36.300
+<v Noah Labhart>is shaping for your team, your company, your product.
+
+423
+00:34:36.440 --> 00:34:41.320
+<v Noah Labhart>And it really sets the tone for what is done next.
+
+424
+00:34:41.480 --> 00:34:46.760
+<v Leon Kuperman>If mistakes are not egregious and like not deliberate and there's a learning
+
+425
+00:34:46.760 --> 00:34:51.600
+<v Leon Kuperman>framework in place and we keep the analysis process blameless,
+
+426
+00:34:51.760 --> 00:34:53.940
+<v Leon Kuperman>your team can only improve as a result of that.
+
+427
+00:34:53.940 --> 00:34:54.720
+<v Leon Kuperman>it.
+
+428
+00:34:56.380 --> 00:35:01.080
+<v Noah Labhart>Well, what does the future look like for cast.ai, the product and for your team?
+
+429
+00:35:02.640 --> 00:35:08.460
+<v Leon Kuperman>So we have to, we kind of have a horizontal scale out of our product, meaning we have to support a
+
+430
+00:35:08.460 --> 00:35:12.540
+<v Leon Kuperman>bunch of more Kubernetes environments. So at KubeCon this year, we're going to be introducing
+
+431
+00:35:12.540 --> 00:35:20.280
+<v Leon Kuperman>Azure Kubernetes service, AKS, but we also have a bunch more to do. So like we have Rancher is a
+
+432
+00:35:20.280 --> 00:35:26.880
+<v Leon Kuperman>a big request. We have OpenShift because OpenShift customers pay twice. They pay for the infrastructure
+
+433
+00:35:26.880 --> 00:35:32.260
+<v Leon Kuperman>and then they pay for the OpenShift license. There's a lot of platforms that we have to enable
+
+434
+00:35:32.260 --> 00:35:39.500
+<v Leon Kuperman>as kind of one dimension of growth. But the other thing is we've been heavily focusing on cost and
+
+435
+00:35:39.500 --> 00:35:46.980
+<v Leon Kuperman>cost reporting. And we have two teams that are creating all of those features. But the platform
+
+436
+00:35:46.980 --> 00:35:51.640
+<v Leon Kuperman>itself is expanding in scope. So once you're onboarded to CAST, I hope in the
+
+437
+00:35:51.640 --> 00:35:54.920
+<v Leon Kuperman>future we will be able to help you with security assessment and storage
+
+438
+00:35:54.920 --> 00:36:00.900
+<v Leon Kuperman>assessment and basically help you manage your resources not just from a cost
+
+439
+00:36:00.900 --> 00:36:05.780
+<v Leon Kuperman>perspective but help you with compliance and security and storage and disaster
+
+440
+00:36:05.780 --> 00:36:10.920
+<v Leon Kuperman>recovery. So the plan to implement those capabilities again using kind of that
+
+441
+00:36:10.920 --> 00:36:15.660
+<v Leon Kuperman>fully autonomous principle is to create new sets of service team for every
+
+442
+00:36:17.080 --> 00:36:21.960
+<v Leon Kuperman>and have those teams kind of run as independent businesses almost within the platform.
+
+443
+00:36:23.640 --> 00:36:24.740
+<v Noah Labhart>Let's switch to you, Leon.
+
+444
+00:36:24.880 --> 00:36:26.780
+<v Noah Labhart>Who influences the way that you work?
+
+445
+00:36:26.920 --> 00:36:30.160
+<v Noah Labhart>A CTO, an architect, a CEO, really any person.
+
+446
+00:36:30.300 --> 00:36:32.240
+<v Noah Labhart>Name a person you look up to and why.
+
+447
+00:36:33.620 --> 00:36:34.980
+<v Leon Kuperman>So I look up to my dad.
+
+448
+00:36:35.800 --> 00:36:42.320
+<v Leon Kuperman>That was kind of a key, kind of two big role models in my life.
+
+449
+00:36:42.320 --> 00:37:01.320
+<v Leon Kuperman>But I look up to my dad because he built a business in North America and Canada specifically, like really starting from zero, coming to a place with all of the odds against them, language, education, culture, capital.
+
+450
+00:37:01.480 --> 00:37:02.900
+<v Leon Kuperman>He had none of those things.
+
+451
+00:37:03.200 --> 00:37:08.200
+<v Leon Kuperman>And he was able to scrap his way into with my brother.
+
+452
+00:37:08.200 --> 00:37:10.700
+<v Leon Kuperman>they built an extremely successful manufacturing business.
+
+453
+00:37:13.780 --> 00:37:17.160
+<v Leon Kuperman>Up until last year, he was still working at 83.
+
+454
+00:37:17.900 --> 00:37:26.220
+<v Leon Kuperman>So the work ethic and the tenacity to achieve against all odds
+
+455
+00:37:26.220 --> 00:37:32.220
+<v Leon Kuperman>is something that I'll forever be thankful for him instilling in that me
+
+456
+00:37:32.220 --> 00:37:35.520
+<v Leon Kuperman>and that I still greatly admire to this day.
+
+457
+00:37:35.520 --> 00:37:41.160
+<v Leon Kuperman>And that goes for my mom and my dad because they were really business partners in the venture together.
+
+458
+00:37:42.540 --> 00:37:52.240
+<v Leon Kuperman>And then from an entrepreneurship technology perspective, I like to consume a lot of information about kind of thought leaders in our space.
+
+459
+00:37:53.080 --> 00:38:04.620
+<v Leon Kuperman>But Peter Thiel is probably the most interesting entrepreneur that I've been kind of like studying in the last decade.
+
+460
+00:38:05.520 --> 00:38:13.820
+<v Leon Kuperman>Elon Musk is someone who is really inspiring in that unlike the conventional wisdom that says,
+
+461
+00:38:13.960 --> 00:38:19.680
+<v Leon Kuperman>hey, you must focus on one thing and do it really well. Focus is the path to kind of success.
+
+462
+00:38:20.040 --> 00:38:27.240
+<v Leon Kuperman>Elon is able to have brilliant ideas in multiple areas by just using first principle thinking and
+
+463
+00:38:27.240 --> 00:38:33.560
+<v Leon Kuperman>then also surrounding himself with great people for each one of those pools of ideas. So he's
+
+464
+00:38:36.000 --> 00:38:41.000
+<v Leon Kuperman>momentum. But then by just asking first principles questions, like the Tesla battery is a great
+
+465
+00:38:41.000 --> 00:38:45.100
+<v Leon Kuperman>example of why can't we make this battery cheaper? The industry has a whole lot of answers.
+
+466
+00:38:45.560 --> 00:38:50.680
+<v Leon Kuperman>But then if you just keep asking why, eventually you get to, well, it's always been done this way
+
+467
+00:38:50.680 --> 00:38:57.800
+<v Leon Kuperman>and it can be changed. So those are kind of the two extremes of my role model influences in life.
+
+468
+00:38:58.820 --> 00:39:03.060
+<v Noah Labhart>Well, we talked about a mistake, but a little bit different spin. If you could go back to the
+
+469
+00:39:03.060 --> 00:39:06.960
+<v Noah Labhart>the beginning, what would you do differently? Or where would you consider taking a different
+
+470
+00:39:06.960 --> 00:39:07.460
+<v Noah Labhart>approach?
+
+471
+00:39:08.060 --> 00:39:14.700
+<v Leon Kuperman>You know, all of those, I think this is what we talked about early on. When I look back
+
+472
+00:39:14.700 --> 00:39:22.840
+<v Leon Kuperman>at the first company we founded and all the mistakes we've made, I'm like, I kind of close my
+
+473
+00:39:22.840 --> 00:39:28.800
+<v Leon Kuperman>eyes, cover my eyes with my hands. Like, how did anyone ever invest money in that 22 year old?
+
+474
+00:39:28.800 --> 00:39:30.960
+<v Leon Kuperman>but I wouldn't have done
+
+475
+00:39:30.960 --> 00:39:33.220
+<v Leon Kuperman>even though there were some extremely difficult times
+
+476
+00:39:33.220 --> 00:39:35.500
+<v Leon Kuperman>and things were really bleak
+
+477
+00:39:35.500 --> 00:39:37.280
+<v Leon Kuperman>they all built
+
+478
+00:39:37.280 --> 00:39:39.000
+<v Leon Kuperman>on one another so even though
+
+479
+00:39:39.000 --> 00:39:41.380
+<v Leon Kuperman>like oh maybe I shouldn't have joined that company
+
+480
+00:39:41.380 --> 00:39:43.520
+<v Leon Kuperman>because I was miserable for a year
+
+481
+00:39:43.520 --> 00:39:44.980
+<v Leon Kuperman>if I hadn't done that
+
+482
+00:39:44.980 --> 00:39:47.260
+<v Leon Kuperman>I wouldn't have experienced that DDoS
+
+483
+00:39:47.260 --> 00:39:48.540
+<v Leon Kuperman>attack that I
+
+484
+00:39:48.540 --> 00:39:51.380
+<v Leon Kuperman>just as an example and as a result
+
+485
+00:39:51.380 --> 00:39:53.340
+<v Leon Kuperman>I would have never become interested in
+
+486
+00:39:53.340 --> 00:39:55.080
+<v Leon Kuperman>the lack of cyber security
+
+487
+00:39:55.080 --> 00:39:56.700
+<v Leon Kuperman>capabilities we have in the world
+
+488
+00:39:56.700 --> 00:40:00.480
+<v Leon Kuperman>So then that would have not lent me to the next startup.
+
+489
+00:40:01.140 --> 00:40:04.160
+<v Leon Kuperman>I think that all of these things happen for a reason.
+
+490
+00:40:04.480 --> 00:40:10.580
+<v Leon Kuperman>And even though some of these things are super painful in the moment and you're like, why would I ever want to live through this?
+
+491
+00:40:10.660 --> 00:40:16.300
+<v Leon Kuperman>Those pains are almost necessary to shape your view of how the world should look like.
+
+492
+00:40:16.720 --> 00:40:22.380
+<v Leon Kuperman>I wouldn't change anything, even though a lot of those things were super painful and not pleasant in the moment.
+
+493
+00:40:24.560 --> 00:40:25.760
+<v Noah Labhart>Well, last question, Leon.
+
+494
+00:40:26.700 --> 00:40:30.880
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+495
+00:40:31.020 --> 00:40:32.060
+<v Noah Labhart>They're jazzed about it.
+
+496
+00:40:32.080 --> 00:40:33.500
+<v Noah Labhart>They can't wait to show it off to the world.
+
+497
+00:40:33.540 --> 00:40:35.360
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+498
+00:40:35.760 --> 00:40:38.860
+<v Noah Labhart>What advice do you give this person having gone down this road a bit?
+
+499
+00:40:39.700 --> 00:40:45.120
+<v Leon Kuperman>You know, when I first started in entrepreneurship and in startup life, you could have a great idea.
+
+500
+00:40:45.160 --> 00:40:53.700
+<v Leon Kuperman>You could execute and build a great product only to find yourself with very little of your company left at the end of that flow because of dilution.
+
+501
+00:40:53.700 --> 00:40:59.460
+<v Leon Kuperman>right like you take on money and you're burning fast because your investors are asking you to
+
+502
+00:40:59.460 --> 00:41:05.720
+<v Leon Kuperman>grow quickly and then you have to take more money on and dilute yourself again and then at the end
+
+503
+00:41:05.720 --> 00:41:11.780
+<v Leon Kuperman>of that whole process you've put you know like what seems like your life's work into a project
+
+504
+00:41:11.780 --> 00:41:18.300
+<v Leon Kuperman>and you're super proud of it and you actually may not end up with the control or the financial
+
+505
+00:41:18.300 --> 00:41:26.460
+<v Leon Kuperman>component at the end of that journey. So the advice that I would give folks is be super frugal
+
+506
+00:41:26.460 --> 00:41:32.000
+<v Leon Kuperman>at the beginning. Don't take money if you don't have to. That means there's a bit of a sacrifice
+
+507
+00:41:32.000 --> 00:41:37.800
+<v Leon Kuperman>in the short term. So the great thing is like 20 years ago, you have to build data centers and
+
+508
+00:41:37.800 --> 00:41:43.280
+<v Leon Kuperman>invest in infrastructure and do all of these things that are just tangential to your actual
+
+509
+00:41:43.280 --> 00:41:49.020
+<v Leon Kuperman>product idea for software as a service, for example. These days with the fungible resources
+
+510
+00:41:49.020 --> 00:41:56.220
+<v Leon Kuperman>we have available to us, you can actually spend very little and get to an MVP. Even if that MVP
+
+511
+00:41:56.220 --> 00:42:03.360
+<v Leon Kuperman>doesn't scale, even especially if this is your first rodeo, you can fix all of that, but get to
+
+512
+00:42:03.360 --> 00:42:10.380
+<v Leon Kuperman>something that has customer value with the least amount of dilution to yourself possible. And then
+
+513
+00:42:10.380 --> 00:42:15.260
+<v Leon Kuperman>when you're ready to scale and you have what's called product market fit then you can take a
+
+514
+00:42:15.260 --> 00:42:19.140
+<v Leon Kuperman>whole bunch of money on and then you can grow quickly but you can do it in a controlled way
+
+515
+00:42:20.200 --> 00:42:25.920
+<v Leon Kuperman>where dilution doesn't put you in a spot at the end of the journey where you you don't have as
+
+516
+00:42:25.920 --> 00:42:30.320
+<v Leon Kuperman>much of the company or as much control of the company as you probably would have dreamed of
+
+517
+00:42:30.320 --> 00:42:37.780
+<v Leon Kuperman>at the beginning so that's kind of the the the one piece of advice and in this day and age especially
+
+518
+00:42:37.780 --> 00:42:39.560
+<v Leon Kuperman>especially with software as a service companies,
+
+519
+00:42:39.880 --> 00:42:44.220
+<v Leon Kuperman>there are so many creative financing options that you don't have to go the
+
+520
+00:42:44.220 --> 00:42:49.120
+<v Leon Kuperman>traditional VC route of seed and series A and series B and get diluted four or five
+
+521
+00:42:49.120 --> 00:42:54.780
+<v Leon Kuperman>times. For example, you can do things like accounts receivable financing.
+
+522
+00:42:55.040 --> 00:42:59.060
+<v Leon Kuperman>So if you have an ARR annual recurring revenue book of business,
+
+523
+00:42:59.280 --> 00:43:03.340
+<v Leon Kuperman>you can actually go and get debt financing against that book
+
+524
+00:43:03.340 --> 00:43:07.200
+<v Leon Kuperman>of business before having to take on more equity dilution.
+
+525
+00:43:07.460 --> 00:43:13.960
+<v Leon Kuperman>That would be the thing that I tell folks early on is start frugal and don't dilute
+
+526
+00:43:13.960 --> 00:43:15.240
+<v Leon Kuperman>yourself until you really have to.
+
+527
+00:43:16.120 --> 00:43:17.100
+<v Noah Labhart>That's great advice.
+
+528
+00:43:17.400 --> 00:43:19.440
+<v Noah Labhart>Well, Leon, thank you for being on the show today.
+
+529
+00:43:19.540 --> 00:43:22.520
+<v Noah Labhart>Thank you for telling the creation story of cast.ai.
+
+530
+00:43:23.340 --> 00:43:24.020
+<v Leon Kuperman>Thank you.
+
+531
+00:43:24.020 --> 00:43:25.100
+<v Leon Kuperman>No, it was great talking to you.
+
+532
+00:43:25.100 --> 00:43:26.320
+<v Leon Kuperman>Thanks for the deep questions.
+
+533
+00:43:28.380 --> 00:43:31.300
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+534
+00:43:33.520 --> 00:43:36.540
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+535
+00:43:36.660 --> 00:43:41.460
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+536
+00:43:41.840 --> 00:43:46.940
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+537
+00:43:47.300 --> 00:43:49.520
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+538
+00:43:49.800 --> 00:43:51.840
+<v Noah Labhart>Both things help us out tremendously.
+
+539
+00:43:54.120 --> 00:43:55.620
+<v Noah Labhart>And thanks again for listening.

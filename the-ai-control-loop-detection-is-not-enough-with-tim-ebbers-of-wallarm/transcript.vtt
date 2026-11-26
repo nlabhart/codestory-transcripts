@@ -1,0 +1,519 @@
+WEBVTT
+
+NOTE The AI Control Loop: Detection is not Enough - with Tim Ebbers of Wallarm
+
+1
+00:00:01.360 --> 00:00:12.660
+<v Noah Labhart>Hello listeners. Today we are dropping another episode in our series, The AI Control Loop. How enterprises govern the AI they've already deployed. Sponsored by our friends at Wallarm.
+
+2
+00:00:13.700 --> 00:00:26.580
+<v Noah Labhart>Wallarm is the AI control platform for enterprise AI, protecting every AI workload, API, and application in production. Giving CISOs the governance they need and CIOs the speed they demand.
+
+3
+00:00:26.580 --> 00:00:38.760
+<v Noah Labhart>And organizations choose Wallarm for a complete inventory of APIs, AI agents, and AI apps using patented AI ML-based threat detection and blocking that operates at production speeds.
+
+4
+00:00:39.560 --> 00:00:57.400
+<v Noah Labhart>In his follow-up appearance on the Code Story podcast, Tim Ebbers, field CTO at Wallarm, discusses why detection alone is insufficient for AI-driven systems, what real enforcement looks like at the runtime level, and what accountability becomes possible once all four stages are in place.
+
+5
+00:01:00.040 --> 00:01:06.380
+<v Noah Labhart>Tim, welcome back to the show. Excited to have you back on a follow-up episode on Code Story. Thanks again for being on the show.
+
+6
+00:01:06.380 --> 00:01:06.880
+<v Tim Ebbers>I
+
+7
+00:01:06.840 --> 00:01:09.960
+<v Tim Ebbers>appreciate being here. It was fun last time and looking for more fun this time.
+
+8
+00:01:10.320 --> 00:01:14.940
+<v Noah Labhart>Absolutely. We're going to have a ball. So today's episode is entitled Detection
+
+9
+00:01:14.940 --> 00:01:20.100
+<v Noah Labhart>is Not Enough. And we're going to talk about how detection alone is insufficient for AI-driven
+
+10
+00:01:20.100 --> 00:01:25.500
+<v Noah Labhart>systems. And jumping right into it, security teams are used to detecting incidents and responding
+
+11
+00:01:25.500 --> 00:01:30.080
+<v Noah Labhart>after the fact. Why is that model insufficient for AI-driven systems?
+
+12
+00:01:30.080 --> 00:01:30.640
+<v Tim Ebbers>I
+
+13
+00:01:30.640 --> 00:01:49.640
+<v Tim Ebbers>think as you look at how fast AI is developing, not only on the bad actor side, but also on the code side, we're putting out a whole lot more code. And AI can, on the bad actor side, can go through that, those endpoints so much faster than they can today when it was all human done.
+
+14
+00:01:49.640 --> 00:02:09.280
+<v Tim Ebbers>Sure, we had automation before and they could have lots of IPs hitting an endpoint. But really, when you look at the detection, then response model, it was designed for human speed incidents. And with AI, it's just so different. People exfiltrating data used to take hours and now it's seconds.
+
+15
+00:02:09.880 --> 00:02:28.460
+<v Tim Ebbers>And when you look at the way that we used to do enforcement, it was fire alert, send off some logs, and then go look to see what's going on. And by that time, the data is already gone. So detection tells you what happened, but it doesn't really change what happened. For AI systems, that's not a tolerable gap.
+
+16
+00:02:28.460 --> 00:02:28.960
+<v Noah Labhart>Yeah,
+
+17
+00:02:29.040 --> 00:02:47.740
+<v Noah Labhart>that makes sense. And I think it feels familiar with the speed that AI is moving. And you described the older process of responding for security teams. What does their enforcement usually mean today? And why can actions like restarting pods or rotating credentials, things like that, come too late?
+
+18
+00:02:47.740 --> 00:02:48.260
+<v Tim Ebbers>So
+
+19
+00:02:48.260 --> 00:03:14.820
+<v Tim Ebbers>there's a lot of enforcement that's done at the perimeter. And that's really where we spent a lot of time is defense in depth at the perimeter, really block at the firewall, rotate keys, maybe kill a pod. Those responses are usually for things that have already occurred. So a pod restart takes time, but that data may already be gone. That credential rotation requires propagation.
+
+20
+00:03:14.820 --> 00:03:40.180
+<v Tim Ebbers>In the meantime, the AI agent is still being compromised or is misbehaving and can invoke a production workflow. So exfiltrating session context and violating compliance boundaries happen in real time or in runtime versus after the fact. And you have to be able to enforce that at the point that it happens, not after the fact, because then you're just doing cleanup and not enforcement.
+
+21
+00:03:40.180 --> 00:03:40.940
+<v Noah Labhart>So
+
+22
+00:03:40.940 --> 00:03:59.780
+<v Noah Labhart>that seems clear. And answer for your first two questions, really create this picture of a gap between incident and then response in the traditional way. And I could probably cherry pick or kind of hypothesize from what you've said so far, but why does AI behavior require controls that operate closer to that runtime?
+
+23
+00:03:59.780 --> 00:04:00.280
+<v Noah Labhart>time.
+
+24
+00:04:00.040 --> 00:04:06.140
+<v Tim Ebbers>Because they don't operate the same. So traditional software runs very differently than
+
+25
+00:04:06.140 --> 00:04:13.000
+<v Tim Ebbers>an AI agent who's making decisions in real time. Whereas the old APIs and the old traditional
+
+26
+00:04:13.000 --> 00:04:17.580
+<v Tim Ebbers>software, there wasn't really decisions being made and tools going and being used based on
+
+27
+00:04:17.580 --> 00:04:23.000
+<v Tim Ebbers>inferences that are coming in. It's really more deterministic. And really, in an AI agent,
+
+28
+00:04:23.200 --> 00:04:29.000
+<v Tim Ebbers>they're dynamic. And then the tools that they call and the data that they pass and the services that
+
+29
+00:04:29.780 --> 00:04:35.360
+<v Tim Ebbers>all done at runtime and all done based on model outputs. So you can't really enumerate that
+
+30
+00:04:35.360 --> 00:04:41.140
+<v Tim Ebbers>behavior in a static policy written before the deployment. It has to be watching in runtime
+
+31
+00:04:41.140 --> 00:04:46.480
+<v Tim Ebbers>and changing with the behavior of the agent and understanding the guardrails that need to be put
+
+32
+00:04:46.480 --> 00:04:51.720
+<v Noah Labhart>there. That makes total sense. It has to be as, I don't know, as adaptable or flexible as the agent
+
+33
+00:04:51.720 --> 00:04:55.740
+<v Noah Labhart>themselves. It has to be learning from what is happening. Am I hearing you correctly?
+
+34
+00:04:55.740 --> 00:04:56.260
+<v Tim Ebbers>Yeah,
+
+35
+00:04:56.360 --> 00:05:14.680
+<v Tim Ebbers>it has to be really flexible and really be able to watch the behaviors and or put guardrails around that runtime so that you won't let it go and do things that aren't what you want them to do. And that's really the big thing is understanding the behavior of those agents and only giving them the permissions that they should have.
+
+36
+00:05:14.680 --> 00:05:15.180
+<v Tim Ebbers>have.
+
+37
+00:05:15.400 --> 00:05:21.200
+<v Noah Labhart>100%. Okay. When enforcement changes at the different levels, right? What's different
+
+38
+00:05:21.200 --> 00:05:26.700
+<v Noah Labhart>about it happening at the kernel level rather than maybe say network identity or application layer?
+
+39
+00:05:27.280 --> 00:05:31.720
+<v Tim Ebbers>Three things change. First, you enforce without the application's cooperation,
+
+40
+00:05:32.520 --> 00:05:38.200
+<v Tim Ebbers>right? The application doesn't need to be patched or updated. So you're doing this in real time as
+
+41
+00:05:38.200 --> 00:05:43.360
+<v Tim Ebbers>the transaction is happening. Second, you can act on the identity that's visible at the workload
+
+42
+00:05:44.680 --> 00:05:50.460
+<v Tim Ebbers>specific session, the specific user, the specific trace, not just the IP or the certificate. So you
+
+43
+00:05:50.460 --> 00:05:54.640
+<v Tim Ebbers>can see all of it when you're looking at the kernel versus what you were able to see before,
+
+44
+00:05:54.860 --> 00:06:02.140
+<v Tim Ebbers>which might just be a log. And then we can inject different ways of enforcement in the kernel that
+
+45
+00:06:02.140 --> 00:06:08.540
+<v Tim Ebbers>can immediately block those transactions or that transaction while the pod keeps running. We don't
+
+46
+00:06:08.540 --> 00:06:13.260
+<v Tim Ebbers>have to take the application down to do enforcement. Other sessions are unaffected and you haven't
+
+47
+00:06:14.680 --> 00:06:18.680
+<v Tim Ebbers>So you don't have to change your application necessarily if you're doing it at the kernel
+
+48
+00:06:18.680 --> 00:06:19.180
+<v Tim Ebbers>level.
+
+49
+00:06:19.200 --> 00:06:22.140
+<v Tim Ebbers>So your developers are just developing how they normally do it.
+
+50
+00:06:22.200 --> 00:06:26.800
+<v Tim Ebbers>And we become really a layer beneath that watching everything.
+
+51
+00:06:27.220 --> 00:06:27.740
+<v Noah Labhart>I'm
+
+52
+00:06:27.740 --> 00:06:28.480
+<v Noah Labhart>tracking with that.
+
+53
+00:06:28.620 --> 00:06:32.800
+<v Noah Labhart>And to stick with the session there and then not changing sort of the application, and
+
+54
+00:06:32.800 --> 00:06:38.000
+<v Noah Labhart>maybe this applies to it as well, what does it mean to revoke or contain a compromised
+
+55
+00:06:38.000 --> 00:06:40.800
+<v Noah Labhart>AI session without having to touch the broader deployment?
+
+56
+00:06:41.140 --> 00:06:42.740
+<v Tim Ebbers>They really go hand in hand.
+
+57
+00:06:44.680 --> 00:06:48.360
+<v Tim Ebbers>really get in the middle of that transaction and terminate that active connection mid-flight,
+
+58
+00:06:48.580 --> 00:06:54.020
+<v Tim Ebbers>you have the ability to protect the downstream data that would have been compromised
+
+59
+00:06:54.020 --> 00:07:00.700
+<v Tim Ebbers>through that transaction. And that's the thing that was hard to see and hard to understand
+
+60
+00:07:00.700 --> 00:07:06.500
+<v Tim Ebbers>is what that AI agent is going to do at that particular time based on that particular context
+
+61
+00:07:06.500 --> 00:07:09.540
+<v Tim Ebbers>or those particular prompts with the data that it was given.
+
+62
+00:07:09.540 --> 00:07:10.240
+<v Noah Labhart>For sure.
+
+63
+00:07:10.440 --> 00:07:23.460
+<v Noah Labhart>Okay. So then how does real-time blocking change the risk side of things, the risk equation for AI agents that access sensitive data, external services, or production workflows? How does it change the risk side of the world?
+
+64
+00:07:23.460 --> 00:07:49.360
+<v Tim Ebbers>It actually changes the question from how quickly can we respond to can we stop this before it completes? It's fundamentally a different risk posture. If an agent in mid-flight on a request that would exfiltrate PII or invoke a payment API, it shouldn't touch. Real-time enforcement lets you terminate that in progress. You're not doing incident response anymore. You're actually preventing the incident.
+
+65
+00:07:49.360 --> 00:07:50.020
+<v Noah Labhart>Which is
+
+66
+00:07:50.020 --> 00:08:04.140
+<v Noah Labhart>fantastic. You're not doing cleanup. It's stopping it from happening. So if organizations are hearing this right now and they're ready to jump in and get going, what should they be able to stop immediately? What kind of AI behaviors should they be able to stop immediately?
+
+67
+00:08:04.140 --> 00:08:04.840
+<v Tim Ebbers>I
+
+68
+00:08:04.840 --> 00:08:25.660
+<v Tim Ebbers>think there's two things that you need to think about, and it's not a long list. And I think people think there's always a journey, but it's not 300 things that you have to think about. It's really a few categories, which is access to data, right? Does that agent and should that agent have access to that tool which has that data? Calls to external services outside of the approved scope.
+
+69
+00:08:25.660 --> 00:08:31.120
+<v Tim Ebbers>So should this agent be able to go external or to this other location with this PII data?
+
+70
+00:08:31.280 --> 00:08:35.040
+<v Tim Ebbers>And understanding the violations of compliance boundaries.
+
+71
+00:08:35.140 --> 00:08:39.380
+<v Tim Ebbers>I think compliance boundaries are going to get very interesting with HIPAA and PCI and
+
+72
+00:08:39.380 --> 00:08:45.380
+<v Tim Ebbers>whatever else applies in your industry to understand if those agents are being manipulated
+
+73
+00:08:45.380 --> 00:08:48.700
+<v Tim Ebbers>and sending or receiving data from where they shouldn't.
+
+74
+00:08:48.800 --> 00:08:54.080
+<v Tim Ebbers>Things like prompt injection patterns and unusual tool sequences in those sessions while
+
+75
+00:08:55.660 --> 00:09:01.360
+<v Tim Ebbers>really important to understand and to be able to stop immediately. And the policy needs to surface
+
+76
+00:09:01.360 --> 00:09:08.020
+<v Tim Ebbers>and manage those things for you. But the problem is today, most organizations really don't have
+
+77
+00:09:08.020 --> 00:09:10.740
+<v Tim Ebbers>a mechanism to enforce it at the moment it happens.
+
+78
+00:09:11.000 --> 00:09:13.180
+<v Noah Labhart>That makes sense there. When you think
+
+79
+00:09:13.180 --> 00:09:19.760
+<v Noah Labhart>about compliance and security, I think some folks can respond to that feeling like it's a clamp down
+
+80
+00:09:19.760 --> 00:09:22.620
+<v Noah Labhart>on innovation and speed, right?
+
+81
+00:09:22.700 --> 00:09:25.760
+<v Noah Labhart>How did teams balance strong enforcement,
+
+82
+00:09:25.920 --> 00:09:27.020
+<v Noah Labhart>which is really important,
+
+83
+00:09:27.200 --> 00:09:30.540
+<v Noah Labhart>with the need to avoid slowing down AI dev and deployment?
+
+84
+00:09:30.840 --> 00:09:32.540
+<v Tim Ebbers>The key architectural decision
+
+85
+00:09:32.540 --> 00:09:34.780
+<v Tim Ebbers>is to separate enforcement from deployment.
+
+86
+00:09:35.040 --> 00:09:38.460
+<v Tim Ebbers>If policy changes require a deployment,
+
+87
+00:09:38.700 --> 00:09:41.360
+<v Tim Ebbers>you've now coupled enforcement to a release cycle
+
+88
+00:09:41.360 --> 00:09:43.780
+<v Tim Ebbers>and teams will avoid touching it, right?
+
+89
+00:09:43.860 --> 00:09:44.900
+<v Tim Ebbers>So you don't want to do that.
+
+90
+00:09:45.060 --> 00:09:47.740
+<v Tim Ebbers>So enforcement rules have to be pushed at runtime,
+
+91
+00:09:47.740 --> 00:09:53.460
+<v Tim Ebbers>time, updated without having anything restarted so that you can iterate on your policies independently
+
+92
+00:09:53.460 --> 00:09:58.480
+<v Tim Ebbers>of application changes. And then you'll get strong enforcement without becoming a bottleneck,
+
+93
+00:09:58.480 --> 00:10:02.300
+<v Tim Ebbers>because that's the thing that security folks and infrastructure folks are always,
+
+94
+00:10:02.320 --> 00:10:04.540
+<v Tim Ebbers>they don't want to be the bottleneck, right? They don't want to be the blocker.
+
+95
+00:10:04.660 --> 00:10:10.160
+<v Tim Ebbers>And so if you separate those two things, I think that you cease to become the bottleneck,
+
+96
+00:10:10.200 --> 00:10:14.060
+<v Tim Ebbers>but you still get strong enforcement. I think the other big piece is observability.
+
+97
+00:10:14.560 --> 00:10:19.180
+<v Tim Ebbers>teams adopting enforcement faster when they can see what would have been blocked before they turn
+
+98
+00:10:19.180 --> 00:10:24.700
+<v Tim Ebbers>it on, right? Understanding the blast radius of what would have happened or what will happen,
+
+99
+00:10:24.760 --> 00:10:27.640
+<v Tim Ebbers>I think is really important before you go and turn things on.
+
+100
+00:10:28.000 --> 00:10:33.880
+<v Noah Labhart>Certainly. Okay. One more question, Tim. Once organizations can discover, observe,
+
+101
+00:10:34.020 --> 00:10:38.880
+<v Noah Labhart>and enforce AI behavior and security and enforcement, what does accountability look
+
+102
+00:10:38.880 --> 00:10:41.040
+<v Noah Labhart>like at the enterprise level? Yeah. And
+
+103
+00:10:41.040 --> 00:10:42.080
+<v Tim Ebbers>I think the big thing here is
+
+104
+00:10:44.200 --> 00:11:03.480
+<v Tim Ebbers>I think gone are the days of, hey, show me the log when this happened, because it doesn't help you understand what the agent did. The question that auditors and regulators will ask isn't, did you have a policy? It's, did the policy work? And how can you prove it? And I think the, and how can you prove it, is the really important part, right?
+
+105
+00:11:03.480 --> 00:11:10.280
+<v Tim Ebbers>If enforcement is tied to specific sessions, specific users, specific tool calls with timestamps
+
+106
+00:11:10.280 --> 00:11:15.760
+<v Tim Ebbers>and outcomes, it means being able to answer that question of, this is what the agent had
+
+107
+00:11:15.760 --> 00:11:18.040
+<v Tim Ebbers>access to based on this policy.
+
+108
+00:11:18.280 --> 00:11:23.900
+<v Tim Ebbers>And if it was off the rails, we would have fired an enforcement block or terminated the
+
+109
+00:11:23.900 --> 00:11:25.300
+<v Tim Ebbers>connection either which way.
+
+110
+00:11:25.460 --> 00:11:30.300
+<v Tim Ebbers>But that's really important is be able to show that trace all the way through so that
+
+111
+00:11:30.300 --> 00:11:31.600
+<v Tim Ebbers>you can produce that evidence.
+
+112
+00:11:33.480 --> 00:11:38.560
+<v Tim Ebbers>loop from discovery through governance, that organizations can not only show what was observed,
+
+113
+00:11:38.740 --> 00:11:43.640
+<v Tim Ebbers>but also what was stopped so that in the wave of the new AI compliance requirements,
+
+114
+00:11:43.940 --> 00:11:48.820
+<v Tim Ebbers>because they're coming, they will be ready before they hit the different avenues.
+
+115
+00:11:49.200 --> 00:11:49.700
+<v Noah Labhart>Yeah,
+
+116
+00:11:49.620 --> 00:11:54.140
+<v Noah Labhart>absolutely. Tim, all this makes too much sense in my eyes. Moving the enforcement
+
+117
+00:11:54.140 --> 00:12:01.280
+<v Noah Labhart>to runtime. AI runs at system speed incidents, not human level incident speed. So security teams
+
+118
+00:12:01.280 --> 00:12:06.060
+<v Noah Labhart>need a new model. You got to enforce security fast in that runtime. And I hear you saying that
+
+119
+00:12:06.060 --> 00:12:11.180
+<v Noah Labhart>companies really need to change their risk posture from thinking about cleaning up incidents to
+
+120
+00:12:11.180 --> 00:12:15.600
+<v Noah Labhart>preventing issues from happening altogether. And moving enforcement to that runtime is the
+
+121
+00:12:15.600 --> 00:12:21.020
+<v Noah Labhart>real answer to changing this posture and ensuring that companies remain secure, but still can move
+
+122
+00:12:21.020 --> 00:12:24.620
+<v Noah Labhart>fast in their deployment. So Tim, I really appreciate you walking us through this today
+
+123
+00:12:24.620 --> 00:12:27.000
+<v Noah Labhart>and appreciate you returning to the show today. Yeah,
+
+124
+00:12:27.040 --> 00:12:28.540
+<v Tim Ebbers>great to be here. Thanks for having me.
+
+125
+00:12:29.360 --> 00:12:34.060
+<v Noah Labhart>As Tim points out, security teams need to change the way they think about incidents.
+
+126
+00:12:34.400 --> 00:12:41.940
+<v Noah Labhart>AI is changing the game and the speed around models and programs that will require enforcement to be moved to runtime.
+
+127
+00:12:44.540 --> 00:12:48.640
+<v Noah Labhart>If you'd like to learn more about Wallarm, you can visit wallarm.com.
+
+128
+00:12:48.820 --> 00:12:52.740
+<v Noah Labhart>That's W-A-L-L-A-R-M dot com.
+
+129
+00:12:54.160 --> 00:12:55.720
+<v Noah Labhart>And thanks again for listening.

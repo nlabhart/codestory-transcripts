@@ -1,0 +1,1523 @@
+WEBVTT
+
+NOTE S8 Bonus: Rewriting Database Physics: Engineering a Hybrid Memory NoSQL Engine for Petabyte-Scale AI Inference with Srini Srinivasan, Co-Founder & CTO of Aerospike
+
+1
+00:00:00.000 --> 00:00:05.400
+<v Srini Srinivasan>I think the one mistake in the early days we made was we started adding features very fast.
+
+2
+00:00:05.740 --> 00:00:10.560
+<v Srini Srinivasan>This was maybe in the 2013 timeframe. Until then we had been more measured.
+
+3
+00:00:10.980 --> 00:00:14.200
+<v Srini Srinivasan>We got some funding, we got some people and so on, we had more resources.
+
+4
+00:00:14.540 --> 00:00:18.280
+<v Srini Srinivasan>And we had a fairly robust way of figuring out what we needed to build.
+
+5
+00:00:18.460 --> 00:00:22.840
+<v Srini Srinivasan>We just did too much of the roadmap too fast within an 18-month period.
+
+6
+00:00:23.080 --> 00:00:28.660
+<v Srini Srinivasan>It ended up in a number of features being released in the 2013-14 timeframe,
+
+7
+00:00:30.000 --> 00:00:35.820
+<v Srini Srinivasan>not complete. This caused fairly bad backlash. In fact, I would say set us back by at least a year
+
+8
+00:00:35.820 --> 00:00:41.740
+<v Srini Srinivasan>or two and be able to recover from that. My name is Srini Srinivasan. I am the CTO and founder
+
+9
+00:00:41.740 --> 00:00:43.000
+<v Srini Srinivasan>of Aerospike.
+
+10
+00:00:46.720 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+11
+00:00:52.340 --> 00:00:52.840
+<v Noah Labhart>Six
+
+12
+00:00:52.560 --> 00:00:55.240
+<v Clip>months moonlighting. There's nothing on the back end.
+
+13
+00:00:55.440 --> 00:00:57.760
+<v Noah Labhart>Who share what it takes to change an
+
+14
+00:00:57.760 --> 00:00:58.260
+<v Clip>industry.
+
+15
+00:00:58.280 --> 00:01:00.240
+<v Clip>I don't exactly know what to do next.
+
+16
+00:01:00.240 --> 00:01:01.240
+<v Clip>It took many goes to get right.
+
+17
+00:01:01.840 --> 00:01:04.480
+<v Noah Labhart>Who built the teams that have their back.
+
+18
+00:01:04.820 --> 00:01:06.100
+<v Clip>The company is its people.
+
+19
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+20
+00:01:07.440 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+21
+00:01:08.880 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+22
+00:01:11.480 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+23
+00:01:12.880 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+24
+00:01:14.440 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+25
+00:01:15.500 --> 00:01:17.800
+<v Noah Labhart>The stories you don't read in the headlines.
+
+26
+00:01:18.260 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, mind you.
+
+27
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+28
+00:01:22.860 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+29
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+30
+00:01:27.760 --> 00:01:28.860
+<v Clip>Not just about technology.
+
+31
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+32
+00:01:32.780 --> 00:01:34.300
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+33
+00:01:34.420 --> 00:01:42.620
+<v Noah Labhart>And today, how Srini Srinivasan built the platform for multi-models and real-time, low-latency data.
+
+34
+00:01:49.180 --> 00:01:53.900
+<v Noah Labhart>Srini Srinivasan grew up in India during a time when you could go do whatever you wanted during the summer.
+
+35
+00:01:54.320 --> 00:01:57.580
+<v Noah Labhart>So he explored and experienced many things, tech and non-tech.
+
+36
+00:01:57.780 --> 00:02:01.120
+<v Noah Labhart>He was very into sports and competition and wanted to be a cricket superstar.
+
+37
+00:02:01.700 --> 00:02:04.020
+<v Noah Labhart>He didn't start coding until he went off to college,
+
+38
+00:02:04.160 --> 00:02:07.680
+<v Noah Labhart>and interestingly enough, there were many startups formed from his class.
+
+39
+00:02:08.400 --> 00:02:11.160
+<v Noah Labhart>In the early days, he really loved the assembly language,
+
+40
+00:02:11.240 --> 00:02:13.400
+<v Noah Labhart>which I can attest is not the norm.
+
+41
+00:02:15.380 --> 00:02:19.760
+<v Noah Labhart>Srini was working in a company focused on mobile and ad tech-related work.
+
+42
+00:02:19.760 --> 00:02:24.840
+<v Noah Labhart>During this time, he discovered that all database tech existing were lacking.
+
+43
+00:02:25.320 --> 00:02:30.220
+<v Noah Labhart>He and his co-founder decided that they were the right pair to build a better system.
+
+44
+00:02:31.540 --> 00:02:34.820
+<v Noah Labhart>This is the creation story of Aerospike.
+
+45
+00:02:38.240 --> 00:02:44.480
+<v Srini Srinivasan>Aerospike has been focused on building out a high-performance database
+
+46
+00:02:44.480 --> 00:02:48.980
+<v Srini Srinivasan>for, I would say, real-time decision-making applications.
+
+47
+00:02:49.760 --> 00:03:01.760
+<v Srini Srinivasan>We are especially focused in completing a bunch of, I would say, analysis on data, you know, enabling applications to analyze data in a short amount of time to make a decision.
+
+48
+00:03:02.020 --> 00:03:17.980
+<v Srini Srinivasan>Think of it as real-time bidding in ad tech, fraud detection in financial services, you know, gaming, as well as e-commerce where huge spikes of access happens over a short period of time.
+
+49
+00:03:19.760 --> 00:03:26.880
+<v Srini Srinivasan>a database system which can handle enormous levels of personalization for hundreds of millions,
+
+50
+00:03:27.120 --> 00:03:33.760
+<v Srini Srinivasan>if not billions of users. And these decisions have to be made correctly and fast and with very high
+
+51
+00:03:33.760 --> 00:03:38.420
+<v Srini Srinivasan>uptime. So if the system doesn't stay up, you lose business, basically. So that's the problem
+
+52
+00:03:38.420 --> 00:03:43.740
+<v Srini Srinivasan>we essentially wanted to tackle when we started it. And the way we came to it, right, my co-founder
+
+53
+00:03:43.740 --> 00:03:52.540
+<v Srini Srinivasan>Founder and I, at the time, we were working in different companies focused on mobile technologies and ad tech related work,
+
+54
+00:03:52.720 --> 00:04:00.380
+<v Srini Srinivasan>where we discovered that all of the existing database technologies that we knew, they didn't actually work out.
+
+55
+00:04:00.480 --> 00:04:04.200
+<v Srini Srinivasan>And new technologies were coming out almost on a yearly basis.
+
+56
+00:04:04.540 --> 00:04:09.980
+<v Srini Srinivasan>So we decided, as founders usually do, we were a little bit, I would say, overconfident.
+
+57
+00:04:09.980 --> 00:04:13.880
+<v Srini Srinivasan>and we said we could build a better system than anybody else.
+
+58
+00:04:14.200 --> 00:04:16.160
+<v Srini Srinivasan>So we started Aerospike.
+
+59
+00:04:17.960 --> 00:04:22.000
+<v Noah Labhart>So tell me about the MVP, so that first version of the product you built.
+
+60
+00:04:22.060 --> 00:04:23.060
+<v Noah Labhart>How long did it take to build?
+
+61
+00:04:23.160 --> 00:04:25.260
+<v Noah Labhart>What sort of tools did you use to bring it to life?
+
+62
+00:04:26.900 --> 00:04:28.820
+<v Srini Srinivasan>Every story is unique, right, in a startup.
+
+63
+00:04:29.140 --> 00:04:32.300
+<v Srini Srinivasan>The first version of it, I was not even involved, actually,
+
+64
+00:04:32.340 --> 00:04:35.040
+<v Srini Srinivasan>because my co-founder had worked with a third person
+
+65
+00:04:35.040 --> 00:04:40.480
+<v Srini Srinivasan>who had built some kind of caching system based on SSDs
+
+66
+00:04:40.480 --> 00:04:45.540
+<v Srini Srinivasan>and how you could somehow do certain kinds of caches faster and better.
+
+67
+00:04:45.820 --> 00:04:49.260
+<v Srini Srinivasan>And that project was pretty much had reached dead end of sorts.
+
+68
+00:04:49.500 --> 00:04:52.680
+<v Srini Srinivasan>And that's when I met my co-founder of Aerospike.
+
+69
+00:04:52.840 --> 00:04:54.640
+<v Srini Srinivasan>And he was doing this work.
+
+70
+00:04:54.780 --> 00:04:58.100
+<v Srini Srinivasan>And I basically, after discussing with him, we came to a decision.
+
+71
+00:04:58.180 --> 00:05:02.520
+<v Srini Srinivasan>In fact, I drove this to some extent because I am by training a database person.
+
+72
+00:05:02.700 --> 00:05:04.540
+<v Srini Srinivasan>I have a computer science degree, an undergrad.
+
+73
+00:05:05.040 --> 00:05:09.280
+<v Srini Srinivasan>and a PhD in computer science focused on databases from the University of Wisconsin.
+
+74
+00:05:09.920 --> 00:05:14.620
+<v Srini Srinivasan>I looked at the core raw technology that my co-founder, Brian Blakowski, is his name,
+
+75
+00:05:14.740 --> 00:05:18.020
+<v Srini Srinivasan>was working with, and I said, look, you know, I'm interested in this,
+
+76
+00:05:18.080 --> 00:05:21.320
+<v Srini Srinivasan>but only if we build a true database for the long term.
+
+77
+00:05:21.460 --> 00:05:23.320
+<v Srini Srinivasan>And Brian was down with that.
+
+78
+00:05:23.540 --> 00:05:24.860
+<v Srini Srinivasan>And that's how we started.
+
+79
+00:05:24.960 --> 00:05:26.940
+<v Srini Srinivasan>And then we said, okay, you know what, we're going to do this properly.
+
+80
+00:05:27.120 --> 00:05:28.080
+<v Srini Srinivasan>We started a company.
+
+81
+00:05:28.300 --> 00:05:32.040
+<v Srini Srinivasan>And then we wrote what we officially called 2.0,
+
+82
+00:05:32.100 --> 00:05:34.200
+<v Srini Srinivasan>because we had already had some code base before.
+
+83
+00:05:35.040 --> 00:05:36.680
+<v Srini Srinivasan>So we started off with the 2.0 version of the product,
+
+84
+00:05:36.760 --> 00:05:39.320
+<v Srini Srinivasan>and we rewrote huge portions of it, obviously.
+
+85
+00:05:39.860 --> 00:05:42.920
+<v Srini Srinivasan>The way we figured out what to build
+
+86
+00:05:42.920 --> 00:05:47.320
+<v Srini Srinivasan>was we interviewed about 40 leaders in various industries
+
+87
+00:05:47.320 --> 00:05:49.860
+<v Srini Srinivasan>who were all in the Bay Area at the time,
+
+88
+00:05:49.860 --> 00:05:51.380
+<v Srini Srinivasan>in various domains, you know.
+
+89
+00:05:51.460 --> 00:05:53.540
+<v Srini Srinivasan>And then we made some predictions in terms of
+
+90
+00:05:53.540 --> 00:05:58.540
+<v Srini Srinivasan>which of them will be able to use a product like Aerospike.
+
+91
+00:05:58.700 --> 00:06:02.260
+<v Srini Srinivasan>By the way, the original name for the company was Citrus Leaf,
+
+92
+00:06:02.260 --> 00:06:05.180
+<v Srini Srinivasan>and the name was changed to Aerospike a couple of years later.
+
+93
+00:06:05.640 --> 00:06:09.640
+<v Srini Srinivasan>But the more important thing is we looked at all these 40 or 50 interviews that we did.
+
+94
+00:06:09.800 --> 00:06:14.280
+<v Srini Srinivasan>We organized it and discovered that ad tech was going to be the place
+
+95
+00:06:14.280 --> 00:06:16.340
+<v Srini Srinivasan>where we could immediately find a beachhead.
+
+96
+00:06:16.540 --> 00:06:20.460
+<v Srini Srinivasan>So the version 2.0 that we released essentially implemented features.
+
+97
+00:06:20.700 --> 00:06:25.040
+<v Srini Srinivasan>Even to this day, it's being heavily used, not just in ad tech, but across the board.
+
+98
+00:06:25.240 --> 00:06:28.120
+<v Srini Srinivasan>Those features were all chosen based on our interviews
+
+99
+00:06:28.120 --> 00:06:33.500
+<v Srini Srinivasan>use and what we learned about the various domains that could use technology like ours.
+
+100
+00:06:34.280 --> 00:06:38.680
+<v Srini Srinivasan>And then our first deployment or the proof of concept started in, I think it was almost
+
+101
+00:06:38.680 --> 00:06:41.200
+<v Srini Srinivasan>like April or so with an ad tech company.
+
+102
+00:06:41.240 --> 00:06:42.580
+<v Srini Srinivasan>So we had predicted it quite well.
+
+103
+00:06:42.720 --> 00:06:47.660
+<v Srini Srinivasan>So it took us about six months, I would say, to rewrite the code from scratch again.
+
+104
+00:06:47.880 --> 00:06:51.600
+<v Srini Srinivasan>You know, we used some, but I rewrote most of my pieces and it was all written in C.
+
+105
+00:06:51.720 --> 00:06:54.580
+<v Srini Srinivasan>And the hard part of writing in C is you have to build your own tools.
+
+106
+00:06:54.580 --> 00:06:59.300
+<v Srini Srinivasan>so to speak. There are no libraries that you can use like in other languages like C++ and Java,
+
+107
+00:06:59.500 --> 00:07:07.040
+<v Srini Srinivasan>but it comes with the advantage that when you write code in C, you can write it for the purpose
+
+108
+00:07:07.040 --> 00:07:12.060
+<v Srini Srinivasan>that it's intended without any interference, you know, from all the libraries and so on.
+
+109
+00:07:12.160 --> 00:07:17.540
+<v Srini Srinivasan>So that's one of the reasons why our product is very carefully engineered, I would say,
+
+110
+00:07:17.620 --> 00:07:22.920
+<v Srini Srinivasan>to produce the kind of results that our application writers love.
+
+111
+00:07:24.580 --> 00:07:27.300
+<v Noah Labhart>So you've got your MVP and it's working.
+
+112
+00:07:27.720 --> 00:07:30.880
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+113
+00:07:30.940 --> 00:07:40.400
+<v Noah Labhart>And I think what I'm curious about there is how you went about building your roadmap and how you went about deciding, OK, this is the next most important thing to build or to address with Aerospike.
+
+114
+00:07:42.220 --> 00:07:49.440
+<v Srini Srinivasan>A lot of that decision, I think my co-founder, Brian, drove with a lot of contribution from me, of course.
+
+115
+00:07:49.620 --> 00:07:53.440
+<v Srini Srinivasan>And the philosophy that we both of us used was very simple.
+
+116
+00:07:54.580 --> 00:07:56.860
+<v Srini Srinivasan>the market that we wanted to approach.
+
+117
+00:07:57.040 --> 00:07:59.460
+<v Srini Srinivasan>We would also look at our existing customers
+
+118
+00:07:59.460 --> 00:08:00.860
+<v Srini Srinivasan>to see where the gaps were.
+
+119
+00:08:01.920 --> 00:08:05.240
+<v Srini Srinivasan>The next step we said, you know, in an intentional way
+
+120
+00:08:05.570 --> 00:08:07.680
+<v Srini Srinivasan>was we were going to expand it to places
+
+121
+00:08:07.680 --> 00:08:11.640
+<v Srini Srinivasan>like financial services, telcos, e-commerce, and so on.
+
+122
+00:08:11.860 --> 00:08:14.260
+<v Srini Srinivasan>So when we had those as targets,
+
+123
+00:08:14.480 --> 00:08:16.900
+<v Srini Srinivasan>we were able to figure out what the gaps were
+
+124
+00:08:16.900 --> 00:08:19.020
+<v Srini Srinivasan>in terms of what our product provided
+
+125
+00:08:19.510 --> 00:08:22.420
+<v Srini Srinivasan>versus what additional features, functionality
+
+126
+00:08:22.420 --> 00:08:27.660
+<v Srini Srinivasan>functionality that these particular areas. And then the good news about this is, since we were
+
+127
+00:08:27.660 --> 00:08:33.380
+<v Srini Srinivasan>already talking with potential prospects as we were working on these new features, it was fairly
+
+128
+00:08:33.380 --> 00:08:40.300
+<v Srini Srinivasan>easy for us to have validation in terms of like whether those people adopted it or not. We would
+
+129
+00:08:40.300 --> 00:08:46.880
+<v Srini Srinivasan>not build a feature just for a single customer. To some extent, we were a little bit of Steve Jobs
+
+130
+00:08:46.880 --> 00:08:49.100
+<v Srini Srinivasan>Jobs mind, you know, school of thought.
+
+131
+00:08:49.280 --> 00:08:52.780
+<v Srini Srinivasan>Steve Jobs' school of thought is the person who builds the product
+
+132
+00:08:52.780 --> 00:08:56.140
+<v Srini Srinivasan>has the responsibility to figure out what the market needs,
+
+133
+00:08:56.380 --> 00:08:57.460
+<v Srini Srinivasan>and we have to build it.
+
+134
+00:08:58.000 --> 00:09:01.260
+<v Srini Srinivasan>Sometimes people say this as, well, we know better than the customer.
+
+135
+00:09:01.380 --> 00:09:02.320
+<v Srini Srinivasan>It's not as simple as that.
+
+136
+00:09:02.480 --> 00:09:04.420
+<v Srini Srinivasan>We better be the experts in the field
+
+137
+00:09:04.420 --> 00:09:07.020
+<v Srini Srinivasan>if we are to build a product which other people are going to use,
+
+138
+00:09:07.160 --> 00:09:11.640
+<v Srini Srinivasan>which means we need to necessarily know more than any specific customer.
+
+139
+00:09:11.900 --> 00:09:13.620
+<v Srini Srinivasan>We cannot know more than the entire market.
+
+140
+00:09:13.780 --> 00:09:14.460
+<v Srini Srinivasan>That's kind of hard.
+
+141
+00:09:14.460 --> 00:09:19.340
+<v Srini Srinivasan>But then that's determined by how we drive the product and how we capture the market, right?
+
+142
+00:09:19.460 --> 00:09:26.660
+<v Srini Srinivasan>So there's a lot of thinking which goes into how we want to shepherd the product through the market, take the feedback and run it.
+
+143
+00:09:27.040 --> 00:09:28.580
+<v Srini Srinivasan>We don't need to be told what to do.
+
+144
+00:09:28.640 --> 00:09:33.060
+<v Srini Srinivasan>We need to figure out what to do in collaboration with the whole market and the prospects and so on.
+
+145
+00:09:33.120 --> 00:09:34.580
+<v Srini Srinivasan>And that's the process we still follow.
+
+146
+00:09:35.800 --> 00:09:37.280
+<v Noah Labhart>Okay, and let's switch to team.
+
+147
+00:09:37.400 --> 00:09:38.480
+<v Noah Labhart>You mentioned we.
+
+148
+00:09:38.640 --> 00:09:40.380
+<v Noah Labhart>How did you go about building your team?
+
+149
+00:09:40.380 --> 00:09:45.020
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+150
+00:09:46.220 --> 00:09:53.780
+<v Srini Srinivasan>If there's one thing I can say I have learned from this entire effort over the last, I don't know, it's been going on for 12 to 13 years now,
+
+151
+00:09:53.900 --> 00:09:58.040
+<v Srini Srinivasan>is that for a software company like ours, it's all about the people.
+
+152
+00:09:58.560 --> 00:10:07.340
+<v Srini Srinivasan>Without having the right people collaborating to solve the problem, it is virtually impossible to achieve the goals that we set ourselves up to do, right?
+
+153
+00:10:07.340 --> 00:10:10.540
+<v Srini Srinivasan>So how do I figure out if a person is going to be successful?
+
+154
+00:10:10.900 --> 00:10:14.640
+<v Srini Srinivasan>This is something we have wrestled with pretty much from the first hire we did.
+
+155
+00:10:14.820 --> 00:10:27.420
+<v Srini Srinivasan>On the engineering side and the operations side, at Yahoo, I had responsibility for running the service as well as building the product, designing it, building it, testing it, deploying it, and then supporting it.
+
+156
+00:10:27.500 --> 00:10:36.440
+<v Srini Srinivasan>So I had very good knowledge of the entire ecosystem of building something and running it in production at scale with high uptime.
+
+157
+00:10:37.340 --> 00:10:39.020
+<v Srini Srinivasan>was my responsibility, which I had done for years.
+
+158
+00:10:39.380 --> 00:10:41.200
+<v Srini Srinivasan>And Brian had his own set of experiences.
+
+159
+00:10:41.320 --> 00:10:44.420
+<v Srini Srinivasan>So we knew exactly who would work out in the technical roles.
+
+160
+00:10:44.700 --> 00:10:45.620
+<v Srini Srinivasan>It was easy for us.
+
+161
+00:10:45.980 --> 00:10:48.960
+<v Srini Srinivasan>The harder part for us was to figure out
+
+162
+00:10:48.960 --> 00:10:52.400
+<v Srini Srinivasan>how to get good people in sales and marketing.
+
+163
+00:10:52.680 --> 00:10:55.140
+<v Srini Srinivasan>How do we make the entire company work well?
+
+164
+00:10:55.260 --> 00:11:01.540
+<v Srini Srinivasan>Because it's very easy to fall into certain traps where we say,
+
+165
+00:11:01.620 --> 00:11:03.920
+<v Srini Srinivasan>we built the product, so it must be the sales problem,
+
+166
+00:11:04.020 --> 00:11:05.620
+<v Srini Srinivasan>because they don't know how to sell it, or vice versa.
+
+167
+00:11:07.340 --> 00:11:08.240
+<v Srini Srinivasan>across these teams.
+
+168
+00:11:08.420 --> 00:11:11.400
+<v Srini Srinivasan>And that, I think, meant that we needed people
+
+169
+00:11:11.400 --> 00:11:14.220
+<v Srini Srinivasan>who were open-minded, both on the engineering side,
+
+170
+00:11:14.460 --> 00:11:17.760
+<v Srini Srinivasan>the operation side, the support side, sales and marketing.
+
+171
+00:11:18.120 --> 00:11:21.620
+<v Srini Srinivasan>And that is what we learned basically over time,
+
+172
+00:11:21.800 --> 00:11:24.400
+<v Srini Srinivasan>is when we had people who are problem solvers
+
+173
+00:11:24.400 --> 00:11:28.340
+<v Srini Srinivasan>and who are basically fearless in addressing issues
+
+174
+00:11:28.900 --> 00:11:30.740
+<v Srini Srinivasan>without becoming defensive and so on,
+
+175
+00:11:30.780 --> 00:11:33.100
+<v Srini Srinivasan>they're just open-minded and they engage
+
+176
+00:11:33.100 --> 00:11:36.640
+<v Srini Srinivasan>with a level of clarity of thought, if you will.
+
+177
+00:11:37.340 --> 00:11:48.460
+<v Srini Srinivasan>It is mostly the capability of the person as well as their ability to learn from others who are also experts in fields they may not themselves be experts in and somehow synthesize something better.
+
+178
+00:11:48.720 --> 00:11:53.340
+<v Srini Srinivasan>And those are the kinds of people it took us in the early days, a little bit of time to find.
+
+179
+00:11:53.640 --> 00:11:56.620
+<v Srini Srinivasan>You know, it took us a while to find the right salesperson, for example.
+
+180
+00:11:56.880 --> 00:12:01.680
+<v Srini Srinivasan>It even resulted in me running sales for a year in the middle when we went through some of these transitions.
+
+181
+00:12:02.160 --> 00:12:03.860
+<v Srini Srinivasan>But you've got to do what you have to do, right?
+
+182
+00:12:03.860 --> 00:12:09.940
+<v Srini Srinivasan>as a founder and as in a startup you have to somehow get that baby to survive and grow and
+
+183
+00:12:09.940 --> 00:12:14.880
+<v Srini Srinivasan>do whatever it takes but then you need to also get the right people on board who are able to take it
+
+184
+00:12:14.880 --> 00:12:19.600
+<v Srini Srinivasan>to the next level and that's we've managed to do that quite well so far the most important
+
+185
+00:12:19.600 --> 00:12:25.640
+<v Srini Srinivasan>thing that I've learned in Aerospike is about how to work with people in areas where which I'm not
+
+186
+00:12:25.640 --> 00:12:30.740
+<v Srini Srinivasan>familiar with and learn from them and also impart my knowledge to people in the other side.
+
+187
+00:12:34.140 --> 00:12:42.300
+<v Noah Labhart>So let's flip to scalability then. So did you build Aerospike to scale efficiently from day one
+
+188
+00:12:42.300 --> 00:12:46.220
+<v Noah Labhart>or have you been fighting this as you grow in any sort of capacity?
+
+189
+00:12:48.660 --> 00:12:56.220
+<v Srini Srinivasan>At the time we built the product, we could scale better than any of the existing technologies,
+
+190
+00:12:56.380 --> 00:13:01.240
+<v Srini Srinivasan>other than custom technologies, people like, you know, Meta and Google and so on built, right?
+
+191
+00:13:01.320 --> 00:13:03.680
+<v Srini Srinivasan>I mean, they can scale. So we're not talking about those.
+
+192
+00:13:03.780 --> 00:13:07.300
+<v Srini Srinivasan>We're talking about general purpose products which are available in the marketplace.
+
+193
+00:13:08.240 --> 00:13:13.200
+<v Srini Srinivasan>Places like Cassandra, Redis, you know, MongoDB, you know, Aerospike, you know,
+
+194
+00:13:13.200 --> 00:13:14.920
+<v Srini Srinivasan>You know, Yugabyte, CockroachDB, doesn't matter.
+
+195
+00:13:15.560 --> 00:13:19.560
+<v Srini Srinivasan>Our goal was to handle a certain kind of use case better than anybody else.
+
+196
+00:13:19.740 --> 00:13:25.220
+<v Srini Srinivasan>And I still remember in the first deployment, the solution that we replaced,
+
+197
+00:13:25.520 --> 00:13:31.680
+<v Srini Srinivasan>and our promise was that we would be 10 times better than the other solutions.
+
+198
+00:13:31.920 --> 00:13:36.620
+<v Srini Srinivasan>And we will also be an order of magnitude cheaper in terms of hardware.
+
+199
+00:13:36.620 --> 00:13:44.840
+<v Srini Srinivasan>So the order magnitude cheaper is very simple because we essentially leverage Flash for real-time data in addition to DRAM.
+
+200
+00:13:44.900 --> 00:13:54.080
+<v Srini Srinivasan>And Flash is, by nature, the price per bit for Flash is actually much lower than that for DRAM.
+
+201
+00:13:54.140 --> 00:13:56.160
+<v Srini Srinivasan>So we get the 10x in terms of cost very easily.
+
+202
+00:13:56.320 --> 00:13:59.320
+<v Srini Srinivasan>But then we also 10x better in terms of performance, right?
+
+203
+00:13:59.320 --> 00:14:10.000
+<v Srini Srinivasan>So when we ran that benchmark, we did the deployment or whatever in the first customer, they saw, it was really an interesting time, they saw 10x reduction in their timeouts.
+
+204
+00:14:10.220 --> 00:14:12.040
+<v Srini Srinivasan>They were timing out too much.
+
+205
+00:14:12.080 --> 00:14:14.920
+<v Srini Srinivasan>That's why they were looking for an alternate solution at the scale that they were running it.
+
+206
+00:14:15.020 --> 00:14:17.340
+<v Srini Srinivasan>So we could easily handle that scale.
+
+207
+00:14:17.520 --> 00:14:18.720
+<v Srini Srinivasan>And that was kind of important.
+
+208
+00:14:19.000 --> 00:14:20.340
+<v Srini Srinivasan>But it's not a static thing.
+
+209
+00:14:20.600 --> 00:14:24.340
+<v Srini Srinivasan>So as the systems evolve, we got new technology coming out.
+
+210
+00:14:24.460 --> 00:14:25.940
+<v Srini Srinivasan>So we keep up with this.
+
+211
+00:14:25.940 --> 00:14:33.860
+<v Srini Srinivasan>So we are focused on leveraging the hardware advances for the purpose of the kind of applications that are run on Aerospike.
+
+212
+00:14:34.000 --> 00:14:39.320
+<v Srini Srinivasan>So we started off with, of course, the basic SSDs and then NVMe SSDs showed up.
+
+213
+00:14:39.400 --> 00:14:41.880
+<v Srini Srinivasan>We basically adapted to that. We did benchmarks.
+
+214
+00:14:41.960 --> 00:14:45.520
+<v Srini Srinivasan>We worked with all of the vendors to make sure that that was successful.
+
+215
+00:14:45.980 --> 00:14:47.900
+<v Srini Srinivasan>Micron, Intel, pick the vendor.
+
+216
+00:14:48.080 --> 00:14:53.140
+<v Srini Srinivasan>Samsung, for example, we worked with all of them to make those technologies work for our applications.
+
+217
+00:14:53.140 --> 00:14:57.820
+<v Srini Srinivasan>applications. We also worked with Intel's Optane persistent memory. We had a version
+
+218
+00:14:57.820 --> 00:15:03.900
+<v Srini Srinivasan>for that. We were early with that. You know, we work with cloud vendors today. The result
+
+219
+00:15:03.900 --> 00:15:10.160
+<v Srini Srinivasan>is there has been no customer who has started on Aerospike who has needed to go to another
+
+220
+00:15:10.160 --> 00:15:15.720
+<v Srini Srinivasan>platform. So you don't really need to replatform in the kinds of use cases that we do, even
+
+221
+00:15:15.720 --> 00:15:21.080
+<v Srini Srinivasan>though your scale is going up 10x, 100x. Many of our customers have gone up 10x or 100x
+
+222
+00:15:21.080 --> 00:15:23.360
+<v Srini Srinivasan>in their scale over the last 10 years.
+
+223
+00:15:23.420 --> 00:15:27.120
+<v Srini Srinivasan>Early customers have been with us for 12 years in deployment, for example.
+
+224
+00:15:27.400 --> 00:15:30.460
+<v Srini Srinivasan>And this is both an original goal,
+
+225
+00:15:30.660 --> 00:15:33.660
+<v Srini Srinivasan>because I think the original pitch that Brian and I would make is,
+
+226
+00:15:33.760 --> 00:15:38.120
+<v Srini Srinivasan>if you want to get to Google scale without spending the kind of money
+
+227
+00:15:38.120 --> 00:15:41.480
+<v Srini Srinivasan>Google's spending on this, then you've got to use Aerospike,
+
+228
+00:15:41.500 --> 00:15:42.940
+<v Srini Srinivasan>because that's the only way you can compete.
+
+229
+00:15:45.140 --> 00:15:49.840
+<v Noah Labhart>So, as you step out on the balcony and you look across all that you've built,
+
+230
+00:15:52.160 --> 00:16:05.040
+<v Srini Srinivasan>The single most important thing I really appreciate is that so many of our customers depend on Aerospike for the most mission critical of applications.
+
+231
+00:16:05.860 --> 00:16:09.500
+<v Srini Srinivasan>Essentially, they have bet their business on Aerospike.
+
+232
+00:16:09.640 --> 00:16:11.340
+<v Srini Srinivasan>A small company, you know, from day one.
+
+233
+00:16:11.500 --> 00:16:16.240
+<v Srini Srinivasan>These are the applications which run billion dollar enterprises.
+
+234
+00:16:16.240 --> 00:16:23.140
+<v Srini Srinivasan>prices. That is on the business side is what I think I'm most proud of what Aerospike has
+
+235
+00:16:23.140 --> 00:16:30.540
+<v Srini Srinivasan>accomplished so far. We have a reputation for working in these use cases and we do our best
+
+236
+00:16:30.540 --> 00:16:35.620
+<v Srini Srinivasan>to support customers as they go through their inflection points, right? So that is the, on the
+
+237
+00:16:35.620 --> 00:16:40.920
+<v Srini Srinivasan>business side, that's the most I'm proud of. On the other side, our collaborative way of working
+
+238
+00:16:40.920 --> 00:16:44.940
+<v Srini Srinivasan>Working has enabled us to come up with solutions to really hard problems.
+
+239
+00:16:45.140 --> 00:16:55.220
+<v Srini Srinivasan>And that's actually built up a really good team culture, which enables us not just to do a better job, but also to work well with customers to help them achieve their goals.
+
+240
+00:16:55.500 --> 00:16:58.180
+<v Srini Srinivasan>Those are two things I would think stand out to me.
+
+241
+00:16:59.320 --> 00:17:05.280
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+242
+00:17:06.060 --> 00:17:11.360
+<v Srini Srinivasan>I think the one mistake in the early days we made was we started adding features very fast.
+
+243
+00:17:11.920 --> 00:17:14.740
+<v Srini Srinivasan>This was maybe in the 2013 timeframe.
+
+244
+00:17:15.080 --> 00:17:19.000
+<v Srini Srinivasan>You know, until then, we had been more measured in terms of what we had added.
+
+245
+00:17:19.140 --> 00:17:22.020
+<v Srini Srinivasan>But then we got some funding, we got some people and so on.
+
+246
+00:17:22.080 --> 00:17:22.800
+<v Srini Srinivasan>We had more resources.
+
+247
+00:17:23.040 --> 00:17:29.860
+<v Srini Srinivasan>And we had, as we spoke earlier, a fairly robust way of figuring out what we needed to build, you know, in terms of the roadmap.
+
+248
+00:17:30.140 --> 00:17:34.340
+<v Srini Srinivasan>We just did too much of the roadmap too fast within an 18-month period.
+
+249
+00:17:35.280 --> 00:17:40.360
+<v Srini Srinivasan>in a number of features being released, you know, in the 2013-14 time frame,
+
+250
+00:17:40.520 --> 00:17:42.020
+<v Srini Srinivasan>many of which were not complete.
+
+251
+00:17:42.300 --> 00:17:44.300
+<v Srini Srinivasan>This caused fairly bad backlash.
+
+252
+00:17:44.400 --> 00:17:49.220
+<v Srini Srinivasan>In fact, I would say it set us back by at least a year or two to recover from that.
+
+253
+00:17:49.480 --> 00:17:52.140
+<v Srini Srinivasan>That's definitely one of the mistakes we did,
+
+254
+00:17:52.320 --> 00:17:55.780
+<v Srini Srinivasan>which I don't think we've done since then, obviously, because it hurts.
+
+255
+00:17:58.140 --> 00:17:59.960
+<v Noah Labhart>This will be fun to talk about.
+
+256
+00:18:00.100 --> 00:18:03.500
+<v Noah Labhart>What does the future look like for the product and for the team?
+
+257
+00:18:05.320 --> 00:18:08.720
+<v Srini Srinivasan>I've worked in database technology for a long time.
+
+258
+00:18:08.880 --> 00:18:14.900
+<v Srini Srinivasan>So I kind of know it is very hard for an enterprise to use a product for long periods of time
+
+259
+00:18:14.900 --> 00:18:18.040
+<v Srini Srinivasan>because they don't necessarily satisfy their needs.
+
+260
+00:18:18.220 --> 00:18:21.360
+<v Srini Srinivasan>Now, if you look at the most successful database products in the world,
+
+261
+00:18:21.480 --> 00:18:24.120
+<v Srini Srinivasan>they have been around for several decades.
+
+262
+00:18:24.660 --> 00:18:28.880
+<v Srini Srinivasan>So you pick an Oracle, you pick a mainframe, an IBM DB2, whatever,
+
+263
+00:18:29.060 --> 00:18:33.440
+<v Srini Srinivasan>you end up using that technology for at least a 20 to 25-year period.
+
+264
+00:18:35.280 --> 00:18:42.560
+<v Srini Srinivasan>view. What I'd like Aerospike to be is basically achieve that milestone. That is, it will be the
+
+265
+00:18:42.560 --> 00:18:48.240
+<v Srini Srinivasan>product people pick, you know, instead of picking a mainframe, which is kind of technology, which is
+
+266
+00:18:48.240 --> 00:18:54.160
+<v Srini Srinivasan>not necessarily evolving to the modern world. But we can work on cloud, we can bring the same level
+
+267
+00:18:54.160 --> 00:18:59.680
+<v Srini Srinivasan>of robustness to running mission-critical applications that people will pick Aerospike
+
+268
+00:18:59.680 --> 00:19:01.520
+<v Srini Srinivasan>for a couple of decades, right?
+
+269
+00:19:01.600 --> 00:19:05.140
+<v Srini Srinivasan>That is, to me, the most consequential thing
+
+270
+00:19:05.140 --> 00:19:07.800
+<v Srini Srinivasan>that we can bring to the table as a database
+
+271
+00:19:07.800 --> 00:19:10.160
+<v Srini Srinivasan>for a new class of applications.
+
+272
+00:19:10.380 --> 00:19:12.180
+<v Srini Srinivasan>That is definitely really important.
+
+273
+00:19:12.520 --> 00:19:15.680
+<v Srini Srinivasan>On the business side, what I would like to see
+
+274
+00:19:15.680 --> 00:19:20.360
+<v Srini Srinivasan>is Aerospike essentially come into its own, so to speak,
+
+275
+00:19:20.580 --> 00:19:23.120
+<v Srini Srinivasan>in terms of managing its business,
+
+276
+00:19:23.360 --> 00:19:24.920
+<v Srini Srinivasan>being a master of our destiny,
+
+277
+00:19:25.120 --> 00:19:28.420
+<v Srini Srinivasan>and figuring out how we can apply this technology
+
+278
+00:19:29.820 --> 00:19:38.520
+<v Srini Srinivasan>in more and more areas broadly to impact industry in even in large measure, so to speak, right?
+
+279
+00:19:38.620 --> 00:19:45.360
+<v Srini Srinivasan>In terms of providing that level of insurance, if you will, so that the various applications
+
+280
+00:19:45.360 --> 00:19:51.140
+<v Srini Srinivasan>that are scaling up don't hit any kind of technology limits if you use Aerospike,
+
+281
+00:19:51.220 --> 00:19:55.620
+<v Srini Srinivasan>so that they can grow their business and compete in the marketplace in the best way possible.
+
+282
+00:19:55.620 --> 00:20:02.340
+<v Srini Srinivasan>And that will essentially lead to Aerospike, I think, growing to a revenue of $100 million or $1 billion a year.
+
+283
+00:20:02.440 --> 00:20:05.080
+<v Srini Srinivasan>That's kind of the business goal, actually, for the company.
+
+284
+00:20:06.340 --> 00:20:08.780
+<v Noah Labhart>Okay, so let's switch to you.
+
+285
+00:20:08.860 --> 00:20:10.660
+<v Noah Labhart>Who influences the way that you work?
+
+286
+00:20:10.840 --> 00:20:15.160
+<v Noah Labhart>Name a person or many persons or something that you look up to and why.
+
+287
+00:20:16.520 --> 00:20:22.500
+<v Srini Srinivasan>I've been fortunate in the database community in Wisconsin where there were so many leaders.
+
+288
+00:20:22.500 --> 00:20:29.600
+<v Srini Srinivasan>I remember when I was doing my PhD there, there was a program, you know, the program in Wisconsin was run by Dave DeWitt and Mike Carey.
+
+289
+00:20:29.640 --> 00:20:37.800
+<v Srini Srinivasan>You know, these are like very accomplished database researchers and technical leaders in the field.
+
+290
+00:20:37.880 --> 00:20:45.440
+<v Srini Srinivasan>And they would invite all of these people to come and talk about various technology challenges and research challenges.
+
+291
+00:20:45.740 --> 00:20:48.760
+<v Srini Srinivasan>You know, these are all like the database field.
+
+292
+00:20:48.840 --> 00:20:51.580
+<v Srini Srinivasan>And there were similar kind of programs elsewhere, I'm sure.
+
+293
+00:20:52.500 --> 00:20:54.760
+<v Srini Srinivasan>I was in Wisconsin, and this affected me a lot.
+
+294
+00:20:54.920 --> 00:20:58.660
+<v Srini Srinivasan>So I definitely wanted to impact the field.
+
+295
+00:20:58.800 --> 00:21:01.940
+<v Srini Srinivasan>Now, the interesting thing is there were some people who were into research
+
+296
+00:21:01.940 --> 00:21:03.600
+<v Srini Srinivasan>that were impacting it quite well and so on,
+
+297
+00:21:03.680 --> 00:21:05.160
+<v Srini Srinivasan>but there's one person who stands out.
+
+298
+00:21:05.280 --> 00:21:10.600
+<v Srini Srinivasan>It happens to be Mike Stonebraker, who is the PhD advisor for my advisor.
+
+299
+00:21:10.840 --> 00:21:13.260
+<v Srini Srinivasan>So Mike Carey's advisor was Mike Stonebraker.
+
+300
+00:21:13.720 --> 00:21:17.260
+<v Srini Srinivasan>Stonebraker actually won the Turing Award in 2015, I believe.
+
+301
+00:21:17.940 --> 00:21:23.480
+<v Srini Srinivasan>people. The thing I took away from Professor Stonebraker was something very simple. He was
+
+302
+00:21:23.480 --> 00:21:28.980
+<v Srini Srinivasan>a researcher at the highest level, if you will, one of the most accomplished researchers ever
+
+303
+00:21:28.980 --> 00:21:34.140
+<v Srini Srinivasan>in systems, which is what excited me. It's all about systems. I see programmers love system
+
+304
+00:21:34.140 --> 00:21:39.420
+<v Srini Srinivasan>software. Mike Stonebraker actually built companies. Not only did he research, he's founded
+
+305
+00:21:39.420 --> 00:21:45.160
+<v Srini Srinivasan>like seven or eight database companies. Most of them have been successful. They have built products,
+
+306
+00:21:45.160 --> 00:21:46.520
+<v Srini Srinivasan>They have shipped them and so on.
+
+307
+00:21:46.620 --> 00:21:49.260
+<v Srini Srinivasan>So I would definitely want to do something like that.
+
+308
+00:21:49.900 --> 00:21:54.240
+<v Srini Srinivasan>Basically build a product, sell it to all the enterprises, and see how good we are.
+
+309
+00:21:54.420 --> 00:21:56.000
+<v Srini Srinivasan>So that's definitely a huge inspiration.
+
+310
+00:21:56.360 --> 00:21:58.540
+<v Srini Srinivasan>The other one is Don Haderle.
+
+311
+00:21:58.660 --> 00:22:00.400
+<v Srini Srinivasan>He is the father of DB2 at IBM.
+
+312
+00:22:00.720 --> 00:22:02.680
+<v Srini Srinivasan>I worked with Don in IBM.
+
+313
+00:22:03.220 --> 00:22:06.060
+<v Srini Srinivasan>He was kind enough to spend time with me.
+
+314
+00:22:06.200 --> 00:22:09.700
+<v Srini Srinivasan>I was very young then and a lot more, I would say, impulsive.
+
+315
+00:22:09.880 --> 00:22:12.860
+<v Srini Srinivasan>And in fact, I left IBM and went to startups and so on.
+
+316
+00:22:12.860 --> 00:22:16.660
+<v Srini Srinivasan>But I've always kept in touch with Don because Don had a certain attitude.
+
+317
+00:22:16.840 --> 00:22:20.560
+<v Srini Srinivasan>He knew how to start from nothing, which is kind of what he did at DB2,
+
+318
+00:22:20.680 --> 00:22:23.020
+<v Srini Srinivasan>and build a product and sell it into the industry.
+
+319
+00:22:23.300 --> 00:22:28.600
+<v Srini Srinivasan>Even though it was at IBM that he did it, he operated like he was in a startup.
+
+320
+00:22:28.760 --> 00:22:33.140
+<v Srini Srinivasan>And having worked in startups afterwards, I always realized that Don was doing inside IBM
+
+321
+00:22:33.140 --> 00:22:35.300
+<v Srini Srinivasan>what people were doing outside IBM in startups.
+
+322
+00:22:35.480 --> 00:22:37.160
+<v Srini Srinivasan>So he's an advisor to us at Aerospike.
+
+323
+00:22:37.260 --> 00:22:41.800
+<v Srini Srinivasan>He was the first person I actually called when we started Aerospike.
+
+324
+00:22:42.920 --> 00:22:50.880
+<v Srini Srinivasan>will share with me his knowledge about how these stages of a product goes through and link it to
+
+325
+00:22:50.880 --> 00:22:54.360
+<v Srini Srinivasan>what we are going through. So it gives me a level of confidence that we're probably not
+
+326
+00:22:54.360 --> 00:22:57.780
+<v Srini Srinivasan>screwing up, you know, because that's one of the worries you always have.
+
+327
+00:22:59.340 --> 00:23:02.180
+<v Noah Labhart>Okay, we talked about a mistake earlier, but this is a little different spin.
+
+328
+00:23:02.740 --> 00:23:06.280
+<v Noah Labhart>If you could go back to the beginning, what would you do different? Or where would you consider
+
+329
+00:23:06.280 --> 00:23:09.500
+<v Noah Labhart>taking a different approach? Could have been something that worked, even worked pretty well,
+
+330
+00:23:09.500 --> 00:23:11.220
+<v Noah Labhart>but maybe you'd tweak it a little bit.
+
+331
+00:23:13.100 --> 00:23:15.120
+<v Srini Srinivasan>We underfunded the company in the early days.
+
+332
+00:23:15.300 --> 00:23:17.600
+<v Srini Srinivasan>We would probably have gone for bigger funding rounds
+
+333
+00:23:17.600 --> 00:23:18.560
+<v Srini Srinivasan>earlier in the game
+
+334
+00:23:18.560 --> 00:23:21.300
+<v Srini Srinivasan>so we could compete more effectively in the marketplace
+
+335
+00:23:21.300 --> 00:23:23.840
+<v Srini Srinivasan>on the non-technical aspects of things
+
+336
+00:23:23.840 --> 00:23:25.660
+<v Srini Srinivasan>like marketing and so on.
+
+337
+00:23:25.800 --> 00:23:29.440
+<v Srini Srinivasan>I think that has definitely been one of the things
+
+338
+00:23:29.440 --> 00:23:30.880
+<v Srini Srinivasan>I would definitely change.
+
+339
+00:23:31.420 --> 00:23:33.000
+<v Srini Srinivasan>Otherwise, I think there are a lot of things.
+
+340
+00:23:33.120 --> 00:23:34.020
+<v Srini Srinivasan>I mean, the other thing I would change
+
+341
+00:23:34.020 --> 00:23:36.520
+<v Srini Srinivasan>is be more careful about adding new features.
+
+342
+00:23:36.520 --> 00:23:39.220
+<v Srini Srinivasan>would be a little bit more circumspect.
+
+343
+00:23:39.500 --> 00:23:40.840
+<v Srini Srinivasan>And we, of course, have learned it.
+
+344
+00:23:40.900 --> 00:23:43.720
+<v Srini Srinivasan>That is less of, I think, of an important issue than the funding.
+
+345
+00:23:43.840 --> 00:23:47.120
+<v Srini Srinivasan>Because if you have more funds earlier in the cycle for a startup
+
+346
+00:23:47.120 --> 00:23:51.020
+<v Srini Srinivasan>and you use them wisely, it reduces risk in the long term.
+
+347
+00:23:51.200 --> 00:23:53.640
+<v Srini Srinivasan>So that'll probably be my single most important thing
+
+348
+00:23:53.640 --> 00:23:55.740
+<v Srini Srinivasan>is to get more funds earlier into the company.
+
+349
+00:23:57.440 --> 00:23:58.160
+<v Noah Labhart>Last question.
+
+350
+00:23:58.420 --> 00:24:01.920
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur
+
+351
+00:24:01.920 --> 00:24:03.220
+<v Noah Labhart>who's about the next big thing.
+
+352
+00:24:03.520 --> 00:24:04.600
+<v Noah Labhart>They're jazzed about it.
+
+353
+00:24:04.620 --> 00:24:05.660
+<v Noah Labhart>They can't wait to shut off the world.
+
+354
+00:24:06.520 --> 00:24:10.840
+<v Noah Labhart>right there on the plane. What advice do you give that person having gone down this road a bit?
+
+355
+00:24:11.800 --> 00:24:19.000
+<v Srini Srinivasan>The key thing about doing something new is it requires a level of passion that allows you
+
+356
+00:24:19.000 --> 00:24:25.720
+<v Srini Srinivasan>to overcome the hurdles. So the first thing I would say is stick with it. And the second thing
+
+357
+00:24:25.720 --> 00:24:30.160
+<v Srini Srinivasan>is going to be a little contradictory. Evaluate it all the time to see if it is still the right
+
+358
+00:24:30.160 --> 00:24:34.780
+<v Srini Srinivasan>thing to do. So both of them go together. You got to keep re-evaluating that this is the right thing
+
+359
+00:24:36.760 --> 00:24:41.340
+<v Srini Srinivasan>beyond all reasonable levels of objection to it, okay?
+
+360
+00:24:41.680 --> 00:24:45.620
+<v Srini Srinivasan>Because there were people who came to me and Brian and said,
+
+361
+00:24:45.760 --> 00:24:49.160
+<v Srini Srinivasan>you know, I'm a guy who always encourages people to do stuff, new stuff,
+
+362
+00:24:49.340 --> 00:24:51.920
+<v Srini Srinivasan>but for you guys, you shouldn't do what you're thinking of doing.
+
+363
+00:24:52.240 --> 00:24:54.660
+<v Srini Srinivasan>And we're looking at it going, what's wrong with us?
+
+364
+00:24:55.580 --> 00:24:57.800
+<v Srini Srinivasan>We took a really hard problem to solve.
+
+365
+00:24:58.060 --> 00:25:00.380
+<v Srini Srinivasan>You know, everybody was telling us to do something else.
+
+366
+00:25:00.520 --> 00:25:03.440
+<v Srini Srinivasan>But our view was, hey, we can do this.
+
+367
+00:25:03.440 --> 00:25:06.520
+<v Srini Srinivasan>We know other people are not doing this, but we're capable of doing this.
+
+368
+00:25:06.600 --> 00:25:07.940
+<v Srini Srinivasan>You need to really know that.
+
+369
+00:25:08.020 --> 00:25:11.560
+<v Srini Srinivasan>You need to know that you can do it, even if the whole world says you can't.
+
+370
+00:25:11.600 --> 00:25:12.700
+<v Noah Labhart>I think that's fantastic.
+
+371
+00:25:13.320 --> 00:25:15.520
+<v Noah Labhart>Well, Srini, thank you for being on the show today.
+
+372
+00:25:15.660 --> 00:25:18.540
+<v Noah Labhart>Thank you for telling the creation story of Aerospike.
+
+373
+00:25:18.800 --> 00:25:19.540
+<v Srini Srinivasan>Thank you, Noah.
+
+374
+00:25:19.680 --> 00:25:20.800
+<v Srini Srinivasan>I appreciate all your questions.
+
+375
+00:25:22.560 --> 00:25:25.260
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+376
+00:25:30.440 --> 00:25:33.580
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+377
+00:25:33.700 --> 00:25:38.500
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+378
+00:25:39.080 --> 00:25:41.300
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+379
+00:25:41.580 --> 00:25:43.620
+<v Noah Labhart>Both things help us out tremendously.
+
+380
+00:25:46.420 --> 00:25:47.920
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1267 @@
+WEBVTT
+
+NOTE S5 E1: How Postman Scaled to 30 Million Developers with Abhinav Asthana
+
+1
+00:00:01.520 --> 00:00:13.640
+<v Abhinav Asthana>You know, Postman grew. I started, you know, looking at every data point that was coming in, you know, people recommending it on Twitter, people posting reviews, people posting feature requests on GitHub.
+
+2
+00:00:15.080 --> 00:00:18.120
+<v Abhinav Asthana>I think, first of all, it was just a lot of fun to explore.
+
+3
+00:00:18.420 --> 00:00:21.660
+<v Abhinav Asthana>And, you know, I think that feeling of joy that you get
+
+4
+00:00:21.660 --> 00:00:25.520
+<v Abhinav Asthana>that somebody independently of you telling them,
+
+5
+00:00:25.600 --> 00:00:28.480
+<v Abhinav Asthana>hey, go and use my product, you know, somebody discovering it, using it,
+
+6
+00:00:28.540 --> 00:00:30.400
+<v Abhinav Asthana>was just like a pretty magical feeling.
+
+7
+00:00:30.460 --> 00:00:34.260
+<v Abhinav Asthana>And I think what we tried to have as co-founders in the team
+
+8
+00:00:34.260 --> 00:00:37.940
+<v Abhinav Asthana>was really try to picture the world that that person was in.
+
+9
+00:00:39.300 --> 00:00:42.800
+<v Abhinav Asthana>I'm Abhinav Asthana. I'm the CEO and co-founder of Postman.
+
+10
+00:00:47.440 --> 00:00:54.300
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who share
+
+11
+00:00:54.300 --> 00:00:59.860
+<v Noah Labhart>in the critical moments of what it takes to change an industry and build and lead a team
+
+12
+00:00:59.860 --> 00:01:00.840
+<v Noah Labhart>that has your back.
+
+13
+00:01:02.240 --> 00:01:07.820
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Abhinav Asthana built the Chrome extension
+
+14
+00:01:07.820 --> 00:01:11.760
+<v Noah Labhart>turned platform, making the way for API collaboration.
+
+15
+00:01:13.700 --> 00:01:16.020
+<v Noah Labhart>All this and more on Code Story.
+
+16
+00:01:20.120 --> 00:01:24.240
+<v Noah Labhart>Abhinav Asthana grew up in several small towns in the northern part of India.
+
+17
+00:01:24.400 --> 00:01:27.920
+<v Noah Labhart>One of those towns was Basti, 150 miles from the capital.
+
+18
+00:01:28.540 --> 00:01:34.140
+<v Noah Labhart>He's been a computer geek since fifth grade, when his dad bought a pretty sophisticated Pentium for the time.
+
+19
+00:01:34.560 --> 00:01:37.900
+<v Noah Labhart>The small towns he lived in were not the most connected parts of the world,
+
+20
+00:01:37.940 --> 00:01:43.060
+<v Noah Labhart>and as such he experienced the impact of computers and the internet, improving lives from a very early age.
+
+21
+00:01:43.640 --> 00:01:46.040
+<v Noah Labhart>He enjoys reading books, and as a kid he was into fiction,
+
+22
+00:01:46.220 --> 00:01:50.060
+<v Noah Labhart>reading Lord of the Rings, Harry Potter, Agatha Christie, etc.
+
+23
+00:01:50.300 --> 00:01:54.440
+<v Noah Labhart>Slowly, he started to drift towards popular science, design books, and nonfiction,
+
+24
+00:01:54.500 --> 00:01:56.220
+<v Noah Labhart>more towards the tech sphere of the world.
+
+25
+00:01:56.640 --> 00:02:01.240
+<v Noah Labhart>In 2012, the projects that Abhinav was involved in had the same pain point,
+
+26
+00:02:01.400 --> 00:02:05.680
+<v Noah Labhart>how to work with the APIs that connected the front and back ends of the application.
+
+27
+00:02:06.280 --> 00:02:09.200
+<v Noah Labhart>And the tools he had to use never helped him develop efficiently.
+
+28
+00:02:09.760 --> 00:02:12.060
+<v Noah Labhart>He thought, what would make this better?
+
+29
+00:02:13.640 --> 00:02:15.880
+<v Noah Labhart>This is the creation story of Postman.
+
+30
+00:02:20.720 --> 00:02:27.800
+<v Abhinav Asthana>Postman is an API platform that helps deliver great quality APIs for development teams.
+
+31
+00:02:28.000 --> 00:02:34.060
+<v Abhinav Asthana>It helps developers test, debug, document, and just generally build APIs faster.
+
+32
+00:02:34.870 --> 00:02:41.960
+<v Abhinav Asthana>The way it got started was I realized in 2012 that for a lot of projects that I was doing,
+
+33
+00:02:43.640 --> 00:02:51.080
+<v Abhinav Asthana>hobby projects or it was at my internship at Yahoo or the startups that I'd either worked with or
+
+34
+00:02:51.080 --> 00:02:56.620
+<v Abhinav Asthana>you know just after college I founded a company called Teleport Me. Like I was building these apps
+
+35
+00:02:56.620 --> 00:03:02.760
+<v Abhinav Asthana>on different platforms all the time sometimes on the web sometimes on desktop sometimes on mobile
+
+36
+00:03:02.760 --> 00:03:10.120
+<v Abhinav Asthana>devices and the main pain point I encountered always was working with the APIs that would
+
+37
+00:03:10.120 --> 00:03:11.460
+<v Abhinav Asthana>would connect the backend and the frontend.
+
+38
+00:03:11.820 --> 00:03:14.480
+<v Abhinav Asthana>You know, the problems were very many,
+
+39
+00:03:14.660 --> 00:03:16.900
+<v Abhinav Asthana>like, you know, what is the right documentation for the API?
+
+40
+00:03:17.560 --> 00:03:19.700
+<v Abhinav Asthana>Do I really know how that API works?
+
+41
+00:03:19.920 --> 00:03:22.000
+<v Abhinav Asthana>Do I know how it behaves in a particular setting?
+
+42
+00:03:22.660 --> 00:03:24.860
+<v Abhinav Asthana>More often than not, I would find out
+
+43
+00:03:24.860 --> 00:03:27.500
+<v Abhinav Asthana>that it's a multi-person problem,
+
+44
+00:03:27.640 --> 00:03:30.080
+<v Abhinav Asthana>that an API would be created by somebody else,
+
+45
+00:03:30.140 --> 00:03:32.260
+<v Abhinav Asthana>and, you know, I was a recipient of that API,
+
+46
+00:03:32.660 --> 00:03:34.540
+<v Abhinav Asthana>or in some cases, I was building the API
+
+47
+00:03:34.540 --> 00:03:35.880
+<v Abhinav Asthana>and somebody else had to use that API.
+
+48
+00:03:36.440 --> 00:03:38.520
+<v Abhinav Asthana>So I always found out that, you know,
+
+49
+00:03:40.120 --> 00:03:44.880
+<v Abhinav Asthana>a bit of a challenge. And the tools that I was using back then, it was, you know,
+
+50
+00:03:44.880 --> 00:03:50.600
+<v Abhinav Asthana>curl on the command line or custom clients that I would write in PHP or JavaScript
+
+51
+00:03:50.600 --> 00:03:59.300
+<v Abhinav Asthana>would never really help me work faster. So I thought of, you know, what would make my life
+
+52
+00:03:59.300 --> 00:04:05.440
+<v Abhinav Asthana>a bit better. And the point I started off with was just a basic API debugger saying that, you know,
+
+53
+00:04:05.440 --> 00:04:10.740
+<v Abhinav Asthana>I just want to have a very clear understanding if an API is not working, is it my code or is it the API?
+
+54
+00:04:11.160 --> 00:04:13.100
+<v Abhinav Asthana>And I started with a REST client.
+
+55
+00:04:13.480 --> 00:04:16.200
+<v Abhinav Asthana>I used Chrome extensions, you know, to build that.
+
+56
+00:04:16.280 --> 00:04:19.040
+<v Abhinav Asthana>It avoided network issues by having something on the web.
+
+57
+00:04:19.360 --> 00:04:21.420
+<v Abhinav Asthana>And, you know, it was a pretty simple tool back then.
+
+58
+00:04:21.660 --> 00:04:22.760
+<v Abhinav Asthana>So that's how it started.
+
+59
+00:04:23.080 --> 00:04:26.840
+<v Abhinav Asthana>I had a pain point and I saw everybody having those pain points around me.
+
+60
+00:04:27.280 --> 00:04:34.200
+<v Abhinav Asthana>And I just built a Chrome extension and kind of put it out on the Chrome web store and started recommending people to it.
+
+61
+00:04:36.440 --> 00:04:37.200
+<v Abhinav Asthana>start using it themselves.
+
+62
+00:04:39.700 --> 00:04:43.000
+<v Noah Labhart>Well, tell me about that MVP. So you mentioned building something
+
+63
+00:04:43.000 --> 00:04:48.440
+<v Noah Labhart>and putting on the Chrome store. How long did it take you to build that? And what sort of tools
+
+64
+00:04:48.440 --> 00:04:49.920
+<v Noah Labhart>did you use to bring it to life?
+
+65
+00:04:51.400 --> 00:04:54.820
+<v Abhinav Asthana>I think it probably took two months or three months to
+
+66
+00:04:54.820 --> 00:04:59.740
+<v Abhinav Asthana>build the first version, if I'm not wrong. You know, I was at that point, you know, I was very
+
+67
+00:04:59.740 --> 00:05:05.460
+<v Abhinav Asthana>much into like building, using the latest frameworks or whatever was hot, you know,
+
+68
+00:05:06.440 --> 00:05:10.900
+<v Abhinav Asthana>found out that I would always get into issues later down the road because I really did not
+
+69
+00:05:10.900 --> 00:05:15.820
+<v Abhinav Asthana>understand a framework or a language properly. So I basically, the first version of Postman
+
+70
+00:05:15.820 --> 00:05:21.060
+<v Abhinav Asthana>was probably three or four files, you know, an HTML file, a CSS file, and a JavaScript file.
+
+71
+00:05:21.480 --> 00:05:27.900
+<v Abhinav Asthana>Very, very simple, you know, code base and probably not more than a few hundred lines of code.
+
+72
+00:05:28.460 --> 00:05:34.760
+<v Abhinav Asthana>Yeah, you know, I think the primary focus for me was the interface back then. I think I used the
+
+73
+00:05:36.440 --> 00:05:38.820
+<v Abhinav Asthana>if it's still popular now, but it was pretty popular back then.
+
+74
+00:05:39.220 --> 00:05:42.340
+<v Abhinav Asthana>Pretty simple, like I think I was using jQuery.
+
+75
+00:05:42.920 --> 00:05:46.720
+<v Abhinav Asthana>A lot of interesting stuff at that time was happening on the Chrome APIs,
+
+76
+00:05:47.060 --> 00:05:49.360
+<v Abhinav Asthana>like the local APIs that the browser was providing.
+
+77
+00:05:49.720 --> 00:05:52.720
+<v Abhinav Asthana>So IndexedDB was a local storage layer that I was using.
+
+78
+00:05:52.920 --> 00:05:56.560
+<v Abhinav Asthana>So, you know, it was a very, very simple MVP, which would just work.
+
+79
+00:05:56.840 --> 00:06:01.340
+<v Noah Labhart>I think that's a great message to send to people starting out building something,
+
+80
+00:06:01.520 --> 00:06:05.140
+<v Noah Labhart>trying to find the perfect framework, or I'm going to use this cool tool,
+
+81
+00:06:06.440 --> 00:06:08.760
+<v Noah Labhart>with the basics and build something quite amazing.
+
+82
+00:06:10.080 --> 00:06:15.340
+<v Noah Labhart>So with the MVP, with any MVP, right, you have to make certain decisions and trade-offs
+
+83
+00:06:15.340 --> 00:06:21.660
+<v Noah Labhart>about what you make in the short term and how you kind of cope with those decisions.
+
+84
+00:06:21.780 --> 00:06:26.780
+<v Noah Labhart>So tell me about some of those things, whether it be like, you know, technical debt or feature
+
+85
+00:06:26.780 --> 00:06:29.580
+<v Noah Labhart>cut or starting small or anything like that.
+
+86
+00:06:29.640 --> 00:06:32.260
+<v Noah Labhart>Tell me about some of those trade-offs and how you coped with them.
+
+87
+00:06:33.860 --> 00:06:39.740
+<v Abhinav Asthana>So the way I think about it is that, you know, when you're building a product, and I'd, by the way, you
+
+88
+00:06:39.740 --> 00:06:45.100
+<v Abhinav Asthana>know, built and failed at many, many products, you know, until Postman. Uh, I mean, we, I had moderate
+
+89
+00:06:45.100 --> 00:06:50.140
+<v Abhinav Asthana>amount of success previously. The way I kind of looked at product building at that time, and still
+
+90
+00:06:50.140 --> 00:06:56.660
+<v Abhinav Asthana>do, is you're kind of exploring a problem space and you're exploring a solution space, and you don't
+
+91
+00:06:56.660 --> 00:07:01.400
+<v Abhinav Asthana>know the fullest extent of both of those, you know, in the beginning. You know, that's why you kind of
+
+92
+00:07:02.260 --> 00:07:10.160
+<v Abhinav Asthana>product to help you explore that. And what I tried to have always in front of me was this
+
+93
+00:07:10.160 --> 00:07:15.840
+<v Abhinav Asthana>awareness that I don't really know the problem set completely just yet, but I want to have my
+
+94
+00:07:15.840 --> 00:07:25.360
+<v Abhinav Asthana>solution be robust enough to explore an increasingly wider set of problems to solve. And it might
+
+95
+00:07:25.360 --> 00:07:30.360
+<v Abhinav Asthana>happen that, you know, my problem space might just expand very rapidly. You know, just a feature,
+
+96
+00:07:32.260 --> 00:07:37.260
+<v Abhinav Asthana>said that, hey, you know, what would be cool in Postman is if these tests could be automated,
+
+97
+00:07:37.520 --> 00:07:41.120
+<v Abhinav Asthana>you know, what you're writing or something like, hey, could I just add some JavaScript to it?
+
+98
+00:07:41.500 --> 00:07:46.740
+<v Abhinav Asthana>And what I noticed was that the way in which people use products, you know, those ideas that
+
+99
+00:07:46.740 --> 00:07:52.920
+<v Abhinav Asthana>come into your mind could really expand the problem space very quickly. And it's not very
+
+100
+00:07:53.440 --> 00:07:57.220
+<v Abhinav Asthana>likely that your solution that you have been building or the way you have been building that
+
+101
+00:07:57.220 --> 00:08:01.860
+<v Abhinav Asthana>is going to scale up to that right away. So there was like this, I think, repeated periods of
+
+102
+00:08:02.260 --> 00:08:07.240
+<v Abhinav Asthana>refactorings, you know, like from those three files, I had to, you know, organize stuff into folders,
+
+103
+00:08:07.280 --> 00:08:12.880
+<v Abhinav Asthana>and then I had to go to separating stuff into modules. And then I had to go into figuring out
+
+104
+00:08:12.880 --> 00:08:18.120
+<v Abhinav Asthana>to how to separate the UI layer and the compute layer and the database layer. And so I kind of
+
+105
+00:08:18.120 --> 00:08:23.180
+<v Abhinav Asthana>always kept in mind, like, okay, what are the next six? What do the next six months look like?
+
+106
+00:08:23.220 --> 00:08:28.620
+<v Abhinav Asthana>What does the next one year look like? And when my co founders joined in, which was in 2013,
+
+107
+00:08:28.620 --> 00:08:33.520
+<v Abhinav Asthana>you know, we always kept in mind that, hey, this is an increasingly bigger and bigger
+
+108
+00:08:33.520 --> 00:08:35.600
+<v Abhinav Asthana>problem space to an extent.
+
+109
+00:08:35.740 --> 00:08:38.880
+<v Abhinav Asthana>You know, of course, now we see that, you know, every company in the world needs an
+
+110
+00:08:38.880 --> 00:08:39.440
+<v Abhinav Asthana>API platform.
+
+111
+00:08:40.020 --> 00:08:45.220
+<v Abhinav Asthana>But at this point in time, you want to focus, you want to solve problems, a limited set
+
+112
+00:08:45.220 --> 00:08:46.900
+<v Abhinav Asthana>of problems for these users.
+
+113
+00:08:47.320 --> 00:08:49.300
+<v Abhinav Asthana>And, you know, can we ship next week?
+
+114
+00:08:49.340 --> 00:08:50.280
+<v Abhinav Asthana>Can we ship next month?
+
+115
+00:08:50.340 --> 00:08:55.280
+<v Abhinav Asthana>If our time horizon of shipping is six months from now, then it's probably the wrong problem
+
+116
+00:08:55.280 --> 00:08:55.780
+<v Abhinav Asthana>to solve.
+
+117
+00:08:57.560 --> 00:09:04.740
+<v Noah Labhart>Well, from that point, how did you progress the product? How did you mature it? And I'm curious
+
+118
+00:09:04.740 --> 00:09:11.640
+<v Noah Labhart>how you went about the process of building your roadmap and deciding, okay, this is the next most
+
+119
+00:09:11.640 --> 00:09:13.080
+<v Noah Labhart>important thing to build.
+
+120
+00:09:13.080 --> 00:09:20.420
+<v Abhinav Asthana>So as you know, Postman grew, I started, you know, looking at every data
+
+121
+00:09:20.420 --> 00:09:25.220
+<v Abhinav Asthana>point that was coming in, you know, people recommending it on Twitter, people
+
+122
+00:09:25.220 --> 00:09:30.380
+<v Abhinav Asthana>posting reviews, people posting feature requests on GitHub, you know, blog
+
+123
+00:09:30.380 --> 00:09:35.120
+<v Abhinav Asthana>articles or references of all sorts. And I think, first of all, it was just a lot
+
+124
+00:09:35.120 --> 00:09:39.860
+<v Abhinav Asthana>of fun to explore. And, you know, I think that I'd say those feeling of joy that
+
+125
+00:09:39.860 --> 00:09:45.040
+<v Abhinav Asthana>you get, that somebody independently of you telling them, hey, go and use my
+
+126
+00:09:45.040 --> 00:09:48.720
+<v Abhinav Asthana>product, you know, somebody discovering it, using it, was just like a pretty magical
+
+127
+00:09:50.420 --> 00:09:54.980
+<v Abhinav Asthana>what we tried to have as co-founders in the team was really try to picture the world that that
+
+128
+00:09:54.980 --> 00:10:00.080
+<v Abhinav Asthana>person was in. What are they going to deal with at work? You know, why are they asking about this
+
+129
+00:10:00.080 --> 00:10:05.040
+<v Abhinav Asthana>particular feature? You know, how many APIs are they building every day? So we were continuously
+
+130
+00:10:05.040 --> 00:10:10.500
+<v Abhinav Asthana>asking all those features on top of the reviews and the references that we were getting. And we
+
+131
+00:10:10.500 --> 00:10:15.660
+<v Abhinav Asthana>tried to draw out themes from that. We tried to see, you know, what is the right categorization
+
+132
+00:10:15.660 --> 00:10:18.900
+<v Abhinav Asthana>of these asks, for example, that are coming in.
+
+133
+00:10:19.040 --> 00:10:22.500
+<v Abhinav Asthana>And do these asks help us stay the course
+
+134
+00:10:22.500 --> 00:10:24.560
+<v Abhinav Asthana>of where we want the product to go?
+
+135
+00:10:24.820 --> 00:10:27.360
+<v Abhinav Asthana>So we also framed our two core hypotheses
+
+136
+00:10:27.360 --> 00:10:28.300
+<v Abhinav Asthana>around the product.
+
+137
+00:10:28.400 --> 00:10:30.220
+<v Abhinav Asthana>First of all was that the world is shifting
+
+138
+00:10:30.220 --> 00:10:32.500
+<v Abhinav Asthana>from code-first to API-first development,
+
+139
+00:10:33.140 --> 00:10:34.880
+<v Abhinav Asthana>where essentially every piece of software
+
+140
+00:10:34.880 --> 00:10:36.960
+<v Abhinav Asthana>is going to be an API or be using APIs.
+
+141
+00:10:37.400 --> 00:10:39.120
+<v Abhinav Asthana>And developers are using tools
+
+142
+00:10:39.120 --> 00:10:40.820
+<v Abhinav Asthana>that are not built for that kind of world.
+
+143
+00:10:40.960 --> 00:10:43.040
+<v Abhinav Asthana>So that was the first hypothesis we framed.
+
+144
+00:10:43.100 --> 00:10:44.140
+<v Abhinav Asthana>And the second thing we framed,
+
+145
+00:10:45.660 --> 00:10:50.740
+<v Abhinav Asthana>the product was that the way people collaborate on APIs is also going to fundamentally change.
+
+146
+00:10:50.900 --> 00:10:54.620
+<v Abhinav Asthana>What people are primarily doing is code collaboration, not API collaboration.
+
+147
+00:10:55.240 --> 00:11:02.100
+<v Abhinav Asthana>So these two themes we kind of kept in sight and saw, okay, is feedback coming in and adding
+
+148
+00:11:02.100 --> 00:11:06.260
+<v Abhinav Asthana>weight to any of these things, or are they taking the product in a new direction?
+
+149
+00:11:07.360 --> 00:11:12.900
+<v Abhinav Asthana>Then I think we benefited from having designers in the team very early on who looked at UI
+
+150
+00:11:12.900 --> 00:11:14.380
+<v Abhinav Asthana>design and user experiences.
+
+151
+00:11:15.660 --> 00:11:19.560
+<v Abhinav Asthana>still haven't nailed down the perfect formula that can be just given to people and say that,
+
+152
+00:11:19.600 --> 00:11:26.860
+<v Abhinav Asthana>you know, run with it. It's a mix of intuition, metrics, qualitative data, and vision that goes
+
+153
+00:11:26.860 --> 00:11:31.320
+<v Abhinav Asthana>into building successive iterations of the product. The number one rule for us is that
+
+154
+00:11:31.320 --> 00:11:37.020
+<v Abhinav Asthana>we got to continue increasing the speed of iteration. If that goes down, then we have a
+
+155
+00:11:37.520 --> 00:11:38.040
+<v Abhinav Asthana>bigger problem.
+
+156
+00:11:39.300 --> 00:11:42.780
+<v Noah Labhart>Well, let's switch to team. So in those early days, when you start getting some
+
+157
+00:11:42.780 --> 00:11:47.800
+<v Noah Labhart>some traction, you built your roadmap, you're starting to grow the postman solution. How did
+
+158
+00:11:47.800 --> 00:11:52.860
+<v Noah Labhart>you go about building your team? And I'm interested in, you know, what you looked for in those people
+
+159
+00:11:52.860 --> 00:11:56.060
+<v Noah Labhart>to indicate that they were the winning horses to join you.
+
+160
+00:11:57.400 --> 00:11:59.760
+<v Abhinav Asthana>The first and probably the most
+
+161
+00:11:59.760 --> 00:12:05.200
+<v Abhinav Asthana>important thing was really like the belief in our vision. And, you know, just basically even
+
+162
+00:12:05.200 --> 00:12:09.840
+<v Abhinav Asthana>something as simple as do they understand APIs at all? You know, if you don't understand APIs or
+
+163
+00:12:09.840 --> 00:12:14.460
+<v Abhinav Asthana>really don't see the power of APIs, it'll be very hard for you to be excited about what we're
+
+164
+00:12:14.460 --> 00:12:19.160
+<v Abhinav Asthana>building. I mean, we made our mistakes as well. And, you know, people just didn't see it the same
+
+165
+00:12:19.160 --> 00:12:24.900
+<v Abhinav Asthana>way. And we were like, you know, that's fine. We have a unique viewpoint and nobody knows about it.
+
+166
+00:12:24.960 --> 00:12:30.000
+<v Abhinav Asthana>It is likely that we will see more people who don't see things than people who do. So that was
+
+167
+00:12:30.000 --> 00:12:34.740
+<v Abhinav Asthana>kind of like the number one thing. You know, we looked for generalists who could, you know, divide
+
+168
+00:12:34.740 --> 00:12:38.260
+<v Abhinav Asthana>their time into multiple different tasks in the early days.
+
+169
+00:12:38.460 --> 00:12:42.420
+<v Abhinav Asthana>And, you know, they could focus on one thing if asked to, but could really like double
+
+170
+00:12:42.420 --> 00:12:43.340
+<v Abhinav Asthana>up in multiple roles.
+
+171
+00:12:43.980 --> 00:12:49.020
+<v Abhinav Asthana>People who are, you know, kind of long-term thinkers, you know, people who would pass
+
+172
+00:12:49.020 --> 00:12:54.500
+<v Abhinav Asthana>the marshmallow test, for example, for adults, you know, like that's how I would phrase it.
+
+173
+00:12:54.700 --> 00:12:59.360
+<v Abhinav Asthana>So that those sort of things we like looked at, you know, and I think having a healthy
+
+174
+00:12:59.360 --> 00:13:05.840
+<v Abhinav Asthana>the team and a team that is giving each other positive feedback and negative feedback when
+
+175
+00:13:05.840 --> 00:13:12.160
+<v Abhinav Asthana>needed to strengthen, you know, the team was much more important than I'd say, like a specific
+
+176
+00:13:12.160 --> 00:13:17.820
+<v Abhinav Asthana>skill set. We found out like specific skill sets don't translate to well-working teams in the early
+
+177
+00:13:17.820 --> 00:13:18.320
+<v Abhinav Asthana>days.
+
+178
+00:13:21.940 --> 00:13:27.640
+<v Noah Labhart>Well, let's flip over to scalability. Did you build this in the beginning to scale
+
+179
+00:13:29.360 --> 00:13:30.820
+<v Noah Labhart>Were you fighting this as you grew?
+
+180
+00:13:30.980 --> 00:13:35.460
+<v Noah Labhart>And I'm curious to see how this applied to you as you grew Postman.
+
+181
+00:13:37.420 --> 00:13:45.240
+<v Abhinav Asthana>The things that we have learned is that there's a lot of pull from the market, almost at like all levels, you know.
+
+182
+00:13:45.260 --> 00:13:49.480
+<v Abhinav Asthana>And I could even see it in our issue tracker or, you know, sometimes references.
+
+183
+00:13:49.580 --> 00:13:53.940
+<v Abhinav Asthana>When I was a solo developer, you know, people were extremely nice.
+
+184
+00:13:54.140 --> 00:13:57.220
+<v Abhinav Asthana>They were like, oh, we want this, but I know how hard you're working.
+
+185
+00:13:57.220 --> 00:14:01.480
+<v Abhinav Asthana>you know, please, you know, take your time and build it, right?
+
+186
+00:14:01.580 --> 00:14:02.740
+<v Abhinav Asthana>But there was still like a lot of requests.
+
+187
+00:14:02.960 --> 00:14:05.640
+<v Abhinav Asthana>And as we became larger, you know, people wanted more things.
+
+188
+00:14:05.740 --> 00:14:08.280
+<v Abhinav Asthana>And as we had customers, people still wanted more things.
+
+189
+00:14:09.360 --> 00:14:12.720
+<v Abhinav Asthana>In our market, we saw that there's just like a lot of pull
+
+190
+00:14:12.720 --> 00:14:16.940
+<v Abhinav Asthana>and that has forced us to scale way faster than, you know,
+
+191
+00:14:16.960 --> 00:14:18.500
+<v Abhinav Asthana>I'd say for most other companies.
+
+192
+00:14:19.300 --> 00:14:22.340
+<v Abhinav Asthana>I think there are two dimensions, I would say.
+
+193
+00:14:22.460 --> 00:14:25.640
+<v Abhinav Asthana>One is the breadth of the company where we had to add additional functions
+
+194
+00:14:27.220 --> 00:14:30.740
+<v Abhinav Asthana>inside the company, like, you know, we need to have a developer relations function.
+
+195
+00:14:31.160 --> 00:14:32.760
+<v Abhinav Asthana>We need to have a marketing function.
+
+196
+00:14:32.900 --> 00:14:34.600
+<v Abhinav Asthana>We need to have a customer success function.
+
+197
+00:14:34.760 --> 00:14:35.520
+<v Abhinav Asthana>We need to add support.
+
+198
+00:14:36.140 --> 00:14:42.760
+<v Abhinav Asthana>And then on the depth of talent and capabilities, we need to grow within engineering our cloud
+
+199
+00:14:42.760 --> 00:14:43.260
+<v Abhinav Asthana>capability.
+
+200
+00:14:44.120 --> 00:14:48.420
+<v Abhinav Asthana>We need to learn, you know, how to deliver things, you know, to millions of developers
+
+201
+00:14:48.420 --> 00:14:49.300
+<v Abhinav Asthana>at scale.
+
+202
+00:14:49.460 --> 00:14:51.960
+<v Abhinav Asthana>So kind of like these two dimensions were the ones we were tracking.
+
+203
+00:14:51.960 --> 00:14:58.440
+<v Abhinav Asthana>You know, today the company is more than 400 people now across probably more than 10 countries already.
+
+204
+00:14:58.600 --> 00:15:02.680
+<v Abhinav Asthana>And we continue to scale, but, you know, kind of like the structure is more well-defined.
+
+205
+00:15:05.100 --> 00:15:10.920
+<v Noah Labhart>As you step out on the balcony and you look across what you've built, what are you most proud of?
+
+206
+00:15:12.000 --> 00:15:13.180
+<v Abhinav Asthana>I'd say two things, you know.
+
+207
+00:15:13.220 --> 00:15:18.120
+<v Abhinav Asthana>First is the community and the feedback and the love that they have given us.
+
+208
+00:15:18.200 --> 00:15:20.820
+<v Abhinav Asthana>And, you know, I think the credit goes to the whole company.
+
+209
+00:15:21.960 --> 00:15:27.120
+<v Abhinav Asthana>what we ship you know be loved sometimes you know hit it it's all good like it's just amazing
+
+210
+00:15:27.780 --> 00:15:31.860
+<v Abhinav Asthana>and as I said like you know that moment of joy that I got the first time around it's just never
+
+211
+00:15:31.860 --> 00:15:36.900
+<v Abhinav Asthana>gone away and it's kind of kept me excited about the next decade I think it's been you know quite
+
+212
+00:15:36.900 --> 00:15:40.440
+<v Abhinav Asthana>a few years since I started the company is young though you know the company was founded in 2000
+
+213
+00:15:40.440 --> 00:15:47.120
+<v Abhinav Asthana>late 2014 the company is relatively young and the project has been around longer so that's that's
+
+214
+00:15:47.120 --> 00:15:50.160
+<v Abhinav Asthana>It's been, you know, a big source of motivation for me.
+
+215
+00:15:50.320 --> 00:15:51.500
+<v Abhinav Asthana>And I'm very proud of that.
+
+216
+00:15:51.600 --> 00:15:54.420
+<v Abhinav Asthana>I think the second thing I'm proud of is basically our team itself.
+
+217
+00:15:54.980 --> 00:16:00.640
+<v Abhinav Asthana>You know, the way my co-founders work with me and the rest of the team and the way our team members are,
+
+218
+00:16:00.760 --> 00:16:08.660
+<v Abhinav Asthana>it's just fantastic to see people, you know, really caring about APIs and really caring about what they're going to build.
+
+219
+00:16:08.760 --> 00:16:10.340
+<v Abhinav Asthana>I think it just feels amazing.
+
+220
+00:16:10.560 --> 00:16:12.920
+<v Abhinav Asthana>Sometimes I'm like, oh my God, that's really happening.
+
+221
+00:16:14.620 --> 00:16:16.180
+<v Noah Labhart>Let's flip the script a little bit.
+
+222
+00:16:17.120 --> 00:16:20.720
+<v Noah Labhart>about a mistake you made and how you and your team responded to it.
+
+223
+00:16:22.000 --> 00:16:26.320
+<v Abhinav Asthana>So, I mean, there are many, many, many mistakes, you know, I think over time.
+
+224
+00:16:26.560 --> 00:16:35.660
+<v Abhinav Asthana>I'd say one mistake probably as I was moving to the U.S. was I probably did kind of underestimated
+
+225
+00:16:35.660 --> 00:16:43.540
+<v Abhinav Asthana>the amount of work that, you know, I should have put in on building and kind of sticking
+
+226
+00:16:43.540 --> 00:16:44.360
+<v Abhinav Asthana>to our culture.
+
+227
+00:16:44.360 --> 00:16:55.700
+<v Abhinav Asthana>You know, I kind of assumed early on that, you know, there are going to be, you know, different personalities and distinct identities, maybe even inside the company.
+
+228
+00:16:55.720 --> 00:17:00.080
+<v Abhinav Asthana>And it was just like a thought in my head, which had many, many implications down the road.
+
+229
+00:17:00.120 --> 00:17:03.600
+<v Abhinav Asthana>And, you know, kind of the people we hired and the kind of processes we built.
+
+230
+00:17:03.680 --> 00:17:12.780
+<v Abhinav Asthana>And it took some time to uncover that and really, you know, hone in on what, you know, we wanted everybody, you know, to be like in a way.
+
+231
+00:17:14.360 --> 00:17:20.340
+<v Abhinav Asthana>a hard realization that you know you you just have to really work in establishing the right culture
+
+232
+00:17:20.340 --> 00:17:26.120
+<v Abhinav Asthana>the right processes that apply to postman and not something that you can just copy paste from
+
+233
+00:17:26.120 --> 00:17:30.660
+<v Abhinav Asthana>another company just because somebody worked at a you know bigger company or at that point in time
+
+234
+00:17:30.660 --> 00:17:35.380
+<v Abhinav Asthana>more successful company so now we are much more rigorous about onboarding people hopefully much
+
+235
+00:17:35.380 --> 00:17:39.860
+<v Abhinav Asthana>better at assessing and interviewing people so all those things you have to put in place after those
+
+236
+00:17:39.860 --> 00:17:40.360
+<v Abhinav Asthana>mistakes.
+
+237
+00:17:42.020 --> 00:17:46.800
+<v Noah Labhart>So this will be interesting and I'm excited to hear what does the future
+
+238
+00:17:46.800 --> 00:17:49.720
+<v Noah Labhart>look like for Postman, the product and for your team?
+
+239
+00:17:51.640 --> 00:17:52.780
+<v Abhinav Asthana>I'm you know extremely
+
+240
+00:17:52.780 --> 00:17:57.200
+<v Abhinav Asthana>excited about the potential of APIs. I think we're still just getting
+
+241
+00:17:57.200 --> 00:18:03.500
+<v Abhinav Asthana>started on what APIs unlock for the world. You know our vision is that
+
+242
+00:18:03.500 --> 00:18:08.640
+<v Abhinav Asthana>Postman is gonna help create net new developers in the world. I talked about
+
+243
+00:18:09.860 --> 00:18:15.160
+<v Abhinav Asthana>what we're seeing is this massive explosion in the number of people who want to build stuff.
+
+244
+00:18:15.500 --> 00:18:18.520
+<v Abhinav Asthana>And building, you know, can have many different connotations.
+
+245
+00:18:18.760 --> 00:18:23.460
+<v Abhinav Asthana>You know, you can write code, you can, you know, integrate different applications.
+
+246
+00:18:24.060 --> 00:18:28.600
+<v Abhinav Asthana>You can, you know, build things on top of other platforms like, you know, Slack and Salesforce.
+
+247
+00:18:29.380 --> 00:18:35.700
+<v Abhinav Asthana>But what we are seeing is this unique need to build, to improve, you know, workflows,
+
+248
+00:18:35.700 --> 00:18:38.700
+<v Abhinav Asthana>whether it's customer support, it's sales, it's marketing,
+
+249
+00:18:38.840 --> 00:18:42.000
+<v Abhinav Asthana>and it's like all of these different professions that are coming up now.
+
+250
+00:18:42.180 --> 00:18:44.740
+<v Abhinav Asthana>And all of that is powered by APIs.
+
+251
+00:18:45.280 --> 00:18:48.660
+<v Abhinav Asthana>And, you know, I believe that even more so in the world,
+
+252
+00:18:48.720 --> 00:18:50.040
+<v Abhinav Asthana>like everything's going to be API driven.
+
+253
+00:18:50.620 --> 00:18:54.560
+<v Abhinav Asthana>It's going to force people to think about new kinds of business models,
+
+254
+00:18:54.640 --> 00:18:58.720
+<v Abhinav Asthana>you know, that are more relevant for a more privacy aware world
+
+255
+00:18:58.720 --> 00:19:02.160
+<v Abhinav Asthana>and more aware of the security implications that exist today.
+
+256
+00:19:02.160 --> 00:19:05.800
+<v Abhinav Asthana>and we are all kind of connected along with, you know, creating these building blocks,
+
+257
+00:19:05.900 --> 00:19:11.220
+<v Abhinav Asthana>which what this new generation of, you know, developers or builders, if I may, will do.
+
+258
+00:19:11.340 --> 00:19:21.920
+<v Abhinav Asthana>And Postman, you know, is, I'd say, in a unique place and that we have the trust of more than 15 million people as of today to help, you know, build that new world.
+
+259
+00:19:22.760 --> 00:19:27.360
+<v Noah Labhart>So let's switch to you, Abhinav. Who influences the way that you work?
+
+260
+00:19:27.360 --> 00:19:31.880
+<v Noah Labhart>Name a CEO, a CTO, an architect, really any person.
+
+261
+00:19:31.980 --> 00:19:34.060
+<v Noah Labhart>Name a person you look up to and why.
+
+262
+00:19:35.900 --> 00:19:40.040
+<v Abhinav Asthana>You know, my geek days, I'm still a geek, right?
+
+263
+00:19:40.160 --> 00:19:44.940
+<v Abhinav Asthana>In my early days, I was like, oh my God, Windows and Bill Gates.
+
+264
+00:19:45.520 --> 00:19:47.180
+<v Abhinav Asthana>I want to be like that.
+
+265
+00:19:47.620 --> 00:19:51.460
+<v Abhinav Asthana>But it shifted more to, I think, as I dived more into coding,
+
+266
+00:19:52.640 --> 00:19:54.940
+<v Abhinav Asthana>Steve Wozniak, Red Eye Woz.
+
+267
+00:19:55.060 --> 00:19:56.840
+<v Abhinav Asthana>We had him at our conference recently.
+
+268
+00:19:57.360 --> 00:20:05.260
+<v Abhinav Asthana>and he was amazing. I think recently, you know, I've been admiring, primarily because of the way
+
+269
+00:20:05.260 --> 00:20:11.000
+<v Abhinav Asthana>Amazon does APIs and they kind of pioneered AWS, you know, more of Jeff Bezos, you know, I mean,
+
+270
+00:20:11.020 --> 00:20:15.560
+<v Abhinav Asthana>I think everything that is written, you know, I try to read and see, you know, what I can learn
+
+271
+00:20:15.560 --> 00:20:20.000
+<v Abhinav Asthana>from. So I think that's one person in the recent times, you know, that has influenced my thinking
+
+272
+00:20:20.000 --> 00:20:27.020
+<v Abhinav Asthana>a lot. But yeah, I think I mostly now look at mentors as, you know, people who I can learn
+
+273
+00:20:27.360 --> 00:20:29.380
+<v Abhinav Asthana>and thinks from rather than the persona itself.
+
+274
+00:20:29.660 --> 00:20:32.700
+<v Abhinav Asthana>Kind of gone over, you know, the Jobs versus Wozniak debate
+
+275
+00:20:32.700 --> 00:20:33.500
+<v Abhinav Asthana>and those sort of things.
+
+276
+00:20:36.440 --> 00:20:39.200
+<v Noah Labhart>Well, we talked about mistakes, right?
+
+277
+00:20:39.320 --> 00:20:40.840
+<v Noah Labhart>But a little bit different spin.
+
+278
+00:20:41.040 --> 00:20:42.780
+<v Noah Labhart>If you could go back to the beginning,
+
+279
+00:20:43.360 --> 00:20:44.660
+<v Noah Labhart>what would you do differently?
+
+280
+00:20:44.760 --> 00:20:47.180
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+281
+00:20:50.360 --> 00:20:52.520
+<v Abhinav Asthana>I would have probably, you know,
+
+282
+00:20:53.460 --> 00:20:55.480
+<v Abhinav Asthana>if I had the benefit of hindsight,
+
+283
+00:20:57.460 --> 00:21:02.600
+<v Abhinav Asthana>and forced my co-founders to leave their jobs earlier.
+
+284
+00:21:03.180 --> 00:21:06.720
+<v Abhinav Asthana>I kind of took some time out from my first company
+
+285
+00:21:06.720 --> 00:21:09.340
+<v Abhinav Asthana>and then the second company just to recharge,
+
+286
+00:21:09.460 --> 00:21:11.060
+<v Abhinav Asthana>which was generally a good thing.
+
+287
+00:21:11.280 --> 00:21:14.400
+<v Abhinav Asthana>But knowing the potential that we have today,
+
+288
+00:21:14.520 --> 00:21:17.300
+<v Abhinav Asthana>I would have just gone all in earlier.
+
+289
+00:21:17.780 --> 00:21:22.440
+<v Noah Labhart>I hear that answer a lot, and I represent that answer too.
+
+290
+00:21:22.520 --> 00:21:23.620
+<v Noah Labhart>I wish I would have started earlier.
+
+291
+00:21:25.400 --> 00:21:30.540
+<v Noah Labhart>Well, last question, Abhinav. You're getting on a plane and you're sitting next to a young
+
+292
+00:21:30.540 --> 00:21:34.640
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+293
+00:21:34.640 --> 00:21:38.080
+<v Noah Labhart>show it off to the world. They can't wait to show it off to you right there on the plane.
+
+294
+00:21:38.400 --> 00:21:41.720
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+295
+00:21:43.820 --> 00:21:48.360
+<v Abhinav Asthana>So, you know, after having spoken to a few founders, I would say, you know,
+
+296
+00:21:48.360 --> 00:21:53.060
+<v Abhinav Asthana>listen to your customers like deeply and believe in your vision and yourself.
+
+297
+00:21:53.620 --> 00:22:00.980
+<v Abhinav Asthana>I felt like everything in between is something that clouds the clarity that I think early founders can have.
+
+298
+00:22:01.160 --> 00:22:05.220
+<v Abhinav Asthana>You know, if you are the customer or the early customer of your product, great.
+
+299
+00:22:05.340 --> 00:22:08.440
+<v Abhinav Asthana>You know, it probably helps you a lot because you've kind of felt the pain.
+
+300
+00:22:08.540 --> 00:22:15.320
+<v Abhinav Asthana>But if your product is or your company is solving someone else's pain point, you know, listening to them and listening,
+
+301
+00:22:15.340 --> 00:22:20.360
+<v Abhinav Asthana>not in the sense of just I have to sell a product to them at some point, but really empathizing with their pain point,
+
+302
+00:22:20.440 --> 00:22:22.540
+<v Abhinav Asthana>really believing and, you know, feeling that pain point.
+
+303
+00:22:23.620 --> 00:22:35.000
+<v Abhinav Asthana>And then when the challenges of company building, like fundraising, hiring, pitching, you know, just the basic operational stuff that comes your way and you kind of feel like, oh, my God, do I really know all this stuff?
+
+304
+00:22:35.280 --> 00:22:42.140
+<v Abhinav Asthana>You know, you kind of go back to kind of the clarity that you probably had when you started the company that, you know, why you did that.
+
+305
+00:22:42.200 --> 00:22:43.660
+<v Abhinav Asthana>And if you believe that, I think you'll be through.
+
+306
+00:22:44.320 --> 00:22:45.180
+<v Noah Labhart>That's great advice.
+
+307
+00:22:46.020 --> 00:22:47.900
+<v Noah Labhart>Abhinav, thank you for being on the show today.
+
+308
+00:22:47.980 --> 00:22:52.580
+<v Noah Labhart>Thank you for being on Code Story and telling the creation story of Postman.
+
+309
+00:22:53.620 --> 00:22:54.940
+<v Abhinav Asthana>Thanks for having me, Noah. It was a pleasure.
+
+310
+00:22:56.800 --> 00:22:59.960
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+311
+00:23:04.360 --> 00:23:07.360
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+312
+00:23:07.540 --> 00:23:12.300
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+313
+00:23:12.720 --> 00:23:17.780
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just $5 to $10 a month.
+
+314
+00:23:18.140 --> 00:23:20.380
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+315
+00:23:20.660 --> 00:23:22.580
+<v Noah Labhart>Both things help us out tremendously.
+
+316
+00:23:25.020 --> 00:23:26.500
+<v Noah Labhart>and thanks again for listening.

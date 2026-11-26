@@ -1,0 +1,1355 @@
+WEBVTT
+
+NOTE S10 Favorite: The Trillion-User Scalability Crisis: Re-Architecting Bitcoin’s Layer 2 for Instant, Enterprise-Grade Global Liquidity with Kevin Hurley, Co-Founder & CTO of Lightspark
+
+1
+00:00:00.000 --> 00:00:03.820
+<v Kevin Hurley>We started out by running a full LND node for each customer.
+
+2
+00:00:03.980 --> 00:00:08.120
+<v Kevin Hurley>But obviously that wasn't something that would be scalable or efficient long-term.
+
+3
+00:00:08.140 --> 00:00:11.840
+<v Kevin Hurley>If you have to spin up an AWS pod for every single customer,
+
+4
+00:00:11.960 --> 00:00:16.120
+<v Kevin Hurley>if you have hundreds or millions of customers, that's obviously not going to scale well.
+
+5
+00:00:16.340 --> 00:00:20.540
+<v Kevin Hurley>So we started off taking that as we want to get something out on the market.
+
+6
+00:00:20.660 --> 00:00:25.280
+<v Kevin Hurley>We want to be able to prove that we can actually simplify how Lightning works
+
+7
+00:00:25.280 --> 00:00:28.240
+<v Kevin Hurley>and make it so that customers can easily integrate.
+
+8
+00:00:28.240 --> 00:00:33.240
+<v Kevin Hurley>and from there we'll be able to figure out how we scale better and actually make the right
+
+9
+00:00:33.240 --> 00:00:36.640
+<v Kevin Hurley>trade-offs later on but we didn't want to over complicate things at the start
+
+10
+00:00:36.640 --> 00:00:39.500
+<v Kevin Hurley>until we actually felt like we had something that was going to be valid
+
+11
+00:00:39.500 --> 00:00:43.640
+<v Kevin Hurley>valuable. I'm Kevin Hurley. I'm the CTO and one of the co-founders at Lightspark.
+
+12
+00:00:46.580 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+13
+00:00:52.340 --> 00:00:55.200
+<v Clip>Six months moonlighting. There's nothing like the bedcams.
+
+14
+00:00:55.460 --> 00:00:58.420
+<v Noah Labhart>Who share what it takes to change an industry. I
+
+15
+00:00:58.420 --> 00:00:59.840
+<v Clip>don't exactly know what to do next.
+
+16
+00:00:59.840 --> 00:01:01.220
+<v Clip>It took many goes to get right.
+
+17
+00:01:01.780 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+18
+00:01:04.740 --> 00:01:07.400
+<v Clip>The company is its people. The teams help each other achieve.
+
+19
+00:01:09.560 --> 00:01:11.220
+<v Noah Labhart>Scalability top of mind
+
+20
+00:01:11.220 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain
+
+21
+00:01:12.880 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group
+
+22
+00:01:14.220 --> 00:01:15.300
+<v Clip>Total waste of time
+
+23
+00:01:15.300 --> 00:01:17.860
+<v Noah Labhart>The stories you don't read in the headlines
+
+24
+00:01:17.860 --> 00:01:20.000
+<v Clip>It's not an easy thing to achieve, Mike
+
+25
+00:01:20.000 --> 00:01:22.120
+<v Clip>Took it off the shelf and dusted it off and tried to begin
+
+26
+00:01:22.120 --> 00:01:25.860
+<v Noah Labhart>To ride the ups and downs of the startup life
+
+27
+00:01:25.860 --> 00:01:27.560
+<v Clip>You need to really want it
+
+28
+00:01:27.560 --> 00:01:28.800
+<v Clip>It's not just about technology
+
+29
+00:01:28.800 --> 00:01:30.940
+<v Noah Labhart>All this and more on Code Story
+
+30
+00:01:32.460 --> 00:01:33.860
+<v Noah Labhart>I'm your host, Noah Labhart
+
+31
+00:01:33.860 --> 00:01:35.700
+<v Noah Labhart>And today, how Kevin Hurley
+
+32
+00:01:35.700 --> 00:01:38.300
+<v Noah Labhart>Is building open payments for the internet
+
+33
+00:01:39.400 --> 00:01:42.840
+<v Noah Labhart>Surprise, great, secure, and on the Lightning Network.
+
+34
+00:01:49.460 --> 00:01:54.080
+<v Noah Labhart>Kevin Hurley grew up in a multi-kid house, which is where he got his competitive nature.
+
+35
+00:01:54.460 --> 00:01:57.780
+<v Noah Labhart>He used to play two-on-two with his dad and siblings at home.
+
+36
+00:01:57.940 --> 00:02:03.760
+<v Noah Labhart>He went to school for electrical engineering and, funny enough, interviewed for a computer science job by accident,
+
+37
+00:02:04.020 --> 00:02:05.940
+<v Noah Labhart>effectively stumbling into the trade.
+
+38
+00:02:06.520 --> 00:02:09.860
+<v Noah Labhart>Outside of tech, he spends his free time with his fiancée,
+
+39
+00:02:09.960 --> 00:02:13.040
+<v Noah Labhart>planning for the wedding and visiting Manhattan Beach for a good walk.
+
+40
+00:02:14.140 --> 00:02:17.860
+<v Noah Labhart>Kevin was part of the team that attempted to launch crypto at Facebook.
+
+41
+00:02:18.320 --> 00:02:20.000
+<v Noah Labhart>Although that didn't work out,
+
+42
+00:02:20.060 --> 00:02:22.180
+<v Noah Labhart>they realized that the backbone of the system
+
+43
+00:02:22.180 --> 00:02:24.260
+<v Noah Labhart>needed to be built on something more common,
+
+44
+00:02:24.800 --> 00:02:26.720
+<v Noah Labhart>and something that was lightning fast.
+
+45
+00:02:28.960 --> 00:02:31.680
+<v Noah Labhart>This is the creation story of LightSpark.
+
+46
+00:02:36.740 --> 00:02:42.260
+<v Kevin Hurley>At LightSpark, our goal is to really help customers move money more easily and efficiently.
+
+47
+00:02:42.820 --> 00:02:48.480
+<v Kevin Hurley>If you look at the payments rails that exist today, they're generally pretty antiquated.
+
+48
+00:02:48.520 --> 00:02:52.240
+<v Kevin Hurley>They have existed since the 60s and 70s, largely unchanged.
+
+49
+00:02:52.820 --> 00:02:58.540
+<v Kevin Hurley>And what we want to do is take those antiquated payments rails and bring them to the modern day,
+
+50
+00:02:58.660 --> 00:03:03.860
+<v Kevin Hurley>bring them to the internet age where you can move money just like you move data packets on the internet.
+
+51
+00:03:04.540 --> 00:03:12.000
+<v Kevin Hurley>Instead of payments that take days to settle, are super expensive, don't actually work on weekends and nights,
+
+52
+00:03:12.200 --> 00:03:17.960
+<v Kevin Hurley>we want to have real-time payments that actually work like they do in the modern day, or like they should in the modern day.
+
+53
+00:03:18.300 --> 00:03:22.560
+<v Kevin Hurley>And we're doing that by building on top of Bitcoin and the Lightning Network.
+
+54
+00:03:22.820 --> 00:03:27.820
+<v Kevin Hurley>A bunch of reasons for that. A lot of us actually came from Facebook, where we were building Diem.
+
+55
+00:03:27.820 --> 00:03:33.460
+<v Kevin Hurley>And at Diem, coming from there, we realized that you really need something truly neutral
+
+56
+00:03:33.460 --> 00:03:36.780
+<v Kevin Hurley>and decentralized as a settlement network for payments globally.
+
+57
+00:03:37.440 --> 00:03:42.940
+<v Kevin Hurley>We took that mission that we had at Diem of trying to build this global interoperable
+
+58
+00:03:42.940 --> 00:03:48.120
+<v Kevin Hurley>open protocol for money and bring it to something that we think can actually really take off
+
+59
+00:03:48.120 --> 00:03:51.100
+<v Kevin Hurley>and truly revolutionize how money works.
+
+60
+00:03:51.340 --> 00:03:54.240
+<v Kevin Hurley>And that's why we ended up on Bitcoin and Lightning.
+
+61
+00:03:54.240 --> 00:03:58.220
+<v Kevin Hurley>Initially, our plan was to try to make Lightning very simple.
+
+62
+00:03:58.360 --> 00:04:05.020
+<v Kevin Hurley>Take all the complexity of Lightning, abstract that away, and make it so that customers can onboard to Lightning really easily.
+
+63
+00:04:05.240 --> 00:04:14.600
+<v Kevin Hurley>And then we start to add new use cases to make it into something that is really valuable for our users and is something that they can actually use for real-world use cases.
+
+64
+00:04:16.560 --> 00:04:18.000
+<v Noah Labhart>Tell me about the MVP.
+
+65
+00:04:18.420 --> 00:04:19.540
+<v Noah Labhart>And this will be interesting.
+
+66
+00:04:19.540 --> 00:04:22.300
+<v Noah Labhart>for that first version of LightSpark that you built.
+
+67
+00:04:22.380 --> 00:04:23.300
+<v Noah Labhart>How long did it take to build
+
+68
+00:04:23.300 --> 00:04:25.280
+<v Noah Labhart>and what sort of tools were you using to bring it to life?
+
+69
+00:04:26.360 --> 00:04:27.980
+<v Kevin Hurley>Yeah, it took about a year.
+
+70
+00:04:28.280 --> 00:04:32.560
+<v Kevin Hurley>So we started in April is when we first started LightSpark.
+
+71
+00:04:32.680 --> 00:04:35.080
+<v Kevin Hurley>And I think it was probably around April of the next year
+
+72
+00:04:35.080 --> 00:04:37.320
+<v Kevin Hurley>that we actually put out our first product.
+
+73
+00:04:38.120 --> 00:04:41.940
+<v Kevin Hurley>The initial plan was we were just going to take LND,
+
+74
+00:04:42.040 --> 00:04:44.280
+<v Kevin Hurley>which is a Lightning implementation,
+
+75
+00:04:44.720 --> 00:04:48.120
+<v Kevin Hurley>run that on AWS and provide a really simple interface
+
+76
+00:04:49.540 --> 00:04:55.420
+<v Kevin Hurley>those nodes to provide inbound liquidity dynamically, provide some machine learning for determining
+
+77
+00:04:55.420 --> 00:04:58.420
+<v Kevin Hurley>good routes, and make it really easy to integrate SDK.
+
+78
+00:04:59.040 --> 00:05:04.180
+<v Kevin Hurley>What we found was that even trying to simplify it, it was still too complex.
+
+79
+00:05:04.660 --> 00:05:10.400
+<v Kevin Hurley>We took that to customers, and even those that had been in the Bitcoin space or the
+
+80
+00:05:10.400 --> 00:05:15.260
+<v Kevin Hurley>crypto space for a long time had a hard time understanding some of the core concepts of
+
+81
+00:05:15.260 --> 00:05:15.760
+<v Kevin Hurley>Lightning.
+
+82
+00:05:15.520 --> 00:05:21.980
+<v Kevin Hurley>because in Lightning you have things like channels, whether pairwise channels. The way I think about
+
+83
+00:05:21.980 --> 00:05:27.580
+<v Kevin Hurley>it is beads on an abacus, or if you ever went to the dentist in the U.S., they always had those
+
+84
+00:05:27.580 --> 00:05:32.200
+<v Kevin Hurley>toys where you had those beads that you pushed along a wire. That's what channels are, where
+
+85
+00:05:32.200 --> 00:05:38.300
+<v Kevin Hurley>sats are the beads on the wire, and it goes between point to point. And that concept is vastly
+
+86
+00:05:38.300 --> 00:05:45.280
+<v Kevin Hurley>different than what exists in really any other L2 or L1. So it was really hard for customers
+
+87
+00:05:45.280 --> 00:05:50.260
+<v Kevin Hurley>to understand, who do we open channels to? What do channels even mean? How do you get inbound
+
+88
+00:05:50.260 --> 00:05:55.540
+<v Kevin Hurley>liquidity? How do you make this work well? So we found that the first version was still too
+
+89
+00:05:55.540 --> 00:06:00.140
+<v Kevin Hurley>complex. We quickly went back to the drawing board and tried to iterate on that and get it
+
+90
+00:06:00.140 --> 00:06:04.600
+<v Kevin Hurley>to something that was even simpler and that kind of abstracted the notion of channels entirely.
+
+91
+00:06:04.600 --> 00:06:05.100
+<v Kevin Hurley>entirely.
+
+92
+00:06:05.240 --> 00:06:09.000
+<v Noah Labhart>In building that MVP, and you touched on some of these in a high level, but I'm curious
+
+93
+00:06:09.000 --> 00:06:13.360
+<v Noah Labhart>about decisions and trade-offs you had to make in that first version, right? And maybe it was
+
+94
+00:06:13.360 --> 00:06:16.620
+<v Noah Labhart>something you learned, or maybe it was something, some hard decision you had to make as far as
+
+95
+00:06:16.620 --> 00:06:21.060
+<v Noah Labhart>how you were going to approach it, what you were going to prove, all those sorts of things. Maybe
+
+96
+00:06:21.060 --> 00:06:25.120
+<v Noah Labhart>dive in a little more to some of those decisions and trade-offs and how you coped with them.
+
+97
+00:06:26.160 --> 00:06:30.520
+<v Kevin Hurley>Like I mentioned, we started out by running a full LND node for each customer,
+
+98
+00:06:30.520 --> 00:06:35.820
+<v Kevin Hurley>which simplified our stack because that's how LND is packaged today.
+
+99
+00:06:36.080 --> 00:06:40.140
+<v Kevin Hurley>But obviously, that wasn't something that would be scalable or efficient long term.
+
+100
+00:06:40.200 --> 00:06:48.180
+<v Kevin Hurley>If you have to spin up an AWS pod for every single customer, if you have hundreds or millions of customers, that's obviously not going to scale well.
+
+101
+00:06:48.380 --> 00:06:52.620
+<v Kevin Hurley>So we started off taking that as we want to get something out on the market.
+
+102
+00:06:52.660 --> 00:07:00.300
+<v Kevin Hurley>We want to be able to prove that we can actually simplify how Lightning works and make it so that customers can easily integrate.
+
+103
+00:07:00.520 --> 00:07:06.300
+<v Kevin Hurley>And from there, we'll be able to figure out how we scale better and actually make the right tradeoffs later on.
+
+104
+00:07:06.360 --> 00:07:13.480
+<v Kevin Hurley>But we didn't want to overcomplicate things at the start until we actually felt like we had product market fit and that we had something that was going to be valuable.
+
+105
+00:07:13.900 --> 00:07:19.820
+<v Kevin Hurley>I think another area that we had a tradeoff was that we really just overcapitalized our nodes initially.
+
+106
+00:07:20.440 --> 00:07:27.620
+<v Kevin Hurley>So until we actually understood the network better and could see the usage patterns of how our customers were using the network,
+
+107
+00:07:27.620 --> 00:07:32.720
+<v Kevin Hurley>work. The easy solution was just to throw more capital at the problem, make it so that we could
+
+108
+00:07:32.720 --> 00:07:37.680
+<v Kevin Hurley>make sure that we can route whatever transactions our customers might have and ensure they have a
+
+109
+00:07:37.680 --> 00:07:42.160
+<v Kevin Hurley>good experience no matter what their usage patterns might be. Now that we've been running for a while,
+
+110
+00:07:42.300 --> 00:07:47.020
+<v Kevin Hurley>we can much more efficiently manage that once we've seen the usage patterns and once we've
+
+111
+00:07:47.020 --> 00:07:51.520
+<v Kevin Hurley>been able to understand better how customer funds might flow, we can make sure that we're
+
+112
+00:07:51.520 --> 00:07:56.440
+<v Kevin Hurley>actually connected throughout the graph really well without having to overcapitalize. And actually,
+
+113
+00:07:57.620 --> 00:08:02.880
+<v Kevin Hurley>that we have is that we can use our capital extremely efficiently and not need to lock up
+
+114
+00:08:02.880 --> 00:08:04.820
+<v Kevin Hurley>a ton of money in individual channels.
+
+115
+00:08:06.760 --> 00:08:10.520
+<v Noah Labhart>You've got the MVP. It's working. You're ready to move
+
+116
+00:08:10.520 --> 00:08:14.420
+<v Noah Labhart>forward. Tell me about how you progressed the product and matured it. I think to wrap in a box
+
+117
+00:08:14.420 --> 00:08:18.800
+<v Noah Labhart>a little bit, what I'm looking for is how did you build your roadmap and how did you go about and
+
+118
+00:08:18.800 --> 00:08:23.220
+<v Noah Labhart>how do you still go about deciding, okay, this is the next most important thing to build or to
+
+119
+00:08:23.220 --> 00:08:24.340
+<v Noah Labhart>to address with LightSpark?
+
+120
+00:08:25.240 --> 00:08:27.520
+<v Kevin Hurley>I think initially it was really,
+
+121
+00:08:27.600 --> 00:08:30.800
+<v Kevin Hurley>how do we get something that we feel like the exchanges
+
+122
+00:08:30.800 --> 00:08:33.320
+<v Kevin Hurley>and others that haven't integrated to Lightning,
+
+123
+00:08:33.540 --> 00:08:36.100
+<v Kevin Hurley>how do we get something that they can easily do that
+
+124
+00:08:36.100 --> 00:08:38.380
+<v Kevin Hurley>and they can start to see the value of Lightning?
+
+125
+00:08:38.540 --> 00:08:40.280
+<v Kevin Hurley>A lot of them, when we had talked to them initially,
+
+126
+00:08:40.780 --> 00:08:43.740
+<v Kevin Hurley>we tried to find out why weren't they using Lightning
+
+127
+00:08:43.740 --> 00:08:46.620
+<v Kevin Hurley>or if they were, why had they backed away from it
+
+128
+00:08:46.620 --> 00:08:47.160
+<v Kevin Hurley>at some point?
+
+129
+00:08:47.320 --> 00:08:49.540
+<v Kevin Hurley>And it was a very common refrain
+
+130
+00:08:49.540 --> 00:08:50.700
+<v Kevin Hurley>that it was just too complex.
+
+131
+00:08:50.880 --> 00:08:52.720
+<v Kevin Hurley>So that was our first starting point
+
+132
+00:08:53.220 --> 00:08:57.560
+<v Kevin Hurley>How do you simplify that, making this something they can integrate with a Stripe-like interface,
+
+133
+00:08:57.740 --> 00:09:03.500
+<v Kevin Hurley>where Stripe always used to advertise integrating 100 lines of code or 10 lines of code or whatever it was.
+
+134
+00:09:03.840 --> 00:09:05.680
+<v Kevin Hurley>We wanted to do something very similar.
+
+135
+00:09:05.880 --> 00:09:07.180
+<v Kevin Hurley>It won't take long to integrate.
+
+136
+00:09:07.340 --> 00:09:08.040
+<v Kevin Hurley>You can add support.
+
+137
+00:09:08.280 --> 00:09:10.380
+<v Kevin Hurley>You can start to see some real usage.
+
+138
+00:09:10.660 --> 00:09:14.200
+<v Kevin Hurley>And from there, we want to build real-world use cases on top of it.
+
+139
+00:09:14.820 --> 00:09:18.940
+<v Kevin Hurley>And I think that's where it becomes a much harder problem,
+
+140
+00:09:18.940 --> 00:09:24.040
+<v Kevin Hurley>is trying to find exactly what those use cases will be that will really catch on.
+
+141
+00:09:24.260 --> 00:09:28.980
+<v Kevin Hurley>I think for us, it's really been how do we make money move more easily and fluidly
+
+142
+00:09:28.980 --> 00:09:31.920
+<v Kevin Hurley>and bring use cases that customers have today
+
+143
+00:09:31.920 --> 00:09:37.520
+<v Kevin Hurley>that can be made better by a solution that works all the time and is extremely low cost.
+
+144
+00:09:38.000 --> 00:09:42.760
+<v Kevin Hurley>As an example, we recently launched Universal Money Addresses, or UMA.
+
+145
+00:09:43.060 --> 00:09:45.420
+<v Kevin Hurley>For a bit of context, to step back just a moment,
+
+146
+00:09:45.620 --> 00:09:48.200
+<v Kevin Hurley>there are a lot of real-time domestic rails.
+
+147
+00:09:48.940 --> 00:09:50.500
+<v Kevin Hurley>like UPI, PIX, or SPEI,
+
+148
+00:09:50.680 --> 00:09:53.640
+<v Kevin Hurley>that are instant bank rails within certain countries.
+
+149
+00:09:53.840 --> 00:09:55.180
+<v Kevin Hurley>So for those that I mentioned,
+
+150
+00:09:55.260 --> 00:09:56.680
+<v Kevin Hurley>it was like India, Brazil, Mexico,
+
+151
+00:09:56.980 --> 00:09:59.740
+<v Kevin Hurley>but those are largely disconnected from each other.
+
+152
+00:10:00.540 --> 00:10:02.660
+<v Kevin Hurley>So actually, like our friends at Nubank
+
+153
+00:10:02.660 --> 00:10:03.620
+<v Kevin Hurley>describe it really well,
+
+154
+00:10:03.960 --> 00:10:06.000
+<v Kevin Hurley>UMA is a global PIX.
+
+155
+00:10:06.140 --> 00:10:08.240
+<v Kevin Hurley>It allows you to send money instantly
+
+156
+00:10:08.240 --> 00:10:10.160
+<v Kevin Hurley>between anyone in the world
+
+157
+00:10:10.160 --> 00:10:11.940
+<v Kevin Hurley>at an extremely low cost
+
+158
+00:10:11.940 --> 00:10:14.260
+<v Kevin Hurley>on this open interoperable system.
+
+159
+00:10:15.240 --> 00:10:18.120
+<v Kevin Hurley>UMA is really just an extension of LNURL,
+
+160
+00:10:18.940 --> 00:10:24.660
+<v Kevin Hurley>human readable addresses. So you'd have something like dollar sign, kevin at rain.com. And I could
+
+161
+00:10:24.660 --> 00:10:30.280
+<v Kevin Hurley>send to someone else using their human readable address. And you can send from any currency to
+
+162
+00:10:30.280 --> 00:10:35.620
+<v Kevin Hurley>any other currency. I think that's something that is maybe a little bit harder for some folks that
+
+163
+00:10:35.620 --> 00:10:41.420
+<v Kevin Hurley>have been in the space for a long time to really understand that you need to bring in the
+
+164
+00:10:41.420 --> 00:10:47.920
+<v Kevin Hurley>traditional Rails to integrate them directly with the new Rails. Otherwise, it's hard to gain
+
+165
+00:10:49.220 --> 00:10:57.880
+<v Kevin Hurley>So what we're trying to do is make it so that folks that are on existing banking providers, for example, they can connect and use Lightning transparently.
+
+166
+00:10:58.060 --> 00:11:02.560
+<v Kevin Hurley>For example, I could travel to Mexico, go to 7-Eleven to buy something.
+
+167
+00:11:02.800 --> 00:11:05.040
+<v Kevin Hurley>I could pay using my UMA address.
+
+168
+00:11:05.280 --> 00:11:06.540
+<v Kevin Hurley>They could receive using theirs.
+
+169
+00:11:06.800 --> 00:11:09.420
+<v Kevin Hurley>And I would pay in U.S. dollars, for example.
+
+170
+00:11:09.640 --> 00:11:11.400
+<v Kevin Hurley>They would receive money in Mexican pesos.
+
+171
+00:11:11.400 --> 00:11:22.860
+<v Kevin Hurley>And Lightning and UMA just glues those things together, makes it so that you have this globally interoperable cheap open payments rails where anyone can send any currency they want, receive any currency they want.
+
+172
+00:11:23.020 --> 00:11:27.620
+<v Kevin Hurley>And Lightning and Bitcoin is just the transparent glue that kind of meshes those things together.
+
+173
+00:11:27.920 --> 00:11:35.140
+<v Kevin Hurley>And I think building out solutions like that that bring real world use cases is pretty vital to actually gaining adoption.
+
+174
+00:11:35.140 --> 00:11:40.580
+<v Kevin Hurley>option. To this point, Bitcoin and a lot of cryptocurrencies in general have been generally
+
+175
+00:11:40.580 --> 00:11:45.420
+<v Kevin Hurley>held more for you buy and hope that they'll appreciate. But we want to bring real world
+
+176
+00:11:45.420 --> 00:11:50.580
+<v Kevin Hurley>use cases because we don't think that's the only use case that can exist for Bitcoin and other
+
+177
+00:11:50.580 --> 00:11:54.740
+<v Kevin Hurley>cryptocurrencies. We think that there are a lot of great things that can actually happen with them
+
+178
+00:11:54.740 --> 00:11:56.580
+<v Kevin Hurley>and the technology is really strong.
+
+179
+00:11:57.800 --> 00:12:00.600
+<v Noah Labhart>So I'm curious, you said we a few times,
+
+180
+00:12:00.600 --> 00:12:03.700
+<v Noah Labhart>and I'm curious about how you went about building your team.
+
+181
+00:12:04.040 --> 00:12:08.120
+<v Noah Labhart>What do you look for in those people to indicate that they're the winning horses to join you?
+
+182
+00:12:09.160 --> 00:12:13.740
+<v Kevin Hurley>It might sound kind of cliche, but actually our primary hiring criteria is just,
+
+183
+00:12:13.820 --> 00:12:15.280
+<v Kevin Hurley>are they good human beings?
+
+184
+00:12:15.640 --> 00:12:19.720
+<v Kevin Hurley>Are they people that are willing to work together, be super collaborative,
+
+185
+00:12:19.860 --> 00:12:21.460
+<v Kevin Hurley>and just want to build great products?
+
+186
+00:12:22.080 --> 00:12:26.660
+<v Kevin Hurley>I think everyone has probably worked with people in the past that just want to prove
+
+187
+00:12:26.660 --> 00:12:30.380
+<v Kevin Hurley>they're the smartest person in the room and they want to win every argument
+
+188
+00:12:30.600 --> 00:12:31.780
+<v Kevin Hurley>for the sake of winning an argument.
+
+189
+00:12:32.000 --> 00:12:34.880
+<v Kevin Hurley>And we're very much biased against those types of people.
+
+190
+00:12:35.080 --> 00:12:37.400
+<v Kevin Hurley>We want people that will get in the room,
+
+191
+00:12:37.460 --> 00:12:38.240
+<v Kevin Hurley>will whiteboard together,
+
+192
+00:12:38.500 --> 00:12:40.400
+<v Kevin Hurley>and then it's time to go build something quickly.
+
+193
+00:12:40.600 --> 00:12:43.360
+<v Kevin Hurley>We don't want to spend two weeks arguing on something
+
+194
+00:12:43.360 --> 00:12:44.560
+<v Kevin Hurley>that'll take a week to build.
+
+195
+00:12:44.960 --> 00:12:47.020
+<v Kevin Hurley>Obviously, if we're wrong, we want to be able to revert
+
+196
+00:12:47.020 --> 00:12:49.020
+<v Kevin Hurley>and move quickly in the other direction.
+
+197
+00:12:49.040 --> 00:12:51.380
+<v Kevin Hurley>But we want to work collaboratively,
+
+198
+00:12:51.760 --> 00:12:54.140
+<v Kevin Hurley>be really open and transparent about what we're doing.
+
+199
+00:12:54.320 --> 00:12:55.960
+<v Kevin Hurley>And we also want people that are obviously
+
+200
+00:12:55.960 --> 00:12:57.500
+<v Kevin Hurley>extremely skilled at what they do,
+
+201
+00:12:57.520 --> 00:12:58.820
+<v Kevin Hurley>and they can be pretty flexible.
+
+202
+00:13:00.620 --> 00:13:07.620
+<v Kevin Hurley>So there's going to be hot areas that come up and fires that come up where we need folks to jump in on things and pitch in.
+
+203
+00:13:07.740 --> 00:13:13.380
+<v Kevin Hurley>So we want people to be willing to jump across the stack and help each other out when the time comes.
+
+204
+00:13:13.520 --> 00:13:22.000
+<v Kevin Hurley>And obviously, we try to keep our roadmap relatively consistent, but we're going to have things that will pop up and we'll change the roadmap.
+
+205
+00:13:22.100 --> 00:13:26.180
+<v Kevin Hurley>And we need to be willing to kind of jump around and move to whatever we need to.
+
+206
+00:13:27.040 --> 00:13:30.520
+<v Kevin Hurley>We also try to be as lean as possible.
+
+207
+00:13:30.620 --> 00:13:39.620
+<v Kevin Hurley>We typically only hire when we're feeling a little bit of pain and really have a very clear plan for where we're going to use people going forward.
+
+208
+00:13:39.920 --> 00:13:43.780
+<v Kevin Hurley>And one of my first jobs, I felt like I was bored all the time.
+
+209
+00:13:43.840 --> 00:13:49.780
+<v Kevin Hurley>And I just sat around reading articles on the Internet and going for walks in the office.
+
+210
+00:13:49.820 --> 00:13:52.100
+<v Kevin Hurley>And I always wished I had more work.
+
+211
+00:13:52.100 --> 00:13:53.260
+<v Kevin Hurley>I would beg people for work.
+
+212
+00:13:53.260 --> 00:14:12.900
+<v Kevin Hurley>And that's a feeling I never want anyone to have. And no one should ever have a startup like we are. But I think we want people to be busy and enjoy what they're doing and be passionate about what they're working on. I think if people are doing things that they enjoy and find interesting, they're going to do better, work harder. And we want people to really enjoy what they're doing.
+
+213
+00:14:15.660 --> 00:14:21.620
+<v Noah Labhart>this will be interesting my next question around scalability you know given you know my understanding
+
+214
+00:14:21.620 --> 00:14:26.580
+<v Noah Labhart>of crypto and i think my audience's understanding of crypto so i'm just gonna i'm gonna ask it kind
+
+215
+00:14:26.580 --> 00:14:34.820
+<v Noah Labhart>of blindly and just hear what you have to say was this built to scale from from day one or
+
+216
+00:14:34.820 --> 00:14:38.760
+<v Noah Labhart>is there are there areas where you've had to fight this as you've grown
+
+217
+00:14:40.040 --> 00:14:46.600
+<v Kevin Hurley>I think we definitely are chasing that a bit. I think every company should be chasing that a bit.
+
+218
+00:14:46.740 --> 00:14:51.600
+<v Kevin Hurley>You don't want to over-engineer things from the beginning so that they're infinitely scalable
+
+219
+00:14:51.600 --> 00:14:57.500
+<v Kevin Hurley>before you see some level of product market fit. I think it's always good to have a tiny bit of
+
+220
+00:14:57.500 --> 00:15:02.620
+<v Kevin Hurley>buffer where you can scale to some degree, but if you built it such that it can scale infinitely
+
+221
+00:15:02.620 --> 00:15:07.140
+<v Kevin Hurley>from the beginning, you probably over-engineered it. At the same time, you don't want to have to
+
+222
+00:15:08.760 --> 00:15:13.960
+<v Kevin Hurley>time you add new customers. So there's definitely a delicate balance there, but you don't want to
+
+223
+00:15:13.960 --> 00:15:17.680
+<v Kevin Hurley>spend so much time building the perfect system that it's going to take you years to get anything
+
+224
+00:15:17.680 --> 00:15:23.800
+<v Kevin Hurley>out. And by that point, you're so far behind that the world has passed you by. So I think that we
+
+225
+00:15:23.800 --> 00:15:29.880
+<v Kevin Hurley>are in a pretty decent position where we feel like we started out at a place where we could get some
+
+226
+00:15:29.880 --> 00:15:35.600
+<v Kevin Hurley>determination on whether there was product market fit. Once we found where that was, we are at a
+
+227
+00:15:35.600 --> 00:15:40.380
+<v Kevin Hurley>a place where we can now start to continue to scale the system more and more. I think we're
+
+228
+00:15:40.380 --> 00:15:44.320
+<v Kevin Hurley>still at that point where you don't want to make it absolutely perfect and infinitely scalable,
+
+229
+00:15:44.500 --> 00:15:48.960
+<v Kevin Hurley>but you want to make it to a point where you can scale to the level of customer that you anticipate
+
+230
+00:15:48.960 --> 00:15:52.260
+<v Kevin Hurley>plus some amount of buffer. And I think we're in a pretty good position there.
+
+231
+00:15:54.360 --> 00:15:59.240
+<v Noah Labhart>So as you step out on the balcony, you look across all that you've built with LightSpark.
+
+232
+00:15:59.400 --> 00:16:00.700
+<v Noah Labhart>What are you most proud of?
+
+233
+00:16:01.800 --> 00:16:03.360
+<v Kevin Hurley>Honestly, I'm most proud of the team.
+
+234
+00:16:03.360 --> 00:16:11.400
+<v Kevin Hurley>We've built such an amazing strong team that really coalesces around problems and can ship quickly.
+
+235
+00:16:12.060 --> 00:16:15.460
+<v Kevin Hurley>And they're just amazing people that really work well together.
+
+236
+00:16:16.320 --> 00:16:21.120
+<v Kevin Hurley>It's never an easy journey as a startup, but this team is truly world-class.
+
+237
+00:16:21.160 --> 00:16:28.400
+<v Kevin Hurley>And I think it makes my life easier, it makes all of our lives easier when we have a group that we can just get in a room together and brainstorm things.
+
+238
+00:16:28.400 --> 00:16:33.960
+<v Kevin Hurley>things and feel like there's no judgment on dumb ideas because I've had many dumb ideas in my time
+
+239
+00:16:33.960 --> 00:16:38.580
+<v Kevin Hurley>and I'm sure I'll have many more. And I think it's healthy to be able to brainstorm things together
+
+240
+00:16:38.580 --> 00:16:43.180
+<v Kevin Hurley>and just throw things out, have others be able to build on those things and build great solutions
+
+241
+00:16:43.180 --> 00:16:49.140
+<v Kevin Hurley>on top of that. So I think that is probably the thing I'm most proud of. If I'm looking at like
+
+242
+00:16:49.140 --> 00:16:55.160
+<v Kevin Hurley>the technical side, it's probably when Coinbase integrated with us. I think that was really a
+
+243
+00:16:55.160 --> 00:17:01.500
+<v Kevin Hurley>a great validation of what we've been working on. So typically Coinbase builds things in-house. So
+
+244
+00:17:01.500 --> 00:17:07.720
+<v Kevin Hurley>for us to be chosen as their partner for Lightning was really an honor and helped show that we were
+
+245
+00:17:07.720 --> 00:17:12.540
+<v Kevin Hurley>on the right track to bringing more users and more companies onto the Lightning space.
+
+246
+00:17:14.580 --> 00:17:19.720
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team
+
+247
+00:17:19.720 --> 00:17:20.520
+<v Noah Labhart>responded to it?
+
+248
+00:17:21.760 --> 00:17:26.420
+<v Kevin Hurley>So I think when we first launched, what I mentioned before, we were trying to make it
+
+249
+00:17:26.420 --> 00:17:30.780
+<v Kevin Hurley>simpler than anything else out there. But I think we quickly found we just didn't go far enough.
+
+250
+00:17:30.980 --> 00:17:36.820
+<v Kevin Hurley>And when we shared it with companies, they still felt overwhelmed by the complexities of Lightning.
+
+251
+00:17:37.060 --> 00:17:42.420
+<v Kevin Hurley>And channels themselves, again, were such a foreign concept that we quickly had to step back and
+
+252
+00:17:42.420 --> 00:17:48.040
+<v Kevin Hurley>rethink what we were doing and figure out how we can abstract that complexity away even more.
+
+253
+00:17:49.720 --> 00:17:54.600
+<v Kevin Hurley>did an amazing job coming together to change the interface that we exposed to customers,
+
+254
+00:17:54.740 --> 00:17:58.660
+<v Kevin Hurley>to make it much simpler, to fully abstract all that complexity away.
+
+255
+00:17:59.620 --> 00:18:04.500
+<v Kevin Hurley>And I think when we spoke with customers, we really found that they didn't want to know
+
+256
+00:18:04.500 --> 00:18:09.920
+<v Kevin Hurley>or necessarily be deep into the intricacies of things that could happen in Lightning.
+
+257
+00:18:10.040 --> 00:18:14.380
+<v Kevin Hurley>So we needed to quickly pivot and make sure that we were providing an experience that
+
+258
+00:18:14.380 --> 00:18:18.840
+<v Kevin Hurley>helped them get on board quickly and easily while still being secure and safe for them
+
+259
+00:18:18.840 --> 00:18:19.340
+<v Kevin Hurley>to use.
+
+260
+00:18:19.940 --> 00:18:26.080
+<v Kevin Hurley>It was really just amazing to see how quickly the team came together and were able to make such core changes so quickly.
+
+261
+00:18:27.920 --> 00:18:37.700
+<v Noah Labhart>This will be fun to ask and, you know, hearing about the Coinbase integration and choice there and just your clear passion for the space.
+
+262
+00:18:37.900 --> 00:18:41.780
+<v Noah Labhart>Tell me what the future looks like for LightSpark, the product, and for your team.
+
+263
+00:18:43.040 --> 00:18:48.080
+<v Kevin Hurley>We're going to keep building what we feel are amazing experiences on top of Lightning.
+
+264
+00:18:49.720 --> 00:18:54.280
+<v Kevin Hurley>the core foundation to a point where we feel pretty confident that we can onboard partners easily.
+
+265
+00:18:54.840 --> 00:18:59.000
+<v Kevin Hurley>They can transact and have a very successful Lightning operation.
+
+266
+00:18:59.720 --> 00:19:05.660
+<v Kevin Hurley>But now it's time to bring these more use cases that can actually build a broader user base.
+
+267
+00:19:06.400 --> 00:19:12.640
+<v Kevin Hurley>There's only so much that you can do if you're only planning on doing Lightning payments and sats.
+
+268
+00:19:12.800 --> 00:19:16.280
+<v Kevin Hurley>I think that you want to be able to do things like we're doing with UMA,
+
+269
+00:19:16.280 --> 00:19:19.480
+<v Kevin Hurley>where you can abstract even the Bitcoin portion of it away.
+
+270
+00:19:19.800 --> 00:19:22.460
+<v Kevin Hurley>And you can just see it as a global payments rails
+
+271
+00:19:22.460 --> 00:19:25.420
+<v Kevin Hurley>where anyone can transact in any currency
+
+272
+00:19:25.420 --> 00:19:28.240
+<v Kevin Hurley>and do this on an open network
+
+273
+00:19:28.240 --> 00:19:30.360
+<v Kevin Hurley>where I could be in Africa
+
+274
+00:19:30.360 --> 00:19:32.240
+<v Kevin Hurley>and send money to someone in Brazil
+
+275
+00:19:32.240 --> 00:19:34.720
+<v Kevin Hurley>and have it instantly land in their account
+
+276
+00:19:34.720 --> 00:19:36.280
+<v Kevin Hurley>at negligible fees.
+
+277
+00:19:36.380 --> 00:19:38.200
+<v Kevin Hurley>I think to see some of the fees
+
+278
+00:19:38.200 --> 00:19:39.240
+<v Kevin Hurley>that are being charged today
+
+279
+00:19:39.240 --> 00:19:41.920
+<v Kevin Hurley>and that it can take you five, 10 days
+
+280
+00:19:41.920 --> 00:19:43.580
+<v Kevin Hurley>for it to settle in your account
+
+281
+00:19:43.580 --> 00:19:45.840
+<v Kevin Hurley>is completely insane in this day and age.
+
+282
+00:19:46.280 --> 00:19:49.500
+<v Kevin Hurley>And I think, honestly, we don't know all the use cases that will be here.
+
+283
+00:19:49.600 --> 00:19:56.840
+<v Kevin Hurley>I think we want to engage really heavily with the community and try to figure out what use cases are going to be the things that will take off.
+
+284
+00:19:56.940 --> 00:20:03.880
+<v Kevin Hurley>So we're building a platform here that we hope that others will use and bring about these new use cases that we can't foresee ourselves.
+
+285
+00:20:04.320 --> 00:20:07.600
+<v Kevin Hurley>And we're obviously going to try to help build out as many use cases as we can.
+
+286
+00:20:07.600 --> 00:20:11.900
+<v Kevin Hurley>end, but I think what we need to make sure that we do well is build this platform in a way that
+
+287
+00:20:12.460 --> 00:20:16.080
+<v Kevin Hurley>college student in the dorm room can build the next great company on top of it and do that
+
+288
+00:20:16.080 --> 00:20:16.760
+<v Kevin Hurley>really easily.
+
+289
+00:20:17.600 --> 00:20:21.360
+<v Noah Labhart>Let's switch to you, Kevin. Tell me who influences the way that you work.
+
+290
+00:20:21.540 --> 00:20:24.620
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+291
+00:20:25.080 --> 00:20:28.100
+<v Kevin Hurley>That's probably a boring answer that you get all the time, but honestly, my family.
+
+292
+00:20:28.240 --> 00:20:33.160
+<v Kevin Hurley>My parents, I think, demonstrated the value of hard work throughout my childhood. And I
+
+293
+00:20:33.160 --> 00:20:38.000
+<v Kevin Hurley>I always want to make them proud and be the absolute best version of myself that I can be.
+
+294
+00:20:38.440 --> 00:20:43.600
+<v Kevin Hurley>I think additionally, I had a brother, Justin, who passed away from a brain tumor.
+
+295
+00:20:44.220 --> 00:20:47.280
+<v Kevin Hurley>He was the most brilliant person I have ever known.
+
+296
+00:20:47.840 --> 00:20:50.600
+<v Kevin Hurley>Absolutely an incredible mind, so well-rounded.
+
+297
+00:20:50.660 --> 00:20:54.140
+<v Kevin Hurley>He was actually in a similar space in programming.
+
+298
+00:20:54.240 --> 00:20:59.000
+<v Kevin Hurley>He was actually the reason I came out to California, so that I could live closer to him.
+
+299
+00:20:59.000 --> 00:21:13.560
+<v Kevin Hurley>And I hope to just honor him by being able to build a company that will hopefully stand the test of time and do something that will actually help countless people with more easily moving money and being able to expand the things that they can do with their own money.
+
+300
+00:21:13.640 --> 00:21:22.020
+<v Kevin Hurley>And I think I want to build something that's like a little bit of a legacy that I'll look back on and be proud of and that hopefully he's looking down and is proud of as well.
+
+301
+00:21:23.080 --> 00:21:24.200
+<v Noah Labhart>Last question, Kevin.
+
+302
+00:21:24.200 --> 00:21:29.960
+<v Noah Labhart>Kevin, so you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+303
+00:21:30.240 --> 00:21:31.260
+<v Noah Labhart>They're jazzed about it.
+
+304
+00:21:31.260 --> 00:21:32.680
+<v Noah Labhart>They can't wait to show it off to the world.
+
+305
+00:21:32.700 --> 00:21:34.200
+<v Noah Labhart>And can we show it off to you right there on the plane?
+
+306
+00:21:34.340 --> 00:21:37.040
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+307
+00:21:38.040 --> 00:21:41.580
+<v Kevin Hurley>I think it's going to be a long road, probably longer than you expect.
+
+308
+00:21:41.720 --> 00:21:43.880
+<v Kevin Hurley>But the journey is honestly worth it.
+
+309
+00:21:43.920 --> 00:21:46.280
+<v Kevin Hurley>Just embrace the people that you work with.
+
+310
+00:21:46.360 --> 00:21:53.220
+<v Kevin Hurley>I think building relationships can be just as valuable, if not more valuable than the tech beneath an idea.
+
+311
+00:21:54.200 --> 00:21:58.500
+<v Kevin Hurley>the journey a hundred times, a thousand times better if you actually learn from those experiences
+
+312
+00:21:58.500 --> 00:22:04.720
+<v Kevin Hurley>of others and build those relationships. And at the same time, I think make sure that you keep a
+
+313
+00:22:04.720 --> 00:22:09.780
+<v Kevin Hurley>focus. It's so easy to have a million new ideas that come up and you want to chase them all at
+
+314
+00:22:09.780 --> 00:22:14.200
+<v Kevin Hurley>once and show that you can build all these amazing things. But then it can get to the point where
+
+315
+00:22:14.200 --> 00:22:20.000
+<v Kevin Hurley>you're doing so many things that you don't do anything very well. And finding that right balance
+
+316
+00:22:20.000 --> 00:22:22.700
+<v Kevin Hurley>of making sure you're doing things really well
+
+317
+00:22:22.700 --> 00:22:25.600
+<v Kevin Hurley>and getting actual signal on whether they're going to work.
+
+318
+00:22:25.780 --> 00:22:29.160
+<v Kevin Hurley>Still also exploring the right number of new ideas.
+
+319
+00:22:29.260 --> 00:22:31.580
+<v Kevin Hurley>You don't want to just do one thing
+
+320
+00:22:31.580 --> 00:22:32.900
+<v Kevin Hurley>and then miss out on something else,
+
+321
+00:22:33.000 --> 00:22:35.000
+<v Kevin Hurley>but you also don't want to do so many things
+
+322
+00:22:35.000 --> 00:22:37.180
+<v Kevin Hurley>that it's so broad that you're not doing anything well.
+
+323
+00:22:37.300 --> 00:22:40.000
+<v Kevin Hurley>So finding that right balance is not easy.
+
+324
+00:22:40.160 --> 00:22:42.520
+<v Kevin Hurley>I don't think there's an exact science behind that.
+
+325
+00:22:42.640 --> 00:22:45.480
+<v Kevin Hurley>And for me, it's been, you have to trust your gut
+
+326
+00:22:45.480 --> 00:22:47.620
+<v Kevin Hurley>and go with what you think will work,
+
+327
+00:22:47.720 --> 00:22:49.280
+<v Kevin Hurley>but there is no exact science to it.
+
+328
+00:22:50.000 --> 00:22:50.920
+<v Kevin Hurley>strike that balance well.
+
+329
+00:22:51.060 --> 00:22:52.280
+<v Noah Labhart>That's fantastic advice.
+
+330
+00:22:52.460 --> 00:22:54.740
+<v Noah Labhart>Well, Kevin, thank you for being on the show today.
+
+331
+00:22:54.880 --> 00:22:57.880
+<v Noah Labhart>And thank you for telling the creation story of LightSpark.
+
+332
+00:22:58.020 --> 00:22:58.620
+<v Noah Labhart>Thank you.
+
+333
+00:23:00.900 --> 00:23:03.920
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+334
+00:23:12.240 --> 00:23:14.900
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+335
+00:23:15.020 --> 00:23:17.680
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+336
+00:23:17.860 --> 00:23:19.800
+<v Noah Labhart>or the podcasting app of your choice.
+
+337
+00:23:20.360 --> 00:23:24.820
+<v Noah Labhart>and when you get a chance leave us a review both things help us out tremendously
+
+338
+00:23:27.420 --> 00:23:29.260
+<v Noah Labhart>and thanks again for listening

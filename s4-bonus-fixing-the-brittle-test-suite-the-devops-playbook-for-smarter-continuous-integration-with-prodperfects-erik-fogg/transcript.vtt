@@ -1,0 +1,2747 @@
+WEBVTT
+
+NOTE S4 Bonus: Fixing the Brittle Test Suite: The DevOps Playbook for Smarter continuous Integration with ProdPerfect’s Erik Fogg
+
+1
+00:00:00.660 --> 00:00:11.540
+<v Erik Fogg>So what's the scalability problem? It's that there are edge cases we run into that require literal engineers to intervene in deploying our service to the customer. So here's a good example.
+
+2
+00:00:12.180 --> 00:00:21.900
+<v Erik Fogg>You know, part of what ProdPerfect needs to do is fill in test data, right? So like when we're building this test into a test environment, the data set there is radically different from it than it is on production.
+
+3
+00:00:21.900 --> 00:00:28.580
+<v Erik Fogg>So like that test data needs to get filled in through guess and check process because like we don't even know how they set up their test data environment.
+
+4
+00:00:28.860 --> 00:00:29.980
+<v Erik Fogg>It's crazy.
+
+5
+00:00:30.220 --> 00:00:36.200
+<v Erik Fogg>Like there's a reason nobody else is doing this because the deeper you get into it, the more you're like these people are nuts for even trying.
+
+6
+00:00:37.000 --> 00:00:37.720
+<v Erik Fogg>And we are.
+
+7
+00:00:38.860 --> 00:00:41.940
+<v Erik Fogg>I'm Erik Fogg, co-founder and COO of ProdPerfect.
+
+8
+00:00:47.760 --> 00:00:49.320
+<v Noah Labhart>This is Code Story.
+
+9
+00:00:49.320 --> 00:01:00.840
+<v Noah Labhart>The podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+10
+00:01:02.180 --> 00:01:03.980
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+11
+00:01:04.180 --> 00:01:11.220
+<v Noah Labhart>And today, how Erik Fogg is helping revolutionize software testing powered by your customers.
+
+12
+00:01:13.480 --> 00:01:16.100
+<v Noah Labhart>All this and more on Code Story.
+
+13
+00:01:19.640 --> 00:01:24.480
+<v Noah Labhart>Erik Fogg attended MIT, but failed his intro to computer science classes.
+
+14
+00:01:24.940 --> 00:01:28.080
+<v Noah Labhart>It was at that point that he punted over to mechanical engineering.
+
+15
+00:01:28.340 --> 00:01:32.940
+<v Noah Labhart>So as you could guess, Erik is not the tech guy, but he does know enough to be dangerous.
+
+16
+00:01:33.620 --> 00:01:39.140
+<v Noah Labhart>He loves to work with his hands and has a professional history in solving old problems in new ways.
+
+17
+00:01:40.100 --> 00:01:43.300
+<v Noah Labhart>Speaking of working with his hands, he likes to create Comic-Con gear.
+
+18
+00:01:43.460 --> 00:01:48.860
+<v Noah Labhart>At the time of recording this podcast, he had a Captain America shield made out of an old satellite in his office.
+
+19
+00:01:49.320 --> 00:01:51.880
+<v Noah Labhart>He's also a huge comic book and sports card collector,
+
+20
+00:01:52.080 --> 00:01:57.660
+<v Noah Labhart>and actually mentors several startups involved in pricing and liquidity around collectibles.
+
+21
+00:01:58.340 --> 00:02:03.380
+<v Noah Labhart>Outside of that, he hosts a podcast around the topic of politics, polarization, and tribalism.
+
+22
+00:02:04.280 --> 00:02:09.820
+<v Noah Labhart>In early 2018, Erik's co-founder started working through the traditional problems of QA testing.
+
+23
+00:02:10.240 --> 00:02:14.880
+<v Noah Labhart>After getting fed up with it, he decided that he just needed to build his own solution,
+
+24
+00:02:15.420 --> 00:02:18.320
+<v Noah Labhart>and needed someone to help him turn it into a business.
+
+25
+00:02:19.320 --> 00:02:25.780
+<v Noah Labhart>the team and has been changing the QA testing landscape ever since. This is the creation story
+
+26
+00:02:25.780 --> 00:02:27.100
+<v Noah Labhart>of ProdPerfect.
+
+27
+00:02:30.440 --> 00:02:34.660
+<v Erik Fogg>What ProdPerfect does is we autonomously build, maintain, and evolve
+
+28
+00:02:34.660 --> 00:02:41.160
+<v Erik Fogg>end-to-end test suites for web applications by analyzing traffic from production, right? So
+
+29
+00:02:41.160 --> 00:02:45.380
+<v Erik Fogg>normally to build a test suite, to build an end-to-end test suite, a browser test suite,
+
+30
+00:02:45.380 --> 00:02:52.420
+<v Erik Fogg>You hire QA engineers and they look at an Excel sheet that has like a bunch of requirements and they write these tests by hand.
+
+31
+00:02:52.880 --> 00:02:55.600
+<v Erik Fogg>And this is a like terrible use of human time.
+
+32
+00:02:55.840 --> 00:03:02.980
+<v Erik Fogg>Machines can do this pretty well because we can look at what users are doing on the application and say, well, let's just test and make sure they can do that.
+
+33
+00:03:03.280 --> 00:03:05.520
+<v Erik Fogg>Right. Let's see what they're doing. Make sure they can do what they're doing.
+
+34
+00:03:05.620 --> 00:03:06.860
+<v Erik Fogg>Build tests that reflect that.
+
+35
+00:03:06.940 --> 00:03:13.820
+<v Erik Fogg>And you can run those tests in your test environment long before your code goes to production to make sure you haven't broken anything important to your users.
+
+36
+00:03:15.380 --> 00:03:19.040
+<v Erik Fogg>skip the sales pitch about it. You know, I think we're going to, over the next 10 years, radically
+
+37
+00:03:19.040 --> 00:03:25.140
+<v Erik Fogg>shift what portion of humans in the software world spend their time testing versus like creating
+
+38
+00:03:25.140 --> 00:03:30.380
+<v Erik Fogg>products, which is what they want to do. So it's a lot like infrastructure as a service or other
+
+39
+00:03:30.380 --> 00:03:35.380
+<v Erik Fogg>things that automated away a job function and freed people up to do more interesting stuff.
+
+40
+00:03:35.620 --> 00:03:39.680
+<v Erik Fogg>So Dan came up with this idea because he was a director of engineering at a company called
+
+41
+00:03:39.680 --> 00:03:44.340
+<v Erik Fogg>WeSpire, the very classic story like QA is the bane of his existence.
+
+42
+00:03:44.660 --> 00:03:50.400
+<v Erik Fogg>A number of companies have gotten into the QA space recently, going at solving this problem in a different way.
+
+43
+00:03:50.660 --> 00:03:57.500
+<v Erik Fogg>But it's a big, gnarly, super unsexy space that everyone has to deal with that's very expensive.
+
+44
+00:03:57.500 --> 00:04:09.360
+<v Erik Fogg>And Dan had this flash of insight where he was sitting there trying to like wrangle Hotjar to give him the data he needed to tell his QA engineers what tests to write.
+
+45
+00:04:09.540 --> 00:04:11.200
+<v Erik Fogg>And he said, I just need to build this myself.
+
+46
+00:04:11.440 --> 00:04:20.560
+<v Erik Fogg>So I got involved because back at a hardware startup called Helmet Hub, we were making helmet vending machines for bike share, which was doomed from the start.
+
+47
+00:04:20.640 --> 00:04:23.800
+<v Erik Fogg>Right. Like one of those like why not things actually got funded, which is cool.
+
+48
+00:04:24.060 --> 00:04:25.120
+<v Erik Fogg>Learned a lot from it.
+
+49
+00:04:25.120 --> 00:04:29.280
+<v Erik Fogg>But I hired Dan as my lead software engineer.
+
+50
+00:04:29.480 --> 00:04:34.820
+<v Erik Fogg>And he and I became best friends because we've been talking about he's an engineer with some interest in politics.
+
+51
+00:04:34.860 --> 00:04:37.080
+<v Erik Fogg>And I'm probably a politician with some interest in engineering.
+
+52
+00:04:37.300 --> 00:04:49.180
+<v Erik Fogg>And he and I are still talking about can we create good AI for citizens, for government that can help us deal with an increasingly complex and noisy world, right?
+
+53
+00:04:49.240 --> 00:04:52.340
+<v Erik Fogg>And misinformation rich world.
+
+54
+00:04:52.580 --> 00:04:54.540
+<v Erik Fogg>We still want to get into that space someday.
+
+55
+00:04:55.160 --> 00:04:57.340
+<v Erik Fogg>But we'd been talking about it for seven years.
+
+56
+00:04:57.560 --> 00:05:00.780
+<v Erik Fogg>And Dan had this idea and he said, Erik, you know, I need your help.
+
+57
+00:05:01.620 --> 00:05:03.160
+<v Erik Fogg>Dan is an engineer's engineer.
+
+58
+00:05:03.540 --> 00:05:07.620
+<v Erik Fogg>And from my consulting days, I learned to fall in love with people and talk to them.
+
+59
+00:05:07.880 --> 00:05:10.780
+<v Erik Fogg>And so he said, like, I need your help, you know, kind of turning this into a business.
+
+60
+00:05:10.960 --> 00:05:12.980
+<v Erik Fogg>And it's been a, it was early 2018.
+
+61
+00:05:13.140 --> 00:05:14.100
+<v Erik Fogg>It's been a ton of fun.
+
+62
+00:05:16.680 --> 00:05:17.980
+<v Noah Labhart>So tell me about the MVP.
+
+63
+00:05:18.420 --> 00:05:23.880
+<v Noah Labhart>You know, tell me about that first product you built, how long it took to build and what sort of tools you used to bring it to life.
+
+64
+00:05:25.980 --> 00:05:31.720
+<v Erik Fogg>I love telling this story and I don't get too much because we turned the concept of the MVP on its head.
+
+65
+00:05:31.820 --> 00:05:33.160
+<v Erik Fogg>And it was like, it was crazy.
+
+66
+00:05:33.540 --> 00:05:38.800
+<v Erik Fogg>A lot of investors walked away because they thought it was the exact opposite way of the way we should have done it.
+
+67
+00:05:38.940 --> 00:05:40.220
+<v Erik Fogg>But we didn't know better.
+
+68
+00:05:40.340 --> 00:05:41.600
+<v Erik Fogg>We didn't know we weren't allowed to do it.
+
+69
+00:05:41.620 --> 00:05:42.240
+<v Erik Fogg>So we did it anyway.
+
+70
+00:05:42.360 --> 00:05:49.140
+<v Erik Fogg>And what we did was, you know, normally an MVP is its minimum viable from the perspective of value to the customer.
+
+71
+00:05:49.220 --> 00:05:49.720
+<v Erik Fogg>Right.
+
+72
+00:05:49.460 --> 00:05:52.240
+<v Erik Fogg>So like, what is the smallest thing that someone will actually pay for?
+
+73
+00:05:52.360 --> 00:05:54.080
+<v Erik Fogg>And then we're going to add value to it.
+
+74
+00:05:55.120 --> 00:05:58.680
+<v Erik Fogg>realized we were actually trying to come up with that what we realized was you know again this is
+
+75
+00:05:58.680 --> 00:06:04.340
+<v Erik Fogg>like custom code for a web application right every like the thing that people want to buy from us is
+
+76
+00:06:04.340 --> 00:06:09.020
+<v Erik Fogg>these end-to-end test scripts that for 20 years everyone has said this is custom code we have to
+
+77
+00:06:09.020 --> 00:06:14.460
+<v Erik Fogg>hire engineers to do it and they have to understand the application intimately and for us to have any
+
+78
+00:06:14.460 --> 00:06:19.700
+<v Erik Fogg>foot in the door we had to be able to provide that full experience we had to be able to set me up to
+
+79
+00:06:19.700 --> 00:06:23.640
+<v Erik Fogg>be able to say like if you pay us a check every month you just don't have to worry about end-to-end
+
+80
+00:06:25.120 --> 00:06:29.160
+<v Erik Fogg>have to tell us anything. You don't have to inform, you know, this data allows us to know
+
+81
+00:06:29.160 --> 00:06:32.620
+<v Erik Fogg>that we're running a great test suite and we actually have good metrics against it.
+
+82
+00:06:32.720 --> 00:06:36.720
+<v Erik Fogg>You know, basically don't you worry about testing. Let me worry about testing. And so it meant that
+
+83
+00:06:36.720 --> 00:06:42.100
+<v Erik Fogg>what we had to do was say, what's the minimum amount of technology that we can insert into
+
+84
+00:06:42.100 --> 00:06:46.920
+<v Erik Fogg>this thing in order to be able to provide the full service. And we'll fill in the rest with
+
+85
+00:06:46.920 --> 00:06:51.640
+<v Erik Fogg>burning the midnight oil. And those were our first customers where we were essentially a consulting
+
+86
+00:06:51.640 --> 00:06:55.640
+<v Erik Fogg>with some technology masquerading as a product.
+
+87
+00:06:57.320 --> 00:07:00.520
+<v Erik Fogg>Everyone knew this, that was buying it, and they were okay with it.
+
+88
+00:07:00.560 --> 00:07:01.380
+<v Erik Fogg>They understood, right?
+
+89
+00:07:01.400 --> 00:07:02.940
+<v Erik Fogg>Our first customers were all startups.
+
+90
+00:07:03.060 --> 00:07:06.300
+<v Erik Fogg>And if Dan and I were getting paid at the time, which we were not,
+
+91
+00:07:06.420 --> 00:07:09.280
+<v Erik Fogg>we would have been hemorrhaging money servicing them, right?
+
+92
+00:07:09.380 --> 00:07:12.560
+<v Erik Fogg>Our economics were negative, deeply negative, and that's okay.
+
+93
+00:07:12.780 --> 00:07:15.120
+<v Erik Fogg>And that for us was the minimum viable product.
+
+94
+00:07:15.200 --> 00:07:17.200
+<v Erik Fogg>It was the whole value, but the minimum technology,
+
+95
+00:07:17.500 --> 00:07:18.980
+<v Erik Fogg>and we filled in the rest with people.
+
+96
+00:07:18.980 --> 00:07:23.080
+<v Erik Fogg>So a lot of our stack was like smart engineers and me.
+
+97
+00:07:23.160 --> 00:07:24.700
+<v Erik Fogg>I had to learn about end-to-end testing.
+
+98
+00:07:24.860 --> 00:07:25.360
+<v Erik Fogg>It was hard.
+
+99
+00:07:25.820 --> 00:07:26.960
+<v Erik Fogg>Somehow I can't write code.
+
+100
+00:07:27.080 --> 00:07:30.140
+<v Erik Fogg>I'm even good with foreign languages and music and I can't write code.
+
+101
+00:07:30.260 --> 00:07:30.760
+<v Erik Fogg>Don't know why.
+
+102
+00:07:30.900 --> 00:07:32.700
+<v Erik Fogg>But so what was the stack we used?
+
+103
+00:07:33.040 --> 00:07:34.080
+<v Erik Fogg>We used Keen.
+
+104
+00:07:34.200 --> 00:07:36.580
+<v Erik Fogg>So Keen.io as our data collector.
+
+105
+00:07:36.860 --> 00:07:37.820
+<v Erik Fogg>We forked it.
+
+106
+00:07:37.920 --> 00:07:39.760
+<v Erik Fogg>So we built our own version of it that we maintain.
+
+107
+00:07:40.020 --> 00:07:41.060
+<v Erik Fogg>That's what we plug into production.
+
+108
+00:07:41.360 --> 00:07:44.140
+<v Erik Fogg>We had to modify it heavily to not collect any PII.
+
+109
+00:07:44.340 --> 00:07:47.980
+<v Erik Fogg>So we block a lot of stuff in order to like, you know, be able to work with a bank or something.
+
+110
+00:07:48.980 --> 00:07:50.920
+<v Erik Fogg>We built our entire backend on AWS.
+
+111
+00:07:51.320 --> 00:07:54.420
+<v Erik Fogg>So we use AWS Pipeline, we use a Lambda to drop some stuff
+
+112
+00:07:54.420 --> 00:07:55.220
+<v Erik Fogg>and filter some stuff.
+
+113
+00:07:55.340 --> 00:07:57.660
+<v Erik Fogg>And then the data sits in an S3 bucket.
+
+114
+00:07:57.820 --> 00:08:01.700
+<v Erik Fogg>And in AWS, what we built initially is the analysis engine.
+
+115
+00:08:01.860 --> 00:08:05.040
+<v Erik Fogg>And this is where we have like cool proprietary tech step one.
+
+116
+00:08:05.460 --> 00:08:08.260
+<v Erik Fogg>We used, everything's in JavaScript or Python,
+
+117
+00:08:08.400 --> 00:08:10.560
+<v Erik Fogg>but the backend is Python pandas.
+
+118
+00:08:10.680 --> 00:08:13.080
+<v Erik Fogg>And we threw a bunch of like data scientists to do there,
+
+119
+00:08:13.100 --> 00:08:17.080
+<v Erik Fogg>kind of like weird arcane, almost Lovecraftian art
+
+120
+00:08:18.980 --> 00:08:22.900
+<v Erik Fogg>like a big mess of data into patterns reliably and automatically.
+
+121
+00:08:23.520 --> 00:08:27.260
+<v Erik Fogg>That code will still like drive you insane if you stare at it too long,
+
+122
+00:08:27.380 --> 00:08:30.620
+<v Erik Fogg>but it works and we're actually refactoring and replacing it.
+
+123
+00:08:30.760 --> 00:08:34.080
+<v Erik Fogg>But the early part was just this analysis engine
+
+124
+00:08:34.080 --> 00:08:37.480
+<v Erik Fogg>that was a bunch of scripts and Keen and an AWS pipeline.
+
+125
+00:08:37.720 --> 00:08:41.200
+<v Erik Fogg>And then we were writing the scripts by hand initially in TestCafe,
+
+126
+00:08:41.660 --> 00:08:43.320
+<v Erik Fogg>which is another open source framework,
+
+127
+00:08:43.440 --> 00:08:45.480
+<v Erik Fogg>much like Selenium for running these tests.
+
+128
+00:08:45.660 --> 00:08:47.020
+<v Erik Fogg>That was like the early thing.
+
+129
+00:08:49.160 --> 00:08:52.520
+<v Erik Fogg>was having a decent idea of what the tests should be.
+
+130
+00:08:52.580 --> 00:08:53.720
+<v Erik Fogg>And we'll just write them ourselves.
+
+131
+00:08:54.580 --> 00:08:58.500
+<v Noah Labhart>So you started with a pretty unconstrained model, minimal technology.
+
+132
+00:08:58.760 --> 00:09:02.340
+<v Noah Labhart>But let's dive into some of the decisions and trade-offs you had to make,
+
+133
+00:09:02.420 --> 00:09:04.040
+<v Noah Labhart>even in that minimal technology.
+
+134
+00:09:04.040 --> 00:09:06.900
+<v Noah Labhart>And perhaps we'll say the minimal engineer stack,
+
+135
+00:09:07.100 --> 00:09:10.580
+<v Noah Labhart>you know, sort of decisions and trade-offs you had to make in the short term
+
+136
+00:09:10.580 --> 00:09:12.000
+<v Noah Labhart>and how you cope with those.
+
+137
+00:09:12.120 --> 00:09:16.480
+<v Noah Labhart>And, you know, I'm thinking like technical debt, feature cut, software minimization.
+
+138
+00:09:16.520 --> 00:09:17.940
+<v Noah Labhart>I'm sure there's a lot that went into that.
+
+139
+00:09:19.980 --> 00:09:24.180
+<v Erik Fogg>The biggest constraint for us was manpower, right?
+
+140
+00:09:24.220 --> 00:09:25.200
+<v Erik Fogg>Because we had no money.
+
+141
+00:09:26.480 --> 00:09:31.580
+<v Erik Fogg>So we had this, I remember drawing it out on a whiteboard and it was in my house.
+
+142
+00:09:31.640 --> 00:09:34.220
+<v Erik Fogg>Like I just happened to get a whiteboard from Craigslist.
+
+143
+00:09:34.600 --> 00:09:36.540
+<v Erik Fogg>I remember drawing out like, what are our constraints?
+
+144
+00:09:36.740 --> 00:09:39.300
+<v Erik Fogg>Well, there's, you know, we can constrain the number of customers.
+
+145
+00:09:39.400 --> 00:09:43.360
+<v Erik Fogg>We can constrain the number of engineers that are working because they're going to become a bottleneck.
+
+146
+00:09:43.860 --> 00:09:55.540
+<v Erik Fogg>But the biggest decision we had to make early on regarding the technology itself was we had to really fiercely to customers say no constantly regarding features that they wanted.
+
+147
+00:09:56.120 --> 00:10:02.140
+<v Erik Fogg>A couple examples of stuff we have now is that customers wanted to be able to see and understand the test suite.
+
+148
+00:10:02.420 --> 00:10:04.440
+<v Erik Fogg>We were like, well, you can look at the code.
+
+149
+00:10:04.580 --> 00:10:05.480
+<v Erik Fogg>They're like, I want to understand.
+
+150
+00:10:05.520 --> 00:10:06.460
+<v Erik Fogg>I don't want to have to look through the code.
+
+151
+00:10:06.520 --> 00:10:07.720
+<v Erik Fogg>I want to understand these test cases.
+
+152
+00:10:07.780 --> 00:10:09.660
+<v Erik Fogg>Like normally they're written out like this in Excel.
+
+153
+00:10:09.820 --> 00:10:11.400
+<v Erik Fogg>And we just had to say no.
+
+154
+00:10:13.360 --> 00:10:22.460
+<v Erik Fogg>Because what we're desperately, desperately trying to do is make sure that the analysis engine can actually, again, autonomously pop out test cases.
+
+155
+00:10:23.080 --> 00:10:25.900
+<v Erik Fogg>It was our entire exclusive focus early on.
+
+156
+00:10:26.300 --> 00:10:29.380
+<v Erik Fogg>And so we ignored script audit generation.
+
+157
+00:10:29.620 --> 00:10:31.180
+<v Erik Fogg>We were like, we're just going to write the scripts by hand.
+
+158
+00:10:31.300 --> 00:10:31.800
+<v Erik Fogg>Deal with it.
+
+159
+00:10:31.780 --> 00:10:33.240
+<v Erik Fogg>I don't have time to do this.
+
+160
+00:10:33.300 --> 00:10:35.100
+<v Erik Fogg>I'm working on the analysis engine during the day.
+
+161
+00:10:35.140 --> 00:10:35.640
+<v Erik Fogg>Fine.
+
+162
+00:10:35.460 --> 00:10:36.140
+<v Erik Fogg>Do it at night.
+
+163
+00:10:36.340 --> 00:10:36.840
+<v Erik Fogg>Right?
+
+164
+00:10:36.840 --> 00:10:38.560
+<v Erik Fogg>You joined a pre-seed startup.
+
+165
+00:10:38.680 --> 00:10:39.180
+<v Erik Fogg>Deal with it.
+
+166
+00:10:39.060 --> 00:10:50.100
+<v Erik Fogg>And again, I'm not allowed near code, but I did a lot of other stuff in recording videos and such and figuring out test data to help set up the engineers to actually write the code faster.
+
+167
+00:10:50.620 --> 00:10:53.600
+<v Erik Fogg>So our entire focus is on that analysis engine until it was stable.
+
+168
+00:10:53.820 --> 00:10:56.280
+<v Erik Fogg>The other thing we had to do was scale test construction.
+
+169
+00:10:56.280 --> 00:11:09.980
+<v Erik Fogg>And so the thing we started writing then in JavaScript was this essentially like this translator between what pops out of the analysis engine and JavaScript code that runs in TestCafe into this thing to like, you know, take these events that we see.
+
+170
+00:11:10.300 --> 00:11:11.360
+<v Erik Fogg>And it wasn't hard.
+
+171
+00:11:11.480 --> 00:11:12.140
+<v Erik Fogg>It just took time.
+
+172
+00:11:12.220 --> 00:11:17.280
+<v Erik Fogg>You know, we see a click, we see a form fill and say, OK, we saw that and it's in our test case now.
+
+173
+00:11:17.500 --> 00:11:23.960
+<v Erik Fogg>Let's just turn that into instead of I'm seeing a click or a form fill to TestCafe, please execute this click or form fill.
+
+174
+00:11:24.100 --> 00:11:25.680
+<v Erik Fogg>That was our exclusive focus second.
+
+175
+00:11:26.280 --> 00:11:29.900
+<v Erik Fogg>what this meant was like, there was no customer experience. There was no web application.
+
+176
+00:11:30.480 --> 00:11:34.820
+<v Erik Fogg>There was just this like magic black box that we like, didn't want to talk about too much
+
+177
+00:11:34.820 --> 00:11:40.620
+<v Erik Fogg>where we said, look, just pay us and test code will pop out. And because of that, like huge
+
+178
+00:11:40.620 --> 00:11:45.140
+<v Erik Fogg>trust gap, because again, there's no visibility, there's no web application, there's nothing to
+
+179
+00:11:45.140 --> 00:11:49.840
+<v Erik Fogg>log into. You just have to like look into this automatically generated code that you can't
+
+180
+00:11:49.840 --> 00:11:55.200
+<v Erik Fogg>understand and you better hope it worked. The other constraint for us was our sales motion.
+
+181
+00:11:56.280 --> 00:11:59.720
+<v Erik Fogg>like, we just sell a contract. And someone's like, Oh, I want a free trial. We go, no,
+
+182
+00:12:00.480 --> 00:12:04.800
+<v Erik Fogg>you don't get a free trial. You buy the contract. We couldn't do that back then. So we were like
+
+183
+00:12:04.800 --> 00:12:08.960
+<v Erik Fogg>hustling this stuff for free and doing this risk-free months. This is where like my specialty
+
+184
+00:12:08.960 --> 00:12:14.200
+<v Erik Fogg>came in was like, how can I sit with someone and get them to agree to try this? And how can we
+
+185
+00:12:14.200 --> 00:12:18.320
+<v Erik Fogg>decide how are we going to like know that it's successful? You know, that got us our first five
+
+186
+00:12:18.320 --> 00:12:22.460
+<v Erik Fogg>customers that like, you know, scrapping our way through everything, you know, classic, classic
+
+187
+00:12:22.460 --> 00:12:25.700
+<v Erik Fogg>story got us our first five customers and therefore our first major investment.
+
+188
+00:12:27.060 --> 00:12:29.760
+<v Noah Labhart>So you've got the product, you've got your first five customers.
+
+189
+00:12:30.020 --> 00:12:34.260
+<v Noah Labhart>I assume as they start using the product, they're giving you mounds of feedback.
+
+190
+00:12:34.560 --> 00:12:38.040
+<v Noah Labhart>So how did you progress the product from that point?
+
+191
+00:12:38.240 --> 00:12:40.220
+<v Noah Labhart>How did you go about building your roadmap?
+
+192
+00:12:40.500 --> 00:12:45.220
+<v Noah Labhart>And I'm really interested in how you decided that this is the next most important thing
+
+193
+00:12:45.220 --> 00:12:45.760
+<v Noah Labhart>to build.
+
+194
+00:12:47.020 --> 00:12:50.600
+<v Erik Fogg>So Dan Whiting, our CEO, here's who he is.
+
+195
+00:12:50.660 --> 00:12:55.100
+<v Erik Fogg>If Henry Ford and Tim Cook had a baby and that baby actually went to empathy school,
+
+196
+00:12:56.280 --> 00:13:07.560
+<v Erik Fogg>I guess the other way of thinking about it is if you've seen like A Beautiful Mind where at some point John Nash is like staring and all the math is like flying across his face, you know, in the hangover, they spoofed this with the poker or the blackjack scene.
+
+197
+00:13:08.120 --> 00:13:19.600
+<v Erik Fogg>Dan has this very broad vision of what this thing needs to become in order to be like a truly enterprise ready product that we can sell for millions of dollars a year and like truly take over the world.
+
+198
+00:13:19.700 --> 00:13:22.460
+<v Erik Fogg>Right. And just and just like, you know, become the big Kraken.
+
+199
+00:13:23.100 --> 00:13:24.600
+<v Erik Fogg>He's laser focused on it.
+
+200
+00:13:24.660 --> 00:13:25.620
+<v Erik Fogg>He is our head of product.
+
+201
+00:13:26.280 --> 00:13:28.520
+<v Erik Fogg>even this far in, he still leads it.
+
+202
+00:13:28.600 --> 00:13:30.760
+<v Erik Fogg>So why Tim Cook and Henry Ford?
+
+203
+00:13:31.880 --> 00:13:34.720
+<v Erik Fogg>Henry Ford said, if I'd asked people what they wanted,
+
+204
+00:13:34.780 --> 00:13:35.940
+<v Erik Fogg>they would have said faster horses.
+
+205
+00:13:36.840 --> 00:13:40.040
+<v Erik Fogg>And Tim Cook, of course, famously just said,
+
+206
+00:13:40.220 --> 00:13:41.540
+<v Erik Fogg>look, people don't know what they want.
+
+207
+00:13:41.640 --> 00:13:42.940
+<v Erik Fogg>We're going to give them something
+
+208
+00:13:42.940 --> 00:13:45.500
+<v Erik Fogg>they don't know they want yet, and they'll want it.
+
+209
+00:13:45.920 --> 00:13:48.220
+<v Erik Fogg>Sorry, not Tim Cook, Steve Jobs, Steve Jobs.
+
+210
+00:13:48.420 --> 00:13:51.900
+<v Erik Fogg>And so what's interesting is for a long time,
+
+211
+00:13:52.100 --> 00:13:53.860
+<v Erik Fogg>we straight up ignored customer feedback.
+
+212
+00:13:54.080 --> 00:13:55.400
+<v Erik Fogg>We did not care.
+
+213
+00:13:56.280 --> 00:14:08.460
+<v Erik Fogg>But we said this is not impacting our roadmap at all because what we need to do is build something that, because like we've already made this promise that we can't scale, right?
+
+214
+00:14:08.580 --> 00:14:12.660
+<v Erik Fogg>We can reliably make, this is like because of that upside down MVP.
+
+215
+00:14:13.060 --> 00:14:17.180
+<v Erik Fogg>You know, we can't scale this to more than 20 customers right now and we need to.
+
+216
+00:14:17.300 --> 00:14:19.640
+<v Erik Fogg>The promise is already gargantuan.
+
+217
+00:14:19.640 --> 00:14:31.720
+<v Erik Fogg>Again, if you think about our, you know, I feel a little bad saying we ignored customer feedback, but if you think about this like upside down MVP, rather than like, hey, here's a little taste of something like what else would be useful?
+
+218
+00:14:31.860 --> 00:14:36.700
+<v Erik Fogg>It is, again, like we're trying to replace the need for you to hire a QA automation engineering team.
+
+219
+00:14:36.820 --> 00:14:38.160
+<v Erik Fogg>And so far we're successful.
+
+220
+00:14:38.360 --> 00:14:40.080
+<v Erik Fogg>So like good enough, right?
+
+221
+00:14:40.200 --> 00:14:47.420
+<v Erik Fogg>If you're not going to fire us, I don't care because I need more customers and I need this to scale and I need to be reliable.
+
+222
+00:14:47.420 --> 00:15:05.840
+<v Erik Fogg>And I need it to not fall apart. If one of the engineers takes a sick day, it was brutal because I was also a customer success, right? Because our sales and customer success team was one, it was me. And so I just had to listen to folks be like, oh yeah, that's really interesting. We'll totally add it to our roadmap at some point. And they're like, when's it going to be ready? I was like, I have no idea. You're just going to have to deal with it.
+
+223
+00:15:05.840 --> 00:15:11.020
+<v Erik Fogg>But what we were already providing was so much better than what they were looking at, which is, well, we could shut down ProdPerfect.
+
+224
+00:15:11.300 --> 00:15:17.320
+<v Erik Fogg>And then we could go like on a job hunt for or not a job hunt, but a recruiting hunt for some QA automation engineers.
+
+225
+00:15:17.440 --> 00:15:20.540
+<v Erik Fogg>So that'll take a few months and then the ramp for six months and then hopefully it'll work out.
+
+226
+00:15:20.720 --> 00:15:23.060
+<v Erik Fogg>And right now we're not shipping app breaking bugs.
+
+227
+00:15:23.280 --> 00:15:24.740
+<v Erik Fogg>So let's just let's just roll with it.
+
+228
+00:15:24.800 --> 00:15:30.460
+<v Erik Fogg>Right. QA is one of those things that is about like satisfaction as opposed to like your moonshot.
+
+229
+00:15:30.560 --> 00:15:33.560
+<v Erik Fogg>Right. There are all sorts of products that are like that are about aspiration.
+
+230
+00:15:33.820 --> 00:15:35.420
+<v Erik Fogg>Right. Especially revenue related products.
+
+231
+00:15:35.840 --> 00:15:39.760
+<v Erik Fogg>us, it's about satisfaction. We were satisfying people who's good enough. They had all sorts of
+
+232
+00:15:39.760 --> 00:15:46.140
+<v Erik Fogg>gripes about it. We ignored it until two and a half years in, we'd raised our series A. We were
+
+233
+00:15:46.140 --> 00:15:51.920
+<v Erik Fogg>able to seriously, sorry, two years in, we raised our series A. We were able to seriously invest in
+
+234
+00:15:51.920 --> 00:15:58.240
+<v Erik Fogg>an engineering team and oh my gosh, someone who knows anything about product from a SaaS and web
+
+235
+00:15:58.240 --> 00:16:03.020
+<v Erik Fogg>application perspective. And we built mission control. That's where we started putting customer
+
+236
+00:16:03.020 --> 00:16:08.060
+<v Erik Fogg>requests into features, but we'd had such a huge backlog of them that we were like,
+
+237
+00:16:08.120 --> 00:16:11.640
+<v Erik Fogg>we have all sorts of great ideas. So they did eventually make it to the roadmap. It just took
+
+238
+00:16:11.640 --> 00:16:12.140
+<v Erik Fogg>years.
+
+239
+00:16:13.340 --> 00:16:19.580
+<v Noah Labhart>Well, let's take a step into what you said. So how did you build your team? And I'm
+
+240
+00:16:19.580 --> 00:16:24.420
+<v Noah Labhart>interested in what you looked for in those people to indicate that they were the winning horses to
+
+241
+00:16:24.420 --> 00:16:24.920
+<v Noah Labhart>to join you.
+
+242
+00:16:26.420 --> 00:16:33.320
+<v Erik Fogg>I think one of ProdPerfect's major, major advantages is talent. It's something that
+
+243
+00:16:33.320 --> 00:16:38.500
+<v Erik Fogg>we are shockingly good at in a way that I can't truly articulate why, but we've been so consistent
+
+244
+00:16:38.500 --> 00:16:42.600
+<v Erik Fogg>about getting great talent that I don't think it's luck anymore. Like some of our secret sauce
+
+245
+00:16:42.600 --> 00:16:47.640
+<v Erik Fogg>is that as leaders, we like actually super duper seriously care about people and their success.
+
+246
+00:16:47.840 --> 00:16:52.680
+<v Erik Fogg>And it's obvious. And that means that when we interview people who we know are talented,
+
+247
+00:16:54.420 --> 00:16:58.780
+<v Erik Fogg>second. What's actually even harder than finding good talent is convincing good talent to join you.
+
+248
+00:16:59.100 --> 00:17:02.640
+<v Erik Fogg>That's where most people, like most of the founders that I talked to fall apart. Like,
+
+249
+00:17:02.660 --> 00:17:07.680
+<v Erik Fogg>oh yeah, you know, we gave offers, but like they joined Amazon instead because Amazon's offering
+
+250
+00:17:07.680 --> 00:17:14.880
+<v Erik Fogg>them $300,000. We don't have that kind of money. And so I think the real secret is in truly caring
+
+251
+00:17:14.880 --> 00:17:20.240
+<v Erik Fogg>about someone's success and wellbeing. So like, if there's one thing you can take away from this
+
+252
+00:17:20.240 --> 00:17:21.100
+<v Erik Fogg>in your recruiting strategy.
+
+253
+00:17:21.360 --> 00:17:23.760
+<v Erik Fogg>It's like, have a founder, right?
+
+254
+00:17:23.840 --> 00:17:24.860
+<v Erik Fogg>Like get off your butt
+
+255
+00:17:24.860 --> 00:17:26.100
+<v Erik Fogg>and go talk to this person
+
+256
+00:17:26.100 --> 00:17:27.020
+<v Erik Fogg>during the interview process
+
+257
+00:17:27.020 --> 00:17:28.420
+<v Erik Fogg>and sell ProdPerfect
+
+258
+00:17:28.420 --> 00:17:29.700
+<v Erik Fogg>the way you would sell it to an investor
+
+259
+00:17:29.700 --> 00:17:31.960
+<v Erik Fogg>because this person is investing
+
+260
+00:17:32.620 --> 00:17:34.660
+<v Erik Fogg>far more than a VC is.
+
+261
+00:17:34.720 --> 00:17:36.580
+<v Erik Fogg>A VC is investing a tiny chunk
+
+262
+00:17:36.580 --> 00:17:38.380
+<v Erik Fogg>of someone else's money, right?
+
+263
+00:17:38.440 --> 00:17:39.200
+<v Erik Fogg>Someone joining your company
+
+264
+00:17:39.200 --> 00:17:42.000
+<v Erik Fogg>is investing a huge chunk of their time,
+
+265
+00:17:42.120 --> 00:17:43.020
+<v Erik Fogg>which is the only thing
+
+266
+00:17:43.020 --> 00:17:43.980
+<v Erik Fogg>they have a limit of, right?
+
+267
+00:17:44.000 --> 00:17:44.760
+<v Erik Fogg>They're going to die soon.
+
+268
+00:17:44.820 --> 00:17:45.420
+<v Erik Fogg>All of us are.
+
+269
+00:17:45.600 --> 00:17:48.040
+<v Erik Fogg>And so you're asking so much of this person,
+
+270
+00:17:48.100 --> 00:17:50.000
+<v Erik Fogg>like you owe it to them
+
+271
+00:17:50.240 --> 00:17:54.480
+<v Erik Fogg>to sit down and say, how is joining ProdPerfect going to help your career?
+
+272
+00:17:54.880 --> 00:17:57.880
+<v Erik Fogg>How is it going to like, what is your mission in life?
+
+273
+00:17:57.960 --> 00:17:58.860
+<v Erik Fogg>What do you want to do?
+
+274
+00:17:59.000 --> 00:18:00.440
+<v Erik Fogg>And can we align those things?
+
+275
+00:18:00.780 --> 00:18:03.560
+<v Erik Fogg>And can we write that down in a way that we can hold ourselves accountable to?
+
+276
+00:18:03.840 --> 00:18:07.960
+<v Erik Fogg>It works really well for us, in part because we actually follow through with it.
+
+277
+00:18:08.000 --> 00:18:09.140
+<v Erik Fogg>So our retention is incredible.
+
+278
+00:18:09.960 --> 00:18:11.660
+<v Erik Fogg>How do we find good people?
+
+279
+00:18:11.760 --> 00:18:13.240
+<v Erik Fogg>We're big poachers.
+
+280
+00:18:13.340 --> 00:18:17.160
+<v Erik Fogg>And I've gotten some calls from chief revenue officers before,
+
+281
+00:18:17.160 --> 00:18:21.480
+<v Erik Fogg>for. Because even during the pandemic, the best people are not unemployed. If you have 20%
+
+282
+00:18:21.480 --> 00:18:25.800
+<v Erik Fogg>unemployment, the best 80% of people are still employed, you know, in the tech, like let's say
+
+283
+00:18:25.800 --> 00:18:30.320
+<v Erik Fogg>in the tech world. And so we have to go poaching. And so we typically look for, we do a lot of
+
+284
+00:18:30.320 --> 00:18:34.700
+<v Erik Fogg>networking. We'll look for people where people we know have relationships that can speak well for
+
+285
+00:18:34.700 --> 00:18:39.460
+<v Erik Fogg>them. And then the two steps we go through to test them are one, we always do some sort of live
+
+286
+00:18:39.460 --> 00:18:44.020
+<v Erik Fogg>exercise. So like for sales, it's role-playing, right? Like sell me something and I'm going to
+
+287
+00:18:44.020 --> 00:18:48.380
+<v Erik Fogg>pretend to be a cranky engineer who hates talking to salespeople because that's most engineers.
+
+288
+00:18:48.740 --> 00:18:53.060
+<v Erik Fogg>If at all possible, especially for a senior role, we do some contract work. We say, look,
+
+289
+00:18:53.140 --> 00:18:58.300
+<v Erik Fogg>we're asking you to make a major investment. You should want to get to know us better as well.
+
+290
+00:18:58.560 --> 00:19:02.560
+<v Erik Fogg>Let's do some work together. Let's see if it's going to work out really well. And people are
+
+291
+00:19:02.560 --> 00:19:07.380
+<v Erik Fogg>actually quite receptive to that. And you know the adage, hire slow, fire fast. We really do
+
+292
+00:19:07.380 --> 00:19:11.820
+<v Erik Fogg>hire slow. And sometimes it's very painful. And sometimes our team is screaming for individuals.
+
+293
+00:19:11.820 --> 00:19:18.240
+<v Erik Fogg>But like the last thing we want to do is like stick a body in the slot just to fill it and then regret it later.
+
+294
+00:19:18.420 --> 00:19:19.540
+<v Erik Fogg>I've done that once.
+
+295
+00:19:19.560 --> 00:19:20.480
+<v Erik Fogg>I will never do it again.
+
+296
+00:19:20.840 --> 00:19:21.420
+<v Noah Labhart>It's interesting.
+
+297
+00:19:21.500 --> 00:19:23.320
+<v Noah Labhart>I really like the way you put that.
+
+298
+00:19:23.560 --> 00:19:27.200
+<v Noah Labhart>Talk to them like they're an investor because they are investing in your company.
+
+299
+00:19:27.420 --> 00:19:28.880
+<v Noah Labhart>It makes a ton of sense.
+
+300
+00:19:29.100 --> 00:19:29.740
+<v Noah Labhart>And they are.
+
+301
+00:19:29.780 --> 00:19:30.840
+<v Noah Labhart>They're investing themselves.
+
+302
+00:19:31.060 --> 00:19:33.820
+<v Noah Labhart>They're investing their time and they're expecting a return.
+
+303
+00:19:34.080 --> 00:19:35.640
+<v Noah Labhart>So it's a it's a joint.
+
+304
+00:19:35.660 --> 00:19:36.440
+<v Noah Labhart>It's a joint thing.
+
+305
+00:19:37.600 --> 00:19:38.100
+<v Erik Fogg>Exactly.
+
+306
+00:19:38.040 --> 00:19:42.720
+<v Erik Fogg>Exactly. We literally use the same pitch deck that we use for investors when we want to give an offer.
+
+307
+00:19:42.820 --> 00:19:44.640
+<v Erik Fogg>We go like, hey, this is where ProdPerfect is going.
+
+308
+00:19:44.820 --> 00:19:46.400
+<v Erik Fogg>Right. This is what we've done so far.
+
+309
+00:19:46.480 --> 00:19:47.940
+<v Erik Fogg>These are the challenges ahead of us.
+
+310
+00:19:47.980 --> 00:19:49.080
+<v Erik Fogg>This is what we need to figure out.
+
+311
+00:19:49.140 --> 00:19:52.580
+<v Erik Fogg>Right. So when you go to invest, you say, here are the challenges we're going to solve with your money.
+
+312
+00:19:52.740 --> 00:19:57.680
+<v Erik Fogg>I say, here are the challenges we're going to solve with your time and why that's going to turn the equity that you have in this company.
+
+313
+00:19:57.780 --> 00:19:59.620
+<v Erik Fogg>We like to be heavy on equity.
+
+314
+00:19:59.780 --> 00:20:01.260
+<v Erik Fogg>We don't want to clutch our pearls about that.
+
+315
+00:20:01.340 --> 00:20:03.480
+<v Erik Fogg>So like this equity that you're getting, you're a shareholder.
+
+316
+00:20:03.740 --> 00:20:06.580
+<v Erik Fogg>Right. And here's how you're going to turn your, you know, especially this early.
+
+317
+00:20:08.040 --> 00:20:10.700
+<v Erik Fogg>Oh my gosh, the 23rd person to work at Amazon is rich.
+
+318
+00:20:10.980 --> 00:20:12.940
+<v Erik Fogg>We don't know their name, but they're loaded.
+
+319
+00:20:13.240 --> 00:20:15.440
+<v Erik Fogg>And so we want people thinking the same way
+
+320
+00:20:15.440 --> 00:20:16.320
+<v Erik Fogg>about working with us.
+
+321
+00:20:16.400 --> 00:20:20.160
+<v Erik Fogg>And so that investment of my time pays off massively.
+
+322
+00:20:23.760 --> 00:20:25.960
+<v Noah Labhart>Let's switch to scalability for a minute.
+
+323
+00:20:26.160 --> 00:20:30.520
+<v Noah Labhart>So was ProdPerfect built to scale efficiently from day one?
+
+324
+00:20:31.280 --> 00:20:33.440
+<v Noah Labhart>Or were you fighting this as you grew?
+
+325
+00:20:33.500 --> 00:20:35.320
+<v Noah Labhart>And I think I know where you're going to go,
+
+326
+00:20:35.340 --> 00:20:36.400
+<v Noah Labhart>but tell me about that.
+
+327
+00:20:36.440 --> 00:20:36.940
+<v Noah Labhart>Dig into that.
+
+328
+00:20:38.460 --> 00:20:40.640
+<v Erik Fogg>it was so not scalable.
+
+329
+00:20:40.820 --> 00:20:43.760
+<v Erik Fogg>It was possibly the least scalable piece of technology
+
+330
+00:20:43.760 --> 00:20:45.440
+<v Erik Fogg>built in the last 10 years.
+
+331
+00:20:45.760 --> 00:20:47.600
+<v Erik Fogg>Despite being on AWS already,
+
+332
+00:20:47.720 --> 00:20:48.760
+<v Erik Fogg>despite being serverless,
+
+333
+00:20:48.980 --> 00:20:50.940
+<v Erik Fogg>it was so not,
+
+334
+00:20:51.100 --> 00:20:53.440
+<v Erik Fogg>I mean, again, it was probably 80%
+
+335
+00:20:53.440 --> 00:20:56.140
+<v Erik Fogg>of the value we were providing to our customers
+
+336
+00:20:56.140 --> 00:20:58.160
+<v Erik Fogg>was being done by hand, by humans,
+
+337
+00:20:58.280 --> 00:21:00.800
+<v Erik Fogg>bespoke and custom to each of them on day one.
+
+338
+00:21:00.880 --> 00:21:01.980
+<v Erik Fogg>It was miserable.
+
+339
+00:21:03.120 --> 00:21:03.960
+<v Erik Fogg>And we were actually,
+
+340
+00:21:04.040 --> 00:21:05.520
+<v Erik Fogg>what's interesting is we're transparent about this
+
+341
+00:21:05.520 --> 00:21:06.540
+<v Erik Fogg>with our investors, right?
+
+342
+00:21:06.640 --> 00:21:07.920
+<v Erik Fogg>This is why you asked me about it.
+
+343
+00:21:08.040 --> 00:21:09.560
+<v Erik Fogg>I was like, oh yeah, the upside down MVP.
+
+344
+00:21:09.820 --> 00:21:12.160
+<v Erik Fogg>Like we've already conceptualized that for investors.
+
+345
+00:21:12.640 --> 00:21:15.680
+<v Erik Fogg>And we needed an investor who's like willing to get behind it
+
+346
+00:21:15.680 --> 00:21:17.500
+<v Erik Fogg>and see how big the opportunity was
+
+347
+00:21:17.500 --> 00:21:18.900
+<v Erik Fogg>with all these challenges.
+
+348
+00:21:19.720 --> 00:21:22.720
+<v Erik Fogg>To be frank, we're still not as scalable as we want to be.
+
+349
+00:21:22.820 --> 00:21:24.440
+<v Erik Fogg>We have fewer than a hundred customers right now.
+
+350
+00:21:24.520 --> 00:21:27.240
+<v Erik Fogg>Now those customers pay very big tickets for us
+
+351
+00:21:27.240 --> 00:21:28.220
+<v Erik Fogg>because we're an alternative
+
+352
+00:21:28.220 --> 00:21:30.240
+<v Erik Fogg>to high talent, expensive headcount.
+
+353
+00:21:30.720 --> 00:21:32.140
+<v Erik Fogg>So we make a lot of money.
+
+354
+00:21:32.360 --> 00:21:34.700
+<v Erik Fogg>You know, our sales are still like very one-to-one,
+
+355
+00:21:34.840 --> 00:21:35.920
+<v Erik Fogg>very consultative.
+
+356
+00:21:35.960 --> 00:21:37.200
+<v Erik Fogg>We spend a lot of time making sure
+
+357
+00:21:38.240 --> 00:21:41.840
+<v Erik Fogg>fit because we don't want a bad fit and because it's expensive for us.
+
+358
+00:21:42.180 --> 00:21:46.620
+<v Erik Fogg>The technology is still not all that scalable in part because I'm going to sort of like
+
+359
+00:21:46.620 --> 00:21:48.060
+<v Erik Fogg>let you in on a little secret here.
+
+360
+00:21:48.140 --> 00:21:53.780
+<v Erik Fogg>So the whole world is now going to know any machine intelligence problem has a long tail
+
+361
+00:21:53.780 --> 00:21:55.920
+<v Erik Fogg>of thorny edge cases, right?
+
+362
+00:21:56.000 --> 00:22:01.260
+<v Erik Fogg>This is why you can't have self-driving cars on the highway right now, because like people
+
+363
+00:22:01.260 --> 00:22:03.560
+<v Erik Fogg>will die and a small portion of them will.
+
+364
+00:22:03.700 --> 00:22:07.680
+<v Erik Fogg>And one of the hard things about technology versus humans, and this is true for us as
+
+365
+00:22:08.040 --> 00:22:12.480
+<v Erik Fogg>Right. Like we accept a certain number of people behind the wheel killing themselves and each other.
+
+366
+00:22:12.560 --> 00:22:15.900
+<v Erik Fogg>But like as soon as a robot does it, we're going to lose our minds.
+
+367
+00:22:16.180 --> 00:22:20.120
+<v Erik Fogg>And it's the same thing with ProdPerfect where like your QA engineer makes a mistake.
+
+368
+00:22:20.320 --> 00:22:26.740
+<v Erik Fogg>And it's like, oh, but it's Mike and we like Mike and like Michael go fix it because Mike, we know Mike cares about the company, all this good stuff.
+
+369
+00:22:26.860 --> 00:22:31.340
+<v Erik Fogg>Whereas if we screw up, it's like we're a vendor and not only a vendor, but a piece of software.
+
+370
+00:22:31.500 --> 00:22:33.120
+<v Erik Fogg>And so all of a sudden there's huge trust issues.
+
+371
+00:22:33.720 --> 00:22:35.160
+<v Erik Fogg>So what's the scalability problem?
+
+372
+00:22:35.160 --> 00:22:43.400
+<v Erik Fogg>It's that there are edge cases we run into that require literal engineers to intervene in deploying our service to the customer.
+
+373
+00:22:43.620 --> 00:22:44.560
+<v Erik Fogg>So here's a good example.
+
+374
+00:22:44.880 --> 00:22:48.080
+<v Erik Fogg>Part of what ProdPerfect needs to do is fill in test data.
+
+375
+00:22:48.260 --> 00:22:53.920
+<v Erik Fogg>So when we're building this test into a test environment, the data set there is radically different from it than it is on production.
+
+376
+00:22:54.160 --> 00:23:00.600
+<v Erik Fogg>So that test data needs to get filled in through a guess and check process because we don't even know how they set up their test data environment.
+
+377
+00:23:00.860 --> 00:23:02.020
+<v Erik Fogg>It's crazy.
+
+378
+00:23:02.020 --> 00:23:05.900
+<v Erik Fogg>crazy. Like there's a reason nobody else is doing this because the deeper you get into it,
+
+379
+00:23:05.940 --> 00:23:10.600
+<v Erik Fogg>the more you're like, these people are nuts for even trying. And we are, but you've got to fill
+
+380
+00:23:10.600 --> 00:23:14.640
+<v Erik Fogg>in this test data. So like a good example is like, let's say Geico is a customer. At some point you
+
+381
+00:23:14.640 --> 00:23:18.180
+<v Erik Fogg>need to fill in a VIN in order to, you know, vehicle identification number to get a quote,
+
+382
+00:23:18.240 --> 00:23:22.220
+<v Erik Fogg>right? Cause they want to know what car you have. Well, if the machine who that's trying to fill in
+
+383
+00:23:22.220 --> 00:23:26.360
+<v Erik Fogg>the data has never seen a VIN before, it's going to fill in like some alphanumeric sequence that
+
+384
+00:23:26.360 --> 00:23:30.880
+<v Erik Fogg>won't work. And so that gets punted up, you know, it fails, it gets punted up and someone has to go
+
+385
+00:23:32.020 --> 00:23:35.420
+<v Erik Fogg>syntax for a VIN, great, I'll fill it in. Luckily, now the machine is being taught.
+
+386
+00:23:36.360 --> 00:23:41.980
+<v Erik Fogg>Then there's more complex stuff. We have a customer that uploads and analyzes CAD files.
+
+387
+00:23:42.340 --> 00:23:47.840
+<v Erik Fogg>And so we definitely need a human to intervene with that. The edge cases get way thornier,
+
+388
+00:23:47.880 --> 00:23:52.480
+<v Erik Fogg>more complicated than that, but those are two accessible ones. So we still need engineers
+
+389
+00:23:52.480 --> 00:23:58.020
+<v Erik Fogg>overseeing this thing. So you imagine this operating engineer core who's sitting there
+
+390
+00:23:58.020 --> 00:24:02.080
+<v Erik Fogg>are essentially running this factory that's breaking all the time and like stuff is getting
+
+391
+00:24:02.080 --> 00:24:06.220
+<v Erik Fogg>punted up to them where they need to go like creatively solve problems and do it in a way
+
+392
+00:24:06.220 --> 00:24:11.920
+<v Erik Fogg>such that it creates a data set for the machine to learn. So it's like still not scalable infinitely
+
+393
+00:24:11.920 --> 00:24:16.560
+<v Erik Fogg>in the way that a SaaS application should be. You know, we're like the only place that's going to
+
+394
+00:24:16.560 --> 00:24:20.080
+<v Erik Fogg>fall down is because like the database got too big or something, or like they didn't, you know,
+
+395
+00:24:20.080 --> 00:24:25.100
+<v Erik Fogg>set up their AWS to scale the right way. We still have a core of engineers that has to grow with
+
+396
+00:24:25.100 --> 00:24:29.380
+<v Erik Fogg>our customer base, the thing that we need to do is move our way down that long tail
+
+397
+00:24:29.380 --> 00:24:35.800
+<v Erik Fogg>by automating how to deal with different styles of challenges for this analysis engine or
+
+398
+00:24:35.800 --> 00:24:38.260
+<v Erik Fogg>for the code generator to produce test code.
+
+399
+00:24:38.620 --> 00:24:43.160
+<v Erik Fogg>What we want is fewer and fewer of these problems per customer so that our customer base can
+
+400
+00:24:43.160 --> 00:24:45.840
+<v Erik Fogg>scale non-linearly compared to the engineer core.
+
+401
+00:24:46.080 --> 00:24:51.940
+<v Erik Fogg>There is some day in the future that we will not need operation engineers to maintain our
+
+402
+00:24:51.940 --> 00:24:54.880
+<v Erik Fogg>customers and our customers' test suites and update those test suites.
+
+403
+00:24:55.100 --> 00:24:56.620
+<v Erik Fogg>but it's probably a long way away.
+
+404
+00:24:56.800 --> 00:24:58.460
+<v Erik Fogg>So scalability is always going to be,
+
+405
+00:24:58.480 --> 00:25:00.880
+<v Erik Fogg>will be a challenge for ProdPerfect for years.
+
+406
+00:25:02.420 --> 00:25:04.920
+<v Noah Labhart>Describing as like the thorny edge cases,
+
+407
+00:25:05.020 --> 00:25:06.960
+<v Noah Labhart>it's a good picture to think of
+
+408
+00:25:06.960 --> 00:25:09.400
+<v Noah Labhart>when you think about QA testing, period, right?
+
+409
+00:25:10.800 --> 00:25:12.740
+<v Noah Labhart>Well, as you step out on the balcony
+
+410
+00:25:12.740 --> 00:25:14.440
+<v Noah Labhart>and you look across what you've built,
+
+411
+00:25:14.640 --> 00:25:16.060
+<v Noah Labhart>what are you most proud of?
+
+412
+00:25:16.760 --> 00:25:18.440
+<v Erik Fogg>You know, I'm a very people-y person,
+
+413
+00:25:18.640 --> 00:25:20.080
+<v Erik Fogg>so I'll give the real answer
+
+414
+00:25:20.080 --> 00:25:21.760
+<v Erik Fogg>and then I'll give like the product answer
+
+415
+00:25:21.760 --> 00:25:23.400
+<v Erik Fogg>because I'm proud of both.
+
+416
+00:25:25.100 --> 00:25:28.160
+<v Erik Fogg>is I have seen in a very short time period,
+
+417
+00:25:28.340 --> 00:25:29.720
+<v Erik Fogg>you know, somewhere between, you know,
+
+418
+00:25:29.720 --> 00:25:32.140
+<v Erik Fogg>some of these hires that been around for six months,
+
+419
+00:25:32.220 --> 00:25:34.940
+<v Erik Fogg>but I think the longest hire we've had two and a half years,
+
+420
+00:25:35.640 --> 00:25:36.860
+<v Erik Fogg>the one after that is two.
+
+421
+00:25:37.080 --> 00:25:40.800
+<v Erik Fogg>And I have seen some like young, ambitious people
+
+422
+00:25:40.800 --> 00:25:43.400
+<v Erik Fogg>who are like looking for their shot.
+
+423
+00:25:43.600 --> 00:25:45.240
+<v Erik Fogg>You know, they're in their like mid, late twenties
+
+424
+00:25:45.240 --> 00:25:46.980
+<v Erik Fogg>and they're looking for their opportunity
+
+425
+00:25:47.640 --> 00:25:50.600
+<v Erik Fogg>for like, for a leadership team that supports them
+
+426
+00:25:50.600 --> 00:25:52.280
+<v Erik Fogg>and also gets the heck out of the way,
+
+427
+00:25:52.280 --> 00:25:55.600
+<v Erik Fogg>lets them make mistakes, lets them take risks,
+
+428
+00:25:55.940 --> 00:25:58.040
+<v Erik Fogg>rewards them for taking initiative
+
+429
+00:25:58.040 --> 00:25:59.740
+<v Erik Fogg>rather than being control freaks.
+
+430
+00:25:59.840 --> 00:26:01.900
+<v Erik Fogg>These folks were looking to take that shot
+
+431
+00:26:01.900 --> 00:26:05.120
+<v Erik Fogg>and thereby advance their career
+
+432
+00:26:05.120 --> 00:26:07.500
+<v Erik Fogg>and advance their salary,
+
+433
+00:26:08.200 --> 00:26:10.480
+<v Erik Fogg>but most importantly, grow as individuals
+
+434
+00:26:10.480 --> 00:26:15.000
+<v Erik Fogg>and move up Maslow's hierarchy of needs
+
+435
+00:26:15.000 --> 00:26:17.420
+<v Erik Fogg>and see themselves develop.
+
+436
+00:26:17.840 --> 00:26:21.380
+<v Erik Fogg>And we finally did formal performance reviews
+
+437
+00:26:22.280 --> 00:26:28.640
+<v Erik Fogg>And so we had this moment where we got to reflect on how far so many of us have come as humans.
+
+438
+00:26:29.320 --> 00:26:33.660
+<v Erik Fogg>People are really proud of themselves for what they've done and who they've become here.
+
+439
+00:26:33.820 --> 00:26:36.300
+<v Erik Fogg>That's what I'm most proud of is seeing that growth.
+
+440
+00:26:36.420 --> 00:26:41.920
+<v Erik Fogg>But looking at the product, I think the thing that we're most proud of is it's of course it's customer feedback.
+
+441
+00:26:42.100 --> 00:26:48.840
+<v Erik Fogg>Like we get unsolicited because we're like in Slack channels with our customers too because of those thorny edge cases.
+
+442
+00:26:48.980 --> 00:26:51.460
+<v Erik Fogg>So we like develop real relationships with these folks.
+
+443
+00:26:52.280 --> 00:26:54.120
+<v Erik Fogg>So I guess this is also a people thing.
+
+444
+00:26:54.480 --> 00:26:58.880
+<v Erik Fogg>Those moments I'm most proud of, and we collate these quotes, of course, is when people say,
+
+445
+00:26:59.000 --> 00:27:05.420
+<v Erik Fogg>holy smokes, like you saved our bacon or like, wow, our SDLC has transformed and we're able
+
+446
+00:27:05.420 --> 00:27:07.540
+<v Erik Fogg>to do so much more than we were able to before.
+
+447
+00:27:07.800 --> 00:27:12.640
+<v Erik Fogg>Or, you know, or like my life used to be very frustrating and now it's very enjoyable.
+
+448
+00:27:12.820 --> 00:27:13.980
+<v Erik Fogg>Thanks to buying your product.
+
+449
+00:27:14.480 --> 00:27:17.740
+<v Erik Fogg>You know, the stuff that's like a little bit, it's a little bit basic or like generic.
+
+450
+00:27:17.860 --> 00:27:21.620
+<v Erik Fogg>But when people just come out of the woodwork and say that, that like we've actually had
+
+451
+00:27:22.280 --> 00:27:26.320
+<v Erik Fogg>not just on their bottom lines, but their lives, that's special.
+
+452
+00:27:26.520 --> 00:27:29.380
+<v Erik Fogg>There's something about when someone purchases your product
+
+453
+00:27:29.380 --> 00:27:32.860
+<v Erik Fogg>and they feel their lives are better for having done so,
+
+454
+00:27:33.020 --> 00:27:36.520
+<v Erik Fogg>or like people get promoted for having done so, that's special.
+
+455
+00:27:37.720 --> 00:27:39.960
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+456
+00:27:40.180 --> 00:27:44.220
+<v Noah Labhart>So tell me about a mistake you made and how you and your team responded to it.
+
+457
+00:27:45.020 --> 00:27:49.020
+<v Erik Fogg>We love mistakes because it means we're moving fast, right?
+
+458
+00:27:49.020 --> 00:27:55.040
+<v Erik Fogg>We're still in Mark Zuckerberg 2011 move fast and break things mode, which is hard when you're a QA company.
+
+459
+00:27:55.680 --> 00:27:58.940
+<v Erik Fogg>So we contain and constrain what we break.
+
+460
+00:27:59.520 --> 00:28:05.020
+<v Erik Fogg>So spoiler, we still have one of the biggest e-commerce companies in the world as a customer.
+
+461
+00:28:05.820 --> 00:28:12.320
+<v Erik Fogg>When we got started with them, we're putting a piece of code on their application that collects data.
+
+462
+00:28:12.620 --> 00:28:15.120
+<v Erik Fogg>Lots of well-justified paranoia.
+
+463
+00:28:15.120 --> 00:28:23.280
+<v Erik Fogg>So we have to go through these like hardcore security reviews and tests like performance and load tests, lots of data coming back.
+
+464
+00:28:23.360 --> 00:28:25.500
+<v Erik Fogg>It took four months just to get through that.
+
+465
+00:28:26.060 --> 00:28:28.340
+<v Erik Fogg>And we pass and we're like, we're in.
+
+466
+00:28:28.580 --> 00:28:32.040
+<v Erik Fogg>And we even like go through a two week trial with them where we catch a number of like key bugs.
+
+467
+00:28:32.140 --> 00:28:33.040
+<v Erik Fogg>We're like, oh my God, we're in.
+
+468
+00:28:33.260 --> 00:28:34.140
+<v Erik Fogg>Let's do this.
+
+469
+00:28:34.280 --> 00:28:42.100
+<v Erik Fogg>And we end up promoting our tracker to production and then shipping an update to the tracker that breaks their site.
+
+470
+00:28:42.920 --> 00:28:46.140
+<v Erik Fogg>When you go to their site, it's a white blank thing.
+
+471
+00:28:46.320 --> 00:28:48.880
+<v Erik Fogg>And it was because of us.
+
+472
+00:28:50.220 --> 00:28:53.200
+<v Erik Fogg>We had like literally just raised money on this deal.
+
+473
+00:28:53.900 --> 00:28:55.440
+<v Erik Fogg>I thought I was going to die.
+
+474
+00:28:55.600 --> 00:29:02.060
+<v Erik Fogg>I thought, you know, I was like, you know, the Japanese have a grand Bushido tradition of going out with honor.
+
+475
+00:29:02.180 --> 00:29:03.360
+<v Erik Fogg>And maybe it's my time.
+
+476
+00:29:03.700 --> 00:29:09.340
+<v Erik Fogg>And we got the phone call like in the middle of the night, which means I didn't pick it up, of course, because I'm a millennial.
+
+477
+00:29:09.400 --> 00:29:11.520
+<v Erik Fogg>But there were like six messages on my phone.
+
+478
+00:29:12.100 --> 00:29:17.100
+<v Erik Fogg>The way we resolved that mistake was we had to, we went back to our champion.
+
+479
+00:29:17.200 --> 00:29:19.080
+<v Erik Fogg>You know, we took this, they took the snippet down.
+
+480
+00:29:19.400 --> 00:29:22.580
+<v Erik Fogg>We had to go through another few months process of getting that thing back online.
+
+481
+00:29:23.280 --> 00:29:28.060
+<v Erik Fogg>And the way that we got through it was we went back to the champion and like, yes, we did our apologies and groveling.
+
+482
+00:29:28.120 --> 00:29:39.320
+<v Erik Fogg>But the thing that people really want from you, whether it's like a customer or a boss or, you know, a spouse, is they want to know how you're going to make sure that that doesn't happen again.
+
+483
+00:29:39.480 --> 00:29:41.040
+<v Erik Fogg>Right. People are looking for like reliability.
+
+484
+00:29:42.100 --> 00:29:45.980
+<v Erik Fogg>Actually, what it did was it caused us to get so tight.
+
+485
+00:29:46.180 --> 00:29:53.060
+<v Erik Fogg>You know, again, we transform really fast from cowboy to real deal with the code we're injecting on someone's application.
+
+486
+00:29:53.380 --> 00:30:01.080
+<v Erik Fogg>You know, including like having a promotion strategy and canary builds and applications that are like that we literally will pay them if we break their site.
+
+487
+00:30:01.220 --> 00:30:03.380
+<v Erik Fogg>Like they're just there to be a test bed.
+
+488
+00:30:03.380 --> 00:30:07.860
+<v Erik Fogg>and the rigor that we put into making sure that thing worked
+
+489
+00:30:08.860 --> 00:30:11.780
+<v Erik Fogg>really leveled up our entire tech development process.
+
+490
+00:30:12.280 --> 00:30:15.200
+<v Erik Fogg>And we use, you know, we don't always use that level of rigor
+
+491
+00:30:15.200 --> 00:30:16.220
+<v Erik Fogg>with all the tech that we ship,
+
+492
+00:30:16.300 --> 00:30:17.780
+<v Erik Fogg>but we always have the option to,
+
+493
+00:30:17.840 --> 00:30:19.120
+<v Erik Fogg>and we now always have the choice.
+
+494
+00:30:19.400 --> 00:30:20.880
+<v Erik Fogg>And so it's made us better.
+
+495
+00:30:21.000 --> 00:30:23.200
+<v Erik Fogg>And so by working with this champion
+
+496
+00:30:23.200 --> 00:30:25.260
+<v Erik Fogg>who really truly needed what we had,
+
+497
+00:30:25.420 --> 00:30:27.840
+<v Erik Fogg>we managed to get back into the good graces
+
+498
+00:30:27.840 --> 00:30:29.140
+<v Erik Fogg>and they're still our biggest contract today.
+
+499
+00:30:29.760 --> 00:30:31.360
+<v Erik Fogg>It's the worst feeling in the world.
+
+500
+00:30:31.360 --> 00:30:34.700
+<v Erik Fogg>because the thing is, at the time, you don't know how it's going to turn out.
+
+501
+00:30:34.940 --> 00:30:38.520
+<v Erik Fogg>So looking back, you're like, oh, yeah, it was great that it happened, and it was.
+
+502
+00:30:39.400 --> 00:30:40.680
+<v Erik Fogg>But boy, was it scary.
+
+503
+00:30:43.820 --> 00:30:47.080
+<v Noah Labhart>What does the future look like for your product and for your team?
+
+504
+00:30:48.060 --> 00:30:49.700
+<v Erik Fogg>We are in growth mode right now.
+
+505
+00:30:50.220 --> 00:30:54.420
+<v Erik Fogg>So we're on the war path to fundraising sometime in 2022.
+
+506
+00:30:55.640 --> 00:30:56.740
+<v Erik Fogg>We're growing right now.
+
+507
+00:30:56.880 --> 00:30:58.600
+<v Erik Fogg>We're expanding primarily the sales team.
+
+508
+00:30:58.600 --> 00:31:05.940
+<v Erik Fogg>You know, I'll just plug, we're looking for like great consultative technology salespeople who like engineers don't hate and can show us that they don't.
+
+509
+00:31:06.280 --> 00:31:08.180
+<v Erik Fogg>And so that growth is happening right now.
+
+510
+00:31:08.260 --> 00:31:18.700
+<v Erik Fogg>And the thing that's happening to the product, which is what we're really here to talk about, is ProdPerfect is finally rolling out those features that don't just like make end-to-end testing work autonomously,
+
+511
+00:31:18.700 --> 00:31:23.460
+<v Erik Fogg>but help our customers, you know, when a test breaks,
+
+512
+00:31:23.540 --> 00:31:26.660
+<v Erik Fogg>be able to take action much faster, much more easily.
+
+513
+00:31:27.500 --> 00:31:31.320
+<v Erik Fogg>ProdPerfect is finally becoming a truly like continuous testing tool set
+
+514
+00:31:31.860 --> 00:31:32.940
+<v Erik Fogg>or service really.
+
+515
+00:31:33.260 --> 00:31:35.980
+<v Erik Fogg>And so, you know, we're working with customers
+
+516
+00:31:35.980 --> 00:31:39.340
+<v Erik Fogg>like to move us earlier in the SDLC, run us more frequently
+
+517
+00:31:39.340 --> 00:31:42.040
+<v Erik Fogg>and thereby, you know, make, you know, kind of like
+
+518
+00:31:42.040 --> 00:31:44.260
+<v Erik Fogg>for all those tech leaders out there who are like,
+
+519
+00:31:44.300 --> 00:31:47.060
+<v Erik Fogg>ah, yes, we have like a three-week, you know, development cycle
+
+520
+00:31:48.700 --> 00:31:50.480
+<v Erik Fogg>What we're trying to do is become a tool that,
+
+521
+00:31:50.540 --> 00:31:52.540
+<v Erik Fogg>or become a service that they can just flip on
+
+522
+00:31:52.540 --> 00:31:56.840
+<v Erik Fogg>and it allows them to translate that slow, agile process
+
+523
+00:31:56.840 --> 00:31:58.320
+<v Erik Fogg>into continuous development.
+
+524
+00:31:58.620 --> 00:32:01.620
+<v Erik Fogg>And those features are all on the front end.
+
+525
+00:32:01.860 --> 00:32:04.220
+<v Erik Fogg>The other thing that we're doing is we're finally getting
+
+526
+00:32:04.220 --> 00:32:06.000
+<v Erik Fogg>super serious about machine learning,
+
+527
+00:32:06.100 --> 00:32:07.560
+<v Erik Fogg>and that's solving the scalability problem.
+
+528
+00:32:07.980 --> 00:32:09.380
+<v Erik Fogg>So we've been training data sets.
+
+529
+00:32:09.440 --> 00:32:12.040
+<v Erik Fogg>We've been doing a lot of R&amp;D on machine learning
+
+530
+00:32:12.040 --> 00:32:14.460
+<v Erik Fogg>and doing a lot of stuff that, like, very basic training,
+
+531
+00:32:14.540 --> 00:32:17.920
+<v Erik Fogg>but not like your true neural net kinds of models.
+
+532
+00:32:18.700 --> 00:32:24.240
+<v Erik Fogg>finally hired some like really, really smart people to help us or to develop that and lead
+
+533
+00:32:24.240 --> 00:32:30.280
+<v Erik Fogg>that and radically transform our scalability and automatability. So those are the big changes that
+
+534
+00:32:30.280 --> 00:32:33.280
+<v Erik Fogg>are happening for the product. And, you know, eventually what's going to happen is we're going
+
+535
+00:32:33.280 --> 00:32:38.280
+<v Erik Fogg>to move out of like out of just web functional end-to-end testing into visual testing and load
+
+536
+00:32:38.280 --> 00:32:42.880
+<v Erik Fogg>testing and performance testing and mobile testing. So the plan has become like this, again, this big
+
+537
+00:32:42.880 --> 00:32:48.140
+<v Erik Fogg>like octopus that eats the world where people are going to look back, like what is ProdPerfect
+
+538
+00:32:48.700 --> 00:32:53.800
+<v Erik Fogg>years. ProdPerfect is going to do to QA testing what New Relic did to performance analysts.
+
+539
+00:32:54.380 --> 00:32:57.860
+<v Erik Fogg>New Relic was so good at killing the performance analyst role that people don't even,
+
+540
+00:32:58.020 --> 00:33:00.800
+<v Erik Fogg>like you say performance analysts, people are like, what are you even talking about? They forget
+
+541
+00:33:00.800 --> 00:33:07.220
+<v Erik Fogg>that it existed. Or similarly, like what AWS did to the IT department. Other than like edge IT,
+
+542
+00:33:07.420 --> 00:33:11.320
+<v Erik Fogg>like your laptop, like there isn't, like people don't maintain bare metal service. Not around here,
+
+543
+00:33:11.340 --> 00:33:16.280
+<v Erik Fogg>like I live in Silicon Valley, not around here. And so that's the future of ProdPerfect is that
+
+544
+00:33:16.280 --> 00:33:21.040
+<v Erik Fogg>that like QA as a service will be like platform as a service, infrastructure as a service,
+
+545
+00:33:21.180 --> 00:33:27.020
+<v Erik Fogg>performance monitoring as a service, and radically change how people develop products once again,
+
+546
+00:33:27.120 --> 00:33:31.700
+<v Erik Fogg>in a way that I think is going to have a huge impact on, you know, the broader software
+
+547
+00:33:31.700 --> 00:33:34.560
+<v Erik Fogg>industry, which is, you know, almost pretty much every company now.
+
+548
+00:33:35.640 --> 00:33:42.120
+<v Noah Labhart>Let's switch to you, Erik. So who influences the way that you work? Name a CEO, CTO, architect,
+
+549
+00:33:42.260 --> 00:33:45.400
+<v Noah Labhart>really, really any person. Name a person that you look up to and why.
+
+550
+00:33:47.240 --> 00:34:02.280
+<v Erik Fogg>Diana Klemp. So probably a name that most of your audience hasn't heard of. She's the CEO of the Conscious Leadership Group. She's the lead author of the 15 Commitments of Conscious Leadership.
+
+551
+00:34:02.280 --> 00:34:09.040
+<v Erik Fogg>So, you know, not being the tech genius, there's only so much that great tech influences influence me.
+
+552
+00:34:09.220 --> 00:34:14.020
+<v Erik Fogg>But I really do think like tech leaders are people leaders, which is obvious.
+
+553
+00:34:14.180 --> 00:34:18.540
+<v Erik Fogg>But I think we spend a lot of time thinking about how to get people to be good at tech, you know, as leaders.
+
+554
+00:34:18.660 --> 00:34:26.080
+<v Erik Fogg>And we don't invest enough time from what I've seen in as leaders, like helping people thrive and do their best work.
+
+555
+00:34:26.080 --> 00:34:28.180
+<v Erik Fogg>You know, everyone's looking for that 10x engineer.
+
+556
+00:34:28.480 --> 00:34:35.540
+<v Erik Fogg>And like, we kind of recruit these folks, you know, recruit hoping that we're going to find someone who's like intrinsically motivated to be a 10x engineer all the time.
+
+557
+00:34:35.580 --> 00:34:40.040
+<v Erik Fogg>If we just pay them enough money, right, they'll be a great 10x engineer and transform our business.
+
+558
+00:34:40.340 --> 00:34:49.640
+<v Erik Fogg>But I really do believe that the environment that we create and the culture that we create in our engineering teams, we can, one, do it deliberately.
+
+559
+00:34:49.940 --> 00:34:54.240
+<v Erik Fogg>And two, culture eats pretty much everything else for breakfast, right?
+
+560
+00:34:56.080 --> 00:34:57.160
+<v Erik Fogg>It eats tactics for breakfast.
+
+561
+00:34:57.400 --> 00:34:58.700
+<v Erik Fogg>It eats process for breakfast.
+
+562
+00:34:58.960 --> 00:35:08.320
+<v Erik Fogg>Because culture is, you know, because like 95% of the time, unless you have way too many meetings, your engineer is sitting there either in front of a computer or they're collaborating on a problem.
+
+563
+00:35:08.460 --> 00:35:16.420
+<v Erik Fogg>Like their brain is either engaged in this really creative way where they're like having fun and enjoying themselves and excited and motivated and ambitious.
+
+564
+00:35:16.760 --> 00:35:22.160
+<v Erik Fogg>Or like they are just trying to get through the day and like do what it takes to keep their job and keep their paycheck.
+
+565
+00:35:22.160 --> 00:35:25.460
+<v Erik Fogg>check and then like go think about something else because there's something else that like,
+
+566
+00:35:25.480 --> 00:35:27.640
+<v Erik Fogg>because there's something else that brings them so much more joy.
+
+567
+00:35:28.920 --> 00:35:33.080
+<v Erik Fogg>And you really want the former, not the latter. It makes a, it is impossible to measure. It is
+
+568
+00:35:33.080 --> 00:35:37.540
+<v Erik Fogg>intangible, but it makes a massive difference. And one of the ways that you can measure it as
+
+569
+00:35:37.540 --> 00:35:41.540
+<v Erik Fogg>all these lagging indicators, such as retention and, you know, and you can take surveys about
+
+570
+00:35:41.540 --> 00:35:46.900
+<v Erik Fogg>morale and how people are feeling. But Diana clamps 15 commitments of conscious leadership.
+
+571
+00:35:47.120 --> 00:35:50.440
+<v Erik Fogg>It's a tough book. And the way she runs her organization is like, you know, she,
+
+572
+00:35:52.160 --> 00:35:58.260
+<v Erik Fogg>a good model of how she's influenced me is what she wrote down. But it's a tough, deeply
+
+573
+00:35:58.260 --> 00:36:04.500
+<v Erik Fogg>introspective book. A lot of people don't like it, but I found that it's made me and Dan much
+
+574
+00:36:04.500 --> 00:36:14.240
+<v Erik Fogg>better leaders that people want to work with and want to do right by and want to share their hard
+
+575
+00:36:14.240 --> 00:36:18.400
+<v Erik Fogg>feedback with. They want to make the company and the culture a better place because of who we've
+
+576
+00:36:18.400 --> 00:36:18.980
+<v Erik Fogg>you've chosen to become.
+
+577
+00:36:20.200 --> 00:36:24.500
+<v Noah Labhart>So we talked about, you know, a mistake, but a little bit different spin.
+
+578
+00:36:24.740 --> 00:36:28.340
+<v Noah Labhart>If you could go back to the beginning, what would you do differently? Or where would you consider
+
+579
+00:36:28.340 --> 00:36:29.780
+<v Noah Labhart>taking a different approach?
+
+580
+00:36:31.120 --> 00:36:36.140
+<v Erik Fogg>One thing we would have done differently is I think we would have,
+
+581
+00:36:36.200 --> 00:36:40.820
+<v Erik Fogg>what we, what we did was we let ourselves get caught up when we were fundraising in just
+
+582
+00:36:40.820 --> 00:36:45.620
+<v Erik Fogg>focusing on ARR, ARR, ARR. You know, I talked about the scalability problem, right? I've got
+
+583
+00:36:45.620 --> 00:36:48.720
+<v Erik Fogg>got some scars from it. We were bringing on customers faster than we could actually onboard
+
+584
+00:36:48.720 --> 00:36:53.360
+<v Erik Fogg>them in this early stage and ended up biting us really, really, really hard. We had to let some
+
+585
+00:36:53.360 --> 00:36:59.080
+<v Erik Fogg>customers go and it was terrible expectation management with our investors. And so like
+
+586
+00:36:59.080 --> 00:37:03.320
+<v Erik Fogg>people really want our product, but we got ahead of, you know, the term is ahead of your skis.
+
+587
+00:37:03.580 --> 00:37:09.460
+<v Erik Fogg>And we had a feeling about this, but we let ourselves get caught up in this like grow revenue
+
+588
+00:37:09.460 --> 00:37:15.140
+<v Erik Fogg>now as fast as possible a year into building, you know, the, one of the more absurdly difficult
+
+589
+00:37:15.620 --> 00:37:20.860
+<v Erik Fogg>tech companies that has been built in the last 10 years. It was the wrong move. Like we should
+
+590
+00:37:20.860 --> 00:37:25.640
+<v Erik Fogg>have had the conviction or we should have stuck to our conviction with our investors that look,
+
+591
+00:37:25.760 --> 00:37:31.460
+<v Erik Fogg>this is a big, hard problem. And like the thing that we're selling right now is a tiny slice of
+
+592
+00:37:31.460 --> 00:37:38.000
+<v Erik Fogg>the opportunity. What we need to do is like use these customers to prove and learn and develop
+
+593
+00:37:38.000 --> 00:37:44.140
+<v Erik Fogg>and make them thrilled. It is not time for us to go into 30% month over month growth mode,
+
+594
+00:37:45.620 --> 00:37:46.240
+<v Erik Fogg>We didn't do that.
+
+595
+00:37:46.360 --> 00:37:48.820
+<v Erik Fogg>So we went to 30% month over month paper growth mode.
+
+596
+00:37:49.220 --> 00:37:51.540
+<v Erik Fogg>People really, really, really want what we have.
+
+597
+00:37:51.820 --> 00:37:53.420
+<v Erik Fogg>They love the vision of it.
+
+598
+00:37:53.520 --> 00:37:56.340
+<v Erik Fogg>And back in 2019, it wasn't ready for that.
+
+599
+00:37:56.660 --> 00:37:58.380
+<v Erik Fogg>And I wish we had stuck to our guns.
+
+600
+00:37:58.780 --> 00:38:03.080
+<v Erik Fogg>And so we've radically changed how we think about fundraising and what kind of conversations
+
+601
+00:38:03.080 --> 00:38:07.260
+<v Erik Fogg>we're going to have, either with our current investors who might just fund our next round,
+
+602
+00:38:07.380 --> 00:38:10.920
+<v Erik Fogg>because we're doing great right now, or we've been doing great for a good chunk.
+
+603
+00:38:11.300 --> 00:38:13.900
+<v Erik Fogg>Or if we decide to get our next round from someone else.
+
+604
+00:38:15.620 --> 00:38:20.880
+<v Erik Fogg>of a technology company should do is like be really really clear on like what is the vision
+
+605
+00:38:20.880 --> 00:38:27.800
+<v Erik Fogg>of this product and how is it going to transform like can you imagine if jeff bezos had looked for
+
+606
+00:38:27.800 --> 00:38:33.120
+<v Erik Fogg>funding now and all he said was like yeah i want to create an online bookstore right like it's very
+
+607
+00:38:33.120 --> 00:38:37.020
+<v Erik Fogg>very different when he says we're going to use that online bookstore to like go do all these
+
+608
+00:38:37.020 --> 00:38:42.360
+<v Erik Fogg>other things that are that are each worth 100 times as much as the online bookstore and so like
+
+609
+00:38:42.360 --> 00:38:44.660
+<v Erik Fogg>Don't even worry about the sales of the online bookstore.
+
+610
+00:38:44.920 --> 00:38:47.460
+<v Erik Fogg>It's an excuse to have the technology out there.
+
+611
+00:38:47.940 --> 00:38:54.460
+<v Erik Fogg>And having that conviction is hard because investors get really excited about revenue now.
+
+612
+00:38:55.000 --> 00:39:01.560
+<v Erik Fogg>But if that's not your path, if your path isn't like, oh, this is a really simple spreadsheet application and it's a race to the front.
+
+613
+00:39:01.660 --> 00:39:05.960
+<v Erik Fogg>Like who's the first, you know, Carta or JustWorks or something like that.
+
+614
+00:39:06.020 --> 00:39:11.340
+<v Erik Fogg>It's a relatively simple piece of technology that has a lot of potential to solve a lot of problems.
+
+615
+00:39:12.360 --> 00:39:17.400
+<v Erik Fogg>like be the first out there and just like win the market, right? That's one model of a startup,
+
+616
+00:39:17.540 --> 00:39:21.960
+<v Erik Fogg>but it doesn't have to be your model. And you don't have to like pretend it's the one you're on
+
+617
+00:39:21.960 --> 00:39:26.700
+<v Erik Fogg>if it's not the one you're on. Like if what you're building is a online bookstore in order to go
+
+618
+00:39:26.700 --> 00:39:32.860
+<v Erik Fogg>build AWS, you know, and Amazon Go and, you know, the largest e-com retailer in the world,
+
+619
+00:39:33.000 --> 00:39:36.580
+<v Erik Fogg>then say that and say, don't worry about the effing book sales this year.
+
+620
+00:39:38.200 --> 00:39:42.740
+<v Noah Labhart>Well, last question, Erik. So you're getting on a plane and you're sitting next to a young
+
+621
+00:39:42.740 --> 00:39:46.580
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+622
+00:39:46.580 --> 00:39:50.180
+<v Noah Labhart>show it off to the world. They can't wait to show it off to you right there on the plane.
+
+623
+00:39:50.560 --> 00:39:53.580
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+624
+00:39:55.320 --> 00:40:02.720
+<v Erik Fogg>So I wish someone had told me this. It's hard to do, but don't be intimidated by investors or by
+
+625
+00:40:02.720 --> 00:40:03.600
+<v Erik Fogg>by anyone giving you advice.
+
+626
+00:40:03.880 --> 00:40:04.380
+<v Erik Fogg>Here's why.
+
+627
+00:40:05.360 --> 00:40:06.560
+<v Erik Fogg>Especially if you're young,
+
+628
+00:40:06.600 --> 00:40:07.840
+<v Erik Fogg>like you've just come out of school recently
+
+629
+00:40:07.840 --> 00:40:09.200
+<v Erik Fogg>or like you're, you know,
+
+630
+00:40:09.640 --> 00:40:11.700
+<v Erik Fogg>you've been an IC, an individual contributor.
+
+631
+00:40:12.040 --> 00:40:13.280
+<v Erik Fogg>There's this sense you have
+
+632
+00:40:13.280 --> 00:40:15.560
+<v Erik Fogg>that there are these people who are senior to you
+
+633
+00:40:15.560 --> 00:40:17.940
+<v Erik Fogg>and that they have all the answers, right?
+
+634
+00:40:18.080 --> 00:40:20.060
+<v Erik Fogg>Like your teachers have all the answers, presumably.
+
+635
+00:40:20.440 --> 00:40:23.260
+<v Erik Fogg>And when you go like give an oral exam,
+
+636
+00:40:23.500 --> 00:40:24.860
+<v Erik Fogg>if they don't like your answers,
+
+637
+00:40:24.940 --> 00:40:26.960
+<v Erik Fogg>you're wrong and too bad.
+
+638
+00:40:27.040 --> 00:40:28.060
+<v Erik Fogg>And you get a bad grade.
+
+639
+00:40:28.200 --> 00:40:29.920
+<v Erik Fogg>Whereas when you're pitching a product,
+
+640
+00:40:29.960 --> 00:40:31.720
+<v Erik Fogg>either to a customer, right?
+
+641
+00:40:32.720 --> 00:40:38.140
+<v Erik Fogg>sales, have this conviction in recruiting, have this conviction in investing. When someone asks
+
+642
+00:40:38.140 --> 00:40:41.580
+<v Erik Fogg>the wrong question, you need to tell them it's the wrong question. So a good example is, you know,
+
+643
+00:40:41.600 --> 00:40:46.260
+<v Erik Fogg>I'm mentoring someone right now who is in the similar position we were early on, where their
+
+644
+00:40:46.260 --> 00:40:50.520
+<v Erik Fogg>economics are negative in their first five customers, but who cares? You know, they say,
+
+645
+00:40:50.560 --> 00:40:55.180
+<v Erik Fogg>how do I handle the what are your economics questions six months in? Well, you say economics
+
+646
+00:40:55.180 --> 00:41:00.180
+<v Erik Fogg>are not what you should be talking about six months in, investor, right? Because like investors,
+
+647
+00:41:00.180 --> 00:41:03.160
+<v Erik Fogg>investors like it's not that they're lazy it's that they're pattern matchers so like they're
+
+648
+00:41:03.160 --> 00:41:06.520
+<v Erik Fogg>like oh i asked this question a lot it's like but this is you know you need to have the conviction
+
+649
+00:41:06.520 --> 00:41:10.760
+<v Erik Fogg>like this isn't the time to talk economics let's talk what the economics can be but the economics
+
+650
+00:41:10.760 --> 00:41:16.800
+<v Erik Fogg>today are irrelevant for your investment decision right because we're not going to scale much
+
+651
+00:41:16.800 --> 00:41:23.200
+<v Erik Fogg>revenue on the product as it is right now because i built it in a garage at night right but how is
+
+652
+00:41:23.200 --> 00:41:27.040
+<v Erik Fogg>this thing going to scale let's talk about that same thing with a customer when they go like well
+
+653
+00:41:27.040 --> 00:41:28.940
+<v Erik Fogg>well, why doesn't it have such and such a feature?
+
+654
+00:41:29.060 --> 00:41:30.700
+<v Erik Fogg>It's like, because it doesn't need such and such a feature
+
+655
+00:41:30.700 --> 00:41:31.720
+<v Erik Fogg>to solve your problem.
+
+656
+00:41:32.380 --> 00:41:35.980
+<v Erik Fogg>So having the conviction that like, you know, you're right.
+
+657
+00:41:36.440 --> 00:41:37.600
+<v Erik Fogg>You know, you need to listen.
+
+658
+00:41:37.720 --> 00:41:39.300
+<v Erik Fogg>But when you know you're right, you're right.
+
+659
+00:41:39.420 --> 00:41:41.560
+<v Erik Fogg>Even when you're wrong, but you're still right.
+
+660
+00:41:41.780 --> 00:41:43.640
+<v Erik Fogg>You need to stick to your guns
+
+661
+00:41:43.640 --> 00:41:45.620
+<v Erik Fogg>and not be a leaf in the wind for customers,
+
+662
+00:41:45.720 --> 00:41:46.740
+<v Erik Fogg>for investors, for anyone.
+
+663
+00:41:47.200 --> 00:41:50.020
+<v Erik Fogg>Like it is the people who, you know,
+
+664
+00:41:50.040 --> 00:41:50.780
+<v Erik Fogg>you've got to be nimble,
+
+665
+00:41:50.780 --> 00:41:52.600
+<v Erik Fogg>but you've got to be nimble to your own convictions,
+
+666
+00:41:52.660 --> 00:41:53.980
+<v Erik Fogg>not other people's convictions.
+
+667
+00:41:54.660 --> 00:41:56.520
+<v Erik Fogg>And you need to be willing to tell people,
+
+668
+00:41:57.240 --> 00:42:02.960
+<v Erik Fogg>that they're wrong, that they're asking the wrong questions, all this stuff. And it's hard. It's so
+
+669
+00:42:02.960 --> 00:42:06.940
+<v Erik Fogg>hard, especially because investors seem like the teacher. It seems like you're supposed to have
+
+670
+00:42:06.940 --> 00:42:09.940
+<v Erik Fogg>the answer. If they ask about your economics, like, oh gosh, I don't have a good economics answer.
+
+671
+00:42:10.060 --> 00:42:14.380
+<v Erik Fogg>You have to let that go and be willing to know that you know more about your business and your
+
+672
+00:42:14.380 --> 00:42:19.080
+<v Erik Fogg>industry and your customer and your technology and your problem than anyone else on earth.
+
+673
+00:42:19.560 --> 00:42:22.760
+<v Erik Fogg>And that when anyone asks you a dumb question about it, you just need to let them know.
+
+674
+00:42:22.760 --> 00:42:23.260
+<v Erik Fogg>Yeah.
+
+675
+00:42:23.640 --> 00:42:28.300
+<v Noah Labhart>That's great advice. Well, Erik, thank you for being on the show today. Thank you for
+
+676
+00:42:28.300 --> 00:42:30.780
+<v Noah Labhart>telling the creation story of ProdPerfect.
+
+677
+00:42:31.620 --> 00:42:34.320
+<v Erik Fogg>Noah, thanks so much. Love your show. And,
+
+678
+00:42:34.320 --> 00:42:35.780
+<v Erik Fogg>you know, can't wait for your next episode.
+
+679
+00:42:36.720 --> 00:42:39.640
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+680
+00:42:43.120 --> 00:42:49.180
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+681
+00:42:49.180 --> 00:42:51.280
+<v Noah Labhart>or the podcasting app of your choice.
+
+682
+00:42:51.720 --> 00:42:55.040
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+683
+00:42:55.040 --> 00:42:56.800
+<v Noah Labhart>for just five to ten bucks a month.
+
+684
+00:42:57.180 --> 00:42:59.380
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+685
+00:42:59.680 --> 00:43:01.700
+<v Noah Labhart>Both things help us out tremendously.
+
+686
+00:43:04.260 --> 00:43:05.740
+<v Noah Labhart>And thanks again for listening.

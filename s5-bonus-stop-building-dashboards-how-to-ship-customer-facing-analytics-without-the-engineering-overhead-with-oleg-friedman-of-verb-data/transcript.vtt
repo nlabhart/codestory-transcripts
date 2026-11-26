@@ -1,0 +1,1543 @@
+WEBVTT
+
+NOTE S5 Bonus: Stop Building Dashboards: How to Ship Customer-Facing Analytics Without the Engineering Overhead with Oleg Friedman of Verb Data
+
+1
+00:00:01.760 --> 00:00:05.780
+<v Oleg Friedman>It probably took us six months before we ever wrote a single line of code.
+
+2
+00:00:07.120 --> 00:00:10.580
+<v Oleg Friedman>But by that point, we actually knew what we were building.
+
+3
+00:00:10.700 --> 00:00:12.440
+<v Oleg Friedman>We knew what challenges we wanted to solve.
+
+4
+00:00:12.700 --> 00:00:21.000
+<v Oleg Friedman>And that let us architect the underlying application to scale to the challenges we expected based
+
+5
+00:00:21.000 --> 00:00:21.720
+<v Oleg Friedman>on those conversations.
+
+6
+00:00:23.400 --> 00:00:25.200
+<v Oleg Friedman>Now, you know, did we get everything right?
+
+7
+00:00:25.240 --> 00:00:25.740
+<v Oleg Friedman>Of course not.
+
+8
+00:00:25.800 --> 00:00:27.980
+<v Oleg Friedman>But, you know, it put us on a much more solid footing.
+
+9
+00:00:27.980 --> 00:00:38.140
+<v Oleg Friedman>We didn't have to do a full code rewrite three months in when we realized that we can't handle more than, you know, a certain amount of data or a certain type of data source or whatever it might be.
+
+10
+00:00:39.420 --> 00:00:42.380
+<v Oleg Friedman>My name is Oleg Friedman. I'm CTO here at Verb Data.
+
+11
+00:00:47.620 --> 00:00:52.940
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+12
+00:00:52.940 --> 00:01:00.840
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+13
+00:01:02.180 --> 00:01:12.280
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Oleg Friedman took his product knowledge and built a developer-first tool to create customer dashboards.
+
+14
+00:01:13.280 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:20.360 --> 00:01:23.160
+<v Noah Labhart>Oleg Friedman has been at this startup thing for a while.
+
+16
+00:01:23.440 --> 00:01:26.280
+<v Noah Labhart>Most of his career, he has been working for himself remotely.
+
+17
+00:01:26.700 --> 00:01:30.620
+<v Noah Labhart>In high school, he was drug into entrepreneurship by a few of his friends,
+
+18
+00:01:30.740 --> 00:01:34.040
+<v Noah Labhart>creating an e-commerce website in 2002 for selling furniture.
+
+19
+00:01:34.360 --> 00:01:38.360
+<v Noah Labhart>They figured out that they sucked at selling furniture, but made a pretty good website.
+
+20
+00:01:38.820 --> 00:01:43.700
+<v Noah Labhart>And post that, he got involved with restaurant ordering and turned it into a thriving business.
+
+21
+00:01:43.700 --> 00:01:49.380
+<v Noah Labhart>business. That business, called Onosys, sold to LivingSocial after serving four countries,
+
+22
+00:01:49.460 --> 00:01:55.020
+<v Noah Labhart>around 10,000 restaurants, and doing quite a bit of online business. Currently, he lives in
+
+23
+00:01:55.020 --> 00:01:59.920
+<v Noah Labhart>Cleveland, Ohio, but has done stints in Austin and Boston. He's married with two little girls,
+
+24
+00:02:00.060 --> 00:02:06.520
+<v Noah Labhart>three years old and seven months old, and his major hobby is Legos. He has a huge Star Wars
+
+25
+00:02:06.520 --> 00:02:11.520
+<v Noah Labhart>collection, owning one of almost everything. When asked if he shared the Legos with his girls,
+
+26
+00:02:11.520 --> 00:02:14.420
+<v Noah Labhart>he mentioned that they knew daddy's Legos were off-limits.
+
+27
+00:02:15.560 --> 00:02:17.020
+<v Noah Labhart>Prior to their current venture,
+
+28
+00:02:17.240 --> 00:02:19.620
+<v Noah Labhart>Oleg and his co-founder Dave ran an agency
+
+29
+00:02:19.620 --> 00:02:21.660
+<v Noah Labhart>focusing on high fidelity prototyping.
+
+30
+00:02:22.180 --> 00:02:23.720
+<v Noah Labhart>After doing many projects,
+
+31
+00:02:23.880 --> 00:02:26.800
+<v Noah Labhart>they figured out that the process of creating dashboards
+
+32
+00:02:26.800 --> 00:02:28.480
+<v Noah Labhart>for a product was mostly the same,
+
+33
+00:02:28.640 --> 00:02:31.440
+<v Noah Labhart>but took a ton of time to prepare the data,
+
+34
+00:02:31.560 --> 00:02:33.080
+<v Noah Labhart>extract data, and display it.
+
+35
+00:02:33.380 --> 00:02:36.200
+<v Noah Labhart>They both figured out that they could create a solution
+
+36
+00:02:36.200 --> 00:02:38.100
+<v Noah Labhart>to make this process simpler.
+
+37
+00:02:39.240 --> 00:02:42.400
+<v Noah Labhart>This is the creation story of Verb Data.
+
+38
+00:02:45.820 --> 00:02:58.400
+<v Oleg Friedman>Verb Data is an integrated, embedded solution for dashboards and any data visualization that you may want to do in your SaaS product that you show to your end customers.
+
+39
+00:02:58.400 --> 00:03:16.140
+<v Oleg Friedman>So we really make the work of creating a, whether it's a full-fledged dashboard or a single pie chart on your website that you want to show to your end consumer so that they can visualize their ROI, how their product is performing, how their sales are going, how their workflows are managed.
+
+40
+00:03:16.520 --> 00:03:22.500
+<v Oleg Friedman>Anything that they may want to know in a visual representation, we're helping you automate all of that.
+
+41
+00:03:22.500 --> 00:03:25.920
+<v Oleg Friedman>that. Connect all the way down to the data source. It will help you ingest that data,
+
+42
+00:03:25.980 --> 00:03:31.420
+<v Oleg Friedman>then model it, transform it in any way you want, and then build visualizations to actually
+
+43
+00:03:31.420 --> 00:03:36.240
+<v Oleg Friedman>show to your customers. And the embedding process is super simple, just a couple lines
+
+44
+00:03:36.240 --> 00:03:42.660
+<v Oleg Friedman>of code to get it to work. And that takes a ton of that effort out of building those
+
+45
+00:03:42.660 --> 00:03:48.200
+<v Oleg Friedman>dashboards. Dashboards are incredibly valuable to that user, but building them takes a lot
+
+46
+00:03:48.200 --> 00:03:51.740
+<v Oleg Friedman>of effort, a lot of planning, and then also a lot of management as time goes on, right?
+
+47
+00:03:52.500 --> 00:03:56.840
+<v Oleg Friedman>is evolve, you're adding functions and features to your application all the time, and you always
+
+48
+00:03:56.840 --> 00:04:01.440
+<v Oleg Friedman>want to continue to visualize those on your dashboard. That's cycles and sprints you're
+
+49
+00:04:01.440 --> 00:04:06.140
+<v Oleg Friedman>taking away from your dev team instead of actually building core functionality. And there's like
+
+50
+00:04:06.140 --> 00:04:12.820
+<v Oleg Friedman>nine steps to that process, right? It's not just Chart.js. If it was that simple, great. And Chart.js
+
+51
+00:04:12.820 --> 00:04:18.720
+<v Oleg Friedman>is fantastic. There's a ton of great visualization libraries, but actually preparing the data to get
+
+52
+00:04:18.720 --> 00:04:24.820
+<v Oleg Friedman>to a point where you can display it. That's really the meat of the effort. And that's the part we're
+
+53
+00:04:24.820 --> 00:04:29.280
+<v Oleg Friedman>helping also take off the plate. And that's really where the engineers love our product.
+
+54
+00:04:29.360 --> 00:04:34.460
+<v Oleg Friedman>They're saying, oh, well, I don't have to actually do any of the grunt work, right? Writing all that
+
+55
+00:04:34.460 --> 00:04:40.660
+<v Oleg Friedman>SQL perform, you know, using a third party tool to extract the data, then using another third
+
+56
+00:04:40.660 --> 00:04:45.360
+<v Oleg Friedman>party tool to transform and then using a fourth or fifth or sixth third party tool to, you know,
+
+57
+00:04:45.360 --> 00:04:50.900
+<v Oleg Friedman>visualize and get all that together. And this is the problem we've had personally,
+
+58
+00:04:51.100 --> 00:04:55.440
+<v Oleg Friedman>you know, throughout pretty much every SaaS business I've ever run. I mean, we've built
+
+59
+00:04:55.440 --> 00:05:02.900
+<v Oleg Friedman>dashboards several dozen times over, either at businesses I've been involved with, or when we
+
+60
+00:05:02.900 --> 00:05:08.800
+<v Oleg Friedman>ran an agency for other SaaS businesses we ran. It's a pain, but you have to do it. Customers
+
+61
+00:05:08.800 --> 00:05:13.320
+<v Oleg Friedman>expect it. It brings credibility to your application. It also helps your sales cycle,
+
+62
+00:05:13.320 --> 00:05:18.300
+<v Oleg Friedman>right it's really nice to show a pretty dashboard when you are showing off your product but they're
+
+63
+00:05:18.300 --> 00:05:23.900
+<v Oleg Friedman>just they're hard to build they're time consuming to build and they take away from from what you
+
+64
+00:05:23.900 --> 00:05:27.700
+<v Oleg Friedman>should be doing which is actually adding core features core functionality to your product
+
+65
+00:05:28.120 --> 00:05:32.400
+<v Noah Labhart>well tell me about the mvp tell me about that first product you built how long it took you
+
+66
+00:05:32.400 --> 00:05:35.000
+<v Noah Labhart>to build and what sort of tools you use to bring it to life
+
+67
+00:05:35.000 --> 00:05:39.600
+<v Oleg Friedman>i'll take one quick step back before
+
+68
+00:05:39.600 --> 00:05:46.280
+<v Oleg Friedman>that before we ran for my partner dave and i ran a agency where we actually focused on high fidelity
+
+69
+00:05:46.280 --> 00:05:53.620
+<v Oleg Friedman>prototyping and building mvps for our customers when we got around to building our own we we had
+
+70
+00:05:53.620 --> 00:05:59.120
+<v Oleg Friedman>a little bit of experience in in doing that we we based that business on a book by Marty Cagan
+
+71
+00:05:59.120 --> 00:06:06.100
+<v Oleg Friedman>called inspired um fantastic book for anybody looking to build product not an overly technical
+
+72
+00:06:06.100 --> 00:06:10.100
+<v Oleg Friedman>technical book more on the product management side, but excellent overall.
+
+73
+00:06:11.040 --> 00:06:16.420
+<v Oleg Friedman>The MVP for us really was first before it ever became even a thought.
+
+74
+00:06:16.600 --> 00:06:18.300
+<v Oleg Friedman>We validated the idea.
+
+75
+00:06:18.440 --> 00:06:24.700
+<v Oleg Friedman>So we had about 150 conversations that we've logged and recorded before we ever
+
+76
+00:06:24.700 --> 00:06:29.300
+<v Oleg Friedman>even drew anything, definitely before we ever wrote a line of code.
+
+77
+00:06:29.400 --> 00:06:31.020
+<v Oleg Friedman>But before we even drew out
+
+78
+00:06:31.020 --> 00:06:35.880
+<v Oleg Friedman>a sketch on a piece of paper of what we might want to be building, because we had
+
+79
+00:06:36.100 --> 00:06:36.980
+<v Oleg Friedman>fully understand the idea.
+
+80
+00:06:37.180 --> 00:06:39.220
+<v Oleg Friedman>There's so many different data sources out there.
+
+81
+00:06:39.260 --> 00:06:41.480
+<v Oleg Friedman>There's so many different ways people want to visualize their data.
+
+82
+00:06:41.600 --> 00:06:44.440
+<v Oleg Friedman>And frankly, there's just so many SaaS businesses out there.
+
+83
+00:06:44.860 --> 00:06:48.640
+<v Oleg Friedman>We had to figure out what people would want to do with our product long before we ever
+
+84
+00:06:48.640 --> 00:06:55.800
+<v Oleg Friedman>built it. We then kind of distilled those conversations into a very early MVP, which
+
+85
+00:06:55.800 --> 00:06:57.960
+<v Oleg Friedman>was simply actually pre MVP.
+
+86
+00:06:58.120 --> 00:06:58.960
+<v Oleg Friedman>It was simply a prototype.
+
+87
+00:06:59.100 --> 00:07:05.720
+<v Oleg Friedman>It was an InVision app with a bunch of clickable screens that didn't look all that
+
+88
+00:07:06.100 --> 00:07:09.540
+<v Oleg Friedman>but you could click around and get from page to page.
+
+89
+00:07:09.720 --> 00:07:12.220
+<v Oleg Friedman>And we then figured out what all the problems were,
+
+90
+00:07:12.280 --> 00:07:13.700
+<v Oleg Friedman>which were everywhere, right?
+
+91
+00:07:13.760 --> 00:07:15.660
+<v Oleg Friedman>Because your first crack at it is never right.
+
+92
+00:07:15.840 --> 00:07:19.940
+<v Oleg Friedman>But the high-fidelity prototyping approach to it
+
+93
+00:07:19.940 --> 00:07:21.560
+<v Oleg Friedman>let us click, drag, and move,
+
+94
+00:07:21.820 --> 00:07:23.440
+<v Oleg Friedman>and then call that person back and go,
+
+95
+00:07:23.520 --> 00:07:24.320
+<v Oleg Friedman>hey, hey, we fixed that.
+
+96
+00:07:24.480 --> 00:07:25.460
+<v Oleg Friedman>What do you think of this now?
+
+97
+00:07:25.900 --> 00:07:29.100
+<v Oleg Friedman>And what was great is those people we spoke to early on,
+
+98
+00:07:29.200 --> 00:07:30.980
+<v Oleg Friedman>they were a little more involved now
+
+99
+00:07:30.980 --> 00:07:33.480
+<v Oleg Friedman>because we got them to give us some input very early on.
+
+100
+00:07:33.480 --> 00:07:39.180
+<v Oleg Friedman>And they were actually really happy to then go back to them and say, well, you know, we have this high fidelity prototype.
+
+101
+00:07:39.280 --> 00:07:40.240
+<v Oleg Friedman>Can you take a look at it?
+
+102
+00:07:40.360 --> 00:07:43.320
+<v Oleg Friedman>And they gave fantastic input over and over again.
+
+103
+00:07:43.500 --> 00:07:47.540
+<v Oleg Friedman>It probably took us six months before we ever wrote a single line of code.
+
+104
+00:07:47.820 --> 00:07:51.300
+<v Oleg Friedman>But by that point, we actually knew what we were building.
+
+105
+00:07:51.420 --> 00:07:53.200
+<v Oleg Friedman>We knew what challenges we wanted to solve.
+
+106
+00:07:53.380 --> 00:08:02.480
+<v Oleg Friedman>And that let us architect the underlying application to scale to the challenges we expected based on those conversations.
+
+107
+00:08:03.480 --> 00:08:05.460
+<v Oleg Friedman>you know, did we get everything right? Of course not.
+
+108
+00:08:05.620 --> 00:08:07.700
+<v Oleg Friedman>But, you know, it put us on a much more solid footing.
+
+109
+00:08:07.920 --> 00:08:11.080
+<v Oleg Friedman>We didn't have to do a full code rewrite three months in
+
+110
+00:08:11.080 --> 00:08:13.780
+<v Oleg Friedman>when we realized that we can't handle more than, you know,
+
+111
+00:08:13.780 --> 00:08:16.320
+<v Oleg Friedman>a certain amount of data or a certain type of data source
+
+112
+00:08:16.320 --> 00:08:17.380
+<v Oleg Friedman>or whatever it might be.
+
+113
+00:08:18.240 --> 00:08:19.960
+<v Oleg Friedman>Six months before we wrote a line of code,
+
+114
+00:08:20.060 --> 00:08:23.280
+<v Oleg Friedman>probably another six months before we had an MVP,
+
+115
+00:08:23.480 --> 00:08:27.700
+<v Oleg Friedman>we were, had customer, had multiple beta customers on.
+
+116
+00:08:27.960 --> 00:08:30.060
+<v Oleg Friedman>You know, we tried to get beta customers onto it
+
+117
+00:08:30.060 --> 00:08:31.400
+<v Oleg Friedman>as early as we could in the process.
+
+118
+00:08:31.400 --> 00:08:37.500
+<v Oleg Friedman>And there was a lot of smoke and mirrors until, you know, some of those features that we promised those people were around.
+
+119
+00:08:37.740 --> 00:08:41.400
+<v Oleg Friedman>But, you know, your early beta customers are the best friends you'll ever have.
+
+120
+00:08:41.500 --> 00:08:51.000
+<v Oleg Friedman>Because if you can find some very willing participants that see the problem just as much as you do and give you solid, continuous feedback, there's
+
+121
+00:08:51.000 --> 00:08:51.500
+<v Noah Labhart>nothing better than that.
+
+122
+00:08:51.440 --> 00:08:54.540
+<v Noah Labhart>I love how you approach that with the high fidelity prototype there.
+
+123
+00:08:55.180 --> 00:09:00.320
+<v Noah Labhart>Let me dig into the MVP, the coded MVP, the beta you've got people on.
+
+124
+00:09:01.700 --> 00:09:07.480
+<v Noah Labhart>even with a well-old process of going through that high-fidelity prototype,
+
+125
+00:09:07.820 --> 00:09:13.700
+<v Noah Labhart>you have to make certain decisions and trade-offs once you start building of technical debt you're going to accept
+
+126
+00:09:13.700 --> 00:09:15.780
+<v Noah Labhart>or feature cut or anything like that.
+
+127
+00:09:15.980 --> 00:09:20.740
+<v Noah Labhart>Tell me about some of those decisions and trade-offs you had to make and how you coped with those decisions.
+
+128
+00:09:24.160 --> 00:09:26.760
+<v Oleg Friedman>Prioritization is always the hardest part, right?
+
+129
+00:09:26.760 --> 00:09:30.880
+<v Oleg Friedman>because you see what's directly in front of you
+
+130
+00:09:30.880 --> 00:09:34.440
+<v Oleg Friedman>and you try your best to predict what people will need or use.
+
+131
+00:09:34.760 --> 00:09:37.540
+<v Oleg Friedman>I mean, now that our product has been live for so long,
+
+132
+00:09:37.660 --> 00:09:40.460
+<v Oleg Friedman>I mean, people are not entirely using it the way we expected, right?
+
+133
+00:09:40.520 --> 00:09:44.280
+<v Oleg Friedman>Which is great because that means that people have found alternative ways
+
+134
+00:09:44.280 --> 00:09:46.740
+<v Oleg Friedman>to apply the product to their business.
+
+135
+00:09:46.860 --> 00:09:50.240
+<v Oleg Friedman>But at the beginning, as you're building the MVP or as it's evolving,
+
+136
+00:09:50.780 --> 00:09:52.620
+<v Oleg Friedman>we're very customer driven.
+
+137
+00:09:52.620 --> 00:09:59.000
+<v Oleg Friedman>customer requests take priority generally over what we think they might want, right?
+
+138
+00:09:59.060 --> 00:10:02.280
+<v Oleg Friedman>Because if somebody's telling you what they want, that holds a lot more weight.
+
+139
+00:10:02.500 --> 00:10:08.440
+<v Oleg Friedman>And we're constantly having, or we're and still are, having conversations with people who aren't customers,
+
+140
+00:10:08.520 --> 00:10:14.240
+<v Oleg Friedman>whether they're referrals we got or somebody we've worked with in the past or whatever it might be, large businesses.
+
+141
+00:10:14.240 --> 00:10:19.260
+<v Oleg Friedman>is the larger the customer or potential customer you can talk to the better because they're going
+
+142
+00:10:19.260 --> 00:10:27.720
+<v Oleg Friedman>to have more and more one unique use cases but two larger use cases right and and building and
+
+143
+00:10:27.720 --> 00:10:32.600
+<v Oleg Friedman>architecting for those for that future growth is is super critical at the beginning because that's
+
+144
+00:10:32.600 --> 00:10:39.880
+<v Oleg Friedman>what causes all those rewrites for us it was find the first roadblock for somebody in our application
+
+145
+00:10:39.880 --> 00:10:42.040
+<v Oleg Friedman>what are they going to stumble on first?
+
+146
+00:10:42.320 --> 00:10:44.060
+<v Oleg Friedman>And for us, for example, it was ingestion.
+
+147
+00:10:44.220 --> 00:10:47.460
+<v Oleg Friedman>So we wanted to make sure we supported as many data sources as possible.
+
+148
+00:10:47.820 --> 00:10:53.960
+<v Oleg Friedman>And if we didn't have that perfect chart for that type of absolute use case, okay.
+
+149
+00:10:54.180 --> 00:10:57.100
+<v Oleg Friedman>But if they could never get their data into our system to begin with,
+
+150
+00:10:57.260 --> 00:11:00.780
+<v Oleg Friedman>then they would never get to step four or five in the process anyway.
+
+151
+00:11:01.120 --> 00:11:05.540
+<v Oleg Friedman>So it was really trying to find how to get as much coverage
+
+152
+00:11:05.540 --> 00:11:07.820
+<v Oleg Friedman>on the step-by-step aspects of our application,
+
+153
+00:11:07.820 --> 00:11:13.020
+<v Oleg Friedman>but also not trying to be exhaustive and not trying to predict what people might need.
+
+154
+00:11:13.260 --> 00:11:17.760
+<v Oleg Friedman>You know, we knew what the biggest data sources are out there and what the most commonly used ones are.
+
+155
+00:11:17.820 --> 00:11:21.980
+<v Oleg Friedman>We built for those and everything else that came after was by pure requests from customers.
+
+156
+00:11:22.160 --> 00:11:25.460
+<v Oleg Friedman>You know, if they came in and said, oh, we don't have A, great.
+
+157
+00:11:25.640 --> 00:11:27.520
+<v Oleg Friedman>We'll figure out how to build A.
+
+158
+00:11:27.620 --> 00:11:30.100
+<v Oleg Friedman>One, you know, is it possible? Absolutely. Great.
+
+159
+00:11:30.280 --> 00:11:35.280
+<v Oleg Friedman>You know, we'll slot that in as we go rather than trying to begin the build process
+
+160
+00:11:35.280 --> 00:11:37.680
+<v Oleg Friedman>and trying to build for A all the way through Z.
+
+161
+00:11:37.860 --> 00:11:39.820
+<v Oleg Friedman>It was just never going to be a realistic scenario.
+
+162
+00:11:39.880 --> 00:11:40.620
+<v Oleg Friedman>We would never get live.
+
+163
+00:11:41.140 --> 00:11:44.040
+<v Oleg Friedman>Shipping is almost more important, right?
+
+164
+00:11:44.120 --> 00:11:47.020
+<v Oleg Friedman>Even if you've shipped something that's 60, 70%,
+
+165
+00:11:47.620 --> 00:11:52.020
+<v Oleg Friedman>trying to get to 95 or 100 is a literal impossibility.
+
+166
+00:11:52.160 --> 00:11:53.620
+<v Oleg Friedman>And it's just going to cause you to go back
+
+167
+00:11:53.620 --> 00:11:55.800
+<v Oleg Friedman>and do more and more over and over again.
+
+168
+00:11:56.280 --> 00:11:58.180
+<v Noah Labhart>Well, take me to the next phase then.
+
+169
+00:11:58.280 --> 00:11:59.460
+<v Noah Labhart>So you've got your MVP,
+
+170
+00:11:59.740 --> 00:12:01.560
+<v Noah Labhart>you're gathering customer feedback,
+
+171
+00:12:01.720 --> 00:12:02.740
+<v Noah Labhart>you're reacting to it,
+
+172
+00:12:02.760 --> 00:12:04.360
+<v Noah Labhart>building what they're asking for
+
+173
+00:12:05.680 --> 00:12:09.960
+<v Noah Labhart>prioritizing in that stage. But what about the next stage? How did you progress the product
+
+174
+00:12:09.960 --> 00:12:13.900
+<v Noah Labhart>from there? And how did you mature it? And to give context to where I'm going,
+
+175
+00:12:14.020 --> 00:12:18.240
+<v Noah Labhart>how did you build your roadmap? And how did you figure out, okay, this is the next most
+
+176
+00:12:18.240 --> 00:12:19.740
+<v Noah Labhart>important thing to build?
+
+177
+00:12:22.980 --> 00:12:27.060
+<v Oleg Friedman>Balancing roadmap is, you know, it comes back to prioritization. It's
+
+178
+00:12:27.060 --> 00:12:33.840
+<v Oleg Friedman>the same challenge you have as MVP as you have the mature product. Our roadmap is 70% customer
+
+179
+00:12:35.280 --> 00:12:41.880
+<v Oleg Friedman>you know, technical debt resolution in 10%. We come up with wild ideas and go from there,
+
+180
+00:12:41.960 --> 00:12:46.640
+<v Oleg Friedman>right? But even the wild ideas, those are prototyped and tested long before they ever see,
+
+181
+00:12:47.120 --> 00:12:51.360
+<v Oleg Friedman>you know, the architect's desk, because trying to figure out how to build something is pointless if
+
+182
+00:12:51.360 --> 00:12:57.360
+<v Oleg Friedman>you can't validate that it's worth building. Many ideas die before they ever see a developer,
+
+183
+00:12:57.480 --> 00:13:01.760
+<v Oleg Friedman>which is exactly what you want. Engineering is always the bottleneck for any business. It
+
+184
+00:13:01.760 --> 00:13:03.140
+<v Oleg Friedman>It certainly isn't ours, right?
+
+185
+00:13:03.240 --> 00:13:07.900
+<v Oleg Friedman>Hiring is a challenge more so now than ever, but it's always a challenge.
+
+186
+00:13:08.100 --> 00:13:13.740
+<v Oleg Friedman>And so getting enough people to execute against engineering tasks is hard.
+
+187
+00:13:13.880 --> 00:13:19.580
+<v Oleg Friedman>And wasting their time doing something that nobody ever uses, buys, or pays for is even worse.
+
+188
+00:13:19.860 --> 00:13:22.800
+<v Oleg Friedman>We hold very frequent meetings with our customers.
+
+189
+00:13:23.060 --> 00:13:28.660
+<v Oleg Friedman>We validate new ideas and prototypes against those customers all the time.
+
+190
+00:13:28.660 --> 00:13:35.920
+<v Oleg Friedman>And, you know, some of it is, of course, what is the gap between us and, you know, something that they built in-house, right?
+
+191
+00:13:36.000 --> 00:13:39.440
+<v Oleg Friedman>Because that, truthfully for us, is we view that as one of our biggest competitors.
+
+192
+00:13:40.040 --> 00:13:48.500
+<v Oleg Friedman>Dashboards are something that inherently are built, or historically, rather, are built in-house by a development organization.
+
+193
+00:13:48.500 --> 00:13:58.280
+<v Oleg Friedman>organization. How do we influence an engineer, a CTO, product manager, whoever it is, to say,
+
+194
+00:13:58.300 --> 00:14:01.160
+<v Oleg Friedman>hey, you know what, that's something we build in-house, but it's not bringing us enough value.
+
+195
+00:14:01.720 --> 00:14:06.420
+<v Oleg Friedman>Let's use Verb instead, which brings us the same value without any of the engineering.
+
+196
+00:14:06.720 --> 00:14:13.180
+<v Oleg Friedman>You have to think about the developer a lot in that. And so a lot of our product roadmap is
+
+197
+00:14:13.180 --> 00:14:17.520
+<v Oleg Friedman>around making the developer's life easier. But just it's the same, you know, you have to think
+
+198
+00:14:18.500 --> 00:14:22.080
+<v Oleg Friedman>the actual person viewing the dashboard to make sure that they're having a fantastic experience
+
+199
+00:14:22.080 --> 00:14:26.640
+<v Oleg Friedman>too. And everybody in between people building it, et cetera. So with any business, it's,
+
+200
+00:14:26.640 --> 00:14:31.180
+<v Oleg Friedman>I don't pretend to have us be any kind of unique scenario, right? There's always so many different
+
+201
+00:14:31.180 --> 00:14:37.420
+<v Oleg Friedman>stakeholders in an application and you have to consider all of them, not just the final result.
+
+202
+00:14:37.680 --> 00:14:38.180
+<v Oleg Friedman>Well, let's
+
+203
+00:14:38.040 --> 00:14:41.700
+<v Noah Labhart>switch to team then. So how did you go about building your team and what did
+
+204
+00:14:41.700 --> 00:14:45.560
+<v Noah Labhart>you look for in those people to indicate that they were the winning horses to join you?
+
+205
+00:14:48.500 --> 00:15:08.120
+<v Oleg Friedman>Team's hard. Verb is young enough. We actually just closed our seed round. So we're starting to really build out our team. And I'll plug that we have many positions open at this point. So please visit our site if you're interested. Everything from product management to development, all of it.
+
+206
+00:15:08.780 --> 00:15:14.860
+<v Oleg Friedman>And as far as what we look for, I mean, experience matters to me more than outright education.
+
+207
+00:15:15.540 --> 00:15:17.380
+<v Oleg Friedman>Universities are fantastic. College is great.
+
+208
+00:15:17.500 --> 00:15:19.060
+<v Oleg Friedman>You know, schooling is excellent.
+
+209
+00:15:19.240 --> 00:15:26.420
+<v Oleg Friedman>But self-motivation to learn that new thing, whether it's at school or not, is to me just as important.
+
+210
+00:15:26.580 --> 00:15:28.220
+<v Oleg Friedman>If not, well, frankly, it's more important.
+
+211
+00:15:28.520 --> 00:15:30.420
+<v Oleg Friedman>And recent experience is really important.
+
+212
+00:15:30.640 --> 00:15:37.180
+<v Oleg Friedman>So working on the latest and greatest is very valuable.
+
+213
+00:15:38.120 --> 00:15:53.100
+<v Oleg Friedman>What exists out there and wanting to keep up with technology, wanting to keep up with the latest tools, wanting to keep up with the latest architectural approaches, whatever is significant to your part of the business, that to me matters a ton.
+
+214
+00:15:53.460 --> 00:15:59.740
+<v Oleg Friedman>And, you know, the desire to work with other cool people in a very unique scenario.
+
+215
+00:15:59.740 --> 00:16:08.040
+<v Oleg Friedman>I mean, I've always worked at small companies and small companies, startups tend to attract a very specific breed of person.
+
+216
+00:16:08.420 --> 00:16:18.880
+<v Oleg Friedman>You have to be willing to put in the hours, but also invest not only time, but the desire in watching the business grow just as much as the founders do.
+
+217
+00:16:19.020 --> 00:16:21.940
+<v Oleg Friedman>So it's a hard thing to look for.
+
+218
+00:16:22.020 --> 00:16:24.540
+<v Oleg Friedman>But when you talk to somebody, you either see it or you don't.
+
+219
+00:16:28.160 --> 00:16:33.520
+<v Noah Labhart>well let's talk about scale for a minute then so did you build this to scale efficiently from day
+
+220
+00:16:33.520 --> 00:16:39.820
+<v Noah Labhart>one you know post that you know high fidelity prototype or are you fighting this as you grow
+
+221
+00:16:42.800 --> 00:16:51.160
+<v Oleg Friedman>a lot of both um you over architecture i think it's one of the the biggest sins a startup can
+
+222
+00:16:51.160 --> 00:16:57.760
+<v Oleg Friedman>can make simply because that means you invested a lot of time and resources into an approach
+
+223
+00:16:57.760 --> 00:17:00.600
+<v Oleg Friedman>that you haven't been able to fully bet against the real world.
+
+224
+00:17:01.040 --> 00:17:05.960
+<v Oleg Friedman>That said, not designing or architecting for scale is also one of the biggest sins.
+
+225
+00:17:06.060 --> 00:17:10.840
+<v Oleg Friedman>So you got to find a way to thread that needle and understand that your first customer is
+
+226
+00:17:10.840 --> 00:17:14.760
+<v Oleg Friedman>certainly not going to be your biggest, but you also don't want to try to architect for
+
+227
+00:17:15.420 --> 00:17:19.340
+<v Oleg Friedman>some massive Fortune 500 company if you don't see that coming down the road.
+
+228
+00:17:21.160 --> 00:17:27.960
+<v Oleg Friedman>sale, right? If you're selling to small, medium businesses, there's no point to try to architect
+
+229
+00:17:27.960 --> 00:17:34.080
+<v Oleg Friedman>for a Google, right? But if you can't scale to that medium business, then you're going to be
+
+230
+00:17:34.080 --> 00:17:40.000
+<v Oleg Friedman>in trouble and rewriting a ton of code. So making sure you're picking the right deployment strategy,
+
+231
+00:17:40.120 --> 00:17:45.600
+<v Oleg Friedman>the right underlying architecture, and also assuming that whatever service you're using for
+
+232
+00:17:45.600 --> 00:17:51.600
+<v Oleg Friedman>or A, B, or C, whether that's email or text or data connection or whatever it might be,
+
+233
+00:17:51.720 --> 00:17:55.520
+<v Oleg Friedman>that probably isn't going to be the service you use a year from now.
+
+234
+00:17:55.720 --> 00:17:57.660
+<v Oleg Friedman>Or it might not be at least, right?
+
+235
+00:17:57.800 --> 00:18:00.260
+<v Oleg Friedman>So building out in a true service architecture,
+
+236
+00:18:00.620 --> 00:18:08.440
+<v Oleg Friedman>using all the great and very cheap and very easy to use cloud architecture strategies
+
+237
+00:18:08.440 --> 00:18:11.940
+<v Oleg Friedman>that now exist from the major hosting providers,
+
+238
+00:18:11.940 --> 00:18:19.460
+<v Oleg Friedman>providers, they make it pretty easy to build to scale. But in doing so, also don't find a way to
+
+239
+00:18:19.460 --> 00:18:24.580
+<v Oleg Friedman>not lock yourself in entirely into a hosting provider. I think there's no problem picking one
+
+240
+00:18:24.580 --> 00:18:29.460
+<v Oleg Friedman>and building to it, but also understand that your customers are going to want,
+
+241
+00:18:29.920 --> 00:18:34.800
+<v Oleg Friedman>you know, if you pick AWS and your customer is at GCP and they say, well, we only will work with
+
+242
+00:18:34.800 --> 00:18:39.440
+<v Oleg Friedman>you if you're in GCP, make sure it's not a complete rewrite of your application to host in
+
+243
+00:18:39.440 --> 00:18:39.940
+<v Noah Labhart>GCP.
+
+244
+00:18:39.740 --> 00:18:43.160
+<v Noah Labhart>You talk about GCP, talk about AWS.
+
+245
+00:18:44.340 --> 00:18:56.560
+<v Noah Labhart>In my head, I go to items like Snowflake and perhaps Datadog or any warehouse type of tools.
+
+246
+00:18:56.860 --> 00:19:00.200
+<v Noah Labhart>How does Verb fit in with that world?
+
+247
+00:19:02.600 --> 00:19:05.920
+<v Oleg Friedman>So Verb can integrate into any of the warehouses.
+
+248
+00:19:05.920 --> 00:19:13.820
+<v Oleg Friedman>is in a lot of our customer implementations we sit side by side with their BI strategy. So if they
+
+249
+00:19:13.820 --> 00:19:18.940
+<v Oleg Friedman>have an internal BI team doing business analytics, you know, trying to figure out where their next
+
+250
+00:19:18.940 --> 00:19:22.360
+<v Oleg Friedman>customer is coming from, trying to figure out how to, you know, get more out of their existing
+
+251
+00:19:22.360 --> 00:19:29.760
+<v Oleg Friedman>customers, that's fantastic and there are great tools that let you do that. Verb really focuses on
+
+252
+00:19:29.760 --> 00:19:34.020
+<v Oleg Friedman>on your existing customers and you're the end user
+
+253
+00:19:34.020 --> 00:19:35.180
+<v Oleg Friedman>at those existing customers.
+
+254
+00:19:35.260 --> 00:19:37.220
+<v Oleg Friedman>If you're a B2B or B2B2C business,
+
+255
+00:19:37.640 --> 00:19:40.420
+<v Oleg Friedman>the people using your actual application
+
+256
+00:19:40.720 --> 00:19:43.140
+<v Oleg Friedman>need that fantastic experience as well.
+
+257
+00:19:43.400 --> 00:19:46.300
+<v Oleg Friedman>And so if that data resides
+
+258
+00:19:46.500 --> 00:19:49.240
+<v Oleg Friedman>in your core application database, great.
+
+259
+00:19:49.320 --> 00:19:50.360
+<v Oleg Friedman>We can ingest it from there.
+
+260
+00:19:50.440 --> 00:19:54.080
+<v Oleg Friedman>If you already have it nice and transformed and managed
+
+261
+00:19:54.080 --> 00:19:57.680
+<v Oleg Friedman>or centralized in something like a Snowflake
+
+262
+00:19:57.680 --> 00:19:58.640
+<v Oleg Friedman>or Redshift or whatever,
+
+263
+00:19:59.760 --> 00:20:29.560
+<v Oleg Friedman>ingested from there. But we're really designed to live at any size business. So whether you have a data analytics team already or not, whether you have data engineers already or not, hell, whether you have engineers or not, you have several customers already that have no engineering team but really needed a fantastic data experience for their customers. We work with a lot of the no-code tools that exist out there and we want to make sure that that experience is great. Whether you've got a team of two
+
+264
+00:20:29.760 --> 00:20:30.380
+<v Oleg Friedman>or 200.
+
+265
+00:20:31.000 --> 00:20:35.220
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built,
+
+266
+00:20:35.380 --> 00:20:36.340
+<v Noah Labhart>what are you most proud of?
+
+267
+00:20:39.600 --> 00:20:43.200
+<v Oleg Friedman>Playing the role of architect at the majority of companies and
+
+268
+00:20:43.200 --> 00:20:51.060
+<v Oleg Friedman>especially at Verb, I'm proud that we're not re-architecting on a constant basis to deal
+
+269
+00:20:51.060 --> 00:20:58.420
+<v Oleg Friedman>with new customer requests. I think understanding not just the immediate business, but the
+
+270
+00:21:00.020 --> 00:21:06.720
+<v Oleg Friedman>you know, the medium term, at least, of where Verb is going, I think is incredibly important.
+
+271
+00:21:06.960 --> 00:21:12.680
+<v Oleg Friedman>So having conversations with our customers just as often as I'm having with our engineering team,
+
+272
+00:21:12.860 --> 00:21:20.480
+<v Oleg Friedman>I think is incredibly critical to planning the architecture properly so that we're not
+
+273
+00:21:20.480 --> 00:21:25.340
+<v Oleg Friedman>finding ourselves drowning in technical debt, having to rework and rewrite.
+
+274
+00:21:25.340 --> 00:21:31.060
+<v Oleg Friedman>right, the best thing that I, you know, I see on a day-to-day basis is somebody, you know,
+
+275
+00:21:31.060 --> 00:21:36.720
+<v Oleg Friedman>somebody from the product teams comes and says, X wants this. And we can just say, okay, that's
+
+276
+00:21:36.720 --> 00:21:41.240
+<v Oleg Friedman>not a problem, right? Sure, it requires effort. Absolutely, you know, we'll have to dedicate
+
+277
+00:21:41.240 --> 00:21:46.000
+<v Oleg Friedman>resources to it, but it's not something that you, you know, we go, oh, that's not actually possible
+
+278
+00:21:46.000 --> 00:21:51.080
+<v Oleg Friedman>because, you know, we chose this path and they want to, you know, that requires us to go down
+
+279
+00:21:51.080 --> 00:21:59.700
+<v Oleg Friedman>this completely opposite direction. Keeping that architecture flexible and highly maintainable,
+
+280
+00:21:59.720 --> 00:22:02.980
+<v Oleg Friedman>I think has been what I'm at Verb most proud of.
+
+281
+00:22:03.120 --> 00:22:05.200
+<v Noah Labhart>Let's flip the script a little bit. Tell me
+
+282
+00:22:05.200 --> 00:22:08.580
+<v Noah Labhart>about a mistake you made and how you and your team responded to it.
+
+283
+00:22:11.560 --> 00:22:15.440
+<v Oleg Friedman>Don't pretend we don't make mistakes. There's no business that doesn't make them.
+
+284
+00:22:15.440 --> 00:22:22.780
+<v Oleg Friedman>I think the biggest mistakes we've made at any level versus Verb or prior is down that architecture path.
+
+285
+00:22:22.960 --> 00:22:26.700
+<v Oleg Friedman>It's not architecting for the possible use cases, right?
+
+286
+00:22:26.840 --> 00:22:32.340
+<v Oleg Friedman>So not just truly architecture, but just designing the business to work for the possible use cases.
+
+287
+00:22:32.740 --> 00:22:35.940
+<v Oleg Friedman>We've had 150 conversations before we ever started the business.
+
+288
+00:22:36.120 --> 00:22:42.260
+<v Oleg Friedman>Could have had 150 more and brought in even more information about how somebody is using it.
+
+289
+00:22:42.260 --> 00:22:49.860
+<v Oleg Friedman>Like, for example, Verb, we did not anticipate people using simple flat files, Excel files, CSVs as often as they do.
+
+290
+00:22:50.120 --> 00:22:53.280
+<v Oleg Friedman>Right. Because our experience wasn't in doing that.
+
+291
+00:22:53.360 --> 00:22:58.260
+<v Oleg Friedman>And somebody, you know, nobody we talked to said, oh, I've got all this data dumped into CSVs.
+
+292
+00:22:58.260 --> 00:22:58.980
+<v Oleg Friedman>I just want to use that.
+
+293
+00:22:59.120 --> 00:23:01.560
+<v Oleg Friedman>Our expectation was engineering team would connect their database.
+
+294
+00:23:02.500 --> 00:23:07.040
+<v Oleg Friedman>Well, we didn't build the experience to be good enough for that.
+
+295
+00:23:07.400 --> 00:23:08.680
+<v Oleg Friedman>We've redesigned it completely.
+
+296
+00:23:08.680 --> 00:23:11.360
+<v Oleg Friedman>But fortunately, it was mostly UI redesign.
+
+297
+00:23:11.540 --> 00:23:16.860
+<v Oleg Friedman>But still, those are use cases where we expected people to use the system one way, they're
+
+298
+00:23:16.860 --> 00:23:23.060
+<v Oleg Friedman>using it a different way and seeing benefit, but not nearly enough.
+
+299
+00:23:24.060 --> 00:23:26.280
+<v Oleg Friedman>You have to dig for that information, right?
+
+300
+00:23:26.720 --> 00:23:31.780
+<v Oleg Friedman>If they're not running into an explicit problem, somebody is not going to know that they could
+
+301
+00:23:31.780 --> 00:23:32.740
+<v Oleg Friedman>have a better experience.
+
+302
+00:23:33.000 --> 00:23:37.640
+<v Oleg Friedman>Having those constant conversations with customers led us to a point where they said, well, I
+
+303
+00:23:38.680 --> 00:23:45.340
+<v Oleg Friedman>really tell me more and then on the team building side i mean you know i don't know any cto who's
+
+304
+00:23:45.340 --> 00:23:51.680
+<v Oleg Friedman>never made a bad hire there's always going to be you know people related issues but i think the
+
+305
+00:23:52.350 --> 00:23:58.320
+<v Oleg Friedman>what i've learned there is move on quickly uh don't let somebody drag the team down with them
+
+306
+00:23:58.320 --> 00:24:03.700
+<v Oleg Friedman>and and find resolutions quickly you know find fair resolutions but find resolutions quickly
+
+307
+00:24:06.020 --> 00:24:10.260
+<v Noah Labhart>So what does the future look like for Verb, the product, and for your team?
+
+308
+00:24:13.740 --> 00:24:15.820
+<v Oleg Friedman>We've got more roadmap than we have people.
+
+309
+00:24:15.940 --> 00:24:22.240
+<v Oleg Friedman>So team, for sure, priority for us right now is hiring great engineers, great product people,
+
+310
+00:24:22.340 --> 00:24:28.680
+<v Oleg Friedman>great designers to help accelerate the production on our side and execution against the roadmap.
+
+311
+00:24:28.680 --> 00:24:33.440
+<v Oleg Friedman>map. A lot of those features are expanding on existing functionality, but also adding
+
+312
+00:24:33.440 --> 00:24:40.540
+<v Oleg Friedman>a ton of AI and ML style stuff. But no, it's not just that, but it's the application of
+
+313
+00:24:40.540 --> 00:24:46.280
+<v Oleg Friedman>machine learning, application of artificial intelligence, adding truly predictive analytics
+
+314
+00:24:46.280 --> 00:24:51.540
+<v Oleg Friedman>into an application, even for the SaaS side, right? Some of that exists today on the BI aspect
+
+315
+00:24:53.020 --> 00:24:57.780
+<v Oleg Friedman>about predicting where your customers might come from on the CRM. CRMs are pretty good at doing
+
+316
+00:24:59.000 --> 00:25:05.360
+<v Oleg Friedman>but giving your end user some of those same tools at scale
+
+317
+00:25:05.360 --> 00:25:09.360
+<v Oleg Friedman>so that they can figure out if you're running a SaaS e-commerce business,
+
+318
+00:25:09.540 --> 00:25:13.160
+<v Oleg Friedman>where should they be investing to further their growth?
+
+319
+00:25:13.260 --> 00:25:15.660
+<v Oleg Friedman>If you're running a workflow business,
+
+320
+00:25:15.940 --> 00:25:17.600
+<v Oleg Friedman>who should be assigned the next task
+
+321
+00:25:17.600 --> 00:25:20.400
+<v Oleg Friedman>because they have the most availability or whatever it might be, right?
+
+322
+00:25:20.520 --> 00:25:24.880
+<v Oleg Friedman>And those kind of visualizations and data analytics are where we're heading.
+
+323
+00:25:25.060 --> 00:25:28.220
+<v Oleg Friedman>But also just adding more and more visualizations in general.
+
+324
+00:25:28.680 --> 00:25:30.800
+<v Oleg Friedman>We have a great mapping feature coming out.
+
+325
+00:25:30.860 --> 00:25:35.460
+<v Oleg Friedman>We've got some use cases around currency conversion coming out very soon.
+
+326
+00:25:35.900 --> 00:25:45.340
+<v Oleg Friedman>And those are all customer demand and roadmap items that we really want to get out there and execute at a very high level.
+
+327
+00:25:46.480 --> 00:25:47.720
+<v Noah Labhart>Let's switch to you, Oleg.
+
+328
+00:25:47.980 --> 00:25:50.540
+<v Noah Labhart>Who influences the way that you work?
+
+329
+00:25:50.700 --> 00:25:55.780
+<v Noah Labhart>You name it, CEO, CTO, architect, really any person that you look up to and why?
+
+330
+00:25:59.200 --> 00:26:09.280
+<v Oleg Friedman>I've had the fortune of, as we've exited some businesses, the businesses that the larger companies that have acquired us have had great leadership at them.
+
+331
+00:26:10.840 --> 00:26:20.080
+<v Oleg Friedman>And there's been tons of influence from people at those leadership positions who executed against their plan really well.
+
+332
+00:26:21.020 --> 00:26:26.640
+<v Oleg Friedman>My two previous partners that I've started, the guys who dragged me into this whole thing,
+
+333
+00:26:26.640 --> 00:26:32.060
+<v Oleg Friedman>the reason I'm even sitting here talking to you, I think are truthfully my two biggest influences.
+
+334
+00:26:32.260 --> 00:26:38.140
+<v Oleg Friedman>Stan Garber and Alex Zakubowicz, they are very different minded than myself, but also understand
+
+335
+00:26:38.140 --> 00:26:42.860
+<v Oleg Friedman>that you need tons of different viewpoints and you need to be really good at your part of the
+
+336
+00:26:42.860 --> 00:26:47.140
+<v Oleg Friedman>business and let people who are really good at their part of the business run that aspect of
+
+337
+00:26:47.140 --> 00:26:51.560
+<v Oleg Friedman>things. So that's why we worked really well together. They taught me everything I know
+
+338
+00:26:51.560 --> 00:26:56.040
+<v Oleg Friedman>about business because I knew nothing about business when I first started. And I'd like
+
+339
+00:26:56.640 --> 00:27:00.160
+<v Oleg Friedman>a little bit about engineering, but who knows?
+
+340
+00:27:01.440 --> 00:27:03.440
+<v Noah Labhart>Well, we talked about a mistake,
+
+341
+00:27:03.620 --> 00:27:04.800
+<v Noah Labhart>but a little bit different spin.
+
+342
+00:27:05.100 --> 00:27:06.780
+<v Noah Labhart>If you could go back to the beginning,
+
+343
+00:27:07.020 --> 00:27:08.120
+<v Noah Labhart>what would you do differently?
+
+344
+00:27:08.180 --> 00:27:10.680
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+345
+00:27:14.420 --> 00:27:17.560
+<v Oleg Friedman>Not to say that I've taken the right path every time,
+
+346
+00:27:17.620 --> 00:27:19.860
+<v Oleg Friedman>but I don't know if I would have,
+
+347
+00:27:19.900 --> 00:27:22.080
+<v Oleg Friedman>because Verb, for example,
+
+348
+00:27:22.080 --> 00:27:25.000
+<v Oleg Friedman>exists only because we've made so many mistakes
+
+349
+00:27:26.820 --> 00:27:35.180
+<v Oleg Friedman>so many times, right? I think the greatest business ideas and the greatest implementations
+
+350
+00:27:35.180 --> 00:27:39.900
+<v Oleg Friedman>of businesses are ones that you've struggled through so many times, you know the pain of,
+
+351
+00:27:40.040 --> 00:27:46.480
+<v Oleg Friedman>and you've heard others have that same pain. And so I don't know, I'm sure I, you know,
+
+352
+00:27:46.480 --> 00:27:50.540
+<v Oleg Friedman>if I thought long and hard on it, I can come up with, you know, A, B, and C that, you know,
+
+353
+00:27:50.540 --> 00:28:00.300
+<v Oleg Friedman>But to me, more important is capitalizing on the knowledge of those mistakes and utilizing them to grow the existing business to further the next one.
+
+354
+00:28:00.420 --> 00:28:02.360
+<v Oleg Friedman>There's always an opportunity to do better.
+
+355
+00:28:02.520 --> 00:28:08.860
+<v Oleg Friedman>And if you're making the same mistake twice, that's the problem, not making it the first time.
+
+356
+00:28:09.580 --> 00:28:10.520
+<v Noah Labhart>Last question, Oleg.
+
+357
+00:28:10.660 --> 00:28:15.520
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+358
+00:28:15.660 --> 00:28:16.960
+<v Noah Labhart>They're jazzed about it.
+
+359
+00:28:17.020 --> 00:28:18.840
+<v Noah Labhart>They can't wait to show it off to the world.
+
+360
+00:28:20.740 --> 00:28:23.920
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+361
+00:28:26.900 --> 00:28:33.060
+<v Oleg Friedman>I think the advice I'd give them is the same one that I think I kind of started with is talk to people.
+
+362
+00:28:33.240 --> 00:28:39.240
+<v Oleg Friedman>Talk to me sitting next to you on that plane and then go talk, you know, turn to your left to talk to that other person.
+
+363
+00:28:39.560 --> 00:28:42.760
+<v Oleg Friedman>You know, even in the same industry, try to talk to as many people.
+
+364
+00:28:42.820 --> 00:28:47.480
+<v Oleg Friedman>I can't tell you how many people in the data space we spoke to before we ever started Verb.
+
+365
+00:28:47.480 --> 00:28:52.940
+<v Oleg Friedman>there's always that concern of young entrepreneurs oh that's it's my idea they're gonna steal it
+
+366
+00:28:52.940 --> 00:28:58.660
+<v Oleg Friedman>if you know what you're doing if you have a great idea and you know how to execute it well you
+
+367
+00:28:58.660 --> 00:29:03.080
+<v Oleg Friedman>shouldn't worry about the competition taking that idea you need them to help you validate that it's
+
+368
+00:29:03.080 --> 00:29:09.640
+<v Oleg Friedman>even worth approaching and then coming back to prototyping we we don't write a single line of
+
+369
+00:29:09.640 --> 00:29:15.140
+<v Oleg Friedman>code we don't you know if you're not a technical founder that's totally fine find yourself a great
+
+370
+00:29:15.140 --> 00:29:20.280
+<v Oleg Friedman>product manager or find a way to play that role and prototype, prototype, prototype,
+
+371
+00:29:20.380 --> 00:29:23.380
+<v Oleg Friedman>validate, validate, validate, and then go build.
+
+372
+00:29:24.200 --> 00:29:28.480
+<v Oleg Friedman>Those are the approaches we've taken and they've worked out pretty well for
+
+373
+00:29:28.480 --> 00:29:28.980
+<v Noah Labhart>us.
+
+374
+00:29:28.560 --> 00:29:29.380
+<v Noah Labhart>Solid advice.
+
+375
+00:29:30.080 --> 00:29:32.360
+<v Noah Labhart>Well, Oleg, thank you for being on the show today.
+
+376
+00:29:32.460 --> 00:29:34.900
+<v Noah Labhart>Thank you for telling the creation story of Verb.
+
+377
+00:29:37.000 --> 00:29:37.740
+<v Oleg Friedman>My pleasure.
+
+378
+00:29:37.820 --> 00:29:38.540
+<v Oleg Friedman>Thanks for having me on.
+
+379
+00:29:38.660 --> 00:29:41.540
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+380
+00:29:47.560 --> 00:29:50.540
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+381
+00:29:50.660 --> 00:29:55.460
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+382
+00:29:55.880 --> 00:30:00.940
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+383
+00:30:01.340 --> 00:30:03.520
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+384
+00:30:03.820 --> 00:30:05.840
+<v Noah Labhart>Both things help us out tremendously.
+
+385
+00:30:08.160 --> 00:30:09.620
+<v Noah Labhart>And thanks again for listening.

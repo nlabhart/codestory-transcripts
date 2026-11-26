@@ -1,0 +1,1863 @@
+WEBVTT
+
+NOTE S1 E7: Reengineering Ridesharing: Rebuilding Tech for Safety and Scale | Jonathan Campos (Alto)
+
+1
+00:00:00.000 --> 00:00:29.980
+<v Noah Labhart>Hey, before we start the show, I'd like to give a shout out to a very special sponsor of the Code Story podcast, and that's DevMountain. DevMountain is one of the highest rated coding schools in the country, employing experts who are passionate about sharing their craft and empowering the next wave of programmers. Through their bootcamp, they accelerate education by focusing on modern skills to align their students with the needs of the tech industry. They offer a variety of courses from web development to UX design,
+
+2
+00:00:30.000 --> 00:00:36.480
+<v Noah Labhart>to iOS development, and their hands-on approach enables students to launch their careers or build
+
+3
+00:00:36.480 --> 00:00:42.020
+<v Noah Labhart>their startups and ultimately to achieve their goals. I can personally vouch for the quality
+
+4
+00:00:42.020 --> 00:00:47.780
+<v Noah Labhart>developers they produce, having hired six graduates from their Dallas campus. Not only does DevMountain
+
+5
+00:00:47.780 --> 00:00:52.720
+<v Noah Labhart>teach the practical skills needed to build software, they give their students a foundation
+
+6
+00:00:52.720 --> 00:00:58.900
+<v Noah Labhart>to amplify the necessary creative thinking, problem solving, and project-focused skills
+
+7
+00:01:00.000 --> 00:01:01.400
+<v Noah Labhart>for tech professionals today.
+
+8
+00:01:02.240 --> 00:01:03.840
+<v Noah Labhart>You can find out more information
+
+9
+00:01:03.840 --> 00:01:05.920
+<v Noah Labhart>about their programs and how to sign up
+
+10
+00:01:05.920 --> 00:01:07.920
+<v Noah Labhart>at devmountain.com.
+
+11
+00:01:08.280 --> 00:01:10.840
+<v Noah Labhart>That's D-E-V mountain dot com.
+
+12
+00:01:14.400 --> 00:01:15.800
+<v Jonathan Campos>But my initial thought was,
+
+13
+00:01:15.900 --> 00:01:18.040
+<v Jonathan Campos>heck no, another ride-hailing company?
+
+14
+00:01:18.240 --> 00:01:19.100
+<v Jonathan Campos>What's the point?
+
+15
+00:01:20.120 --> 00:01:22.280
+<v Jonathan Campos>Does Uber and Lyft have it all wrapped up
+
+16
+00:01:22.280 --> 00:01:24.000
+<v Jonathan Campos>or is there any space out there?
+
+17
+00:01:26.160 --> 00:01:29.040
+<v Jonathan Campos>When I started hearing some of these horror stories,
+
+18
+00:01:30.000 --> 00:01:32.360
+<v Jonathan Campos>at first was like, okay, that's a one-off, that's a one-off.
+
+19
+00:01:33.120 --> 00:01:36.240
+<v Jonathan Campos>And then I came home to my wife and I was like, you know, this is, this is crazy.
+
+20
+00:01:36.320 --> 00:01:40.040
+<v Jonathan Campos>You know, you and I take Uber and Lyft all the time. And she goes, stop.
+
+21
+00:01:40.960 --> 00:01:45.860
+<v Jonathan Campos>We take Uber and Lyft all the time. I don't take it by myself.
+
+22
+00:01:47.020 --> 00:01:50.620
+<v Jonathan Campos>If you'll permit me, I'd love to join your team and let's,
+
+23
+00:01:50.620 --> 00:01:51.540
+<v Jonathan Campos>let's make this happen.
+
+24
+00:01:57.000 --> 00:02:10.080
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+25
+00:02:11.100 --> 00:02:20.880
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Jonathan Campos saw the opportunity to create and build the next big thing in ride sharing.
+
+26
+00:02:22.540 --> 00:02:25.000
+<v Noah Labhart>All this and more on Code Story.
+
+27
+00:02:27.660 --> 00:02:36.680
+<v Noah Labhart>After getting his master's, Jonathan Campos found himself working with clients, listening to their pain points, and creating software to meet those needs.
+
+28
+00:02:36.680 --> 00:02:42.400
+<v Noah Labhart>He worked his way through a handful of startups and agencies before landing at
+
+29
+00:02:42.400 --> 00:02:46.960
+<v Noah Labhart>Bottle Rocket as the chief architect growing their web and backend practice.
+
+30
+00:02:48.080 --> 00:02:54.140
+<v Noah Labhart>Not too long after, a former boss reached out about an opportunity to up-level the
+
+31
+00:02:54.140 --> 00:02:59.720
+<v Noah Labhart>ride-sharing experience, focusing on simple billing, safety, consistency,
+
+32
+00:03:00.100 --> 00:03:06.520
+<v Noah Labhart>and control over the experience. This opportunity was to become the CTO of
+
+33
+00:03:06.680 --> 00:03:13.420
+<v Noah Labhart>of Alto. Tell me your career path up to this point.
+
+34
+00:03:14.000 --> 00:03:15.740
+<v Jonathan Campos>Started high school doing some development.
+
+35
+00:03:15.940 --> 00:03:23.260
+<v Jonathan Campos>In college, I started as a CS major at UTD, and I actually found CS to be quite boring.
+
+36
+00:03:23.480 --> 00:03:28.860
+<v Jonathan Campos>Just wasn't scratching the itch that I was hoping for, so I switched over to actually Arts and
+
+37
+00:03:28.860 --> 00:03:35.620
+<v Jonathan Campos>Humanities and was one of the very first people in a program that eventually became the ATEC
+
+38
+00:03:36.440 --> 00:03:42.340
+<v Jonathan Campos>Dallas. And so with that, it was kind of mixing like the art and the communication side of
+
+39
+00:03:42.340 --> 00:03:49.940
+<v Jonathan Campos>development with the technology. So shot through school again, just couldn't get my hands off of
+
+40
+00:03:49.940 --> 00:03:56.400
+<v Jonathan Campos>working hard. So that ended up only lasting about three years. And then I lost a bet to my older
+
+41
+00:03:56.400 --> 00:04:01.960
+<v Jonathan Campos>sister and I wasn't able to find a job right out of college. So I went and got my master's.
+
+42
+00:04:01.960 --> 00:04:08.700
+<v Jonathan Campos>When I came back to Dallas, I got my first job in a small marketing company.
+
+43
+00:04:08.980 --> 00:04:13.780
+<v Jonathan Campos>As we were working with these clients and trying to help them on their marketing plans,
+
+44
+00:04:14.320 --> 00:04:18.020
+<v Jonathan Campos>the developer in me just kind of kept listening to their problems.
+
+45
+00:04:18.420 --> 00:04:25.220
+<v Jonathan Campos>And eventually, I convinced my boss and we started actually building, at the time, what
+
+46
+00:04:25.220 --> 00:04:28.820
+<v Jonathan Campos>I would consider semi-basic software for these clients.
+
+47
+00:04:28.820 --> 00:04:35.640
+<v Jonathan Campos>clients. A lot of what's out there right now on the cloud wasn't out there back in 2005, 2006.
+
+48
+00:04:36.160 --> 00:04:41.880
+<v Jonathan Campos>What a lot of these customers needed was not a new marketing plan, but a centralized way to deal
+
+49
+00:04:41.880 --> 00:04:50.600
+<v Jonathan Campos>with contacts and basic CRM programs that are more customized to their business. And so I started
+
+50
+00:04:50.600 --> 00:04:57.740
+<v Jonathan Campos>getting right back in development. And at the time, I was doing a lot of PHP, MySQL, and very
+
+51
+00:04:59.120 --> 00:05:05.060
+<v Jonathan Campos>From there, I got stolen away to a startup in the Frisco area called Nexplore, where
+
+52
+00:05:05.060 --> 00:05:10.960
+<v Jonathan Campos>the idea was that we were going to start building basically what would be equivalent to Google
+
+53
+00:05:11.640 --> 00:05:18.400
+<v Jonathan Campos>apps, like Google Docs, Google Sheets, the whole nine yards, along with a search engine. But the
+
+54
+00:05:18.400 --> 00:05:25.600
+<v Jonathan Campos>company just never materialized the way we wanted. I then moved to Stream Energy, where I was really
+
+55
+00:05:25.600 --> 00:05:29.560
+<v Jonathan Campos>really focused on front end development with that team and doing a lot with like Flash and Flex.
+
+56
+00:05:29.860 --> 00:05:35.000
+<v Jonathan Campos>Then quickly got stolen away from there and became a consultant and I was a consultant for a good,
+
+57
+00:05:35.040 --> 00:05:41.100
+<v Jonathan Campos>you know, 10-12 years with a company called Precocity here in Dallas and my focus, you know,
+
+58
+00:05:41.160 --> 00:05:46.980
+<v Jonathan Campos>started off on the front end technology. So again, Flash, Flex, HTML. And then the last few years,
+
+59
+00:05:47.060 --> 00:05:54.260
+<v Jonathan Campos>I worked at Bottle Rocket Studios, who if you're from Dallas, you know, they're a premier mobile
+
+60
+00:05:55.600 --> 00:06:00.560
+<v Jonathan Campos>I was the chief architect and really kind of helping lead and grow some of the technology.
+
+61
+00:06:00.860 --> 00:06:04.580
+<v Jonathan Campos>They're really amazing when it comes to the mobile technology, but they're still growing
+
+62
+00:06:04.580 --> 00:06:06.560
+<v Jonathan Campos>up when it comes to web and backend.
+
+63
+00:06:07.480 --> 00:06:10.660
+<v Jonathan Campos>So I was there for about a year and a half, you know, helping them with that.
+
+64
+00:06:11.320 --> 00:06:15.260
+<v Jonathan Campos>And then, you know, lo and behold, you know, you keep good relationships with your old
+
+65
+00:06:15.260 --> 00:06:15.760
+<v Jonathan Campos>bosses.
+
+66
+00:06:15.680 --> 00:06:23.800
+<v Jonathan Campos>And my old boss, through a friend of a friend, started talking to Will Coleman and Alex from
+
+67
+00:06:25.600 --> 00:06:28.600
+<v Jonathan Campos>If you need a CTO, there's only one person you need to talk to.
+
+68
+00:06:28.720 --> 00:06:32.980
+<v Jonathan Campos>So they gave me a call and that led to Alto.
+
+69
+00:06:34.000 --> 00:06:36.020
+<v Noah Labhart>Tell me about that process, that phone call.
+
+70
+00:06:36.140 --> 00:06:38.220
+<v Noah Labhart>How did that go when they reached out to you?
+
+71
+00:06:39.260 --> 00:06:44.660
+<v Jonathan Campos>When they first called me and they said, hey, we've got this ride-hailing company in Dallas that we're kicking off.
+
+72
+00:06:44.760 --> 00:06:46.520
+<v Jonathan Campos>We're still extremely early on.
+
+73
+00:06:46.920 --> 00:06:49.560
+<v Jonathan Campos>You know, you'd basically be like employee number three or four.
+
+74
+00:06:50.060 --> 00:06:50.940
+<v Jonathan Campos>Are you interested?
+
+75
+00:06:50.940 --> 00:06:56.880
+<v Jonathan Campos>did. And I took this call initially because, you know, a previous boss made the connection. So a
+
+76
+00:06:56.880 --> 00:07:01.680
+<v Jonathan Campos>friend of a friend, but my initial thought was, heck no, another ride-hailing company, you know,
+
+77
+00:07:01.700 --> 00:07:08.200
+<v Jonathan Campos>Uber and Lyft, they'll crush you. You know, there's, there's, what's the point? But then I started
+
+78
+00:07:08.200 --> 00:07:13.740
+<v Jonathan Campos>reaching out to some friends and, you know, Will sat me down and Alex, and we kind of went through
+
+79
+00:07:13.740 --> 00:07:18.760
+<v Jonathan Campos>all that they were doing. And the experience was amazing, what they're trying to put together. And,
+
+80
+00:07:18.760 --> 00:07:22.880
+<v Jonathan Campos>And, you know, the plans that they had, it was like everything was buttoned up.
+
+81
+00:07:22.960 --> 00:07:28.400
+<v Jonathan Campos>And like, again, some of the smartest people you've seen and some of the best laid plans.
+
+82
+00:07:28.560 --> 00:07:31.440
+<v Jonathan Campos>And it was just like, OK, obviously you're on to something.
+
+83
+00:07:31.620 --> 00:07:32.240
+<v Jonathan Campos>You're intelligent.
+
+84
+00:07:32.460 --> 00:07:33.300
+<v Jonathan Campos>You know, this isn't crazy.
+
+85
+00:07:34.200 --> 00:07:38.120
+<v Jonathan Campos>I've got to go find out and do my own small market research.
+
+86
+00:07:38.300 --> 00:07:41.000
+<v Jonathan Campos>So I reached out to some people that I trust.
+
+87
+00:07:41.320 --> 00:07:46.420
+<v Jonathan Campos>One of my buddies at TechCrunch, I reached out to him and I said, hey, there's this ride-
+
+88
+00:07:46.420 --> 00:07:50.780
+<v Jonathan Campos>hailing company in Dallas like okay tell me honestly like does Uber and Lyft have it all
+
+89
+00:07:50.780 --> 00:07:55.740
+<v Jonathan Campos>wrapped up or you know is there any space out there he immediately was like no Uber and Lyft
+
+90
+00:07:55.740 --> 00:08:00.680
+<v Jonathan Campos>do not have this wrapped up like ride handling is actually still like on the grow and changing
+
+91
+00:08:01.260 --> 00:08:08.400
+<v Jonathan Campos>do not have this wrapped up like ride-hailing is actually still like on the grow and changing
+
+92
+00:08:08.920 --> 00:08:15.180
+<v Jonathan Campos>get that right edge of a loyal customer that's not going to go jump between apps you know on a drop
+
+93
+00:08:16.420 --> 00:08:19.740
+<v Jonathan Campos>you actually may have a winning combination there of how to grow.
+
+94
+00:08:20.560 --> 00:08:22.820
+<v Jonathan Campos>And I was like, okay, so there may be a market,
+
+95
+00:08:22.860 --> 00:08:24.320
+<v Jonathan Campos>there may be ability not to get crushed.
+
+96
+00:08:24.460 --> 00:08:25.180
+<v Jonathan Campos>This is interesting.
+
+97
+00:08:25.640 --> 00:08:29.500
+<v Jonathan Campos>And one other thing that is really big for Alto is safety.
+
+98
+00:08:29.860 --> 00:08:34.100
+<v Jonathan Campos>And specifically, they really like focusing on women passengers
+
+99
+00:08:34.100 --> 00:08:38.940
+<v Jonathan Campos>and improving the experience because as two guys on this call,
+
+100
+00:08:38.940 --> 00:08:46.640
+<v Jonathan Campos>you know, it's, it's hard to, it's, it's hard to sympathize properly with the
+
+101
+00:08:46.640 --> 00:08:50.540
+<v Jonathan Campos>experience that women have when it comes to, you know, Uber and Lyft and other
+
+102
+00:08:50.540 --> 00:08:55.240
+<v Jonathan Campos>traditional TNCs. You know, when I started hearing some of these horror
+
+103
+00:08:55.240 --> 00:08:59.420
+<v Jonathan Campos>stories, you know, I at first was like, okay, that's a one-off, it's one-off. And
+
+104
+00:08:59.420 --> 00:09:03.580
+<v Jonathan Campos>I came home my wife and I was like, this is, you know, this is, this is crazy. You
+
+105
+00:09:03.580 --> 00:09:07.000
+<v Jonathan Campos>know, I'm hearing all these stories, like, there's no way this is true. You know, you
+
+106
+00:09:08.940 --> 00:09:16.000
+<v Jonathan Campos>time, and she goes, stop, no, no, no, we take Uber and Lyft all the time. I don't take it by myself.
+
+107
+00:09:16.420 --> 00:09:20.700
+<v Jonathan Campos>And then she says, I don't even like it when you get out of the car too fast, if I'm still in the
+
+108
+00:09:20.700 --> 00:09:24.920
+<v Jonathan Campos>car, because I'm afraid they're going to take off with me still in the car. You know, something as
+
+109
+00:09:24.920 --> 00:09:30.320
+<v Jonathan Campos>simple as that, you're like, whoa, that's, I didn't realize it's like a day-to-day, you know, concern.
+
+110
+00:09:30.320 --> 00:09:37.340
+<v Jonathan Campos>And, you know, as I keep talking, it was just like, and to her and others, it was just, wow, there, there
+
+111
+00:09:38.940 --> 00:09:44.980
+<v Jonathan Campos>real visceral, like, fear. Okay. There's definitely something there. And at that point,
+
+112
+00:09:45.520 --> 00:09:51.060
+<v Jonathan Campos>you know, I, I called Will up and I was like, we've, you've got something. And, you know,
+
+113
+00:09:51.060 --> 00:09:56.780
+<v Jonathan Campos>if, if you'll permit me, I'd love to join you, your team and let's, let's make this happen.
+
+114
+00:09:56.880 --> 00:09:59.720
+<v Jonathan Campos>And that was it. We, we got moving from there.
+
+115
+00:09:59.980 --> 00:10:03.260
+<v Noah Labhart>You did your research. You, you saw the problem
+
+116
+00:10:03.260 --> 00:10:09.420
+<v Noah Labhart>and the need. You don't even, felt it in certain, certain close intimate circles
+
+117
+00:10:09.420 --> 00:10:13.000
+<v Noah Labhart>with your wife, you know, speaking to you that way. And so you jumped on board,
+
+118
+00:10:13.000 --> 00:10:17.060
+<v Noah Labhart>employee number three or four, like you mentioned. When you started in, was there
+
+119
+00:10:17.060 --> 00:10:22.540
+<v Noah Labhart>any technology pre-built, or did you jump in ground zero and, and start creating
+
+120
+00:10:22.540 --> 00:10:24.300
+<v Noah Labhart>something? So
+
+121
+00:10:24.300 --> 00:10:28.260
+<v Jonathan Campos>there was some pre-built. We've been working with, or at the time
+
+122
+00:10:28.260 --> 00:10:32.400
+<v Jonathan Campos>they've been working with a company called frog design in based in Austin.
+
+123
+00:10:33.340 --> 00:10:36.440
+<v Jonathan Campos>Frog was helping them get the MVP out the door.
+
+124
+00:10:36.560 --> 00:10:39.600
+<v Jonathan Campos>We had a, you know, they had a very short timeline.
+
+125
+00:10:40.320 --> 00:10:42.600
+<v Jonathan Campos>They had made some technology decisions already.
+
+126
+00:10:44.280 --> 00:10:48.460
+<v Jonathan Campos>And, you know, all these decisions were around how to get an MVP out the door
+
+127
+00:10:48.460 --> 00:10:52.200
+<v Jonathan Campos>and we could, you know, start to be able to actually get real feedback from customers.
+
+128
+00:10:52.860 --> 00:10:58.160
+<v Jonathan Campos>You know, I came in and, of course, the first thing I did is did a technology audit,
+
+129
+00:10:58.220 --> 00:11:01.920
+<v Jonathan Campos>figure out what decisions have been made, you know,
+
+130
+00:11:03.260 --> 00:11:09.060
+<v Jonathan Campos>stamp of approval or on some of these things and start determining where are we going to go.
+
+131
+00:11:10.120 --> 00:11:16.840
+<v Jonathan Campos>And, you know, I, once we kicked off and got going, it was immediately apparent that our
+
+132
+00:11:16.840 --> 00:11:26.140
+<v Jonathan Campos>growth trajectory was going to outgrow the MVP within months. So we went from something that,
+
+133
+00:11:26.160 --> 00:11:31.860
+<v Jonathan Campos>you know, you, you hope an MVP lasts a year, a year and a half, maybe two years. Yeah. And at
+
+134
+00:11:33.260 --> 00:11:41.860
+<v Jonathan Campos>this all has to switch out. It is not at the scale necessary for the growth that we're seeing.
+
+135
+00:11:42.160 --> 00:11:48.040
+<v Jonathan Campos>So immediately I ramped up a team and we got to developing.
+
+136
+00:11:49.540 --> 00:11:55.620
+<v Noah Labhart>The trade-off obviously in the beginning is you accepted probably a quicker solution
+
+137
+00:11:55.620 --> 00:12:02.960
+<v Noah Labhart>that ended up not being suited for your growth trajectory. What was the tech used for the MVP
+
+138
+00:12:03.260 --> 00:12:07.320
+<v Noah Labhart>And then what tech did you start to change over to, to support your growth?
+
+139
+00:12:07.780 --> 00:12:13.260
+<v Jonathan Campos>These decisions that were made, I'm not faulting anyone if they've made decisions similar.
+
+140
+00:12:14.340 --> 00:12:18.320
+<v Jonathan Campos>I can tell you just through my years of technology that I get it.
+
+141
+00:12:18.340 --> 00:12:22.840
+<v Jonathan Campos>People make decisions in the moment that they're in.
+
+142
+00:12:23.000 --> 00:12:24.380
+<v Jonathan Campos>Not everything's perfect.
+
+143
+00:12:24.660 --> 00:12:28.540
+<v Jonathan Campos>And so if you've, you know, anyone listening, if you've made some of these decisions, like
+
+144
+00:12:28.540 --> 00:12:32.300
+<v Jonathan Campos>that very well may be perfect for your use case.
+
+145
+00:12:33.260 --> 00:12:36.460
+<v Jonathan Campos>and the growth that was coming, it just wasn't going to work.
+
+146
+00:12:36.620 --> 00:12:41.540
+<v Jonathan Campos>So what they set up is they put together a Node.js server
+
+147
+00:12:41.540 --> 00:12:43.500
+<v Jonathan Campos>that was running on AWS.
+
+148
+00:12:43.680 --> 00:12:50.440
+<v Jonathan Campos>It was one big monolithic application running with GraphQL and Prisma
+
+149
+00:12:50.440 --> 00:12:56.960
+<v Jonathan Campos>to handle real-time communications with various applications
+
+150
+00:12:56.960 --> 00:12:59.280
+<v Jonathan Campos>and the database.
+
+151
+00:12:59.280 --> 00:13:05.960
+<v Jonathan Campos>And, you know, it makes it nice, you know, the, if you know GraphQL, you know, that it's
+
+152
+00:13:05.960 --> 00:13:10.100
+<v Jonathan Campos>nice because you can be a little bit more flexible about your service calls as you're
+
+153
+00:13:10.100 --> 00:13:10.980
+<v Jonathan Campos>setting things up.
+
+154
+00:13:11.180 --> 00:13:16.740
+<v Jonathan Campos>If you know Prisma, it's kind of one of those like out of the box, you know, able to do
+
+155
+00:13:16.740 --> 00:13:20.380
+<v Jonathan Campos>a lot for you and do a lot of heavy lifting of the communications back and forth.
+
+156
+00:13:20.660 --> 00:13:22.080
+<v Jonathan Campos>It doesn't scale well.
+
+157
+00:13:22.220 --> 00:13:24.400
+<v Jonathan Campos>And there are bugs.
+
+158
+00:13:24.400 --> 00:13:29.300
+<v Jonathan Campos>bugs, there's even if you look in the official documentation, there's places where they say
+
+159
+00:13:29.300 --> 00:13:32.340
+<v Jonathan Campos>do not use these products in production.
+
+160
+00:13:32.560 --> 00:13:34.460
+<v Jonathan Campos>You know, there's serious problems.
+
+161
+00:13:34.860 --> 00:13:39.480
+<v Jonathan Campos>Yeah, I mean, one of them, you know, was a really horrible memory leak that we're dealing
+
+162
+00:13:39.480 --> 00:13:46.660
+<v Jonathan Campos>with for months and in their, you know, in their GitHub repo where you actually see them
+
+163
+00:13:46.660 --> 00:13:50.660
+<v Jonathan Campos>going through and talking about it like, yeah, we're focusing on this, but it's a problem.
+
+164
+00:13:50.760 --> 00:13:52.320
+<v Jonathan Campos>You know, don't use this in production.
+
+165
+00:13:53.040 --> 00:13:56.560
+<v Jonathan Campos>And so of course, that's not something you know immediately,
+
+166
+00:13:56.760 --> 00:13:58.420
+<v Jonathan Campos>that's something you start learning once you start getting
+
+167
+00:13:58.420 --> 00:14:02.380
+<v Jonathan Campos>load in the system and you start seeing like, wow, this is an issue.
+
+168
+00:14:03.460 --> 00:14:06.540
+<v Jonathan Campos>We worked with the MVP and we're still working with it and
+
+169
+00:14:08.220 --> 00:14:12.880
+<v Jonathan Campos>transitioning off of the MVP, but where we're going is totally
+
+170
+00:14:12.880 --> 00:14:17.920
+<v Jonathan Campos>built on Kubernetes with Istio and Knative and a lot of other
+
+171
+00:14:17.920 --> 00:14:21.060
+<v Jonathan Campos>cool buzzwords that you've heard, I'm sure, a million times already.
+
+172
+00:14:22.320 --> 00:14:24.580
+<v Jonathan Campos>are kind of switching over so that what we have,
+
+173
+00:14:24.620 --> 00:14:27.080
+<v Jonathan Campos>we're actually going to use Google servers
+
+174
+00:14:27.080 --> 00:14:30.380
+<v Jonathan Campos>and use Firebase for a lot of those real-time database
+
+175
+00:14:30.380 --> 00:14:30.960
+<v Jonathan Campos>communications.
+
+176
+00:14:31.480 --> 00:14:34.920
+<v Jonathan Campos>And this is really going to help because switching
+
+177
+00:14:34.920 --> 00:14:37.120
+<v Jonathan Campos>from a monolithic application structure
+
+178
+00:14:37.120 --> 00:14:39.320
+<v Jonathan Campos>to a microservices application structure,
+
+179
+00:14:39.620 --> 00:14:43.320
+<v Jonathan Campos>it just makes us a lot more nimble and able to make changes
+
+180
+00:14:43.320 --> 00:14:45.820
+<v Jonathan Campos>on the fly, where rather than having
+
+181
+00:14:45.820 --> 00:14:49.120
+<v Jonathan Campos>to wait till after midnight, 1, 2 o'clock in the morning
+
+182
+00:14:49.120 --> 00:14:54.800
+<v Jonathan Campos>when customers are off the platform, we can start doing middle of the day switch, you know,
+
+183
+00:14:54.800 --> 00:15:00.220
+<v Jonathan Campos>hot switches because we're now changing small incremental pieces as opposed to the entire
+
+184
+00:15:00.220 --> 00:15:00.720
+<v Jonathan Campos>application.
+
+185
+00:15:01.680 --> 00:15:06.980
+<v Noah Labhart>How did you go about the process of building or how do you go about the process of
+
+186
+00:15:06.980 --> 00:15:12.040
+<v Noah Labhart>building your product roadmap? So we talked about the, you know, the internals, the tech part of it,
+
+187
+00:15:12.120 --> 00:15:18.720
+<v Noah Labhart>but how do you go about prioritizing not only internal changes, but the product changes
+
+188
+00:15:19.120 --> 00:15:19.620
+<v Noah Labhart>themselves?
+
+189
+00:15:20.140 --> 00:15:25.240
+<v Jonathan Campos>So this is actually a place that I'm very proud. I feel that our executive team does a
+
+190
+00:15:25.240 --> 00:15:33.620
+<v Jonathan Campos>good job. So as a startup and any new company, heck, probably any company period, there are a
+
+191
+00:15:33.620 --> 00:15:38.960
+<v Jonathan Campos>million things that you can work on and almost any one of them gives you some level of positive
+
+192
+00:15:38.960 --> 00:15:44.480
+<v Jonathan Campos>return. So with that, we've got this laundry list that we can work on for the next few years of all
+
+193
+00:15:44.480 --> 00:15:45.380
+<v Jonathan Campos>all this wonderful things,
+
+194
+00:15:45.620 --> 00:15:48.200
+<v Jonathan Campos>but how do you start prioritizing and determining
+
+195
+00:15:48.200 --> 00:15:50.360
+<v Jonathan Campos>which one's gonna give you the biggest bang for your buck
+
+196
+00:15:50.360 --> 00:15:56.180
+<v Jonathan Campos>and which one is going to be right for our current timeline.
+
+197
+00:15:56.720 --> 00:15:58.460
+<v Jonathan Campos>Obviously we can't be building something
+
+198
+00:15:58.460 --> 00:16:00.300
+<v Jonathan Campos>that only will be good a year from now.
+
+199
+00:16:00.400 --> 00:16:02.280
+<v Jonathan Campos>We have to also build stuff that's gonna be helpful
+
+200
+00:16:02.280 --> 00:16:03.440
+<v Jonathan Campos>the next week.
+
+201
+00:16:03.600 --> 00:16:05.500
+<v Jonathan Campos>What we do is we actually sit down with
+
+202
+00:16:05.500 --> 00:16:07.820
+<v Jonathan Campos>some of our highest priority items.
+
+203
+00:16:07.980 --> 00:16:10.140
+<v Jonathan Campos>We listen to what our customers are saying
+
+204
+00:16:10.140 --> 00:16:11.480
+<v Jonathan Campos>and what their pain points are.
+
+205
+00:16:11.740 --> 00:16:13.660
+<v Jonathan Campos>We listen to what our drivers are saying
+
+206
+00:16:14.480 --> 00:16:18.160
+<v Jonathan Campos>our drivers are, you know, some of our most important customers, and we hear what their
+
+207
+00:16:18.160 --> 00:16:24.440
+<v Jonathan Campos>pain points are and honestly we put them up on a board and you know once we start narrowing it
+
+208
+00:16:24.440 --> 00:16:30.080
+<v Jonathan Campos>down to let's say the top you know even 30 narrow it down on a two by two board that we make a
+
+209
+00:16:30.080 --> 00:16:37.860
+<v Jonathan Campos>matrix of impact to our customers and and the level of effort it would take to actually uh
+
+210
+00:16:37.860 --> 00:16:44.120
+<v Jonathan Campos>complete these tasks so when you actually look at those two scales you're able to determine okay
+
+211
+00:16:44.480 --> 00:16:48.420
+<v Jonathan Campos>This one is low impact, but really hard to work on.
+
+212
+00:16:48.700 --> 00:16:50.420
+<v Jonathan Campos>Okay, maybe we don't focus on that.
+
+213
+00:16:50.640 --> 00:16:56.880
+<v Jonathan Campos>This one over here though, this other task is really high impact, but very low effort.
+
+214
+00:16:57.160 --> 00:16:58.920
+<v Jonathan Campos>Well, that sounds like an easy win to me.
+
+215
+00:16:59.400 --> 00:17:03.140
+<v Jonathan Campos>So once we start laying things out, we start determining which one's more important, which
+
+216
+00:17:03.140 --> 00:17:04.380
+<v Jonathan Campos>ones are easier, which ones are harder.
+
+217
+00:17:04.560 --> 00:17:10.960
+<v Jonathan Campos>You see it up on the board and you're really able to start seeing clustering of priorities.
+
+218
+00:17:10.960 --> 00:17:15.640
+<v Jonathan Campos>priorities. And then with that, you're able to just slice off certain areas and say, okay,
+
+219
+00:17:15.660 --> 00:17:19.200
+<v Jonathan Campos>this is going to be highest priority and the stuff we're going to focus on in this next quarter
+
+220
+00:17:19.200 --> 00:17:26.240
+<v Jonathan Campos>versus these other pieces, which may be a disregard or pushback until their priority changes.
+
+221
+00:17:27.380 --> 00:17:34.080
+<v Noah Labhart>So it sounds really mathematical and clean, and it makes a lot of sense to do it that way. Do you
+
+222
+00:17:34.080 --> 00:17:40.700
+<v Noah Labhart>you ever find yourself or the team taking those high impact, high magnitude of work items and
+
+223
+00:17:40.700 --> 00:17:43.940
+<v Noah Labhart>breaking them down into short-term and long-term pieces?
+
+224
+00:17:44.260 --> 00:17:46.500
+<v Jonathan Campos>Yes, definitely. Especially when they're,
+
+225
+00:17:46.600 --> 00:17:51.680
+<v Jonathan Campos>you know, some of these pieces are very big. And so we start determining, you know, how can we
+
+226
+00:17:51.680 --> 00:17:58.500
+<v Jonathan Campos>focus on certain pieces or, you know, what is the MVP version of the story versus, you know,
+
+227
+00:17:58.500 --> 00:18:06.560
+<v Jonathan Campos>the entire piece because if we always do the biggest possible work item, then we'll never
+
+228
+00:18:06.560 --> 00:18:13.940
+<v Jonathan Campos>get anything out to our customers. And a lot of times, even getting that 20% of the feature out
+
+229
+00:18:14.520 --> 00:18:22.160
+<v Jonathan Campos>will impact and improve 80% of your customers' usage. So start really breaking down individual
+
+230
+00:18:22.160 --> 00:18:27.060
+<v Jonathan Campos>pieces and figure out what's the MVP of this feature, or do we have to have the whole thing
+
+231
+00:18:28.900 --> 00:18:34.620
+<v Noah Labhart>Let's take a step back and probably into something that you're continuously doing as the CTO.
+
+232
+00:18:34.840 --> 00:18:37.240
+<v Noah Labhart>But tell me how did you build your team?
+
+233
+00:18:37.440 --> 00:18:43.260
+<v Noah Labhart>How did you select the winning horses to really drive the development of what you're doing
+
+234
+00:18:43.260 --> 00:18:43.760
+<v Noah Labhart>at Alto?
+
+235
+00:18:44.140 --> 00:18:48.600
+<v Jonathan Campos>This first team is just an amazing group of people.
+
+236
+00:18:48.700 --> 00:18:54.400
+<v Jonathan Campos>So immediately, just because of the teams I've worked on before, I knew roughly what
+
+237
+00:18:54.820 --> 00:18:56.220
+<v Jonathan Campos>the structure needed to be.
+
+238
+00:18:56.220 --> 00:19:03.640
+<v Jonathan Campos>I needed two or three back-end folks, two or three front-end folks, someone that would
+
+239
+00:19:03.640 --> 00:19:11.060
+<v Jonathan Campos>be a good project manager, someone that would be a good system reliability engineer, someone
+
+240
+00:19:11.060 --> 00:19:18.160
+<v Jonathan Campos>that would be a QA, and then someone that would focus on the product itself, both in
+
+241
+00:19:18.160 --> 00:19:22.180
+<v Jonathan Campos>terms of the design and the user experience, which are very different things.
+
+242
+00:19:22.180 --> 00:19:26.640
+<v Jonathan Campos>You kind of put all those together and that's the list of people you need.
+
+243
+00:19:26.740 --> 00:19:31.520
+<v Jonathan Campos>However, that's more requirements than I actually had open slots for.
+
+244
+00:19:31.620 --> 00:19:33.280
+<v Jonathan Campos>So a few people we had to double up on.
+
+245
+00:19:33.420 --> 00:19:37.340
+<v Jonathan Campos>But I immediately started reaching out to some people that I've worked with previously.
+
+246
+00:19:37.620 --> 00:19:41.960
+<v Jonathan Campos>So two or three of them were people that I worked with before.
+
+247
+00:19:42.060 --> 00:19:50.320
+<v Jonathan Campos>And I knew that their temperament and their drive to learn and grow and try new things was exactly what we were looking for.
+
+248
+00:19:52.180 --> 00:19:54.280
+<v Jonathan Campos>just started fishing out there.
+
+249
+00:19:54.400 --> 00:19:58.440
+<v Jonathan Campos>So I knew from the beginning that I wanted to make a team
+
+250
+00:19:58.440 --> 00:20:00.940
+<v Jonathan Campos>that was representative of our customer base.
+
+251
+00:20:01.300 --> 00:20:04.820
+<v Jonathan Campos>So being that at least half of our customers are women
+
+252
+00:20:04.820 --> 00:20:07.420
+<v Jonathan Campos>and half of them are men, I really wanted to focus on,
+
+253
+00:20:07.500 --> 00:20:11.600
+<v Jonathan Campos>I can very proudly say we have a very diverse team
+
+254
+00:20:11.600 --> 00:20:14.840
+<v Jonathan Campos>that includes both women coders and men coders.
+
+255
+00:20:15.880 --> 00:20:19.800
+<v Jonathan Campos>And then with that, just making sure to keep a good culture
+
+256
+00:20:19.800 --> 00:20:21.400
+<v Jonathan Campos>that will keep growing this team
+
+257
+00:20:22.180 --> 00:20:31.640
+<v Jonathan Campos>Once I started getting the first two or three, those people would start evangelizing for us and talking to other people they knew.
+
+258
+00:20:31.900 --> 00:20:35.540
+<v Jonathan Campos>And it became more of a word of mouth campaign than anything else.
+
+259
+00:20:35.600 --> 00:20:39.520
+<v Jonathan Campos>So in the end, I was able to bring the team up to about 12 individuals.
+
+260
+00:20:39.900 --> 00:20:42.440
+<v Jonathan Campos>And again, it's a great team.
+
+261
+00:20:42.520 --> 00:20:48.300
+<v Jonathan Campos>We focus on getting work product out, not how often your butt is sitting in a chair.
+
+262
+00:20:48.300 --> 00:20:57.340
+<v Jonathan Campos>We really focus on trying to do something new and learn and grow while also making sure you get a good high quality product out.
+
+263
+00:20:58.380 --> 00:21:08.060
+<v Noah Labhart>Is your structure of the team pretty flat or do you have managers underneath you that are managing groups of folks or leads?
+
+264
+00:21:08.300 --> 00:21:10.080
+<v Noah Labhart>How did you go about structuring that?
+
+265
+00:21:11.360 --> 00:21:13.060
+<v Jonathan Campos>It is fairly flat.
+
+266
+00:21:13.260 --> 00:21:15.380
+<v Jonathan Campos>I do try not to have too many levels.
+
+267
+00:21:15.380 --> 00:21:21.140
+<v Jonathan Campos>However, I do know that we've got different experience levels within our team.
+
+268
+00:21:21.280 --> 00:21:26.960
+<v Jonathan Campos>So right now, the way I set it up is the fact there'd be two juniors for every one senior developer.
+
+269
+00:21:27.460 --> 00:21:34.940
+<v Jonathan Campos>This is really something that's important so that way these junior developers can have someone to mentor them,
+
+270
+00:21:35.160 --> 00:21:37.700
+<v Jonathan Campos>someone to answer those questions and help them grow.
+
+271
+00:21:37.800 --> 00:21:41.060
+<v Jonathan Campos>If you have all juniors, it's really hard because then, of course,
+
+272
+00:21:41.060 --> 00:21:44.640
+<v Jonathan Campos>you know, they're still learning and cutting their teeth on problems that a lot of us have
+
+273
+00:21:44.640 --> 00:21:49.740
+<v Jonathan Campos>solved already. But on the other hand, if you just have all seniors, yeah, that's, you know,
+
+274
+00:21:49.740 --> 00:21:56.060
+<v Jonathan Campos>that's wonderful, but it's a high-priced team that's, you know, hard to keep up with and then
+
+275
+00:21:56.060 --> 00:22:01.360
+<v Jonathan Campos>also hard to keep them encouraged. You know, by having this mix, it made it where, you know,
+
+276
+00:22:01.360 --> 00:22:06.200
+<v Jonathan Campos>also hard to keep them encouraged. You know, by having this mix, it made it where, you know,
+
+277
+00:22:06.200 --> 00:22:12.880
+<v Jonathan Campos>of coding, that really loved teaching others. And so they, you know, my senior
+
+278
+00:22:12.880 --> 00:22:17.240
+<v Jonathan Campos>developers, they, you know, right from beginning, they said they want, you know,
+
+279
+00:22:17.240 --> 00:22:22.400
+<v Jonathan Campos>a ability to teach and to mentor. And so they were able to scratch that itch with
+
+280
+00:22:22.400 --> 00:22:28.380
+<v Jonathan Campos>us while improving, you know, people that were still just starting out their
+
+281
+00:22:28.380 --> 00:22:33.240
+<v Jonathan Campos>career in development. Yeah, that was, that was kind of my financial plan. So
+
+282
+00:22:33.240 --> 00:22:42.020
+<v Jonathan Campos>Right there, one senior front end, one senior back end, and then two junior front end, two junior back end.
+
+283
+00:22:42.180 --> 00:22:48.560
+<v Jonathan Campos>The rest of the team is kind of individual contributors, including project managers, designer, QA, etc.
+
+284
+00:22:48.560 --> 00:22:49.360
+<v Noah Labhart>So
+
+285
+00:22:49.360 --> 00:23:05.100
+<v Noah Labhart>it sounds like not only is the team culture important across the company, but you've set up your tech team culture for where there are opportunities for mentorship, for growth, for pass down of senior knowledge, things like that. Is that right?
+
+286
+00:23:05.100 --> 00:23:05.600
+<v Jonathan Campos>Right.
+
+287
+00:23:06.460 --> 00:23:10.580
+<v Jonathan Campos>Before even coming into Alto, I can tell you that, you know, I sat down with Will
+
+288
+00:23:10.580 --> 00:23:15.640
+<v Jonathan Campos>and I said, okay, well, if I come in, there's certain requirements I have, you know, as a
+
+289
+00:23:15.640 --> 00:23:21.660
+<v Jonathan Campos>developer, I know that what, what us developers want is we want something that challenges us.
+
+290
+00:23:21.720 --> 00:23:27.400
+<v Jonathan Campos>We want to be able to grow. We don't want to get stagnant. And so I told him like, you know,
+
+291
+00:23:27.420 --> 00:23:34.640
+<v Jonathan Campos>we need to have, you know, I can't come in unless we have a guarantee of a certain amount of budget
+
+292
+00:23:35.100 --> 00:23:38.600
+<v Jonathan Campos>specifically for learning and growth and conferences.
+
+293
+00:23:39.820 --> 00:23:44.100
+<v Jonathan Campos>And Will was extremely positive with that.
+
+294
+00:23:44.120 --> 00:23:44.800
+<v Jonathan Campos>He said, I love it.
+
+295
+00:23:44.840 --> 00:23:50.060
+<v Jonathan Campos>I love the idea of people getting better and wanting to stay and being challenged.
+
+296
+00:23:50.120 --> 00:23:51.280
+<v Jonathan Campos>So let's do it.
+
+297
+00:23:51.420 --> 00:23:54.040
+<v Jonathan Campos>So that was an easy decision to make.
+
+298
+00:23:54.720 --> 00:23:58.220
+<v Jonathan Campos>And so with that, we do a lot of internal training.
+
+299
+00:23:59.000 --> 00:24:05.660
+<v Jonathan Campos>We're not great at doing it every week just because we forget from one week to the other,
+
+300
+00:24:05.720 --> 00:24:07.740
+<v Jonathan Campos>but we're usually pretty good about doing lunch and learns.
+
+301
+00:24:08.220 --> 00:24:12.440
+<v Jonathan Campos>We have the team do pair programming.
+
+302
+00:24:12.700 --> 00:24:14.380
+<v Jonathan Campos>We have a lot of code reviews.
+
+303
+00:24:14.640 --> 00:24:21.600
+<v Jonathan Campos>We have certain levels of expectations that we expect, but all of this is meant to be
+
+304
+00:24:21.600 --> 00:24:22.860
+<v Jonathan Campos>a growing and learning environment.
+
+305
+00:24:22.860 --> 00:24:28.160
+<v Jonathan Campos>I can tell you that this last week or two, we started getting some new areas of code
+
+306
+00:24:28.160 --> 00:24:33.180
+<v Jonathan Campos>and it was great to watch some of my front end developers come up and they said, hey,
+
+307
+00:24:33.940 --> 00:24:37.100
+<v Jonathan Campos>there's this online course, cost this much, I want to do it.
+
+308
+00:24:38.000 --> 00:24:39.640
+<v Jonathan Campos>And I didn't even blink an eye.
+
+309
+00:24:39.700 --> 00:24:40.200
+<v Jonathan Campos>Here you go.
+
+310
+00:24:40.180 --> 00:24:40.860
+<v Jonathan Campos>Here's the credit card.
+
+311
+00:24:40.920 --> 00:24:41.940
+<v Jonathan Campos>Let's make this happen.
+
+312
+00:24:42.300 --> 00:24:45.780
+<v Jonathan Campos>And within a day they came back and they're like, I've learned so much.
+
+313
+00:24:45.940 --> 00:24:46.780
+<v Jonathan Campos>I'm ready to go.
+
+314
+00:24:47.100 --> 00:24:50.380
+<v Jonathan Campos>Some of these things don't have to be huge, long, multi-month training.
+
+315
+00:24:50.380 --> 00:24:54.540
+<v Jonathan Campos>anything. It could be just focused on one little piece, but just that kind of environment helps
+
+316
+00:24:54.540 --> 00:25:00.560
+<v Jonathan Campos>people know that the company, the best for them. And so in turn, they want the best for the company.
+
+317
+00:25:01.420 --> 00:25:06.280
+<v Noah Labhart>Tell me about a mistake that you made throughout your process at Alto,
+
+318
+00:25:06.480 --> 00:25:10.880
+<v Noah Labhart>either a leadership mistake or a tech mistake. You know, what did you do about it?
+
+319
+00:25:11.060 --> 00:25:19.420
+<v Jonathan Campos>One mistake that I've made is there, we were initially trying to really rush to get
+
+320
+00:25:20.740 --> 00:25:23.600
+<v Jonathan Campos>one position, one key position filled.
+
+321
+00:25:24.480 --> 00:25:28.180
+<v Jonathan Campos>Because of that, we kind of scrimped on some of the,
+
+322
+00:25:28.200 --> 00:25:30.480
+<v Jonathan Campos>you know, best laid plans that we'd put out.
+
+323
+00:25:30.540 --> 00:25:32.720
+<v Jonathan Campos>We, you know, we said that we always want, you know,
+
+324
+00:25:32.720 --> 00:25:34.420
+<v Jonathan Campos>every one of our candidates to go through, you know,
+
+325
+00:25:34.420 --> 00:25:38.060
+<v Jonathan Campos>these stages and we kind of scrimped on that just because,
+
+326
+00:25:38.200 --> 00:25:40.100
+<v Jonathan Campos>you know, we felt this was the right person
+
+327
+00:25:40.100 --> 00:25:42.460
+<v Jonathan Campos>and we really wanted this position filled.
+
+328
+00:25:43.180 --> 00:25:47.140
+<v Jonathan Campos>And so we kind of rushed and when they came in,
+
+329
+00:25:47.140 --> 00:25:54.740
+<v Jonathan Campos>it was pretty much it was pretty immediate that we knew that we'd made the wrong choice with with
+
+330
+00:25:54.740 --> 00:26:02.060
+<v Jonathan Campos>this candidate and that it just it wasn't going to work really tried hard and for a good couple
+
+331
+00:26:02.060 --> 00:26:07.960
+<v Jonathan Campos>months we really tried working with the candidate and you know making sure that you know to see if
+
+332
+00:26:07.960 --> 00:26:15.800
+<v Jonathan Campos>we could recover this and it was just it was a mismatch in skill sets and expectations and it
+
+333
+00:26:17.140 --> 00:26:21.660
+<v Jonathan Campos>happens you you never like being in a situation you never like seeing anyone else in the situation
+
+334
+00:26:21.660 --> 00:26:26.700
+<v Jonathan Campos>it was it was it was really painful and disheartening for the executive team that
+
+335
+00:26:26.700 --> 00:26:33.620
+<v Jonathan Campos>you know we made this decision and and things were going this way so you know sadly it was best that
+
+336
+00:26:33.620 --> 00:26:38.900
+<v Jonathan Campos>we you know we sat down we had many conversations and we just just we just chose to you know to part
+
+337
+00:26:38.900 --> 00:26:46.380
+<v Jonathan Campos>ways it's just it reminded us whenever this was all over that the old saying is very true you know
+
+338
+00:26:47.140 --> 00:26:53.280
+<v Jonathan Campos>hire slow and be very sure of what you're getting yourself into.
+
+339
+00:26:53.540 --> 00:26:54.420
+<v Jonathan Campos>Fire fast.
+
+340
+00:26:54.680 --> 00:26:56.360
+<v Jonathan Campos>If you know things aren't going to work out,
+
+341
+00:26:56.960 --> 00:27:00.060
+<v Jonathan Campos>just be very open, honest, and communicate that issue.
+
+342
+00:27:01.040 --> 00:27:05.360
+<v Noah Labhart>Whenever your team did decide to part ways with the candidate,
+
+343
+00:27:05.600 --> 00:27:08.960
+<v Noah Labhart>what was the impact on your team after the fact?
+
+344
+00:27:09.080 --> 00:27:11.100
+<v Noah Labhart>Was it positive, negative, neutral?
+
+345
+00:27:11.360 --> 00:27:12.480
+<v Noah Labhart>What are your thoughts there?
+
+346
+00:27:12.480 --> 00:27:13.160
+<v Jonathan Campos>This
+
+347
+00:27:13.160 --> 00:27:23.680
+<v Jonathan Campos>was the first person from my team that we had to let go. And so I wanted to make sure that it went as positively as possible.
+
+348
+00:27:24.580 --> 00:27:35.960
+<v Jonathan Campos>It's always, you know, I feel that it's kind of scary when someone gets let go within a group, especially, you know, a group of only 12 people.
+
+349
+00:27:36.080 --> 00:27:43.560
+<v Jonathan Campos>These people knew this person and they knew who they were, they knew their family to some degree.
+
+350
+00:27:44.020 --> 00:27:49.060
+<v Jonathan Campos>You want to make sure that people know that this was not a decision made lightly.
+
+351
+00:27:49.060 --> 00:27:53.420
+<v Jonathan Campos>The person did not walk in one day and we just decided, hey, that's it, it's over.
+
+352
+00:27:53.760 --> 00:27:58.520
+<v Jonathan Campos>And so I made sure to sit everyone down and let them know that these are the steps that
+
+353
+00:27:58.520 --> 00:27:59.540
+<v Jonathan Campos>we took as a company.
+
+354
+00:27:59.700 --> 00:28:01.940
+<v Jonathan Campos>These are the many communication points that we had.
+
+355
+00:28:02.360 --> 00:28:09.320
+<v Jonathan Campos>This was not a decision that was made lightly and I wanted everyone to know that if it comes
+
+356
+00:28:09.320 --> 00:28:17.320
+<v Jonathan Campos>down to it, we will work as hard for you and make sure that we can try to salvage the situation,
+
+357
+00:28:19.060 --> 00:28:26.660
+<v Jonathan Campos>descriptions as necessary just do whatever we can to you know make this work because you know we
+
+358
+00:28:26.660 --> 00:28:31.080
+<v Jonathan Campos>want a good working relationship you know in the end I think it ended up really positive it
+
+359
+00:28:31.080 --> 00:28:37.680
+<v Jonathan Campos>it let people know you know that we do care and just sometimes we have to make those hard decisions
+
+360
+00:28:38.840 --> 00:28:46.040
+<v Noah Labhart>I've been in that seat and it's it's not an easy one the team does benefit from it in in many ways
+
+361
+00:28:46.040 --> 00:28:56.340
+<v Noah Labhart>Can you speak to some of the things that y'all are doing in the cars themselves about the experience and some of the IoT stuff that y'all have introduced?
+
+362
+00:28:56.340 --> 00:28:57.320
+<v Jonathan Campos>We
+
+363
+00:28:57.320 --> 00:29:05.580
+<v Jonathan Campos>do have monitors in the car for all of our drivers. These include a camera that is plain to see.
+
+364
+00:29:05.740 --> 00:29:11.540
+<v Jonathan Campos>With this, we track every one of our drivers. We ensure that if there's any kind of harsh braking events,
+
+365
+00:29:11.700 --> 00:29:15.780
+<v Jonathan Campos>if there's any kind of distracted driving, that's something that we actually respond to immediately.
+
+366
+00:29:16.220 --> 00:29:22.820
+<v Jonathan Campos>All of our drivers know this. We actually train around this technology,
+
+367
+00:29:22.820 --> 00:29:30.220
+<v Jonathan Campos>technology and we ensure that using technology that we can give customers the best experience.
+
+368
+00:29:30.520 --> 00:29:36.480
+<v Jonathan Campos>We actually go on to the second half where for our customers, we actually make it where
+
+369
+00:29:36.480 --> 00:29:44.300
+<v Jonathan Campos>they can actually control the car in ways that other competitors can't do.
+
+370
+00:29:44.620 --> 00:29:49.600
+<v Jonathan Campos>Because we own the car and we can actually put specific technology in the car, we're
+
+371
+00:29:49.600 --> 00:29:57.080
+<v Jonathan Campos>able to do things like give customers control of the radio in a much more seamless fashion than
+
+372
+00:29:57.080 --> 00:30:01.920
+<v Jonathan Campos>possible. There are a few other ride-hailing companies out there that allow you to request
+
+373
+00:30:01.920 --> 00:30:07.340
+<v Jonathan Campos>to have certain radio stations playing or something to that effect, but ultimately what it
+
+374
+00:30:07.340 --> 00:30:13.180
+<v Jonathan Campos>does is it comes down to the driver reading a request on a screen and choosing to actually
+
+375
+00:30:13.180 --> 00:30:20.660
+<v Jonathan Campos>execute that request or not. Or even worse, you're in the car, the driver is
+
+376
+00:30:20.660 --> 00:30:26.000
+<v Jonathan Campos>focused on driving you safely to your next destination and you're asking them
+
+377
+00:30:26.000 --> 00:30:29.980
+<v Jonathan Campos>hey can you change the radio station, can you plug in my phone, can you set the
+
+378
+00:30:29.980 --> 00:30:34.140
+<v Jonathan Campos>Bluetooth up, can you do this, can you do this, can you do that, and it's a horrible
+
+379
+00:30:34.140 --> 00:30:37.960
+<v Jonathan Campos>experience as opposed to for us where because we own the cars and because
+
+380
+00:30:38.600 --> 00:30:42.080
+<v Jonathan Campos>we've got this tight integration of technology you can actually
+
+381
+00:30:43.180 --> 00:30:49.680
+<v Jonathan Campos>control the radio, control the volume, control the lighting and all sorts of stuff within the car directly from your phone.
+
+382
+00:30:50.840 --> 00:30:58.540
+<v Jonathan Campos>So, you know, and it's it sounds like a small change compared to requesting it from the driver until you're in the car.
+
+383
+00:30:58.920 --> 00:31:01.880
+<v Jonathan Campos>You're sitting there and you decide, you know what, I'm going to change this music.
+
+384
+00:31:03.280 --> 00:31:07.680
+<v Jonathan Campos>No talking necessary, no explanation, no back and forth.
+
+385
+00:31:07.760 --> 00:31:10.760
+<v Jonathan Campos>You just make the change magically.
+
+386
+00:31:10.760 --> 00:31:15.180
+<v Jonathan Campos>the radio station changes over and there's something just very satisfying to
+
+387
+00:31:15.180 --> 00:31:15.680
+<v Jonathan Campos>that.
+
+388
+00:31:15.400 --> 00:31:19.900
+<v Jonathan Campos>It just becomes a very magical positive moment and experience where you
+
+389
+00:31:19.900 --> 00:31:22.760
+<v Jonathan Campos>realize this could be better than what's out there.
+
+390
+00:31:23.560 --> 00:31:25.320
+<v Noah Labhart>Okay. Jonathan, um, name,
+
+391
+00:31:25.360 --> 00:31:30.420
+<v Noah Labhart>name an architect or CTO or tech person that you look up to.
+
+392
+00:31:30.560 --> 00:31:34.320
+<v Noah Labhart>Tell me why, or if it's a non-tech person, who do you look up to?
+
+393
+00:31:34.800 --> 00:31:39.620
+<v Jonathan Campos>A lot of the people I look up to, I can, you know, I, I try not to do,
+
+394
+00:31:40.760 --> 00:31:46.340
+<v Jonathan Campos>grandiose about people that you see out there that are more public figures because
+
+395
+00:31:46.340 --> 00:31:51.580
+<v Jonathan Campos>you don't know how they actually are and they work. But I've been very fortunate over the years
+
+396
+00:31:51.580 --> 00:31:58.200
+<v Jonathan Campos>to work closely with some really amazing intelligent folks. Within the community,
+
+397
+00:31:58.420 --> 00:32:05.120
+<v Jonathan Campos>I can tell you that gentleman in Chicago named Mike Labriola that runs Digital Primates, which
+
+398
+00:32:05.120 --> 00:32:09.440
+<v Jonathan Campos>which he is an amazing architect and one of the smartest people I've ever met.
+
+399
+00:32:09.760 --> 00:32:16.380
+<v Jonathan Campos>Within Dallas, there's Carter Bradford, who, again, is just one of the smartest cloud architects
+
+400
+00:32:16.380 --> 00:32:20.200
+<v Jonathan Campos>and now runs Precocity here in Dallas.
+
+401
+00:32:20.720 --> 00:32:25.920
+<v Jonathan Campos>I was very fortunate for a while to work with Roy Fielding,
+
+402
+00:32:25.980 --> 00:32:31.480
+<v Jonathan Campos>actually the person that penned his dissertation on RESTful services.
+
+403
+00:32:31.480 --> 00:32:40.060
+<v Jonathan Campos>hearing him talk about the open source community and how Apache came together and his goals around technology.
+
+404
+00:32:40.300 --> 00:32:48.940
+<v Jonathan Campos>It's amazing. You bring in a brain like that into Adobe, which Adobe is a huge technology company.
+
+405
+00:32:49.280 --> 00:32:57.100
+<v Jonathan Campos>I mean, within hours, he's making fundamental shifts to their technology platform.
+
+406
+00:32:57.100 --> 00:33:05.220
+<v Jonathan Campos>platform. And it's just amazing to see some of these people and, you know, one, the, the command
+
+407
+00:33:05.220 --> 00:33:11.180
+<v Jonathan Campos>they have over the technology and to the understanding of how to, you know, work with,
+
+408
+00:33:11.200 --> 00:33:15.460
+<v Jonathan Campos>with people and with organizations. It's just, it's awe inspiring.
+
+409
+00:33:16.170 --> 00:33:22.900
+<v Noah Labhart>If you could go back to the beginning of Alto, Alto specifically, what would you do differently?
+
+410
+00:33:22.900 --> 00:33:25.020
+<v Noah Labhart>or what would you,
+
+411
+00:33:25.500 --> 00:33:27.400
+<v Noah Labhart>would there be another approach
+
+412
+00:33:27.400 --> 00:33:29.280
+<v Noah Labhart>you might take to a certain area?
+
+413
+00:33:30.520 --> 00:33:31.020
+<v Jonathan Campos>Yeah.
+
+414
+00:33:31.100 --> 00:33:33.020
+<v Jonathan Campos>So if I were to go back and do it differently,
+
+415
+00:33:33.020 --> 00:33:36.840
+<v Jonathan Campos>I definitely would come on board a little bit earlier
+
+416
+00:33:38.560 --> 00:33:41.020
+<v Jonathan Campos>and make sure that we built everything
+
+417
+00:33:41.020 --> 00:33:43.320
+<v Jonathan Campos>using microservices right from the get-go.
+
+418
+00:33:43.520 --> 00:33:45.600
+<v Jonathan Campos>It adds a little bit more complexity,
+
+419
+00:33:45.700 --> 00:33:47.720
+<v Jonathan Campos>but man, it gives you a lot of flexibility.
+
+420
+00:33:48.120 --> 00:33:50.760
+<v Jonathan Campos>You know, I could be switching out piece by piece
+
+421
+00:33:50.760 --> 00:33:53.520
+<v Jonathan Campos>as opposed to having to plan and build,
+
+422
+00:33:53.660 --> 00:33:56.620
+<v Jonathan Campos>that would be the biggest change I would make
+
+423
+00:33:56.620 --> 00:33:58.980
+<v Jonathan Campos>if I could go back and wave that magic wand.
+
+424
+00:33:59.260 --> 00:33:59.860
+<v Noah Labhart>If you could
+
+425
+00:33:59.860 --> 00:34:01.800
+<v Noah Labhart>give some advice to someone
+
+426
+00:34:01.800 --> 00:34:05.020
+<v Noah Labhart>who is getting started a few years back
+
+427
+00:34:05.020 --> 00:34:06.040
+<v Noah Labhart>from where you are now,
+
+428
+00:34:06.280 --> 00:34:08.180
+<v Noah Labhart>what sort of advice would you give them?
+
+429
+00:34:08.440 --> 00:34:08.940
+<v Jonathan Campos>So this is
+
+430
+00:34:08.900 --> 00:34:11.380
+<v Jonathan Campos>advice I've given in the past
+
+431
+00:34:11.380 --> 00:34:15.140
+<v Jonathan Campos>and I believe it with every bit of my being.
+
+432
+00:34:15.200 --> 00:34:17.060
+<v Jonathan Campos>So I'm going to say it over and over and over again
+
+433
+00:34:17.060 --> 00:34:18.780
+<v Jonathan Campos>until everyone hears it.
+
+434
+00:34:20.760 --> 00:34:27.900
+<v Jonathan Campos>Every new developer that's coming in to create a project that you're passionate about and
+
+435
+00:34:28.300 --> 00:34:30.380
+<v Jonathan Campos>to see it through from beginning to end.
+
+436
+00:34:30.820 --> 00:34:35.160
+<v Jonathan Campos>A lot of developers are out there and they may have done like a course at DevMountain.
+
+437
+00:34:35.400 --> 00:34:41.980
+<v Jonathan Campos>They may have just been sitting in their room reading books and plugging away at their own
+
+438
+00:34:41.980 --> 00:34:46.560
+<v Jonathan Campos>little personal projects and decide that development is the way to go.
+
+439
+00:34:46.700 --> 00:34:49.980
+<v Jonathan Campos>But I can tell you, launch something.
+
+440
+00:34:50.760 --> 00:34:54.600
+<v Jonathan Campos>have to be big, preferably keep it small because it's going to get bigger than you believe,
+
+441
+00:34:55.260 --> 00:35:01.400
+<v Jonathan Campos>but launch something, really put it out there, really work on it and love it and own it because
+
+442
+00:35:01.400 --> 00:35:07.380
+<v Jonathan Campos>you learn so many different parts and pieces as you're going through. There's no single piece
+
+443
+00:35:07.380 --> 00:35:12.860
+<v Jonathan Campos>that you get lost in. When you start working at these big companies, you just focus on your one
+
+444
+00:35:12.860 --> 00:35:16.900
+<v Jonathan Campos>little area of code. You don't realize how everything works together. When you're new
+
+445
+00:35:16.900 --> 00:35:22.880
+<v Jonathan Campos>in development, you don't have that resume that says, you know, you've been working on,
+
+446
+00:35:23.680 --> 00:35:28.340
+<v Jonathan Campos>you know, X technology for five years or 10 years. And so it's really hard to prove you've
+
+447
+00:35:28.780 --> 00:35:34.320
+<v Jonathan Campos>got those skill sets. So the best thing you can do for yourself is to just build it, build it on
+
+448
+00:35:34.320 --> 00:35:39.360
+<v Jonathan Campos>your own, be able to come into an interview and say, yes, you're right. I don't have 10 years of
+
+449
+00:35:39.360 --> 00:35:44.580
+<v Jonathan Campos>experience I can point to, but look at this, open it up for them. It doesn't have to be amazing.
+
+450
+00:35:44.580 --> 00:35:48.860
+<v Jonathan Campos>doesn't have to be beautiful you know whatever your skill sets are lean towards that if it's
+
+451
+00:35:48.860 --> 00:35:56.300
+<v Jonathan Campos>you know highly scalable great if it has this you know beautiful way of dealing with data if it's
+
+452
+00:35:56.760 --> 00:36:01.640
+<v Jonathan Campos>just beautiful on its own and maybe you're more of a designer just build something and get it
+
+453
+00:36:01.640 --> 00:36:07.640
+<v Jonathan Campos>out there work on every little piece so that way you can talk about it and you will be so much
+
+454
+00:36:07.640 --> 00:36:14.020
+<v Jonathan Campos>further than you believe there's a lot of people out there that don't sit and really learn and
+
+455
+00:36:14.580 --> 00:36:19.200
+<v Jonathan Campos>10,000 hours on something. And because of that, you will be surprised how much further you are
+
+456
+00:36:19.200 --> 00:36:25.360
+<v Jonathan Campos>along than any of your peers, because you've spent that time and really loved and grew your
+
+457
+00:36:25.360 --> 00:36:28.000
+<v Jonathan Campos>own piece of development art.
+
+458
+00:36:29.280 --> 00:36:32.640
+<v Noah Labhart>That is solid advice. Solid advice. Well, Jonathan, I really
+
+459
+00:36:32.640 --> 00:36:37.740
+<v Noah Labhart>appreciate you being on the Code Story podcast. Thank you for your time today. Thank you.
+
+460
+00:36:37.980 --> 00:36:40.960
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+461
+00:36:45.520 --> 00:36:51.420
+<v Noah Labhart>Code Story is a production of TouchTap LLC and is hosted and produced by Noah Labhart,
+
+462
+00:36:51.420 --> 00:36:54.500
+<v Noah Labhart>co-produced and edited by George Mocharko.
+
+463
+00:36:55.320 --> 00:37:00.380
+<v Noah Labhart>Special thanks to Deanna Chapman and Stephanie Campisi for their promotional support.
+
+464
+00:37:01.080 --> 00:37:07.440
+<v Noah Labhart>Be sure to subscribe on iTunes, Google Play, Breaker, or the podcasting app of your choice.
+
+465
+00:37:07.440 --> 00:37:15.680
+<v Noah Labhart>Make sure to check us out at codestory.co or follow us on Facebook, Instagram, Twitter, or LinkedIn.

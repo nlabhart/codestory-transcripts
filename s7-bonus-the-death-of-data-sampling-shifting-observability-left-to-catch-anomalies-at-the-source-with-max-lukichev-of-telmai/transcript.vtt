@@ -1,0 +1,1087 @@
+WEBVTT
+
+NOTE S7 Bonus: The Death of Data Sampling: Shifting Observability Left to Catch Anomalies at the Source with Max Lukichev of Telmai
+
+1
+00:00:00.000 --> 00:00:04.980
+<v Max Lukichev>From the very first prototype, it was all built on the scalable technologies.
+
+2
+00:00:05.200 --> 00:00:09.980
+<v Max Lukichev>It wasn't a non-negotiable thing, primarily because of my prior experience.
+
+3
+00:00:10.480 --> 00:00:14.960
+<v Max Lukichev>I saw that work at scale and I knew where we are heading.
+
+4
+00:00:15.140 --> 00:00:20.880
+<v Max Lukichev>So there was no point to build something simple to just struggle later on.
+
+5
+00:00:21.000 --> 00:00:22.240
+<v Max Lukichev>And it helped us tremendously.
+
+6
+00:00:22.540 --> 00:00:26.260
+<v Max Lukichev>You know, the very first prototype, the real POC went engaged.
+
+7
+00:00:26.640 --> 00:00:27.380
+<v Max Lukichev>Guess what?
+
+8
+00:00:27.380 --> 00:00:30.600
+<v Max Lukichev>The requirement was, oh, can you monitor this table?
+
+9
+00:00:30.680 --> 00:00:33.980
+<v Max Lukichev>It has 100 million records and 8,000 attributes.
+
+10
+00:00:34.360 --> 00:00:35.340
+<v Max Lukichev>All in JSON.
+
+11
+00:00:35.500 --> 00:00:38.020
+<v Max Lukichev>I'm like, okay, that was a good choice.
+
+12
+00:00:38.520 --> 00:00:40.400
+<v Max Lukichev>My name is Max Lukichev.
+
+13
+00:00:40.440 --> 00:00:42.540
+<v Max Lukichev>I'm co-founder and CEO of Telmai.
+
+14
+00:00:47.520 --> 00:00:49.280
+<v Noah Labhart>This is Code Story,
+
+15
+00:00:49.540 --> 00:00:52.920
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+16
+00:00:52.920 --> 00:00:57.140
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry.
+
+17
+00:00:57.380 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+18
+00:01:02.240 --> 00:01:03.880
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+19
+00:01:04.040 --> 00:01:09.100
+<v Noah Labhart>and today, how Max Lukichev gift-wrapped a central way to observe your data
+
+20
+00:01:09.100 --> 00:01:11.840
+<v Noah Labhart>without a single line of code.
+
+21
+00:01:13.360 --> 00:01:15.820
+<v Noah Labhart>All this and more on Code Story.
+
+22
+00:01:19.260 --> 00:01:21.580
+<v Noah Labhart>Max Lukichev is a deeply technical guy,
+
+23
+00:01:21.740 --> 00:01:24.800
+<v Noah Labhart>which means his hobbies have been related to tech since the early days.
+
+24
+00:01:25.460 --> 00:01:29.860
+<v Noah Labhart>He's a PhD in computer science and has always been interested in building things.
+
+25
+00:01:30.040 --> 00:01:33.980
+<v Noah Labhart>In fact, in his words, he's been building drones since back before they were cool.
+
+26
+00:01:34.320 --> 00:01:36.700
+<v Noah Labhart>Overall, he likes to figure out how things work.
+
+27
+00:01:37.000 --> 00:01:42.140
+<v Noah Labhart>But outside of tech, he's a family man and makes sure that his kids have all kinds of STEM tools.
+
+28
+00:01:43.900 --> 00:01:50.700
+<v Noah Labhart>After spending decades in the enterprise data space, Max experienced firsthand the struggles around data anomaly detection.
+
+29
+00:01:50.700 --> 00:02:00.240
+<v Noah Labhart>He constantly lived in escalation mode and saw firsthand that traditional rules and static dashboard-based solutions were failing today's data needs.
+
+30
+00:02:01.280 --> 00:02:04.060
+<v Noah Labhart>He set out to be part of the solution.
+
+31
+00:02:05.520 --> 00:02:08.120
+<v Noah Labhart>This is the creation story of Telmai.
+
+32
+00:02:12.580 --> 00:02:15.800
+<v Max Lukichev>Telmai is a data monitoring platform.
+
+33
+00:02:15.800 --> 00:02:25.880
+<v Max Lukichev>What it means is it can monitor data anywhere in the pipeline, left side of the pipeline or the delivery, the right side of the pipeline.
+
+34
+00:02:26.120 --> 00:02:30.640
+<v Max Lukichev>It can connect to anything, databases, data warehouses, even streams of data.
+
+35
+00:02:30.860 --> 00:02:43.700
+<v Max Lukichev>And it not only focuses on the high-level signals, the pipeline operation, that would be the volume of the data delivered, the timeliness of the data, the schema, and any problems with that.
+
+36
+00:02:43.700 --> 00:02:46.840
+<v Max Lukichev>But it also looks deep into the quality of the data.
+
+37
+00:02:47.000 --> 00:02:51.420
+<v Max Lukichev>How accurate are the values in the received data, in the received records?
+
+38
+00:02:51.620 --> 00:02:53.320
+<v Max Lukichev>Are they valid? Are they fresh?
+
+39
+00:02:53.920 --> 00:02:56.740
+<v Max Lukichev>Monitoring all of those aspects, you know, distribution streets.
+
+40
+00:02:57.580 --> 00:03:02.160
+<v Max Lukichev>You know, classically, data quality was approached through rigid rules.
+
+41
+00:03:02.440 --> 00:03:06.500
+<v Max Lukichev>You know, people were setting up rules or expectations about the data.
+
+42
+00:03:06.580 --> 00:03:11.300
+<v Max Lukichev>But as we go in the scale and the number of data sources, amount of data itself,
+
+43
+00:03:11.600 --> 00:03:13.380
+<v Max Lukichev>this becomes non-scalable, right?
+
+44
+00:03:13.700 --> 00:03:30.360
+<v Max Lukichev>We really focus on making possible to detect problems in the data without relying on the rules only, yet allowing users to provide their definitions of expectations, but trying to automate as much as possible.
+
+45
+00:03:32.040 --> 00:03:40.380
+<v Noah Labhart>Tell me about the MVP, Max. So that first product you built, how long did it take you to build and what sort of tools did you use to bring it to life?
+
+46
+00:03:41.960 --> 00:03:48.920
+<v Max Lukichev>This is actually very funny. The very first MVP was assembled really without a lot of technology.
+
+47
+00:03:49.500 --> 00:03:54.980
+<v Max Lukichev>So what we, from the very early days, I realized, okay, I had experience in my previous companies
+
+48
+00:03:54.980 --> 00:03:59.160
+<v Max Lukichev>working with different clouds. All we are building is, it's a cloud software, right?
+
+49
+00:03:59.540 --> 00:04:05.300
+<v Max Lukichev>And I had experience working with Google, with Amazon, and I really like the offerings from the
+
+50
+00:04:05.300 --> 00:04:10.040
+<v Max Lukichev>the GCP from Google because of the ease of assembling stuff quickly.
+
+51
+00:04:10.280 --> 00:04:14.160
+<v Max Lukichev>You know, great products, BigQuery, Dataproc, Dataflow.
+
+52
+00:04:14.740 --> 00:04:20.280
+<v Max Lukichev>Our first MVP, you know, we chose to start working, building on the Google platform because
+
+53
+00:04:20.280 --> 00:04:24.000
+<v Max Lukichev>of, again, out-of-the-box tools and systems available.
+
+54
+00:04:24.620 --> 00:04:26.420
+<v Max Lukichev>So we built it very simple.
+
+55
+00:04:26.520 --> 00:04:32.120
+<v Max Lukichev>We built a very simple pipeline with Dataflow, delivering data in the BigQuery, and visualizing
+
+56
+00:04:32.120 --> 00:04:33.960
+<v Max Lukichev>this on top of the BigQuery using Data Studio.
+
+57
+00:04:35.300 --> 00:04:41.080
+<v Max Lukichev>call it a product. It was a solution built from the kind of Lego box, trying to combine those
+
+58
+00:04:41.080 --> 00:04:47.200
+<v Max Lukichev>three tools together. But it worked tremendously well at scale. It was fast enough. And we started
+
+59
+00:04:47.200 --> 00:04:53.800
+<v Max Lukichev>showing the idea of what Telmai is to our customers, just to get the feedback, to understand
+
+60
+00:04:53.800 --> 00:04:59.480
+<v Max Lukichev>what the customers need, to show them how much garbage is in their data. It was always eye
+
+61
+00:04:59.480 --> 00:05:05.520
+<v Max Lukichev>eye-opening. People think, well, I may be doing okay. I haven't had a data monitoring software
+
+62
+00:05:05.520 --> 00:05:09.420
+<v Max Lukichev>before until they see how much actually garbage there, how much impact it actually does.
+
+63
+00:05:10.200 --> 00:05:16.540
+<v Max Lukichev>This was very helpful. So the MVP wasn't actually, it wasn't even the monitoring system in that
+
+64
+00:05:16.540 --> 00:05:23.020
+<v Max Lukichev>sense. It was just a collection of dashboards and analytical engine inside, which allowed us to
+
+65
+00:05:23.020 --> 00:05:27.060
+<v Max Lukichev>start just explaining the concept. And then we started building the actual proper product.
+
+66
+00:05:28.020 --> 00:05:34.260
+<v Noah Labhart>that's interesting so with that portion of the product which was just you know analytics and
+
+67
+00:05:34.260 --> 00:05:41.400
+<v Noah Labhart>dashboards and illustrating the point of the data how did you come about making that decision and
+
+68
+00:05:41.400 --> 00:05:46.440
+<v Noah Labhart>i'm curious kind of i'll ask that in more of a broader way tell me about decisions and trade-offs
+
+69
+00:05:46.440 --> 00:05:51.960
+<v Noah Labhart>you had to make in more detail of that one or other ones and how you coped with those decisions
+
+70
+00:05:53.240 --> 00:05:59.780
+<v Max Lukichev>We just philosophically decided to kind of abstract from what everyone else is doing
+
+71
+00:06:00.740 --> 00:06:03.320
+<v Max Lukichev>and follow what our customers want.
+
+72
+00:06:03.460 --> 00:06:05.780
+<v Max Lukichev>Being in the listen mode for as long as possible,
+
+73
+00:06:05.860 --> 00:06:10.540
+<v Max Lukichev>trying to capture that pattern of what's common between the customers.
+
+74
+00:06:10.800 --> 00:06:11.960
+<v Max Lukichev>And that's what we did, basically.
+
+75
+00:06:12.400 --> 00:06:17.200
+<v Max Lukichev>Having these dashboards in hand, it was just an opportunity to be in the conversation.
+
+76
+00:06:17.200 --> 00:06:22.720
+<v Max Lukichev>and we started capturing, okay, they talk about being overwhelmed with number of dashboards.
+
+77
+00:06:22.880 --> 00:06:24.140
+<v Max Lukichev>Okay, it has to be proactive.
+
+78
+00:06:24.380 --> 00:06:26.560
+<v Max Lukichev>It has to be monitoring system, which alerts early.
+
+79
+00:06:26.880 --> 00:06:34.060
+<v Max Lukichev>They talked about providing the manual feedback, the rules versus fully automatic detection of the problems.
+
+80
+00:06:34.220 --> 00:06:34.720
+<v Max Lukichev>Okay, great.
+
+81
+00:06:34.800 --> 00:06:40.820
+<v Max Lukichev>Give this idea what is the workflow there, where artificial intelligence should help,
+
+82
+00:06:40.960 --> 00:06:44.800
+<v Max Lukichev>where the rules should excel, and so on.
+
+83
+00:06:44.800 --> 00:06:54.220
+<v Max Lukichev>One thing which we had in mind right up front and which wasn't up to debate is being in the cloud and scalable for any volume of data.
+
+84
+00:06:54.420 --> 00:06:55.900
+<v Max Lukichev>We defaulted from the very beginning.
+
+85
+00:06:55.980 --> 00:06:57.400
+<v Max Lukichev>We are not going to do sampling.
+
+86
+00:06:57.680 --> 00:07:02.680
+<v Max Lukichev>It should be a self-service tool which doesn't require heavy configuration, right?
+
+87
+00:07:03.340 --> 00:07:05.340
+<v Max Lukichev>These were kind of the foundation.
+
+88
+00:07:05.560 --> 00:07:10.620
+<v Max Lukichev>And then back on top of that, we started just listening for customers hearing their feedback.
+
+89
+00:07:10.720 --> 00:07:12.580
+<v Max Lukichev>You know, what makes sense, what doesn't.
+
+90
+00:07:12.580 --> 00:07:15.420
+<v Max Lukichev>and just started translating into the product.
+
+91
+00:07:17.480 --> 00:07:18.900
+<v Noah Labhart>So you're at that point,
+
+92
+00:07:18.960 --> 00:07:22.120
+<v Noah Labhart>you've built the dashboards collecting the analytics
+
+93
+00:07:22.120 --> 00:07:25.180
+<v Noah Labhart>to tell the potential customers
+
+94
+00:07:25.180 --> 00:07:27.320
+<v Noah Labhart>the garbage they have in their system, right?
+
+95
+00:07:27.560 --> 00:07:29.520
+<v Noah Labhart>How did you progress the product from there?
+
+96
+00:07:29.620 --> 00:07:30.640
+<v Noah Labhart>How did you mature it?
+
+97
+00:07:30.720 --> 00:07:32.180
+<v Noah Labhart>What else did you build?
+
+98
+00:07:32.340 --> 00:07:34.880
+<v Noah Labhart>And I'm curious, to wrap that in a box a little bit,
+
+99
+00:07:35.040 --> 00:07:36.760
+<v Noah Labhart>I'm curious how you built your roadmap
+
+100
+00:07:36.760 --> 00:07:39.260
+<v Noah Labhart>and how you decided, how you went about deciding,
+
+101
+00:07:39.560 --> 00:07:42.180
+<v Noah Labhart>okay, this is the next most important thing to build.
+
+102
+00:07:42.880 --> 00:07:47.560
+<v Max Lukichev>we kind of gauged what customers are more excited about.
+
+103
+00:07:47.880 --> 00:07:51.000
+<v Max Lukichev>And that part was really this continuous monitoring.
+
+104
+00:07:51.500 --> 00:07:53.460
+<v Max Lukichev>It was our hypothesis initially.
+
+105
+00:07:53.600 --> 00:07:55.480
+<v Max Lukichev>We knew that we are building the monitoring system,
+
+106
+00:07:55.660 --> 00:07:58.840
+<v Max Lukichev>but we needed a strong validation of that.
+
+107
+00:07:59.180 --> 00:08:01.280
+<v Max Lukichev>And once we got this strong validation,
+
+108
+00:08:01.860 --> 00:08:04.520
+<v Max Lukichev>we just went full throttle building.
+
+109
+00:08:05.160 --> 00:08:06.940
+<v Max Lukichev>If you're building the monitoring system,
+
+110
+00:08:07.080 --> 00:08:09.100
+<v Max Lukichev>the dashboard is not going to be sufficient.
+
+111
+00:08:09.420 --> 00:08:12.080
+<v Max Lukichev>It has to be a system with a rich analytics,
+
+112
+00:08:12.580 --> 00:08:14.380
+<v Max Lukichev>which runs on the backend and generates alerts
+
+113
+00:08:14.380 --> 00:08:17.960
+<v Max Lukichev>and presents the findings to the user
+
+114
+00:08:17.960 --> 00:08:19.900
+<v Max Lukichev>in a nice, understandable manner.
+
+115
+00:08:20.280 --> 00:08:23.120
+<v Max Lukichev>So at that point, we realized, okay, the dashboard,
+
+116
+00:08:23.440 --> 00:08:27.020
+<v Max Lukichev>our initial approach with this rigid Data Studio dashboards,
+
+117
+00:08:27.240 --> 00:08:29.820
+<v Max Lukichev>which was really a hack, is not going to make it.
+
+118
+00:08:29.860 --> 00:08:32.380
+<v Max Lukichev>So we will start building the proper UI using React
+
+119
+00:08:32.380 --> 00:08:35.560
+<v Max Lukichev>and all the modern software to make a nice experience.
+
+120
+00:08:35.960 --> 00:08:38.460
+<v Max Lukichev>The user experience, it was another thing.
+
+121
+00:08:38.640 --> 00:08:39.640
+<v Max Lukichev>Through these conversations,
+
+122
+00:08:39.860 --> 00:08:41.760
+<v Max Lukichev>we found that user experience is crucial.
+
+123
+00:08:42.580 --> 00:08:44.840
+<v Max Lukichev>which helps people finding problems in the data.
+
+124
+00:08:44.960 --> 00:08:47.740
+<v Max Lukichev>It should be fast, easy to understand, easy to use,
+
+125
+00:08:47.860 --> 00:08:52.280
+<v Max Lukichev>and present a lot of evidence in a very consumable package.
+
+126
+00:08:54.640 --> 00:08:56.520
+<v Noah Labhart>Okay, let's switch to team then.
+
+127
+00:08:56.640 --> 00:08:58.480
+<v Noah Labhart>So how did you go about building your team?
+
+128
+00:08:58.660 --> 00:09:00.440
+<v Noah Labhart>And what did you look for in those people
+
+129
+00:09:00.440 --> 00:09:03.200
+<v Noah Labhart>to indicate that they are the winning horses to join you?
+
+130
+00:09:04.000 --> 00:09:05.940
+<v Max Lukichev>Apart from the product, if you ask me,
+
+131
+00:09:05.960 --> 00:09:08.700
+<v Max Lukichev>what I'm the most proud of is really the team.
+
+132
+00:09:09.400 --> 00:09:12.100
+<v Max Lukichev>We started going through our network.
+
+133
+00:09:12.580 --> 00:09:18.800
+<v Max Lukichev>team of people who would want to join us on this journey, fun experience in the startup and so on.
+
+134
+00:09:18.840 --> 00:09:23.660
+<v Max Lukichev>So yeah, we had a lot of friends helping us basically. But then we started growing and
+
+135
+00:09:23.660 --> 00:09:29.740
+<v Max Lukichev>starting hiring from outside. But still, a lot of those are either personal network or references
+
+136
+00:09:29.740 --> 00:09:36.840
+<v Max Lukichev>from the personal network. What I'm looking when building the team is really that ability to
+
+137
+00:09:36.840 --> 00:09:39.620
+<v Max Lukichev>to wear multiple hats and be an owner.
+
+138
+00:09:40.020 --> 00:09:42.000
+<v Max Lukichev>This is the most critical part.
+
+139
+00:09:42.880 --> 00:09:44.520
+<v Max Lukichev>People who have the drive,
+
+140
+00:09:45.080 --> 00:09:47.620
+<v Max Lukichev>who don't want to work on a task,
+
+141
+00:09:47.760 --> 00:09:50.240
+<v Max Lukichev>but rather own the problem, solve the problem.
+
+142
+00:09:50.460 --> 00:09:51.720
+<v Max Lukichev>This, you know, curiosity,
+
+143
+00:09:51.920 --> 00:09:54.520
+<v Max Lukichev>that's what really make a great startup person.
+
+144
+00:09:58.840 --> 00:10:00.940
+<v Noah Labhart>Okay, let's switch to scalability.
+
+145
+00:10:01.300 --> 00:10:03.800
+<v Noah Labhart>You know, given your answers to the previous questions,
+
+146
+00:10:03.980 --> 00:10:06.040
+<v Noah Labhart>I could guess where you're going to go here,
+
+147
+00:10:06.840 --> 00:10:12.140
+<v Noah Labhart>going to ask it generically. Was this built to scale efficiently from day one, or are you fighting
+
+148
+00:10:12.140 --> 00:10:13.840
+<v Noah Labhart>this as you grow and gain traction?
+
+149
+00:10:14.220 --> 00:10:18.060
+<v Max Lukichev>No, actually from the day one, from the very first prototype,
+
+150
+00:10:18.260 --> 00:10:24.440
+<v Max Lukichev>it was all built on the scalable technologies. We use Spark, we use auto-scaling policies and
+
+151
+00:10:24.440 --> 00:10:29.980
+<v Max Lukichev>everything. So it wasn't a non-negotiable thing, primarily because of my prior experience.
+
+152
+00:10:29.980 --> 00:10:34.880
+<v Max Lukichev>I saw that work at scale and I knew where we are heading.
+
+153
+00:10:35.060 --> 00:10:40.820
+<v Max Lukichev>So there was no point to build something simple to just struggle later on.
+
+154
+00:10:40.940 --> 00:10:42.200
+<v Max Lukichev>And it helped us tremendously.
+
+155
+00:10:42.460 --> 00:10:46.400
+<v Max Lukichev>You know, the very first prototype, the real POC went engaged.
+
+156
+00:10:46.620 --> 00:10:47.340
+<v Max Lukichev>Guess what?
+
+157
+00:10:47.480 --> 00:10:50.540
+<v Max Lukichev>The requirement was, oh, can you monitor this table?
+
+158
+00:10:50.640 --> 00:10:53.980
+<v Max Lukichev>It has 100 million records and 8,000 attributes.
+
+159
+00:10:54.580 --> 00:10:55.280
+<v Max Lukichev>All in JSON.
+
+160
+00:10:56.080 --> 00:10:58.460
+<v Max Lukichev>I'm like, okay, that was a good choice.
+
+161
+00:10:59.980 --> 00:11:05.240
+<v Max Lukichev>to us because it was the first real stress test of the system it worked this gave us a lot of
+
+162
+00:11:05.240 --> 00:11:10.260
+<v Max Lukichev>confidence in all of the decisions we made up front because as a startup founder you you always
+
+163
+00:11:10.260 --> 00:11:16.540
+<v Max Lukichev>start debating like i have this budget i have this always lack of money should i go for something
+
+164
+00:11:16.540 --> 00:11:24.660
+<v Max Lukichev>super simple just to you know show an idea or should i like invest more and do it a proper way
+
+165
+00:11:24.660 --> 00:11:26.280
+<v Max Lukichev>And there is no right answer.
+
+166
+00:11:26.360 --> 00:11:29.340
+<v Max Lukichev>You have to follow your gut feel,
+
+167
+00:11:29.400 --> 00:11:31.420
+<v Max Lukichev>like depending on the industry you're in,
+
+168
+00:11:31.500 --> 00:11:33.360
+<v Max Lukichev>depending on the type of use case you will be solving,
+
+169
+00:11:34.040 --> 00:11:36.740
+<v Max Lukichev>one or another way will work.
+
+170
+00:11:36.900 --> 00:11:39.160
+<v Max Lukichev>Or sometimes you can save something on the UI,
+
+171
+00:11:39.580 --> 00:11:41.560
+<v Max Lukichev>you know, shortcut it on the UI,
+
+172
+00:11:41.760 --> 00:11:45.000
+<v Max Lukichev>but on the backend, you have to have the right stuff
+
+173
+00:11:45.000 --> 00:11:46.840
+<v Max Lukichev>from the day one.
+
+174
+00:11:47.400 --> 00:11:49.420
+<v Max Lukichev>Again, there is no universal advice here.
+
+175
+00:11:49.540 --> 00:11:51.280
+<v Max Lukichev>It's like, as a startup founder,
+
+176
+00:11:51.440 --> 00:11:53.240
+<v Max Lukichev>this is the hard question you have to figure out.
+
+177
+00:11:55.360 --> 00:12:01.620
+<v Noah Labhart>Okay, well, Max, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+178
+00:12:02.800 --> 00:12:16.280
+<v Max Lukichev>One thing would be the product that being such an early stage startup, we were able to build technology, which does scale so well and is able to really bring value to our customers.
+
+179
+00:12:16.280 --> 00:12:22.320
+<v Max Lukichev>or something that like this wow effect when I when I'm on the conversation with our users and I hear
+
+180
+00:12:22.320 --> 00:12:29.120
+<v Max Lukichev>like wow this is so helpful it gives me so much power to do my job this is like the great feeling
+
+181
+00:12:29.120 --> 00:12:33.460
+<v Max Lukichev>but this is just one part of the story second one is really building that you know amazing group of
+
+182
+00:12:33.460 --> 00:12:40.200
+<v Max Lukichev>people who are it's a small company it's a small group of people but motivated excited eager and
+
+183
+00:12:40.200 --> 00:12:44.880
+<v Max Lukichev>curious people to to solve this problem that that's another thing like product and people
+
+184
+00:12:46.680 --> 00:12:50.940
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you
+
+185
+00:12:50.940 --> 00:12:52.600
+<v Noah Labhart>and your team responded to it.
+
+186
+00:12:53.220 --> 00:12:55.980
+<v Max Lukichev>When you have early conversations with your
+
+187
+00:12:55.980 --> 00:13:02.320
+<v Max Lukichev>customers and potential customers and you feel they're excited and they try to
+
+188
+00:13:02.320 --> 00:13:07.400
+<v Max Lukichev>move you to one way you are like yeah I will follow I will just build something
+
+189
+00:13:07.400 --> 00:13:13.440
+<v Max Lukichev>for them so I could sell it faster I you know that's a done deal but sometimes
+
+190
+00:13:13.440 --> 00:13:21.000
+<v Max Lukichev>it's not and we did some missteps there we built something that wasn't necessary so i won't say it
+
+191
+00:13:21.000 --> 00:13:30.820
+<v Max Lukichev>was a total waste of of time but we could have been more broad in the approach of of the problem
+
+192
+00:13:30.820 --> 00:13:37.880
+<v Max Lukichev>like analyzing more customers rather than going deeper too soon probably the biggest mistake is
+
+193
+00:13:37.880 --> 00:13:44.880
+<v Max Lukichev>building stuff too early until you have a very solid validation that's gonna sell so we recover
+
+194
+00:13:44.880 --> 00:13:50.000
+<v Max Lukichev>from that very quickly we realize that we are going a little bit too deep for one customer who
+
+195
+00:13:50.000 --> 00:13:57.780
+<v Max Lukichev>even didn't convert so it wasn't a lot of harm done but this is one thing if you ask for advice
+
+196
+00:13:57.780 --> 00:14:02.840
+<v Max Lukichev>to other founders just be super careful about it like don't be misguided by the false signals
+
+197
+00:14:02.840 --> 00:14:08.740
+<v Max Lukichev>signals right sometimes you have to be just pause for a second and ask yourself a question is it
+
+198
+00:14:08.740 --> 00:14:15.200
+<v Max Lukichev>really that generally applicable to everyone to everyone whom you're trying to solve be hard on
+
+199
+00:14:15.200 --> 00:14:20.880
+<v Max Lukichev>yourself trying to you know really be the devil's advocate here like should i go there is it too
+
+200
+00:14:20.880 --> 00:14:26.120
+<v Max Lukichev>early to go there you don't have a lot of signals yet you have to do something you have to move fast
+
+201
+00:14:26.120 --> 00:14:31.060
+<v Max Lukichev>right and like in the lack of signals you will make a mistake like take it as a granted you will
+
+202
+00:14:32.840 --> 00:14:35.100
+<v Max Lukichev>is to figure it out early.
+
+203
+00:14:35.320 --> 00:14:37.040
+<v Max Lukichev>Are you going the right path?
+
+204
+00:14:37.180 --> 00:14:39.500
+<v Max Lukichev>And if you are not, just change it, change the course.
+
+205
+00:14:42.040 --> 00:14:44.280
+<v Noah Labhart>What does the future look like for Telmai,
+
+206
+00:14:44.400 --> 00:14:45.560
+<v Noah Labhart>the product, and for your team?
+
+207
+00:14:47.400 --> 00:14:49.820
+<v Max Lukichev>We are on a good track right now.
+
+208
+00:14:49.940 --> 00:14:53.780
+<v Max Lukichev>We have very exciting customers with great use cases
+
+209
+00:14:53.780 --> 00:14:56.420
+<v Max Lukichev>and a lot of interest from the industry,
+
+210
+00:14:57.040 --> 00:14:59.940
+<v Max Lukichev>from the type of the customers we are working with.
+
+211
+00:15:00.040 --> 00:15:00.780
+<v Max Lukichev>It's all enterprise.
+
+212
+00:15:00.780 --> 00:15:06.620
+<v Max Lukichev>price, what interesting problems they're trying to solve, but basically being a solution to their
+
+213
+00:15:06.620 --> 00:15:14.260
+<v Max Lukichev>data quality problems. Really, our goal is to reduce their impact of the bad data, right?
+
+214
+00:15:14.960 --> 00:15:16.680
+<v Max Lukichev>Make their life happier with that.
+
+215
+00:15:19.560 --> 00:15:24.760
+<v Noah Labhart>Okay, let's switch to you, Max. Who influences the way that you work? Name a person you look up to,
+
+216
+00:15:24.880 --> 00:15:27.420
+<v Noah Labhart>or many persons, or something you look up to, and why?
+
+217
+00:15:28.380 --> 00:15:34.400
+<v Max Lukichev>I was, again, lucky to work with a lot of great people through my career.
+
+218
+00:15:35.520 --> 00:15:40.180
+<v Max Lukichev>One of the biggest influences was probably when I joined Veeva.
+
+219
+00:15:40.880 --> 00:15:45.280
+<v Max Lukichev>You know, one phrase which stuck up in my mind is,
+
+220
+00:15:45.500 --> 00:15:46.960
+<v Max Lukichev>persistence will pay off.
+
+221
+00:15:47.180 --> 00:15:51.700
+<v Max Lukichev>This was a phrase printed on a water cooler in the office.
+
+222
+00:15:52.240 --> 00:15:55.240
+<v Max Lukichev>It helps me keep going, really, right?
+
+223
+00:15:55.240 --> 00:15:59.400
+<v Max Lukichev>In the life of a startup, it's basically a roller coaster.
+
+224
+00:15:59.960 --> 00:16:02.020
+<v Max Lukichev>There's ups and downs all the time.
+
+225
+00:16:02.500 --> 00:16:04.420
+<v Max Lukichev>Today you have a good day, tomorrow it's horrible.
+
+226
+00:16:05.320 --> 00:16:10.520
+<v Max Lukichev>If you just focus on what you're doing, you have a goal in your mind.
+
+227
+00:16:11.240 --> 00:16:13.420
+<v Max Lukichev>For example, for me, I'm doing it for my customers.
+
+228
+00:16:13.780 --> 00:16:21.940
+<v Max Lukichev>I want them to have the best experience to solve the hard problems they face every day.
+
+229
+00:16:22.100 --> 00:16:23.100
+<v Max Lukichev>And this is my goal.
+
+230
+00:16:23.280 --> 00:16:24.340
+<v Max Lukichev>So I just stick to that.
+
+231
+00:16:25.280 --> 00:16:28.320
+<v Max Lukichev>how bad day today is or how good day today is.
+
+232
+00:16:28.680 --> 00:16:32.420
+<v Max Lukichev>I'm just keep doing what I'm supposed to be doing for that goal.
+
+233
+00:16:33.240 --> 00:16:37.120
+<v Max Lukichev>In the end, all the success was because of that formula.
+
+234
+00:16:37.260 --> 00:16:39.140
+<v Max Lukichev>Just keep doing what you believe in.
+
+235
+00:16:41.060 --> 00:16:45.180
+<v Noah Labhart>So we talked about a mistake earlier, but this is a little different spin.
+
+236
+00:16:45.420 --> 00:16:47.840
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+237
+00:16:47.940 --> 00:16:50.360
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+238
+00:16:50.680 --> 00:16:51.180
+<v Noah Labhart>For
+
+239
+00:16:51.000 --> 00:16:53.520
+<v Max Lukichev>the startup, it's very important when to accelerate.
+
+240
+00:16:55.240 --> 00:17:00.560
+<v Max Lukichev>if you do it too early and it's bad if you do it too late. So finding that right balance, just be
+
+241
+00:17:00.560 --> 00:17:05.860
+<v Max Lukichev>always on the lookout, get all the signals possible. Is it the right time to start building?
+
+242
+00:17:06.020 --> 00:17:10.160
+<v Max Lukichev>In my case, I did some mistakes in the very beginning. I started building a little bit too
+
+243
+00:17:10.160 --> 00:17:17.260
+<v Max Lukichev>early. I recovered from that. I realized that it was the case. So no harm was done. But I see this
+
+244
+00:17:17.260 --> 00:17:21.940
+<v Max Lukichev>all the time. This is probably the most common mistakes startup people do. They start pumping
+
+245
+00:17:21.940 --> 00:17:28.540
+<v Max Lukichev>pumping money into stuff too early when there is no solid signal or solid validation of the idea
+
+246
+00:17:28.540 --> 00:17:33.560
+<v Max Lukichev>yet. I mean, not the idea in general, but the features that has to be built.
+
+247
+00:17:35.600 --> 00:17:39.720
+<v Noah Labhart>Okay, Max, last question. So you're getting on a plane and you're sitting next to a young
+
+248
+00:17:39.720 --> 00:17:43.580
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+249
+00:17:43.580 --> 00:17:46.460
+<v Noah Labhart>show it off to the world and can't wait to show it off to you right there on the plane.
+
+250
+00:17:46.920 --> 00:17:51.040
+<v Noah Labhart>What advice do you give that person having gone down this road a bit several times?
+
+251
+00:17:51.940 --> 00:17:52.720
+<v Max Lukichev>Believe in what you do.
+
+252
+00:17:52.960 --> 00:17:54.120
+<v Max Lukichev>Believe in your team.
+
+253
+00:17:54.420 --> 00:17:55.400
+<v Max Lukichev>Support each other.
+
+254
+00:17:55.520 --> 00:17:56.460
+<v Max Lukichev>And don't give up.
+
+255
+00:17:56.880 --> 00:18:04.060
+<v Max Lukichev>There will be people who will tell you this is a total bad idea or it's not worth anything.
+
+256
+00:18:04.420 --> 00:18:07.300
+<v Max Lukichev>But if you believe in it, if you have a vision, stick to that.
+
+257
+00:18:07.380 --> 00:18:09.980
+<v Max Lukichev>Just against all the odds, keep doing.
+
+258
+00:18:10.640 --> 00:18:16.160
+<v Max Lukichev>There's only one person or a couple of people, just the founders sometimes, who know what they're doing.
+
+259
+00:18:16.200 --> 00:18:17.880
+<v Max Lukichev>No one else knows better what they're doing.
+
+260
+00:18:18.680 --> 00:18:19.580
+<v Noah Labhart>That's great advice.
+
+261
+00:18:19.580 --> 00:18:22.540
+<v Noah Labhart>Well, Max, thank you for being on the show today.
+
+262
+00:18:22.600 --> 00:18:25.340
+<v Noah Labhart>And thank you for telling the creation story of Telmai.
+
+263
+00:18:25.400 --> 00:18:25.900
+<v Noah Labhart>Thank
+
+264
+00:18:25.500 --> 00:18:26.120
+<v Max Lukichev>you so much.
+
+265
+00:18:26.160 --> 00:18:26.720
+<v Max Lukichev>Glad to be here.
+
+266
+00:18:29.200 --> 00:18:32.100
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+267
+00:18:35.020 --> 00:18:37.960
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+268
+00:18:38.160 --> 00:18:42.940
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+269
+00:18:43.540 --> 00:18:45.760
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+270
+00:18:46.080 --> 00:18:47.960
+<v Noah Labhart>Both things help us out tremendously.
+
+271
+00:18:50.420 --> 00:18:51.860
+<v Noah Labhart>and thanks again for listening.

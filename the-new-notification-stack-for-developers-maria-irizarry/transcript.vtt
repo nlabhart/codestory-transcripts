@@ -1,0 +1,1063 @@
+WEBVTT
+
+NOTE The New Notification Stack for Developers - Maria Irizarry
+
+1
+00:00:02.160 --> 00:00:27.340
+<v Noah Labhart>Welcome back, listeners. Today we are continuing our series entitled The New Notification Stack for Developers, brought to you by our longtime friends and sponsors of the Code Story podcast, Courier. As a reminder, Courier is developer infrastructure for product notifications, making it easier to deliver the notification experience that your customers expect. Check out their product to learn more at courier.com.
+
+2
+00:00:27.940 --> 00:00:33.340
+<v Noah Labhart>Well, today I have a special guest on the Code Story podcast, Maria Irizarry.
+
+3
+00:00:33.580 --> 00:00:41.560
+<v Noah Labhart>She is a technical lead manager at Courier, has spent many, many years in software, spending time at Level, Google, and Cisco.
+
+4
+00:00:41.680 --> 00:00:43.540
+<v Noah Labhart>Maria, thank you for being on the show today.
+
+5
+00:00:43.760 --> 00:00:46.340
+<v Maria Irizarry>Of course, I'm super happy to be here.
+
+6
+00:00:46.580 --> 00:00:52.900
+<v Noah Labhart>Before we jump into our topic for today, tell me and my audience a little bit more about you.
+
+7
+00:00:53.140 --> 00:00:53.640
+<v Noah Labhart>Well,
+
+8
+00:00:53.720 --> 00:00:56.000
+<v Maria Irizarry>this is my first time being on a podcast.
+
+9
+00:00:57.340 --> 00:01:03.560
+<v Maria Irizarry>definitely super excited. I have quite a bit of years under my belt in the software engineering
+
+10
+00:01:03.560 --> 00:01:10.540
+<v Maria Irizarry>industry. Had a chance to work on consumer facing products for a while now, at least like six,
+
+11
+00:01:10.660 --> 00:01:19.080
+<v Maria Irizarry>seven years. And I'm super passionate about it. As a developer, you know, I've had my own
+
+12
+00:01:19.080 --> 00:01:28.800
+<v Maria Irizarry>fair share of journeys with notifications and kind of honestly the pain that it was to build them.
+
+13
+00:01:28.980 --> 00:01:34.380
+<v Maria Irizarry>A little bit more about that. Like I worked at Google, worked at Google Home. We're building
+
+14
+00:01:34.380 --> 00:01:39.660
+<v Maria Irizarry>out notifications for the Home app there. It kind of just feels like full circle now. I'm here at
+
+15
+00:01:39.660 --> 00:01:46.060
+<v Maria Irizarry>Courier. I've been at Courier for eight months now and it feels like the time has flown by and I'm
+
+16
+00:01:46.060 --> 00:01:51.940
+<v Maria Irizarry>super excited to be stepping into not only the consumer facing product, but the developer persona
+
+17
+00:01:51.940 --> 00:01:59.420
+<v Maria Irizarry>and thinking back to my experience of, oh man, what do I wish I would have had or what would
+
+18
+00:01:59.420 --> 00:02:05.180
+<v Maria Irizarry>have been easier for me if I could have? And I get to execute on that. So that's really exciting.
+
+19
+00:02:05.340 --> 00:02:12.820
+<v Maria Irizarry>And personally, yeah, I've been living in the Bay Area for almost 10 years now. I am completely
+
+20
+00:02:12.820 --> 00:02:20.020
+<v Maria Irizarry>just utterly in love with birds. Kind of a funny coincidence that Courier's logo is a pigeon.
+
+21
+00:02:20.380 --> 00:02:28.520
+<v Maria Irizarry>So I feel like Courier picked me. And I have two parrots and they're super adorable and they're
+
+22
+00:02:28.520 --> 00:02:29.760
+<v Maria Irizarry>like my little children.
+
+23
+00:02:30.360 --> 00:02:34.180
+<v Noah Labhart>That's amazing. Okay. Well, you mentioned your personal experiences,
+
+24
+00:02:34.340 --> 00:02:39.960
+<v Noah Labhart>Google, and I know you've spent time at Level and Cisco too. In personal experience with building
+
+25
+00:02:39.960 --> 00:02:45.920
+<v Noah Labhart>notifications as a developer. Tell me more about that. Tell me about some of those experiences
+
+26
+00:02:45.920 --> 00:02:49.580
+<v Noah Labhart>around, you know, building notifications and preferences. You
+
+27
+00:02:49.580 --> 00:02:50.780
+<v Maria Irizarry>know, you have a lot of activity
+
+28
+00:02:50.780 --> 00:02:56.520
+<v Maria Irizarry>happening with your smart home devices. And if you have a family, people are joining your household,
+
+29
+00:02:56.720 --> 00:03:02.940
+<v Maria Irizarry>leaving it. And it was very important for us to build out a system that could let users know
+
+30
+00:03:02.940 --> 00:03:08.680
+<v Maria Irizarry>what's going on in their home. The home app didn't actually have any sort of like infrastructure
+
+31
+00:03:09.960 --> 00:03:17.320
+<v Maria Irizarry>send out push notifications. I believe we had a very early iteration of emails, but I believe the
+
+32
+00:03:17.320 --> 00:03:24.140
+<v Maria Irizarry>infrastructure at that point was pretty outdated. Google's this like very nice and giant company,
+
+33
+00:03:24.260 --> 00:03:30.160
+<v Maria Irizarry>right? They have all the nice infrastructure, shiny things, resources. So put yourself in that
+
+34
+00:03:30.160 --> 00:03:35.740
+<v Maria Irizarry>context. Like you have probably the best of the best because they know what they're doing in terms
+
+35
+00:03:35.740 --> 00:03:38.640
+<v Maria Irizarry>So like involving that with their environment and their tools.
+
+36
+00:03:38.760 --> 00:03:42.040
+<v Maria Irizarry>And they had an internal infrastructure for notifications.
+
+37
+00:03:42.540 --> 00:03:51.160
+<v Maria Irizarry>And what I'll say about that is, so it was more like a backend API, actually kind of similar to Courier's.
+
+38
+00:03:51.300 --> 00:03:59.460
+<v Maria Irizarry>But a key difference is that that project actually took around a quarter to build with two or three engineers.
+
+39
+00:03:59.460 --> 00:04:10.400
+<v Maria Irizarry>And part of that was not only making sure the notifications are being sent at the right time, but what do those notifications look like?
+
+40
+00:04:10.500 --> 00:04:13.180
+<v Maria Irizarry>What if the user no longer wants to receive that notification?
+
+41
+00:04:14.080 --> 00:04:20.940
+<v Maria Irizarry>The actual infrastructure that we were connecting with didn't really have what we needed in terms of preferences management.
+
+42
+00:04:20.940 --> 00:04:27.380
+<v Maria Irizarry>management. So we had to build our own, like plan out and build our own preferences, let's say
+
+43
+00:04:27.380 --> 00:04:33.840
+<v Maria Irizarry>database and thing and like, okay, well, what are we, how do we map a notification to preferences?
+
+44
+00:04:34.120 --> 00:04:38.620
+<v Maria Irizarry>And then like, do we really want to have a preference for every single kind of notification
+
+45
+00:04:38.620 --> 00:04:44.500
+<v Maria Irizarry>we send? Like, and really thinking through all of that, right? That was just in the beginning phases,
+
+46
+00:04:44.560 --> 00:04:48.880
+<v Maria Irizarry>like the quarter long project was actually integrating with the notifications infrastructure,
+
+47
+00:04:48.880 --> 00:04:55.080
+<v Maria Irizarry>infrastructure, but the preferences side like was after that. So imagine all the time that you're
+
+48
+00:04:55.080 --> 00:04:59.760
+<v Maria Irizarry>saving like that. That's why I was so excited when I heard about Courier because we not only have
+
+49
+00:04:59.760 --> 00:05:06.200
+<v Maria Irizarry>that infrastructure and more, right? Our pipeline supports a bunch of cool stuff, but we have the
+
+50
+00:05:06.200 --> 00:05:12.520
+<v Maria Irizarry>Courier web app, right? And you could just drag and drop and design your notifications for each
+
+51
+00:05:12.520 --> 00:05:16.960
+<v Maria Irizarry>of your channels. And then you don't have to worry about it again because you have your template ID.
+
+52
+00:05:18.880 --> 00:05:20.140
+<v Maria Irizarry>We worry about the rest.
+
+53
+00:05:20.640 --> 00:05:22.900
+<v Maria Irizarry>And that's where preferences come in.
+
+54
+00:05:23.300 --> 00:05:29.020
+<v Maria Irizarry>It was really exciting to spend time working on this because I know firsthand the pains.
+
+55
+00:05:29.260 --> 00:05:30.360
+<v Maria Irizarry>And here's the thing.
+
+56
+00:05:30.980 --> 00:05:35.580
+<v Maria Irizarry>Courier's product is notifications, notifications infrastructure, communications.
+
+57
+00:05:36.220 --> 00:05:37.660
+<v Maria Irizarry>That is our core product.
+
+58
+00:05:37.820 --> 00:05:39.800
+<v Maria Irizarry>And that is what we should be working on.
+
+59
+00:05:39.880 --> 00:05:43.220
+<v Maria Irizarry>Notifications, preferences, automations, right?
+
+60
+00:05:43.540 --> 00:05:45.060
+<v Maria Irizarry>Anything regarding that.
+
+61
+00:05:45.060 --> 00:05:50.200
+<v Maria Irizarry>that. Other companies, they don't want to be spending time on that. That's not their core
+
+62
+00:05:50.200 --> 00:05:56.780
+<v Maria Irizarry>product, but every single product usually has some form of communication with their customers,
+
+63
+00:05:56.980 --> 00:06:03.600
+<v Maria Irizarry>with their users. So it's really cool to be able to kind of take that on and then go and talk to
+
+64
+00:06:03.600 --> 00:06:08.960
+<v Maria Irizarry>customers and say, hey, we took care of this for you so you don't have to spend a quarter's worth
+
+65
+00:06:08.960 --> 00:06:15.600
+<v Maria Irizarry>or resources in order to accomplish this and go build what you do best.
+
+66
+00:06:16.880 --> 00:06:19.220
+<v Noah Labhart>I've followed Courier for a long time.
+
+67
+00:06:19.300 --> 00:06:21.900
+<v Noah Labhart>I've worked with you guys for a long time.
+
+68
+00:06:22.120 --> 00:06:28.960
+<v Noah Labhart>And I know that you've provided developers with the ability to integrate user preference management before.
+
+69
+00:06:29.280 --> 00:06:31.780
+<v Noah Labhart>How has this feature evolved, though?
+
+70
+00:06:31.820 --> 00:06:34.480
+<v Noah Labhart>Tell me about what's new and tell me about that evolution.
+
+71
+00:06:34.480 --> 00:06:35.780
+<v Noah Labhart>solution? We've
+
+72
+00:06:35.780 --> 00:06:40.740
+<v Maria Irizarry>offered several solutions to preferences in the past, and I think it helped
+
+73
+00:06:40.740 --> 00:06:46.640
+<v Maria Irizarry>some of our customers out. So I'll kind of walk through the most recent one prior to what we're
+
+74
+00:06:46.640 --> 00:06:51.920
+<v Maria Irizarry>calling Preferences Center and Preferences Designer. So we had this thing called categories,
+
+75
+00:06:52.120 --> 00:06:59.600
+<v Maria Irizarry>and you could lump a bunch of notification templates into a single category. That's great,
+
+76
+00:06:59.600 --> 00:07:06.700
+<v Maria Irizarry>right? That's a step in the right direction. I think that what was missing there is that UI view
+
+77
+00:07:06.700 --> 00:07:13.340
+<v Maria Irizarry>of what does your preferences page look like? So kind of like providing a solution for not only
+
+78
+00:07:13.340 --> 00:07:19.080
+<v Maria Irizarry>the backend, but also the front end. And that previous solution, you would need to go into
+
+79
+00:07:19.080 --> 00:07:25.080
+<v Maria Irizarry>your code base and modify the way you're calling us with our send API. And you would need to pass
+
+80
+00:07:25.080 --> 00:07:30.560
+<v Maria Irizarry>that category along with your send call, right? That would involve engineering work.
+
+81
+00:07:30.940 --> 00:07:38.560
+<v Maria Irizarry>And with Preferences Center, what changes here is that when you go to that Preferences tab,
+
+82
+00:07:38.760 --> 00:07:47.000
+<v Maria Irizarry>you have this nice UI that you can drag and drop and design what you want your preferences to look
+
+83
+00:07:47.000 --> 00:07:53.880
+<v Maria Irizarry>like. And instead of categories, we're calling it subscription topics. And similar experience,
+
+84
+00:07:55.080 --> 00:08:00.320
+<v Maria Irizarry>you get to easily like drag and drop your notification templates onto a single subscription
+
+85
+00:08:00.320 --> 00:08:07.580
+<v Maria Irizarry>topic. You get to say what the default state of it is if you want to add channel customization.
+
+86
+00:08:08.580 --> 00:08:14.720
+<v Maria Irizarry>And the important piece here is that you can go on, make those changes in the web app,
+
+87
+00:08:14.860 --> 00:08:21.320
+<v Maria Irizarry>and then there's a publish button similar to our designer where you can immediately just produce
+
+88
+00:08:21.320 --> 00:08:28.500
+<v Maria Irizarry>a hosted page that you can easily integrate into your notification templates where your users can
+
+89
+00:08:28.500 --> 00:08:34.960
+<v Maria Irizarry>click into that URL and see that beautiful page in a matter of literally 20 minutes.
+
+90
+00:08:35.140 --> 00:08:37.060
+<v Maria Irizarry>And that's being generous. Okay.
+
+91
+00:08:37.120 --> 00:08:39.120
+<v Noah Labhart>So that sounds super easy and really,
+
+92
+00:08:39.180 --> 00:08:45.580
+<v Noah Labhart>really exciting that that's available now as an engineer, my mouth's kind of watering about,
+
+93
+00:08:45.580 --> 00:08:52.600
+<v Noah Labhart>about being able to do that in such a fast way. So, okay, what has your experience been like
+
+94
+00:08:52.600 --> 00:08:58.400
+<v Noah Labhart>and what challenges have you faced in the process of building this? Because I heard you say this
+
+95
+00:08:58.400 --> 00:09:02.720
+<v Noah Labhart>towards the beginning and something we've all faced and it's a big problem that Courier is
+
+96
+00:09:02.720 --> 00:09:08.040
+<v Noah Labhart>solving is not having to build this again. And tell me about some of the challenges that you
+
+97
+00:09:08.040 --> 00:09:10.020
+<v Noah Labhart>faced while you were building it. There's
+
+98
+00:09:10.020 --> 00:09:13.400
+<v Maria Irizarry>several aspects to this. When you think about Courier,
+
+99
+00:09:13.400 --> 00:09:19.220
+<v Maria Irizarry>what is our bread and butter and what is our like precious gem? And that is our send infrastructure,
+
+100
+00:09:19.480 --> 00:09:27.280
+<v Maria Irizarry>our what we call our send pipeline. And integrating preferences directly into the send pipeline,
+
+101
+00:09:27.580 --> 00:09:32.420
+<v Maria Irizarry>we have to be very, very careful with not breaking the send pipeline, right?
+
+102
+00:09:34.100 --> 00:09:41.220
+<v Maria Irizarry>So we really had to make sure that we made changes incrementally. Where in the pipeline do we go and
+
+103
+00:09:41.220 --> 00:09:45.800
+<v Maria Irizarry>and check for those preferences. And where do you block it? Where do you block that notification?
+
+104
+00:09:46.100 --> 00:09:53.040
+<v Maria Irizarry>How do you let the user know in the logs that it was blocked and why? Right. And so that's one
+
+105
+00:09:53.040 --> 00:10:00.800
+<v Maria Irizarry>piece. And then there's the user experience piece too, because what happens if a user is part of a
+
+106
+00:10:00.800 --> 00:10:06.580
+<v Maria Irizarry>list and they unsubscribe from that list, right? Like what takes precedence? The unsubscribe from
+
+107
+00:10:06.580 --> 00:10:12.880
+<v Maria Irizarry>from that list, unsubscribe from that subscription topic, or just from that single notification
+
+108
+00:10:12.880 --> 00:10:20.240
+<v Maria Irizarry>template, which we are like veering away from, right? We want to think about notifications as a,
+
+109
+00:10:20.260 --> 00:10:24.340
+<v Maria Irizarry>you know, a theme. What are you trying to tell with your notifications? And that's going to be
+
+110
+00:10:24.340 --> 00:10:29.720
+<v Maria Irizarry>your subscription topic, right? Like user activity, let's say transactional notifications,
+
+111
+00:10:29.720 --> 00:10:45.520
+<v Maria Irizarry>You want those required, right? Really making sure that pipeline was well tested and worked. And there was a hierarchy respected within our send pipeline in terms of the catch conditions of when we're actually sending versus not.
+
+112
+00:10:46.260 --> 00:10:55.680
+<v Maria Irizarry>It definitely led to a lot of discussions and, you know, people, especially engineers, we can be very opinionated.
+
+113
+00:10:56.100 --> 00:10:58.980
+<v Maria Irizarry>So it was definitely a healthy discussion there.
+
+114
+00:10:59.160 --> 00:11:09.560
+<v Maria Irizarry>And I think what was important for us is to not only place ourselves in the developer persona, but also our customers users persona.
+
+115
+00:11:09.560 --> 00:11:14.560
+<v Maria Irizarry>persona, right? Like as a user, like bring it back to forget that you're an engineer,
+
+116
+00:11:14.760 --> 00:11:19.520
+<v Maria Irizarry>you're interacting with an email. Like we all know the pain. You don't have to be an engineer
+
+117
+00:11:19.520 --> 00:11:25.880
+<v Maria Irizarry>to know this. The pain of getting a ton of emails, opting in, opting out, still getting those emails,
+
+118
+00:11:26.040 --> 00:11:32.520
+<v Maria Irizarry>right? Like what do you expect to happen? And that's what we need to do. So I would say on
+
+119
+00:11:32.520 --> 00:11:38.460
+<v Maria Irizarry>the technical side, the send pipeline, on the UX side, kind of talking through what the,
+
+120
+00:11:39.560 --> 00:11:43.020
+<v Maria Irizarry>user experiences and really defining that and sticking to that.
+
+121
+00:11:43.660 --> 00:11:45.040
+<v Noah Labhart>That makes a ton of sense.
+
+122
+00:11:45.160 --> 00:11:50.220
+<v Noah Labhart>The need to make sure you're not breaking your core product when you're integrating this
+
+123
+00:11:50.220 --> 00:11:55.640
+<v Noah Labhart>next piece of functionality. And that's challenging, right? Because you're essentially
+
+124
+00:11:55.640 --> 00:12:00.340
+<v Noah Labhart>having to test two things. One of them you're not necessarily touching as much. That can be
+
+125
+00:12:00.340 --> 00:12:05.780
+<v Noah Labhart>super challenging. Okay. So tell me your vision, right? Tell me your vision on how developers will
+
+126
+00:12:05.780 --> 00:12:07.720
+<v Noah Labhart>will be using this feature?
+
+127
+00:12:07.880 --> 00:12:10.820
+<v Noah Labhart>You know, I would imagine as you're creating it,
+
+128
+00:12:10.820 --> 00:12:11.960
+<v Noah Labhart>and you even mentioned this, you know,
+
+129
+00:12:11.960 --> 00:12:14.140
+<v Noah Labhart>thinking about not only how developers are using this,
+
+130
+00:12:14.200 --> 00:12:16.720
+<v Noah Labhart>but how the end users are going to be experiencing it.
+
+131
+00:12:16.820 --> 00:12:19.680
+<v Noah Labhart>How do you see developers using this feature?
+
+132
+00:12:19.960 --> 00:12:20.480
+<v Noah Labhart>There's a
+
+133
+00:12:20.480 --> 00:12:22.180
+<v Maria Irizarry>double answer there.
+
+134
+00:12:22.400 --> 00:12:26.580
+<v Maria Irizarry>One of them is I actually don't foresee them using it a ton
+
+135
+00:12:26.580 --> 00:12:28.220
+<v Maria Irizarry>after they set it up, right?
+
+136
+00:12:28.340 --> 00:12:29.000
+<v Maria Irizarry>And that's great.
+
+137
+00:12:29.100 --> 00:12:31.940
+<v Maria Irizarry>Honestly, like developers love to code, interact with APIs.
+
+138
+00:12:32.180 --> 00:12:35.000
+<v Maria Irizarry>I know that myself, but when I can offload something,
+
+139
+00:12:35.780 --> 00:12:42.500
+<v Maria Irizarry>set it up real quick. Great. Like my hope is that they're able to set this up and only interact with
+
+140
+00:12:42.500 --> 00:12:46.640
+<v Maria Irizarry>it when they need to tweak a subscription topic or something like that. They don't need to spend
+
+141
+00:12:46.640 --> 00:12:52.600
+<v Maria Irizarry>like maintenance. They don't need to set up pagers. I mean, they can if they want to. So I imagine them,
+
+142
+00:12:52.660 --> 00:12:59.760
+<v Maria Irizarry>if you're a developer, jumping in, setting it up. And you know how we, you go into a tool or
+
+143
+00:12:59.760 --> 00:13:05.020
+<v Maria Irizarry>something like this happens to me with Notion because they like to have this, like the coding
+
+144
+00:13:05.780 --> 00:13:12.060
+<v Maria Irizarry>or the formulas. And then I'm like, well, can I do this? Can I do that? Like finding like how I can
+
+145
+00:13:12.060 --> 00:13:19.060
+<v Maria Irizarry>customize it. So they definitely can go in, you know, they're not limited to only the preferences
+
+146
+00:13:19.060 --> 00:13:25.680
+<v Maria Irizarry>designer experience, but they can go into our repo, Courier React components, that we have publicly
+
+147
+00:13:25.680 --> 00:13:31.820
+<v Maria Irizarry>accessible and they can go and grab that preferences component that we offer and embed it into their
+
+148
+00:13:31.820 --> 00:13:37.500
+<v Maria Irizarry>app and customize styles. And we can go even further than that. Let's say they don't care for
+
+149
+00:13:37.500 --> 00:13:44.500
+<v Maria Irizarry>the actual UI that we provide. We also provide the APIs where they can interact just directly
+
+150
+00:13:44.500 --> 00:13:50.280
+<v Maria Irizarry>with our infrastructures. For those that really just wanted the backend, we're not taking that
+
+151
+00:13:50.280 --> 00:13:55.200
+<v Maria Irizarry>away from them. So I think that as a developer, you get to choose your own adventure there.
+
+152
+00:13:55.460 --> 00:14:01.340
+<v Maria Irizarry>And if you're saying, hey, Noah, I don't want to spend two weeks working on this. I think that
+
+153
+00:14:01.820 --> 00:14:08.780
+<v Maria Irizarry>be better if we just have this first like iteration of the hosted page and we can work
+
+154
+00:14:08.780 --> 00:14:15.560
+<v Maria Irizarry>on this other thing that's a P double zero, right? And then we can iterate on maybe embedding the
+
+155
+00:14:15.560 --> 00:14:22.240
+<v Maria Irizarry>component and customizing the look and making that a sub page within our app. I think it gives you a
+
+156
+00:14:22.240 --> 00:14:27.900
+<v Maria Irizarry>lot of flexibility. And honestly, especially if you're fast prototyping and some of our customers
+
+157
+00:14:27.900 --> 00:14:33.140
+<v Maria Irizarry>have shown interest in that, right? Like eventually they want to go towards customizing the look and
+
+158
+00:14:33.140 --> 00:14:37.980
+<v Maria Irizarry>feel of their preferences, but to get up and running, they have the hosted page, right?
+
+159
+00:14:38.100 --> 00:14:42.420
+<v Maria Irizarry>And there's other customers that are like, hey, actually your hosted page looks amazing.
+
+160
+00:14:42.780 --> 00:14:47.700
+<v Maria Irizarry>This works great. And they just go and embed our component so that, you know, they can actually
+
+161
+00:14:47.700 --> 00:14:54.320
+<v Maria Irizarry>show it in their application and that's it. You know, it should just be something that you set
+
+162
+00:14:54.320 --> 00:14:59.680
+<v Maria Irizarry>it and forget it. You don't have to allocate that one single engineer or those two engineers that
+
+163
+00:14:59.680 --> 00:15:05.620
+<v Maria Irizarry>just infinitely maintain that infrastructure that truly no one wanted to build. They had to,
+
+164
+00:15:05.660 --> 00:15:11.200
+<v Maria Irizarry>right? And especially with anti-spam laws and things like that, it's crucial infrastructure.
+
+165
+00:15:11.540 --> 00:15:13.360
+<v Maria Irizarry>You don't want to spam your users.
+
+166
+00:15:14.100 --> 00:15:17.100
+<v Noah Labhart>It's super cool. And it brings up a question for me because
+
+167
+00:15:17.100 --> 00:15:21.680
+<v Noah Labhart>I immediately think, you know, if I'm going to implement, you know, or utilize the React
+
+168
+00:15:21.680 --> 00:15:26.820
+<v Noah Labhart>component, drop it in my page. I'm going to want it to look like my brand, right? I'm going to want
+
+169
+00:15:27.460 --> 00:15:34.180
+<v Noah Labhart>Courier's component to wear my t-shirt, so to speak. And so how customizable is the components?
+
+170
+00:15:34.380 --> 00:15:37.300
+<v Noah Labhart>How easy is it to go customize them? You
+
+171
+00:15:37.300 --> 00:15:40.860
+<v Maria Irizarry>bring up a very good point, the branding piece,
+
+172
+00:15:41.000 --> 00:15:47.780
+<v Maria Irizarry>the t-shirt piece. Our hosted page actually uses your brand that you've set up with us in the
+
+173
+00:15:47.780 --> 00:15:54.820
+<v Maria Irizarry>the Courier web app, you already have a bit of the look of your company, right? Kind of like the
+
+174
+00:15:54.820 --> 00:16:00.960
+<v Maria Irizarry>t-shirt. But in the React component, you can actually override. So let's say you import it in,
+
+175
+00:16:01.040 --> 00:16:08.040
+<v Maria Irizarry>you can override the styles to make it look how you want. So let's say that, hey Courier, I love
+
+176
+00:16:08.040 --> 00:16:12.980
+<v Maria Irizarry>it that my company's t-shirt can be purple with that logo, but I actually want that t-shirt to
+
+177
+00:16:12.980 --> 00:16:18.760
+<v Maria Irizarry>to be fitted and the collar to be more square or more cornered, you know, all of that is just
+
+178
+00:16:18.760 --> 00:16:24.760
+<v Maria Irizarry>easily overridable in the component and the functionality, right, is containerized within it.
+
+179
+00:16:24.860 --> 00:16:29.100
+<v Maria Irizarry>So you can make it look however you want and make it fit your product.
+
+180
+00:16:29.960 --> 00:16:35.500
+<v Noah Labhart>That's fantastic. I mean, that's basically giving, you know, giving all the wiring hooked up to the
+
+181
+00:16:35.500 --> 00:16:40.740
+<v Noah Labhart>preferences while giving you a blank canvas on the front end to make it look, you know,
+
+182
+00:16:40.740 --> 00:16:47.360
+<v Noah Labhart>wear the t-shirt. So that's super cool. Okay. So then tell me about some of the use cases where
+
+183
+00:16:47.360 --> 00:16:52.540
+<v Noah Labhart>that preferences feature is useful. So I'm thinking like from a product standpoint, I use a ton of
+
+184
+00:16:52.540 --> 00:16:57.740
+<v Noah Labhart>apps. I use a ton of applications and there's different types of preferences, settings, and
+
+185
+00:16:57.740 --> 00:17:02.560
+<v Noah Labhart>all those sorts of things. But I'm curious, what sort of use cases out of the gate,
+
+186
+00:17:03.020 --> 00:17:08.640
+<v Noah Labhart>the team and you have identified as something to really sort of illustrate the power?
+
+187
+00:17:08.640 --> 00:17:38.140
+<v Maria Irizarry>Yeah, I mean, let's kind of talk through that. The one that comes to mind first, right? And I think it's on all of our minds is marketing emails. So marketing emails off the bat is a subscription topic. And maybe as a product owner, you don't want to proactively start spamming your users. You know how sometimes you sign up for something and they automatically click in the checkbox to get newsletters? Isn't that like super annoying?
+
+188
+00:17:38.640 --> 00:17:39.140
+<v Maria Irizarry>So annoying.
+
+189
+00:17:39.720 --> 00:17:43.140
+<v Maria Irizarry>So we pass that decision on to our customers.
+
+190
+00:17:43.280 --> 00:17:44.220
+<v Maria Irizarry>Like, do you want to do that?
+
+191
+00:17:44.260 --> 00:17:46.580
+<v Maria Irizarry>Do you want it to be on an opt-out, opt-in basis?
+
+192
+00:17:46.960 --> 00:17:48.120
+<v Maria Irizarry>So yeah, sure.
+
+193
+00:17:48.240 --> 00:17:49.000
+<v Maria Irizarry>That's one of them.
+
+194
+00:17:49.120 --> 00:17:57.040
+<v Maria Irizarry>Another one is let's talk about more crucial notifications like, hey, your password needs to be reset.
+
+195
+00:17:57.280 --> 00:17:58.720
+<v Maria Irizarry>Hey, your payment has expired.
+
+196
+00:17:59.120 --> 00:18:02.860
+<v Maria Irizarry>Hey, like something that requires user action immediately.
+
+197
+00:18:03.260 --> 00:18:05.480
+<v Maria Irizarry>You don't want your users to miss those.
+
+198
+00:18:05.480 --> 00:18:28.280
+<v Maria Irizarry>So you want to restrict them from opting out. But if you are one of our customers that opts in for a custom routing, you can add that and you can say, hey, to my users for password reset. Some people don't like to get bombarded on their email. They already get too many. Hey, I want to get my password reset stuff or my crucial notifications on my phone.
+
+199
+00:18:28.720 --> 00:18:31.100
+<v Maria Irizarry>I'm way better about looking at my text messages.
+
+200
+00:18:31.280 --> 00:18:36.480
+<v Maria Irizarry>So they can't necessarily opt out of those crucial notifications, but they can select
+
+201
+00:18:36.480 --> 00:18:39.040
+<v Maria Irizarry>the channel they want to receive them through.
+
+202
+00:18:39.280 --> 00:18:41.980
+<v Maria Irizarry>You know, I feel like that's kind of a happy medium there, right?
+
+203
+00:18:42.180 --> 00:18:48.600
+<v Maria Irizarry>And then let's talk about a third case where it's like the user may be interested in some
+
+204
+00:18:48.600 --> 00:18:49.120
+<v Maria Irizarry>cases.
+
+205
+00:18:49.340 --> 00:18:54.800
+<v Maria Irizarry>So let's say it's like user activity, or I like to use the Nextdoor example.
+
+206
+00:18:54.940 --> 00:18:56.220
+<v Maria Irizarry>So neighborhood activity.
+
+207
+00:18:56.220 --> 00:19:01.060
+<v Maria Irizarry>Kind of same thing for the crucial notifications one.
+
+208
+00:19:01.240 --> 00:19:13.840
+<v Maria Irizarry>You maybe don't want to opt them in right away, but maybe in your onboarding flow, you want to give them the option, hey, we send weekly stuff about what's going on in your neighborhood.
+
+209
+00:19:14.020 --> 00:19:15.020
+<v Maria Irizarry>Would you like to see that?
+
+210
+00:19:15.360 --> 00:19:17.380
+<v Maria Irizarry>Then you give them the option to opt in.
+
+211
+00:19:17.420 --> 00:19:23.500
+<v Maria Irizarry>You can even just like grab the component and put that in the onboarding and say, hey, click that switch to opt in, right?
+
+212
+00:19:23.500 --> 00:19:28.460
+<v Maria Irizarry>Right. Maybe for that one, you don't want to allow custom routing where they can select the channels.
+
+213
+00:19:28.580 --> 00:19:33.080
+<v Maria Irizarry>That one, you could just make it a simple one. So that's where our sections fall in.
+
+214
+00:19:33.180 --> 00:19:40.200
+<v Maria Irizarry>So you can have one section of topics where you allow custom routing and then a different section where you don't.
+
+215
+00:19:40.260 --> 00:19:44.820
+<v Maria Irizarry>You know, hey, this sounds cool. I'm going to opt in to neighborhood updates.
+
+216
+00:19:45.000 --> 00:19:50.220
+<v Maria Irizarry>I want to make sure I know if someone's getting robbed outside of my door or something like that.
+
+217
+00:19:50.220 --> 00:19:57.340
+<v Maria Irizarry>Right. You know, I think that covers the story around like, hey, what the actual like product wants.
+
+218
+00:19:57.480 --> 00:20:04.140
+<v Maria Irizarry>Like we do want in some cases for our users to know about new features, maybe a little bit of marketing.
+
+219
+00:20:04.260 --> 00:20:07.000
+<v Maria Irizarry>I think it's good practice overall to not spam your users.
+
+220
+00:20:07.900 --> 00:20:09.600
+<v Maria Irizarry>Bloomingdale's, I hear you. I see you.
+
+221
+00:20:09.600 --> 00:20:21.340
+<v Maria Irizarry>So I think that having these and being outright to your user saying, hey, these are the kinds of notifications that you're opting into.
+
+222
+00:20:21.940 --> 00:20:23.380
+<v Maria Irizarry>Do you want them?
+
+223
+00:20:23.460 --> 00:20:23.960
+<v Maria Irizarry>Right.
+
+224
+00:20:23.720 --> 00:20:27.640
+<v Maria Irizarry>Giving them that option establishes trust with your user.
+
+225
+00:20:27.800 --> 00:20:34.760
+<v Maria Irizarry>And I think that, you know, they're less likely to kind of like rage click or unsubscribe from all notifications.
+
+226
+00:20:34.760 --> 00:20:40.240
+<v Maria Irizarry>communications. Having that two-way communication, I think, is important, establishes trust, and I
+
+227
+00:20:40.240 --> 00:20:43.460
+<v Maria Irizarry>think ultimately increases engagement.
+
+228
+00:20:44.420 --> 00:20:48.300
+<v Noah Labhart>So you've done development for quite a while now, and you've
+
+229
+00:20:48.300 --> 00:20:55.120
+<v Noah Labhart>landed in Courier, you know, building this amazing infrastructure. Tell me about how it is for you.
+
+230
+00:20:55.200 --> 00:20:59.740
+<v Noah Labhart>You're a developer, and you're building something to save developers time and make their lives
+
+231
+00:20:59.740 --> 00:21:05.840
+<v Noah Labhart>better, make it better for them to focus on building their core competency in their product.
+
+232
+00:21:06.040 --> 00:21:08.580
+<v Noah Labhart>How does that feel for you as an engineer building that?
+
+233
+00:21:08.840 --> 00:21:13.640
+<v Maria Irizarry>So it's very rewarding from that aspect that I'm making people's lives easier.
+
+234
+00:21:14.480 --> 00:21:20.740
+<v Maria Irizarry>There's pieces where, let's say I jump in to one of our APIs or SDKs and I'm like,
+
+235
+00:21:20.820 --> 00:21:25.460
+<v Maria Irizarry>oh man, we don't support this. And then there's that empathetic aspect that makes me a little
+
+236
+00:21:25.460 --> 00:21:30.320
+<v Maria Irizarry>little bit sad that we can't prioritize that right now. It's kind of like, oh, wait, but like,
+
+237
+00:21:30.380 --> 00:21:34.880
+<v Maria Irizarry>oh, the developers, like they're going to have issues and I don't want them to have issues.
+
+238
+00:21:34.940 --> 00:21:41.560
+<v Maria Irizarry>Right. So like there's that piece. And then there's the selfish piece, which is you get to
+
+239
+00:21:41.560 --> 00:21:48.500
+<v Maria Irizarry>get from your like pull from your experiences as a developer, say, well, I want to do it this way
+
+240
+00:21:48.500 --> 00:21:52.900
+<v Maria Irizarry>because I think this is really what will make things easy for our users.
+
+241
+00:21:53.420 --> 00:21:58.660
+<v Maria Irizarry>And another piece to it is that because it's our core product,
+
+242
+00:21:58.900 --> 00:22:01.440
+<v Maria Irizarry>I get to focus on that, right?
+
+243
+00:22:01.520 --> 00:22:02.680
+<v Maria Irizarry>That is our bread and butter.
+
+244
+00:22:02.820 --> 00:22:04.660
+<v Maria Irizarry>It's not a critical feature for us.
+
+245
+00:22:04.700 --> 00:22:05.540
+<v Maria Irizarry>It's a core feature.
+
+246
+00:22:06.040 --> 00:22:11.040
+<v Maria Irizarry>So we get to spend our time really building it right.
+
+247
+00:22:11.200 --> 00:22:14.700
+<v Maria Irizarry>Like you're trying to launch this home automation thing
+
+248
+00:22:14.700 --> 00:22:18.200
+<v Maria Irizarry>and your deadline is coming up in a week.
+
+249
+00:22:18.500 --> 00:22:21.720
+<v Maria Irizarry>and you still haven't built out your notifications or your preferences, right?
+
+250
+00:22:21.900 --> 00:22:29.180
+<v Maria Irizarry>You know, I totally understand, but it can come as an afterthought because truly that's not their bread and butter, right?
+
+251
+00:22:29.480 --> 00:22:33.480
+<v Maria Irizarry>And I get to spend my time building those things, right?
+
+252
+00:22:33.560 --> 00:22:39.260
+<v Maria Irizarry>I don't have to worry as much on the critical side because I am building the critical side and the core side.
+
+253
+00:22:40.260 --> 00:22:41.420
+<v Maria Irizarry>So it's great.
+
+254
+00:22:42.380 --> 00:22:45.180
+<v Noah Labhart>Well, Maria, thank you for being on the show today.
+
+255
+00:22:45.180 --> 00:22:48.900
+<v Noah Labhart>day. I really appreciate our conversation and I've learned a ton around the preferences feature,
+
+256
+00:22:49.120 --> 00:22:55.280
+<v Noah Labhart>how great it is for developers, how easy it makes life for developers, along with the amazing
+
+257
+00:22:55.280 --> 00:23:00.760
+<v Noah Labhart>infrastructure and the notifications pipeline and how you're making developers' lives better.
+
+258
+00:23:00.980 --> 00:23:03.000
+<v Noah Labhart>Maria, I appreciate you being on the show today. Thank
+
+259
+00:23:03.000 --> 00:23:04.040
+<v Maria Irizarry>you for having me, Noah.
+
+260
+00:23:06.520 --> 00:23:11.560
+<v Noah Labhart>Really cool conversation with Maria at Courier. You know, all of the components that we hear
+
+261
+00:23:11.560 --> 00:23:16.080
+<v Noah Labhart>about coming from Courier make the developers experience and building out a notification
+
+262
+00:23:16.080 --> 00:23:22.880
+<v Noah Labhart>strategy. It makes their lives easier, makes it faster to develop so they can focus on their
+
+263
+00:23:22.880 --> 00:23:30.060
+<v Noah Labhart>core competency of their product. As a reminder, Courier makes it easier for you to deliver a
+
+264
+00:23:30.060 --> 00:23:35.400
+<v Noah Labhart>world-class notification experience that your customers expect. To learn more about their
+
+265
+00:23:35.400 --> 00:23:41.360
+<v Noah Labhart>product and get started today, check out courier.com. And thanks again for listening.

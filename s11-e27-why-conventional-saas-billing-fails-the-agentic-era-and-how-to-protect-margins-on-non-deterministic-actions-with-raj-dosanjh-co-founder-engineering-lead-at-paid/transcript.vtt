@@ -1,0 +1,2555 @@
+WEBVTT
+
+NOTE S11 E27: Why Conventional SaaS Billing Fails the Agentic Era and How to Protect Margins on Non-Deterministic Actions with Raj Dosanjh, Co-Founder & Engineering Lead at Paid
+
+1
+00:00:00.840 --> 00:00:04.700
+<v Raj Dosanjh>When people talk about scalability, that really scares me. It's a lot more complicated
+
+2
+00:00:04.700 --> 00:00:08.880
+<v Raj Dosanjh>than people think. What you'll find is, and actually a lot of engineers will say, oh,
+
+3
+00:00:08.960 --> 00:00:12.880
+<v Raj Dosanjh>I think we need to rework this architecture. I think this is not going to work for scalability
+
+4
+00:00:12.880 --> 00:00:17.980
+<v Raj Dosanjh>and stuff like that. And actually, when I dig into it, this is normally parroting something
+
+5
+00:00:17.980 --> 00:00:22.320
+<v Raj Dosanjh>that they've heard or something that they've read. I think scalability is a lot simpler
+
+6
+00:00:22.320 --> 00:00:27.540
+<v Raj Dosanjh>in that way. And it all comes down to good observability. And it's understanding how
+
+7
+00:00:27.540 --> 00:00:28.640
+<v Raj Dosanjh>how your application is performing,
+
+8
+00:00:28.760 --> 00:00:31.860
+<v Raj Dosanjh>having metrics on like your P95s
+
+9
+00:00:31.860 --> 00:00:34.440
+<v Raj Dosanjh>and the CPU usage of your machines or whatever,
+
+10
+00:00:35.160 --> 00:00:36.520
+<v Raj Dosanjh>and being on top of that
+
+11
+00:00:36.520 --> 00:00:38.300
+<v Raj Dosanjh>and solving the problems as they come.
+
+12
+00:00:39.560 --> 00:00:42.500
+<v Raj Dosanjh>I'm Raj Dosanjh, co-founder and CTO of Paid.
+
+13
+00:00:45.640 --> 00:00:47.360
+<v Clip>This is Code Story,
+
+14
+00:00:48.000 --> 00:00:51.260
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries.
+
+15
+00:00:51.380 --> 00:00:52.740
+<v Clip>Six months moonlighting.
+
+16
+00:00:52.760 --> 00:00:54.300
+<v Clip>There's nothing on the back end.
+
+17
+00:00:54.540 --> 00:00:57.140
+<v Noah Labhart>Who share what it takes to change an industry.
+
+18
+00:00:57.540 --> 00:00:59.280
+<v Clip>I don't exactly know what to do next.
+
+19
+00:00:59.300 --> 00:01:00.300
+<v Clip>It took many goes to get right.
+
+20
+00:01:00.920 --> 00:01:03.520
+<v Noah Labhart>Who built the teams that have their back?
+
+21
+00:01:03.540 --> 00:01:05.160
+<v Clip>What company is its people?
+
+22
+00:01:05.160 --> 00:01:06.540
+<v Clip>The teams help each other achieve more.
+
+23
+00:01:06.540 --> 00:01:07.640
+<v Clip>Most proud of our team.
+
+24
+00:01:07.960 --> 00:01:10.240
+<v Noah Labhart>Keeping scalability top of mind.
+
+25
+00:01:10.520 --> 00:01:11.940
+<v Clip>All that infrastructure was a pain.
+
+26
+00:01:11.940 --> 00:01:13.360
+<v Clip>Yes, we've been fighting it as we've grown.
+
+27
+00:01:13.540 --> 00:01:14.360
+<v Clip>Total waste of time.
+
+28
+00:01:14.580 --> 00:01:16.860
+<v Noah Labhart>The stories you don't read in the headlines.
+
+29
+00:01:17.360 --> 00:01:19.080
+<v Clip>It's not an easy thing to achieve, my dear.
+
+30
+00:01:19.080 --> 00:01:21.160
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+31
+00:01:21.500 --> 00:01:24.900
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+32
+00:01:25.040 --> 00:01:26.620
+<v Clip>You need to really want it.
+
+33
+00:01:27.540 --> 00:01:34.720
+<v Noah Labhart>technology. All this and more on Code Story. I'm your host Noah Labhart and today how Raj
+
+34
+00:01:34.720 --> 00:01:41.780
+<v Noah Labhart>Dosanjh is enabling a revenue engine for AI agents so you can stop leaving money on the table.
+
+35
+00:01:47.940 --> 00:01:53.920
+<v Noah Labhart>Raj Dosanjh grew up in Coventry which he calls the Detroit of the UK. He still enjoys following
+
+36
+00:01:53.920 --> 00:01:58.640
+<v Noah Labhart>the football team and hopes they rejuvenate the city some. He eventually left for university and
+
+37
+00:01:58.640 --> 00:02:03.300
+<v Noah Labhart>moved to London. He likes to dig into how people think and how things are built. But outside of
+
+38
+00:02:03.300 --> 00:02:08.640
+<v Noah Labhart>tech, he is engaged to be married in 2026. As such, he has recently taken up physical training,
+
+39
+00:02:08.760 --> 00:02:12.940
+<v Noah Labhart>which results in a lot of working out and meals filled with chicken.
+
+40
+00:02:14.940 --> 00:02:20.420
+<v Noah Labhart>In the past, Raj's now co-founder reached out to him, post shutting the doors on his prior startup.
+
+41
+00:02:20.420 --> 00:02:30.560
+<v Noah Labhart>After they felt out the market to see if a billing solution would fit, they moved forward and eventually started enabling revenue streams for AI agents.
+
+42
+00:02:32.940 --> 00:02:35.560
+<v Noah Labhart>This is the creation story of Paid.
+
+43
+00:02:39.960 --> 00:02:46.520
+<v Raj Dosanjh>The way we currently describe Paid at the moment is the revenue engine for your AI agents.
+
+44
+00:02:47.060 --> 00:02:53.560
+<v Raj Dosanjh>and the reason that sort of is a cryptic phrase is because it does a lot and there's a lot of the
+
+45
+00:02:53.560 --> 00:03:02.020
+<v Raj Dosanjh>devil in the details we plug into ai agents understand what they are doing show the value
+
+46
+00:03:02.020 --> 00:03:08.400
+<v Raj Dosanjh>to the people using it and then also make sure our customers are able to monetize their agents
+
+47
+00:03:08.400 --> 00:03:12.940
+<v Raj Dosanjh>well so they're not leaving anything off the table so it's appropriate for the costs they're
+
+48
+00:03:12.940 --> 00:03:17.060
+<v Raj Dosanjh>incurring for the tokens they're using and also making sure that they're
+
+49
+00:03:17.060 --> 00:03:22.800
+<v Raj Dosanjh>properly realizing the value that providing how we got to that was a fair
+
+50
+00:03:22.800 --> 00:03:27.680
+<v Raj Dosanjh>bit of iteration my co-founder Manny had previously founded and was the CEO of a
+
+51
+00:03:27.680 --> 00:03:30.560
+<v Raj Dosanjh>company called Outreach which is a unicorn based out of Seattle in the
+
+52
+00:03:30.560 --> 00:03:36.220
+<v Raj Dosanjh>sales space so he was moving to London because his wife really likes in the
+
+53
+00:03:36.220 --> 00:03:40.340
+<v Raj Dosanjh>one to move then it wasn't viable for him to be the CEO of Outreach remotely
+
+54
+00:03:40.340 --> 00:03:47.220
+<v Raj Dosanjh>remotely. So he's then in London being chairman of Outreach and, you know, just trying to
+
+55
+00:03:47.220 --> 00:03:51.440
+<v Raj Dosanjh>take some time off. But a problem that he had at Outreach that he couldn't quite drop
+
+56
+00:03:51.440 --> 00:03:56.700
+<v Raj Dosanjh>was they were launching a bunch of AI agents about like outbound email and he wanted to
+
+57
+00:03:56.700 --> 00:04:00.560
+<v Raj Dosanjh>price for them differently, like price per outcome, because that's the sort of value
+
+58
+00:04:00.560 --> 00:04:05.220
+<v Raj Dosanjh>that's been created. And his team basically said it wasn't possible. It was like a large,
+
+59
+00:04:05.220 --> 00:04:07.300
+<v Raj Dosanjh>a large investment in terms of engineering.
+
+60
+00:04:07.680 --> 00:04:10.520
+<v Raj Dosanjh>And he never bought that sort of idea
+
+61
+00:04:10.520 --> 00:04:12.500
+<v Raj Dosanjh>and couldn't think about it.
+
+62
+00:04:12.600 --> 00:04:14.400
+<v Raj Dosanjh>And then I think he went to see his friend
+
+63
+00:04:14.400 --> 00:04:15.440
+<v Raj Dosanjh>in San Sebastian or something.
+
+64
+00:04:16.040 --> 00:04:17.840
+<v Raj Dosanjh>And when he should have been hanging out,
+
+65
+00:04:17.900 --> 00:04:19.420
+<v Raj Dosanjh>he was actually calling a bunch of people
+
+66
+00:04:19.420 --> 00:04:21.240
+<v Raj Dosanjh>validating the idea and realized
+
+67
+00:04:21.240 --> 00:04:23.580
+<v Raj Dosanjh>actually there was some space for a new product.
+
+68
+00:04:23.920 --> 00:04:26.440
+<v Raj Dosanjh>He then reached out to my co-founder Manoj
+
+69
+00:04:26.440 --> 00:04:28.440
+<v Raj Dosanjh>who has sold a billing company to Salesforce
+
+70
+00:04:28.440 --> 00:04:30.180
+<v Raj Dosanjh>because I think he very quickly realized
+
+71
+00:04:30.180 --> 00:04:32.340
+<v Raj Dosanjh>this would be solved in this sort of billing space.
+
+72
+00:04:32.340 --> 00:04:35.780
+<v Raj Dosanjh>and then through an intro got in touch with me.
+
+73
+00:04:36.120 --> 00:04:37.900
+<v Raj Dosanjh>And that intro was a funny one as well.
+
+74
+00:04:38.020 --> 00:04:40.140
+<v Raj Dosanjh>I had previously founded a company
+
+75
+00:04:40.140 --> 00:04:42.340
+<v Raj Dosanjh>that was part of the YC Winter 24 batch,
+
+76
+00:04:42.480 --> 00:04:43.420
+<v Raj Dosanjh>which was going pretty well.
+
+77
+00:04:43.560 --> 00:04:45.600
+<v Raj Dosanjh>But me and my co-founder just decided
+
+78
+00:04:45.600 --> 00:04:48.320
+<v Raj Dosanjh>that the reality of how big an investment it is
+
+79
+00:04:48.320 --> 00:04:49.480
+<v Raj Dosanjh>to start like a startup,
+
+80
+00:04:49.620 --> 00:04:51.000
+<v Raj Dosanjh>and we were like, we are not the team.
+
+81
+00:04:51.040 --> 00:04:52.240
+<v Raj Dosanjh>We don't like work well enough together.
+
+82
+00:04:52.320 --> 00:04:53.620
+<v Raj Dosanjh>So we gave the money back
+
+83
+00:04:53.620 --> 00:04:55.720
+<v Raj Dosanjh>and I was spending just a bunch of time hanging out.
+
+84
+00:04:55.820 --> 00:04:57.200
+<v Raj Dosanjh>And I ended up by accident,
+
+85
+00:04:57.220 --> 00:04:59.200
+<v Raj Dosanjh>like taking a job at this other YC startup.
+
+86
+00:04:59.300 --> 00:05:00.860
+<v Raj Dosanjh>They contacted me on LinkedIn.
+
+87
+00:05:00.880 --> 00:05:01.660
+<v Raj Dosanjh>For some reason I said,
+
+88
+00:05:02.340 --> 00:05:03.180
+<v Raj Dosanjh>I'll talk to you guys.
+
+89
+00:05:04.200 --> 00:05:07.760
+<v Raj Dosanjh>And I was almost being straight up like avoiding getting the jobs.
+
+90
+00:05:07.860 --> 00:05:10.280
+<v Raj Dosanjh>I think I was asked to do meet the team or do a tech test.
+
+91
+00:05:10.360 --> 00:05:13.280
+<v Raj Dosanjh>I was like, I don't want to do the tech test or find or meet the team.
+
+92
+00:05:13.340 --> 00:05:14.980
+<v Raj Dosanjh>And eventually ended up working there.
+
+93
+00:05:15.300 --> 00:05:16.700
+<v Raj Dosanjh>And I think I said about three weeks.
+
+94
+00:05:16.860 --> 00:05:18.440
+<v Raj Dosanjh>I actually managed to create a bunch of value there.
+
+95
+00:05:18.540 --> 00:05:21.200
+<v Raj Dosanjh>But mid-meeting, I was just like, you know what?
+
+96
+00:05:21.500 --> 00:05:22.400
+<v Raj Dosanjh>This is not for me.
+
+97
+00:05:22.460 --> 00:05:24.140
+<v Raj Dosanjh>I'm definitely like here for founding.
+
+98
+00:05:24.320 --> 00:05:27.820
+<v Raj Dosanjh>But because, yeah, we had actually a pretty amicable sort of me leaving.
+
+99
+00:05:29.020 --> 00:05:32.220
+<v Raj Dosanjh>I got an intro to Manny through the CEO of that company
+
+100
+00:05:32.220 --> 00:05:35.880
+<v Raj Dosanjh>and we decided to start in January
+
+101
+00:05:35.880 --> 00:05:38.620
+<v Raj Dosanjh>so on January 8th we got an Airbnb for two weeks
+
+102
+00:05:38.620 --> 00:05:41.740
+<v Raj Dosanjh>and built out the first version of the product
+
+103
+00:05:41.740 --> 00:05:43.560
+<v Raj Dosanjh>which was very much
+
+104
+00:05:43.560 --> 00:05:45.920
+<v Raj Dosanjh>not much more than an interactive Figma
+
+105
+00:05:45.920 --> 00:05:46.900
+<v Raj Dosanjh>obviously it was coded
+
+106
+00:05:46.900 --> 00:05:48.860
+<v Raj Dosanjh>I would be able to demo it by just clicking on the stuff
+
+107
+00:05:48.860 --> 00:05:49.880
+<v Raj Dosanjh>but it wouldn't do too much
+
+108
+00:05:50.440 --> 00:05:52.340
+<v Raj Dosanjh>very much my philosophy is
+
+109
+00:05:52.340 --> 00:05:55.520
+<v Raj Dosanjh>I don't want to build anything that I absolutely don't have to
+
+110
+00:05:55.520 --> 00:06:02.940
+<v Raj Dosanjh>do. And then we had a few breakthroughs along the way. For example, I was actually sitting on like
+
+111
+00:06:02.940 --> 00:06:07.920
+<v Raj Dosanjh>the bullet train in Japan when I was trying to take a break and it hit me that Datadog knows so
+
+112
+00:06:07.920 --> 00:06:11.920
+<v Raj Dosanjh>much about what our application is doing. Why can't we take that and use that to understand
+
+113
+00:06:11.920 --> 00:06:16.040
+<v Raj Dosanjh>the value that's been created, which will give us a great way to monetize it, but also improve
+
+114
+00:06:16.040 --> 00:06:21.880
+<v Raj Dosanjh>retention by showing customers the value that's been created and also give us a really easy way
+
+115
+00:06:21.880 --> 00:06:27.140
+<v Raj Dosanjh>to understand how much generative AI providers are costing per customer because we're in a different
+
+116
+00:06:27.140 --> 00:06:32.360
+<v Raj Dosanjh>world where in terms of SaaS your costs were variable but they weren't variable straight away
+
+117
+00:06:32.360 --> 00:06:37.080
+<v Raj Dosanjh>you wouldn't have to scale up instance straight away not everything runs a capacity but if you
+
+118
+00:06:37.080 --> 00:06:42.120
+<v Raj Dosanjh>use a token at the moment you are getting billed for that so some customers are going to be more
+
+119
+00:06:42.900 --> 00:06:47.220
+<v Raj Dosanjh>profitable than others just because if you're a voice agent and one customer talks on the phone a
+
+120
+00:06:47.220 --> 00:06:50.320
+<v Raj Dosanjh>lot that's going to cost you more and you need to potentially build it correctly for that so
+
+121
+00:06:51.880 --> 00:06:53.960
+<v Raj Dosanjh>in this new world that we need to come up with.
+
+122
+00:06:54.140 --> 00:06:56.940
+<v Raj Dosanjh>We're finding that we've got a pretty good formula now
+
+123
+00:06:56.940 --> 00:06:59.420
+<v Raj Dosanjh>and it's mainly just working very closely with our users.
+
+124
+00:06:59.640 --> 00:07:01.720
+<v Raj Dosanjh>We can tell a story before actually building it out.
+
+125
+00:07:01.820 --> 00:07:04.340
+<v Raj Dosanjh>We have the confidence that if that story lands,
+
+126
+00:07:04.580 --> 00:07:05.960
+<v Raj Dosanjh>we're pretty effective at building it out.
+
+127
+00:07:06.100 --> 00:07:08.340
+<v Raj Dosanjh>So, at this iteration, we've come to what we have today,
+
+128
+00:07:08.480 --> 00:07:11.040
+<v Raj Dosanjh>which is, yeah, a billing is a large part of what we do,
+
+129
+00:07:11.080 --> 00:07:13.200
+<v Raj Dosanjh>but actually we focus on understanding
+
+130
+00:07:13.600 --> 00:07:14.900
+<v Raj Dosanjh>what that agent is doing well,
+
+131
+00:07:14.980 --> 00:07:16.040
+<v Raj Dosanjh>how it's creating the most value.
+
+132
+00:07:16.660 --> 00:07:18.960
+<v Raj Dosanjh>And I spent five years at Palantir
+
+133
+00:07:18.960 --> 00:07:21.580
+<v Raj Dosanjh>and one of the things I really took away from that
+
+134
+00:07:21.580 --> 00:07:23.900
+<v Raj Dosanjh>was if you focus on true value,
+
+135
+00:07:23.980 --> 00:07:25.100
+<v Raj Dosanjh>the rest will take care of itself.
+
+136
+00:07:25.800 --> 00:07:27.720
+<v Raj Dosanjh>So it's kind of been the story so far
+
+137
+00:07:27.720 --> 00:07:28.600
+<v Raj Dosanjh>and it's going pretty well.
+
+138
+00:07:31.060 --> 00:07:32.860
+<v Noah Labhart>First off, I want to dive into the MVP.
+
+139
+00:07:33.080 --> 00:07:34.000
+<v Noah Labhart>So that first version,
+
+140
+00:07:34.220 --> 00:07:35.360
+<v Noah Labhart>maybe it's the Airbnb version
+
+141
+00:07:35.360 --> 00:07:37.000
+<v Noah Labhart>where you took those two weeks,
+
+142
+00:07:37.020 --> 00:07:37.660
+<v Noah Labhart>you built something.
+
+143
+00:07:38.300 --> 00:07:40.980
+<v Noah Labhart>Tell me about that process of building the MVP,
+
+144
+00:07:41.220 --> 00:07:42.340
+<v Noah Labhart>how long it took you to build
+
+145
+00:07:42.340 --> 00:07:44.180
+<v Noah Labhart>and what sort of tools you're using to bring it to life.
+
+146
+00:07:45.800 --> 00:07:49.020
+<v Raj Dosanjh>It was pretty much built with v0 and Cursor.
+
+147
+00:07:50.080 --> 00:07:51.680
+<v Raj Dosanjh>So in the same vein of,
+
+148
+00:07:52.280 --> 00:07:53.940
+<v Raj Dosanjh>I don't want to put any serious effort
+
+149
+00:07:53.940 --> 00:07:55.800
+<v Raj Dosanjh>into building anything I don't have to.
+
+150
+00:07:56.160 --> 00:07:58.400
+<v Raj Dosanjh>I don't want to put any more effort
+
+151
+00:07:58.400 --> 00:07:59.760
+<v Raj Dosanjh>than I have to into actually the MVP.
+
+152
+00:07:59.920 --> 00:08:02.200
+<v Raj Dosanjh>So it would very much be Vercel's v0.
+
+153
+00:08:02.360 --> 00:08:03.360
+<v Raj Dosanjh>I give it a prompt.
+
+154
+00:08:04.080 --> 00:08:06.500
+<v Raj Dosanjh>Yeah, put that into the code base,
+
+155
+00:08:06.740 --> 00:08:08.540
+<v Raj Dosanjh>have Cursor potentially wire it up
+
+156
+00:08:08.540 --> 00:08:11.000
+<v Raj Dosanjh>and very much focusing about the flows.
+
+157
+00:08:11.200 --> 00:08:13.620
+<v Raj Dosanjh>So when I'm thinking about what I'm building,
+
+158
+00:08:14.180 --> 00:08:18.020
+<v Raj Dosanjh>thinking about actually the product and thinking about the story that I want to tell because the
+
+159
+00:08:18.020 --> 00:08:24.420
+<v Raj Dosanjh>product is non-existent yet. So it was very much a simple SDK which we just had some docs the SDK
+
+160
+00:08:24.420 --> 00:08:30.500
+<v Raj Dosanjh>didn't really exist we would show some signals which is what we used for what your agent is doing
+
+161
+00:08:30.500 --> 00:08:35.500
+<v Raj Dosanjh>will pop up in the UI and it shows you how to monetize that and yeah it didn't really take
+
+162
+00:08:35.500 --> 00:08:40.500
+<v Raj Dosanjh>long to build we had a bunch of calls lined up so we would show them something change the v0
+
+163
+00:08:40.500 --> 00:08:44.680
+<v Raj Dosanjh>zero prototype or whatever to that until we started to gain a little more confidence in
+
+164
+00:08:44.680 --> 00:08:49.800
+<v Raj Dosanjh>actually we have something here a lot of our assumptions were actually pretty good so we put
+
+165
+00:08:49.800 --> 00:08:55.200
+<v Raj Dosanjh>a little more investment into it to then find that sort of those early design partners and once we
+
+166
+00:08:55.200 --> 00:09:00.220
+<v Raj Dosanjh>found some design partners we found that there were sort of new problems we were targeting sort
+
+167
+00:09:00.220 --> 00:09:06.960
+<v Raj Dosanjh>of startups that maybe a year or two old in the agent space like they are like so chaotic they do
+
+168
+00:09:06.960 --> 00:09:12.120
+<v Raj Dosanjh>do not have the half an hour required to like implement some things into the code base to send
+
+169
+00:09:12.120 --> 00:09:18.400
+<v Raj Dosanjh>like telemetry back they are not actually that focused on realizing the value they're more
+
+170
+00:09:18.400 --> 00:09:24.860
+<v Raj Dosanjh>interested in like expanding so they can make it to the next round so we started to figure out that
+
+171
+00:09:24.860 --> 00:09:29.900
+<v Raj Dosanjh>showing the value is much more important for them and built some features around that but i think
+
+172
+00:09:29.900 --> 00:09:34.980
+<v Raj Dosanjh>what we really learned was working with these folks as design partners wasn't working because
+
+173
+00:09:37.620 --> 00:09:40.140
+<v Raj Dosanjh>So they were like, yeah, of course we want to design, be your design partners.
+
+174
+00:09:40.540 --> 00:09:41.500
+<v Raj Dosanjh>Money sounds great.
+
+175
+00:09:41.540 --> 00:09:42.300
+<v Raj Dosanjh>He's got a great reputation.
+
+176
+00:09:42.480 --> 00:09:43.380
+<v Raj Dosanjh>Why wouldn't we want to work with you?
+
+177
+00:09:43.660 --> 00:09:46.740
+<v Raj Dosanjh>But then when it comes down to it, oh, could you embed this SDK into your database?
+
+178
+00:09:46.920 --> 00:09:48.020
+<v Raj Dosanjh>Yeah, we're going to get around to it.
+
+179
+00:09:48.160 --> 00:09:49.520
+<v Raj Dosanjh>Oh, our engineers are not sure.
+
+180
+00:09:50.120 --> 00:09:50.800
+<v Raj Dosanjh>A lot of that.
+
+181
+00:09:50.880 --> 00:09:52.800
+<v Raj Dosanjh>So that gives me a lot of signal.
+
+182
+00:09:52.920 --> 00:09:56.900
+<v Raj Dosanjh>So the thing that tells me is maybe our ICPs is not correct.
+
+183
+00:09:57.140 --> 00:09:59.820
+<v Raj Dosanjh>Maybe we're not like approaching this design partner thing correctly.
+
+184
+00:10:00.620 --> 00:10:03.860
+<v Raj Dosanjh>And I think that we were treading water for a bit there while we figured that out.
+
+185
+00:10:03.860 --> 00:10:07.220
+<v Raj Dosanjh>and there was a few things that I think got us over this hump.
+
+186
+00:10:07.640 --> 00:10:09.320
+<v Raj Dosanjh>One was just those pure reps.
+
+187
+00:10:09.420 --> 00:10:11.120
+<v Raj Dosanjh>Every time we had hidden a good objection,
+
+188
+00:10:11.420 --> 00:10:13.660
+<v Raj Dosanjh>we built something in the products to address it, etc.
+
+189
+00:10:13.980 --> 00:10:17.360
+<v Raj Dosanjh>And then the real thing was having design partners pay us.
+
+190
+00:10:17.940 --> 00:10:20.400
+<v Raj Dosanjh>And that now puts some skin in the game their side
+
+191
+00:10:20.400 --> 00:10:23.620
+<v Raj Dosanjh>and it creates a really strong forcing function for us
+
+192
+00:10:23.620 --> 00:10:27.260
+<v Raj Dosanjh>because we know that they are expecting something, they've paid us.
+
+193
+00:10:27.440 --> 00:10:28.880
+<v Raj Dosanjh>And then we got a lot of engagement,
+
+194
+00:10:29.560 --> 00:10:31.900
+<v Raj Dosanjh>which allowed us to iterate very quickly with them.
+
+195
+00:10:32.040 --> 00:10:33.600
+<v Raj Dosanjh>And that is my favorite way of building
+
+196
+00:10:33.860 --> 00:10:36.000
+<v Raj Dosanjh>because they have paid us, they are asking for it.
+
+197
+00:10:36.060 --> 00:10:38.760
+<v Raj Dosanjh>If we're not delivering pure value, they're going to let us know.
+
+198
+00:10:38.900 --> 00:10:41.200
+<v Raj Dosanjh>So I think that was working really well.
+
+199
+00:10:41.340 --> 00:10:43.400
+<v Raj Dosanjh>And I think the other thing that we would do is,
+
+200
+00:10:43.620 --> 00:10:44.760
+<v Raj Dosanjh>we have a lot of events,
+
+201
+00:10:45.520 --> 00:10:48.280
+<v Raj Dosanjh>and we always want to demo something new at the event.
+
+202
+00:10:48.400 --> 00:10:50.800
+<v Raj Dosanjh>And again, it acts as a really good forcing function.
+
+203
+00:10:51.860 --> 00:10:54.200
+<v Raj Dosanjh>So creating these forcing functions and figuring out
+
+204
+00:10:54.200 --> 00:10:58.300
+<v Raj Dosanjh>what sort of forcing functions work for the type of team is super important.
+
+205
+00:10:58.600 --> 00:11:00.940
+<v Raj Dosanjh>And I think that's what got us over the hump of
+
+206
+00:11:00.940 --> 00:11:03.180
+<v Raj Dosanjh>finding those initial early adopters
+
+207
+00:11:03.860 --> 00:11:06.940
+<v Raj Dosanjh>as something that we can really like core into and start building on top of.
+
+208
+00:11:08.940 --> 00:11:12.600
+<v Noah Labhart>You've got something, you've got those early adopters, you're getting that traction you're
+
+209
+00:11:12.600 --> 00:11:16.500
+<v Noah Labhart>looking for and you're ready to build on top of it. I'm curious about how you progressed and
+
+210
+00:11:16.500 --> 00:11:20.480
+<v Noah Labhart>matured the product from that point. And to wrap in a box a little bit, what I'm looking for is
+
+211
+00:11:20.480 --> 00:11:25.300
+<v Noah Labhart>how you built your roadmap, how you went about deciding that, okay, this is the next most
+
+212
+00:11:25.300 --> 00:11:28.160
+<v Noah Labhart>important thing to build or to address with paid.
+
+213
+00:11:29.420 --> 00:11:32.200
+<v Raj Dosanjh>So this is very much writes itself because
+
+214
+00:11:34.640 --> 00:11:37.300
+<v Raj Dosanjh>and make a promise of we can solve this problem.
+
+215
+00:11:38.180 --> 00:11:41.380
+<v Raj Dosanjh>And that our customers don't necessarily know how to solve this problem,
+
+216
+00:11:41.460 --> 00:11:42.360
+<v Raj Dosanjh>otherwise they wouldn't buy us.
+
+217
+00:11:42.460 --> 00:11:45.600
+<v Raj Dosanjh>And we have a better idea, but every customer is different.
+
+218
+00:11:45.740 --> 00:11:47.620
+<v Raj Dosanjh>So learning a lot from my time at Palantir,
+
+219
+00:11:47.640 --> 00:11:49.140
+<v Raj Dosanjh>where the forward deployed engineer model
+
+220
+00:11:49.140 --> 00:11:51.580
+<v Raj Dosanjh>essentially gives you so much learning
+
+221
+00:11:51.580 --> 00:11:54.180
+<v Raj Dosanjh>and so much insight into your customers' problems
+
+222
+00:11:54.180 --> 00:11:56.120
+<v Raj Dosanjh>that the features figure themselves out.
+
+223
+00:11:56.960 --> 00:12:00.080
+<v Raj Dosanjh>And we've taken this philosophy all of the way.
+
+224
+00:12:00.160 --> 00:12:02.680
+<v Raj Dosanjh>We don't necessarily have a real roadmap.
+
+225
+00:12:03.860 --> 00:12:07.660
+<v Raj Dosanjh>every engineer embedded pretty tightly of customers and not just from the
+
+226
+00:12:07.660 --> 00:12:12.000
+<v Raj Dosanjh>implementation phase in terms of making sure that they're using the product
+
+227
+00:12:12.000 --> 00:12:15.600
+<v Raj Dosanjh>seeing if they're using it most effective way they can how can we can
+
+228
+00:12:15.600 --> 00:12:18.860
+<v Raj Dosanjh>expand that account going forward to retention and all these sort of things
+
+229
+00:12:18.860 --> 00:12:23.060
+<v Raj Dosanjh>true she thinks that we would hire for I realized that all you're doing is
+
+230
+00:12:23.060 --> 00:12:26.480
+<v Raj Dosanjh>constraining the bandwidth because let's say a CSM is talking to a customer they
+
+231
+00:12:26.480 --> 00:12:30.180
+<v Raj Dosanjh>see why it's why it's going wild or why it's not that will essentially make its
+
+232
+00:12:30.180 --> 00:12:32.520
+<v Raj Dosanjh>It's way normally to a product manager that will then put it into tickets.
+
+233
+00:12:33.280 --> 00:12:36.680
+<v Raj Dosanjh>And every stage of that process, you're losing information.
+
+234
+00:12:37.300 --> 00:12:40.520
+<v Raj Dosanjh>Whereas if the engineer has seen it themselves, they have an opinion.
+
+235
+00:12:40.640 --> 00:12:45.680
+<v Raj Dosanjh>They can essentially address it straight away and get that feedback cycle very tight.
+
+236
+00:12:45.800 --> 00:12:49.100
+<v Raj Dosanjh>They can essentially ship something within hours of hearing the objection.
+
+237
+00:12:49.400 --> 00:12:50.540
+<v Raj Dosanjh>Our customers love it.
+
+238
+00:12:50.640 --> 00:12:52.900
+<v Raj Dosanjh>They know that they're going to be listened to.
+
+239
+00:12:53.160 --> 00:12:57.840
+<v Raj Dosanjh>Our engineers love it because I think, quite frankly, I've worked with some amazing PMs,
+
+240
+00:12:57.840 --> 00:13:01.600
+<v Raj Dosanjh>but I think there is a category of PM that essentially just does organization,
+
+241
+00:13:02.240 --> 00:13:07.380
+<v Raj Dosanjh>puts tickets in, maybe treats very qualified, very smart engineers as like code monkeys,
+
+242
+00:13:07.560 --> 00:13:08.520
+<v Raj Dosanjh>and they find that frustrating.
+
+243
+00:13:08.800 --> 00:13:12.220
+<v Raj Dosanjh>And I think that removing all of this, simplifying and giving them the freedom
+
+244
+00:13:12.220 --> 00:13:18.220
+<v Raj Dosanjh>has really meant that we're able to adapt and create value and solve our customers' problems
+
+245
+00:13:18.220 --> 00:13:24.860
+<v Raj Dosanjh>much more effectively and much quicker than if we had this very traditional structure.
+
+246
+00:13:24.860 --> 00:13:33.100
+<v Raj Dosanjh>I find that as organizationally, there's so much alpha in the way that we do it because if our competition is doing it, they're still tying up their laces while we solve them.
+
+247
+00:13:33.200 --> 00:13:34.020
+<v Raj Dosanjh>Our customers are happy.
+
+248
+00:13:34.180 --> 00:13:35.920
+<v Raj Dosanjh>And this scales really well.
+
+249
+00:13:36.040 --> 00:13:42.660
+<v Raj Dosanjh>So if you read the Mythical Man month, they talk about how adding more engineers doesn't actually make a project go faster.
+
+250
+00:13:42.880 --> 00:13:49.060
+<v Raj Dosanjh>And you definitely see as we hire engineers, the rate of progress isn't linear, but it's pretty close.
+
+251
+00:13:49.220 --> 00:13:52.760
+<v Raj Dosanjh>So I think that we're finding this method scales really well.
+
+252
+00:13:52.760 --> 00:13:57.900
+<v Raj Dosanjh>engineers really like it and also we don't shy away from the fact that we hire people that
+
+253
+00:13:57.900 --> 00:14:04.040
+<v Raj Dosanjh>are going to be future successful founders and the way we play it is I say to everyone if you
+
+254
+00:14:04.040 --> 00:14:09.020
+<v Raj Dosanjh>guys leave paid to join another company like I have done a bad job of being a CTO I've not created
+
+255
+00:14:09.020 --> 00:14:14.620
+<v Raj Dosanjh>somewhere you want to work but personally if you guys leave to go and be a founder yeah that causes
+
+256
+00:14:14.620 --> 00:14:18.780
+<v Raj Dosanjh>me a problem but ultimately I'm going to be incredibly proud and hope the best for you because
+
+257
+00:14:18.780 --> 00:14:22.020
+<v Raj Dosanjh>I think being a founder is the best thing in the world I wouldn't want to take that away from
+
+258
+00:14:22.760 --> 00:14:26.800
+<v Raj Dosanjh>think everybody should try it. Actually, a lot of what I learned in YC and applying that
+
+259
+00:14:26.800 --> 00:14:31.920
+<v Raj Dosanjh>is working really well. And yeah, the office is just a great place to be. I think that
+
+260
+00:14:32.280 --> 00:14:36.400
+<v Raj Dosanjh>sometimes it's a shock for new hires. We just work with them, get them used to maybe failing
+
+261
+00:14:36.400 --> 00:14:40.300
+<v Raj Dosanjh>here and there, maybe knowing it's not the end of the world and freeing them up from any of that
+
+262
+00:14:40.300 --> 00:14:44.600
+<v Raj Dosanjh>fear that they might've had before to go and build something great and keep it running until you do.
+
+263
+00:14:46.260 --> 00:14:50.060
+<v Noah Labhart>Let's dive into that team then. How did you go about building that team? What did you look for
+
+264
+00:14:50.060 --> 00:14:52.960
+<v Noah Labhart>and those people to indicate that they're the winning horses to join you.
+
+265
+00:14:54.620 --> 00:14:55.860
+<v Raj Dosanjh>This was tough as well.
+
+266
+00:14:56.800 --> 00:14:59.860
+<v Raj Dosanjh>Initially, I wanted to hire people like a similar shape to myself.
+
+267
+00:15:00.280 --> 00:15:05.020
+<v Raj Dosanjh>10 plus years, maybe have got solid CV behind them,
+
+268
+00:15:05.120 --> 00:15:05.920
+<v Raj Dosanjh>been there, done that.
+
+269
+00:15:06.080 --> 00:15:11.220
+<v Raj Dosanjh>And what we found was these people are incredibly hard to find.
+
+270
+00:15:11.320 --> 00:15:14.420
+<v Raj Dosanjh>When you find them to convince them to join you is like very tough,
+
+271
+00:15:14.600 --> 00:15:15.200
+<v Raj Dosanjh>very expensive.
+
+272
+00:15:15.920 --> 00:15:18.600
+<v Raj Dosanjh>And we never successfully hired any one of them.
+
+273
+00:15:20.060 --> 00:15:22.520
+<v Raj Dosanjh>I would just have red flags when I would speak to them.
+
+274
+00:15:22.840 --> 00:15:25.840
+<v Raj Dosanjh>They would use very big hammers to solve issues
+
+275
+00:15:25.840 --> 00:15:28.220
+<v Raj Dosanjh>that potentially do make sense at Meta or Google,
+
+276
+00:15:28.360 --> 00:15:30.760
+<v Raj Dosanjh>but doesn't make sense for like a five-person startup.
+
+277
+00:15:31.020 --> 00:15:34.120
+<v Raj Dosanjh>Out of desperation, I put something on LinkedIn
+
+278
+00:15:34.120 --> 00:15:35.940
+<v Raj Dosanjh>just says, anyone who wants to work with us,
+
+279
+00:15:36.000 --> 00:15:37.160
+<v Raj Dosanjh>go to my DMs.
+
+280
+00:15:37.160 --> 00:15:41.720
+<v Raj Dosanjh>And we found Zylan, who maybe was pretty much
+
+281
+00:15:41.720 --> 00:15:44.100
+<v Raj Dosanjh>just out of uni, maybe a little bit of work experience.
+
+282
+00:15:44.700 --> 00:15:46.360
+<v Raj Dosanjh>Really smart guy from Kazakhstan.
+
+283
+00:15:46.760 --> 00:15:48.340
+<v Raj Dosanjh>And we're like, okay, yeah, let's join us.
+
+284
+00:15:50.060 --> 00:15:52.680
+<v Raj Dosanjh>We're so positively surprised by his output.
+
+285
+00:15:53.000 --> 00:15:56.820
+<v Raj Dosanjh>And like technically there was some work to do, but not too much.
+
+286
+00:15:56.940 --> 00:15:59.700
+<v Raj Dosanjh>Like we worked on that with him, ramped him up.
+
+287
+00:15:59.840 --> 00:16:01.900
+<v Raj Dosanjh>And yeah, our next hire was a friend of his.
+
+288
+00:16:02.040 --> 00:16:03.960
+<v Raj Dosanjh>And from there we figured out the archetype.
+
+289
+00:16:04.320 --> 00:16:10.100
+<v Raj Dosanjh>Maybe two to four, five years experience is really solid enough time for them to have
+
+290
+00:16:10.100 --> 00:16:14.640
+<v Raj Dosanjh>gained an opinion, got some skills, but also potentially not have some bad habits
+
+291
+00:16:14.640 --> 00:16:16.580
+<v Raj Dosanjh>or bad habits they have done.
+
+292
+00:16:16.660 --> 00:16:17.760
+<v Raj Dosanjh>Like we're willing to talk with them.
+
+293
+00:16:17.760 --> 00:16:22.680
+<v Raj Dosanjh>ideally I'm looking for something exceptional they've done in the past but more evidence that
+
+294
+00:16:22.680 --> 00:16:27.140
+<v Raj Dosanjh>they actually are people that do things because I don't know I feel potentially for every hire
+
+295
+00:16:27.140 --> 00:16:32.360
+<v Raj Dosanjh>maybe I do 10-15 interviews and the amount of people when I ask them like what they're most
+
+296
+00:16:32.360 --> 00:16:38.320
+<v Raj Dosanjh>proud of is something around migrating to a microservices architecture or Kubernetes installs
+
+297
+00:16:38.320 --> 00:16:43.440
+<v Raj Dosanjh>like that and I'm just screaming to myself like you've created no value and I think that there
+
+298
+00:16:43.440 --> 00:16:45.800
+<v Raj Dosanjh>there is a bit of culture in engineering
+
+299
+00:16:45.800 --> 00:16:48.480
+<v Raj Dosanjh>in a lot of places where they're focused
+
+300
+00:16:48.480 --> 00:16:51.340
+<v Raj Dosanjh>on these beautiful applications
+
+301
+00:16:51.340 --> 00:16:52.640
+<v Raj Dosanjh>that are architecturally perfect,
+
+302
+00:16:52.760 --> 00:16:54.680
+<v Raj Dosanjh>but are they creating value for their customers?
+
+303
+00:16:55.420 --> 00:16:56.580
+<v Raj Dosanjh>And I think a lot of the time,
+
+304
+00:16:56.600 --> 00:16:57.840
+<v Raj Dosanjh>they're like, oh, we don't worry about the value.
+
+305
+00:16:58.080 --> 00:16:59.340
+<v Raj Dosanjh>And that is a great question.
+
+306
+00:16:59.460 --> 00:17:00.480
+<v Raj Dosanjh>When that happens, it's great
+
+307
+00:17:00.480 --> 00:17:02.460
+<v Raj Dosanjh>because they're ultimately disqualified very quickly.
+
+308
+00:17:02.780 --> 00:17:04.640
+<v Raj Dosanjh>And also, if someone has,
+
+309
+00:17:05.340 --> 00:17:06.780
+<v Raj Dosanjh>actually a great example is Zylan,
+
+310
+00:17:06.920 --> 00:17:09.500
+<v Raj Dosanjh>that hire, he was like, oh, I had some food allergies,
+
+311
+00:17:09.500 --> 00:17:10.420
+<v Raj Dosanjh>so I built this app,
+
+312
+00:17:10.520 --> 00:17:12.460
+<v Raj Dosanjh>which allowed me to take a picture of the label
+
+313
+00:17:13.280 --> 00:17:15.340
+<v Raj Dosanjh>anything. I was like, oh my god, that is perfect.
+
+314
+00:17:15.420 --> 00:17:17.320
+<v Raj Dosanjh>You've seen a problem, you have solved it
+
+315
+00:17:17.320 --> 00:17:18.600
+<v Raj Dosanjh>and you have figured out how to do that by yourself.
+
+316
+00:17:18.900 --> 00:17:21.340
+<v Raj Dosanjh>That is what I mean when I say they're exceptional,
+
+317
+00:17:21.520 --> 00:17:23.140
+<v Raj Dosanjh>they have some history of doing something
+
+318
+00:17:23.140 --> 00:17:25.340
+<v Raj Dosanjh>and I don't quite know how to
+
+319
+00:17:25.340 --> 00:17:27.420
+<v Raj Dosanjh>describe this, but I feel like you can just get the impression
+
+320
+00:17:27.420 --> 00:17:28.260
+<v Raj Dosanjh>when someone is smart.
+
+321
+00:17:29.340 --> 00:17:30.840
+<v Raj Dosanjh>The left-wings, I think that
+
+322
+00:17:31.320 --> 00:17:33.080
+<v Raj Dosanjh>that's enough to show me that I can work with them
+
+323
+00:17:33.980 --> 00:17:35.020
+<v Raj Dosanjh>and pay to the environment
+
+324
+00:17:35.020 --> 00:17:37.320
+<v Raj Dosanjh>for them to really flourish. We've seen this work
+
+325
+00:17:37.320 --> 00:17:37.860
+<v Raj Dosanjh>out really well.
+
+326
+00:17:38.600 --> 00:17:40.500
+<v Raj Dosanjh>The team is now, I want to say,
+
+327
+00:17:40.900 --> 00:17:42.820
+<v Raj Dosanjh>12 or 13 engineers and growing
+
+328
+00:17:43.440 --> 00:17:47.920
+<v Raj Dosanjh>And I am constantly surprised by how quickly new people are onboarding.
+
+329
+00:17:48.200 --> 00:17:50.920
+<v Raj Dosanjh>In a couple of days, they have committed some code.
+
+330
+00:17:51.160 --> 00:17:54.000
+<v Raj Dosanjh>And the reason it only takes a couple of days is because for the first couple of days,
+
+331
+00:17:54.100 --> 00:17:56.860
+<v Raj Dosanjh>we asked them to build an agent integrated with paid to show them the ropes.
+
+332
+00:17:56.960 --> 00:17:58.400
+<v Raj Dosanjh>And then that's productive so quickly.
+
+333
+00:17:58.580 --> 00:18:02.860
+<v Raj Dosanjh>So I would definitely suggest this for like anyone who's struggling with hiring,
+
+334
+00:18:03.020 --> 00:18:04.480
+<v Raj Dosanjh>potentially lean into that.
+
+335
+00:18:07.160 --> 00:18:08.340
+<v Noah Labhart>Let's move forward then.
+
+336
+00:18:08.420 --> 00:18:09.960
+<v Noah Labhart>Let's talk about scalability.
+
+337
+00:18:09.960 --> 00:18:13.980
+<v Noah Labhart>You know, was scale sort of considered from the beginning?
+
+338
+00:18:14.120 --> 00:18:17.480
+<v Noah Labhart>I wouldn't even say like in how you built the MVP or that.
+
+339
+00:18:17.560 --> 00:18:20.720
+<v Noah Labhart>Have there been interesting areas where you've had to fight scale as you've grown?
+
+340
+00:18:21.580 --> 00:18:32.740
+<v Raj Dosanjh>When people talk about scalability, that really scares me because I think that it's a lot more complicated than people think to potentially go and build a production ready app that like scales really well.
+
+341
+00:18:33.260 --> 00:18:37.960
+<v Raj Dosanjh>What you'll find is and actually a lot of engineers that join say, oh, I think we need to rework this architecture.
+
+342
+00:18:39.960 --> 00:18:41.680
+<v Raj Dosanjh>for scalability and stuff like that.
+
+343
+00:18:41.800 --> 00:18:43.760
+<v Raj Dosanjh>And actually, when I dig into it,
+
+344
+00:18:43.840 --> 00:18:46.280
+<v Raj Dosanjh>this is normally parroting something that they've heard
+
+345
+00:18:46.280 --> 00:18:47.340
+<v Raj Dosanjh>or something that they've read.
+
+346
+00:18:47.660 --> 00:18:51.040
+<v Raj Dosanjh>I think scalability is a lot simpler in that way.
+
+347
+00:18:51.140 --> 00:18:53.220
+<v Raj Dosanjh>And it all comes down to good observability.
+
+348
+00:18:53.420 --> 00:18:56.720
+<v Raj Dosanjh>And it's understanding how your application is performing,
+
+349
+00:18:56.820 --> 00:19:00.320
+<v Raj Dosanjh>having metrics on like your P95s
+
+350
+00:19:00.320 --> 00:19:02.900
+<v Raj Dosanjh>and the CPU usage of your machines or whatever,
+
+351
+00:19:03.600 --> 00:19:05.000
+<v Raj Dosanjh>and being on top of that
+
+352
+00:19:05.000 --> 00:19:06.800
+<v Raj Dosanjh>and solving the problems as they come.
+
+353
+00:19:06.800 --> 00:19:10.840
+<v Raj Dosanjh>because so many times and in times that you potentially,
+
+354
+00:19:11.080 --> 00:19:13.280
+<v Raj Dosanjh>the places you would think that would do better,
+
+355
+00:19:14.000 --> 00:19:17.340
+<v Raj Dosanjh>they would throw very big hammers at perceived problems
+
+356
+00:19:17.340 --> 00:19:19.700
+<v Raj Dosanjh>and you don't know that's going to fix it.
+
+357
+00:19:19.800 --> 00:19:21.980
+<v Raj Dosanjh>You hear the horror stories of the app is not scaling,
+
+358
+00:19:22.060 --> 00:19:23.540
+<v Raj Dosanjh>so they're going to migrate to Kubernetes.
+
+359
+00:19:23.740 --> 00:19:25.720
+<v Raj Dosanjh>I'm like, that is a huge bet.
+
+360
+00:19:25.940 --> 00:19:28.140
+<v Raj Dosanjh>The opportunity cost of that is huge.
+
+361
+00:19:28.520 --> 00:19:30.760
+<v Raj Dosanjh>You don't necessarily have the skill to do this,
+
+362
+00:19:31.340 --> 00:19:33.420
+<v Raj Dosanjh>especially when one small surgical fix,
+
+363
+00:19:33.420 --> 00:19:34.740
+<v Raj Dosanjh>introducing like a
+
+364
+00:19:35.260 --> 00:19:36.420
+<v Raj Dosanjh>SQL database proxy
+
+365
+00:19:36.420 --> 00:19:38.720
+<v Raj Dosanjh>or adding a cache here and there
+
+366
+00:19:38.720 --> 00:19:40.400
+<v Raj Dosanjh>could potentially improve your scalability a lot
+
+367
+00:19:40.400 --> 00:19:42.140
+<v Raj Dosanjh>the work is not always done
+
+368
+00:19:42.140 --> 00:19:43.620
+<v Raj Dosanjh>so then they feel like they're blind
+
+369
+00:19:43.620 --> 00:19:45.260
+<v Raj Dosanjh>and especially like scalability issues
+
+370
+00:19:45.260 --> 00:19:46.500
+<v Raj Dosanjh>tend to be a little bit urgent
+
+371
+00:19:46.500 --> 00:19:48.780
+<v Raj Dosanjh>so it looks a little bit passive
+
+372
+00:19:48.780 --> 00:19:50.440
+<v Raj Dosanjh>when you say we're actually going to do nothing
+
+373
+00:19:51.360 --> 00:19:53.020
+<v Raj Dosanjh>and just wait for some metrics
+
+374
+00:19:53.020 --> 00:19:54.680
+<v Raj Dosanjh>but sometimes that's the best way to go
+
+375
+00:19:54.680 --> 00:19:55.800
+<v Raj Dosanjh>because the alternative is
+
+376
+00:19:55.800 --> 00:19:56.700
+<v Raj Dosanjh>you're going to be doing something
+
+377
+00:19:56.700 --> 00:19:57.900
+<v Raj Dosanjh>but you don't know if that's going to get you
+
+378
+00:19:57.900 --> 00:19:58.460
+<v Raj Dosanjh>closer to your goal
+
+379
+00:19:58.460 --> 00:19:59.220
+<v Raj Dosanjh>so I think that
+
+380
+00:19:59.860 --> 00:20:01.260
+<v Raj Dosanjh>being disciplined about this
+
+381
+00:20:01.260 --> 00:20:02.440
+<v Raj Dosanjh>you will probably have a hypothesis
+
+382
+00:20:03.420 --> 00:20:07.880
+<v Raj Dosanjh>to test it, have some data to back it up, and then fix it. I think you can get a lot further
+
+383
+00:20:08.600 --> 00:20:12.620
+<v Raj Dosanjh>than you potentially think. We've tackled a few of these. So we moved from EC2,
+
+384
+00:20:13.200 --> 00:20:18.160
+<v Raj Dosanjh>a single instance to ECS, which has some level of horizontal scaling. We've introduced some
+
+385
+00:20:18.720 --> 00:20:23.820
+<v Raj Dosanjh>different databases, but it's never been like everything is on fire. It's just saying,
+
+386
+00:20:23.880 --> 00:20:27.660
+<v Raj Dosanjh>oh, we're seeing a bit of back pressure. Let's spend a few days to get on top of this.
+
+387
+00:20:28.200 --> 00:20:32.140
+<v Raj Dosanjh>Whereas it's potentially not as satisfying, it's a bit of a boring answer. I find that
+
+388
+00:20:33.420 --> 00:20:37.460
+<v Raj Dosanjh>well and some of the biggest apps that I've worked on and if you take something like Palantir
+
+389
+00:20:37.460 --> 00:20:41.100
+<v Raj Dosanjh>Foundry that doesn't look like the perfect architecture that you potentially would think
+
+390
+00:20:41.100 --> 00:20:45.700
+<v Raj Dosanjh>it would be for a software that costs millions and millions of dollars it's just stuff that has
+
+391
+00:20:45.700 --> 00:20:50.060
+<v Raj Dosanjh>been battle tested enough and had enough iteration that all of these things have been found and all
+
+392
+00:20:50.060 --> 00:20:55.600
+<v Raj Dosanjh>of these bottlenecks have been addressed and it just builds up over time so that's my general
+
+393
+00:20:55.600 --> 00:20:59.440
+<v Raj Dosanjh>thoughts on it and I think sometimes it is a battle depending on what type of engineers you
+
+394
+00:20:59.440 --> 00:21:04.880
+<v Raj Dosanjh>have. Fundamentally, this infrastructure can be really enjoyable to people. And I have to
+
+395
+00:21:04.880 --> 00:21:10.080
+<v Raj Dosanjh>sometimes rewire the incentives. Okay, there's so much alpha to create. We're building so much
+
+396
+00:21:10.080 --> 00:21:14.740
+<v Raj Dosanjh>stuff, cool stuff, talking to customers. Focus on that. I get it, infrastructure can be cool,
+
+397
+00:21:14.820 --> 00:21:20.440
+<v Raj Dosanjh>but actually, is that going to move it forward? And I think that I'm in a really good place and
+
+398
+00:21:20.440 --> 00:21:24.960
+<v Raj Dosanjh>so grateful to the amazing people I have on my team that actually we all get it. And the culture
+
+399
+00:21:24.960 --> 00:21:28.200
+<v Raj Dosanjh>which is now becoming where almost it's building up an immune system
+
+400
+00:21:28.200 --> 00:21:32.120
+<v Raj Dosanjh>so we can reject it when we have these sort of big heavy-handed ideas come up.
+
+401
+00:21:33.640 --> 00:21:37.540
+<v Noah Labhart>Okay, Raj, as you step out on the balcony and you look across all that you've built,
+
+402
+00:21:37.600 --> 00:21:40.240
+<v Noah Labhart>thus far with paid, what are you most proud of?
+
+403
+00:21:42.000 --> 00:21:48.180
+<v Raj Dosanjh>The way we leaned on like OpenTelemetry, I think, was a really smart move by us.
+
+404
+00:21:48.720 --> 00:21:53.600
+<v Raj Dosanjh>It allows us to solve this billing problem in a way that has not been solved before.
+
+405
+00:21:54.960 --> 00:22:00.720
+<v Raj Dosanjh>that something that I really like to do is take approaches that work in areas that are potentially
+
+406
+00:22:00.720 --> 00:22:06.280
+<v Raj Dosanjh>not what you're working on and seeing if they apply. So we started out with like a metering
+
+407
+00:22:06.280 --> 00:22:11.160
+<v Raj Dosanjh>solution where we have an SDK and you would submit events and we found that the person submitting the
+
+408
+00:22:11.160 --> 00:22:14.820
+<v Raj Dosanjh>events is being pushed by a non-technical person to just do it so they're not going to do the best
+
+409
+00:22:14.820 --> 00:22:18.900
+<v Raj Dosanjh>job of it. They're not that interested in doing it. They're busy and that would really halt our
+
+410
+00:22:18.900 --> 00:22:23.620
+<v Raj Dosanjh>integrations because fundamentally paid needs to know what an agent is doing. Looking at something
+
+411
+00:22:24.960 --> 00:22:29.680
+<v Raj Dosanjh>I can see a flame graph of every sort of method and function that was called, how long it took.
+
+412
+00:22:29.980 --> 00:22:31.820
+<v Raj Dosanjh>And there's so much information in this.
+
+413
+00:22:32.080 --> 00:22:34.160
+<v Raj Dosanjh>And I'm not instrumenting this bit by bit.
+
+414
+00:22:34.260 --> 00:22:36.020
+<v Raj Dosanjh>This is already done for paid.
+
+415
+00:22:36.200 --> 00:22:39.320
+<v Raj Dosanjh>And actually, a lot of our customers might be doing something similar.
+
+416
+00:22:39.400 --> 00:22:40.280
+<v Raj Dosanjh>It's a concept they understand.
+
+417
+00:22:40.460 --> 00:22:42.080
+<v Raj Dosanjh>And actually, it's a concept engineers understand.
+
+418
+00:22:43.180 --> 00:22:50.980
+<v Raj Dosanjh>And what we're able to do is abstract the hard part to someone who cares, to someone who does care more about the revenue of the business.
+
+419
+00:22:50.980 --> 00:22:58.020
+<v Raj Dosanjh>is. And then we have the additional challenge of spans and method names. And these descriptors are
+
+420
+00:22:58.020 --> 00:23:03.460
+<v Raj Dosanjh>not very friendly to somebody who doesn't really understand that. But actually, we're at a point
+
+421
+00:23:03.460 --> 00:23:09.120
+<v Raj Dosanjh>where an LLM AI can make that a lot simpler. And again, that's another massive green flag in my
+
+422
+00:23:09.120 --> 00:23:12.520
+<v Raj Dosanjh>head, because we're doing something that is just about possible. This solution wouldn't have worked
+
+423
+00:23:12.520 --> 00:23:16.520
+<v Raj Dosanjh>a few years ago, because you take some telemetry data and show it to somebody non-technical,
+
+424
+00:23:16.520 --> 00:23:20.240
+<v Raj Dosanjh>they're like okay what do i do with this but actually now we can put that into context
+
+425
+00:23:20.740 --> 00:23:25.980
+<v Raj Dosanjh>and use natural language to create transformational queries that can then turn this sort of raw data
+
+426
+00:23:26.860 --> 00:23:31.380
+<v Raj Dosanjh>into billable business metrics that map directly onto what their end customers are paying for
+
+427
+00:23:31.380 --> 00:23:38.400
+<v Raj Dosanjh>i think that was like such a huge unlock and i'm also incredibly proud of how quickly we were able
+
+428
+00:23:38.400 --> 00:23:42.860
+<v Raj Dosanjh>to build that by essentially focusing on the alpha we could have gone deep and started to
+
+429
+00:23:42.860 --> 00:23:46.220
+<v Raj Dosanjh>build a custom telemetry system but why do that when there's an open standard out there
+
+430
+00:23:46.520 --> 00:23:51.860
+<v Raj Dosanjh>It helps us build the trust of engineers, and we initially proved it by using it for cost tracking.
+
+431
+00:23:53.000 --> 00:23:57.840
+<v Raj Dosanjh>Through OpenTelemetry, we were able to understand, at least for Node.js apps, the egress that was made.
+
+432
+00:23:57.920 --> 00:24:00.220
+<v Raj Dosanjh>So we can say, oh, there was an egress made to OpenAI at this point.
+
+433
+00:24:00.260 --> 00:24:05.560
+<v Raj Dosanjh>We can look at the request and the response and say, hey, this customer is costing you this much because we're just able to decode that data.
+
+434
+00:24:06.360 --> 00:24:13.540
+<v Raj Dosanjh>So we showed value exceptionally quickly, and it also proved the hypothesis that actually people are willing to do this.
+
+435
+00:24:13.540 --> 00:24:18.260
+<v Raj Dosanjh>this does get engineers more excited and we can present it in a way where our sort of business
+
+436
+00:24:18.800 --> 00:24:23.460
+<v Raj Dosanjh>blocker which was getting engineers to the work actually they can become our champions and i love
+
+437
+00:24:23.460 --> 00:24:27.280
+<v Raj Dosanjh>that we address that from a product point of view because often that's done from marketing and we
+
+438
+00:24:27.280 --> 00:24:31.020
+<v Raj Dosanjh>are going to invest in marketing more to developers and showing them why this is going to make their
+
+439
+00:24:31.020 --> 00:24:35.840
+<v Raj Dosanjh>lives easier but i think that there's something really pure about finding a product solution
+
+440
+00:24:35.840 --> 00:24:42.440
+<v Raj Dosanjh>and actually finding a bunch of things that kind of are already out there but repurpose for something
+
+441
+00:24:44.560 --> 00:24:45.920
+<v Noah Labhart>Let's flip the script a little bit.
+
+442
+00:24:45.960 --> 00:24:47.520
+<v Noah Labhart>Tell me about a mistake you made
+
+443
+00:24:47.520 --> 00:24:49.760
+<v Noah Labhart>and how you and your team responded to it.
+
+444
+00:24:50.920 --> 00:24:52.140
+<v Raj Dosanjh>In the early days of the company,
+
+445
+00:24:52.360 --> 00:24:54.240
+<v Raj Dosanjh>me and my co-founders didn't really know each other.
+
+446
+00:24:54.360 --> 00:24:56.260
+<v Raj Dosanjh>And I think that there was a bit of tension
+
+447
+00:24:56.260 --> 00:24:57.120
+<v Raj Dosanjh>as to how we would build it.
+
+448
+00:24:57.280 --> 00:24:59.460
+<v Raj Dosanjh>So when my co-founders were very big
+
+449
+00:24:59.460 --> 00:25:02.260
+<v Raj Dosanjh>in terms of write a spec, have someone to build it,
+
+450
+00:25:02.300 --> 00:25:03.640
+<v Raj Dosanjh>it's potentially like low-skilled work
+
+451
+00:25:03.640 --> 00:25:05.300
+<v Raj Dosanjh>and you could outsource that and get a lot done.
+
+452
+00:25:05.820 --> 00:25:07.660
+<v Raj Dosanjh>And I think we burnt a bit of time during this
+
+453
+00:25:07.660 --> 00:25:09.480
+<v Raj Dosanjh>and eventually we learned that this was not the approach.
+
+454
+00:25:10.280 --> 00:25:12.880
+<v Raj Dosanjh>I think the thing that I think back to
+
+455
+00:25:13.540 --> 00:25:16.240
+<v Raj Dosanjh>I was trying to work in a way that I don't like to work.
+
+456
+00:25:16.700 --> 00:25:18.440
+<v Raj Dosanjh>And that's being very prescriptive.
+
+457
+00:25:18.680 --> 00:25:23.000
+<v Raj Dosanjh>We just weren't operating as efficiently as we should have been.
+
+458
+00:25:23.080 --> 00:25:26.900
+<v Raj Dosanjh>And that was just because I very much enjoy it when engineers that I work with take initiative.
+
+459
+00:25:27.260 --> 00:25:28.460
+<v Raj Dosanjh>But no, they wanted a spec.
+
+460
+00:25:28.620 --> 00:25:30.200
+<v Raj Dosanjh>It would be exactly built to that spec.
+
+461
+00:25:30.500 --> 00:25:31.260
+<v Raj Dosanjh>And guess what?
+
+462
+00:25:31.360 --> 00:25:32.680
+<v Raj Dosanjh>We actually didn't know what to build.
+
+463
+00:25:32.800 --> 00:25:34.600
+<v Raj Dosanjh>So, you know, this spec, we're just guessing.
+
+464
+00:25:34.660 --> 00:25:38.920
+<v Raj Dosanjh>But actually coming back to the sort of having engineers own the whole relationship,
+
+465
+00:25:39.000 --> 00:25:41.300
+<v Raj Dosanjh>there was like, you know, I'm talking to customers.
+
+466
+00:25:41.380 --> 00:25:43.080
+<v Raj Dosanjh>I'm then translating that into what I see.
+
+467
+00:25:43.540 --> 00:25:46.060
+<v Raj Dosanjh>it's a big chunk of work that someone goes away and builds.
+
+468
+00:25:46.480 --> 00:25:48.400
+<v Raj Dosanjh>They probably don't build to the standard that we need.
+
+469
+00:25:49.120 --> 00:25:51.960
+<v Raj Dosanjh>It's hard for me to put in the time to properly explain it
+
+470
+00:25:51.960 --> 00:25:55.060
+<v Raj Dosanjh>and then come out and actually, has it moved us forward?
+
+471
+00:25:55.120 --> 00:25:57.300
+<v Raj Dosanjh>No, because they've done what was in the instructions.
+
+472
+00:25:57.820 --> 00:26:00.160
+<v Raj Dosanjh>They may have done it to a different standard than needed.
+
+473
+00:26:00.280 --> 00:26:01.460
+<v Raj Dosanjh>The instructions might have been wrong.
+
+474
+00:26:01.700 --> 00:26:03.420
+<v Raj Dosanjh>And I feel like where I really failed is,
+
+475
+00:26:03.520 --> 00:26:05.820
+<v Raj Dosanjh>I didn't push hard enough initially to say,
+
+476
+00:26:05.860 --> 00:26:07.820
+<v Raj Dosanjh>actually, this cannot be the way we build this company
+
+477
+00:26:07.820 --> 00:26:09.340
+<v Raj Dosanjh>if you want me to run engineering.
+
+478
+00:26:09.580 --> 00:26:11.800
+<v Raj Dosanjh>Because I think there's an element of,
+
+479
+00:26:13.540 --> 00:26:17.420
+<v Raj Dosanjh>it fit build the business that you'll like want to build and I definitely didn't have this in my
+
+480
+00:26:17.420 --> 00:26:21.980
+<v Raj Dosanjh>last startup and I think that sort of organizationally it was going away from me in this
+
+481
+00:26:22.500 --> 00:26:28.520
+<v Raj Dosanjh>aspect as well there was a lot of tension and I think that I wasn't essentially being vocal enough
+
+482
+00:26:28.520 --> 00:26:33.640
+<v Raj Dosanjh>I think that I was trying to essentially be too people-pleasing so didn't put my foot down like
+
+483
+00:26:33.640 --> 00:26:38.000
+<v Raj Dosanjh>hard enough and I'm gonna be honest that we probably lost a few months to this so when we
+
+484
+00:26:38.000 --> 00:26:41.660
+<v Raj Dosanjh>addressed that said this is not gonna be the way we worked and then that was through a lot of
+
+485
+00:26:43.600 --> 00:26:48.360
+<v Raj Dosanjh>actually we came to a solution that I liked and ultimately I think it was the right decision and
+
+486
+00:26:48.360 --> 00:26:52.000
+<v Raj Dosanjh>honestly through that fighting and through these arguments and tension with co-founders our
+
+487
+00:26:52.000 --> 00:26:57.020
+<v Raj Dosanjh>relationship is a lot stronger if you know someone truly you're okay to argue with them it's when you
+
+488
+00:26:57.020 --> 00:27:00.800
+<v Raj Dosanjh>don't have that trust and respect necessarily you're worried about like how they're going to
+
+489
+00:27:00.800 --> 00:27:05.780
+<v Raj Dosanjh>take it you potentially don't have those hard conversations so I think that when I look back
+
+490
+00:27:05.780 --> 00:27:10.980
+<v Raj Dosanjh>to the mistakes that we made and like I'm gonna honestly take the responsibility for this one
+
+491
+00:27:10.980 --> 00:27:15.360
+<v Raj Dosanjh>when I saw things weren't going in the direction I want or the direction that I could work most
+
+492
+00:27:15.360 --> 00:27:19.840
+<v Raj Dosanjh>effectively I was not quick enough to have those difficult conversations and I think that's
+
+493
+00:27:19.840 --> 00:27:24.300
+<v Raj Dosanjh>actually probably been the place that I've grown most in this role a lot of the times it's been
+
+494
+00:27:24.300 --> 00:27:28.600
+<v Raj Dosanjh>I see something is happening in the way that I don't necessarily agree with but potentially don't
+
+495
+00:27:28.600 --> 00:27:33.220
+<v Raj Dosanjh>intervene enough and then at that point your feedback cycle is very long because you've not
+
+496
+00:27:33.220 --> 00:27:39.200
+<v Raj Dosanjh>validated it quickly and ultimately time will kill most ideas and time will kill most startups so
+
+497
+00:27:40.980 --> 00:27:43.920
+<v Raj Dosanjh>bringing everything forward wasn't the way we were thinking about it. So I think that was probably
+
+498
+00:27:43.920 --> 00:27:48.140
+<v Raj Dosanjh>the biggest mistake in the starting of the company. And I'm actually really glad that it happened
+
+499
+00:27:48.140 --> 00:27:48.740
+<v Raj Dosanjh>pretty early on.
+
+500
+00:27:51.920 --> 00:27:55.540
+<v Noah Labhart>Okay, let's move forward then. Tell me what the future looks like for paid. I
+
+501
+00:27:55.540 --> 00:27:59.280
+<v Noah Labhart>really want to hear the passion in your voice for what you've built for the team that you're
+
+502
+00:27:59.280 --> 00:28:00.660
+<v Noah Labhart>leading. Tell me what the future looks like.
+
+503
+00:28:02.200 --> 00:28:06.800
+<v Raj Dosanjh>My goal is that anyone who is able to build an AI
+
+504
+00:28:06.800 --> 00:28:13.040
+<v Raj Dosanjh>agent and actually the bar for this is becoming a lot lower we'll be able to turn that fun project
+
+505
+00:28:13.040 --> 00:28:20.860
+<v Raj Dosanjh>into a viable business using paid so i want paid to create hundreds or even thousands of millionaires
+
+506
+00:28:20.860 --> 00:28:28.660
+<v Raj Dosanjh>and i hope that also it can act as a way to get ai into the hands of most people and that could be
+
+507
+00:28:28.660 --> 00:28:34.240
+<v Raj Dosanjh>our sort of intelligence making sure it's priced correctly so that it's viable for our customers
+
+508
+00:28:34.240 --> 00:28:37.480
+<v Raj Dosanjh>to sell it to different people who potentially would want me to be priced out.
+
+509
+00:28:37.600 --> 00:28:43.120
+<v Raj Dosanjh>And also the customers of ours are created because they see that actually I can vibe
+
+510
+00:28:43.120 --> 00:28:45.680
+<v Raj Dosanjh>code this agent, but it's providing me a bunch of value.
+
+511
+00:28:45.860 --> 00:28:48.820
+<v Raj Dosanjh>Why can't it provide anyone else a bunch of value?
+
+512
+00:28:49.000 --> 00:28:50.640
+<v Raj Dosanjh>So that's my dream for where the business goes.
+
+513
+00:28:50.720 --> 00:28:52.500
+<v Raj Dosanjh>And I think this is very important to me as well.
+
+514
+00:28:52.600 --> 00:28:57.940
+<v Raj Dosanjh>You can see how there is potentially a future where people like you and I potentially benefit
+
+515
+00:28:57.940 --> 00:29:03.320
+<v Raj Dosanjh>really well from AI and reap a lot of the rewards, but people are left behind.
+
+516
+00:29:04.240 --> 00:29:08.700
+<v Raj Dosanjh>hard at least in the uk for folks to find jobs if they study computer science and that's insane to
+
+517
+00:29:08.700 --> 00:29:12.240
+<v Raj Dosanjh>me being a software engineer used to be such a safe career bet even like five six years ago
+
+518
+00:29:12.800 --> 00:29:16.220
+<v Raj Dosanjh>and i'm hoping paid can be part of the answer to this one of the things we will start doing and
+
+519
+00:29:16.220 --> 00:29:20.480
+<v Raj Dosanjh>we're in the stages of planning and hoping we're going to get to do a bit of this like this year
+
+520
+00:29:20.480 --> 00:29:25.640
+<v Raj Dosanjh>is hit up the universities talk to people about hey that idea or even that university project why
+
+521
+00:29:25.640 --> 00:29:29.600
+<v Raj Dosanjh>not make it into a business and be the catalyst for that so that would be my sort of ultimate
+
+522
+00:29:29.600 --> 00:29:33.960
+<v Raj Dosanjh>dream. In terms of the products, we're working towards that. We're launching our self-serve
+
+523
+00:29:33.960 --> 00:29:37.760
+<v Raj Dosanjh>offering. We're with some early design partners now, but we're looking for a launch in like late
+
+524
+00:29:37.760 --> 00:29:43.740
+<v Raj Dosanjh>Q1 next year and also making the product more proactive. So I see it as like levels of AI
+
+525
+00:29:43.740 --> 00:29:49.820
+<v Raj Dosanjh>assistance. First of all, actually not too much AI. Now we have ways to prompt and ask questions
+
+526
+00:29:49.820 --> 00:29:55.060
+<v Raj Dosanjh>about your customers and how it's doing and build interactive dashboards. And we're reaching level
+
+527
+00:29:55.060 --> 00:30:00.420
+<v Raj Dosanjh>level three where I want paid to be more proactive and say hey you are leaving x amount off the table
+
+528
+00:30:00.420 --> 00:30:05.280
+<v Raj Dosanjh>you need to actually be charging for this new functionality that your agent has started doing
+
+529
+00:30:05.280 --> 00:30:10.240
+<v Raj Dosanjh>and we've understood that without your engineers having to do anything just through telemetry data
+
+530
+00:30:10.240 --> 00:30:14.460
+<v Raj Dosanjh>our AI has managed to read it understand that value has been created that wasn't before
+
+531
+00:30:14.460 --> 00:30:20.940
+<v Raj Dosanjh>and allow our customers to realize that value so I think that's going to be a big theme of next year
+
+532
+00:30:20.940 --> 00:30:26.860
+<v Raj Dosanjh>and actually when I've seen some experiments that we've done the team I'm constantly shocked at how
+
+533
+00:30:26.860 --> 00:30:32.840
+<v Raj Dosanjh>much we can infer we do demos every Friday where the team show off what they've done like big or
+
+534
+00:30:32.840 --> 00:30:39.920
+<v Raj Dosanjh>small and we had this one demo where we took telemetry data and used a visualization part
+
+535
+00:30:39.920 --> 00:30:45.380
+<v Raj Dosanjh>of our product called blocks and blocks which is like essentially a rendering engine that uses AI
+
+536
+00:30:45.380 --> 00:30:50.860
+<v Raj Dosanjh>to build UIs, has taken telemetry data and been able to draw a flow chart for what the agent was
+
+537
+00:30:50.860 --> 00:30:54.680
+<v Raj Dosanjh>doing. And we've not even designed it to do that. We're like, oh, our UI layer has actually
+
+538
+00:30:55.520 --> 00:30:59.940
+<v Raj Dosanjh>shown understanding itself and actually has given us a diagram of what the agent is doing.
+
+539
+00:31:00.160 --> 00:31:05.340
+<v Raj Dosanjh>Garry Tan was actually my partner in YC and he said something that I actually thought was nonsense at
+
+540
+00:31:05.340 --> 00:31:12.480
+<v Raj Dosanjh>the time, but is showing to be true. He said, just build it even if the AI is not necessarily there
+
+541
+00:31:12.480 --> 00:31:17.960
+<v Raj Dosanjh>there and the AI will probably catch up and I was like it can't be the case but he's being shown
+
+542
+00:31:17.960 --> 00:31:23.180
+<v Raj Dosanjh>like time and time again like that's going to be true and then I also think about something that
+
+543
+00:31:23.180 --> 00:31:28.740
+<v Raj Dosanjh>I was very fortunate in my YC batch to have a few minutes of talking to Sam Altman and he was very
+
+544
+00:31:29.240 --> 00:31:32.940
+<v Raj Dosanjh>intense but when I spoke to him about this and validated he's I think this is going to be true
+
+545
+00:31:32.940 --> 00:31:38.500
+<v Raj Dosanjh>until we reach GPT-6 and then I'm not sure so yeah I feel like I've heard it from pretty good
+
+546
+00:31:38.500 --> 00:31:44.500
+<v Raj Dosanjh>authority and I'm very much seeing this play out to be true. And yeah, I guess it is core in terms
+
+547
+00:31:44.500 --> 00:31:48.160
+<v Raj Dosanjh>of like how paid is approaching the future. And I think that's one of the reasons we're ultimately
+
+548
+00:31:48.160 --> 00:31:55.160
+<v Raj Dosanjh>going to win and win very big because we're set up to realize these advances in the sort of
+
+549
+00:31:55.160 --> 00:31:55.840
+<v Raj Dosanjh>generative models.
+
+550
+00:31:57.220 --> 00:32:01.560
+<v Noah Labhart>Let's switch to you, Raj. Who influences the way that you work? Any more person
+
+551
+00:32:01.560 --> 00:32:03.720
+<v Noah Labhart>or many persons or something you look up to and why?
+
+552
+00:32:04.880 --> 00:32:08.240
+<v Raj Dosanjh>At the moment, my co-founder Manny is being
+
+553
+00:32:08.500 --> 00:32:14.340
+<v Raj Dosanjh>such a positive influence for me we work super well together and i think that we've over the
+
+554
+00:32:14.340 --> 00:32:18.500
+<v Raj Dosanjh>course of this has actually become very close so i would go to him with some something i'm thinking
+
+555
+00:32:18.500 --> 00:32:24.380
+<v Raj Dosanjh>about any ideas and bounce ideas off each other and ask him about how he approaches stuff and
+
+556
+00:32:24.380 --> 00:32:29.840
+<v Raj Dosanjh>actually he's teaching me a lot about how sales works and that's just making me better at my job
+
+557
+00:32:29.840 --> 00:32:35.260
+<v Raj Dosanjh>and aside from this i've learned a lot from football managers someone like Mourinho or Jürgen
+
+558
+00:32:35.260 --> 00:32:39.900
+<v Raj Dosanjh>Klopp and specifically the Arsenal manager who's Mikel Arteta sorry for you guys this will
+
+559
+00:32:39.900 --> 00:32:47.860
+<v Raj Dosanjh>be soccer I always thought about why is it that a team can change manager and within a few days
+
+560
+00:32:47.860 --> 00:32:52.760
+<v Raj Dosanjh>their next game they're performing much better and when I was going into management this was at
+
+561
+00:32:52.760 --> 00:32:57.520
+<v Raj Dosanjh>Palantir I was a bit lost there was maybe suffering from Peter's principle I'm like given a team but
+
+562
+00:32:57.520 --> 00:33:00.960
+<v Raj Dosanjh>I don't really know what to do but what I did know is like I was watching these documentaries on how
+
+563
+00:33:00.960 --> 00:33:07.060
+<v Raj Dosanjh>these coaches run their teams and shaping the idea of a coach can come in change not very much
+
+564
+00:33:07.060 --> 00:33:10.440
+<v Raj Dosanjh>because they've only had a few days and the team starts to perform better there's got to be so much
+
+565
+00:33:10.440 --> 00:33:15.500
+<v Raj Dosanjh>to like the people side of this i very much think about how they think about the psychology of their
+
+566
+00:33:15.500 --> 00:33:22.360
+<v Raj Dosanjh>team setting up the team and using these in tech and creating like a really good atmosphere to get
+
+567
+00:33:22.360 --> 00:33:27.580
+<v Raj Dosanjh>the sort of most out of my team and then gives me the ability to get out the way it means that i'm
+
+568
+00:33:27.580 --> 00:33:31.400
+<v Raj Dosanjh>not going to burn out because I'm trying to do everything myself actually I've provided the
+
+569
+00:33:31.400 --> 00:33:36.800
+<v Raj Dosanjh>context and the setup and then the environment and culture which means that paid is going to
+
+570
+00:33:36.800 --> 00:33:42.660
+<v Raj Dosanjh>be successful without me having to get stuck in with every decision and actually it allows me to
+
+571
+00:33:42.660 --> 00:33:49.340
+<v Raj Dosanjh>think about other things other than this I am fundamentally super interested in like politics
+
+572
+00:33:49.340 --> 00:33:54.640
+<v Raj Dosanjh>and I think the thing that really shapes how I do things as well which I think is cool is I have a
+
+573
+00:33:54.640 --> 00:34:01.300
+<v Raj Dosanjh>a lot of respect for the politicians that clearly act with integrity. What you'll find is I see so
+
+574
+00:34:01.300 --> 00:34:06.840
+<v Raj Dosanjh>much in startups that you find these startups that play incredibly short-term games, treat people
+
+575
+00:34:06.840 --> 00:34:12.540
+<v Raj Dosanjh>that they hire as resources who they're going to burn out and recycle. First of all, that's just
+
+576
+00:34:12.540 --> 00:34:17.940
+<v Raj Dosanjh>not how I want to win. But second of all, I just find everyone I know that plays long-term games
+
+577
+00:34:17.940 --> 00:34:24.120
+<v Raj Dosanjh>actually does come out better. I think a lot about Obama actually and how his demeanor,
+
+578
+00:34:24.640 --> 00:34:29.840
+<v Raj Dosanjh>He seems to inject calm into situations and how he speaks and can motivate people.
+
+579
+00:34:29.960 --> 00:34:31.200
+<v Raj Dosanjh>And what could I learn from him?
+
+580
+00:34:31.480 --> 00:34:35.700
+<v Raj Dosanjh>And here's another really random one in terms of the speaking side and the performance side of what I do.
+
+581
+00:34:35.740 --> 00:34:38.700
+<v Raj Dosanjh>Because I think that as a founder, there is like getting people behind you.
+
+582
+00:34:39.040 --> 00:34:43.320
+<v Raj Dosanjh>Recently, in the last sort of maybe six to eight months, I got really into WWE.
+
+583
+00:34:44.060 --> 00:34:46.180
+<v Raj Dosanjh>And I actually forward through the wrestling part.
+
+584
+00:34:46.340 --> 00:34:53.660
+<v Raj Dosanjh>But when they come and talk and get the crowd riled up, I'm like, OK, how can I take these sort of like even more fun aspects into like my day to day with the team?
+
+585
+00:34:54.880 --> 00:34:59.040
+<v Raj Dosanjh>find inspiration from anywhere that potentially isn't tech because I understand those ideas.
+
+586
+00:34:59.120 --> 00:35:02.880
+<v Raj Dosanjh>I've been surrounded those ideas for my whole life. What can I do differently and provide that
+
+587
+00:35:02.880 --> 00:35:05.140
+<v Raj Dosanjh>outfit? So yeah, there's a wide bunch there. If
+
+588
+00:35:05.140 --> 00:35:06.540
+<v Noah Labhart>you're going to be jumping off the ropes,
+
+589
+00:35:06.660 --> 00:35:10.000
+<v Noah Labhart>please invite me to your next town hall. I want to see that one for the WWE.
+
+590
+00:35:10.280 --> 00:35:10.780
+<v Noah Labhart>That would
+
+591
+00:35:10.460 --> 00:35:13.520
+<v Raj Dosanjh>be amazing. One day, it ties together with my fitness. Actually,
+
+592
+00:35:13.920 --> 00:35:16.820
+<v Raj Dosanjh>I was watching it like a few weeks ago and I messaged my friend. I was like,
+
+593
+00:35:16.860 --> 00:35:21.420
+<v Raj Dosanjh>do you know, if I ever make it onto WWE, I've crushed it both physically and I probably would
+
+594
+00:35:21.420 --> 00:35:24.060
+<v Raj Dosanjh>We've probably done enough right in my career that I've got on that.
+
+595
+00:35:24.120 --> 00:35:24.620
+<v Raj Dosanjh>So maybe.
+
+596
+00:35:25.300 --> 00:35:26.400
+<v Noah Labhart>Okay, Raj, last question.
+
+597
+00:35:26.660 --> 00:35:30.960
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+598
+00:35:31.280 --> 00:35:32.300
+<v Noah Labhart>They're jazzed about it.
+
+599
+00:35:32.340 --> 00:35:33.560
+<v Noah Labhart>They can't wait to show it off to the world.
+
+600
+00:35:33.620 --> 00:35:35.340
+<v Noah Labhart>And can't wait to show it off to you right there on the plane.
+
+601
+00:35:35.720 --> 00:35:38.660
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+602
+00:35:39.460 --> 00:35:43.140
+<v Raj Dosanjh>I can sum up my advice to most founders in two sentences.
+
+603
+00:35:43.440 --> 00:35:45.100
+<v Raj Dosanjh>One is make something people want.
+
+604
+00:35:45.180 --> 00:35:46.180
+<v Raj Dosanjh>That's the YC slogan.
+
+605
+00:35:46.280 --> 00:35:47.100
+<v Raj Dosanjh>And that is so true.
+
+606
+00:35:47.100 --> 00:35:51.560
+<v Raj Dosanjh>but I think that something else that I've been taught that they don't talk about as much as
+
+607
+00:35:51.560 --> 00:35:55.760
+<v Raj Dosanjh>don't give up until you've built something that people want so yeah just keep going until you do
+
+608
+00:35:55.760 --> 00:36:00.180
+<v Raj Dosanjh>you only really give up when you quit focus on building something people want talk to your
+
+609
+00:36:00.180 --> 00:36:06.100
+<v Raj Dosanjh>customers know exactly what they want don't try to guess if you have an idea find out and then
+
+610
+00:36:06.100 --> 00:36:09.960
+<v Raj Dosanjh>just keep doing that until you've had enough rolls of the dice that you will be successful
+
+611
+00:36:09.960 --> 00:36:15.260
+<v Raj Dosanjh>and I think when you put it that way there's very much know what to do hopefully that will
+
+612
+00:36:17.100 --> 00:36:20.200
+<v Raj Dosanjh>And the fact if they've built something, it's the next big thing.
+
+613
+00:36:20.340 --> 00:36:21.860
+<v Raj Dosanjh>The thing that I would say to them is prove it.
+
+614
+00:36:21.880 --> 00:36:24.240
+<v Raj Dosanjh>Show me why it's the next big thing and I'll tell you why it's probably not.
+
+615
+00:36:24.360 --> 00:36:27.340
+<v Raj Dosanjh>Because if it's the next big thing, you would be showing me revenue numbers.
+
+616
+00:36:27.600 --> 00:36:29.720
+<v Raj Dosanjh>Ultimately, cut out any sort of noise.
+
+617
+00:36:30.080 --> 00:36:34.560
+<v Raj Dosanjh>People are always going to tell you that they like what you've built, that it's nice.
+
+618
+00:36:34.640 --> 00:36:35.700
+<v Raj Dosanjh>Because, you know, they want to be nice.
+
+619
+00:36:35.740 --> 00:36:37.100
+<v Raj Dosanjh>They don't want to like crush what you've done.
+
+620
+00:36:37.180 --> 00:36:43.700
+<v Raj Dosanjh>But ultimately, getting people to part with their cash is a gold standard to knowing that you've built something people want.
+
+621
+00:36:43.780 --> 00:36:44.280
+<v Raj Dosanjh>So that's it.
+
+622
+00:36:44.200 --> 00:36:46.620
+<v Raj Dosanjh>Just keep at that until you figure it out.
+
+623
+00:36:47.100 --> 00:36:49.300
+<v Raj Dosanjh>And also don't try to get too smart about it.
+
+624
+00:36:49.340 --> 00:36:52.540
+<v Raj Dosanjh>You can try to do very clever things to get around that.
+
+625
+00:36:52.660 --> 00:36:57.560
+<v Raj Dosanjh>But generally, I think attrition and like discipline of making sure you're validating
+
+626
+00:36:57.560 --> 00:37:01.140
+<v Raj Dosanjh>will probably be all the advice you really need with that.
+
+627
+00:37:01.280 --> 00:37:02.640
+<v Raj Dosanjh>Anything else you can figure out yourself.
+
+628
+00:37:02.900 --> 00:37:04.420
+<v Noah Labhart>I think that's fantastic advice.
+
+629
+00:37:04.560 --> 00:37:06.440
+<v Noah Labhart>Well, Raj, thank you for being on the show today.
+
+630
+00:37:06.640 --> 00:37:09.000
+<v Noah Labhart>Thank you for telling the creation story of paid.
+
+631
+00:37:09.420 --> 00:37:10.020
+<v Raj Dosanjh>Appreciate it.
+
+632
+00:37:10.040 --> 00:37:10.540
+<v Raj Dosanjh>Thanks for having me.
+
+633
+00:37:13.000 --> 00:37:15.660
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+634
+00:37:20.280 --> 00:37:23.340
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+635
+00:37:23.440 --> 00:37:28.260
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+636
+00:37:28.820 --> 00:37:31.060
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+637
+00:37:31.340 --> 00:37:33.280
+<v Noah Labhart>Both things help us out tremendously.
+
+638
+00:37:36.180 --> 00:37:37.680
+<v Noah Labhart>And thanks again for listening.

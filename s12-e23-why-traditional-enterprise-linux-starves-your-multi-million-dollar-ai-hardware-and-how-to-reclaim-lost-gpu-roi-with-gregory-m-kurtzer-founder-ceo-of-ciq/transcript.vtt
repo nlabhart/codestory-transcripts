@@ -1,0 +1,1411 @@
+WEBVTT
+
+NOTE S12 E23: Why Traditional Enterprise Linux Starves Your Multi-Million Dollar AI Hardware and How to Reclaim Lost GPU ROI with Gregory M. Kurtzer, Founder & CEO of CIQ
+
+1
+00:00:00.000 --> 00:00:06.420
+<v Gregory M. Kurtzer>A founder of a startup is somebody who is generally the best at what they do.
+
+2
+00:00:06.780 --> 00:00:10.600
+<v Gregory M. Kurtzer>They know their stuff, they know their discipline backwards and forwards.
+
+3
+00:00:10.980 --> 00:00:16.020
+<v Gregory M. Kurtzer>And tech founders are usually at the top of their game, they're top of their class in
+
+4
+00:00:16.020 --> 00:00:16.520
+<v Gregory M. Kurtzer>what they do.
+
+5
+00:00:17.340 --> 00:00:19.060
+<v Gregory M. Kurtzer>Then they go and build a company.
+
+6
+00:00:19.280 --> 00:00:24.660
+<v Gregory M. Kurtzer>And when they build a company, they're given some resources, generally speaking, and or
+
+7
+00:00:24.660 --> 00:00:27.180
+<v Gregory M. Kurtzer>they're taking on a role they've never done before.
+
+8
+00:00:27.180 --> 00:00:38.340
+<v Gregory M. Kurtzer>So they go from being top of their game, doing what they're best at, to doing something that they've got no idea, no experience, and probably no education in doing.
+
+9
+00:00:38.820 --> 00:00:42.840
+<v Gregory M. Kurtzer>I am Gregory Kurtzer. I'm the CEO and founder of CIQ.
+
+10
+00:00:46.420 --> 00:00:52.240
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+11
+00:00:52.300 --> 00:00:53.280
+<v Clip>Six months moonlighting.
+
+12
+00:00:53.780 --> 00:00:55.260
+<v Clip>There's nothing on the back end.
+
+13
+00:00:57.180 --> 00:00:59.100
+<v Clip>change in industry. I don't exactly
+
+14
+00:00:59.100 --> 00:01:01.260
+<v Clip>know what to do next. It took many goes to get right.
+
+15
+00:01:01.860 --> 00:01:03.140
+<v Clip>Who built the teams
+
+16
+00:01:03.140 --> 00:01:05.020
+<v Noah Labhart>that have their back. A company
+
+17
+00:01:05.020 --> 00:01:07.080
+<v Clip>is its people. The teams help each other
+
+18
+00:01:07.080 --> 00:01:08.600
+<v Clip>achieve more. Most proud of our team.
+
+19
+00:01:08.920 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+20
+00:01:11.500 --> 00:01:13.360
+<v Clip>All that infrastructure was a pain. Yes, we've been
+
+21
+00:01:13.360 --> 00:01:15.320
+<v Clip>fighting it as we've grown. Total waste of time.
+
+22
+00:01:15.520 --> 00:01:17.160
+<v Clip>The stories you don't read
+
+23
+00:01:17.160 --> 00:01:19.380
+<v Clip>in the headlines. It's not an easy thing
+
+24
+00:01:19.380 --> 00:01:21.360
+<v Clip>to achieve, my dear. Took it off the shelf and dusted it off
+
+25
+00:01:21.360 --> 00:01:23.100
+<v Clip>and tried it again. Dry
+
+26
+00:01:23.100 --> 00:01:25.120
+<v Noah Labhart>the ups and downs of the
+
+27
+00:01:25.120 --> 00:01:25.860
+<v Noah Labhart>The startup life.
+
+28
+00:01:25.980 --> 00:01:27.580
+<v Clip>You need to really want it.
+
+29
+00:01:27.600 --> 00:01:28.960
+<v Clip>It's not just about technology.
+
+30
+00:01:29.080 --> 00:01:31.040
+<v Noah Labhart>All this and more on Code Story.
+
+31
+00:01:32.260 --> 00:01:33.920
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+32
+00:01:33.980 --> 00:01:39.620
+<v Noah Labhart>And today, how Gregory M. Kurtzer is building new software infrastructure for the age of AI.
+
+33
+00:01:40.520 --> 00:01:43.340
+<v Noah Labhart>Optimized, validated, and under your control.
+
+34
+00:01:49.080 --> 00:02:00.320
+<v Noah Labhart>Gregory M. Kurtzer is a veteran open-source pioneer, technologist, and entrepreneur with over 25 years of experience in high-performance computing and large-scale enterprise infrastructure.
+
+35
+00:02:00.680 --> 00:02:10.580
+<v Noah Labhart>He first gained widespread industry prominence as the co-founder of CentOS Linux, which grew into one of the world's most ubiquitous enterprise operating systems.
+
+36
+00:02:10.580 --> 00:02:16.100
+<v Noah Labhart>systems, and he later created other foundational open source projects like the Warewulf Cluster
+
+37
+00:02:16.100 --> 00:02:20.160
+<v Noah Labhart>Management Toolkit and the Singularity container system.
+
+38
+00:02:21.300 --> 00:02:26.480
+<v Noah Labhart>In 2020, Gregory founded his current venture with the goal of modernizing infrastructure
+
+39
+00:02:26.480 --> 00:02:28.920
+<v Noah Labhart>stacks for the cloud and AI era.
+
+40
+00:02:29.200 --> 00:02:34.060
+<v Noah Labhart>He and his team recognized that traditional enterprise infrastructure was too fragmented
+
+41
+00:02:34.060 --> 00:02:38.820
+<v Noah Labhart>and ill-equipped to handle the next generation of data-intensive computing.
+
+42
+00:02:41.160 --> 00:02:44.060
+<v Noah Labhart>This is the creation story of CIQ.
+
+43
+00:02:49.980 --> 00:02:54.060
+<v Gregory M. Kurtzer>CIQ is really focused on doing software infrastructure for enterprises.
+
+44
+00:02:54.700 --> 00:02:58.560
+<v Gregory M. Kurtzer>Unlike most startups that are really focused on doing one thing
+
+45
+00:02:58.560 --> 00:03:01.900
+<v Gregory M. Kurtzer>and doing it better than everything else, we're doing a lot.
+
+46
+00:03:01.900 --> 00:03:06.760
+<v Gregory M. Kurtzer>and it's sometimes it's hard to keep up there's a lot of stuff going on at CIQ
+
+47
+00:03:06.760 --> 00:03:10.360
+<v Gregory M. Kurtzer>we started off really building a high-performance computing platform
+
+48
+00:03:10.360 --> 00:03:15.000
+<v Gregory M. Kurtzer>designed to modernize the high-performance computing infrastructure
+
+49
+00:03:15.000 --> 00:03:20.940
+<v Gregory M. Kurtzer>which is about 30 plus years old which in tech that's pretty antique so we
+
+50
+00:03:20.940 --> 00:03:24.020
+<v Gregory M. Kurtzer>started off modernizing that and then bringing a lot of those capabilities to
+
+51
+00:03:24.020 --> 00:03:28.400
+<v Gregory M. Kurtzer>enterprises and then while we were doing that the whole ecosystem was disrupted
+
+52
+00:03:28.400 --> 00:03:33.860
+<v Gregory M. Kurtzer>with the end of life of one of the most widely utilized operating systems in the world,
+
+53
+00:03:34.000 --> 00:03:37.820
+<v Gregory M. Kurtzer>an operating system that I was lucky enough to be part of founding called CentOS.
+
+54
+00:03:38.700 --> 00:03:42.040
+<v Gregory M. Kurtzer>When that was end of life, I raised my hand to the world and said,
+
+55
+00:03:42.160 --> 00:03:46.080
+<v Gregory M. Kurtzer>I want to recreate this. Anybody wants to join me? Here's where I'm hanging out.
+
+56
+00:03:46.220 --> 00:03:51.140
+<v Gregory M. Kurtzer>And almost overnight, we had 10,000 members of the open source community all joining.
+
+57
+00:03:51.520 --> 00:03:56.640
+<v Gregory M. Kurtzer>Rocky Linux was born and CIQ's vision kind of opened up and expanded quite a bit.
+
+58
+00:03:58.400 --> 00:03:59.740
+<v Gregory M. Kurtzer>across the board for enterprises.
+
+59
+00:04:02.960 --> 00:04:06.680
+<v Noah Labhart>I'm curious what you would call, you know, the MVP.
+
+60
+00:04:07.000 --> 00:04:09.140
+<v Noah Labhart>And maybe it's Rocky, right?
+
+61
+00:04:09.200 --> 00:04:11.820
+<v Noah Labhart>The MVP for CIQ and the CIQ vision.
+
+62
+00:04:12.020 --> 00:04:15.560
+<v Noah Labhart>What was the first thing that you set out to build
+
+63
+00:04:15.560 --> 00:04:17.420
+<v Noah Labhart>and how long it take to build
+
+64
+00:04:17.420 --> 00:04:19.360
+<v Noah Labhart>and what sort of tools are you using to bring it to life?
+
+65
+00:04:19.760 --> 00:04:22.580
+<v Gregory M. Kurtzer>So what we initially set out to build
+
+66
+00:04:22.580 --> 00:04:23.760
+<v Gregory M. Kurtzer>was this computing platform.
+
+67
+00:04:23.760 --> 00:04:28.400
+<v Gregory M. Kurtzer>And the MVP is everything you shouldn't have done,
+
+68
+00:04:28.500 --> 00:04:29.740
+<v Gregory M. Kurtzer>everything you shouldn't do.
+
+69
+00:04:29.880 --> 00:04:33.740
+<v Gregory M. Kurtzer>So for example, the MVP for an entire computing platform,
+
+70
+00:04:33.940 --> 00:04:36.420
+<v Gregory M. Kurtzer>which think of it as it is Kubernetes
+
+71
+00:04:37.000 --> 00:04:38.820
+<v Gregory M. Kurtzer>for performance intensive workloads,
+
+72
+00:04:39.400 --> 00:04:43.020
+<v Gregory M. Kurtzer>is not something a small startup generally would take on,
+
+73
+00:04:43.140 --> 00:04:43.700
+<v Gregory M. Kurtzer>but we did.
+
+74
+00:04:43.900 --> 00:04:47.740
+<v Gregory M. Kurtzer>Here we are six years later and we're still building.
+
+75
+00:04:47.880 --> 00:04:50.440
+<v Gregory M. Kurtzer>And it's not that we don't have customers using it,
+
+76
+00:04:50.500 --> 00:04:52.940
+<v Gregory M. Kurtzer>but it is still moving forward
+
+77
+00:04:53.760 --> 00:04:58.980
+<v Gregory M. Kurtzer>a ton of effort and energy on making Fuzzball the greatest platform ever. In terms of the MVP of it,
+
+78
+00:04:59.060 --> 00:05:04.080
+<v Gregory M. Kurtzer>it was pretty massive. There was a lot of things that we wanted to get into that to make sure that
+
+79
+00:05:04.080 --> 00:05:06.520
+<v Gregory M. Kurtzer>we were hitting the needs of our user base.
+
+80
+00:05:07.420 --> 00:05:09.820
+<v Noah Labhart>You're serving the enterprise. So I imagine that
+
+81
+00:05:09.820 --> 00:05:14.080
+<v Noah Labhart>the MVP of anything that you build has a lot of requirements. Is that true?
+
+82
+00:05:14.400 --> 00:05:19.680
+<v Gregory M. Kurtzer>Yeah, this is, as I alluded to, this is kind of like Kubernetes for performance intensive
+
+83
+00:05:19.680 --> 00:05:22.300
+<v Gregory M. Kurtzer>of computing and Kubernetes is a gigantic project,
+
+84
+00:05:22.540 --> 00:05:24.560
+<v Gregory M. Kurtzer>lot of features, lot of capabilities.
+
+85
+00:05:25.320 --> 00:05:28.900
+<v Gregory M. Kurtzer>An MVP of that is not exceedingly useful.
+
+86
+00:05:29.160 --> 00:05:33.460
+<v Gregory M. Kurtzer>So for us, our MVP was actually fairly significant.
+
+87
+00:05:33.720 --> 00:05:35.680
+<v Gregory M. Kurtzer>And again, this isn't what you should do in a startup,
+
+88
+00:05:35.800 --> 00:05:37.780
+<v Gregory M. Kurtzer>but our vision was extremely bold.
+
+89
+00:05:37.960 --> 00:05:40.020
+<v Gregory M. Kurtzer>And we had a huge amount of confidence
+
+90
+00:05:40.020 --> 00:05:41.060
+<v Gregory M. Kurtzer>that we could build this.
+
+91
+00:05:41.240 --> 00:05:43.800
+<v Gregory M. Kurtzer>And luckily, the people that stand behind us,
+
+92
+00:05:43.860 --> 00:05:45.420
+<v Gregory M. Kurtzer>our customers and our early adopters
+
+93
+00:05:45.420 --> 00:05:47.400
+<v Gregory M. Kurtzer>all seem to believe in us as well.
+
+94
+00:05:47.520 --> 00:05:48.820
+<v Gregory M. Kurtzer>And so we were able to build this.
+
+95
+00:05:50.020 --> 00:05:57.940
+<v Noah Labhart>Tell me about maybe a key decision or trade-off you had to make in the early days and how you coped with that decision.
+
+96
+00:05:59.260 --> 00:06:04.940
+<v Gregory M. Kurtzer>A founder of a startup is somebody who is generally the best at what they do.
+
+97
+00:06:05.280 --> 00:06:09.140
+<v Gregory M. Kurtzer>They know their stuff. They know their discipline backwards and forwards.
+
+98
+00:06:09.380 --> 00:06:16.340
+<v Gregory M. Kurtzer>They're a guru. They understand what needs to happen, what it needs to look like, how it needs to go, how to build it even.
+
+99
+00:06:16.340 --> 00:06:21.740
+<v Gregory M. Kurtzer>in. And tech founders are usually at the top of their game. They're top of their class in what
+
+100
+00:06:21.740 --> 00:06:27.900
+<v Gregory M. Kurtzer>they do. Then they go and build a company. And when they build a company, they're given some
+
+101
+00:06:27.900 --> 00:06:32.760
+<v Gregory M. Kurtzer>resources, generally speaking, and or they're taking on a role they've never done before.
+
+102
+00:06:33.280 --> 00:06:38.800
+<v Gregory M. Kurtzer>So they go from being top of their game, doing what they're best at, to doing something that
+
+103
+00:06:38.800 --> 00:06:46.040
+<v Gregory M. Kurtzer>they've got no idea, no experience, and probably no education in doing. And as a result,
+
+104
+00:06:46.860 --> 00:06:51.420
+<v Gregory M. Kurtzer>there's a lot of mistakes that founders are going to make.
+
+105
+00:06:52.220 --> 00:06:53.720
+<v Gregory M. Kurtzer>Interestingly, what I found is,
+
+106
+00:06:53.740 --> 00:06:55.700
+<v Gregory M. Kurtzer>in talking with lots of my fellow founders,
+
+107
+00:06:55.920 --> 00:06:57.780
+<v Gregory M. Kurtzer>generally take a lot of the same mistakes,
+
+108
+00:06:58.000 --> 00:07:02.300
+<v Gregory M. Kurtzer>but if I can summarize some of the areas
+
+109
+00:07:02.300 --> 00:07:05.900
+<v Gregory M. Kurtzer>in which I focused on and some of the important aspects,
+
+110
+00:07:06.240 --> 00:07:10.460
+<v Gregory M. Kurtzer>it really had to do with the initial hires that we make
+
+111
+00:07:10.920 --> 00:07:12.760
+<v Gregory M. Kurtzer>have to be jack of all trades,
+
+112
+00:07:12.760 --> 00:07:16.820
+<v Gregory M. Kurtzer>It's people that know how to do a ton of different things.
+
+113
+00:07:17.540 --> 00:07:24.920
+<v Gregory M. Kurtzer>I make the analogy for the Doctor Who fans in the audience that a TARDIS, which is Doctor Who's vehicle.
+
+114
+00:07:25.120 --> 00:07:26.980
+<v Gregory M. Kurtzer>This is how he travels and moves around.
+
+115
+00:07:27.160 --> 00:07:30.200
+<v Gregory M. Kurtzer>But it's some sort of weird four-dimensional quantum vehicle.
+
+116
+00:07:30.340 --> 00:07:32.100
+<v Gregory M. Kurtzer>So it's bigger on the inside than it is on the out.
+
+117
+00:07:32.560 --> 00:07:33.780
+<v Gregory M. Kurtzer>Startup is exactly the opposite.
+
+118
+00:07:34.700 --> 00:07:39.860
+<v Gregory M. Kurtzer>It's bigger on the outside, or at least it should seem bigger on the outside than it actually is on the inside.
+
+119
+00:07:39.860 --> 00:07:45.180
+<v Gregory M. Kurtzer>And the way to do that is you got to hire people that are very skilled in a lot of different
+
+120
+00:07:45.180 --> 00:07:45.680
+<v Gregory M. Kurtzer>things.
+
+121
+00:07:46.780 --> 00:07:50.620
+<v Gregory M. Kurtzer>That means they're generally speaking, you know, they're really good at a lot of different
+
+122
+00:07:50.620 --> 00:07:51.120
+<v Gregory M. Kurtzer>things.
+
+123
+00:07:51.020 --> 00:07:54.860
+<v Gregory M. Kurtzer>They're not necessarily experts in everything that you're doing.
+
+124
+00:07:55.860 --> 00:07:58.220
+<v Gregory M. Kurtzer>So you need to hire those people initially.
+
+125
+00:07:58.300 --> 00:08:03.360
+<v Gregory M. Kurtzer>You have to hire people who can do a lot of things, fill the gaps across the board.
+
+126
+00:08:03.360 --> 00:08:19.520
+<v Gregory M. Kurtzer>And from there, as the company starts building some inertia and getting successful, then you have to reconsider and you have to start bringing in people who are much more specialized and gurus and experts in specific disciplines.
+
+127
+00:08:19.780 --> 00:08:27.040
+<v Gregory M. Kurtzer>And then surround yourself by these people, because, again, tech founders generally don't know how to be a CEO.
+
+128
+00:08:27.040 --> 00:08:31.200
+<v Gregory M. Kurtzer>go. This is something you're going to have to learn over time. So in the meantime, you have
+
+129
+00:08:31.200 --> 00:08:35.460
+<v Gregory M. Kurtzer>to surround yourself with people who know how to do all of the things that you don't.
+
+130
+00:08:36.680 --> 00:08:40.180
+<v Gregory M. Kurtzer>And if I were to say that something I had to reconsider and something I had to think through,
+
+131
+00:08:40.260 --> 00:08:42.560
+<v Gregory M. Kurtzer>that's probably one of my biggest lessons learned.
+
+132
+00:08:44.980 --> 00:08:47.820
+<v Noah Labhart>Let's move forward then. I'm curious about,
+
+133
+00:08:48.000 --> 00:08:53.960
+<v Noah Labhart>you know, how you are progressing and maturing, what you're building at CIQ. And I kind of,
+
+134
+00:08:53.960 --> 00:08:58.240
+<v Noah Labhart>wrap that in a box a little. I'm looking for a roadmap. How do you build your roadmap at CIQ?
+
+135
+00:08:58.320 --> 00:09:03.300
+<v Noah Labhart>And how do you go about deciding that, okay, this is the next most important thing to build or to
+
+136
+00:09:03.300 --> 00:09:03.800
+<v Noah Labhart>address?
+
+137
+00:09:05.140 --> 00:09:10.420
+<v Gregory M. Kurtzer>Early on when the company's still brand new and you're charting everything out, it's
+
+138
+00:09:10.420 --> 00:09:16.100
+<v Gregory M. Kurtzer>really, it's about the founder's vision. And from the founder's vision, there's a lot of that's
+
+139
+00:09:16.100 --> 00:09:21.060
+<v Gregory M. Kurtzer>based in the expertise that the founder kind of brings along with that person. Over time,
+
+140
+00:09:21.060 --> 00:09:29.540
+<v Gregory M. Kurtzer>as the company starts to scale it's incredibly important to formalize this and product a very
+
+141
+00:09:29.540 --> 00:09:35.900
+<v Gregory M. Kurtzer>strong and empowered product team is incredibly imperative and it's important for the product team
+
+142
+00:09:35.900 --> 00:09:40.720
+<v Gregory M. Kurtzer>to be not aligned necessarily with engineering and not aligned necessarily with sales
+
+143
+00:09:41.160 --> 00:09:47.400
+<v Gregory M. Kurtzer>sit in between and to read the market differently than from an engineering perspective what's cool
+
+144
+00:09:47.400 --> 00:09:50.600
+<v Gregory M. Kurtzer>and what would an engineer want versus a sales perspective.
+
+145
+00:09:50.840 --> 00:09:52.360
+<v Gregory M. Kurtzer>What does your latest prospect look like?
+
+146
+00:09:52.460 --> 00:09:54.320
+<v Gregory M. Kurtzer>It really comes back to that product team
+
+147
+00:09:54.320 --> 00:09:57.220
+<v Gregory M. Kurtzer>and making sure that you are empowering that product team
+
+148
+00:09:57.220 --> 00:09:59.760
+<v Gregory M. Kurtzer>to make the appropriate priority decisions
+
+149
+00:10:00.320 --> 00:10:02.500
+<v Gregory M. Kurtzer>such that you know what you're building,
+
+150
+00:10:02.660 --> 00:10:04.360
+<v Gregory M. Kurtzer>you can have confidence in what you're building,
+
+151
+00:10:04.440 --> 00:10:06.740
+<v Gregory M. Kurtzer>is actually solving a real problem in the market.
+
+152
+00:10:08.840 --> 00:10:10.220
+<v Noah Labhart>Let's flip to team.
+
+153
+00:10:10.620 --> 00:10:13.020
+<v Noah Labhart>Gregory, I'm curious about how you build your team.
+
+154
+00:10:13.220 --> 00:10:15.200
+<v Noah Labhart>What do you look for in those people to indicate
+
+155
+00:10:15.200 --> 00:10:17.200
+<v Noah Labhart>that they are the winning horses to join you?
+
+156
+00:10:18.380 --> 00:10:23.760
+<v Gregory M. Kurtzer>Again, because this is a founder podcast, I don't mind being pretty open about the things
+
+157
+00:10:23.760 --> 00:10:27.400
+<v Gregory M. Kurtzer>that I've done that are good, of course, I can brag about, but some of the mistakes that
+
+158
+00:10:27.400 --> 00:10:27.900
+<v Gregory M. Kurtzer>I've made.
+
+159
+00:10:28.020 --> 00:10:32.760
+<v Gregory M. Kurtzer>And one of the mistakes that I made early on, and again, I come from being an engineer.
+
+160
+00:10:32.980 --> 00:10:39.320
+<v Gregory M. Kurtzer>I come from being a techie, somebody who I see with maybe a team underneath me, but I
+
+161
+00:10:39.320 --> 00:10:42.560
+<v Gregory M. Kurtzer>never really had to manage because I had a manager just being team lead architect.
+
+162
+00:10:42.560 --> 00:10:47.980
+<v Gregory M. Kurtzer>When I started working as a CEO, the most important thing for me is to get stuff done,
+
+163
+00:10:48.180 --> 00:10:54.800
+<v Gregory M. Kurtzer>get stuff built, innovate, drive, be aggressive in the sense of you want this to, you want
+
+164
+00:10:54.800 --> 00:10:55.540
+<v Gregory M. Kurtzer>to overachieve.
+
+165
+00:10:55.980 --> 00:10:59.200
+<v Gregory M. Kurtzer>And that was kind of, that's how I approached this.
+
+166
+00:10:59.280 --> 00:11:02.400
+<v Gregory M. Kurtzer>So I bring on, I brought on people who are kind of similar in that sense.
+
+167
+00:11:02.760 --> 00:11:10.060
+<v Gregory M. Kurtzer>Some of them came out of a very large hyperscaler that many people know that has a very strong
+
+168
+00:11:10.060 --> 00:11:15.820
+<v Gregory M. Kurtzer>strong drive of culture, a top-down drive of culture. And when I brought in some of these
+
+169
+00:11:15.820 --> 00:11:22.720
+<v Gregory M. Kurtzer>individuals, first questions they had was, where's our core values? What do you want the culture to
+
+170
+00:11:22.720 --> 00:11:27.360
+<v Gregory M. Kurtzer>be? And my response was, I really don't have time to think about core values. I don't have time.
+
+171
+00:11:27.380 --> 00:11:34.460
+<v Gregory M. Kurtzer>Just get your job done. And they really kept pushing on this. And at some point, they proposed
+
+172
+00:11:34.460 --> 00:11:41.480
+<v Gregory M. Kurtzer>posed a draft of, I think it was like 14 or 15 different core values for CIQ. And this is what
+
+173
+00:11:41.480 --> 00:11:47.060
+<v Gregory M. Kurtzer>was important to them and whatnot. At some point, it occurred to me that it's not fair for everybody
+
+174
+00:11:47.060 --> 00:11:53.400
+<v Gregory M. Kurtzer>to not know how I rate their success. What do I consider success? What do I consider them doing
+
+175
+00:11:53.400 --> 00:11:58.680
+<v Gregory M. Kurtzer>a good job? How do they know that they're doing a good job to me? And all of a sudden it clicked.
+
+176
+00:11:58.880 --> 00:12:03.920
+<v Gregory M. Kurtzer>Oh my gosh, I need core values. And I started doing all this research in core values.
+
+177
+00:12:04.460 --> 00:12:11.420
+<v Gregory M. Kurtzer>And I've read a few books and it's interesting because the most impactful book for me was the book that actually I couldn't finish.
+
+178
+00:12:11.540 --> 00:12:20.780
+<v Gregory M. Kurtzer>I couldn't finish this book because I got so excited about it that halfway through or just over halfway through of this book, I'm like, I'm going to go do this.
+
+179
+00:12:20.840 --> 00:12:22.100
+<v Gregory M. Kurtzer>Enough reading about it.
+
+180
+00:12:22.140 --> 00:12:23.380
+<v Gregory M. Kurtzer>I just got to go do this now.
+
+181
+00:12:23.920 --> 00:12:30.420
+<v Gregory M. Kurtzer>I redid all of the core values and I built the core values in terms of what is important to me.
+
+182
+00:12:30.420 --> 00:12:35.520
+<v Gregory M. Kurtzer>me. And previously, nobody really knew our core values, even though they were documented. And
+
+183
+00:12:35.520 --> 00:12:40.240
+<v Gregory M. Kurtzer>we told everybody that they have to memorize them and whatnot, but it's kind of hard to memorize
+
+184
+00:12:40.240 --> 00:12:45.520
+<v Gregory M. Kurtzer>10 plus core values and then figure out how do you put them into life. So I made five core values,
+
+185
+00:12:45.740 --> 00:12:54.300
+<v Gregory M. Kurtzer>super simple, and they are customer centric, optimistic, dedicated, efficient, and excellent.
+
+186
+00:12:54.300 --> 00:12:56.780
+<v Gregory M. Kurtzer>And that happens to spell code.
+
+187
+00:12:57.160 --> 00:12:59.500
+<v Gregory M. Kurtzer>Yeah, with two E's, but that spells code.
+
+188
+00:13:00.120 --> 00:13:05.060
+<v Gregory M. Kurtzer>Everybody at our company, especially the coders, can remember our core values.
+
+189
+00:13:05.240 --> 00:13:07.000
+<v Gregory M. Kurtzer>And they're super simple.
+
+190
+00:13:07.100 --> 00:13:11.260
+<v Gregory M. Kurtzer>So everybody knows how to bring them and operate with them in a day-to-day perspective.
+
+191
+00:13:12.140 --> 00:13:18.840
+<v Gregory M. Kurtzer>That has done miracles for building the team that CIQ needs for success.
+
+192
+00:13:18.840 --> 00:13:28.840
+<v Gregory M. Kurtzer>And if I were to give advice to any other tech founders who are discounting the need for core values, take my lessons learned, please.
+
+193
+00:13:29.100 --> 00:13:31.540
+<v Gregory M. Kurtzer>They're incredibly valuable and useful.
+
+194
+00:13:34.780 --> 00:13:38.800
+<v Noah Labhart>I'm curious about scalability, right?
+
+195
+00:13:38.900 --> 00:13:47.340
+<v Noah Labhart>And this is baked in, I'm sure, since early days, you know, building the MVP that needed to be a big deal, right?
+
+196
+00:13:48.840 --> 00:13:52.840
+<v Noah Labhart>scalability, but also I'm interested if there's been interesting areas where you've had to fight
+
+197
+00:13:52.840 --> 00:13:53.660
+<v Noah Labhart>it as you've grown.
+
+198
+00:13:55.700 --> 00:14:02.020
+<v Gregory M. Kurtzer>Scalability starts with the founder. And I'm going to go back to one of the
+
+199
+00:14:02.020 --> 00:14:07.860
+<v Gregory M. Kurtzer>earlier statements that I made. The founder comes from being an expert in a particular domain,
+
+200
+00:14:08.060 --> 00:14:15.220
+<v Gregory M. Kurtzer>in a particular scenario, and then going into an entirely new role. It is so incredibly important
+
+201
+00:14:15.220 --> 00:14:21.000
+<v Gregory M. Kurtzer>important for the founder to leave the ego at the door, be self-reflective and be honest
+
+202
+00:14:21.000 --> 00:14:25.940
+<v Gregory M. Kurtzer>with themselves on what are the things that they can do and they are great at.
+
+203
+00:14:26.440 --> 00:14:30.020
+<v Gregory M. Kurtzer>And then what are the gaps that you have to bring in others for?
+
+204
+00:14:30.500 --> 00:14:33.860
+<v Gregory M. Kurtzer>And you have to be able to build the team around you.
+
+205
+00:14:34.040 --> 00:14:40.200
+<v Gregory M. Kurtzer>Even if you're a unicorn founder and you could do the technology, you can invent the technology,
+
+206
+00:14:40.200 --> 00:14:48.220
+<v Gregory M. Kurtzer>technology build it manage people then figure out go to market marketing sales do finance HR and you
+
+207
+00:14:48.220 --> 00:14:52.800
+<v Gregory M. Kurtzer>can do everything and I'm not saying that those people don't exist but I'm definitely not one of
+
+208
+00:14:52.800 --> 00:14:58.980
+<v Gregory M. Kurtzer>those it's absolutely incredibly imperative that you are surrounding yourself with people who know
+
+209
+00:14:58.980 --> 00:15:04.040
+<v Gregory M. Kurtzer>how to do these things and are great at these things and again even if you are one of those
+
+210
+00:15:04.040 --> 00:15:09.060
+<v Gregory M. Kurtzer>people you don't scale you're just one of you so you're going to have to bring in people that you
+
+211
+00:15:10.200 --> 00:15:13.640
+<v Gregory M. Kurtzer>People that are going to run with the same core values
+
+212
+00:15:13.640 --> 00:15:17.860
+<v Gregory M. Kurtzer>that you believe in and the same perspectives and vision.
+
+213
+00:15:18.040 --> 00:15:19.880
+<v Gregory M. Kurtzer>And they're excited about that vision
+
+214
+00:15:19.880 --> 00:15:23.060
+<v Gregory M. Kurtzer>and the just cause of what you're setting out to accomplish.
+
+215
+00:15:23.360 --> 00:15:25.960
+<v Gregory M. Kurtzer>And so they're super excited about it
+
+216
+00:15:25.960 --> 00:15:28.440
+<v Gregory M. Kurtzer>and super passionate about making sure
+
+217
+00:15:28.440 --> 00:15:30.800
+<v Gregory M. Kurtzer>that you're building the same thing.
+
+218
+00:15:30.960 --> 00:15:35.300
+<v Gregory M. Kurtzer>From there, you have to encourage them to also scale
+
+219
+00:15:35.300 --> 00:15:39.520
+<v Gregory M. Kurtzer>and also build more capabilities around themselves
+
+220
+00:15:40.200 --> 00:15:45.260
+<v Gregory M. Kurtzer>all the things that they don't maybe not excel at and then make sure they can scale their team
+
+221
+00:15:45.260 --> 00:15:49.520
+<v Gregory M. Kurtzer>and then continue on down the chain, especially as you continue to grow.
+
+222
+00:15:50.440 --> 00:15:56.160
+<v Gregory M. Kurtzer>Scaling and efficiency is going to be a challenge for a lot of startups, especially as they start
+
+223
+00:15:56.160 --> 00:16:03.420
+<v Gregory M. Kurtzer>to go from development of MVP, proving that out, getting go-to-market nailed, but then really
+
+224
+00:16:03.420 --> 00:16:09.120
+<v Gregory M. Kurtzer>nailing that product market fit. As soon as you have that product market fit, you're going to end
+
+225
+00:16:10.400 --> 00:16:11.680
+<v Gregory M. Kurtzer>fast and strong.
+
+226
+00:16:11.920 --> 00:16:13.720
+<v Gregory M. Kurtzer>And you're going to want to make sure you scale
+
+227
+00:16:13.720 --> 00:16:16.480
+<v Gregory M. Kurtzer>so you're not just scaling your growing pains.
+
+228
+00:16:18.780 --> 00:16:21.660
+<v Noah Labhart>Okay, so as you step out on the balcony
+
+229
+00:16:21.660 --> 00:16:24.960
+<v Noah Labhart>and you look across all that you've built within CIQ,
+
+230
+00:16:25.120 --> 00:16:26.300
+<v Noah Labhart>what are you most proud of?
+
+231
+00:16:27.420 --> 00:16:30.380
+<v Gregory M. Kurtzer>My just cause for so much of what I do
+
+232
+00:16:30.380 --> 00:16:33.000
+<v Gregory M. Kurtzer>is to help other people to do amazing things.
+
+233
+00:16:33.640 --> 00:16:35.780
+<v Gregory M. Kurtzer>Going all the way back to early in my career,
+
+234
+00:16:35.940 --> 00:16:38.160
+<v Gregory M. Kurtzer>I found that I had a knack for certain things
+
+235
+00:16:38.160 --> 00:16:41.760
+<v Gregory M. Kurtzer>and where some of my peers had a knack for other things.
+
+236
+00:16:41.900 --> 00:16:45.880
+<v Gregory M. Kurtzer>And I can help them to do their jobs better.
+
+237
+00:16:45.980 --> 00:16:48.140
+<v Gregory M. Kurtzer>I can help them and support them in ways
+
+238
+00:16:48.140 --> 00:16:50.800
+<v Gregory M. Kurtzer>that they can actually do amazing things.
+
+239
+00:16:51.100 --> 00:16:53.780
+<v Gregory M. Kurtzer>The amount that has now scaled
+
+240
+00:16:53.780 --> 00:16:56.040
+<v Gregory M. Kurtzer>by creating open source projects,
+
+241
+00:16:56.260 --> 00:17:00.980
+<v Gregory M. Kurtzer>by having those open source projects solve real needs,
+
+242
+00:17:01.670 --> 00:17:03.680
+<v Gregory M. Kurtzer>real pain points for people,
+
+243
+00:17:03.780 --> 00:17:07.880
+<v Gregory M. Kurtzer>and watch how those open source projects have proliferated
+
+244
+00:17:08.160 --> 00:17:16.080
+<v Gregory M. Kurtzer>into the community and into the world to do things that I never would have dreamed that I would be able to be part of.
+
+245
+00:17:16.700 --> 00:17:21.880
+<v Gregory M. Kurtzer>And a really few good examples of this is my background comes out of science,
+
+246
+00:17:22.100 --> 00:17:25.400
+<v Gregory M. Kurtzer>and I did high-performance computing for the majority of my career.
+
+247
+00:17:25.620 --> 00:17:30.780
+<v Gregory M. Kurtzer>And I created some open-source projects that have actually helped people cure diseases,
+
+248
+00:17:31.140 --> 00:17:36.600
+<v Gregory M. Kurtzer>find better energy sources, aerospace, launching rockets into the atmosphere and space,
+
+249
+00:17:38.240 --> 00:17:47.280
+<v Gregory M. Kurtzer>All of these sorts of things are things I've tangentially been part of because of what my career has allowed me to build.
+
+250
+00:17:47.880 --> 00:17:57.360
+<v Gregory M. Kurtzer>So now becoming, going from science, working for the U.S. Department of Energy, and now becoming an entrepreneur, I can now take those even to the next level.
+
+251
+00:17:57.500 --> 00:18:02.120
+<v Gregory M. Kurtzer>And I can now help support a lot of those initiatives much more directly.
+
+252
+00:18:02.120 --> 00:18:13.380
+<v Gregory M. Kurtzer>And that has been incredible for me because it feeds right back into the just cause that has been my reason for working so hard and being such an overachiever all the way through my career.
+
+253
+00:18:15.780 --> 00:18:22.700
+<v Noah Labhart>Okay, let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it, specifically in CIQ.
+
+254
+00:18:23.220 --> 00:18:30.420
+<v Gregory M. Kurtzer>I love to mentor other young CEOs, young, not necessarily from an age perspective, from a,
+
+255
+00:18:30.420 --> 00:18:34.560
+<v Gregory M. Kurtzer>from an experience perspective, but some of the biggest mistakes I've already volunteered.
+
+256
+00:18:35.300 --> 00:18:41.180
+<v Gregory M. Kurtzer>I would say discounting the need for core values and building culture is probably the biggest
+
+257
+00:18:41.180 --> 00:18:48.180
+<v Gregory M. Kurtzer>mistake that I've made and had to recover from. It's been an extraordinarily eyeopening journey.
+
+258
+00:18:48.180 --> 00:18:53.940
+<v Gregory M. Kurtzer>And I'll share this for other tech founders or other who are just kind of coming into this.
+
+259
+00:18:54.400 --> 00:19:05.900
+<v Gregory M. Kurtzer>I joke a little bit about that having a life partner, a spouse is one of those, one of those things that every, and I'm a software person, so I'll think about it in terms of bugs.
+
+260
+00:19:06.000 --> 00:19:12.320
+<v Gregory M. Kurtzer>So every bug that you have, every glitch in your system that you have, you can count on the other person to kind of tickle.
+
+261
+00:19:12.680 --> 00:19:17.560
+<v Gregory M. Kurtzer>It makes you a better person and it grows you in ways that you wouldn't grow otherwise.
+
+262
+00:19:18.180 --> 00:19:26.760
+<v Gregory M. Kurtzer>Being a CEO, being a founder will tickle so many different bugs and glitches that you didn't even know you had.
+
+263
+00:19:26.920 --> 00:19:39.080
+<v Gregory M. Kurtzer>The amount of scar tissue that is going to develop from mistakes, which will then cause you to learn and cause you to grow again in ways that you never even thought possible.
+
+264
+00:19:39.260 --> 00:19:44.460
+<v Gregory M. Kurtzer>Lots of mistakes, lots of scar tissue and lots of learning across the board.
+
+265
+00:19:47.300 --> 00:19:53.280
+<v Noah Labhart>Okay, let's look to the future then for CIQ. I'm curious about what that future looks like for,
+
+266
+00:19:53.600 --> 00:19:58.340
+<v Noah Labhart>you know, for the industry, for CIQ, for all of the products that you're building,
+
+267
+00:19:58.420 --> 00:20:00.560
+<v Noah Labhart>all the things. Tell me about what the future looks like.
+
+268
+00:20:01.620 --> 00:20:08.540
+<v Gregory M. Kurtzer>We started off with this vision of innovation. Then it was thrust upon us this opportunity
+
+269
+00:20:08.540 --> 00:20:14.300
+<v Gregory M. Kurtzer>of stability in the sense of products, not talking about the company, but products.
+
+270
+00:20:14.460 --> 00:20:17.060
+<v Gregory M. Kurtzer>So innovation, building a new computing platform.
+
+271
+00:20:17.720 --> 00:20:22.040
+<v Gregory M. Kurtzer>Stability in terms of organizations needed lots of production all of a sudden.
+
+272
+00:20:22.180 --> 00:20:26.200
+<v Gregory M. Kurtzer>Like they needed to focus on their production capabilities within their infrastructure.
+
+273
+00:20:26.420 --> 00:20:27.880
+<v Gregory M. Kurtzer>Things like their operating system.
+
+274
+00:20:28.160 --> 00:20:34.900
+<v Gregory M. Kurtzer>People generally don't want to have fast-moving innovation on something that needs to be absolutely rock stable.
+
+275
+00:20:35.120 --> 00:20:38.080
+<v Gregory M. Kurtzer>They want something that they won't have to think about.
+
+276
+00:20:38.180 --> 00:20:43.260
+<v Gregory M. Kurtzer>Something that is going to be so incredibly boring that it just runs.
+
+277
+00:20:44.460 --> 00:20:45.480
+<v Gregory M. Kurtzer>and they can sleep at night.
+
+278
+00:20:45.760 --> 00:20:47.980
+<v Gregory M. Kurtzer>So our product vision kind of went from
+
+279
+00:20:48.640 --> 00:20:49.920
+<v Gregory M. Kurtzer>massive amounts of innovation,
+
+280
+00:20:50.160 --> 00:20:52.400
+<v Gregory M. Kurtzer>creating something brand new that doesn't exist,
+
+281
+00:20:52.660 --> 00:20:55.960
+<v Gregory M. Kurtzer>to now we also have to think through the production side
+
+282
+00:20:55.960 --> 00:20:58.680
+<v Gregory M. Kurtzer>of how do we do this in such a way
+
+283
+00:20:58.680 --> 00:21:00.700
+<v Gregory M. Kurtzer>that the people that have to maintain it,
+
+284
+00:21:00.720 --> 00:21:02.620
+<v Gregory M. Kurtzer>the people whose jobs are depending on this,
+
+285
+00:21:02.780 --> 00:21:04.680
+<v Gregory M. Kurtzer>are able to sleep at night,
+
+286
+00:21:04.760 --> 00:21:07.120
+<v Gregory M. Kurtzer>they're able to be comfortable with what they're running,
+
+287
+00:21:07.280 --> 00:21:08.700
+<v Gregory M. Kurtzer>and they know it's gonna just work.
+
+288
+00:21:08.860 --> 00:21:10.460
+<v Gregory M. Kurtzer>To then, all of a sudden,
+
+289
+00:21:10.460 --> 00:21:18.020
+<v Gregory M. Kurtzer>the entire ecosystem was transformed over a matter of just a couple years with this new thing called
+
+290
+00:21:18.020 --> 00:21:24.880
+<v Gregory M. Kurtzer>ai and it has transformed how everybody works and i often say this is the biggest innovation to
+
+291
+00:21:24.880 --> 00:21:31.100
+<v Gregory M. Kurtzer>happen in tech since the internet what this means now is all of a sudden we're thinking about several
+
+292
+00:21:31.100 --> 00:21:36.760
+<v Gregory M. Kurtzer>different perspectives we're thinking about fast innovation how do we enable organizations to
+
+293
+00:21:36.760 --> 00:21:42.920
+<v Gregory M. Kurtzer>innovate and move and drive super super fast while at the same time recognizing that these same
+
+294
+00:21:42.920 --> 00:21:50.260
+<v Gregory M. Kurtzer>organizations have to run production which means everything has to be completely stable rock solid
+
+295
+00:21:50.260 --> 00:21:56.820
+<v Gregory M. Kurtzer>and which is counter to the entire idea of let's be fast let's drive fast and let's move on
+
+296
+00:21:56.820 --> 00:22:03.860
+<v Gregory M. Kurtzer>innovation so we got one side innovation we got one side production so as we look towards the
+
+297
+00:22:03.860 --> 00:22:10.320
+<v Gregory M. Kurtzer>future in the era of AI, we're seeing a really interesting cross between both of these.
+
+298
+00:22:10.760 --> 00:22:15.840
+<v Gregory M. Kurtzer>Organizations are saying, we know we recognize that we have to be doing something with AI.
+
+299
+00:22:16.100 --> 00:22:18.120
+<v Gregory M. Kurtzer>We have to be using this internally.
+
+300
+00:22:18.340 --> 00:22:21.960
+<v Gregory M. Kurtzer>We have to be gaining all these advantages that all these organizations are, and we've
+
+301
+00:22:21.960 --> 00:22:23.500
+<v Gregory M. Kurtzer>possibly even proven out already.
+
+302
+00:22:23.760 --> 00:22:28.700
+<v Gregory M. Kurtzer>We also need to do this in a way that's suitable for production, suitable for their own controls
+
+303
+00:22:28.700 --> 00:22:30.060
+<v Gregory M. Kurtzer>and compliance requirements.
+
+304
+00:22:30.060 --> 00:22:33.400
+<v Gregory M. Kurtzer>requirements, all large organizations have to manage these sorts of things.
+
+305
+00:22:33.600 --> 00:22:38.680
+<v Gregory M. Kurtzer>So now it's no longer just, it's something that they're thinking about in terms of testing and
+
+306
+00:22:38.680 --> 00:22:43.680
+<v Gregory M. Kurtzer>development. It's how do they roll it out into production? This has created an incredibly
+
+307
+00:22:43.680 --> 00:22:51.120
+<v Gregory M. Kurtzer>amazing opportunity for us because this is exactly where we fit best. We have the knowledge in terms
+
+308
+00:22:51.120 --> 00:22:56.900
+<v Gregory M. Kurtzer>of dealing with very large scale production. We have the knowledge on dealing with innovation
+
+309
+00:22:56.900 --> 00:22:58.340
+<v Gregory M. Kurtzer>and driving innovation.
+
+310
+00:22:58.720 --> 00:23:01.200
+<v Gregory M. Kurtzer>And now we can help organizations do that.
+
+311
+00:23:01.300 --> 00:23:02.680
+<v Gregory M. Kurtzer>So what does the future look like?
+
+312
+00:23:02.840 --> 00:23:06.200
+<v Gregory M. Kurtzer>The future looks like organizations adopting
+
+313
+00:23:06.200 --> 00:23:07.900
+<v Gregory M. Kurtzer>a lot of these new capabilities
+
+314
+00:23:07.900 --> 00:23:10.480
+<v Gregory M. Kurtzer>and modernizing their infrastructure
+
+315
+00:23:10.480 --> 00:23:12.240
+<v Gregory M. Kurtzer>to be able to handle that
+
+316
+00:23:12.240 --> 00:23:14.720
+<v Gregory M. Kurtzer>in a way that manages their controls,
+
+317
+00:23:14.900 --> 00:23:15.800
+<v Gregory M. Kurtzer>their compliance,
+
+318
+00:23:16.080 --> 00:23:18.200
+<v Gregory M. Kurtzer>and allows them to be sovereign in nature.
+
+319
+00:23:18.940 --> 00:23:20.500
+<v Noah Labhart>Okay, Gregory, last question.
+
+320
+00:23:20.620 --> 00:23:21.740
+<v Noah Labhart>So you're getting on a plane
+
+321
+00:23:21.740 --> 00:23:23.740
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+322
+00:23:23.740 --> 00:23:25.240
+<v Noah Labhart>who's built the next big thing.
+
+323
+00:23:25.400 --> 00:23:26.580
+<v Noah Labhart>They're jazzed about it.
+
+324
+00:23:26.900 --> 00:23:30.860
+<v Noah Labhart>we show it off to the world? And can we show it off to you right there on the plane? What advice
+
+325
+00:23:30.860 --> 00:23:32.840
+<v Noah Labhart>do you give that person having gone down this road a bit?
+
+326
+00:23:33.340 --> 00:23:35.760
+<v Gregory M. Kurtzer>There's a theme here from my perspective,
+
+327
+00:23:35.780 --> 00:23:41.760
+<v Gregory M. Kurtzer>and that is they've created this thing. They are so excited about it and they love it.
+
+328
+00:23:41.920 --> 00:23:47.640
+<v Gregory M. Kurtzer>And in their future, they're going to now have to become a CEO. They're going to now have to
+
+329
+00:23:47.640 --> 00:23:54.240
+<v Gregory M. Kurtzer>run an entire company. And in many cases, that means they're not going to have time to play with
+
+330
+00:23:54.240 --> 00:23:55.140
+<v Gregory M. Kurtzer>with that technology anymore.
+
+331
+00:23:55.320 --> 00:23:56.980
+<v Gregory M. Kurtzer>They're not gonna have time to go build that.
+
+332
+00:23:57.020 --> 00:23:59.940
+<v Gregory M. Kurtzer>And that excitement that they have for that product
+
+333
+00:23:59.940 --> 00:24:02.840
+<v Gregory M. Kurtzer>is gonna get bisected in different ways
+
+334
+00:24:03.220 --> 00:24:04.640
+<v Gregory M. Kurtzer>to focus on other things.
+
+335
+00:24:05.840 --> 00:24:09.580
+<v Gregory M. Kurtzer>One of the best things they can do is hire people
+
+336
+00:24:10.140 --> 00:24:13.900
+<v Gregory M. Kurtzer>that can do the things that they are not the best expert
+
+337
+00:24:13.900 --> 00:24:14.720
+<v Gregory M. Kurtzer>in the world to do.
+
+338
+00:24:14.920 --> 00:24:16.460
+<v Gregory M. Kurtzer>Bring in other people,
+
+339
+00:24:16.580 --> 00:24:20.200
+<v Gregory M. Kurtzer>allow other people to do what they do best.
+
+340
+00:24:20.320 --> 00:24:22.380
+<v Gregory M. Kurtzer>So hire the best people you can find
+
+341
+00:24:24.300 --> 00:24:33.840
+<v Gregory M. Kurtzer>And the faster you do that, the faster you can actually get back to doing the stuff that you're best at and the stuff that you are most passionate about.
+
+342
+00:24:34.120 --> 00:24:35.420
+<v Noah Labhart>That's fantastic advice.
+
+343
+00:24:35.560 --> 00:24:37.660
+<v Noah Labhart>Well, Gregory, thank you for being on the show today.
+
+344
+00:24:37.840 --> 00:24:40.720
+<v Noah Labhart>Thank you for telling the creation story of CIQ.
+
+345
+00:24:41.200 --> 00:24:41.980
+<v Gregory M. Kurtzer>Been a pleasure.
+
+346
+00:24:42.100 --> 00:24:42.600
+<v Gregory M. Kurtzer>Thank you, Noah.
+
+347
+00:24:44.660 --> 00:24:47.460
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+348
+00:24:52.220 --> 00:24:55.260
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+349
+00:24:55.400 --> 00:25:00.180
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+350
+00:25:00.800 --> 00:25:03.000
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+351
+00:25:03.280 --> 00:25:05.180
+<v Noah Labhart>Both things help us out tremendously.
+
+352
+00:25:07.500 --> 00:25:09.600
+<v Noah Labhart>And thanks again for listening.

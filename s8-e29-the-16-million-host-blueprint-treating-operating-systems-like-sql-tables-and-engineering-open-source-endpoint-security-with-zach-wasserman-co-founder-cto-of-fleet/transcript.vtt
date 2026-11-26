@@ -1,0 +1,1219 @@
+WEBVTT
+
+NOTE S8 E29: The 1.6 Million Host Blueprint: Treating Operating Systems Like SQL Tables and Engineering Open-Source Endpoint Security with Zach Wasserman, Co-Founder & CTO of Fleet
+
+1
+00:00:01.340 --> 00:00:06.640
+<v Zach Wasserman>It's not just the throughput, but it's also there's some, I think, user experience-related
+
+2
+00:00:06.640 --> 00:00:12.720
+<v Zach Wasserman>latency considerations. Those humans want to see responses quickly. It's often that
+
+3
+00:00:12.720 --> 00:00:18.660
+<v Zach Wasserman>the human-based API endpoints need to have low latency, but also relatively low throughput.
+
+4
+00:00:19.280 --> 00:00:23.840
+<v Zach Wasserman>Then when you look at the API endpoints that the devices, the agents on the devices are
+
+5
+00:00:23.840 --> 00:00:28.300
+<v Zach Wasserman>using to check into, the latency actually tends to matter a lot less, but the throughput
+
+6
+00:00:30.000 --> 00:00:32.900
+<v Zach Wasserman>And so we have to think about these things a bit differently.
+
+7
+00:00:33.660 --> 00:00:38.080
+<v Zach Wasserman>I'm Zach Wasserman, and I'm the CTO at Fleet Device Management.
+
+8
+00:00:41.540 --> 00:00:47.380
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:47.400 --> 00:00:48.800
+<v Clip>Six months moonlighting.
+
+10
+00:00:48.880 --> 00:00:50.340
+<v Clip>There's nothing on the back end.
+
+11
+00:00:50.580 --> 00:00:53.220
+<v Noah Labhart>Who share what it takes to change an industry.
+
+12
+00:00:53.420 --> 00:00:55.200
+<v Clip>I don't exactly know what to do next.
+
+13
+00:00:55.200 --> 00:00:56.360
+<v Clip>It took many goes to get right.
+
+14
+00:00:56.880 --> 00:00:59.600
+<v Noah Labhart>Who built the teams that have their back.
+
+15
+00:00:59.860 --> 00:01:01.240
+<v Clip>The company is its people.
+
+16
+00:01:01.240 --> 00:01:02.520
+<v Clip>The teams help each other achieve.
+
+17
+00:01:02.560 --> 00:01:03.680
+<v Clip>Most proud of our team.
+
+18
+00:01:04.000 --> 00:01:06.320
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:08.080 --> 00:01:09.380
+<v Clip>Yes, we've been fighting it as we grow.
+
+20
+00:01:09.560 --> 00:01:10.420
+<v Clip>Total waste of time.
+
+21
+00:01:10.680 --> 00:01:12.940
+<v Noah Labhart>The stories you don't read in the headlines.
+
+22
+00:01:13.400 --> 00:01:15.140
+<v Clip>It's not an easy thing to achieve, mind you.
+
+23
+00:01:15.160 --> 00:01:17.180
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+24
+00:01:17.620 --> 00:01:20.980
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+25
+00:01:21.200 --> 00:01:22.680
+<v Clip>You need to really want it.
+
+26
+00:01:22.760 --> 00:01:24.060
+<v Clip>It's not just about technology.
+
+27
+00:01:24.180 --> 00:01:26.080
+<v Noah Labhart>All this and more on Code Story.
+
+28
+00:01:27.840 --> 00:01:29.260
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+29
+00:01:29.740 --> 00:01:33.900
+<v Noah Labhart>Today, how Zach Wasserman is making device management lighter than air
+
+30
+00:01:34.440 --> 00:01:37.820
+<v Noah Labhart>by creating a GitOps-driven MDM.
+
+31
+00:01:42.780 --> 00:01:47.640
+<v Noah Labhart>Zach Wasserman lives near Vancouver, but grew up a child of the 90s in Berkeley, California.
+
+32
+00:01:47.980 --> 00:01:52.440
+<v Noah Labhart>The dot-com boom was happening around him, so he found himself fascinated with this era in tech,
+
+33
+00:01:52.600 --> 00:01:54.260
+<v Noah Labhart>with little understanding of the details.
+
+34
+00:01:54.780 --> 00:01:59.560
+<v Noah Labhart>He was a skater kid riding around the Bay Area, typically on a shortboard over a longboard.
+
+35
+00:02:00.220 --> 00:02:04.760
+<v Noah Labhart>Nowadays, he's more into the outdoors as a mountain biker, rock climber, and backcountry skier.
+
+36
+00:02:04.760 --> 00:02:08.540
+<v Noah Labhart>He enjoys the vast selection of Chinese food at his home near Vancouver.
+
+37
+00:02:10.720 --> 00:02:13.140
+<v Noah Labhart>In 2014, Zach was working at Facebook.
+
+38
+00:02:13.620 --> 00:02:19.340
+<v Noah Labhart>During that time, a team member wanted to build a platform where they could know what was going on with all of their assorted machines.
+
+39
+00:02:20.140 --> 00:02:25.940
+<v Noah Labhart>They needed a way to ask questions without writing code and more quickly get answers about their community of devices.
+
+40
+00:02:28.320 --> 00:02:30.700
+<v Noah Labhart>This is the creation story of Fleet.
+
+41
+00:02:33.040 --> 00:02:42.100
+<v Zach Wasserman>The company is a new approach to managing your computing devices we've got in organizations, and
+
+42
+00:02:42.100 --> 00:02:47.380
+<v Zach Wasserman>particularly enterprises. We've got this wide array of computing devices that folks are using
+
+43
+00:02:47.380 --> 00:02:54.480
+<v Zach Wasserman>these days. Of course, there's a traditional stuff like workstations, servers, but now we've got mobile
+
+44
+00:02:54.480 --> 00:03:02.820
+<v Zach Wasserman>devices, we've got IoT devices, we've got container technologies and Kubernetes, and there's just so
+
+45
+00:03:02.820 --> 00:03:10.240
+<v Zach Wasserman>many different kinds of computing devices. And also through that, like a huge range of competing
+
+46
+00:03:10.240 --> 00:03:16.560
+<v Zach Wasserman>and somewhat overlapping and somewhat complementary products to do the management, both from an IT
+
+47
+00:03:16.560 --> 00:03:25.020
+<v Zach Wasserman>perspective and from a security perspective. And so what Fleet has done is we've taken an
+
+48
+00:03:25.020 --> 00:03:30.500
+<v Zach Wasserman>open source project that was originally created at Facebook that I helped co-create at Facebook
+
+49
+00:03:30.500 --> 00:03:36.660
+<v Zach Wasserman>back in 2014. That project is called osquery and it runs across Mac, Linux, and Windows.
+
+50
+00:03:36.920 --> 00:03:42.980
+<v Zach Wasserman>And we've used that project, which by the way, since 2014 has now been transferred to the Linux
+
+51
+00:03:42.980 --> 00:03:47.340
+<v Zach Wasserman>Foundation. So it's like a totally community oriented project of the Linux Foundation.
+
+52
+00:03:48.220 --> 00:03:56.500
+<v Zach Wasserman>We use osquery to collect data about all of these computing devices. And then we're what
+
+53
+00:03:56.500 --> 00:04:02.180
+<v Zach Wasserman>we're moving into is more of the active management of the devices space. And we've really embraced
+
+54
+00:04:02.180 --> 00:04:08.560
+<v Zach Wasserman>some of the principles that came from DevOps, such as configuration as code. And we're helping
+
+55
+00:04:08.560 --> 00:04:17.460
+<v Zach Wasserman>Helping folks move from the more traditional kind of ClickOps, IT and security workflows to GitOps and again, configuration as code.
+
+56
+00:04:18.340 --> 00:04:32.860
+<v Zach Wasserman>It's all very much inspired by open source, building things that are hackable and that allow organizations with some technical competence to really customize and integrate into their workflows.
+
+57
+00:04:33.000 --> 00:04:38.240
+<v Zach Wasserman>And I think it's really the new paradigm that's emerging in security and IT.
+
+58
+00:04:39.560 --> 00:04:47.640
+<v Zach Wasserman>Going back to 2014, I was working at Facebook on the security team, and this guy, Mike Arpaia,
+
+59
+00:04:47.640 --> 00:04:54.000
+<v Zach Wasserman>joined Facebook with the vision to create a cross-platform open source agent that would
+
+60
+00:04:54.000 --> 00:05:01.640
+<v Zach Wasserman>help to answer questions about what's going on the computers that I manage. And Mike had the
+
+61
+00:05:01.640 --> 00:05:09.400
+<v Zach Wasserman>The really novel insight that we needed a way to make it such that you didn't have to be
+
+62
+00:05:09.400 --> 00:05:15.400
+<v Zach Wasserman>a software engineer. You didn't have to know how to write code in order to ask new questions.
+
+63
+00:05:16.060 --> 00:05:22.560
+<v Zach Wasserman>And so the really cool thing was that as we started to research into this, we discovered
+
+64
+00:05:22.560 --> 00:05:28.920
+<v Zach Wasserman>that SQLite has a really interesting concept called virtual tables, where you can actually
+
+65
+00:05:28.920 --> 00:05:36.220
+<v Zach Wasserman>have functions that get called to generate the data as if it were in an actual table in the
+
+66
+00:05:36.220 --> 00:05:41.500
+<v Zach Wasserman>database, but it doesn't have to be. So then what we did in osquery was we figured out how to hook
+
+67
+00:05:41.500 --> 00:05:48.120
+<v Zach Wasserman>these virtual tables up to the OS APIs and to the file system and to all the sorts of things that
+
+68
+00:05:48.120 --> 00:05:53.640
+<v Zach Wasserman>users might want to get at on these systems. And so now instead of having to write code and sort of
+
+69
+00:05:53.640 --> 00:05:58.200
+<v Zach Wasserman>of Python scripts or PowerShell or Bash or that kind of thing.
+
+70
+00:05:58.380 --> 00:06:03.600
+<v Zach Wasserman>Folks just write a little bit of SQL and the osquery system helps to normalize everything
+
+71
+00:06:03.600 --> 00:06:08.500
+<v Zach Wasserman>into a schema where you can start to join different data sources together and avoid
+
+72
+00:06:08.500 --> 00:06:14.500
+<v Zach Wasserman>having to really write code so you can just get quicker to the answers that you're looking for.
+
+73
+00:06:17.200 --> 00:06:22.300
+<v Noah Labhart>Let's dive into what you would consider the MVP of Fleets, that first version of the product
+
+74
+00:06:22.300 --> 00:06:22.800
+<v Noah Labhart>you built.
+
+75
+00:06:23.640 --> 00:06:26.360
+<v Noah Labhart>to build and what sort of tools did you use to bring it to life?
+
+76
+00:06:27.420 --> 00:06:29.860
+<v Zach Wasserman>The MVP of Fleet was actually
+
+77
+00:06:29.860 --> 00:06:36.220
+<v Zach Wasserman>something that I built at my former company, Kolide, and we built it in, I'd say, about six
+
+78
+00:06:36.220 --> 00:06:43.660
+<v Zach Wasserman>months. We essentially built Fleet as an osquery management server. So we had osquery, which is a
+
+79
+00:06:43.660 --> 00:06:49.500
+<v Zach Wasserman>great piece of software that runs on the individual endpoints or devices, if you will. We saw that
+
+80
+00:06:49.500 --> 00:06:55.400
+<v Zach Wasserman>people had needs to be able to manage the configurations, be able to deal with the logs
+
+81
+00:06:55.400 --> 00:07:00.180
+<v Zach Wasserman>coming out of those, and people wanted to be able to live query all of those devices
+
+82
+00:07:00.180 --> 00:07:03.600
+<v Zach Wasserman>and not just do these kind of actions on a single device.
+
+83
+00:07:04.460 --> 00:07:09.540
+<v Zach Wasserman>We were pretty excited about Go, and we knew we needed to build a system that scaled effectively.
+
+84
+00:07:09.940 --> 00:07:18.480
+<v Zach Wasserman>So we used Go, and we built a backend in Go and a frontend in React and JavaScript at
+
+85
+00:07:18.480 --> 00:07:19.200
+<v Zach Wasserman>that time.
+
+86
+00:07:19.500 --> 00:07:25.800
+<v Zach Wasserman>later migrated onto TypeScript, but at that time JavaScript. And we built kind of that MVP over
+
+87
+00:07:25.800 --> 00:07:31.480
+<v Zach Wasserman>about six months with not necessarily the intention of open sourcing it at that time.
+
+88
+00:07:31.620 --> 00:07:38.660
+<v Zach Wasserman>We then later pivoted the company and in essence started building a new related,
+
+89
+00:07:38.880 --> 00:07:44.680
+<v Zach Wasserman>but completely new product. And it was at that time that we open sourced the original
+
+90
+00:07:44.680 --> 00:07:52.800
+<v Zach Wasserman>Kolide Fleet code base. And that became the kind of MVP that Fleet, the project, and then later,
+
+91
+00:07:52.860 --> 00:08:00.000
+<v Zach Wasserman>the company that we founded in 2020, was based off of that abandonware open source,
+
+92
+00:08:00.260 --> 00:08:04.120
+<v Zach Wasserman>but that people were starting to use. And that was what really caught my attention
+
+93
+00:08:04.120 --> 00:08:09.000
+<v Zach Wasserman>and got me motivated to continue investing in it later when I left Kolide.
+
+94
+00:08:10.420 --> 00:08:16.420
+<v Noah Labhart>I hear you talking about sort of key moments and shifts into going open source and a few other things.
+
+95
+00:08:16.500 --> 00:08:28.180
+<v Noah Labhart>I'm curious if you can walk me through some of the big decisions and tradeoffs you had to make, you know, specifically around, you know, your approach, when you made those decisions, any sort of technical debt you were taking on or anything like that.
+
+96
+00:08:28.380 --> 00:08:30.080
+<v Noah Labhart>And how did you cope with those decisions?
+
+97
+00:08:31.300 --> 00:08:47.580
+<v Zach Wasserman>Looking back, I think one of the biggest and most interesting decisions that we made was the decision that this had to be not necessarily React-based, but that was the technology that we chose, but that this had to be a React-based single-page application.
+
+98
+00:08:48.000 --> 00:08:57.640
+<v Zach Wasserman>And I think a really interesting consequence of that was I don't necessarily think that helps move faster in terms of shipping product.
+
+99
+00:08:57.640 --> 00:09:10.460
+<v Zach Wasserman>In fact, I think using something more integrated, like a server-side programming language with a templating engine and rendering static HTML with some JavaScript thrown in, I do think it helps you move faster.
+
+100
+00:09:10.660 --> 00:09:25.440
+<v Zach Wasserman>But the interesting thing in retrospect that I think was really important about that decision is that the downstream consequence of that is that Fleet uses the exact same APIs that are available to all of our end users and our customers.
+
+101
+00:09:25.440 --> 00:09:37.560
+<v Zach Wasserman>So there's no notion of things that can be done through clicking around in our UI that can't be done through API integrations that anyone builds.
+
+102
+00:09:37.720 --> 00:09:40.740
+<v Zach Wasserman>And I think that is super powerful.
+
+103
+00:09:40.920 --> 00:09:50.560
+<v Zach Wasserman>And it also means that our product itself can become a reference implementation of the APIs as well.
+
+104
+00:09:50.560 --> 00:09:57.360
+<v Zach Wasserman>Well, what we find is as our users get more deeply into things and they want to build integrations,
+
+105
+00:09:57.420 --> 00:10:03.520
+<v Zach Wasserman>we say, look, here, just use the same API documentation that we use to do our development.
+
+106
+00:10:03.740 --> 00:10:11.280
+<v Zach Wasserman>And if you want to see the real examples of that working, just open up the dev tools in your browser while you walk through our application,
+
+107
+00:10:11.480 --> 00:10:15.800
+<v Zach Wasserman>and you'll see exactly how those APIs are being used.
+
+108
+00:10:15.960 --> 00:10:19.300
+<v Zach Wasserman>And I think that there's a really interesting power in that.
+
+109
+00:10:20.560 --> 00:10:27.160
+<v Zach Wasserman>it makes it a little bit slower to ship product. I think it makes it that much easier and that
+
+110
+00:10:27.160 --> 00:10:33.780
+<v Zach Wasserman>much more powerful for this kind of new paradigm of deeper integration into the tools.
+
+111
+00:10:35.920 --> 00:10:41.680
+<v Noah Labhart>You've got MVP, you go to the open sourcing point, and you're getting some traction. How
+
+112
+00:10:41.680 --> 00:10:46.940
+<v Noah Labhart>have you progressed and matured the product from that point? And I'm curious about roadmap,
+
+113
+00:10:46.940 --> 00:10:51.360
+<v Noah Labhart>map? Like, how do you build your roadmap? And what do you, what do you do to make the decision
+
+114
+00:10:51.360 --> 00:10:55.920
+<v Noah Labhart>that, okay, this thing is the next most important thing to build or to address with fleet?
+
+115
+00:10:57.160 --> 00:11:03.280
+<v Zach Wasserman>I'd split that into two, like, one is the question of what do we build next? And then the other big
+
+116
+00:11:03.280 --> 00:11:09.320
+<v Zach Wasserman>question for a company like us, which we're an open core company. So we've got this sort of MIT
+
+117
+00:11:09.320 --> 00:11:16.060
+<v Zach Wasserman>license, truly open source. And then we've also got these premium license features. And this,
+
+118
+00:11:16.940 --> 00:11:20.380
+<v Zach Wasserman>is a business model that we've adopted directly from GitLab
+
+119
+00:11:20.380 --> 00:11:23.460
+<v Zach Wasserman>and Sid Sijbrandij, the CEO and founder of GitLab,
+
+120
+00:11:23.580 --> 00:11:27.920
+<v Zach Wasserman>his kind of philosophy on how to do open core business models.
+
+121
+00:11:29.000 --> 00:11:30.860
+<v Zach Wasserman>There's two really interesting questions.
+
+122
+00:11:30.980 --> 00:11:32.460
+<v Zach Wasserman>One is, what do we build?
+
+123
+00:11:32.640 --> 00:11:36.220
+<v Zach Wasserman>And the other is, how do we figure out what's free and open source
+
+124
+00:11:36.220 --> 00:11:37.520
+<v Zach Wasserman>and what's premium?
+
+125
+00:11:38.460 --> 00:11:41.160
+<v Zach Wasserman>Ultimately, the first question of what do we build
+
+126
+00:11:41.160 --> 00:11:45.240
+<v Zach Wasserman>comes down to listening a lot and engaging a lot
+
+127
+00:11:46.940 --> 00:11:54.120
+<v Zach Wasserman>using the tools. And in particular, and it is so much easier now that we have a real company based
+
+128
+00:11:54.120 --> 00:12:00.440
+<v Zach Wasserman>around this because for multiple years, Fleet was me working as a consultant on sort of whatever
+
+129
+00:12:00.440 --> 00:12:06.940
+<v Zach Wasserman>individual feature I could find a client who wanted me to build and who would fund that.
+
+130
+00:12:07.160 --> 00:12:11.860
+<v Zach Wasserman>And so it was really tightly focused around following the money. And I think that's
+
+131
+00:12:11.860 --> 00:12:19.020
+<v Zach Wasserman>one of the ongoing challenges with a lot of open source maintenance. As we've evolved,
+
+132
+00:12:19.160 --> 00:12:25.580
+<v Zach Wasserman>we're able to look a little bit more holistically at what we're hearing from our users across both
+
+133
+00:12:25.580 --> 00:12:33.620
+<v Zach Wasserman>the paid and the free open source users and start to synthesize our own ideas on what folks are
+
+134
+00:12:33.620 --> 00:12:40.800
+<v Zach Wasserman>really trying to do with these tools and what we can do to best enable them there. It's looking at
+
+135
+00:12:41.860 --> 00:12:47.380
+<v Zach Wasserman>of both free and paid users is doing to decide what to build next. And then to the question of
+
+136
+00:12:47.380 --> 00:12:54.180
+<v Zach Wasserman>what to put into free versus premium. Again, we go back to this philosophy that Sid has promoted
+
+137
+00:12:54.180 --> 00:12:58.740
+<v Zach Wasserman>and has done really successfully at GitLab, which is the buyer-based open core model.
+
+138
+00:12:58.980 --> 00:13:04.240
+<v Zach Wasserman>So we make sure that we build something that really is ready to use for individual practitioners,
+
+139
+00:13:04.440 --> 00:13:10.600
+<v Zach Wasserman>and then that has really appealing features and features that have clear return on investment
+
+140
+00:13:11.860 --> 00:13:15.740
+<v Zach Wasserman>the people with purchasing power at the organizations that we'd like to sell to.
+
+141
+00:13:15.940 --> 00:13:22.860
+<v Zach Wasserman>And so that way we're able to get adoption through open source adoption.
+
+142
+00:13:23.100 --> 00:13:26.620
+<v Zach Wasserman>And these folks are able to really use it and really get value from it.
+
+143
+00:13:26.700 --> 00:13:32.420
+<v Zach Wasserman>And then the people who have control of the pocketbooks, if you will,
+
+144
+00:13:32.540 --> 00:13:38.800
+<v Zach Wasserman>also really see the value and can then pull the trigger on unlocking that additional value,
+
+145
+00:13:38.800 --> 00:13:43.540
+<v Zach Wasserman>you, particularly the stuff that's more oriented towards them and less oriented towards the
+
+146
+00:13:43.540 --> 00:13:44.420
+<v Zach Wasserman>individual contributors.
+
+147
+00:13:46.220 --> 00:13:50.060
+<v Noah Labhart>Let's talk about team. How did you go about building your team? And
+
+148
+00:13:50.060 --> 00:13:53.420
+<v Noah Labhart>what did you look for in those people to indicate that they were the winning horses to join you?
+
+149
+00:13:54.640 --> 00:14:02.180
+<v Zach Wasserman>Finding the right balance of, like, people who are amazing engineers and who are inspired to
+
+150
+00:14:02.180 --> 00:14:10.800
+<v Zach Wasserman>to build an awesome product, and who don't want or have not been able to get into the biggest tech
+
+151
+00:14:10.800 --> 00:14:16.660
+<v Zach Wasserman>companies where they're paying massive compensation. It's an interesting kind of needle to thread
+
+152
+00:14:16.660 --> 00:14:22.560
+<v Zach Wasserman>because there are a ton of people out there who are super talented and who are, for whatever reason,
+
+153
+00:14:22.560 --> 00:14:29.600
+<v Zach Wasserman>not working in FANG. I as well had the experience of working at FANG, at Facebook, and while it was
+
+154
+00:14:29.600 --> 00:14:34.460
+<v Zach Wasserman>amazing in some ways, it didn't really hold my attention for that long in the
+
+155
+00:14:34.460 --> 00:14:39.140
+<v Zach Wasserman>way that working in smaller companies, there's this interesting, like I said,
+
+156
+00:14:39.140 --> 00:14:44.800
+<v Zach Wasserman>needle to thread of finding these people who are talented and driven, and yet not
+
+157
+00:14:44.800 --> 00:14:50.160
+<v Zach Wasserman>driven to plain corporate life. And we've actually had some really cool
+
+158
+00:14:50.160 --> 00:14:56.100
+<v Zach Wasserman>experiences of hiring of very junior engineers, but people who we saw a lot of
+
+159
+00:14:56.100 --> 00:15:01.480
+<v Zach Wasserman>of promise, a lot of motivation in, and finding that they were able to really become amazing
+
+160
+00:15:01.480 --> 00:15:07.500
+<v Zach Wasserman>contributors to the team. It's been a combination of finding very non-traditional candidates who
+
+161
+00:15:07.500 --> 00:15:13.460
+<v Zach Wasserman>are just breaking into the field, but who've ultimately really paid off for us as now not
+
+162
+00:15:13.460 --> 00:15:20.780
+<v Zach Wasserman>just entry-level, but really mid-level engineers. And then combine that with some select, excellent,
+
+163
+00:15:20.780 --> 00:15:27.800
+<v Zach Wasserman>more senior engineers who help us drive architecture and help to mentor those newer engineers.
+
+164
+00:15:28.080 --> 00:15:30.060
+<v Zach Wasserman>I look at this thing as like an engine.
+
+165
+00:15:30.240 --> 00:15:38.820
+<v Zach Wasserman>As we get it going more, we can keep continuing to push more of this kind of flywheel around
+
+166
+00:15:38.820 --> 00:15:44.300
+<v Zach Wasserman>and we'll be able to start bringing on more awesome, motivated junior engineers and training them up.
+
+167
+00:15:44.400 --> 00:15:48.680
+<v Zach Wasserman>And with that momentum, we'll also be able to continue to find more senior engineers
+
+168
+00:15:48.680 --> 00:15:54.500
+<v Zach Wasserman>who are not drawn to the kind of more stagnant, if you will, corporate life.
+
+169
+00:15:57.680 --> 00:15:59.300
+<v Noah Labhart>So let's flip to scalability.
+
+170
+00:15:59.420 --> 00:16:02.880
+<v Noah Labhart>This will be interesting to hear how you approach this or where problems arise here.
+
+171
+00:16:03.060 --> 00:16:07.060
+<v Noah Labhart>But was Fleet built to scale efficiently from day one?
+
+172
+00:16:07.160 --> 00:16:10.460
+<v Noah Labhart>Or are you fighting this as you grow in any sort of capacity?
+
+173
+00:16:10.620 --> 00:16:11.580
+<v Noah Labhart>And tell me about those areas.
+
+174
+00:16:12.540 --> 00:16:15.940
+<v Zach Wasserman>In most organizations, when you're thinking about scaling an application,
+
+175
+00:16:16.240 --> 00:16:18.440
+<v Zach Wasserman>let's say Facebook, because I was there.
+
+176
+00:16:18.680 --> 00:16:24.760
+<v Zach Wasserman>Facebook scales based on the number of users and each user has a bunch of content as the users
+
+177
+00:16:24.760 --> 00:16:30.840
+<v Zach Wasserman>clicking around, there's gonna have to be database calls and updates and that kind of stuff. The thing
+
+178
+00:16:30.840 --> 00:16:37.140
+<v Zach Wasserman>that I've always found a little bit unique about the fleet application scaling is that the number
+
+179
+00:16:37.140 --> 00:16:42.900
+<v Zach Wasserman>of human administrative users, the ones who are making the API calls through clicking around in
+
+180
+00:16:42.900 --> 00:16:47.180
+<v Zach Wasserman>the UI or through running their scripts or that kind of thing, even in a very large organization,
+
+181
+00:16:48.680 --> 00:16:51.360
+<v Zach Wasserman>probably only in the dozens or something like that.
+
+182
+00:16:51.500 --> 00:16:55.940
+<v Zach Wasserman>However, our other big API client is the actual agents
+
+183
+00:16:55.940 --> 00:16:57.800
+<v Zach Wasserman>that are running on the individual devices
+
+184
+00:16:57.800 --> 00:17:01.940
+<v Zach Wasserman>and that are checking in and updating large amounts sometimes
+
+185
+00:17:01.940 --> 00:17:04.640
+<v Zach Wasserman>of data that we need to store in our databases.
+
+186
+00:17:05.000 --> 00:17:08.020
+<v Zach Wasserman>And so we have typically in fleet deployments
+
+187
+00:17:08.020 --> 00:17:11.140
+<v Zach Wasserman>multiple orders of magnitude difference in scale
+
+188
+00:17:11.140 --> 00:17:17.080
+<v Zach Wasserman>of the throughput on each of these kinds of API endpoints.
+
+189
+00:17:18.680 --> 00:17:26.060
+<v Zach Wasserman>you have 10 human users on a fleet deployment, you probably have 10,000 or up to maybe 100,000
+
+190
+00:17:26.060 --> 00:17:31.000
+<v Zach Wasserman>computers or devices that are checking in regularly. So we have to think really differently
+
+191
+00:17:31.000 --> 00:17:36.340
+<v Zach Wasserman>about scaling these different kinds of endpoints. It's not just the throughput, but it's also there's
+
+192
+00:17:36.340 --> 00:17:42.480
+<v Zach Wasserman>some, I think, user experience related latency considerations. Those humans want to see responses
+
+193
+00:17:42.480 --> 00:17:49.220
+<v Zach Wasserman>quickly. It's often that the human-based API endpoints need to have low latency, but also
+
+194
+00:17:49.220 --> 00:17:55.000
+<v Zach Wasserman>relatively low throughput. Then when you look at the API endpoints that the devices, the agents on
+
+195
+00:17:55.000 --> 00:17:59.680
+<v Zach Wasserman>the devices are using to check into, the latency actually tends to matter a lot less, but the
+
+196
+00:17:59.680 --> 00:18:04.780
+<v Zach Wasserman>throughput matters a lot more. And so we have to think about these things a bit differently.
+
+197
+00:18:04.780 --> 00:18:09.420
+<v Zach Wasserman>So then you asked, was it built to scale from day one?
+
+198
+00:18:09.920 --> 00:18:20.580
+<v Zach Wasserman>And thinking about MVPs and this kind of thing, what I would say is it was built with the understanding it would need to scale from day one, but it did not.
+
+199
+00:18:22.280 --> 00:18:29.500
+<v Zach Wasserman>Fleet would work up to until you're managing about three, four, five thousand devices with it.
+
+200
+00:18:29.500 --> 00:18:37.740
+<v Zach Wasserman>And then it would start to fall over as the devices themselves essentially overwhelmed the database and things weren't optimized for that.
+
+201
+00:18:37.880 --> 00:18:50.880
+<v Zach Wasserman>But it was always intended that we would be able to optimize the portions that needed to be optimized through a couple of sort of major revisions and then just incremental efforts.
+
+202
+00:18:50.880 --> 00:18:58.300
+<v Zach Wasserman>since then. Now the product or the platform will scale up to some hundreds of thousands
+
+203
+00:18:58.300 --> 00:19:04.400
+<v Zach Wasserman>of devices connected. So it's been multiple orders of magnitude of increased ability.
+
+204
+00:19:06.920 --> 00:19:11.240
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built,
+
+205
+00:19:11.300 --> 00:19:12.280
+<v Noah Labhart>what are you most proud of?
+
+206
+00:19:13.760 --> 00:19:20.020
+<v Zach Wasserman>The thing that I'm most proud of, again, five years ago and even just over three years ago,
+
+207
+00:19:20.880 --> 00:19:30.140
+<v Zach Wasserman>the sole maintainer of this project. There were a handful of organizations using it and very
+
+208
+00:19:30.140 --> 00:19:36.180
+<v Zach Wasserman>excited about it. But the thing that's most exciting to me is looking at Fleet, the organization,
+
+209
+00:19:36.480 --> 00:19:44.700
+<v Zach Wasserman>and the number of people who are now making their living working on this project and who are pretty
+
+210
+00:19:44.700 --> 00:19:50.100
+<v Zach Wasserman>dedicated and excited about what we're doing. And then the number of customers and open source users
+
+211
+00:19:50.880 --> 00:19:57.440
+<v Zach Wasserman>have also grown massively. And so just seeing the impact that this has made on people and also
+
+212
+00:19:57.440 --> 00:20:04.680
+<v Zach Wasserman>knowing that while we're building a business that's sustainable and will hopefully someday
+
+213
+00:20:04.680 --> 00:20:12.080
+<v Zach Wasserman>be profitable, but it's certainly growing quite a bit through the venture-backed model. I'm just
+
+214
+00:20:12.080 --> 00:20:28.000
+<v Zach Wasserman>I'm just really proud to see how the impact has grown on both ends for both people who are using Fleet to get their job done and people who have made working on Fleet into their career.
+
+215
+00:20:29.480 --> 00:20:35.420
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+216
+00:20:36.820 --> 00:20:41.660
+<v Zach Wasserman>probably some of the biggest mistakes over time have been made in scaling.
+
+217
+00:20:41.900 --> 00:20:47.200
+<v Zach Wasserman>In particular, there were things that we didn't understand initially,
+
+218
+00:20:47.360 --> 00:20:52.400
+<v Zach Wasserman>or we didn't anticipate initially about the properties of a system
+
+219
+00:20:52.400 --> 00:20:54.720
+<v Zach Wasserman>with so many devices trying to check in.
+
+220
+00:20:54.880 --> 00:20:57.740
+<v Zach Wasserman>And so we definitely made some mistakes over time.
+
+221
+00:20:57.960 --> 00:21:04.140
+<v Zach Wasserman>In particular, how does the system recover when unusual conditions take place?
+
+222
+00:21:05.420 --> 00:21:09.940
+<v Zach Wasserman>kind of thing manifests is that in the product we have a quite a bit of information that we want to
+
+223
+00:21:09.940 --> 00:21:15.480
+<v Zach Wasserman>keep up to date and if you ever start to fall behind on keeping that information up to date
+
+224
+00:21:15.480 --> 00:21:21.100
+<v Zach Wasserman>and you just imagine it's like you've got a dam and the water is starting to back up behind it
+
+225
+00:21:21.100 --> 00:21:25.560
+<v Zach Wasserman>and you can't really let any more water through so it's just building up bigger and bigger.
+
+226
+00:21:26.220 --> 00:21:33.380
+<v Zach Wasserman>I think that we under anticipated in earlier versions of fleet like the potential for that
+
+227
+00:21:33.380 --> 00:21:36.320
+<v Zach Wasserman>that water to just keep building back, building up,
+
+228
+00:21:36.380 --> 00:21:39.280
+<v Zach Wasserman>and the amount of data that needs to be ingested to keep building up.
+
+229
+00:21:40.100 --> 00:21:43.840
+<v Zach Wasserman>This is a somewhat common problem in distributed systems
+
+230
+00:21:43.840 --> 00:21:46.940
+<v Zach Wasserman>and one that we've continued to engage on.
+
+231
+00:21:48.580 --> 00:21:51.120
+<v Zach Wasserman>Underanticipating the effects of that buildup
+
+232
+00:21:51.120 --> 00:21:55.020
+<v Zach Wasserman>and then finding that it could be really hard to recover
+
+233
+00:21:55.020 --> 00:22:01.440
+<v Zach Wasserman>from the inevitable small outages turning into bigger outages.
+
+234
+00:22:03.380 --> 00:22:04.860
+<v Zach Wasserman>learnings that we had around that,
+
+235
+00:22:04.940 --> 00:22:07.500
+<v Zach Wasserman>we're figuring out how do you take a system
+
+236
+00:22:07.500 --> 00:22:08.540
+<v Zach Wasserman>that's integrated performance
+
+237
+00:22:08.540 --> 00:22:11.680
+<v Zach Wasserman>and let it come back online slowly
+
+238
+00:22:11.680 --> 00:22:13.540
+<v Zach Wasserman>without being like just overwhelmed
+
+239
+00:22:13.540 --> 00:22:16.380
+<v Zach Wasserman>by the deluge of backed up data
+
+240
+00:22:16.380 --> 00:22:18.480
+<v Zach Wasserman>that it needs to ingest and that kind of thing.
+
+241
+00:22:18.620 --> 00:22:21.140
+<v Zach Wasserman>Again, I think these are perennial problems
+
+242
+00:22:21.140 --> 00:22:22.660
+<v Zach Wasserman>in larger systems.
+
+243
+00:22:22.940 --> 00:22:25.440
+<v Zach Wasserman>And I think that each system
+
+244
+00:22:25.440 --> 00:22:28.960
+<v Zach Wasserman>has its own slightly novel properties.
+
+245
+00:22:30.660 --> 00:22:39.200
+<v Zach Wasserman>We've had to do quite a bit of learning and I think trial and error to ultimately get to a place where we have a quite stable system.
+
+246
+00:22:42.040 --> 00:22:49.740
+<v Noah Labhart>This will be fun to ask, and it's always interesting to hear the excitement come out in one of the founders' voices.
+
+247
+00:22:50.000 --> 00:22:53.480
+<v Noah Labhart>Tell me what the future looks like for Fleet, the product, and for your team.
+
+248
+00:22:55.140 --> 00:22:57.880
+<v Zach Wasserman>Historically, Fleet has been a telemetry product.
+
+249
+00:22:58.040 --> 00:23:07.940
+<v Zach Wasserman>So let's view the state and let's record the state and provide insights based on the state of our systems and the events that are happening in our systems.
+
+250
+00:23:08.060 --> 00:23:13.120
+<v Zach Wasserman>And the big thing that Fleet has been moving into this year is actually the active management of the system.
+
+251
+00:23:13.240 --> 00:23:16.920
+<v Zach Wasserman>So we released in April macOS MDM.
+
+252
+00:23:16.920 --> 00:23:27.860
+<v Zach Wasserman>So it's functionality to fully manage macOS devices from the first time they're open to ultimately deprovisioning them through remote lock and wipe if that's necessary.
+
+253
+00:23:28.860 --> 00:23:33.920
+<v Zach Wasserman>What we're working on now and we'll be shipping by the end of this year is the same for Windows.
+
+254
+00:23:33.920 --> 00:23:51.220
+<v Zach Wasserman>And I think the thing that's really exciting is taking all of these concepts that we've built that are meant to be able to be composed together because there's command line tools and there's APIs and there's configuration as code around it, all this powerful stuff.
+
+255
+00:23:51.220 --> 00:24:11.860
+<v Zach Wasserman>And combining that from not just telemetry and driving insights, but to the active management of devices and really being able to start to replace some of the big and really entrenched tools that we think are ultimately not serving the practitioners and IT and security as well as they can be.
+
+256
+00:24:11.860 --> 00:24:22.100
+<v Zach Wasserman>So I think that for me, definitely the most exciting thing is just the increasing surface area that we're going to be able to impact through everything that we're doing.
+
+257
+00:24:24.120 --> 00:24:25.700
+<v Noah Labhart>Zach, let's switch to you.
+
+258
+00:24:25.840 --> 00:24:28.120
+<v Noah Labhart>Who influences the way that you work?
+
+259
+00:24:28.300 --> 00:24:31.780
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+260
+00:24:32.920 --> 00:24:40.900
+<v Zach Wasserman>I already mentioned it once, but Sid Sijbrandij at GitLab, I think, is really a pioneer of buyer-based open core business model.
+
+261
+00:24:41.860 --> 00:24:49.480
+<v Zach Wasserman>that we've been pursuing. But as well, there's something more about sort of the ethics and the
+
+262
+00:24:49.480 --> 00:24:57.640
+<v Zach Wasserman>transparency with which he's pursued everything. GitLab, the company has an amazing open handbook
+
+263
+00:24:57.640 --> 00:25:04.120
+<v Zach Wasserman>that just has a wealth of information about how they run the organization. And to me, it's so cool
+
+264
+00:25:04.120 --> 00:25:10.500
+<v Zach Wasserman>this concept of sharing this kind of information. And so for us, as the founders at Fleet,
+
+265
+00:25:11.860 --> 00:25:19.380
+<v Zach Wasserman>a lot of attention to what GitLab has done to address building a business. And we've also
+
+266
+00:25:19.380 --> 00:25:27.100
+<v Zach Wasserman>adopted a lot of those principles around transparency. And so I just love that. And I love
+
+267
+00:25:27.100 --> 00:25:34.000
+<v Zach Wasserman>to see what Sid has done. And of course, you've probably heard it from my excitement throughout
+
+268
+00:25:34.000 --> 00:25:40.440
+<v Zach Wasserman>this, but I'm just a huge fan of open source and seeing people who have made open source work
+
+269
+00:25:41.860 --> 00:25:46.780
+<v Zach Wasserman>business models is something that I am just absolutely excited about.
+
+270
+00:25:48.860 --> 00:25:52.560
+<v Noah Labhart>So we talked about a mistake earlier, but this is a little different spin.
+
+271
+00:25:53.100 --> 00:25:56.280
+<v Noah Labhart>If you could go back to the beginning, what would you do different? Or where would you consider
+
+272
+00:25:56.280 --> 00:25:59.560
+<v Noah Labhart>taking a different approach? It doesn't have to be something that didn't work. It could have
+
+273
+00:25:59.560 --> 00:26:01.960
+<v Noah Labhart>worked even well, but maybe you tweak it a little bit.
+
+274
+00:26:01.960 --> 00:26:12.340
+<v Zach Wasserman>it. I actually would have liked to hold on for a little bit longer to see if things were working.
+
+275
+00:26:13.000 --> 00:26:19.240
+<v Zach Wasserman>We're in an industry that's so fast paced and we read a lot of content around staying lean and
+
+276
+00:26:19.240 --> 00:26:24.940
+<v Zach Wasserman>iterating quickly and pivoting and that kind of thing. And I think it is definitely super important
+
+277
+00:26:24.940 --> 00:26:31.700
+<v Zach Wasserman>to be realistic about what's working and to move quickly and to experiment quickly and that kind
+
+278
+00:26:31.960 --> 00:26:38.420
+<v Zach Wasserman>But I also think in enterprise software, things do take time and adoption does take time.
+
+279
+00:26:38.520 --> 00:26:45.980
+<v Zach Wasserman>And I think that I could look back on times in my journey where we pivoted too quickly
+
+280
+00:26:45.980 --> 00:26:52.300
+<v Zach Wasserman>and I would have liked to see what would have happened if we held on a little bit longer
+
+281
+00:26:52.300 --> 00:27:01.480
+<v Zach Wasserman>and waited and worked with our customers and our users to understand things a bit better
+
+282
+00:27:01.960 --> 00:27:02.460
+<v Zach Wasserman>moving on.
+
+283
+00:27:03.960 --> 00:27:08.640
+<v Noah Labhart>Zach, last question. So you're getting on a plane and you're sitting next to a young
+
+284
+00:27:08.640 --> 00:27:12.780
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show
+
+285
+00:27:12.780 --> 00:27:16.220
+<v Noah Labhart>it off to the world. Can't wait to show it off to you right there on the plane. What advice do you
+
+286
+00:27:16.220 --> 00:27:18.160
+<v Noah Labhart>give that person having gone down this road a bit?
+
+287
+00:27:19.300 --> 00:27:22.520
+<v Zach Wasserman>Product market fit is everything and building
+
+288
+00:27:22.520 --> 00:27:28.900
+<v Zach Wasserman>something that people actually want to buy is everything. Don't give away your product for free
+
+289
+00:27:28.900 --> 00:27:32.620
+<v Zach Wasserman>because I think it doesn't give you the proof that you need to yourself and to your
+
+290
+00:27:32.620 --> 00:27:38.840
+<v Zach Wasserman>potential investors and the actual money that you need flowing into your business to grow.
+
+291
+00:27:39.720 --> 00:27:43.460
+<v Zach Wasserman>Believe in what you're doing enough that you're willing to charge for it
+
+292
+00:27:43.460 --> 00:27:52.780
+<v Zach Wasserman>and find customers who believe in it enough to pay for it and let that be a real indication
+
+293
+00:27:52.780 --> 00:27:56.320
+<v Zach Wasserman>of the actual economic value that you're driving.
+
+294
+00:27:56.320 --> 00:28:01.320
+<v Zach Wasserman>And then don't let economic value dissuade you from doing things that you're passionate about.
+
+295
+00:28:01.580 --> 00:28:12.760
+<v Zach Wasserman>But if you're trying to build a business, then I think be really realistic about product market fit and the ability to actually sell whatever it is that you're building.
+
+296
+00:28:13.420 --> 00:28:14.320
+<v Noah Labhart>Couldn't agree more.
+
+297
+00:28:14.500 --> 00:28:15.480
+<v Noah Labhart>That's fantastic advice.
+
+298
+00:28:15.780 --> 00:28:18.040
+<v Noah Labhart>Well, Zach, thank you for being on the show today.
+
+299
+00:28:18.160 --> 00:28:20.840
+<v Noah Labhart>And thank you for telling the creation story of Fleet.
+
+300
+00:28:20.960 --> 00:28:22.480
+<v Zach Wasserman>Thank you so much for having me.
+
+301
+00:28:24.520 --> 00:28:27.560
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+302
+00:28:29.180 --> 00:28:35.540
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or
+
+303
+00:28:35.540 --> 00:28:41.440
+<v Noah Labhart>the podcasting app of your choice. And when you get a chance, leave us a review. Both things help
+
+304
+00:28:41.440 --> 00:28:46.720
+<v Noah Labhart>us out tremendously. And thanks again for listening.

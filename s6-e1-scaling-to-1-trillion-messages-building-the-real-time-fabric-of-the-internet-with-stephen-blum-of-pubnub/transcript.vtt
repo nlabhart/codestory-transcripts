@@ -1,0 +1,1543 @@
+WEBVTT
+
+NOTE S6 E1: Scaling to 1 Trillion Messages: Building the Real-Time Fabric of the Internet with Stephen Blum of PubNub
+
+1
+00:00:00.980 --> 00:00:29.120
+<v Stephen Blum>The design was intended to build and scale. But initially, you know, as we were, we didn't want to waste a bunch of money just by throwing servers up and saying, here we go. And we can just handle any load immediately. We didn't auto scale. Right? That's a big part of modern cloud and API is ability to auto scale is all been manual, and we have to sort of predict and the challenges with messaging infrastructure and our latency being, you know,
+
+2
+00:00:30.000 --> 00:00:32.880
+<v Stephen Blum>under 30 milliseconds, pretty much everywhere.
+
+3
+00:00:33.300 --> 00:00:37.080
+<v Stephen Blum>How do we, you can't launch a server in 30 milliseconds.
+
+4
+00:00:38.300 --> 00:00:42.700
+<v Stephen Blum>My name is Stephen Blum, CTO, co-founder at PubNub.
+
+5
+00:00:47.520 --> 00:00:49.340
+<v Noah Labhart>This is Code Story,
+
+6
+00:00:49.560 --> 00:00:52.920
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+7
+00:00:52.920 --> 00:00:55.280
+<v Noah Labhart>who share in the critical moments
+
+8
+00:00:55.280 --> 00:00:57.120
+<v Noah Labhart>of what it takes to change an industry
+
+9
+00:00:57.120 --> 00:01:05.060
+<v Noah Labhart>streak and build and lead a team that has your back. I'm your host Noah Labhart and today how
+
+10
+00:01:05.060 --> 00:01:11.620
+<v Noah Labhart>Stephen Blum built the platform that powered virtual spaces with real-time integrated communication.
+
+11
+00:01:13.320 --> 00:01:15.760
+<v Noah Labhart>All this and more on Code Story.
+
+12
+00:01:19.860 --> 00:01:25.340
+<v Noah Labhart>Stephen Blum finds that his life outside of tech is tricky to define given we're surrounded by
+
+13
+00:01:27.120 --> 00:01:30.760
+<v Noah Labhart>He was inspired to be a game developer at an early age, and he found it fun and exciting.
+
+14
+00:01:31.060 --> 00:01:34.260
+<v Noah Labhart>And in those days, he really enjoyed The Legend of Zelda and Metroid.
+
+15
+00:01:34.660 --> 00:01:38.000
+<v Noah Labhart>Those adventures and the animation was fascinating to him.
+
+16
+00:01:38.480 --> 00:01:43.920
+<v Noah Labhart>After a while, he found more excitement within the business world and using technology to solve problems and profit.
+
+17
+00:01:44.380 --> 00:01:50.440
+<v Noah Labhart>In fact, he finds it so much fun that what he loves to do outside of work and business is just chill.
+
+18
+00:01:50.960 --> 00:01:55.700
+<v Noah Labhart>Stephen likes to support and invest in early-stage AI and API companies.
+
+19
+00:01:57.120 --> 00:02:01.200
+<v Noah Labhart>companies he has invested in, and he wants to continue expanding that portfolio, and into
+
+20
+00:02:01.200 --> 00:02:07.120
+<v Noah Labhart>crypto as well, specifically arbitrage through APIs, which he finds particularly fun and lucrative.
+
+21
+00:02:08.300 --> 00:02:14.040
+<v Noah Labhart>Stephen's current venture, in their inception, was trying to solve a problem by simply creating
+
+22
+00:02:14.040 --> 00:02:19.440
+<v Noah Labhart>a button to order a taxi. In the process of building that, they figured out that they needed
+
+23
+00:02:19.440 --> 00:02:26.540
+<v Noah Labhart>tech to allow more than one party to participate, and their product vision clicked. This is the
+
+24
+00:02:27.120 --> 00:02:28.160
+<v Noah Labhart>story of PubNub.
+
+25
+00:02:32.500 --> 00:02:38.360
+<v Stephen Blum>PubNub these days, we're calling it a virtual spaces. So sort of like connected
+
+26
+00:02:38.360 --> 00:02:44.100
+<v Stephen Blum>experiences built in virtual spaces, which sounds like, okay, there's an abstract concept there,
+
+27
+00:02:44.160 --> 00:02:49.100
+<v Stephen Blum>but sort of like everything's a virtual space these days where you have more than one individual,
+
+28
+00:02:49.440 --> 00:02:54.760
+<v Stephen Blum>more than one party interacting. So when you order food, right? I'm hungry. It's lunchtime.
+
+29
+00:02:54.760 --> 00:02:58.520
+<v Stephen Blum>I want my burrito. There's a lot of, a lot of parties involved there. You've got the restaurant,
+
+30
+00:02:58.700 --> 00:03:02.160
+<v Stephen Blum>you've got the DoorDash and you've got the driver, and then you've got me, the, or the,
+
+31
+00:03:02.260 --> 00:03:07.260
+<v Stephen Blum>I want my hungry. And so there's four, four parties there. And so you have to sort of coordinate all
+
+32
+00:03:07.260 --> 00:03:10.840
+<v Stephen Blum>that together. You need to show the updates and status and notifications. Where's the car on the
+
+33
+00:03:10.840 --> 00:03:15.480
+<v Stephen Blum>map, right? Are they, are they headed towards you or with the burrito or are they still picking up
+
+34
+00:03:15.480 --> 00:03:21.000
+<v Stephen Blum>the burrito? That is the, that's what we facilitate. That's what PubNub is. We, we empower
+
+35
+00:03:21.000 --> 00:03:26.860
+<v Stephen Blum>that connection in that virtual space. So you can facilitate the multi-party environment.
+
+36
+00:03:27.180 --> 00:03:32.280
+<v Stephen Blum>And that's a small, small use case for us, a small volume use case. But the bigger use cases
+
+37
+00:03:32.280 --> 00:03:36.520
+<v Stephen Blum>are fun where you get into games, where you have multiplayer environments and you need thousands
+
+38
+00:03:36.520 --> 00:03:42.600
+<v Stephen Blum>or tens of thousands of players all interacting simultaneously. And that's the kind of power that
+
+39
+00:03:42.600 --> 00:03:47.920
+<v Stephen Blum>we've brought into PubNub. All of our tech is written in C and everything all the way from
+
+40
+00:03:47.920 --> 00:03:50.400
+<v Stephen Blum>from the edge all the way back into our PubSub bus is C.
+
+41
+00:03:50.800 --> 00:03:53.220
+<v Stephen Blum>And it allows us to have this extremely low latency
+
+42
+00:03:53.220 --> 00:03:54.980
+<v Stephen Blum>and full control of the network stack.
+
+43
+00:03:55.280 --> 00:03:58.160
+<v Stephen Blum>And it's something that no one else has come close to
+
+44
+00:03:58.160 --> 00:03:59.260
+<v Stephen Blum>in our industry.
+
+45
+00:03:59.280 --> 00:04:01.460
+<v Stephen Blum>Yeah, we've got competitors, but they don't have our tech.
+
+46
+00:04:02.500 --> 00:04:06.920
+<v Stephen Blum>We had a hard problem of getting two devices to communicate.
+
+47
+00:04:07.200 --> 00:04:12.580
+<v Stephen Blum>So before the way when, when apps were becoming a thing
+
+48
+00:04:12.580 --> 00:04:14.280
+<v Stephen Blum>and the iPhone was released,
+
+49
+00:04:14.540 --> 00:04:17.740
+<v Stephen Blum>there wasn't really a way to press a button to order a taxi.
+
+50
+00:04:17.920 --> 00:04:22.220
+<v Stephen Blum>you know, we're thinking, hey, wouldn't it be neat if all you had to do is on your phone here,
+
+51
+00:04:22.280 --> 00:04:27.220
+<v Stephen Blum>right? We create a digital button that says order taxi. That would be awesome. Don't have to worry
+
+52
+00:04:27.220 --> 00:04:32.200
+<v Stephen Blum>about calling. Let's just order a taxi. And so in the process of attempting to build that,
+
+53
+00:04:32.700 --> 00:04:37.320
+<v Stephen Blum>it turned out that we need something like PubNub. And that was, you know, a big core,
+
+54
+00:04:37.420 --> 00:04:43.980
+<v Stephen Blum>probably the most, the biggest part of that entire exchange was building that app. So
+
+55
+00:04:43.980 --> 00:04:48.800
+<v Stephen Blum>So what we realized was that this tech could be used in more than one way.
+
+56
+00:04:48.880 --> 00:05:01.140
+<v Stephen Blum>So instead of just doing, you know, the taxi dispatch, which, you know, looking back before Uber and before, you know, get taxi and all these other, you know, ride sharing apps.
+
+57
+00:05:01.520 --> 00:05:03.700
+<v Stephen Blum>It might have been good if we had pursued that.
+
+58
+00:05:04.160 --> 00:05:11.980
+<v Stephen Blum>But, you know, after releasing the API to power that sort of like, you know, the way in the gold rush was creating the tools.
+
+59
+00:05:12.480 --> 00:05:13.800
+<v Stephen Blum>So we're building the shovel.
+
+60
+00:05:13.980 --> 00:05:19.380
+<v Stephen Blum>right? The API. And that's what PubNub is. We've got these tools that let you create these app
+
+61
+00:05:19.380 --> 00:05:25.380
+<v Stephen Blum>experiences in these connected spaces. And so it went beyond just ordering taxis. It went into
+
+62
+00:05:25.380 --> 00:05:31.220
+<v Stephen Blum>gaming and it went into live updates and collaboration, you know, Atlassian. That's
+
+63
+00:05:31.220 --> 00:05:38.160
+<v Stephen Blum>a big agile company with Jira, Confluence. They're our customer. They use us to power
+
+64
+00:05:38.160 --> 00:05:39.200
+<v Stephen Blum>those kinds of experiences.
+
+65
+00:05:41.000 --> 00:05:44.440
+<v Noah Labhart>Tell me about the MVP, that first product that you built,
+
+66
+00:05:44.580 --> 00:05:49.700
+<v Noah Labhart>you know, with the button to call the taxi and then everything that was behind or underneath
+
+67
+00:05:49.700 --> 00:05:53.660
+<v Noah Labhart>that what you were focusing on, how long did it take you to build and what sort of tools did you
+
+68
+00:05:53.660 --> 00:05:54.640
+<v Noah Labhart>use to bring it to life?
+
+69
+00:05:56.060 --> 00:06:00.420
+<v Stephen Blum>So it's, you know, rapid development, quick iterations, a few weeks.
+
+70
+00:06:00.860 --> 00:06:07.020
+<v Stephen Blum>It's kind of what we were looking at in terms of in the app and then a very rudimentary prototype
+
+71
+00:06:08.160 --> 00:06:14.540
+<v Stephen Blum>subsystem is today to facilitate that. There was a hard, challenging part of actually involving
+
+72
+00:06:14.540 --> 00:06:19.560
+<v Stephen Blum>the dispatch companies, right? Because there were only taxi companies back then, and you would call
+
+73
+00:06:19.560 --> 00:06:26.600
+<v Stephen Blum>in and then they would schedule a taxi for you. So we had to come up with a way to digitally place a
+
+74
+00:06:26.600 --> 00:06:31.960
+<v Stephen Blum>place a call order it with the synthesized voice over the phone line and then getting a confirmation
+
+75
+00:06:31.960 --> 00:06:37.960
+<v Stephen Blum>information and then relaying that via PubSub and our with our PubSub system back over the app.
+
+76
+00:06:38.200 --> 00:06:43.840
+<v Stephen Blum>So the hard part was actually just in brokering the transaction with the taxi company. That wasn't
+
+77
+00:06:43.840 --> 00:06:47.740
+<v Stephen Blum>the interesting part because you know phones aren't used all that much. We didn't see a future
+
+78
+00:06:47.740 --> 00:06:53.160
+<v Stephen Blum>in phone from that perspective but we did see a future in the PubSub side of things. So we opened
+
+79
+00:06:53.160 --> 00:06:58.400
+<v Stephen Blum>up the API for that. That's when that's when things got interesting. So we we started getting
+
+80
+00:06:58.400 --> 00:07:04.100
+<v Stephen Blum>game developers. And that was one of the biggest first initial introductions. It's like, oh,
+
+81
+00:07:04.100 --> 00:07:09.900
+<v Stephen Blum>we need to build a multiplayer game for this RPG. And, you know, we started seeing a lot of message
+
+82
+00:07:09.900 --> 00:07:15.880
+<v Stephen Blum>and it was great. They were paying. It was crazy. You know, games, they often, you know,
+
+83
+00:07:15.880 --> 00:07:21.220
+<v Stephen Blum>are profitable themselves and they were able to pay very regularly. And so it's like, hey,
+
+84
+00:07:21.240 --> 00:07:26.060
+<v Stephen Blum>this is a reliable source of revenue. Can we can we grow that? Can we get bigger? I want to go bigger.
+
+85
+00:07:28.400 --> 00:07:42.680
+<v Noah Labhart>So sticking on the MVP a little bit, you know, when you're making that MVP and you're open sourcing the PubNub part of it, what decisions and tradeoffs did you have to make while you were building that part of the platform?
+
+86
+00:07:43.220 --> 00:07:50.460
+<v Noah Labhart>You know, it could be how you're building it or, you know, feature limiting or tech debt, any sorts of things like that.
+
+87
+00:07:50.620 --> 00:07:53.300
+<v Noah Labhart>Tell me about some of those decisions and how you coped with them.
+
+88
+00:07:54.920 --> 00:07:57.400
+<v Stephen Blum>I might be different than others in this aspect.
+
+89
+00:07:58.400 --> 00:08:02.880
+<v Stephen Blum>Expectations were at, at the ceiling. I wanted something that was as perfect as possible,
+
+90
+00:08:02.880 --> 00:08:08.600
+<v Stephen Blum>which, you know, goes against that, beats the purpose of rapid iteration, but I wanted all those things
+
+91
+00:08:08.600 --> 00:08:13.760
+<v Stephen Blum>all at the same time, which I feel like I was able to achieve. And big part is, I wanted it extremely
+
+92
+00:08:13.760 --> 00:08:21.180
+<v Stephen Blum>efficient, low memory, high, high throughput, uh, best, you know, cost of operation, right? I want to be able
+
+93
+00:08:21.180 --> 00:08:27.060
+<v Stephen Blum>to push billions of messages through the system, deliver them at low latency, and beating everyone.
+
+94
+00:08:28.400 --> 00:08:48.400
+<v Stephen Blum>So this is an example. When you pick up your phone and you dial a family member, that's a signal that goes to ring to your family member's phone, right? The ringing sound is a signal that goes over the internet to connect and dial your phone. That signal takes good three, four seconds before the phone starts ringing.
+
+95
+00:08:48.400 --> 00:08:57.540
+<v Stephen Blum>And I wanted something that was so fast that it would be the speed of light at the possible limit of existing fiber optics.
+
+96
+00:08:58.040 --> 00:08:59.440
+<v Stephen Blum>And we were able to achieve that.
+
+97
+00:08:59.600 --> 00:09:04.220
+<v Stephen Blum>So it's the moment that you press the dial button, the other phone is immediately ringing.
+
+98
+00:09:04.220 --> 00:09:21.120
+<v Stephen Blum>And this level of latency has brought in those over-the-top apps that use us today for ringing phones like Plantronics and those VoIP phones, soft phones on your app with RingCentral and several others.
+
+99
+00:09:21.180 --> 00:09:25.040
+<v Stephen Blum>They use us to ring the phone because it's that much faster.
+
+100
+00:09:25.220 --> 00:09:26.920
+<v Stephen Blum>And we can do that at scale.
+
+101
+00:09:27.320 --> 00:09:32.820
+<v Stephen Blum>There's hundreds of millions of messages going through the system, and all of them are low latency.
+
+102
+00:09:34.220 --> 00:09:40.120
+<v Stephen Blum>that cost effectively because of the tech stack that we wanted to create, as well as one extra bit.
+
+103
+00:09:40.640 --> 00:09:45.160
+<v Stephen Blum>I wanted to be global, not just, you know, hey, you've got an API, you've got a single data center.
+
+104
+00:09:45.580 --> 00:09:51.280
+<v Stephen Blum>I wanted every data center to work all the time for every customer. When you get onto our network,
+
+105
+00:09:51.460 --> 00:09:57.720
+<v Stephen Blum>every single server is at your fingertips. And that's the level of multi-tenancy that I wanted
+
+106
+00:09:57.720 --> 00:10:00.200
+<v Stephen Blum>to drive. We were able to achieve all those things.
+
+107
+00:10:00.400 --> 00:10:02.760
+<v Noah Labhart>You know, it is unique to want to build
+
+108
+00:10:04.220 --> 00:10:08.740
+<v Noah Labhart>with everything and globally and performing so highly.
+
+109
+00:10:08.820 --> 00:10:11.460
+<v Noah Labhart>But it sounds like you had a very clear vision
+
+110
+00:10:11.460 --> 00:10:14.280
+<v Noah Labhart>of what you wanted to build in the very beginning.
+
+111
+00:10:14.460 --> 00:10:15.260
+<v Noah Labhart>Do you think that's true?
+
+112
+00:10:16.080 --> 00:10:19.140
+<v Stephen Blum>Yeah, that's actually a pretty big part of it.
+
+113
+00:10:19.180 --> 00:10:21.560
+<v Stephen Blum>It's just sort of listing out all the things
+
+114
+00:10:21.560 --> 00:10:24.800
+<v Stephen Blum>that would make sense for a globally distributed messaging bus
+
+115
+00:10:24.800 --> 00:10:28.500
+<v Stephen Blum>that would work for what normally you have inside the firewall
+
+116
+00:10:28.500 --> 00:10:32.560
+<v Stephen Blum>with these ESBs and things like, you know,
+
+117
+00:10:35.240 --> 00:10:38.700
+<v Stephen Blum>or RabbitMQ work great for inside the firewall.
+
+118
+00:10:38.900 --> 00:10:41.660
+<v Stephen Blum>I wanted that level of resiliency,
+
+119
+00:10:42.300 --> 00:10:45.640
+<v Stephen Blum>but even better performance for outside the firewall
+
+120
+00:10:45.640 --> 00:10:48.480
+<v Stephen Blum>where normally you only have a thousand servers
+
+121
+00:10:48.480 --> 00:10:49.680
+<v Stephen Blum>or 10,000 servers,
+
+122
+00:10:49.820 --> 00:10:51.520
+<v Stephen Blum>but in the real world,
+
+123
+00:10:51.560 --> 00:10:53.360
+<v Stephen Blum>you have hundreds of millions of phones
+
+124
+00:10:53.360 --> 00:10:56.240
+<v Stephen Blum>and that's a lot bigger scale.
+
+125
+00:10:56.460 --> 00:10:58.920
+<v Stephen Blum>And so today we have 800 million mobile phones
+
+126
+00:10:58.920 --> 00:10:59.700
+<v Stephen Blum>on our network
+
+127
+00:10:59.700 --> 00:11:03.000
+<v Stephen Blum>and we're able to keep up with the performance needed
+
+128
+00:11:04.220 --> 00:11:10.500
+<v Stephen Blum>low latency game experiences. And that was that, that sounds like it was a challenge, but
+
+129
+00:11:10.500 --> 00:11:17.020
+<v Stephen Blum>just going through and seeing what, so we built on Linux, what Linux kernel APIs are available.
+
+130
+00:11:18.340 --> 00:11:24.020
+<v Stephen Blum>That was a key part of what made PubNub possible was actually just directly going to the kernel
+
+131
+00:11:24.020 --> 00:11:27.600
+<v Stephen Blum>and seeing what they had available. They have these really powerful capabilities.
+
+132
+00:11:27.600 --> 00:11:31.620
+<v Stephen Blum>and most software engineering projects today
+
+133
+00:11:31.620 --> 00:11:34.200
+<v Stephen Blum>start with importing a library.
+
+134
+00:11:35.020 --> 00:11:36.880
+<v Stephen Blum>Oh, hey, there's this library over here.
+
+135
+00:11:37.340 --> 00:11:39.340
+<v Stephen Blum>We can just NPM install.
+
+136
+00:11:39.700 --> 00:11:41.300
+<v Stephen Blum>Okay, now I've got a PubSub system
+
+137
+00:11:41.300 --> 00:11:42.820
+<v Stephen Blum>and it will work pretty quick.
+
+138
+00:11:43.060 --> 00:11:45.200
+<v Stephen Blum>But I wanted maximum performance
+
+139
+00:11:45.200 --> 00:11:47.400
+<v Stephen Blum>and I wanted to be able to sell that.
+
+140
+00:11:49.780 --> 00:11:52.220
+<v Noah Labhart>So, okay, you've got the MVP,
+
+141
+00:11:52.500 --> 00:11:53.720
+<v Noah Labhart>you open source the API,
+
+142
+00:11:54.100 --> 00:11:55.860
+<v Noah Labhart>you start immediately getting traction
+
+143
+00:11:57.600 --> 00:12:08.420
+<v Noah Labhart>How did you progress the product from there and mature it? And I'm curious how you went about building your roadmap and deciding, okay, this is the next most important thing to build.
+
+144
+00:12:10.620 --> 00:12:21.740
+<v Stephen Blum>A lot of it comes from promotion. So yes, we've got a really powerful product, but unless you promote it and you promote it in a very particular way, no one's going to use it.
+
+145
+00:12:21.740 --> 00:12:27.100
+<v Stephen Blum>you can have the best product in the world that nobody uses. That would be sad. That'd be so sad,
+
+146
+00:12:27.820 --> 00:12:34.060
+<v Stephen Blum>right? And so it's like, I want, I want to show the, and that was part of, you know,
+
+147
+00:12:34.060 --> 00:12:38.600
+<v Stephen Blum>your initial question, how do we get into the technology world? The, the ability to show off
+
+148
+00:12:38.600 --> 00:12:45.920
+<v Stephen Blum>how powerful certain technologies can be was maybe the driving point for me. I'd be able to show you
+
+149
+00:12:45.920 --> 00:12:47.840
+<v Stephen Blum>the cool magic parts of PubNub.
+
+150
+00:12:48.000 --> 00:12:49.720
+<v Stephen Blum>This is what you can do.
+
+151
+00:12:49.820 --> 00:12:50.860
+<v Stephen Blum>You can build chat.
+
+152
+00:12:51.060 --> 00:12:52.880
+<v Stephen Blum>You can build dispatch, right?
+
+153
+00:12:52.960 --> 00:12:54.620
+<v Stephen Blum>For powering the on-demand economy,
+
+154
+00:12:55.420 --> 00:12:56.840
+<v Stephen Blum>we need that level of,
+
+155
+00:12:57.480 --> 00:12:59.280
+<v Stephen Blum>we need that PubSub system to do it.
+
+156
+00:12:59.500 --> 00:13:01.420
+<v Stephen Blum>And being able to show those things
+
+157
+00:13:01.420 --> 00:13:03.540
+<v Stephen Blum>and show those different opportunities
+
+158
+00:13:03.540 --> 00:13:06.560
+<v Stephen Blum>was really interesting to see the stats on them.
+
+159
+00:13:06.740 --> 00:13:10.860
+<v Stephen Blum>So we'd release these beachheads
+
+160
+00:13:11.620 --> 00:13:13.740
+<v Stephen Blum>of these capabilities, right?
+
+161
+00:13:13.740 --> 00:13:16.320
+<v Stephen Blum>these use cases, sort of solution stories.
+
+162
+00:13:17.220 --> 00:13:23.060
+<v Stephen Blum>And what we'd see is we'd get folks who would find these web articles
+
+163
+00:13:23.060 --> 00:13:26.320
+<v Stephen Blum>and landing pages, they would find them,
+
+164
+00:13:27.300 --> 00:13:30.220
+<v Stephen Blum>but they wouldn't go with those solutions.
+
+165
+00:13:30.780 --> 00:13:35.040
+<v Stephen Blum>For example, we've got a healthcare sort of doctor-patient exchange
+
+166
+00:13:35.040 --> 00:13:36.180
+<v Stephen Blum>for telemedicine.
+
+167
+00:13:36.720 --> 00:13:38.140
+<v Stephen Blum>We talk all about that.
+
+168
+00:13:38.300 --> 00:13:41.140
+<v Stephen Blum>But then when we look at the stats and we see customers who hit those,
+
+169
+00:13:41.140 --> 00:13:47.300
+<v Stephen Blum>they are actually in the gaming space so they understand the the value through different
+
+170
+00:13:47.300 --> 00:13:54.340
+<v Stephen Blum>stories that we tell but they might not necessarily be in that market or in that industry so it's it's
+
+171
+00:13:54.340 --> 00:13:59.740
+<v Stephen Blum>kind of interesting to see the different stories that are told and then how it translates and how
+
+172
+00:13:59.740 --> 00:14:04.640
+<v Stephen Blum>they're able to translate it to their use case to solve the problem so that's that's a big part of
+
+173
+00:14:04.640 --> 00:14:10.860
+<v Stephen Blum>it. You just need to go out and hit all possible use cases. This is something that's hard, I would
+
+174
+00:14:10.860 --> 00:14:15.600
+<v Stephen Blum>say, for maybe anyone starting a business, but you really need to spend a lot of time on promotion.
+
+175
+00:14:16.000 --> 00:14:20.160
+<v Stephen Blum>And I would say so much as 90% of your time should be spent on promotion.
+
+176
+00:14:22.840 --> 00:14:27.840
+<v Noah Labhart>Let's switch to team. So how did you build your team? And what did you look for in those people
+
+177
+00:14:27.840 --> 00:14:31.260
+<v Noah Labhart>to indicate that they were the winning horses to join you?
+
+178
+00:14:32.320 --> 00:14:39.260
+<v Stephen Blum>So what I, what I like to do is, don't necessarily care about credentials. What I'd like, what I like
+
+179
+00:14:39.260 --> 00:14:47.060
+<v Stephen Blum>to see is inspiration and motivation, right? And I don't necessarily need to see someone who's done
+
+180
+00:14:47.720 --> 00:14:54.160
+<v Stephen Blum>you know, like 10 years, 20 years of experience. Just whatever motivation you have now, I want
+
+181
+00:14:54.160 --> 00:14:59.980
+<v Stephen Blum>to take advantage of that. And that's, that's hard to find. And being able to cultivate that motivation
+
+182
+00:15:01.260 --> 00:15:05.400
+<v Stephen Blum>maybe even more challenging, because what you have to do is create sort of an open field
+
+183
+00:15:05.400 --> 00:15:12.360
+<v Stephen Blum>with key objectives and outcomes on the, on the outset, and then leaving an open for the team to
+
+184
+00:15:12.360 --> 00:15:18.520
+<v Stephen Blum>be creative. That's a big part of agile, but I think it's way overlooked because in that world,
+
+185
+00:15:18.560 --> 00:15:24.660
+<v Stephen Blum>often most companies will, you know, do their own flavor of agile and they'll leave out probably the
+
+186
+00:15:24.660 --> 00:15:31.020
+<v Stephen Blum>most critical part of that is allowing the team to be inspirational with their solutions and giving
+
+187
+00:15:31.260 --> 00:15:36.140
+<v Stephen Blum>them the ability to define the goals and then achieve those goals that hit towards those
+
+188
+00:15:36.140 --> 00:15:41.800
+<v Stephen Blum>business metrics that you're looking for. And that's, and that's scary because if you do that,
+
+189
+00:15:41.900 --> 00:15:48.900
+<v Stephen Blum>then you're leaving your whole business and the entire livelihood on the table up to the team to,
+
+190
+00:15:48.940 --> 00:15:54.140
+<v Stephen Blum>to take care of. And they need, I think they need that. I think if you don't have that,
+
+191
+00:15:54.200 --> 00:16:00.380
+<v Stephen Blum>you're leaving so much on the table with that team and their, their opportunity, their potential.
+
+192
+00:16:01.260 --> 00:16:02.940
+<v Stephen Blum>You're only leveraging a fraction of it.
+
+193
+00:16:03.300 --> 00:16:09.220
+<v Stephen Blum>So I really want to leverage the entire asset, right?
+
+194
+00:16:09.320 --> 00:16:12.680
+<v Stephen Blum>Let's leverage all their skills as much as possible.
+
+195
+00:16:12.860 --> 00:16:14.400
+<v Stephen Blum>And that has to come from within.
+
+196
+00:16:14.580 --> 00:16:16.820
+<v Stephen Blum>And that motivation is really easy to lose.
+
+197
+00:16:17.400 --> 00:16:18.900
+<v Stephen Blum>It's super easy to lose.
+
+198
+00:16:19.100 --> 00:16:21.180
+<v Stephen Blum>So it's just keeping that team motivated.
+
+199
+00:16:21.440 --> 00:16:24.880
+<v Stephen Blum>And it doesn't necessarily come with years of skill.
+
+200
+00:16:25.360 --> 00:16:27.380
+<v Stephen Blum>It just comes with the drive.
+
+201
+00:16:27.660 --> 00:16:29.620
+<v Stephen Blum>And that's the critical thing.
+
+202
+00:16:29.660 --> 00:16:30.280
+<v Stephen Blum>Look for the drive.
+
+203
+00:16:33.920 --> 00:16:37.920
+<v Noah Labhart>Well, this will be really fun to hear your answer to this question.
+
+204
+00:16:38.000 --> 00:16:40.800
+<v Noah Labhart>And I think you're going to pounce on it, which I'm super excited about.
+
+205
+00:16:41.740 --> 00:16:44.240
+<v Noah Labhart>But I'm going to ask it super open and generic.
+
+206
+00:16:44.820 --> 00:16:47.500
+<v Noah Labhart>Did you build this to scale efficiently from day one?
+
+207
+00:16:47.620 --> 00:16:49.980
+<v Noah Labhart>Or are you fighting this in any way as you grow?
+
+208
+00:16:51.620 --> 00:16:55.320
+<v Stephen Blum>The design was intended to build and scale.
+
+209
+00:16:56.300 --> 00:17:00.080
+<v Stephen Blum>But initially, you know, as we were, we didn't want to waste a bunch of money
+
+210
+00:17:01.260 --> 00:17:04.280
+<v Stephen Blum>and saying, here we go, and we can just handle any load immediately.
+
+211
+00:17:04.460 --> 00:17:06.700
+<v Stephen Blum>We didn't autoscale, right?
+
+212
+00:17:06.780 --> 00:17:11.120
+<v Stephen Blum>That's a big part of modern cloud and APIs is being able to autoscale.
+
+213
+00:17:11.220 --> 00:17:13.800
+<v Stephen Blum>It's all been manual, and we have to sort of predict.
+
+214
+00:17:13.940 --> 00:17:18.120
+<v Stephen Blum>And the challenges with messaging infrastructure and our latency being, you know,
+
+215
+00:17:18.800 --> 00:17:22.580
+<v Stephen Blum>under 30 milliseconds pretty much everywhere.
+
+216
+00:17:23.040 --> 00:17:26.800
+<v Stephen Blum>How do we, you can't launch a server in 30 milliseconds.
+
+217
+00:17:27.340 --> 00:17:29.640
+<v Stephen Blum>It's not possible as with existing tech.
+
+218
+00:17:31.280 --> 00:17:36.620
+<v Stephen Blum>we're ready to go for that scale. And that's what we've been doing, uh, for the past decade
+
+219
+00:17:36.620 --> 00:17:43.080
+<v Stephen Blum>is having that. And only, uh, only this recently since, um, since lockdown, uh, you know,
+
+220
+00:17:43.080 --> 00:17:52.320
+<v Stephen Blum>starting in 2020, we, we realized the, we need, Oh, one second. Sorry. Uh, phone call. Okay.
+
+221
+00:17:53.000 --> 00:17:58.720
+<v Stephen Blum>Uh, we realized the importance, um, and, and the desire to get more towards that auto-scaling.
+
+222
+00:17:58.720 --> 00:18:04.900
+<v Stephen Blum>So we did it, uh, during, during lockdown and things like that. We've, you know, we modernized on
+
+223
+00:18:04.900 --> 00:18:12.760
+<v Stephen Blum>containers and, uh, full CI/CD auto scaling with Kubernetes. And it's great, and we've had the
+
+224
+00:18:12.760 --> 00:18:19.800
+<v Stephen Blum>biggest, uh, even to prove it out, we had one of the biggest, so BTS, as, you know, popular musician
+
+225
+00:18:19.800 --> 00:18:28.780
+<v Stephen Blum>transition, uh, band setup, get up, you know, they use, uh, they use us, and they use us for that, that
+
+226
+00:18:28.780 --> 00:18:36.040
+<v Stephen Blum>experience when you're, you know, um, trying to do audience, uh, online, right? Simulating the audience
+
+227
+00:18:36.040 --> 00:18:43.680
+<v Stephen Blum>online in the interactivity. They, they used us, and, you know, we didn't have to go and have our team
+
+228
+00:18:43.680 --> 00:18:51.660
+<v Stephen Blum>scale up a whole bunch of servers. It just worked. It auto scaled. You know, it took about a minute,
+
+229
+00:18:51.660 --> 00:18:55.700
+<v Stephen Blum>but that's exactly the amount of time that we needed, because once they open the doors,
+
+230
+00:18:56.700 --> 00:19:00.880
+<v Stephen Blum>right, because you're in the lobby and you wait and then you go in, it immediately, it's an immediate
+
+231
+00:19:00.880 --> 00:19:08.800
+<v Stephen Blum>surge with millions of users, and being able to sort of tune that was the big win that we've had
+
+232
+00:19:08.800 --> 00:19:14.140
+<v Stephen Blum>over the years. We did not start out with that at all. And that was like, back to your questions,
+
+233
+00:19:14.180 --> 00:19:20.120
+<v Stephen Blum>like, Hey, did you start with being able to scale out the box? And the answer is no, we didn't.
+
+234
+00:19:22.560 --> 00:19:26.920
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built,
+
+235
+00:19:26.980 --> 00:19:27.940
+<v Noah Labhart>what are you most proud of?
+
+236
+00:19:30.160 --> 00:19:35.140
+<v Stephen Blum>The team and probably every, every team and every company always talks about tech debt.
+
+237
+00:19:35.140 --> 00:19:41.140
+<v Stephen Blum>like, oh man, we have to rewrite everything. But if you look at what we've built in our
+
+238
+00:19:41.140 --> 00:19:48.440
+<v Stephen Blum>capabilities and, you know, our uptime stability, cost efficiency, and, you know, overall service
+
+239
+00:19:48.440 --> 00:19:54.660
+<v Stephen Blum>ability, if you look at that, our code, I'm really proud of our code. What we've created,
+
+240
+00:19:54.760 --> 00:20:01.860
+<v Stephen Blum>of course, everything has debt to it. But the system that we've built has always, you know,
+
+241
+00:20:01.860 --> 00:20:08.660
+<v Stephen Blum>been number one. And I'm really proud of that. I think that's, that's fantastic. And we've even had,
+
+242
+00:20:08.680 --> 00:20:13.560
+<v Stephen Blum>you know, different, different points at PubNub, you know, we want to make sure that we're secure
+
+243
+00:20:13.560 --> 00:20:18.980
+<v Stephen Blum>and scalable. You know, we have folks that come in and sort of grade our systems, and it helps us,
+
+244
+00:20:19.520 --> 00:20:24.480
+<v Stephen Blum>you know, focus on which parts of the tech debt, but we've, we always pass with flying colors
+
+245
+00:20:25.040 --> 00:20:31.040
+<v Stephen Blum>on the code side, when you compare us to the rest of the industry. And it's, it's just a good
+
+246
+00:20:32.060 --> 00:20:39.240
+<v Stephen Blum>that. And, you know, over the years, you know, we want to maintain that. And I think we've got a
+
+247
+00:20:39.240 --> 00:20:42.020
+<v Stephen Blum>good, a good formula to make that possible.
+
+248
+00:20:43.760 --> 00:20:46.180
+<v Noah Labhart>Let's flip the script a little bit. So tell
+
+249
+00:20:46.180 --> 00:20:50.820
+<v Noah Labhart>me about a mistake you made and how you and your team responded to it.
+
+250
+00:20:52.380 --> 00:20:58.140
+<v Stephen Blum>The best possible business that I can imagine is you going onto my website,
+
+251
+00:20:58.140 --> 00:21:00.760
+<v Stephen Blum>site, clicking a button, and then I get money. Right?
+
+252
+00:21:00.920 --> 00:21:03.200
+<v Noah Labhart>That sounds good. That sounds like a good
+
+253
+00:21:03.200 --> 00:21:03.980
+<v Noah Labhart>formula. I like
+
+254
+00:21:03.980 --> 00:21:10.900
+<v Stephen Blum>it. Yeah. I like that. Yeah. I love that. We can't do that exactly with an API
+
+255
+00:21:10.900 --> 00:21:16.680
+<v Stephen Blum>company, but we can get close. So you have to download an SDK, right? And that helps bridge
+
+256
+00:21:16.680 --> 00:21:22.260
+<v Stephen Blum>the gap. So you don't have to worry about message signatures and security and it's just all built in.
+
+257
+00:21:22.940 --> 00:21:24.720
+<v Stephen Blum>So we have to do that.
+
+258
+00:21:25.080 --> 00:21:28.060
+<v Stephen Blum>Well, that means that once we've launched that SDK,
+
+259
+00:21:28.160 --> 00:21:30.100
+<v Stephen Blum>that's code that's running on millions of devices,
+
+260
+00:21:30.860 --> 00:21:32.260
+<v Stephen Blum>like hundreds of millions of devices.
+
+261
+00:21:32.380 --> 00:21:39.540
+<v Stephen Blum>And often they don't get upgraded very, very quickly or at all, as we've noticed.
+
+262
+00:21:40.460 --> 00:21:47.700
+<v Stephen Blum>So the mistake that we made was in a retry policy in one of our SDKs
+
+263
+00:21:47.700 --> 00:21:54.280
+<v Stephen Blum>that happened to be running in 120 million AT&amp;T phones on the AT&amp;T's network.
+
+264
+00:21:55.900 --> 00:22:05.060
+<v Stephen Blum>So what happened was a DNS mistake was made on one of the vendors' side,
+
+265
+00:22:05.160 --> 00:22:08.440
+<v Stephen Blum>and this caused a retry loop to start.
+
+266
+00:22:09.880 --> 00:22:15.440
+<v Stephen Blum>When that happened and the DNS was corrected, things were able to reconnect,
+
+267
+00:22:15.440 --> 00:22:21.980
+<v Stephen Blum>reconnect, but it happened in such a fashion where they would reconnect, and every time it failed,
+
+268
+00:22:21.980 --> 00:22:27.180
+<v Stephen Blum>it would try to reconnect twice, and then when that failed, it retried, tried to reconnect four times,
+
+269
+00:22:27.180 --> 00:22:33.500
+<v Stephen Blum>and that would happen every second. And so once the DNS was fixed, every phone was already trying
+
+270
+00:22:33.500 --> 00:22:40.640
+<v Stephen Blum>to retry a thousand times simultaneously. And so immediately the entire AT&amp;T IP block
+
+271
+00:22:40.640 --> 00:22:43.800
+<v Stephen Blum>became a DDoS for our network.
+
+272
+00:22:45.020 --> 00:22:45.900
+<v Stephen Blum>Oh, no!
+
+273
+00:22:49.660 --> 00:22:53.220
+<v Stephen Blum>Like, all of a sudden, all the dashboards and all the alerts went off.
+
+274
+00:22:53.380 --> 00:22:55.180
+<v Stephen Blum>Like, what's going on? What's happening? Why is this?
+
+275
+00:22:56.320 --> 00:23:00.880
+<v Stephen Blum>We're just trying to figure it out, and we just see all these devices just in a retry loop.
+
+276
+00:23:01.180 --> 00:23:05.900
+<v Stephen Blum>So we were able to pin down the IP block.
+
+277
+00:23:06.240 --> 00:23:09.200
+<v Stephen Blum>We were able to siphon off those clients,
+
+278
+00:23:10.640 --> 00:23:17.600
+<v Stephen Blum>we had a separate endpoint that would return successful statuses to all those phones.
+
+279
+00:23:17.720 --> 00:23:22.100
+<v Stephen Blum>So that way they'd clear the thread loop and then get back down to one retry per second.
+
+280
+00:23:23.020 --> 00:23:28.220
+<v Stephen Blum>And once that happened, we then migrated the healthy traffic back to the main network
+
+281
+00:23:28.220 --> 00:23:29.340
+<v Stephen Blum>and everything went back to normal.
+
+282
+00:23:33.640 --> 00:23:37.740
+<v Noah Labhart>Well, what does the future look like for PubNub, the product, and for your team?
+
+283
+00:23:40.640 --> 00:23:45.240
+<v Stephen Blum>So we just closed our latest round of financing, 65 million.
+
+284
+00:23:45.560 --> 00:23:50.520
+<v Stephen Blum>We want to continue to provide value at various levels.
+
+285
+00:23:50.820 --> 00:23:54.020
+<v Stephen Blum>I'm very interested in AI and ML.
+
+286
+00:23:54.180 --> 00:23:59.320
+<v Stephen Blum>So we've got 22 petabytes of data going through the network every month.
+
+287
+00:24:00.720 --> 00:24:07.660
+<v Stephen Blum>And what we can do is provide these really powerful and potent models to our customers
+
+288
+00:24:07.660 --> 00:24:11.380
+<v Stephen Blum>to help augment the existing data going through the pipe.
+
+289
+00:24:12.320 --> 00:24:14.640
+<v Stephen Blum>And there's just so much opportunity
+
+290
+00:24:14.640 --> 00:24:17.760
+<v Stephen Blum>because the whole thing of AI and ML is you need that data.
+
+291
+00:24:17.840 --> 00:24:20.980
+<v Stephen Blum>You need the data in order to create good models.
+
+292
+00:24:21.440 --> 00:24:24.080
+<v Stephen Blum>And good news, check it out, we have that data.
+
+293
+00:24:24.440 --> 00:24:25.500
+<v Stephen Blum>The data's there.
+
+294
+00:24:26.280 --> 00:24:29.440
+<v Stephen Blum>And so I'm eager and excited to begin
+
+295
+00:24:30.180 --> 00:24:32.780
+<v Stephen Blum>offering new advanced technologies and capabilities
+
+296
+00:24:32.780 --> 00:24:36.640
+<v Stephen Blum>and bringing AI and ML to existing customers
+
+297
+00:24:36.640 --> 00:24:37.240
+<v Stephen Blum>and new customers.
+
+298
+00:24:38.100 --> 00:24:40.340
+<v Stephen Blum>That's one of the big things that I'm excited about.
+
+299
+00:24:40.340 --> 00:24:42.280
+<v Stephen Blum>From a product perspective, let's say.
+
+300
+00:24:42.700 --> 00:24:45.640
+<v Stephen Blum>From a company perspective, you know, the IPO.
+
+301
+00:24:45.820 --> 00:24:46.380
+<v Stephen Blum>Let's do that.
+
+302
+00:24:46.500 --> 00:24:47.060
+<v Stephen Blum>Let's do IPO.
+
+303
+00:24:47.240 --> 00:24:47.860
+<v Stephen Blum>That sounds great.
+
+304
+00:24:48.500 --> 00:24:49.160
+<v Stephen Blum>Why not?
+
+305
+00:24:51.540 --> 00:24:52.640
+<v Noah Labhart>Well, let's switch to you, Stephen.
+
+306
+00:24:52.800 --> 00:24:54.780
+<v Noah Labhart>Who influences the way that you work?
+
+307
+00:24:54.940 --> 00:24:59.720
+<v Noah Labhart>The CEO, CTO, architect, really any person that you look up to and why?
+
+308
+00:25:02.440 --> 00:25:06.900
+<v Stephen Blum>It's more about, are they showing a lot of energy and drive?
+
+309
+00:25:07.760 --> 00:25:14.660
+<v Stephen Blum>and if I see that, that motivates me. That's the big thing for me. It's like, if there's just a
+
+310
+00:25:14.660 --> 00:25:21.760
+<v Stephen Blum>lot of energy and drive there, I see that, I get motivated, I echo and, you know, match that volume.
+
+311
+00:25:21.920 --> 00:25:27.040
+<v Stephen Blum>And my goal is like, how do you measure if you're successful? I measure success
+
+312
+00:25:29.040 --> 00:25:35.560
+<v Stephen Blum>if you've done better than you did the previous day. I think that's a good measure of success.
+
+313
+00:25:35.560 --> 00:25:41.400
+<v Stephen Blum>us. Because imagine 100 years from now, the kind of technology and things that we're doing are
+
+314
+00:25:41.400 --> 00:25:46.920
+<v Stephen Blum>going to be a little bit behind. Right? There's always going to be more advanced technologies,
+
+315
+00:25:47.100 --> 00:25:53.900
+<v Stephen Blum>more ways to achieve. Yeah, exactly. More ways to achieve things. So let's stay on the forefront
+
+316
+00:25:53.900 --> 00:25:57.880
+<v Stephen Blum>as much as possible and continue to drive down that path.
+
+317
+00:25:59.060 --> 00:26:11.260
+<v Noah Labhart>Well, we talked about a mistake earlier with the DDoS retries, but a little bit different spin. If you could go back to the beginning, what would you do differently? Or where would you consider taking a different approach?
+
+318
+00:26:12.600 --> 00:26:19.540
+<v Stephen Blum>I mentioned earlier that promotion is very, very critical, 90%.
+
+319
+00:26:20.040 --> 00:26:21.900
+<v Stephen Blum>When I say that, I'm not really kidding.
+
+320
+00:26:22.080 --> 00:26:23.080
+<v Stephen Blum>I think I'm just being weird.
+
+321
+00:26:23.440 --> 00:26:30.440
+<v Stephen Blum>We really should have spent more time continuing to invest in that level of promotion.
+
+322
+00:26:30.680 --> 00:26:37.300
+<v Stephen Blum>And what I kind of want to do is kind of like a pipe dream, maybe, you know, in an upcoming adventure, who knows, maybe even at PubNub,
+
+323
+00:26:37.300 --> 00:26:46.500
+<v Stephen Blum>is create a media studio 100% dedicated to telling the story and showing possibilities
+
+324
+00:26:46.500 --> 00:26:51.440
+<v Stephen Blum>of what the product is capable of and creating that inspiration and awe. So that way,
+
+325
+00:26:51.560 --> 00:26:56.380
+<v Stephen Blum>if you haven't heard about us or you do hear about us, you can see what's capable, what's new,
+
+326
+00:26:57.100 --> 00:27:02.380
+<v Stephen Blum>and just becoming a print house, a media house that's just dedicated to that.
+
+327
+00:27:02.380 --> 00:27:11.200
+<v Stephen Blum>We, we've got started a little bit on that, but nowhere near, uh, to what we, just never kept it up,
+
+328
+00:27:11.200 --> 00:27:14.760
+<v Stephen Blum>and so it's actually kind of a hard thing for any business. You're looking at your stats and
+
+329
+00:27:14.760 --> 00:27:19.180
+<v Stephen Blum>you're inbound and trying to correlate what's bringing, what's driving the business. And every
+
+330
+00:27:19.180 --> 00:27:26.380
+<v Stephen Blum>time you look at it, everyone isn't going to immediately draw the conclusion of what's, what's
+
+331
+00:27:26.380 --> 00:27:31.300
+<v Stephen Blum>bringing that business in. And I've had a hard time selling that it is the media. Like, hey, guess what?
+
+332
+00:27:32.520 --> 00:27:37.820
+<v Stephen Blum>what are we doing right now? This is what I, that's what I want to do. That that's going to
+
+333
+00:27:37.820 --> 00:27:43.120
+<v Stephen Blum>be a guaranteed the next thing next time, or if we can get it going this time around,
+
+334
+00:27:43.180 --> 00:27:50.480
+<v Stephen Blum>I'll have a dedicated media studio, videos, audio, um, diagrams, stories, podcasts,
+
+335
+00:27:51.620 --> 00:27:55.860
+<v Stephen Blum>everything. We need to have that. And that all that media will be free and informative and
+
+336
+00:27:55.860 --> 00:28:01.400
+<v Stephen Blum>valuable. And, you know, a drive back towards the main product, which is PubNub.
+
+337
+00:28:04.300 --> 00:28:05.020
+<v Noah Labhart>last question,
+
+338
+00:28:05.140 --> 00:28:05.640
+<v Noah Labhart>Stephen.
+
+339
+00:28:05.620 --> 00:28:09.300
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur
+
+340
+00:28:09.300 --> 00:28:10.780
+<v Noah Labhart>who's built the next big thing.
+
+341
+00:28:10.960 --> 00:28:12.060
+<v Noah Labhart>They're jazzed about it.
+
+342
+00:28:12.080 --> 00:28:13.420
+<v Noah Labhart>They can't wait to show it off to the world.
+
+343
+00:28:13.460 --> 00:28:15.480
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+344
+00:28:15.840 --> 00:28:18.800
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+345
+00:28:21.100 --> 00:28:22.460
+<v Stephen Blum>Releasing a product isn't,
+
+346
+00:28:23.680 --> 00:28:24.720
+<v Stephen Blum>isn't the starting line.
+
+347
+00:28:25.780 --> 00:28:26.940
+<v Stephen Blum>If you kind of look at it,
+
+348
+00:28:27.320 --> 00:28:27.820
+<v Stephen Blum>it's,
+
+349
+00:28:27.680 --> 00:28:28.180
+<v Stephen Blum>uh,
+
+350
+00:28:27.980 --> 00:28:28.480
+<v Stephen Blum>you're,
+
+351
+00:28:28.400 --> 00:28:28.900
+<v Stephen Blum>you're,
+
+352
+00:28:28.900 --> 00:28:29.540
+<v Stephen Blum>you're not,
+
+353
+00:28:29.580 --> 00:28:30.920
+<v Stephen Blum>you're barely getting started,
+
+354
+00:28:30.980 --> 00:28:31.480
+<v Stephen Blum>right?
+
+355
+00:28:31.660 --> 00:28:32.160
+<v Stephen Blum>One,
+
+356
+00:28:32.380 --> 00:28:35.620
+<v Stephen Blum>once you launch the product, there's just going to be so much more to do.
+
+357
+00:28:36.220 --> 00:28:38.380
+<v Stephen Blum>It's, it's a never, never ending thing.
+
+358
+00:28:38.800 --> 00:28:41.820
+<v Stephen Blum>And it depends on where they want to go with it. What is it? Is it,
+
+359
+00:28:41.840 --> 00:28:44.160
+<v Stephen Blum>are we talking about a game? Are we talking about like,
+
+360
+00:28:44.240 --> 00:28:47.620
+<v Stephen Blum>you've heard of Clubhouse, right? Yeah. Yeah. They're, they're a,
+
+361
+00:28:47.640 --> 00:28:50.760
+<v Stephen Blum>they use us, they use us. They're one of our customers. And it's,
+
+362
+00:28:51.540 --> 00:28:56.200
+<v Stephen Blum>it's always cause we've got thousands of customers, you know, flock to us.
+
+363
+00:28:56.780 --> 00:28:58.780
+<v Stephen Blum>We are looking at them. We talk to them.
+
+364
+00:28:58.880 --> 00:29:02.120
+<v Stephen Blum>It's really hard to tell which one's going to take off because,
+
+365
+00:29:02.380 --> 00:29:09.640
+<v Stephen Blum>there's only a handful that ever organically take off like those two. I mean, like less than a
+
+366
+00:29:09.640 --> 00:29:16.360
+<v Stephen Blum>percent. It's just not many. And so if you, if you want to be successful with your application
+
+367
+00:29:16.360 --> 00:29:22.400
+<v Stephen Blum>and your, what you can't just expect or assume that you're going to, you have to, you have to
+
+368
+00:29:22.400 --> 00:29:27.980
+<v Stephen Blum>make the smart bet, right? No bet that it's not going to be just an instantaneous, you know,
+
+369
+00:29:27.980 --> 00:29:35.640
+<v Stephen Blum>unicorn, because they're rare. So what you got to do is create that business plan that includes
+
+370
+00:29:35.640 --> 00:29:43.120
+<v Stephen Blum>the promotion. Like I would always go back to say, spend 90% of your time on promotion.
+
+371
+00:29:43.580 --> 00:29:51.380
+<v Stephen Blum>You got to do that. And from there, you attract minds and people start talking and you get that
+
+372
+00:29:51.380 --> 00:29:57.020
+<v Stephen Blum>network effect. And then you start to continue the echo. Just keep going from there. That's
+
+373
+00:29:57.980 --> 00:30:01.900
+<v Stephen Blum>any one thing that I could say is 90% of your time on promotion.
+
+374
+00:30:02.520 --> 00:30:04.360
+<v Noah Labhart>That's great advice. Well,
+
+375
+00:30:04.380 --> 00:30:08.720
+<v Noah Labhart>Stephen, thank you for being on the show today. Thank you for telling the creation story of PubNub.
+
+376
+00:30:08.940 --> 00:30:10.100
+<v Stephen Blum>Absolutely, Noah. Thank you.
+
+377
+00:30:12.300 --> 00:30:15.300
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+378
+00:30:18.040 --> 00:30:23.840
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+379
+00:30:23.840 --> 00:30:25.940
+<v Noah Labhart>or the podcasting app of your choice.
+
+380
+00:30:26.360 --> 00:30:29.680
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+381
+00:30:29.680 --> 00:30:31.440
+<v Noah Labhart>for just five to ten bucks a month.
+
+382
+00:30:31.820 --> 00:30:34.020
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+383
+00:30:34.320 --> 00:30:36.360
+<v Noah Labhart>Both things help us out tremendously.
+
+384
+00:30:38.660 --> 00:30:40.140
+<v Noah Labhart>And thanks again for listening.
+
+385
+00:30:53.840 --> 00:30:55.020
+<v Stephen Blum>Thank you.

@@ -1,0 +1,1335 @@
+WEBVTT
+
+NOTE S7 E30: The Architecture of Infinite Scale: Harnessing Vitess and Database Sharding with Sam Lambert of PlanetScale
+
+1
+00:00:00.680 --> 00:00:10.800
+<v Sam Lambert>We always have to do things to kind of unlock customers' usage of the scale, but when the product has already run, what, the third, fourth largest website on planet Earth, scale's kind of in the bag.
+
+2
+00:00:11.880 --> 00:00:24.560
+<v Sam Lambert>We're actually scaling down at this point. We're trying to scale down tech that has run at the most extreme scale and make sure that everyone can use it. We're bringing it into the hands of everybody, which is kind of a different challenge.
+
+3
+00:00:25.460 --> 00:00:30.680
+<v Sam Lambert>Other database companies, when they take on their biggest customers, it's a real risk. They really
+
+4
+00:00:30.680 --> 00:00:34.840
+<v Sam Lambert>have to make sure they can manage that scale. We kind of have the opposite, where it's like, well,
+
+5
+00:00:34.840 --> 00:00:38.620
+<v Sam Lambert>as long as you stay smaller scale than YouTube.com, I think we've got you covered.
+
+6
+00:00:39.580 --> 00:00:42.220
+<v Sam Lambert>Hi, I'm Sam Lambert, CEO of PlanetScale.
+
+7
+00:00:47.620 --> 00:00:52.900
+<v Noah Labhart>this is Code Story the podcast bringing you interviews with tech visionaries
+
+8
+00:00:54.560 --> 00:01:00.280
+<v Noah Labhart>the critical moments of what it takes to change an industry and build and lead a team that has
+
+9
+00:01:00.280 --> 00:01:07.920
+<v Noah Labhart>your back. I'm your host Noah Labhart and today how Sam Lambert took an incredible set of tools
+
+10
+00:01:07.920 --> 00:01:15.840
+<v Noah Labhart>and built the world's most advanced serverless MySQL platform. All this and more on Code Story.
+
+11
+00:01:19.540 --> 00:01:24.360
+<v Noah Labhart>Sam Lambert is originally from the UK and has lived quite a few places during his life.
+
+12
+00:01:24.560 --> 00:01:27.520
+<v Noah Labhart>He went to school in India, but now resides in San Francisco.
+
+13
+00:01:27.900 --> 00:01:34.460
+<v Noah Labhart>He finds software to be a creative, playful process, and sees people trying to build that away from the process.
+
+14
+00:01:34.940 --> 00:01:38.940
+<v Noah Labhart>He feels very lucky to be building something that provides fruit and solves problems.
+
+15
+00:01:39.600 --> 00:01:43.100
+<v Noah Labhart>Outside of tech, he's married with a four-year-old and is into cooking and art.
+
+16
+00:01:43.260 --> 00:01:48.320
+<v Noah Labhart>I asked about NFTs, giving his tech background, but he's not super into that form of art at this time.
+
+17
+00:01:49.980 --> 00:01:55.540
+<v Noah Labhart>Sam spent time working at GitHub as a VP of Engineering, specifically focusing on infrastructure.
+
+18
+00:01:56.600 --> 00:02:01.020
+<v Noah Labhart>He and his team came across Vitess, the backend that ran YouTube.
+
+19
+00:02:01.280 --> 00:02:07.700
+<v Noah Labhart>And he took this amazing framework into his current venture to remix their approach of design and scalability.
+
+20
+00:02:09.740 --> 00:02:13.020
+<v Noah Labhart>This is the creation story of PlanetScale.
+
+21
+00:02:17.740 --> 00:02:20.300
+<v Sam Lambert>PlanetScale is a cloud-hosted database platform.
+
+22
+00:02:20.680 --> 00:02:24.920
+<v Sam Lambert>We host major, major websites and workloads on our platform.
+
+23
+00:02:25.180 --> 00:02:32.400
+<v Sam Lambert>We are known for being able to take databases and the applications that run on those databases to extreme scale.
+
+24
+00:02:32.660 --> 00:02:37.140
+<v Sam Lambert>So our backend is technology, Vitess, which was developed at YouTube.
+
+25
+00:02:37.140 --> 00:02:42.920
+<v Sam Lambert>They were running it till about two and a half billion monthly active users, running on tens of
+
+26
+00:02:42.920 --> 00:02:48.620
+<v Sam Lambert>thousands of servers. So huge scale. And then the project kind of spun out of Google, picked up by
+
+27
+00:02:48.620 --> 00:02:54.920
+<v Sam Lambert>Slack. Yeah, all of these, just so many great tech companies started running on Vitess and
+
+28
+00:02:54.920 --> 00:03:00.460
+<v Sam Lambert>contributing to Vitess. And Slack blogged about it. Slack had a blog series come out this week about
+
+29
+00:03:00.460 --> 00:03:05.460
+<v Sam Lambert>their use of Vitess. And then we started using it at GitHub, and I was at, I was at GitHub. I was one
+
+30
+00:03:07.440 --> 00:03:10.680
+<v Sam Lambert>and, you know, specifically I focused on infrastructure
+
+31
+00:03:10.680 --> 00:03:13.300
+<v Sam Lambert>and I was also the first database engineer to ever join GitHub
+
+32
+00:03:13.300 --> 00:03:16.900
+<v Sam Lambert>and I've spent a long time, nearly 15 years now, in databases.
+
+33
+00:03:17.840 --> 00:03:19.060
+<v Sam Lambert>We came across Vitess.
+
+34
+00:03:19.120 --> 00:03:21.900
+<v Sam Lambert>It did exactly what it was supposed to do, incredible technology.
+
+35
+00:03:22.460 --> 00:03:24.560
+<v Sam Lambert>And then I eventually found my way to PlanetScale.
+
+36
+00:03:24.700 --> 00:03:27.880
+<v Sam Lambert>And, you know, we kind of took a bunch of the folks
+
+37
+00:03:27.880 --> 00:03:29.740
+<v Sam Lambert>that came from GitHub alongside me
+
+38
+00:03:29.740 --> 00:03:32.240
+<v Sam Lambert>and we rebuilt the kind of the cloud product
+
+39
+00:03:32.240 --> 00:03:39.440
+<v Sam Lambert>to really remix and mix the DNA of this incredibly scalable backend database and the presentation
+
+40
+00:03:39.440 --> 00:03:45.860
+<v Sam Lambert>form function and style of GitHub or at least GitHub's design philosophy and how we build for
+
+41
+00:03:45.860 --> 00:03:49.860
+<v Sam Lambert>developers. So this team that's here, you know, we built a platform that has a hundred million
+
+42
+00:03:49.860 --> 00:03:54.480
+<v Sam Lambert>developers on it, something that has never been done before. And we're applying that to running
+
+43
+00:03:54.480 --> 00:03:57.960
+<v Sam Lambert>a database. So, you know, going back to what the product does, I mean, it's kind of the best
+
+44
+00:03:57.960 --> 00:04:03.820
+<v Sam Lambert>database you could pick on day one of your company. And it is proven and does run the back end of many
+
+45
+00:04:03.820 --> 00:04:08.580
+<v Sam Lambert>public companies. And so there's not really a data other database out there that kind of claim
+
+46
+00:04:08.580 --> 00:04:14.980
+<v Sam Lambert>or can claim to be exciting and innovative and work for developers at any scale. And that's
+
+47
+00:04:14.980 --> 00:04:15.740
+<v Sam Lambert>really what we're about.
+
+48
+00:04:17.580 --> 00:04:21.300
+<v Noah Labhart>Let's dive into the MVP then. So this will be interesting to see where
+
+49
+00:04:21.300 --> 00:04:26.040
+<v Noah Labhart>this started. How long did it take you to build and what sort of tools did you use to bring it
+
+50
+00:04:27.960 --> 00:04:29.700
+<v Noah Labhart>Vitess, but give me a little more there.
+
+51
+00:04:30.620 --> 00:04:32.840
+<v Sam Lambert>So we had Vitess. Vitess runs on Kubernetes,
+
+52
+00:04:33.120 --> 00:04:38.280
+<v Sam Lambert>is extremely mature. So that was a really good starting point. The MVP for the cloud product
+
+53
+00:04:38.280 --> 00:04:46.380
+<v Sam Lambert>that many, many thousands of people use now, we actually went from first line of code to out in
+
+54
+00:04:46.380 --> 00:04:52.760
+<v Sam Lambert>beta was less than six months. And we did that not only by picking tools that were familiar to us,
+
+55
+00:04:52.760 --> 00:04:59.520
+<v Sam Lambert>but also taking a development philosophy and the way we developed was extremely iterative.
+
+56
+00:04:59.780 --> 00:05:03.140
+<v Sam Lambert>We would have a demo of what we were doing every Friday.
+
+57
+00:05:03.960 --> 00:05:07.900
+<v Sam Lambert>Monday, we would pick what we were doing next and then demo again on Friday.
+
+58
+00:05:08.120 --> 00:05:13.500
+<v Sam Lambert>And we just had this quick cadence of ship, learn, ship, learn, ship, learn.
+
+59
+00:05:13.620 --> 00:05:14.480
+<v Sam Lambert>And we still do the same.
+
+60
+00:05:14.560 --> 00:05:20.840
+<v Sam Lambert>We deploy and ship many, many times a day and get changes and great things out in front of our users constantly.
+
+61
+00:05:22.780 --> 00:05:24.980
+<v Sam Lambert>us all being used to working in GitHub's culture,
+
+62
+00:05:25.220 --> 00:05:28.120
+<v Sam Lambert>which was sometimes hundreds of deploys a day.
+
+63
+00:05:28.480 --> 00:05:29.960
+<v Sam Lambert>And so the kind of tools we use,
+
+64
+00:05:30.040 --> 00:05:32.540
+<v Sam Lambert>well, the stack is Ruby on Rails
+
+65
+00:05:32.540 --> 00:05:35.680
+<v Sam Lambert>for the API that powers the web frontend.
+
+66
+00:05:35.700 --> 00:05:38.580
+<v Sam Lambert>The web frontend is a Next.js app.
+
+67
+00:05:38.800 --> 00:05:41.000
+<v Sam Lambert>And then in the backend is a lot of Go.
+
+68
+00:05:41.260 --> 00:05:44.020
+<v Sam Lambert>Vitess is one of the oldest Go applications in the world,
+
+69
+00:05:44.040 --> 00:05:45.820
+<v Sam Lambert>or it's still going.
+
+70
+00:05:46.420 --> 00:05:49.100
+<v Sam Lambert>And having those kind of separations and layers
+
+71
+00:05:49.100 --> 00:05:52.320
+<v Sam Lambert>means that we can iterate in just different parts of the stack
+
+72
+00:05:52.760 --> 00:05:53.420
+<v Sam Lambert>really, really quickly.
+
+73
+00:05:54.720 --> 00:05:57.020
+<v Noah Labhart>Okay, let's stick on the MVP for a second.
+
+74
+00:05:57.120 --> 00:05:58.880
+<v Noah Labhart>So when you're building any MVP,
+
+75
+00:05:59.080 --> 00:06:01.100
+<v Noah Labhart>you've got to make certain decisions and trade-offs, right?
+
+76
+00:06:01.240 --> 00:06:03.860
+<v Noah Labhart>And probably around tooling that you chose,
+
+77
+00:06:04.080 --> 00:06:06.000
+<v Noah Labhart>there were some decisions and trade-offs
+
+78
+00:06:06.000 --> 00:06:10.040
+<v Noah Labhart>or limiting how you approach the first problem.
+
+79
+00:06:10.300 --> 00:06:11.860
+<v Noah Labhart>Tell me a little bit about those
+
+80
+00:06:11.860 --> 00:06:13.440
+<v Noah Labhart>and how you cope with those decisions.
+
+81
+00:06:16.280 --> 00:06:19.200
+<v Sam Lambert>Well, we thought really hard about what a database is there to do.
+
+82
+00:06:19.980 --> 00:06:22.100
+<v Sam Lambert>One, it's there to obviously do the fundamentals,
+
+83
+00:06:22.760 --> 00:06:25.580
+<v Sam Lambert>data, give you access to your data, be available, be scalable.
+
+84
+00:06:25.760 --> 00:06:27.000
+<v Sam Lambert>Vitess has handled all of that.
+
+85
+00:06:27.060 --> 00:06:28.640
+<v Sam Lambert>That, you know, Vitess makes it seem easy.
+
+86
+00:06:28.720 --> 00:06:30.580
+<v Sam Lambert>It's not, but, but does do that.
+
+87
+00:06:31.140 --> 00:06:35.860
+<v Sam Lambert>When it came to the MVP of the whole cloud product, one of our first key insights is
+
+88
+00:06:35.860 --> 00:06:39.600
+<v Sam Lambert>like when someone signs up to a cloud product, they have an idea in their head.
+
+89
+00:06:39.720 --> 00:06:44.220
+<v Sam Lambert>They have a thing that you're in the way of them building the next stripe or whatever.
+
+90
+00:06:44.400 --> 00:06:46.160
+<v Sam Lambert>You know, they've got this incredible idea in their head.
+
+91
+00:06:46.220 --> 00:06:46.820
+<v Sam Lambert>They want to get going.
+
+92
+00:06:47.640 --> 00:06:51.560
+<v Sam Lambert>I went and I looked at a load of other database platforms and I looked at how
+
+93
+00:06:52.760 --> 00:06:57.620
+<v Sam Lambert>database and one of the kind of formerly hot kind of database companies at the time was like 24
+
+94
+00:06:57.620 --> 00:07:02.880
+<v Sam Lambert>minutes and I was like that's ridiculous I mean I would have forgotten what my idea is by 24 minutes
+
+95
+00:07:02.880 --> 00:07:07.760
+<v Sam Lambert>so the first thing we did was decide we're going to be the fastest place to deploy a database
+
+96
+00:07:08.560 --> 00:07:14.640
+<v Sam Lambert>we got it down to almost practically instant. And actually Lee Rob from Vercel did this YouTube
+
+97
+00:07:14.640 --> 00:07:21.520
+<v Sam Lambert>video very early in our life as a company measuring like 20 different database companies
+
+98
+00:07:22.760 --> 00:07:25.820
+<v Sam Lambert>to getting a database and we were fastest, we were number one.
+
+99
+00:07:25.980 --> 00:07:27.220
+<v Sam Lambert>And that made me very, very proud.
+
+100
+00:07:27.400 --> 00:07:28.420
+<v Sam Lambert>And that took trade-offs, right?
+
+101
+00:07:28.540 --> 00:07:29.800
+<v Sam Lambert>Like, you know, you have to do things,
+
+102
+00:07:29.860 --> 00:07:31.420
+<v Sam Lambert>you have to have warm pools of machines ready.
+
+103
+00:07:31.740 --> 00:07:33.780
+<v Sam Lambert>You have to deliberately care about that.
+
+104
+00:07:33.900 --> 00:07:36.600
+<v Sam Lambert>And it was interesting to me that no other cloud database
+
+105
+00:07:36.600 --> 00:07:37.940
+<v Sam Lambert>had cared about that before.
+
+106
+00:07:38.100 --> 00:07:40.860
+<v Sam Lambert>We were coming into the market focused on developers.
+
+107
+00:07:41.460 --> 00:07:43.280
+<v Sam Lambert>And people would say to us,
+
+108
+00:07:43.340 --> 00:07:46.280
+<v Sam Lambert>I care so much about like creating a database so quickly.
+
+109
+00:07:46.860 --> 00:07:49.440
+<v Sam Lambert>It was really telling that the other companies don't do that.
+
+110
+00:07:49.500 --> 00:07:51.260
+<v Sam Lambert>And I think it's because they don't quite understand
+
+111
+00:07:52.760 --> 00:07:54.180
+<v Sam Lambert>are using their product for.
+
+112
+00:07:54.360 --> 00:07:55.700
+<v Sam Lambert>And so we really thought about this
+
+113
+00:07:55.700 --> 00:07:58.020
+<v Sam Lambert>and thought about how developers would use the product
+
+114
+00:07:58.020 --> 00:07:59.320
+<v Sam Lambert>and it kind of very much influenced
+
+115
+00:07:59.320 --> 00:08:01.200
+<v Sam Lambert>how we did things in the early days.
+
+116
+00:08:03.800 --> 00:08:05.480
+<v Noah Labhart>From that point, you got your MVP.
+
+117
+00:08:05.900 --> 00:08:08.620
+<v Noah Labhart>How did you progress the product and mature it?
+
+118
+00:08:08.660 --> 00:08:11.000
+<v Noah Labhart>And I think to wrap that question in a box a little bit,
+
+119
+00:08:11.040 --> 00:08:11.820
+<v Noah Labhart>what I'm looking for is,
+
+120
+00:08:11.880 --> 00:08:13.820
+<v Noah Labhart>how did you go about building your roadmap?
+
+121
+00:08:14.020 --> 00:08:15.340
+<v Noah Labhart>What process did you follow
+
+122
+00:08:15.340 --> 00:08:18.080
+<v Noah Labhart>or what sort of things did you include to decide,
+
+123
+00:08:18.160 --> 00:08:20.640
+<v Noah Labhart>okay, this is the next most important thing
+
+124
+00:08:20.640 --> 00:08:22.320
+<v Noah Labhart>to build for PlanetScale?
+
+125
+00:08:23.280 --> 00:08:24.760
+<v Sam Lambert>We listen to customers.
+
+126
+00:08:25.240 --> 00:08:27.540
+<v Sam Lambert>First of all, customers are so important.
+
+127
+00:08:27.780 --> 00:08:29.600
+<v Sam Lambert>We listen to everyone that will give us feedback.
+
+128
+00:08:30.260 --> 00:08:32.360
+<v Sam Lambert>Now, do we do everything people say? No.
+
+129
+00:08:32.460 --> 00:08:33.920
+<v Sam Lambert>We have a very strong opinion.
+
+130
+00:08:34.080 --> 00:08:38.340
+<v Sam Lambert>We take very strong opinions how databases should be operated,
+
+131
+00:08:38.600 --> 00:08:41.280
+<v Sam Lambert>what they should do, and so we also just have our opinion.
+
+132
+00:08:41.400 --> 00:08:44.060
+<v Sam Lambert>We have experience using databases,
+
+133
+00:08:44.320 --> 00:08:45.840
+<v Sam Lambert>operating databases at scale.
+
+134
+00:08:45.940 --> 00:08:50.040
+<v Sam Lambert>So we reflect a lot on what our users are looking for and what they need,
+
+135
+00:08:50.220 --> 00:08:51.340
+<v Sam Lambert>and then we discuss it.
+
+136
+00:08:52.760 --> 00:08:56.880
+<v Sam Lambert>centralized planning where everyone goes and gets their opinion. You know, we have a small group of
+
+137
+00:08:56.880 --> 00:09:03.080
+<v Sam Lambert>people sit down and discuss at length the problems that we face and our users face, and really dial
+
+138
+00:09:03.080 --> 00:09:07.760
+<v Sam Lambert>into what they need. And then you do the classic thing with roadmaps. You look at what will
+
+139
+00:09:07.760 --> 00:09:12.520
+<v Sam Lambert>move the needle the most and is easier. You look at what things are just going to naturally take
+
+140
+00:09:12.520 --> 00:09:17.820
+<v Sam Lambert>a very long time, so you need to get going on those, and what pieces unlock other pieces.
+
+141
+00:09:17.820 --> 00:09:22.380
+<v Sam Lambert>And you kind of tease it together. And we don't build long roadmaps. There's a few things we're
+
+142
+00:09:22.760 --> 00:09:27.240
+<v Sam Lambert>now that will probably be a year long. If you're building and releasing a database that runs a
+
+143
+00:09:27.240 --> 00:09:32.020
+<v Sam Lambert>significant chunk, like chunk of the internet, you have to be very careful and deliberate about making
+
+144
+00:09:32.020 --> 00:09:36.600
+<v Sam Lambert>those changes. So working on those, but everything else of the kind of the surfaces, the area which
+
+145
+00:09:36.600 --> 00:09:40.840
+<v Sam Lambert>is the team, that there's the name of the team that actually manages all the surfaces that humans
+
+146
+00:09:40.840 --> 00:09:45.960
+<v Sam Lambert>interact with, those we iterate on quickly and we really build that quarter by quarter, because I
+
+147
+00:09:45.960 --> 00:09:50.520
+<v Sam Lambert>just don't believe you can build long roadmaps and be right. We just take a very iterative approach.
+
+148
+00:09:50.520 --> 00:09:54.240
+<v Sam Lambert>approach, look at what's working, measure whatever worked, and then take the next iteration.
+
+149
+00:09:57.120 --> 00:10:01.500
+<v Noah Labhart>Okay, let's switch to team then. So how did you go about building your team? And
+
+150
+00:10:01.500 --> 00:10:06.140
+<v Noah Labhart>what did you look for in those people to indicate that they were the winning horses to join
+
+151
+00:10:06.140 --> 00:10:06.640
+<v Noah Labhart>you?
+
+152
+00:10:07.040 --> 00:10:07.540
+<v Sam Lambert>I
+
+153
+00:10:07.480 --> 00:10:11.760
+<v Sam Lambert>looked at everyone, all of the fantastic people I'd worked with in the past, and kind
+
+154
+00:10:11.760 --> 00:10:16.040
+<v Sam Lambert>of started trying to convince them one by one to join the company. And then they knew
+
+155
+00:10:16.040 --> 00:10:20.760
+<v Sam Lambert>people from other companies that came along. Our philosophy at PlanetScale is that we want to have
+
+156
+00:10:20.760 --> 00:10:27.280
+<v Sam Lambert>a very small team of incredible people. We have a very deliberate performance culture and that
+
+157
+00:10:27.280 --> 00:10:31.440
+<v Sam Lambert>kind of creates this flywheel of just more and more great people trying to kind of bring each
+
+158
+00:10:31.440 --> 00:10:35.580
+<v Sam Lambert>other and attract each other to the company. It's not an easy way to run a company always.
+
+159
+00:10:35.760 --> 00:10:40.720
+<v Sam Lambert>It takes diligence, it takes really thinking about what performance and being effective at a company
+
+160
+00:10:40.720 --> 00:10:44.900
+<v Sam Lambert>is. But yeah, we build it by just looking for absolutely the best folks. I mean, there's some
+
+161
+00:10:46.040 --> 00:10:50.540
+<v Sam Lambert>world leading in their field and it's great it's a really easy way to do things as well when you
+
+162
+00:10:50.540 --> 00:10:54.680
+<v Sam Lambert>just attract kind of amazing people to your company and give them lots of freedom and
+
+163
+00:10:54.680 --> 00:10:57.380
+<v Sam Lambert>hard problems to solve it kind of works from there
+
+164
+00:10:57.380 --> 00:11:02.940
+<v Noah Labhart>okay this will be fun to ask giving given the
+
+165
+00:11:02.940 --> 00:11:07.740
+<v Noah Labhart>nature of your product and the description of the tools you're already using but i'm going to ask it
+
+166
+00:11:07.740 --> 00:11:13.140
+<v Noah Labhart>a little bit blindly and let you just run did you build this to scale efficiently from day one or
+
+167
+00:11:13.140 --> 00:11:15.520
+<v Noah Labhart>Or are you fighting this as you grow in any capacity?
+
+168
+00:11:17.080 --> 00:11:21.000
+<v Sam Lambert>We always have to do things to kind of unlock customers' usage of the scale.
+
+169
+00:11:21.200 --> 00:11:25.580
+<v Sam Lambert>But when the product has already run, what, the third, fourth largest website on planet Earth,
+
+170
+00:11:25.800 --> 00:11:27.200
+<v Sam Lambert>scale's kind of in the bag.
+
+171
+00:11:28.140 --> 00:11:30.280
+<v Sam Lambert>We're actually scaling down at this point.
+
+172
+00:11:30.360 --> 00:11:34.540
+<v Sam Lambert>We're trying to scale down tech that has run at the most extreme scale
+
+173
+00:11:34.540 --> 00:11:37.400
+<v Sam Lambert>and make sure that everyone can use it.
+
+174
+00:11:37.460 --> 00:11:40.840
+<v Sam Lambert>We're bringing it into the hands of everybody, which is kind of a different challenge.
+
+175
+00:11:42.000 --> 00:11:47.200
+<v Sam Lambert>Other database companies, when they take on their biggest customers, it's a real risk. They really
+
+176
+00:11:47.200 --> 00:11:51.740
+<v Sam Lambert>have to make sure they can manage that scale. We kind of have the opposite. We was like, well, as long
+
+177
+00:11:51.740 --> 00:11:57.180
+<v Sam Lambert>as you can sort of wryly say to customers, as long as you stay smaller scale than YouTube.com, I think
+
+178
+00:11:57.180 --> 00:12:02.480
+<v Sam Lambert>we've got you covered. So yeah, I mean, we are about scale, but working at any scale, scale for anybody,
+
+179
+00:12:02.480 --> 00:12:08.320
+<v Sam Lambert>no matter where they are in their business life giving them a simple and smooth graduation path
+
+180
+00:12:08.320 --> 00:12:10.860
+<v Sam Lambert>from having no users to having billions of users.
+
+181
+00:12:11.300 --> 00:12:14.300
+<v Noah Labhart>You would be the first person I've had on the show
+
+182
+00:12:14.300 --> 00:12:16.080
+<v Noah Labhart>that have said, we're actually trying to scale down
+
+183
+00:12:16.080 --> 00:12:18.760
+<v Noah Labhart>from something that has already been built
+
+184
+00:12:18.760 --> 00:12:20.900
+<v Noah Labhart>for that type of scale.
+
+185
+00:12:21.040 --> 00:12:21.820
+<v Noah Labhart>It's super cool.
+
+186
+00:12:22.100 --> 00:12:23.160
+<v Sam Lambert>Interesting problem, right?
+
+187
+00:12:23.420 --> 00:12:23.920
+<v Noah Labhart>Absolutely.
+
+188
+00:12:25.140 --> 00:12:28.140
+<v Noah Labhart>Okay, so as you step out on the balcony
+
+189
+00:12:28.140 --> 00:12:30.000
+<v Noah Labhart>and you look across all that you've built,
+
+190
+00:12:30.080 --> 00:12:31.320
+<v Noah Labhart>what are you most proud of?
+
+191
+00:12:32.360 --> 00:12:34.040
+<v Sam Lambert>I try not to be too proud.
+
+192
+00:12:34.420 --> 00:12:36.100
+<v Sam Lambert>I think I'm most proud of the team.
+
+193
+00:12:36.100 --> 00:12:40.540
+<v Sam Lambert>you know we all find faults and flaws you look at the product and you're like
+
+194
+00:12:40.540 --> 00:12:45.260
+<v Sam Lambert>oh I liked that six months ago now I did it it just happens right you have to
+
+195
+00:12:45.260 --> 00:12:48.540
+<v Sam Lambert>keep moving forward no one else is gonna make your product better for you so we
+
+196
+00:12:48.540 --> 00:12:53.360
+<v Sam Lambert>try I try not to be too proud I think the most proud of the team just a really
+
+197
+00:12:53.360 --> 00:12:58.980
+<v Sam Lambert>great set of people that are incredibly talented and very chill and funny and
+
+198
+00:12:58.980 --> 00:13:03.180
+<v Sam Lambert>fun and well-spirited and I love coming to work and working all with all these
+
+199
+00:13:03.180 --> 00:13:08.140
+<v Sam Lambert>these people. So I think probably the team, and then next is like opening, opening up multiple
+
+200
+00:13:08.700 --> 00:13:14.320
+<v Sam Lambert>apps that are in the, like, top 50 of the App Store that I have on my phone and use, like
+
+201
+00:13:14.320 --> 00:13:21.300
+<v Sam Lambert>almost daily, and knowing that the backend is PlanetScale on our cloud makes me also very, very
+
+202
+00:13:21.300 --> 00:13:26.400
+<v Sam Lambert>happy it's just this incredible thing to know that your product is just working
+
+203
+00:13:26.400 --> 00:13:29.820
+<v Sam Lambert>and having impact and and getting people excited
+
+204
+00:13:32.000 --> 00:13:33.940
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+205
+00:13:34.120 --> 00:13:38.280
+<v Noah Labhart>So tell me about a mistake you made and how you and your team responded to it.
+
+206
+00:13:39.420 --> 00:13:44.000
+<v Sam Lambert>In the early versions of the product, and we still haven't fully corrected this, I think
+
+207
+00:13:44.000 --> 00:13:45.820
+<v Sam Lambert>we made some things a bit too magic.
+
+208
+00:13:46.380 --> 00:13:49.080
+<v Sam Lambert>That sounds a bit kind of self-congratulatory.
+
+209
+00:13:49.140 --> 00:13:49.880
+<v Sam Lambert>It's really not.
+
+210
+00:13:50.360 --> 00:13:54.180
+<v Sam Lambert>Magic is not really something you should try and convey, especially in an infrastructure
+
+211
+00:13:54.180 --> 00:13:54.720
+<v Sam Lambert>product.
+
+212
+00:13:55.180 --> 00:13:58.360
+<v Sam Lambert>But I think we hit a bit too much of what's going on underlying, right?
+
+213
+00:14:00.280 --> 00:14:06.000
+<v Sam Lambert>very extremely clean. Like you don't even see the word server in our UI, right? Even though you can
+
+214
+00:14:06.000 --> 00:14:10.520
+<v Sam Lambert>provision, like there's people running it with like thousands of them behind or whatever, right?
+
+215
+00:14:10.880 --> 00:14:15.920
+<v Sam Lambert>I think we made it very, very simple. Sometimes that gives people a sense that there's not this
+
+216
+00:14:15.920 --> 00:14:20.600
+<v Sam Lambert>heft to the product, right? Like, you know, it's kind of, you go in a Tesla and it's a little bit
+
+217
+00:14:20.600 --> 00:14:27.440
+<v Sam Lambert>too empty for me. It just doesn't feel too stark. And I think we oversimplified some of the product
+
+218
+00:14:27.440 --> 00:14:33.520
+<v Sam Lambert>and now we're kind of trying to really thoughtfully add some more of surfacing what's going on under
+
+219
+00:14:33.520 --> 00:14:40.740
+<v Sam Lambert>the hood and making it not scary not something they even have to care about but something that
+
+220
+00:14:40.740 --> 00:14:46.600
+<v Sam Lambert>they're aware of that we're doing things for them rather than it just being this kind of
+
+221
+00:14:46.600 --> 00:14:52.540
+<v Sam Lambert>magic box that kind of just scales and expands i think we need to show people a little bit more of
+
+222
+00:14:52.540 --> 00:14:56.980
+<v Sam Lambert>what's going on with the on under the hood so we're not we're not we haven't solved that fully
+
+223
+00:14:57.440 --> 00:14:59.880
+<v Sam Lambert>but it's something we're kind of working on right now
+
+224
+00:14:59.880 --> 00:15:02.380
+<v Sam Lambert>that's kind of one of the top of mind things with the product.
+
+225
+00:15:05.020 --> 00:15:06.220
+<v Noah Labhart>Okay, this will be fun.
+
+226
+00:15:06.540 --> 00:15:10.120
+<v Noah Labhart>So what does the future look like for the product and for your team?
+
+227
+00:15:11.860 --> 00:15:13.560
+<v Sam Lambert>I mean, first of all, it's really exciting.
+
+228
+00:15:13.800 --> 00:15:15.800
+<v Sam Lambert>Like we're having, we're enjoying ourselves, right?
+
+229
+00:15:15.880 --> 00:15:17.060
+<v Sam Lambert>We're kind of onboarding customers.
+
+230
+00:15:17.140 --> 00:15:18.520
+<v Sam Lambert>We're building a product that people like.
+
+231
+00:15:19.160 --> 00:15:23.360
+<v Sam Lambert>Right now, you know, we're migrating two of the top 200 websites
+
+232
+00:15:23.360 --> 00:15:25.860
+<v Sam Lambert>over to PlanetScale on our cloud platform.
+
+233
+00:15:27.440 --> 00:15:33.120
+<v Sam Lambert>work, but it's good work. We know the technology will work for the customer. So that's one thing
+
+234
+00:15:33.120 --> 00:15:38.640
+<v Sam Lambert>that's very kind of very exciting, really. Like the future is keep helping customers win, make them
+
+235
+00:15:38.640 --> 00:15:43.840
+<v Sam Lambert>successful, keep building a product that people love, don't overdo it, don't crowd the product, get
+
+236
+00:15:43.840 --> 00:15:48.680
+<v Sam Lambert>it just right, keep dialing in, keep talking to customers. We've got some more revolutionary
+
+237
+00:15:48.680 --> 00:15:54.140
+<v Sam Lambert>products that are coming. We've just shipped PlanetScale Boost. That's getting ready to go GA and get
+
+238
+00:15:54.140 --> 00:15:59.240
+<v Sam Lambert>into more and more people's hands. And so that's another kind of exciting evolution and starts to
+
+239
+00:15:59.240 --> 00:16:03.100
+<v Sam Lambert>really speak to the power of our backend tech. And we're going to just keep building and hopefully
+
+240
+00:16:03.100 --> 00:16:07.260
+<v Sam Lambert>keep delighting users with some sort of very special pieces of new technology that people
+
+241
+00:16:07.260 --> 00:16:09.740
+<v Sam Lambert>haven't seen before.
+
+242
+00:16:09.740 --> 00:16:14.140
+<v Noah Labhart>Okay, let's switch to you, Sam. Who influences the way that you work? Name a person
+
+243
+00:16:14.140 --> 00:16:18.400
+<v Noah Labhart>or many persons or something you look up to, and why?
+
+244
+00:16:18.400 --> 00:16:20.520
+<v Sam Lambert>A lot of different people I look up to. I tend
+
+245
+00:16:20.520 --> 00:16:24.520
+<v Sam Lambert>I tend to take influence not from any one individual because we're all different.
+
+246
+00:16:24.720 --> 00:16:25.820
+<v Sam Lambert>We're all good at certain things.
+
+247
+00:16:25.860 --> 00:16:27.480
+<v Sam Lambert>We're all deeply flawed in some ways.
+
+248
+00:16:27.700 --> 00:16:33.900
+<v Sam Lambert>For me, it's I kind of take inspiration from achievement that groups of people have made
+
+249
+00:16:33.900 --> 00:16:38.820
+<v Sam Lambert>and products that people have built or things that are exciting or things that are compelling.
+
+250
+00:16:39.580 --> 00:16:44.500
+<v Sam Lambert>So, yeah, I don't really look to being like anyone type of person.
+
+251
+00:16:45.420 --> 00:16:49.360
+<v Sam Lambert>I kind of just want to build great things like others have built great things.
+
+252
+00:16:50.520 --> 00:16:55.840
+<v Sam Lambert>For example, it's a bit cliche, but Apple products are something that kind of kicked off my love
+
+253
+00:16:55.840 --> 00:17:02.680
+<v Sam Lambert>of computers. The bicycle for the mind. These incredible devices that can be presented so
+
+254
+00:17:02.680 --> 00:17:08.480
+<v Sam Lambert>evocatively and so beautifully and cleanly, I've taken inspiration there. I take inspiration how
+
+255
+00:17:08.480 --> 00:17:14.200
+<v Sam Lambert>you can take deep technology like LiDAR, hard technologies, and embed them in a phone so that
+
+256
+00:17:14.200 --> 00:17:19.620
+<v Sam Lambert>people can unlock it just by looking at it, right? And then this technology is hidden behind a single
+
+257
+00:17:20.520 --> 00:17:21.540
+<v Sam Lambert>hard to break glass screen.
+
+258
+00:17:21.820 --> 00:17:26.580
+<v Sam Lambert>So this kind of engineering that presents deep and complicated engineering so
+
+259
+00:17:26.580 --> 00:17:30.400
+<v Sam Lambert>beautifully and simply and powerfully and impacting so many people.
+
+260
+00:17:30.480 --> 00:17:31.840
+<v Sam Lambert>So it's like kind of products and,
+
+261
+00:17:31.860 --> 00:17:35.140
+<v Sam Lambert>and things like that have changed people's lives and that,
+
+262
+00:17:35.160 --> 00:17:40.580
+<v Sam Lambert>that are the result of humans and different types of humans collaborating in
+
+263
+00:17:40.580 --> 00:17:43.580
+<v Sam Lambert>unison to build really, really inspires me.
+
+264
+00:17:45.100 --> 00:17:47.480
+<v Noah Labhart>Okay. So we, we talked about a mistake earlier,
+
+265
+00:17:47.520 --> 00:17:48.300
+<v Noah Labhart>but a little bit different spin.
+
+266
+00:17:48.300 --> 00:17:52.400
+<v Noah Labhart>been? If you could go back to the beginning, what would you do different? Or where would you consider
+
+267
+00:17:52.400 --> 00:17:55.780
+<v Noah Labhart>taking a different approach? It doesn't have to be a mistake. It could have worked really well,
+
+268
+00:17:55.840 --> 00:17:56.700
+<v Noah Labhart>but you tweak it a little.
+
+269
+00:17:58.200 --> 00:18:01.580
+<v Sam Lambert>At first, we kind of hid a little bit that we were a MySQL database.
+
+270
+00:18:01.920 --> 00:18:07.280
+<v Sam Lambert>Not too much. We didn't exactly push it forward. There's just a massive amount of MySQL databases
+
+271
+00:18:07.280 --> 00:18:12.520
+<v Sam Lambert>out there in the world that need modernization and need a modern platform. So I think we would
+
+272
+00:18:12.520 --> 00:18:16.520
+<v Sam Lambert>have gone out a bit more boldly about being that. We weren't very serverless, very much just being
+
+273
+00:18:18.300 --> 00:18:23.220
+<v Sam Lambert>talking about that we are the best way to kind of scale my SQL databases. Yeah, I think we would
+
+274
+00:18:23.220 --> 00:18:25.980
+<v Sam Lambert>have done that potentially differently. I don't know, though. It could have been a different
+
+275
+00:18:25.980 --> 00:18:30.720
+<v Sam Lambert>history. But there's like a lot of other data, you know, Postgres community, Postgres databases,
+
+276
+00:18:30.720 --> 00:18:36.200
+<v Sam Lambert>or whatever, kind of are out there and apparently quite cool. And so, yeah, I think we were a little
+
+277
+00:18:36.200 --> 00:18:42.280
+<v Sam Lambert>bit maybe embarrassed, but now, now, absolutely not. I mean, we're very proud of the way we've
+
+278
+00:18:42.280 --> 00:18:46.640
+<v Sam Lambert>built our technologies and what it's doing for people and the fact that we're moving lots from
+
+279
+00:18:48.300 --> 00:18:51.840
+<v Sam Lambert>form. Really happy with that. Maybe wouldn't have, maybe would have done that differently, but not,
+
+280
+00:18:51.840 --> 00:18:58.960
+<v Sam Lambert>it's not clear. I very rarely regret anything. I think it's a quite useless emotion. I mean, you
+
+281
+00:18:58.960 --> 00:19:03.180
+<v Sam Lambert>learn you should just learn your lessons very quickly and move on that's all you know i mean
+
+282
+00:19:03.180 --> 00:19:08.200
+<v Sam Lambert>you should break decisions down into as small chunks as you need and then just treat it almost
+
+283
+00:19:08.200 --> 00:19:12.280
+<v Sam Lambert>like a shotgun blast if it goes in the right direction you'll hit it right and you'll get it
+
+284
+00:19:12.280 --> 00:19:18.640
+<v Sam Lambert>done. People who lump together giant decisions to be made will fail because no one is right all
+
+285
+00:19:18.640 --> 00:19:24.120
+<v Sam Lambert>the time. You have to be kind of directionally correct and then make lots of decisions very,
+
+286
+00:19:24.160 --> 00:19:30.940
+<v Sam Lambert>very quickly. And then no one big decision matters. It's about the small, undoable or,
+
+287
+00:19:31.080 --> 00:19:37.500
+<v Sam Lambert>you know, decisions that can just change and move around. And so like, yeah, that's how we do it.
+
+288
+00:19:37.500 --> 00:19:38.640
+<v Sam Lambert>which is small iterations.
+
+289
+00:19:40.680 --> 00:19:41.860
+<v Noah Labhart>Well, last question, Sam.
+
+290
+00:19:42.040 --> 00:19:43.140
+<v Noah Labhart>So you're getting on a plane
+
+291
+00:19:43.140 --> 00:19:45.100
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+292
+00:19:45.100 --> 00:19:46.920
+<v Noah Labhart>who's built the next big thing.
+
+293
+00:19:47.040 --> 00:19:48.160
+<v Noah Labhart>They're jazzed about it.
+
+294
+00:19:48.200 --> 00:19:49.400
+<v Noah Labhart>They can't wait to show it off to the world.
+
+295
+00:19:49.520 --> 00:19:50.380
+<v Noah Labhart>Can't wait to show it off to you
+
+296
+00:19:50.380 --> 00:19:51.580
+<v Noah Labhart>right there on the plane.
+
+297
+00:19:51.740 --> 00:19:53.520
+<v Noah Labhart>What advice do you give that person
+
+298
+00:19:53.520 --> 00:19:54.880
+<v Noah Labhart>having gone down this road a bit?
+
+299
+00:19:55.860 --> 00:19:57.040
+<v Sam Lambert>Pick good technologies.
+
+300
+00:19:57.440 --> 00:19:59.460
+<v Sam Lambert>I know that sounds self-serving,
+
+301
+00:19:59.520 --> 00:20:03.260
+<v Sam Lambert>but having scaled now a number of companies,
+
+302
+00:20:03.640 --> 00:20:05.000
+<v Sam Lambert>picking bad technologies
+
+303
+00:20:05.000 --> 00:20:06.900
+<v Sam Lambert>is way more consequential
+
+304
+00:20:07.500 --> 00:20:12.080
+<v Sam Lambert>people realize. I know people talk about just get it done, go early, ship. Definitely. More
+
+305
+00:20:12.080 --> 00:20:17.060
+<v Sam Lambert>important than that is getting something in users' hands. But now with the kind of new era of
+
+306
+00:20:17.060 --> 00:20:22.000
+<v Sam Lambert>serverless and cloud and the way things are, you can pick incredible technologies that will serve
+
+307
+00:20:22.000 --> 00:20:26.220
+<v Sam Lambert>you for nearly the entire life of your company and you can pick them on day one. That's amazing
+
+308
+00:20:26.220 --> 00:20:29.900
+<v Sam Lambert>to get that right. Because if you get it wrong and your competitor gets it right, it could be
+
+309
+00:20:29.900 --> 00:20:34.020
+<v Sam Lambert>the difference between them winning and you failing. Constantly understand your users. And
+
+310
+00:20:34.020 --> 00:20:36.460
+<v Sam Lambert>And if it's an early company, don't rush.
+
+311
+00:20:36.860 --> 00:20:40.540
+<v Sam Lambert>The early stage when you have like a small group of users
+
+312
+00:20:40.540 --> 00:20:42.260
+<v Sam Lambert>that you have constant contact with
+
+313
+00:20:42.260 --> 00:20:43.880
+<v Sam Lambert>and you can iterate with
+
+314
+00:20:43.880 --> 00:20:46.800
+<v Sam Lambert>is the most in touch you'll ever be with your product.
+
+315
+00:20:47.920 --> 00:20:49.780
+<v Sam Lambert>Use that time very wisely.
+
+316
+00:20:49.900 --> 00:20:51.960
+<v Sam Lambert>Enjoy it and be diligent and learn
+
+317
+00:20:51.960 --> 00:20:53.380
+<v Sam Lambert>and really learn your audience
+
+318
+00:20:53.380 --> 00:20:56.540
+<v Sam Lambert>because it's a lot harder to do in the abstract.
+
+319
+00:20:56.840 --> 00:20:59.620
+<v Sam Lambert>It's a really special time to be there doing it.
+
+320
+00:20:59.820 --> 00:21:00.740
+<v Noah Labhart>Fantastic advice.
+
+321
+00:21:00.940 --> 00:21:02.980
+<v Noah Labhart>Well, Sam, thank you for being on the show today
+
+322
+00:21:04.020 --> 00:21:06.060
+<v Noah Labhart>on the creation story of PlanetScale.
+
+323
+00:21:06.280 --> 00:21:06.780
+<v Sam Lambert>Thank
+
+324
+00:21:06.560 --> 00:21:07.220
+<v Sam Lambert>you for having me.
+
+325
+00:21:07.260 --> 00:21:08.460
+<v Sam Lambert>It's been really awesome to be here.
+
+326
+00:21:10.700 --> 00:21:11.200
+<v Noah Labhart>And
+
+327
+00:21:11.180 --> 00:21:13.600
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+328
+00:21:17.500 --> 00:21:20.480
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+329
+00:21:20.680 --> 00:21:23.300
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+330
+00:21:23.500 --> 00:21:25.440
+<v Noah Labhart>or the podcasting app of your choice.
+
+331
+00:21:26.060 --> 00:21:28.260
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+332
+00:21:28.580 --> 00:21:30.580
+<v Noah Labhart>Both things help us out tremendously.
+
+333
+00:21:32.260 --> 00:21:34.380
+<v Noah Labhart>And thanks again for listening.

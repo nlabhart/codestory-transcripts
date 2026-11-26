@@ -1,0 +1,1455 @@
+WEBVTT
+
+NOTE S1 E13: The Technical Journey of Moving Money via API | Ben Milne (Dwolla)
+
+1
+00:00:01.840 --> 00:00:07.520
+<v Noah Labhart>Today's episode is sponsored by Dwolla. Dwolla is a fintech company helping clients solve
+
+2
+00:00:07.520 --> 00:00:13.140
+<v Noah Labhart>a fundamental business problem, how to best move money. Payments are a key component of
+
+3
+00:00:13.140 --> 00:00:19.220
+<v Noah Labhart>every business, yet one that can be difficult to understand. Dwolla's ACH payment API removes
+
+4
+00:00:19.220 --> 00:00:24.260
+<v Noah Labhart>the complexity involved in moving money to and from bank accounts, so businesses can
+
+5
+00:00:24.260 --> 00:00:27.160
+<v Noah Labhart>can continue to focus on their core revenue streams.
+
+6
+00:00:27.980 --> 00:00:30.400
+<v Noah Labhart>ACH transfers are efficient, reliable,
+
+7
+00:00:30.680 --> 00:00:33.320
+<v Noah Labhart>and with Dwolla's API, they're available for any business.
+
+8
+00:00:34.040 --> 00:00:36.240
+<v Noah Labhart>With a developer-friendly white-labeled API,
+
+9
+00:00:36.660 --> 00:00:38.440
+<v Noah Labhart>businesses can seamlessly integrate
+
+10
+00:00:38.440 --> 00:00:40.960
+<v Noah Labhart>and brand the entire end user experience
+
+11
+00:00:41.300 --> 00:00:44.200
+<v Noah Labhart>while empowering teams to focus on generating revenue
+
+12
+00:00:44.200 --> 00:00:45.260
+<v Noah Labhart>and company growth.
+
+13
+00:00:46.460 --> 00:00:48.700
+<v Noah Labhart>Dwolla is at the forefront of a payments revolution,
+
+14
+00:00:49.080 --> 00:00:51.200
+<v Noah Labhart>having created a ready-made connection
+
+15
+00:00:51.200 --> 00:00:53.000
+<v Noah Labhart>to America's money-moving network
+
+16
+00:00:54.260 --> 00:00:55.560
+<v Noah Labhart>to help your business scale.
+
+17
+00:00:56.440 --> 00:00:58.480
+<v Noah Labhart>I've partnered with Dwolla for over two years
+
+18
+00:00:58.480 --> 00:01:01.360
+<v Noah Labhart>and can vouch for two important aspects of their business,
+
+19
+00:01:02.160 --> 00:01:06.080
+<v Noah Labhart>solid, reliable technology, and amazing customer support.
+
+20
+00:01:06.660 --> 00:01:09.720
+<v Noah Labhart>Dwolla enabled our team to achieve same day pay
+
+21
+00:01:09.720 --> 00:01:10.560
+<v Noah Labhart>on our platform.
+
+22
+00:01:11.020 --> 00:01:12.960
+<v Noah Labhart>And if my team needs anything,
+
+23
+00:01:13.140 --> 00:01:15.020
+<v Noah Labhart>we can rely on Dwolla's support team
+
+24
+00:01:15.020 --> 00:01:16.160
+<v Noah Labhart>to get an answer quickly.
+
+25
+00:01:17.440 --> 00:01:19.160
+<v Noah Labhart>Start building against Dwolla's API
+
+26
+00:01:19.460 --> 00:01:21.880
+<v Noah Labhart>in the sandbox environment today for free.
+
+27
+00:01:21.880 --> 00:01:26.040
+<v Noah Labhart>Visit dwolla.com slash Code Story to get started.
+
+28
+00:01:26.580 --> 00:01:31.280
+<v Noah Labhart>That's d-w-o-l-l-a dot com slash Code Story.
+
+29
+00:01:51.880 --> 00:01:56.220
+<v Ben Milne>Our only incentive is to securely transmit the bits and the instructions.
+
+30
+00:01:57.480 --> 00:02:00.640
+<v Ben Milne>Oh my God, how do we get these bits where they need to go?
+
+31
+00:02:01.520 --> 00:02:04.460
+<v Ben Milne>The good news was, when we launched it, it kind of worked.
+
+32
+00:02:04.960 --> 00:02:07.240
+<v Ben Milne>And then over a period of four or five years,
+
+33
+00:02:07.320 --> 00:02:10.060
+<v Ben Milne>ended up with a million people on it, moving a billion dollars a year.
+
+34
+00:02:11.420 --> 00:02:14.140
+<v Ben Milne>I am Ben Milne, CEO at Dwolla.
+
+35
+00:02:19.940 --> 00:02:21.520
+<v Noah Labhart>This is Code Story.
+
+36
+00:02:21.880 --> 00:02:32.840
+<v Noah Labhart>A podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+37
+00:02:34.060 --> 00:02:44.600
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how moving a billion dollars allowed Ben Milne to realize he'd built a best-in-class way to transfer money.
+
+38
+00:02:45.570 --> 00:02:47.800
+<v Noah Labhart>All this and more on Code Story.
+
+39
+00:02:50.540 --> 00:02:54.720
+<v Noah Labhart>Ben Milne grew up in a small town and has had a pretty normal life.
+
+40
+00:02:55.460 --> 00:03:01.100
+<v Noah Labhart>Raising a family, riding a stationary bike, and funding startups through selling music gear,
+
+41
+00:03:01.770 --> 00:03:03.720
+<v Noah Labhart>he's been in the tech world for a good while.
+
+42
+00:03:04.720 --> 00:03:10.960
+<v Noah Labhart>His second startup started out as a consumer product that you downloaded to move money between banks
+
+43
+00:03:11.880 --> 00:03:15.300
+<v Noah Labhart>without using credit cards or paying hefty fees.
+
+44
+00:03:15.300 --> 00:03:21.420
+<v Noah Labhart>What he discovered was the thing they were best at was payment processing infrastructure.
+
+45
+00:03:22.660 --> 00:03:31.400
+<v Noah Labhart>So, he changed his business to focus on being a high-performing, white-label solution for enabling others to process ACH payments.
+
+46
+00:03:32.420 --> 00:03:36.820
+<v Noah Labhart>And in doing so, started phase two of his company, known as Dwolla.
+
+47
+00:03:37.700 --> 00:03:39.260
+<v Noah Labhart>Well, let's jump into Dwolla.
+
+48
+00:03:39.260 --> 00:03:45.440
+<v Noah Labhart>So for people that don't know who Dwolla is, what Dwolla does, tell me what the company is and what the product does.
+
+49
+00:03:45.840 --> 00:03:50.240
+<v Ben Milne>Dwolla connects our customers, our clients' software to bank infrastructure.
+
+50
+00:03:51.040 --> 00:03:57.240
+<v Ben Milne>Said very simply, our customers are connecting their software to bank infrastructure to move money.
+
+51
+00:03:57.660 --> 00:04:01.480
+<v Ben Milne>And the reason they do that is for an innumerable number of reasons.
+
+52
+00:04:01.900 --> 00:04:05.560
+<v Ben Milne>Software these days simply needs to move money, and that's where we come in.
+
+53
+00:04:05.560 --> 00:04:10.880
+<v Ben Milne>We're highly performant, highly durable, and we believe really nice to work with.
+
+54
+00:04:11.000 --> 00:04:13.660
+<v Ben Milne>So we make things that are difficult to work with simple.
+
+55
+00:04:13.840 --> 00:04:14.340
+<v Noah Labhart>How
+
+56
+00:04:14.080 --> 00:04:15.460
+<v Noah Labhart>did Dwolla get started?
+
+57
+00:04:15.560 --> 00:04:20.160
+<v Noah Labhart>Tell me the origination and the creation story for the beginning of Dwolla.
+
+58
+00:04:20.320 --> 00:04:20.820
+<v Ben Milne>Well,
+
+59
+00:04:20.600 --> 00:04:21.960
+<v Ben Milne>Dwolla is really in its second phase.
+
+60
+00:04:22.180 --> 00:04:26.520
+<v Ben Milne>The first Dwolla was sort of born out of a problem that I had in my first company.
+
+61
+00:04:26.920 --> 00:04:29.140
+<v Ben Milne>All of the company's money came in through credit cards.
+
+62
+00:04:29.340 --> 00:04:33.700
+<v Ben Milne>And after a while, I started looking at, well, what's a way in order to get paid through
+
+63
+00:04:35.560 --> 00:04:41.000
+<v Ben Milne>credit card fees. And that led me to bank transfers and ACH. And what became sort of
+
+64
+00:04:41.000 --> 00:04:47.240
+<v Ben Milne>abundantly clear was banks had this sort of like pre-internet era technology, which was actually
+
+65
+00:04:47.240 --> 00:04:51.960
+<v Ben Milne>massively scalable, massively efficient, and really low cost. It was just hard to access,
+
+66
+00:04:52.060 --> 00:04:57.720
+<v Ben Milne>hard to use, hard to control risk. So the general thesis was if we make this thing easy to use,
+
+67
+00:04:57.960 --> 00:05:03.780
+<v Ben Milne>well, would people use it? We think so. So the first product that was built was a consumer
+
+68
+00:05:05.560 --> 00:05:10.640
+<v Ben Milne>to move money through banks, not using credit cards, not using cards at all, not using those
+
+69
+00:05:10.640 --> 00:05:16.260
+<v Ben Milne>networks. The good news was when we launched it, it kind of worked. And then over a period of four
+
+70
+00:05:16.260 --> 00:05:21.520
+<v Ben Milne>or five years, ended up with a million people on it, moving a billion dollars a year. And we learned
+
+71
+00:05:21.520 --> 00:05:26.920
+<v Ben Milne>a lot, certainly while we were supporting that business. And later on decided that the consumer
+
+72
+00:05:26.920 --> 00:05:31.060
+<v Ben Milne>business was not one that we were best in class at. What we were best in class at was infrastructure.
+
+73
+00:05:31.060 --> 00:05:43.640
+<v Ben Milne>And so we changed the business to really support being a white label provider to our clients to save them time and money building their own direct-to-bank interactions or integrations and have since sort of faded more into the background.
+
+74
+00:05:43.980 --> 00:05:47.800
+<v Ben Milne>And nowadays, we focus on being that highly performant and scalable infrastructure.
+
+75
+00:05:48.200 --> 00:05:50.860
+<v Noah Labhart>So tell me about the first part of the product.
+
+76
+00:05:50.980 --> 00:05:55.920
+<v Noah Labhart>Maybe there's two types of MVPs or maybe you used what was working in the first part.
+
+77
+00:05:56.060 --> 00:05:57.980
+<v Noah Labhart>Tell me about the initial build.
+
+78
+00:05:57.980 --> 00:06:01.520
+<v Noah Labhart>build? What sort of tools did you use and what sort of trade-offs did you make?
+
+79
+00:06:01.740 --> 00:06:02.240
+<v Ben Milne>The
+
+80
+00:06:01.900 --> 00:06:08.000
+<v Ben Milne>initial build, thankfully, it was sort of in a versioning. Version one, and we are now in
+
+81
+00:06:08.000 --> 00:06:14.820
+<v Ben Milne>version 212. Version one was, I can't even remember the name of the Microsoft product that we were
+
+82
+00:06:14.820 --> 00:06:21.920
+<v Ben Milne>using at the time. It was pre-MVC. And basically what this thing did was it kicked out files that
+
+83
+00:06:21.920 --> 00:06:26.680
+<v Ben Milne>we would basically deliver to financial institutions. And then we'd sort of figure
+
+84
+00:06:27.980 --> 00:06:33.720
+<v Ben Milne>around that and how to think about things like risk and fraud and identity verification.
+
+85
+00:06:34.260 --> 00:06:42.440
+<v Ben Milne>But the initial kind of build that proved out that it could be done was a really, really
+
+86
+00:06:42.440 --> 00:06:45.560
+<v Ben Milne>hacked together system to just demonstrate a proof of concept.
+
+87
+00:06:45.780 --> 00:06:47.540
+<v Ben Milne>It did not look beautiful.
+
+88
+00:06:47.720 --> 00:06:51.260
+<v Ben Milne>In fact, it looked what I believe was downright shameful.
+
+89
+00:06:51.440 --> 00:06:56.320
+<v Ben Milne>And every once in a while, I show somebody the initial logo that was built to put on
+
+90
+00:06:57.980 --> 00:07:00.260
+<v Ben Milne>it makes everybody cringe every time.
+
+91
+00:07:00.780 --> 00:07:03.640
+<v Noah Labhart>Do you believe that if you're proud of your first
+
+92
+00:07:03.640 --> 00:07:05.100
+<v Noah Labhart>release, you're not shipping fast enough?
+
+93
+00:07:05.540 --> 00:07:08.000
+<v Ben Milne>I'm definitely a believer in that. I think that the
+
+94
+00:07:08.000 --> 00:07:13.560
+<v Ben Milne>best way to test product is to get it in a client's hands and see what they do with it.
+
+95
+00:07:13.980 --> 00:07:19.960
+<v Ben Milne>And in some cases there isn't a client. And so just shipping it and seeing what happens
+
+96
+00:07:19.960 --> 00:07:24.960
+<v Ben Milne>can be really interesting. But sometimes that's a really hard emotional barrier for people to
+
+97
+00:07:24.960 --> 00:07:29.320
+<v Ben Milne>to get over. The only problem is, is a lot of innovation comes with feedback. And if you don't
+
+98
+00:07:29.320 --> 00:07:34.240
+<v Ben Milne>derive processes to get those feedback or get that feedback, you kind of just end up living
+
+99
+00:07:34.240 --> 00:07:37.180
+<v Ben Milne>in your own head and making decisions that maybe aren't right. So
+
+100
+00:07:37.180 --> 00:07:39.220
+<v Noah Labhart>how has the product progressed?
+
+101
+00:07:39.560 --> 00:07:45.920
+<v Noah Labhart>I think maybe dive into more of the consumer base versus infrastructure. How has that progression
+
+102
+00:07:45.920 --> 00:07:46.740
+<v Noah Labhart>played out?
+
+103
+00:07:47.260 --> 00:07:53.960
+<v Ben Milne>On one end of the spectrum, you have a self-hosted on a standalone box piece of software
+
+104
+00:07:55.040 --> 00:08:07.720
+<v Ben Milne>And on the other side, you have a highly performant AWS infrastructure that's largely built using Scala and all kinds of other distributed technologies that I haven't contributed code to in years.
+
+105
+00:08:07.920 --> 00:08:10.340
+<v Ben Milne>We have this like wide range.
+
+106
+00:08:10.660 --> 00:08:21.580
+<v Ben Milne>And the thing that's sort of the similarity from day one to day whatever we're on now is that the software has always been responsible for moving money in a secure and efficient manner.
+
+107
+00:08:22.220 --> 00:08:23.980
+<v Ben Milne>We are not a financial institution.
+
+108
+00:08:24.960 --> 00:08:31.400
+<v Ben Milne>hold the money. Our only incentive is to securely transmit the bits and the instructions. And that's
+
+109
+00:08:31.400 --> 00:08:36.120
+<v Ben Milne>what we've always done since day one. And I think that's something we've always done really well.
+
+110
+00:08:36.240 --> 00:08:42.740
+<v Ben Milne>We've just gotten much better at doing it across n number of instances and across n number of
+
+111
+00:08:42.740 --> 00:08:48.120
+<v Ben Milne>clients and across n number of companies that are scaling simultaneously that need our software to
+
+112
+00:08:48.120 --> 00:08:53.080
+<v Ben Milne>work asynchronously and be performant. And the type of engineering problems that we're solving
+
+113
+00:08:54.960 --> 00:08:59.800
+<v Ben Milne>than the initial type of engineering problems on day one, which are really more in line with,
+
+114
+00:09:00.400 --> 00:09:05.960
+<v Ben Milne>oh my God, how do we get these bits where they need to go? As opposed to now, we know that,
+
+115
+00:09:06.080 --> 00:09:09.660
+<v Ben Milne>we need to make sure that we're managing a lot more bits.
+
+116
+00:09:09.960 --> 00:09:14.580
+<v Noah Labhart>Taking that core vision, how did you build over time and now,
+
+117
+00:09:14.800 --> 00:09:18.520
+<v Noah Labhart>how do you build your roadmap? How do you figure out what's important to build?
+
+118
+00:09:18.520 --> 00:09:19.020
+<v Noah Labhart>Build?
+
+119
+00:09:19.740 --> 00:09:25.200
+<v Ben Milne>Roadmaps are hard, plain and simple. I mean, I think all companies sort of have a vision
+
+120
+00:09:25.200 --> 00:09:29.360
+<v Ben Milne>for what they want the company to be, a strategy for executing on that. And then there's the
+
+121
+00:09:30.160 --> 00:09:36.420
+<v Ben Milne>actual product roadmap that informs what's going to happen right now. And in terms of how we manage
+
+122
+00:09:36.420 --> 00:09:39.940
+<v Ben Milne>our product roadmap, the best person to answer that would be our product leader, Ben Schmidt,
+
+123
+00:09:40.100 --> 00:09:45.340
+<v Ben Milne>and having him sit down and talk about his process for gathering customer feedback and gathering
+
+124
+00:09:45.340 --> 00:09:46.800
+<v Ben Milne>gathering feedback from internal stakeholders,
+
+125
+00:09:47.440 --> 00:09:50.620
+<v Ben Milne>negotiating across everybody to think about what's the right thing for us to do.
+
+126
+00:09:51.000 --> 00:09:54.440
+<v Ben Milne>And in a perfect world, there's an element of the roadmap that reflects
+
+127
+00:09:54.440 --> 00:09:59.800
+<v Ben Milne>future technology enhancements that help the technology scale out really gracefully.
+
+128
+00:10:00.180 --> 00:10:03.400
+<v Ben Milne>There's future enhancements that help clients and internal stakeholders.
+
+129
+00:10:03.820 --> 00:10:06.560
+<v Ben Milne>And then peppered in there somewhere is some of the new hot stuff, right?
+
+130
+00:10:06.640 --> 00:10:08.280
+<v Ben Milne>There's always something that's next.
+
+131
+00:10:08.580 --> 00:10:12.500
+<v Ben Milne>And I feel like payments right now are a little bit like modems in the 90s of
+
+132
+00:10:12.500 --> 00:10:15.780
+<v Ben Milne>of there's always a new thing and the new thing enables all these other things.
+
+133
+00:10:16.020 --> 00:10:18.880
+<v Ben Milne>And there's like a new thing every month.
+
+134
+00:10:19.060 --> 00:10:22.080
+<v Ben Milne>And so there's a little bit of complexity there.
+
+135
+00:10:22.180 --> 00:10:24.980
+<v Ben Milne>But as long as that complexity is aligned with internal stakeholders
+
+136
+00:10:24.980 --> 00:10:27.400
+<v Ben Milne>and also with our clients and helping them be successful,
+
+137
+00:10:27.600 --> 00:10:30.180
+<v Ben Milne>you know, I think that the product roadmap really should reflect that.
+
+138
+00:10:30.420 --> 00:10:33.100
+<v Noah Labhart>How did you go about building the team early days and now?
+
+139
+00:10:33.300 --> 00:10:37.780
+<v Noah Labhart>And maybe how has that, you know, changed or what have you learned through that process?
+
+140
+00:10:37.980 --> 00:10:41.500
+<v Noah Labhart>What characteristics do you look for in picking the winning horses?
+
+141
+00:10:42.500 --> 00:10:45.960
+<v Ben Milne>during recruiting, there's kind of a view of either get it right or you get it wrong.
+
+142
+00:10:46.540 --> 00:10:51.740
+<v Ben Milne>And I don't know that it's a zero sum game. And in the early days, it feels like
+
+143
+00:10:53.240 --> 00:10:58.060
+<v Ben Milne>it's almost a stroke of luck just to find someone who is willing to work with you
+
+144
+00:10:58.060 --> 00:11:03.920
+<v Ben Milne>because there's so much risk. Any big idea sounds really crazy. And those initial teams
+
+145
+00:11:03.920 --> 00:11:08.020
+<v Ben Milne>are really hard to build. And one of the things I know that in the early days, I really
+
+146
+00:11:09.320 --> 00:11:13.780
+<v Ben Milne>didn't pay enough attention to was how we were thinking about the diversity of the team.
+
+147
+00:11:14.380 --> 00:11:20.640
+<v Ben Milne>Where when we thought about the product, the product was being built to be supporting a
+
+148
+00:11:20.640 --> 00:11:26.280
+<v Ben Milne>diverse set of applications and supporting people and clients that are as diverse as the internet
+
+149
+00:11:26.280 --> 00:11:30.380
+<v Ben Milne>is. But we weren't being intentional about building the team internally in that way.
+
+150
+00:11:30.500 --> 00:11:37.000
+<v Ben Milne>And it wasn't until, I want to say maybe two years ago, we started really thinking about that more
+
+151
+00:11:38.480 --> 00:11:44.140
+<v Ben Milne>intentionally. And now I think we are much better at that. I think I underestimated the value of
+
+152
+00:11:44.140 --> 00:11:49.720
+<v Ben Milne>focusing on diversity in not only the company's makeup, but as a part of the recruiting process
+
+153
+00:11:49.720 --> 00:11:54.080
+<v Ben Milne>and hiring process and about how it could actually help us serve our clients better.
+
+154
+00:11:54.440 --> 00:11:57.660
+<v Ben Milne>And that's been a big shift for the company. And I think a big shift for the better.
+
+155
+00:11:57.760 --> 00:11:58.260
+<v Noah Labhart>How
+
+156
+00:11:58.000 --> 00:12:02.200
+<v Noah Labhart>do you structure your team to align with product development and kind of,
+
+157
+00:12:02.200 --> 00:12:10.360
+<v Noah Labhart>You mentioned you learned how to focus on diversity and that can mean different ideas and perspectives and things.
+
+158
+00:12:10.440 --> 00:12:11.120
+<v Noah Labhart>And that's really good.
+
+159
+00:12:11.220 --> 00:12:15.840
+<v Noah Labhart>How do you take that type of team and structure it to align with how you need to make your product?
+
+160
+00:12:16.000 --> 00:12:18.520
+<v Ben Milne>Our actual org structure looks fairly classical.
+
+161
+00:12:19.540 --> 00:12:28.540
+<v Ben Milne>But the way that we sort of think about the process of debating and negotiating is probably more non-classical.
+
+162
+00:12:28.540 --> 00:12:40.920
+<v Ben Milne>And I think debate and challenges and a dialogue about what the right thing is and the wrong thing is something that you need to create safe spaces for, whether or not that's a couple hours a week or it just happens organically.
+
+163
+00:12:41.240 --> 00:12:49.060
+<v Ben Milne>It's different for all companies, but for us, I think building it into what our off sites look like, what our one-on-ones look like, what our weekly meetings look like.
+
+164
+00:12:49.060 --> 00:12:58.840
+<v Ben Milne>So we've got time to actually discuss real topics and have a intellectually honest conversation about those where differing opinions don't mean a dividing line.
+
+165
+00:12:58.980 --> 00:13:02.740
+<v Ben Milne>They mean there's an opportunity for people to change their minds.
+
+166
+00:13:02.940 --> 00:13:05.160
+<v Ben Milne>And if you change your mind, there should be no judgment.
+
+167
+00:13:05.200 --> 00:13:06.540
+<v Ben Milne>It's like a blameless retro.
+
+168
+00:13:07.620 --> 00:13:10.340
+<v Ben Milne>It doesn't mean somebody's wrongs because they change their mind.
+
+169
+00:13:10.540 --> 00:13:14.520
+<v Ben Milne>And we should not be shy about trying to stick up for the things we believe in.
+
+170
+00:13:14.540 --> 00:13:15.820
+<v Ben Milne>And we don't all agree all the time.
+
+171
+00:13:15.820 --> 00:13:21.100
+<v Ben Milne>If we did, we'd just be clones of one another and the company would probably be shipping garbage.
+
+172
+00:13:21.340 --> 00:13:33.480
+<v Noah Labhart>In building a product that's more infrastructure-based, more behind the scenes, how do you keep your team's eye on the ball early on and now to build things to scale efficiently?
+
+173
+00:13:34.620 --> 00:13:37.780
+<v Ben Milne>You know, it's easier early on when everybody fits in the same room.
+
+174
+00:13:37.780 --> 00:13:43.540
+<v Ben Milne>I think as the companies kind of grow out, someone told me once that at 10 people and at 20 people
+
+175
+00:13:43.540 --> 00:13:49.460
+<v Ben Milne>and 20 people and 40 people, every time the company doubles, everything breaks. And so when
+
+176
+00:13:49.460 --> 00:13:54.880
+<v Ben Milne>you think about that, you just need to rethink your communication processes. I can't speak for
+
+177
+00:13:54.880 --> 00:14:00.160
+<v Ben Milne>all companies, but I can say that one thing here that I think is really important is setting very
+
+178
+00:14:00.160 --> 00:14:05.600
+<v Ben Milne>intentional quarterly goals that include all company goals that go all the way to individual
+
+179
+00:14:05.600 --> 00:14:11.080
+<v Ben Milne>individual goals, myself included. Now, there are varying degrees of benefits from that if it's
+
+180
+00:14:11.080 --> 00:14:16.040
+<v Ben Milne>transparent to everybody all the time versus some of it maybe isn't because you clearly don't want
+
+181
+00:14:16.040 --> 00:14:21.620
+<v Ben Milne>to single people out. As long as team members understand, again, myself included, I am a team
+
+182
+00:14:21.620 --> 00:14:26.180
+<v Ben Milne>member. I have individual goals that tie up to the company goals. How their contributions actually
+
+183
+00:14:26.180 --> 00:14:30.940
+<v Ben Milne>align and being intentional about that process and unwavering in your commitment to actually
+
+184
+00:14:30.940 --> 00:14:36.260
+<v Ben Milne>actually follow it, I think can be really helpful. And I think it helps align all the teams around
+
+185
+00:14:36.260 --> 00:14:40.440
+<v Ben Milne>what it is we're doing, why we're doing it. And it doesn't mean that it's always perfect.
+
+186
+00:14:40.680 --> 00:14:45.340
+<v Ben Milne>It actually means there's always a highlight for where you can improve, kind of admitting that,
+
+187
+00:14:45.360 --> 00:14:50.640
+<v Ben Milne>yes, there's always opportunity for improvement. Let's take ourselves up on that opportunity and
+
+188
+00:14:50.640 --> 00:14:55.100
+<v Ben Milne>actually just improve. I think just doing that consistently is really healthy for everybody.
+
+189
+00:14:57.600 --> 00:15:01.200
+<v Noah Labhart>Support for today's episode is brought to you by Hackbright Academy.
+
+190
+00:15:01.940 --> 00:15:05.560
+<v Noah Labhart>Hackbright Academy is an all-women coding boot camp in San Francisco.
+
+191
+00:15:05.980 --> 00:15:11.560
+<v Noah Labhart>They were founded with the mission to provide women with a personalized path to a software engineering career.
+
+192
+00:15:12.320 --> 00:15:17.100
+<v Noah Labhart>One of the most impressive things about the school is the tight-knit community they've created.
+
+193
+00:15:17.620 --> 00:15:23.540
+<v Noah Labhart>They truly believe in empowering each other and working to change the ratio of women in the tech industry.
+
+194
+00:15:26.100 --> 00:15:35.120
+<v Noah Labhart>Hackbright firmly believes that when you combine a community of like-minded, ambitious women and a network of strong support, the possibilities are endless.
+
+195
+00:15:36.160 --> 00:15:40.000
+<v Noah Labhart>Check out their programs at hackbrightacademy.com.
+
+196
+00:15:44.560 --> 00:15:51.460
+<v Noah Labhart>Did you start out building Dwolla in more of a monolithic architecture and then move to some microservices?
+
+197
+00:15:51.600 --> 00:15:55.160
+<v Noah Labhart>Did you focus on more scalable architecture early on?
+
+198
+00:15:56.100 --> 00:15:56.600
+<v Noah Labhart>that.
+
+199
+00:15:56.480 --> 00:16:01.700
+<v Ben Milne>Early on, we focused on how in the hell do we solve this problem? I hope I'm always very
+
+200
+00:16:01.700 --> 00:16:08.460
+<v Ben Milne>honest about that because as time goes on, I think there's a desire sometimes for founders to tell
+
+201
+00:16:08.460 --> 00:16:12.980
+<v Ben Milne>this beautiful story. But the reality was we were just trying to figure out how to do it in the
+
+202
+00:16:12.980 --> 00:16:17.940
+<v Ben Milne>beginning. And as the system grew, there was a while where we were just trying to keep the wheels
+
+203
+00:16:17.940 --> 00:16:25.540
+<v Ben Milne>on. There was a point where we got over that hump and we started thinking about, do we want this to
+
+204
+00:16:26.100 --> 00:16:30.740
+<v Ben Milne>technology architecture? And the answer was no. We want to move it into a different type of
+
+205
+00:16:30.740 --> 00:16:36.260
+<v Ben Milne>environment because it has these advantages. And then we started realizing, well, we're in this
+
+206
+00:16:36.260 --> 00:16:40.820
+<v Ben Milne>new environment. We actually have all these new opportunities to be leveraging microservices and
+
+207
+00:16:40.820 --> 00:16:46.440
+<v Ben Milne>transitioning some of our old .NET stack to Scala. In what order would we do those things? And that's
+
+208
+00:16:46.440 --> 00:16:51.620
+<v Ben Milne>really where the new engineering leadership really started to be able to take more ownership over the
+
+209
+00:16:51.620 --> 00:16:56.460
+<v Ben Milne>engineering stack and not just deal with the technical debt that was created by the people
+
+210
+00:16:56.460 --> 00:17:02.160
+<v Ben Milne>before them. That transition and those changes, from my perspective, are also the things that
+
+211
+00:17:02.160 --> 00:17:06.260
+<v Ben Milne>are helping the company be successful today. Because when we look at some of our all-company
+
+212
+00:17:06.260 --> 00:17:11.920
+<v Ben Milne>goals, we're always performing on our uptime number. We're always making things faster.
+
+213
+00:17:12.120 --> 00:17:15.520
+<v Ben Milne>And a lot of the things that we're doing technically are enabled by the decisions
+
+214
+00:17:15.520 --> 00:17:18.280
+<v Ben Milne>that the engineering leaders made when we made that transition.
+
+215
+00:17:18.280 --> 00:17:19.080
+<v Noah Labhart>What are
+
+216
+00:17:19.080 --> 00:17:26.860
+<v Noah Labhart>you most proud of with Dwolla? In your mind, you think of Dwolla and you think of all that you've accomplished. What stands out as what you're most proud of?
+
+217
+00:17:26.860 --> 00:17:48.640
+<v Ben Milne>I really like the people I work with. They are constantly doing things that I am not able independently to do. And the fact that I get to be a part of that always gives me great pride. Separately, my reward system is seeing what people build on Dwolla's platform. So when I look at Variable or Rally Road or anybody building a new type of innovation that we didn't think of, I get a huge kick out of that.
+
+218
+00:17:48.640 --> 00:17:53.080
+<v Ben Milne>that. And so every day when I'm coming in and I get to see something new or learn about
+
+219
+00:17:53.080 --> 00:17:59.620
+<v Ben Milne>somebody new building something, again, that's my reward system. I feel a lot of pride in
+
+220
+00:17:59.620 --> 00:18:00.700
+<v Ben Milne>seeing what other people build.
+
+221
+00:18:00.920 --> 00:18:06.380
+<v Noah Labhart>You're essentially getting to work alongside a lot of different startups and a lot of different
+
+222
+00:18:06.380 --> 00:18:09.320
+<v Noah Labhart>solutions and be a part of their success. Is that true?
+
+223
+00:18:09.880 --> 00:18:15.480
+<v Ben Milne>Yeah, you nailed it. We get exposed to hundreds of the most innovative companies around the
+
+224
+00:18:15.480 --> 00:18:21.140
+<v Ben Milne>the country with extremely talented engineers, motivated people, building new experiences that
+
+225
+00:18:21.140 --> 00:18:26.180
+<v Ben Milne>couldn't have existed in a pre-internet era. I mean, none of this shit could have existed 40
+
+226
+00:18:26.180 --> 00:18:32.460
+<v Ben Milne>years ago. And every week we see something new. And I think that is awesome. And it is a super
+
+227
+00:18:32.460 --> 00:18:34.740
+<v Ben Milne>exciting thing to see and be a part of. Well,
+
+228
+00:18:34.800 --> 00:18:36.920
+<v Noah Labhart>let's shift gears a little bit. So tell me about
+
+229
+00:18:36.920 --> 00:18:41.140
+<v Noah Labhart>a mistake that was made and how your team responded to it.
+
+230
+00:18:41.440 --> 00:18:44.760
+<v Ben Milne>There are many mistakes every day,
+
+231
+00:18:45.480 --> 00:18:51.020
+<v Ben Milne>And in some cases, they are probably tolerated because I work with really nice and kind people.
+
+232
+00:18:51.140 --> 00:18:58.320
+<v Ben Milne>And then in other ways, there are some larger mistakes that have played themselves out internally and externally.
+
+233
+00:18:58.600 --> 00:19:11.120
+<v Ben Milne>And I think one of the big ones that we made historically looking back, and certainly I was a huge part of this, was we really made a decision to go all in to sell directly into banks at one point.
+
+234
+00:19:11.120 --> 00:19:16.480
+<v Ben Milne>and that meant that we were going to go do integrations directly with each one of the banks we were going to work with.
+
+235
+00:19:17.100 --> 00:19:24.600
+<v Ben Milne>That was an all-consuming, wear a suit every day, live on the corner of 33rd and Park in New York,
+
+236
+00:19:24.680 --> 00:19:26.480
+<v Ben Milne>make every day about making that work.
+
+237
+00:19:28.900 --> 00:19:32.920
+<v Ben Milne>And there was an element to it of it could be really great.
+
+238
+00:19:32.920 --> 00:19:41.260
+<v Ben Milne>but in hindsight which is always simpler it is really hard to get banks to do things on a
+
+239
+00:19:41.260 --> 00:19:44.340
+<v Ben Milne>timeline that works for you and
+
+240
+00:19:44.340 --> 00:19:45.900
+<v Ben Milne>we
+
+241
+00:19:45.900 --> 00:19:49.560
+<v Ben Milne>wouldn't have learned had we not done that but what we learned
+
+242
+00:19:49.560 --> 00:19:53.740
+<v Ben Milne>coming out of that was that we could create a framework that would allow the banks to join
+
+243
+00:19:53.740 --> 00:19:59.100
+<v Ben Milne>our platform and do the integration directly to us as opposed to vice versa and that's turned out
+
+244
+00:19:59.100 --> 00:20:04.420
+<v Ben Milne>to be a great shift and I wish it would have started there. It was definitely a mistake for
+
+245
+00:20:04.420 --> 00:20:08.500
+<v Ben Milne>our business and the people that were in the company at the time to go down the road of doing
+
+246
+00:20:08.500 --> 00:20:14.200
+<v Ben Milne>the integration directly with the banks. It was a long, drawn out, painful process. You know, as we
+
+247
+00:20:14.200 --> 00:20:19.840
+<v Ben Milne>learned, they're also more concerned when new people they don't know come into their technology
+
+248
+00:20:19.840 --> 00:20:24.640
+<v Ben Milne>and start writing things to it and are much more comfortable actually extending it on their own
+
+249
+00:20:24.640 --> 00:20:28.200
+<v Ben Milne>and doing that with their current team and current staff.
+
+250
+00:20:28.660 --> 00:20:30.040
+<v Ben Milne>And that's turned out to be a good thing,
+
+251
+00:20:30.100 --> 00:20:32.460
+<v Ben Milne>but it took us three years to figure it out.
+
+252
+00:20:32.880 --> 00:20:35.820
+<v Noah Labhart>What does the future look like for Dwolla and for your team?
+
+253
+00:20:36.400 --> 00:20:38.760
+<v Ben Milne>Right now, it's all about supporting clients' innovations.
+
+254
+00:20:40.300 --> 00:20:43.420
+<v Ben Milne>We feel really good about the current product,
+
+255
+00:20:43.580 --> 00:20:44.720
+<v Ben Milne>but that doesn't mean it's perfect.
+
+256
+00:20:44.940 --> 00:20:46.760
+<v Ben Milne>We need to continue to build out the feature set
+
+257
+00:20:46.760 --> 00:20:48.380
+<v Ben Milne>to support our clients' growth.
+
+258
+00:20:48.700 --> 00:20:50.320
+<v Ben Milne>Some of that means new value types.
+
+259
+00:20:50.440 --> 00:20:52.040
+<v Ben Milne>Some of it means new transfer types.
+
+260
+00:20:52.160 --> 00:20:54.240
+<v Ben Milne>And some of it's related to data,
+
+261
+00:20:54.640 --> 00:20:59.000
+<v Ben Milne>of management in the dashboard, there are things that we need to do to continue to support our
+
+262
+00:20:59.000 --> 00:21:03.840
+<v Ben Milne>clients. And that's a big part of it. We are fortunate that we are still very small in a very
+
+263
+00:21:03.840 --> 00:21:10.120
+<v Ben Milne>big market. So being mindful of the fact that not to build too wide too quickly, kind of become a
+
+264
+00:21:10.120 --> 00:21:14.860
+<v Ben Milne>Swiss army knife that does everything but nothing well. We think about that often to make sure that
+
+265
+00:21:14.860 --> 00:21:20.680
+<v Ben Milne>we're focusing on our strengths. And also, we continue to build out our team. We're fortunate
+
+266
+00:21:20.680 --> 00:21:25.840
+<v Ben Milne>that we're in a place where we have a great recruiting and hiring pipeline, but we don't
+
+267
+00:21:25.840 --> 00:21:30.860
+<v Ben Milne>have enough people yet to do all the things we want and need to do. So focusing on hiring more
+
+268
+00:21:30.860 --> 00:21:33.160
+<v Ben Milne>really great people is also a focus for the business.
+
+269
+00:21:33.460 --> 00:21:35.900
+<v Noah Labhart>Can you speak to some of the, call
+
+270
+00:21:35.900 --> 00:21:40.920
+<v Noah Labhart>them third-party integration, but partner systems that you're building to enable other things or
+
+271
+00:21:40.920 --> 00:21:42.900
+<v Noah Labhart>recommend other partners out there?
+
+272
+00:21:43.280 --> 00:21:47.960
+<v Ben Milne>You know, our APIs are built to support businesses and
+
+273
+00:21:47.960 --> 00:21:50.660
+<v Ben Milne>and financial institutions and governments
+
+274
+00:21:51.130 --> 00:21:53.180
+<v Ben Milne>that basically want to build software
+
+275
+00:21:53.180 --> 00:21:54.580
+<v Ben Milne>on top of bank infrastructure.
+
+276
+00:21:55.400 --> 00:21:58.440
+<v Ben Milne>And one of the ways that we've really supported
+
+277
+00:21:58.730 --> 00:22:01.700
+<v Ben Milne>new types of products is by having an account structure
+
+278
+00:22:01.700 --> 00:22:05.080
+<v Ben Milne>that supports banks having an account on our platform
+
+279
+00:22:05.710 --> 00:22:08.780
+<v Ben Milne>or MSBs having an account on our platform
+
+280
+00:22:08.780 --> 00:22:11.040
+<v Ben Milne>that enables specific types of interactions.
+
+281
+00:22:11.710 --> 00:22:13.980
+<v Ben Milne>One of the things that I think is really interesting
+
+282
+00:22:13.980 --> 00:22:17.680
+<v Ben Milne>is there's a partner company that is doing card issuance.
+
+283
+00:22:17.820 --> 00:22:19.260
+<v Ben Milne>Actually, I think there are three companies
+
+284
+00:22:19.260 --> 00:22:21.540
+<v Ben Milne>that are doing card issuance with our clients
+
+285
+00:22:21.540 --> 00:22:23.960
+<v Ben Milne>that are supported by a technical workflow,
+
+286
+00:22:24.200 --> 00:22:25.540
+<v Ben Milne>which is unique to us,
+
+287
+00:22:25.640 --> 00:22:27.600
+<v Ben Milne>which is something we think is really cool.
+
+288
+00:22:27.720 --> 00:22:29.920
+<v Ben Milne>And whether or not that's card issuance
+
+289
+00:22:29.920 --> 00:22:32.120
+<v Ben Milne>or push to credit or push to card
+
+290
+00:22:32.120 --> 00:22:35.040
+<v Ben Milne>or basically enabling funds flows
+
+291
+00:22:35.040 --> 00:22:38.420
+<v Ben Milne>for international FX transfers or international delivery,
+
+292
+00:22:39.100 --> 00:22:40.660
+<v Ben Milne>all supported through our platform
+
+293
+00:22:40.660 --> 00:22:41.900
+<v Ben Milne>through some of these other partnerships.
+
+294
+00:22:41.900 --> 00:22:49.100
+<v Ben Milne>and in about a month at Money20/20, we're going to release a standardized technical implementation
+
+295
+00:22:49.100 --> 00:22:53.680
+<v Ben Milne>for third parties that is sort of the rules of engagement for third parties to do technical
+
+296
+00:22:53.680 --> 00:22:58.180
+<v Ben Milne>implementations on our client applications without ever touching the money. If you're familiar with
+
+297
+00:22:58.180 --> 00:23:03.920
+<v Ben Milne>PSD2, it starts to look a little bit like PSD2 of opening up the platform and that's something
+
+298
+00:23:03.920 --> 00:23:09.000
+<v Ben Milne>that I think is going to be incredibly unique, not just in the United States, but I'm really
+
+299
+00:23:09.000 --> 00:23:12.460
+<v Ben Milne>really excited for what that means for the future of our business and also the future of our
+
+300
+00:23:12.460 --> 00:23:13.980
+<v Ben Milne>clients' businesses. So if I'm
+
+301
+00:23:13.980 --> 00:23:16.080
+<v Noah Labhart>understanding right, that's creating like a just standard
+
+302
+00:23:16.080 --> 00:23:21.760
+<v Noah Labhart>protocol of how to interact with your platform, never touch the money, but utilize your
+
+303
+00:23:21.760 --> 00:23:26.760
+<v Noah Labhart>infrastructure to enable them to do all kinds of sorts of things. But it's really that standardized
+
+304
+00:23:26.760 --> 00:23:27.820
+<v Noah Labhart>protocol. Is that right?
+
+305
+00:23:28.580 --> 00:23:32.400
+<v Ben Milne>Yeah, you nailed it. Our infrastructure or the design is to put our
+
+306
+00:23:32.400 --> 00:23:38.540
+<v Ben Milne>client in control of what partners they give that information or data to or capability to if they
+
+307
+00:23:39.000 --> 00:23:43.260
+<v Ben Milne>to be able to initiate transfers on behalf of themselves or even their customers.
+
+308
+00:23:43.680 --> 00:23:48.420
+<v Ben Milne>And so you take this incredibly complex financial infrastructure and you make it available to
+
+309
+00:23:48.420 --> 00:23:52.180
+<v Ben Milne>software engineers and put them in the driver's seat with the rules of engagement.
+
+310
+00:23:52.380 --> 00:23:56.680
+<v Ben Milne>So we're not getting into trouble or they're not getting into trouble violating certain
+
+311
+00:23:56.680 --> 00:23:57.180
+<v Ben Milne>rules.
+
+312
+00:23:57.520 --> 00:23:59.040
+<v Ben Milne>We think that could be really powerful.
+
+313
+00:23:59.160 --> 00:24:00.820
+<v Ben Milne>We're really excited to see what people do with it.
+
+314
+00:24:00.880 --> 00:24:05.560
+<v Ben Milne>And a big thing we think about a lot here is with these new types of enhancements, how
+
+315
+00:24:05.560 --> 00:24:07.360
+<v Ben Milne>do we save engineering time?
+
+316
+00:24:09.000 --> 00:24:14.880
+<v Ben Milne>our clients' roll features out without spending a thousand hours negotiating with a new financial
+
+317
+00:24:14.880 --> 00:24:18.660
+<v Ben Milne>institution and a new technology provider? How do we enable them just to turn that on
+
+318
+00:24:18.660 --> 00:24:22.860
+<v Ben Milne>and all of a sudden you've got card issuance or turn that on and all of a sudden you've got a
+
+319
+00:24:22.860 --> 00:24:28.640
+<v Ben Milne>real-time fraud monitoring system that learns based on your actual applications usage? How do
+
+320
+00:24:28.640 --> 00:24:32.760
+<v Ben Milne>we enable these extremely complex, hard things really quickly?
+
+321
+00:24:33.020 --> 00:24:36.340
+<v Noah Labhart>Name an architect or a CTO or CEO
+
+322
+00:24:36.340 --> 00:24:40.360
+<v Noah Labhart>CEO or entrepreneur person that you look up to and tell me why.
+
+323
+00:24:40.760 --> 00:24:41.260
+<v Ben Milne>You
+
+324
+00:24:41.200 --> 00:24:44.560
+<v Ben Milne>know, on the tech side, I spend a lot of time with Skylar, our VP of engineering.
+
+325
+00:24:45.120 --> 00:24:50.600
+<v Ben Milne>Skylar and I spend a lot of time talking about some extremely hairy technical issues when it
+
+326
+00:24:50.600 --> 00:24:57.040
+<v Ben Milne>comes to payments infrastructure. And I absolutely love working with that guy. I think the world of
+
+327
+00:24:57.040 --> 00:25:01.840
+<v Ben Milne>his approach. And I also think he has a way of thinking about solving problems that I always
+
+328
+00:25:01.840 --> 00:25:06.700
+<v Ben Milne>learned something from him when we talk about how we're going to solution something. I find a lot of
+
+329
+00:25:06.700 --> 00:25:11.060
+<v Ben Milne>value in that because it's a working partnership. I find a lot more value in those working
+
+330
+00:25:11.060 --> 00:25:16.120
+<v Ben Milne>partnerships right now in my life than I think I do some of the blogs that five years ago I probably
+
+331
+00:25:16.120 --> 00:25:20.240
+<v Ben Milne>would have answered with that I'm just having a good time learning from the team right now.
+
+332
+00:25:20.440 --> 00:25:21.040
+<v Noah Labhart>So if
+
+333
+00:25:21.040 --> 00:25:23.840
+<v Noah Labhart>you could go back to the beginning, what would you do differently?
+
+334
+00:25:24.760 --> 00:25:29.500
+<v Ben Milne>Without being overly cliche and sort of using the, you know, everything's easy in hindsight,
+
+335
+00:25:29.500 --> 00:25:34.520
+<v Ben Milne>site, I was trying to think, how would we have gotten here without making the same mistakes?
+
+336
+00:25:35.940 --> 00:25:43.320
+<v Ben Milne>We've gone our own way on so many different topics. I don't know how we would have got here
+
+337
+00:25:43.320 --> 00:25:48.000
+<v Ben Milne>without making all those mistakes. The one that I pointed out regarding going direct to the banks,
+
+338
+00:25:48.140 --> 00:25:54.140
+<v Ben Milne>it could have been great. It just wasn't. And it didn't work out the way we thought it would.
+
+339
+00:25:54.760 --> 00:26:16.020
+<v Ben Milne>Had we built the technology for them to implement directly into us, it could have worked, but maybe we would have run into the same problems. I don't actually know. By the time we sort of flipped the model in its head, we'd actually contributed to the Federal Reserve Faster Payments Task Force. We've earned credibility through building central services with the Gates Foundation, Mojaloop Project.
+
+340
+00:26:16.020 --> 00:26:29.840
+<v Ben Milne>You know, we earned a little bit more street cred to be taken seriously on scalable ledger projects. And we didn't have that when we started doing this stuff directly with the banks. So I struggle with this one a little bit.
+
+341
+00:26:29.840 --> 00:26:37.000
+<v Ben Milne>it. I, I'm glad. And one thing that I know I wouldn't change is a desire to get our product
+
+342
+00:26:37.000 --> 00:26:42.740
+<v Ben Milne>in the hands of people that use it and being receptive to feedback because sometimes it
+
+343
+00:26:42.740 --> 00:26:46.780
+<v Ben Milne>doesn't work the way that we want it to. And people having the confidence to say,
+
+344
+00:26:46.880 --> 00:26:51.180
+<v Ben Milne>ah, I don't like this very much. Have you thought about doing this way? Provides
+
+345
+00:26:51.920 --> 00:26:57.400
+<v Ben Milne>honestly ideas and insights that we independently didn't have. And I'm hopeful that we're going to
+
+346
+00:26:57.400 --> 00:26:57.900
+<v Ben Milne>to continue that.
+
+347
+00:26:58.280 --> 00:27:02.380
+<v Noah Labhart>What advice would you give someone just getting started down this road,
+
+348
+00:27:02.560 --> 00:27:07.900
+<v Noah Labhart>either a startup or someone with an idea to solve a big problem? What advice would you give them?
+
+349
+00:27:08.240 --> 00:27:14.400
+<v Ben Milne>Find people who lift you up. It's a long game that we're all playing and it's not always simple.
+
+350
+00:27:15.420 --> 00:27:20.580
+<v Ben Milne>You learn not to take certain things personally, but something that certainly I think helps
+
+351
+00:27:20.580 --> 00:27:25.740
+<v Ben Milne>throughout the years is finding and surrounding yourself with people who continue to help you
+
+352
+00:27:27.420 --> 00:27:33.280
+<v Ben Milne>up. And if you make a conscious decision to, or if you don't make a conscious decision to
+
+353
+00:27:33.280 --> 00:27:38.880
+<v Ben Milne>surround yourself with people that support and want to help, I think it could feel
+
+354
+00:27:39.660 --> 00:27:45.880
+<v Ben Milne>overwhelming to say the least. Don't underestimate how much the people around you are going to help
+
+355
+00:27:45.880 --> 00:27:50.440
+<v Ben Milne>you. And, you know, don't be afraid to show them gratitude when they do.
+
+356
+00:27:50.840 --> 00:27:55.280
+<v Noah Labhart>Well, Ben, thank you for being on the podcast today. Thank you for your time and telling the
+
+357
+00:27:55.280 --> 00:27:57.020
+<v Noah Labhart>creation story of Dwolla.
+
+358
+00:27:57.400 --> 00:28:00.180
+<v Ben Milne>Yeah, thanks for having me. I appreciate it. Super cool.
+
+359
+00:28:01.140 --> 00:28:04.140
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+360
+00:28:06.940 --> 00:28:15.060
+<v Noah Labhart>Code Story is a production of TouchTap LLC and is hosted and produced by Noah Labhart and edited by George Mocharko.
+
+361
+00:28:15.940 --> 00:28:20.960
+<v Noah Labhart>Special thanks to Deanna Chapman and Stephanie Campisi for their promotional support.
+
+362
+00:28:20.960 --> 00:28:28.020
+<v Noah Labhart>Be sure to subscribe on iTunes, Google Play, Breaker, or the podcasting app of your choice.
+
+363
+00:28:28.560 --> 00:28:36.100
+<v Noah Labhart>Make sure to check us out at CodeStory.co or follow us on Facebook, Instagram, Twitter, or LinkedIn.

@@ -1,0 +1,2735 @@
+WEBVTT
+
+NOTE S6 E21: The Code-First Data Stack: Bringing DevOps Best Practices to Data Pipelines with Douwe Maan of Meltano
+
+1
+00:00:00.000 --> 00:00:08.360
+<v Douwe Maan>Most of these SaaS EL solutions only get up into the maybe 100, maybe 150 different sources and destinations they can support.
+
+2
+00:00:08.980 --> 00:00:13.420
+<v Douwe Maan>So the library that Meltano supports is already by far the largest out there in the ecosystem.
+
+3
+00:00:14.180 --> 00:00:20.340
+<v Douwe Maan>But we had far broader aspirations than just bringing DevOps to EL.
+
+4
+00:00:20.520 --> 00:00:23.120
+<v Douwe Maan>We wanted to bring DevOps to the entire data lifecycle.
+
+5
+00:00:23.120 --> 00:00:28.660
+<v Douwe Maan>cycle. So we knew that our vision wouldn't be complete until we found a way to also fit in
+
+6
+00:00:28.660 --> 00:00:33.280
+<v Douwe Maan>everything else that a data team does and everything else that data people would want
+
+7
+00:00:33.280 --> 00:00:40.240
+<v Douwe Maan>to collaborate on and get all of these best practices benefits. My name is Douwe Maan
+
+8
+00:00:40.240 --> 00:00:42.160
+<v Douwe Maan>and I'm the founder and CEO of Meltano.
+
+9
+00:00:47.440 --> 00:00:52.880
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+10
+00:00:52.880 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+11
+00:00:57.100 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+12
+00:01:02.220 --> 00:01:08.040
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Douwe Maan built all the tools you will ever need
+
+13
+00:01:08.040 --> 00:01:11.360
+<v Noah Labhart>to manage all the data tools in your stack.
+
+14
+00:01:13.260 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:20.080 --> 00:01:24.620
+<v Noah Labhart>Douwe Maan started programming when he was nine years old and grew up with his dad pushing Linux
+
+16
+00:01:24.620 --> 00:01:28.840
+<v Noah Labhart>on him over Windows. He was raised in the Netherlands outside of Amsterdam. How he
+
+17
+00:01:28.840 --> 00:01:33.120
+<v Noah Labhart>recharges outside of technology is traveling to new places. Prior to his current venture,
+
+18
+00:01:33.240 --> 00:01:38.280
+<v Noah Labhart>he joined as employee number 10 to GitLab. The company is the largest all-remote company which
+
+19
+00:01:38.280 --> 00:01:42.160
+<v Noah Labhart>allowed for him to be a digital nomad, which roundabout led him to meet
+
+20
+00:01:42.160 --> 00:01:44.580
+<v Noah Labhart>to meet his wife, get married, and live in Mexico City.
+
+21
+00:01:45.140 --> 00:01:48.080
+<v Noah Labhart>Since 2018, there was a team inside of GitLab
+
+22
+00:01:48.080 --> 00:01:50.720
+<v Noah Labhart>working on a project to bring the same principles
+
+23
+00:01:50.720 --> 00:01:52.660
+<v Noah Labhart>and methodologies from software development
+
+24
+00:01:53.220 --> 00:01:55.880
+<v Noah Labhart>into designing and maintaining data architecture.
+
+25
+00:01:56.360 --> 00:01:57.720
+<v Noah Labhart>Through some changes in GitLab,
+
+26
+00:01:57.920 --> 00:02:00.340
+<v Noah Labhart>he was tasked to lead the team of reviving the project,
+
+27
+00:02:00.500 --> 00:02:03.220
+<v Noah Labhart>which eventually led to it becoming its own thing.
+
+28
+00:02:04.720 --> 00:02:07.320
+<v Noah Labhart>This is the creation story of Meltano.
+
+29
+00:02:13.500 --> 00:02:19.160
+<v Douwe Maan>So Meltano, in terms of the tagline, it is the open source data ops operating system.
+
+30
+00:02:19.360 --> 00:02:25.460
+<v Douwe Maan>And what it does in sort of high level terms is bridging the worlds of DevOps and the data
+
+31
+00:02:25.460 --> 00:02:30.440
+<v Douwe Maan>lifecycle and the modern data stack to bring all of the advantages of software development
+
+32
+00:02:30.440 --> 00:02:35.180
+<v Douwe Maan>best practices that allow software development teams to work together effectively and iterate
+
+33
+00:02:35.180 --> 00:02:39.220
+<v Douwe Maan>rapidly and have really high confidence in the output of their work, bring all of that
+
+34
+00:02:39.220 --> 00:02:43.020
+<v Douwe Maan>that stuff to the work that data teams are doing as they are pulling data from various
+
+35
+00:02:43.020 --> 00:02:48.340
+<v Douwe Maan>sources, transforming it, preparing it for analysis, and then running their dashboards
+
+36
+00:02:48.340 --> 00:02:53.560
+<v Douwe Maan>or data science and now AI workloads against it, which is currently something that for
+
+37
+00:02:53.560 --> 00:02:57.300
+<v Douwe Maan>many teams takes place across a number of different applications that all do one thing
+
+38
+00:02:57.300 --> 00:03:02.780
+<v Douwe Maan>really well. But you have to log into one interface to set up the data extraction, another
+
+39
+00:03:02.780 --> 00:03:06.480
+<v Douwe Maan>interface to manage the transformation, and there's a whole different tool where you set
+
+40
+00:03:06.480 --> 00:03:11.160
+<v Douwe Maan>set up your dashboard. And we think that that entire flow can be made all the more effective
+
+41
+00:03:11.160 --> 00:03:15.400
+<v Douwe Maan>and efficient and data teams all the more successful because of it by adopting some of
+
+42
+00:03:15.400 --> 00:03:20.120
+<v Douwe Maan>those software development best practices like version control and code review and automatic
+
+43
+00:03:20.120 --> 00:03:25.800
+<v Douwe Maan>end-to-end testing so that people that build data platforms and that build this critical asset to
+
+44
+00:03:25.800 --> 00:03:31.360
+<v Douwe Maan>the organization's success can do so in a way that doesn't get in their way when they're trying to
+
+45
+00:03:31.360 --> 00:03:33.120
+<v Douwe Maan>to rapidly iterate and try stuff out.
+
+46
+00:03:33.380 --> 00:03:36.140
+<v Douwe Maan>Essentially, we allow teams to iterate quickly
+
+47
+00:03:36.140 --> 00:03:38.580
+<v Douwe Maan>on their data platform without any fear
+
+48
+00:03:38.580 --> 00:03:40.580
+<v Douwe Maan>of accidentally breaking a dashboard in production
+
+49
+00:03:40.580 --> 00:03:43.220
+<v Douwe Maan>by allowing them to adopt some
+
+50
+00:03:43.220 --> 00:03:44.880
+<v Douwe Maan>of this software development best practices
+
+51
+00:03:44.880 --> 00:03:48.620
+<v Douwe Maan>and treat the data platform like any other software project.
+
+52
+00:03:49.000 --> 00:03:50.760
+<v Douwe Maan>If you go to the Meltano website today,
+
+53
+00:03:50.880 --> 00:03:52.860
+<v Douwe Maan>you'll find that the product is open source and free,
+
+54
+00:03:53.060 --> 00:03:55.120
+<v Douwe Maan>and it is the best possible way
+
+55
+00:03:55.120 --> 00:03:57.460
+<v Douwe Maan>to either design a modern data stack
+
+56
+00:03:57.460 --> 00:03:58.560
+<v Douwe Maan>if you're starting from scratch,
+
+57
+00:03:58.700 --> 00:04:01.160
+<v Douwe Maan>but also to make your existing modern data stack
+
+58
+00:04:01.360 --> 00:04:06.920
+<v Douwe Maan>more manageable and to make it less fragile by bringing in this new layer that can essentially
+
+59
+00:04:06.920 --> 00:04:14.520
+<v Douwe Maan>be a control plane for the entire data platform. How this ties back to GitLab is that GitLab is
+
+60
+00:04:14.520 --> 00:04:21.120
+<v Douwe Maan>a company that built the leading open source DevOps platform. So it's a software product
+
+61
+00:04:21.120 --> 00:04:26.100
+<v Douwe Maan>that software development teams use in order to develop software. So that sounds very meta,
+
+62
+00:04:26.200 --> 00:04:30.820
+<v Douwe Maan>and that's because it is. It's very much a product built by its users for its users,
+
+63
+00:04:31.360 --> 00:04:35.380
+<v Douwe Maan>software developers coming together to build the tool they want to use to build better
+
+64
+00:04:35.380 --> 00:04:35.880
+<v Douwe Maan>software.
+
+65
+00:04:36.420 --> 00:04:42.120
+<v Douwe Maan>The data team at GitLab back in 2018 realized that a lot of these qualities that we have
+
+66
+00:04:42.120 --> 00:04:46.520
+<v Douwe Maan>come to take for granted around CI CD and version control and code review could similarly
+
+67
+00:04:46.520 --> 00:04:50.820
+<v Douwe Maan>benefit data teams in the way they're doing building their data platform and evolving
+
+68
+00:04:50.820 --> 00:04:51.600
+<v Douwe Maan>it every day.
+
+69
+00:04:51.700 --> 00:04:56.640
+<v Douwe Maan>But the data tools that they found in 2018 very much weren't built with those things
+
+70
+00:04:56.640 --> 00:04:57.360
+<v Douwe Maan>in mind.
+
+71
+00:04:58.000 --> 00:05:04.640
+<v Douwe Maan>GitLab realized a massive opportunity to build the data tooling, build along the lines of software developer tooling,
+
+72
+00:05:04.820 --> 00:05:11.200
+<v Douwe Maan>allowing you to manage your pipelines in the repository and have end-to-end testing so that you are warned of any typos before.
+
+73
+00:05:11.600 --> 00:05:16.940
+<v Douwe Maan>This is live in production and it's about to blow up in your CFO's face when he's about to present to the board.
+
+74
+00:05:17.240 --> 00:05:20.340
+<v Douwe Maan>Since 2018, there was a team inside GitLab working on this project.
+
+75
+00:05:20.340 --> 00:05:35.820
+<v Douwe Maan>By the time it had grown to about 1400 in 2019, I was really starting to feel an itch to go back to the early startup days where you can really see the impact of every hour and every customer user interaction, every issue you file for a cool new feature.
+
+76
+00:05:36.080 --> 00:05:40.580
+<v Douwe Maan>The distance between the work you do every day and the real impact in people's lives is much shorter.
+
+77
+00:05:40.700 --> 00:05:41.860
+<v Douwe Maan>And I was very much craving that again.
+
+78
+00:05:41.860 --> 00:05:46.540
+<v Douwe Maan>So I got this opportunity to join the internal Meltano project at GitLab.
+
+79
+00:05:46.660 --> 00:05:52.560
+<v Douwe Maan>Originally as its engineering lead by 2020 because of some organizational changes on the project,
+
+80
+00:05:52.760 --> 00:06:00.360
+<v Douwe Maan>I was left by myself as general manager, essentially with a goal of turning the Meltano project around over the course of 2020
+
+81
+00:06:00.360 --> 00:06:09.720
+<v Douwe Maan>and really finding that audience and that traction and that community that we knew was out there for this DevOps-flavored data tooling that we had envisioned.
+
+82
+00:06:09.720 --> 00:06:15.640
+<v Douwe Maan>envision. I managed to find out what the users really wanted to make this something that they
+
+83
+00:06:15.640 --> 00:06:21.200
+<v Douwe Maan>could actually adopt quickly and start getting value out of right away. So by making it focus
+
+84
+00:06:21.200 --> 00:06:26.380
+<v Douwe Maan>narrower over the course of 2020, we were able to build our Slack community into the several hundreds,
+
+85
+00:06:26.520 --> 00:06:32.800
+<v Douwe Maan>which led to us spinning out of GitLab officially about a year ago with a seed investment from GV,
+
+86
+00:06:32.980 --> 00:06:38.680
+<v Douwe Maan>formerly known as Google Ventures. And that's how I became the founder and CEO of Meltano.
+
+87
+00:06:39.720 --> 00:06:48.820
+<v Douwe Maan>We've been working with a team that now counts 14 people and a Slack community that is just about to hit 2,300 people across the data industry.
+
+88
+00:06:49.320 --> 00:06:57.860
+<v Douwe Maan>And we've come together to realize this vision we have for a data ops operating system that can form the foundation of every team's ideal data stack.
+
+89
+00:06:59.400 --> 00:07:07.000
+<v Noah Labhart>Tell me about the MVP for Meltano and how long it took to build and what sort of tools were used to bring it to life.
+
+90
+00:07:07.000 --> 00:07:11.120
+<v Noah Labhart>And maybe that's in GitLab or maybe that's in After, but you decide where you want to take it.
+
+91
+00:07:11.180 --> 00:07:11.960
+<v Noah Labhart>But tell me about that MVP.
+
+92
+00:07:13.040 --> 00:07:18.220
+<v Douwe Maan>A couple of things are a little different here because the project had already been around for a year and a half before I even joined.
+
+93
+00:07:18.900 --> 00:07:28.400
+<v Douwe Maan>In retrospect, and this is also one of the things that led to me taking over the project in 2020, having to sort of turn it around, is that we started off fighting off more than we could chew.
+
+94
+00:07:28.400 --> 00:07:34.680
+<v Douwe Maan>And some of this was inherent to the broad vision and lofty goal we had set for ourselves.
+
+95
+00:07:34.900 --> 00:07:42.520
+<v Douwe Maan>Because the data lifecycle, taking data out of various systems, transforming it, performing some kind of analysis on it or further processing,
+
+96
+00:07:42.640 --> 00:07:48.200
+<v Douwe Maan>is a lifecycle where for every step of the way, there are a number of really great competing solutions.
+
+97
+00:07:48.700 --> 00:07:51.900
+<v Douwe Maan>We want teams to be able to approach it like a software development project.
+
+98
+00:07:51.900 --> 00:08:00.420
+<v Douwe Maan>So we should just rebuild an entire data platform, end-to-end data platform, that does everything from integration to analytics in one place.
+
+99
+00:08:00.640 --> 00:08:06.860
+<v Douwe Maan>But what we realized pretty quickly is that everyone understood the need for sort of the future we were sketching.
+
+100
+00:08:06.980 --> 00:08:13.180
+<v Douwe Maan>But getting there by saying like, well, this is the repo, you can clone it and try it out locally.
+
+101
+00:08:13.380 --> 00:08:18.380
+<v Douwe Maan>It kind of expects you to throw away any data stack you have today and start using this instead of everything else.
+
+102
+00:08:18.380 --> 00:08:24.180
+<v Douwe Maan>That was the initial product, but it already doesn't sound very minimal or really even viable
+
+103
+00:08:24.180 --> 00:08:27.500
+<v Douwe Maan>because there would be a lot of ground to cover before this is really something that organizations
+
+104
+00:08:27.500 --> 00:08:33.320
+<v Douwe Maan>could start depending on for all of their data needs. So the MVP was a little bit based on our
+
+105
+00:08:33.320 --> 00:08:37.560
+<v Douwe Maan>own conviction that this thing needs to exist. Let's just start building it, and then the user
+
+106
+00:08:37.560 --> 00:08:43.300
+<v Douwe Maan>contribution will follow. And we found out over the course of 2018, 2019 that it wasn't that simple. We
+
+107
+00:08:43.300 --> 00:08:47.480
+<v Douwe Maan>needed to start with something a little bit smaller in focus something that could be adopted
+
+108
+00:08:48.380 --> 00:08:53.320
+<v Douwe Maan>data stack that would still give people the taste of what data tools could be like if they are built
+
+109
+00:08:53.320 --> 00:08:58.500
+<v Douwe Maan>similar to software development tools, but make it so that they can start simple and then crave
+
+110
+00:08:58.500 --> 00:09:03.100
+<v Douwe Maan>more and be motivated to actually slowly start swapping out more and more of their data platform
+
+111
+00:09:03.100 --> 00:09:07.720
+<v Douwe Maan>for this Meltano managed approach, instead of requiring it to be kind of an all or nothing
+
+112
+00:09:07.720 --> 00:09:12.620
+<v Douwe Maan>adoption story. By talking through some of the people in the community, what I realized is that
+
+113
+00:09:12.620 --> 00:09:18.980
+<v Douwe Maan>the most valuable thing we had built in Meltano at the time was on the side of ELT, extract, load,
+
+114
+00:09:19.080 --> 00:09:25.140
+<v Douwe Maan>transform. It was this wrapper around an open source technology called Singer and another open
+
+115
+00:09:25.140 --> 00:09:30.580
+<v Douwe Maan>source technology called dbt. And we had in Meltano adopted this technology to fulfill the
+
+116
+00:09:30.580 --> 00:09:35.240
+<v Douwe Maan>role of data integration within the end-to-end data platform. But it turned out that what people
+
+117
+00:09:35.240 --> 00:09:39.920
+<v Douwe Maan>really wanted in the short term was only those bits that made those Singer connectors actually
+
+118
+00:09:39.920 --> 00:09:44.540
+<v Douwe Maan>work really well together and in combination with dbt, which is this transformation tool.
+
+119
+00:09:45.340 --> 00:09:51.080
+<v Douwe Maan>In some sense, the minimum viable product, which it turned out to only be about, you know, 25 or 30
+
+120
+00:09:51.080 --> 00:09:57.180
+<v Douwe Maan>of the entire code base we had written was in that glue code around singer that showed people that
+
+121
+00:09:57.180 --> 00:10:01.620
+<v Douwe Maan>you can take some existing open source technologies from the data space make them better than the sum
+
+122
+00:10:01.620 --> 00:10:07.700
+<v Douwe Maan>of their parts by allowing them to live together in a repository have users use a cli to manage the
+
+123
+00:10:07.700 --> 00:10:14.000
+<v Douwe Maan>configuration and scheduling the pipelines. In other words, an ELT tool built as a software
+
+124
+00:10:14.000 --> 00:10:15.380
+<v Douwe Maan>developer would expect it to work.
+
+125
+00:10:15.900 --> 00:10:19.720
+<v Noah Labhart>You mentioned this, you know, the decision and, you know,
+
+126
+00:10:19.720 --> 00:10:25.620
+<v Noah Labhart>so to speak, maybe trade-off of having to cut part of the product or not focus on part of the
+
+127
+00:10:25.620 --> 00:10:31.980
+<v Noah Labhart>product and really key in on that, the singer part. Tell me about how you worked through that
+
+128
+00:10:31.980 --> 00:10:36.740
+<v Noah Labhart>decision and really how you coped with that decision. Because there's probably a lot of
+
+129
+00:10:37.700 --> 00:10:42.660
+<v Noah Labhart>to a team of why you need to go forward with just that part of the product.
+
+130
+00:10:42.740 --> 00:10:45.560
+<v Noah Labhart>So tell me about that and how you went with that, how you coped with that decision.
+
+131
+00:10:47.200 --> 00:10:51.180
+<v Douwe Maan>Well, one part of what you're describing as the challenge, like how to get your team on board,
+
+132
+00:10:51.320 --> 00:10:57.380
+<v Douwe Maan>had been made irrelevant because the team size got cut down from six to one, leaving just me.
+
+133
+00:10:57.520 --> 00:10:59.520
+<v Douwe Maan>So there was really no one to convince.
+
+134
+00:11:00.580 --> 00:11:04.680
+<v Douwe Maan>Really, you know, we had reached this point where it was clear that the year and a half or so
+
+135
+00:11:04.680 --> 00:11:06.480
+<v Douwe Maan>and had been put into Meltano up to that point,
+
+136
+00:11:07.000 --> 00:11:09.480
+<v Douwe Maan>wasn't really yielding the type of attraction
+
+137
+00:11:10.060 --> 00:11:12.400
+<v Douwe Maan>and usage and contributions that we needed.
+
+138
+00:11:12.540 --> 00:11:14.140
+<v Douwe Maan>So it was clear to everyone involved
+
+139
+00:11:14.140 --> 00:11:16.080
+<v Douwe Maan>that it was time for a change,
+
+140
+00:11:16.280 --> 00:11:18.120
+<v Douwe Maan>which also made it sort of easy for me
+
+141
+00:11:18.120 --> 00:11:21.200
+<v Douwe Maan>to not hold on to anything that already was
+
+142
+00:11:21.200 --> 00:11:24.180
+<v Douwe Maan>and really feel like all routes were open to me
+
+143
+00:11:24.180 --> 00:11:25.420
+<v Douwe Maan>because clearly the current path
+
+144
+00:11:25.420 --> 00:11:26.780
+<v Douwe Maan>isn't getting us where we need to get.
+
+145
+00:11:27.000 --> 00:11:29.160
+<v Douwe Maan>So let's just try something and see if it works.
+
+146
+00:11:29.520 --> 00:11:31.220
+<v Douwe Maan>And it helped if the few people
+
+147
+00:11:31.220 --> 00:11:32.580
+<v Douwe Maan>that we had attracted to the community
+
+148
+00:11:32.580 --> 00:11:36.740
+<v Douwe Maan>had actually found us for that singer side of the story.
+
+149
+00:11:36.900 --> 00:11:39.140
+<v Douwe Maan>So we didn't even have to convince our users
+
+150
+00:11:39.140 --> 00:11:41.420
+<v Douwe Maan>because the users were effectively already there
+
+151
+00:11:41.420 --> 00:11:42.280
+<v Douwe Maan>for this new vision.
+
+152
+00:11:42.680 --> 00:11:45.900
+<v Douwe Maan>And it was really a matter just of me going into the website
+
+153
+00:11:45.900 --> 00:11:49.400
+<v Douwe Maan>and changing the positioning to put more emphasis
+
+154
+00:11:49.400 --> 00:11:52.100
+<v Douwe Maan>on the EL extract and load side of the story
+
+155
+00:11:52.100 --> 00:11:55.600
+<v Douwe Maan>and the singer integration away from the end-to-end aspect
+
+156
+00:11:55.600 --> 00:11:59.300
+<v Douwe Maan>and this little BI solution business intelligence tool
+
+157
+00:11:59.300 --> 00:12:00.480
+<v Douwe Maan>that we had built into the product
+
+158
+00:12:00.480 --> 00:12:02.440
+<v Douwe Maan>without even touching the product itself.
+
+159
+00:12:02.720 --> 00:12:04.680
+<v Douwe Maan>It was just a matter of changing the framing on the website.
+
+160
+00:12:04.900 --> 00:12:06.540
+<v Douwe Maan>And honestly, that's also the kind of thing
+
+161
+00:12:06.540 --> 00:12:10.420
+<v Douwe Maan>that made it just a really easy change to try.
+
+162
+00:12:10.640 --> 00:12:13.380
+<v Douwe Maan>And in a different world, we would have A-B tested this.
+
+163
+00:12:13.720 --> 00:12:15.880
+<v Douwe Maan>As it happened, we were right on the money
+
+164
+00:12:15.880 --> 00:12:17.140
+<v Douwe Maan>and that's exactly what people needed.
+
+165
+00:12:17.520 --> 00:12:19.400
+<v Douwe Maan>And after that change was made,
+
+166
+00:12:19.520 --> 00:12:21.480
+<v Douwe Maan>all of our numbers started going very nicely
+
+167
+00:12:21.480 --> 00:12:23.220
+<v Douwe Maan>up and to the right throughout all of 2020.
+
+168
+00:12:23.480 --> 00:12:25.720
+<v Douwe Maan>And then in early 2021, like I mentioned earlier,
+
+169
+00:12:25.900 --> 00:12:27.740
+<v Douwe Maan>we'd reached a point where GitLab had enough confidence
+
+170
+00:12:27.740 --> 00:12:29.620
+<v Douwe Maan>in the project for me to bring some more people
+
+171
+00:12:30.660 --> 00:12:41.100
+<v Douwe Maan>So we brought on GitLab's data lead, Taylor Murphy, as our head of product and data, and one of the most kind of prolific community contributors, AJ Steers, as head of engineering.
+
+172
+00:12:41.460 --> 00:12:44.420
+<v Douwe Maan>And then we spun out and, you know, we were able to kind of keep running with it.
+
+173
+00:12:46.080 --> 00:12:56.140
+<v Noah Labhart>Okay, so from that point, you've progressed the product, you've trimmed it down, you got your MVP, people are getting what they needed, and you're going up and to the right.
+
+174
+00:12:56.140 --> 00:12:58.800
+<v Noah Labhart>How did you progress the product from there?
+
+175
+00:12:58.900 --> 00:13:00.040
+<v Noah Labhart>And how have you matured it?
+
+176
+00:13:00.140 --> 00:13:07.940
+<v Noah Labhart>And I think I'm curious how you go about building your roadmap and deciding, okay, this is the next most important thing to build.
+
+177
+00:13:09.240 --> 00:13:13.880
+<v Douwe Maan>In 2020, we narrowed the focus to only this EL part of the equation.
+
+178
+00:13:13.980 --> 00:13:24.160
+<v Douwe Maan>And we saw that there was a really big demand in the market for an EL tool with a large open source library of connectors that would make it really easy for people to add support for new sources and destinations.
+
+179
+00:13:26.140 --> 00:13:30.980
+<v Douwe Maan>tool that would treat its users like developers and that would allow them to version control their
+
+180
+00:13:30.980 --> 00:13:36.640
+<v Douwe Maan>pipeline. And this is also the thesis and the vision that we raised our series seed on,
+
+181
+00:13:36.780 --> 00:13:42.280
+<v Douwe Maan>because we realized that the Singer ecosystem needed a lot more love than it had perceived
+
+182
+00:13:42.280 --> 00:13:48.400
+<v Douwe Maan>up to that point. And while we were doing sort of a nice first step in providing a better tool
+
+183
+00:13:48.400 --> 00:13:53.800
+<v Douwe Maan>to run these Singer-powered connectors, there was also demand for, on the one hand, better tooling
+
+184
+00:13:53.800 --> 00:13:57.820
+<v Douwe Maan>for building Singer connectors and for discovering Singer connectors.
+
+185
+00:13:58.180 --> 00:14:00.340
+<v Douwe Maan>What we built in terms of roadmap at the time,
+
+186
+00:14:00.380 --> 00:14:03.040
+<v Douwe Maan>just trying to figure out, okay, how do we make Singer and Meltano
+
+187
+00:14:03.040 --> 00:14:05.220
+<v Douwe Maan>a really compelling solution for all of those teams
+
+188
+00:14:05.220 --> 00:14:06.420
+<v Douwe Maan>that are looking for an EL solution
+
+189
+00:14:06.420 --> 00:14:09.700
+<v Douwe Maan>built along these software development tooling lines,
+
+190
+00:14:09.940 --> 00:14:13.940
+<v Douwe Maan>is, okay, just building this EL tool in Meltano is not enough.
+
+191
+00:14:14.020 --> 00:14:15.080
+<v Douwe Maan>We have to invest in the ecosystem.
+
+192
+00:14:15.360 --> 00:14:18.700
+<v Douwe Maan>So we built the Meltano SDK for Singer taps and targets,
+
+193
+00:14:18.860 --> 00:14:21.560
+<v Douwe Maan>which makes it easier than ever to build new connectors
+
+194
+00:14:21.560 --> 00:14:24.660
+<v Douwe Maan>and many of the existing connectors that existed before we came around
+
+195
+00:14:24.660 --> 00:14:26.340
+<v Douwe Maan>have also been ported over to it.
+
+196
+00:14:26.680 --> 00:14:29.340
+<v Douwe Maan>And then we built Meltano Hub for Singer,
+
+197
+00:14:29.520 --> 00:14:32.060
+<v Douwe Maan>which is the kind of single source of truth,
+
+198
+00:14:32.160 --> 00:14:35.800
+<v Douwe Maan>single centralized catalog of all of the connectors,
+
+199
+00:14:36.020 --> 00:14:38.720
+<v Douwe Maan>all 300 plus of them in the Singer ecosystem.
+
+200
+00:14:38.880 --> 00:14:43.280
+<v Douwe Maan>Most of these sort of SaaS EL solutions only get up into the maybe 100,
+
+201
+00:14:43.540 --> 00:14:46.480
+<v Douwe Maan>maybe 150 different sources and destinations they can support.
+
+202
+00:14:46.740 --> 00:14:49.700
+<v Douwe Maan>So the library that Meltano supports is already by far
+
+203
+00:14:49.700 --> 00:14:51.040
+<v Douwe Maan>the largest out there in the ecosystem.
+
+204
+00:14:51.880 --> 00:14:57.960
+<v Douwe Maan>But we had far broader aspirations than just bringing DevOps to EL.
+
+205
+00:14:58.160 --> 00:15:00.740
+<v Douwe Maan>We wanted to bring DevOps to the entire data lifecycle.
+
+206
+00:15:01.100 --> 00:15:06.900
+<v Douwe Maan>So we knew that our vision wouldn't be complete until we found a way to also fit in everything
+
+207
+00:15:06.900 --> 00:15:10.960
+<v Douwe Maan>else that a data team does and everything else that data people would want to collaborate
+
+208
+00:15:10.960 --> 00:15:14.160
+<v Douwe Maan>on and get all of these DevOps best practices benefits.
+
+209
+00:15:14.580 --> 00:15:19.240
+<v Douwe Maan>So the product roadmap by the time that we had spun out of GitLab and sort of proved
+
+210
+00:15:19.240 --> 00:15:23.120
+<v Douwe Maan>to the world that there was a ton of value here and that we could actually pull it off, we
+
+211
+00:15:23.640 --> 00:15:29.020
+<v Douwe Maan>broadened our vision and started including more aspects of the data lifecycle. To start with
+
+212
+00:15:29.020 --> 00:15:33.880
+<v Douwe Maan>really strong support for transformation, which is the step that typically follows EL,
+
+213
+00:15:34.160 --> 00:15:40.780
+<v Douwe Maan>where our support for the dbt transformation tool is increasing. Finally, also adding support for
+
+214
+00:15:40.780 --> 00:15:46.820
+<v Douwe Maan>BI on top of Meltano. There are a number of open source BI solutions like Superset, Metabase,
+
+215
+00:15:46.820 --> 00:15:48.340
+<v Douwe Maan>and more recently Lightdash
+
+216
+00:15:48.340 --> 00:15:50.100
+<v Douwe Maan>that are also starting to embrace
+
+217
+00:15:50.100 --> 00:15:52.020
+<v Douwe Maan>this version controllable way
+
+218
+00:15:52.020 --> 00:15:53.400
+<v Douwe Maan>of thinking about your dashboards
+
+219
+00:15:53.400 --> 00:15:55.960
+<v Douwe Maan>and allowing them to be taken through code review
+
+220
+00:15:55.960 --> 00:15:57.900
+<v Douwe Maan>instead of all of these changes
+
+221
+00:15:57.900 --> 00:15:58.960
+<v Douwe Maan>just happening in a UI
+
+222
+00:15:58.960 --> 00:16:01.500
+<v Douwe Maan>where one button click on the save button
+
+223
+00:16:01.500 --> 00:16:02.800
+<v Douwe Maan>automatically takes it into production.
+
+224
+00:16:03.260 --> 00:16:05.920
+<v Douwe Maan>We realized that what we had built with Meltano for EL
+
+225
+00:16:05.920 --> 00:16:09.280
+<v Douwe Maan>wasn't so much a tool that is an EL tool
+
+226
+00:16:09.280 --> 00:16:11.300
+<v Douwe Maan>and happens to use Singer to do it,
+
+227
+00:16:11.340 --> 00:16:13.420
+<v Douwe Maan>but rather we are a fundamental layer
+
+228
+00:16:13.420 --> 00:16:15.740
+<v Douwe Maan>that brings together different open source technologies,
+
+229
+00:16:16.820 --> 00:16:32.860
+<v Douwe Maan>It tracks away a lot of the differences in how they want to be installed, how they want to be configured, how they need to be deployed and integrated together, and allows teams to just start treating their data platform as one, with all of these components being brought in one by one to perform particular capabilities of the data platform.
+
+230
+00:16:33.220 --> 00:16:42.920
+<v Douwe Maan>We started building support for some of these best-in-class open-source solutions that fit really well with this DevOps approach to where we think the data platforms are going.
+
+231
+00:16:42.920 --> 00:16:54.000
+<v Douwe Maan>So that means that the roadmap made itself pretty clear because we needed to expand support for different types of data tools and then also support for different alternatives on each of these categories.
+
+232
+00:16:54.000 --> 00:17:03.040
+<v Douwe Maan>And that's what we've been working on for the last months, after we had spent the first half of the year really building the tools that the Singer ecosystem needed to thrive.
+
+233
+00:17:03.260 --> 00:17:13.780
+<v Douwe Maan>Because our story and our vision relies and very much hinges on the existence of really great open source technologies for every step of the data lifecycle.
+
+234
+00:17:14.420 --> 00:17:20.860
+<v Douwe Maan>Whenever these tools already exist, we adopt them and we embrace them and we make them easier to use from Meltano.
+
+235
+00:17:20.860 --> 00:17:24.500
+<v Douwe Maan>And if these tools don't exist yet, we might step in and make it so.
+
+236
+00:17:24.740 --> 00:17:44.900
+<v Douwe Maan>And if they sort of exist, but they have been a little bit neglected and maybe the community isn't thriving to the extended could, then we are happy to step in and provide that additional support and build those missing bits of tooling in the ecosystem to make sure that all of the components that belong in a modern DevOps-laborated data platform really exist.
+
+237
+00:17:45.640 --> 00:17:46.900
+<v Noah Labhart>So let's switch to team.
+
+238
+00:17:46.900 --> 00:18:02.080
+<v Noah Labhart>And this will be super interesting, right? Because you mentioned, you know, having the team be cut down to just you. And so you essentially had to build it back up. So how did you go about that? And what did you look for in those people to indicate that they were the winning horses to join you?
+
+239
+00:18:02.640 --> 00:18:04.780
+<v Douwe Maan>In a couple of ways, we were very spoiled.
+
+240
+00:18:05.000 --> 00:18:17.140
+<v Douwe Maan>You know, one of them is the fact that we had an open source community where the most enthusiastic, most insightful people kind of, you know, step up by themselves because they are actually motivated by the mission.
+
+241
+00:18:17.240 --> 00:18:21.020
+<v Douwe Maan>And they are so motivated that they will spend time on it without even being paid for it.
+
+242
+00:18:21.020 --> 00:18:35.580
+<v Douwe Maan>So sort of automatically, the first person I was like, okay, we've got to bring this person in was AJ Steers, our now head of engineering, who had been a data ops engineer at Slalom, one of these consulting firms before.
+
+243
+00:18:35.720 --> 00:18:40.740
+<v Douwe Maan>He came across Meltano in his journeys of building a great internal data platform at Slalom.
+
+244
+00:18:40.740 --> 00:18:53.000
+<v Douwe Maan>He started contributing to Meltano and he suggested pretty quickly, pretty early on in 2020, like, hey, Douwe, should we just plan like a monthly meeting and kind of catch up on what we see happening in the open source sort of data upspace?
+
+245
+00:18:53.320 --> 00:19:00.380
+<v Douwe Maan>And those monthly meetings pretty quickly turned into him already feeling like a team member more so than just someone in the community.
+
+246
+00:19:00.500 --> 00:19:03.660
+<v Douwe Maan>And to be clear, no one in the community feels like just a community member.
+
+247
+00:19:03.660 --> 00:19:06.460
+<v Douwe Maan>where we very much think of the community as an extension of our team.
+
+248
+00:19:06.600 --> 00:19:10.800
+<v Douwe Maan>And we think of us as building Meltano in collaboration with all of its users.
+
+249
+00:19:11.120 --> 00:19:13.500
+<v Douwe Maan>But AJ very clearly, very quickly stood out.
+
+250
+00:19:13.580 --> 00:19:15.500
+<v Douwe Maan>So when I needed to bring engineers on board,
+
+251
+00:19:15.700 --> 00:19:17.500
+<v Douwe Maan>he already had a track record of contributions.
+
+252
+00:19:17.900 --> 00:19:22.460
+<v Douwe Maan>He had been really instrumental in coming up with this Meltano SDK,
+
+253
+00:19:23.300 --> 00:19:26.720
+<v Douwe Maan>software development kits kind of vision
+
+254
+00:19:26.720 --> 00:19:28.840
+<v Douwe Maan>that would help the Singer ecosystem thrive.
+
+255
+00:19:28.840 --> 00:19:35.360
+<v Douwe Maan>and it was just a no-brainer to get him to work on that full-time also because he had built similar
+
+256
+00:19:35.360 --> 00:19:40.940
+<v Douwe Maan>stuff for years at slalom at companies where he was working through slalom like starbucks and also
+
+257
+00:19:40.940 --> 00:19:45.860
+<v Douwe Maan>at amazon where he'd worked previously and then the second person i brought on when i was given
+
+258
+00:19:45.860 --> 00:19:50.980
+<v Douwe Maan>the opportunity to do so again by by gitlab allowing me some headcounts was essentially
+
+259
+00:19:50.980 --> 00:19:59.180
+<v Douwe Maan>the very first kind of persona, user, design partner that Meltano had ever had.
+
+260
+00:19:59.480 --> 00:20:03.880
+<v Douwe Maan>Taylor Murphy, the lead and first data engineer of GitLab's data team,
+
+261
+00:20:04.000 --> 00:20:08.140
+<v Douwe Maan>who had been sort of a touchpoint within the GitLab organization
+
+262
+00:20:08.140 --> 00:20:10.400
+<v Douwe Maan>from the day the Meltano team was founded,
+
+263
+00:20:10.480 --> 00:20:13.960
+<v Douwe Maan>because he was very much the person who would need to love Meltano
+
+264
+00:20:13.960 --> 00:20:18.580
+<v Douwe Maan>and use Meltano and kind of make it into his image,
+
+265
+00:20:18.580 --> 00:20:22.180
+<v Douwe Maan>trying to abstract away some of the manual work data leads do
+
+266
+00:20:22.180 --> 00:20:25.080
+<v Douwe Maan>and build better tooling to take over some of that burden.
+
+267
+00:20:25.340 --> 00:20:29.360
+<v Douwe Maan>So bringing him on as our head of product was a no-brainer as well,
+
+268
+00:20:29.480 --> 00:20:31.820
+<v Douwe Maan>in large part because he had done a lot of this work
+
+269
+00:20:31.820 --> 00:20:34.540
+<v Douwe Maan>and he'd been involved with the Meltano project even longer than I had,
+
+270
+00:20:34.680 --> 00:20:37.500
+<v Douwe Maan>but also because Taylor, who some of the listeners today
+
+271
+00:20:37.500 --> 00:20:38.920
+<v Douwe Maan>might know better as Data Bay,
+
+272
+00:20:39.400 --> 00:20:43.000
+<v Douwe Maan>is a little bit of a data thought leader on Twitter.
+
+273
+00:20:43.760 --> 00:20:44.920
+<v Douwe Maan>He has tons of followers.
+
+274
+00:20:45.060 --> 00:20:47.000
+<v Douwe Maan>He's done a lot of writing and talking about
+
+275
+00:20:48.880 --> 00:20:52.800
+<v Douwe Maan>developing and getting him on board with the project, both because of his own knowledge,
+
+276
+00:20:52.900 --> 00:20:57.200
+<v Douwe Maan>but also his connections in space. And just in some sense, the credibility that his attachment
+
+277
+00:20:57.200 --> 00:21:03.080
+<v Douwe Maan>gave to the Meltano project, again, was a total no-brainer. So that's how the team went from one
+
+278
+00:21:03.080 --> 00:21:08.700
+<v Douwe Maan>person to three, just before we spun out of GitLab. And then from that point on, we were once
+
+279
+00:21:08.700 --> 00:21:12.040
+<v Douwe Maan>again lucky enough to have a lot of people in the community who had already proven themselves
+
+280
+00:21:12.040 --> 00:21:17.080
+<v Douwe Maan>through their contributions, had shown that they really cared about this, and were able to speak
+
+281
+00:21:18.580 --> 00:21:19.960
+<v Douwe Maan>and the software engineering language
+
+282
+00:21:19.960 --> 00:21:21.640
+<v Douwe Maan>and work with us to figure out
+
+283
+00:21:21.640 --> 00:21:23.800
+<v Douwe Maan>what emerging of those worlds would look like.
+
+284
+00:21:24.240 --> 00:21:26.240
+<v Douwe Maan>So that's where we got our first few engineers.
+
+285
+00:21:26.620 --> 00:21:28.300
+<v Douwe Maan>And then I was also lucky enough
+
+286
+00:21:28.300 --> 00:21:30.920
+<v Douwe Maan>to be able to reach out to a couple of people
+
+287
+00:21:30.920 --> 00:21:32.260
+<v Douwe Maan>that I had worked with at GitLab
+
+288
+00:21:32.260 --> 00:21:33.560
+<v Douwe Maan>since the early beginning.
+
+289
+00:21:34.800 --> 00:21:37.040
+<v Douwe Maan>And just an example is Emily Kyle,
+
+290
+00:21:37.320 --> 00:21:39.180
+<v Douwe Maan>who was GitLab's very first managing,
+
+291
+00:21:39.400 --> 00:21:40.780
+<v Douwe Maan>rather marketing hire,
+
+292
+00:21:41.340 --> 00:21:44.060
+<v Douwe Maan>who I was able to convince to join me
+
+293
+00:21:44.060 --> 00:21:46.260
+<v Douwe Maan>on this Meltano project as our director of marketing.
+
+294
+00:21:46.260 --> 00:21:51.540
+<v Douwe Maan>thing and she has been absolutely stellar and i had known that through the years that we had
+
+295
+00:21:51.540 --> 00:21:57.060
+<v Douwe Maan>worked together the impact that she had on get lab from the early days and also um the everything i
+
+296
+00:21:57.060 --> 00:22:01.020
+<v Douwe Maan>would get out of that not in the least the fact that she and i had worked together for a long
+
+297
+00:22:01.020 --> 00:22:06.960
+<v Douwe Maan>time so i also knew that she would be maybe more inclined than others to call me out on my shit
+
+298
+00:22:06.960 --> 00:22:10.580
+<v Douwe Maan>whenever that needed happening uh it's good to have people on the team that you also know
+
+299
+00:22:10.580 --> 00:22:14.940
+<v Douwe Maan>are not going to like hold back or be deferential to the CEO,
+
+300
+00:22:15.160 --> 00:22:18.100
+<v Douwe Maan>but are also going to, yeah, call me out when I needed it.
+
+301
+00:22:18.180 --> 00:22:20.040
+<v Douwe Maan>That's been really great to have on board.
+
+302
+00:22:20.440 --> 00:22:22.840
+<v Douwe Maan>And then finally, you know, like I said,
+
+303
+00:22:22.880 --> 00:22:24.440
+<v Douwe Maan>we had two trump cards, the GitLab Association
+
+304
+00:22:24.440 --> 00:22:25.800
+<v Douwe Maan>and then the community.
+
+305
+00:22:26.800 --> 00:22:30.500
+<v Douwe Maan>The Meltano team today has GitLab's first engineering manager.
+
+306
+00:22:30.620 --> 00:22:33.260
+<v Douwe Maan>That's myself, as well as its first data person,
+
+307
+00:22:33.420 --> 00:22:36.660
+<v Douwe Maan>Taylor, marketing person, Emily, community person,
+
+308
+00:22:36.660 --> 00:22:41.880
+<v Douwe Maan>Amanda Folson, first sales, technical salesperson, Rep Baum.
+
+309
+00:22:42.140 --> 00:22:56.920
+<v Douwe Maan>So through my early GitLab kind of connections, we were able to get some of this all-star team together and work on bringing DevOps to yet another industry that we think would benefit tremendously from having these best practices applied to their day-to-day work.
+
+310
+00:22:59.540 --> 00:23:01.400
+<v Noah Labhart>So you took over this solution.
+
+311
+00:23:01.620 --> 00:23:03.220
+<v Noah Labhart>So my next question will be interesting.
+
+312
+00:23:03.220 --> 00:23:08.620
+<v Noah Labhart>It'll be either, you know, it could be a combination, but I'm just going to ask it generically.
+
+313
+00:23:08.780 --> 00:23:11.980
+<v Noah Labhart>Was this built to scale efficiently from day one?
+
+314
+00:23:12.100 --> 00:23:19.040
+<v Noah Labhart>Or are you fighting this as you grow, as you've gone in and changed the product, changed the company?
+
+315
+00:23:19.740 --> 00:23:21.780
+<v Noah Labhart>And are you fighting this as you grow?
+
+316
+00:23:22.340 --> 00:23:30.920
+<v Douwe Maan>From GitLab's perspective, Meltano was set up as an internally incubated startup rather than just another product line.
+
+317
+00:23:30.920 --> 00:23:41.900
+<v Douwe Maan>is because of that realization that a lot of that overhead and skill-informed process definition
+
+318
+00:23:43.140 --> 00:23:48.740
+<v Douwe Maan>serves a larger later-stage company, but actively hurts a startup.
+
+319
+00:23:49.140 --> 00:23:54.480
+<v Douwe Maan>So GitLab realized that in order for Meltano to really be as successful as it could be,
+
+320
+00:23:54.880 --> 00:23:59.460
+<v Douwe Maan>it should start out as an internal startup where everything is different
+
+321
+00:24:00.920 --> 00:24:02.220
+<v Douwe Maan>from the rest of the GitLab organization.
+
+322
+00:24:02.660 --> 00:24:06.060
+<v Douwe Maan>So from day one, we were supposed to be thrifty
+
+323
+00:24:06.060 --> 00:24:08.300
+<v Douwe Maan>and do things that don't scale and just try stuff out
+
+324
+00:24:08.300 --> 00:24:10.000
+<v Douwe Maan>and also be able to change course quickly.
+
+325
+00:24:10.520 --> 00:24:13.800
+<v Douwe Maan>As I described the opportunity I had
+
+326
+00:24:13.800 --> 00:24:15.640
+<v Douwe Maan>to change the positioning on the website
+
+327
+00:24:15.640 --> 00:24:17.100
+<v Douwe Maan>just in a matter of hours
+
+328
+00:24:17.100 --> 00:24:19.000
+<v Douwe Maan>and then realize that that was exactly
+
+329
+00:24:19.000 --> 00:24:20.480
+<v Douwe Maan>what the community needed to start,
+
+330
+00:24:21.360 --> 00:24:23.440
+<v Douwe Maan>drawing a shorter line in their head
+
+331
+00:24:23.440 --> 00:24:24.740
+<v Douwe Maan>between what Meltano was
+
+332
+00:24:24.740 --> 00:24:26.060
+<v Douwe Maan>and what it could do for their team.
+
+333
+00:24:27.160 --> 00:24:28.660
+<v Douwe Maan>And then as we've grown
+
+334
+00:24:28.660 --> 00:24:31.020
+<v Douwe Maan>and as our vision has changed a little bit
+
+335
+00:24:31.020 --> 00:24:33.100
+<v Douwe Maan>and as we had to get out of GitLab
+
+336
+00:24:33.100 --> 00:24:35.040
+<v Douwe Maan>and not be able to rely anymore
+
+337
+00:24:35.040 --> 00:24:37.780
+<v Douwe Maan>on some of the parts of GitLab's organization
+
+338
+00:24:37.780 --> 00:24:39.680
+<v Douwe Maan>that we had been able to use up to that point,
+
+339
+00:24:39.780 --> 00:24:42.720
+<v Douwe Maan>like HR and hiring and all of this stuff,
+
+340
+00:24:43.820 --> 00:24:45.760
+<v Douwe Maan>we, of course, realized that there were things
+
+341
+00:24:45.760 --> 00:24:47.720
+<v Douwe Maan>that we had done that just needed changing.
+
+342
+00:24:48.020 --> 00:24:51.060
+<v Douwe Maan>Some of them as a result of the vision
+
+343
+00:24:51.060 --> 00:24:52.080
+<v Douwe Maan>that had changed over time,
+
+344
+00:24:52.260 --> 00:24:53.900
+<v Douwe Maan>the emphasis that we have now
+
+345
+00:24:53.900 --> 00:24:56.320
+<v Douwe Maan>on supporting existing open source technologies
+
+346
+00:24:56.320 --> 00:24:57.060
+<v Douwe Maan>and data tools,
+
+347
+00:24:58.660 --> 00:25:01.660
+<v Douwe Maan>We're more inclined to just build our own stuff if we think it didn't exist yet.
+
+348
+00:25:01.880 --> 00:25:04.640
+<v Douwe Maan>That, of course, had big impact on the architecture of the product.
+
+349
+00:25:04.780 --> 00:25:11.480
+<v Douwe Maan>And there's a lot of technical debt that we've had to kind of get rid of over the last few months in order to set us up for this next stage.
+
+350
+00:25:12.420 --> 00:25:21.800
+<v Douwe Maan>But then within the organization that we sat down to one person essentially allowed us to build stuff out aware of the fact that this was it.
+
+351
+00:25:21.940 --> 00:25:27.800
+<v Douwe Maan>Like it had taken Meltano a year and a half or so to go from one person to then six and then back to one.
+
+352
+00:25:28.660 --> 00:25:32.260
+<v Douwe Maan>By the time it was back to one and myself, and then we raised funding, we knew, okay,
+
+353
+00:25:32.300 --> 00:25:34.640
+<v Douwe Maan>from this point on, it's only going to be scaling upwards and upwards.
+
+354
+00:25:34.820 --> 00:25:40.060
+<v Douwe Maan>And we're onto something and we're confident that this is going to be the vision we'll
+
+355
+00:25:40.060 --> 00:25:41.160
+<v Douwe Maan>be working on for years.
+
+356
+00:25:41.600 --> 00:25:48.820
+<v Douwe Maan>So we were able to, from that one person place, be a little bit more aware of the fact that
+
+357
+00:25:48.820 --> 00:25:51.780
+<v Douwe Maan>we didn't just want to do things that would be outdated three to six months from now,
+
+358
+00:25:51.880 --> 00:25:54.440
+<v Douwe Maan>because we knew we would still be around three to six months.
+
+359
+00:25:54.440 --> 00:26:02.780
+<v Douwe Maan>But there's always a danger in thinking too far ahead and thereby not doing the work that needs doing right now to even justify that future.
+
+360
+00:26:03.020 --> 00:26:06.920
+<v Douwe Maan>And of course, finding a balance between that has been a challenge in its own right.
+
+361
+00:26:07.000 --> 00:26:20.540
+<v Douwe Maan>Also because of the fact that I and some of these other people that I asked to join me at Meltano had gotten used to the, you know, 1000 plus person company in GitLab or in, you know, Amazon or other places we found people.
+
+362
+00:26:20.540 --> 00:26:41.920
+<v Douwe Maan>And it did require a little bit of sort of figuring out for ourselves how scrappy and quick moving and willing to try stuff and fail and just get up again and try something new, which we had sort of unlearned a little bit through the scaling of the respective organizations we came from.
+
+363
+00:26:41.920 --> 00:27:04.340
+<v Douwe Maan>But one of the core values that GitLab has had since the beginning was called iteration, which we in our Meltano values call progress over perfection, which is very much about this idea of making small changes, getting feedback and not being afraid to go back on them or change your mind or rapidly iterate when it turns out that the first thing you launched wasn't quite it yet.
+
+364
+00:27:04.340 --> 00:27:13.780
+<v Douwe Maan>but doing so with small steps and very low barrier of low amount of shame about the maybe
+
+365
+00:27:14.540 --> 00:27:19.740
+<v Douwe Maan>half-bakedness of the first thing you put out is something that was so deep in GitLab's DNA
+
+366
+00:27:19.740 --> 00:27:25.720
+<v Douwe Maan>and in our own that has always come pretty naturally to us. And that's definitely a
+
+367
+00:27:25.720 --> 00:27:31.140
+<v Douwe Maan>strength now as well, as we try to find a balance between changing what we're up to quickly and
+
+368
+00:27:31.140 --> 00:27:35.980
+<v Douwe Maan>and kind of adjusting based on the needs of the market and the feedback we're getting from our community.
+
+369
+00:27:37.260 --> 00:27:43.220
+<v Douwe Maan>At the same time as making sure that the steps that we do take are ones that we're confident in
+
+370
+00:27:43.220 --> 00:27:49.740
+<v Douwe Maan>and also ones that we think will serve us for not just the next month, but also at least the next, let's say, two quarters.
+
+371
+00:27:51.060 --> 00:27:55.900
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+372
+00:27:57.300 --> 00:28:03.720
+<v Douwe Maan>not just the product we've been able to build together but also the community that we have
+
+373
+00:28:03.720 --> 00:28:09.920
+<v Douwe Maan>built around it and the literally thousands of people who have we have gotten to buy into this
+
+374
+00:28:09.920 --> 00:28:16.080
+<v Douwe Maan>vision recognize that this need exists be willing to get on board of this ship of ours even before
+
+375
+00:28:16.080 --> 00:28:21.200
+<v Douwe Maan>a lot of what we are talking about and what i'm talking about in this podcast before a lot of it
+
+376
+00:28:21.200 --> 00:28:25.480
+<v Douwe Maan>has even been realized just because they recognize that there's a real need here and a real opportunity
+
+377
+00:28:25.900 --> 00:28:30.600
+<v Douwe Maan>do things differently and do things better and motivate them enough to make it happen with us.
+
+378
+00:28:30.720 --> 00:28:36.620
+<v Douwe Maan>So we have almost 2,300 people in Slack right now. We had, you know, 600 different contributions
+
+379
+00:28:36.620 --> 00:28:43.900
+<v Douwe Maan>last year. We have hundreds of active members in Slack every week. We have office hours every week
+
+380
+00:28:43.900 --> 00:28:48.560
+<v Douwe Maan>where people join to ask us questions or help us figure out some of the features that we have on
+
+381
+00:28:48.560 --> 00:28:52.640
+<v Douwe Maan>the roadmap. Because like I mentioned, we're building Meltano in collaboration with its users.
+
+382
+00:28:52.640 --> 00:28:58.580
+<v Douwe Maan>I strongly believe that the best tools are built in close collaboration with those who end up using those tools.
+
+383
+00:28:58.720 --> 00:29:10.600
+<v Douwe Maan>So if you have users who are technical enough to actually program and potentially contribute back, you're doing yourself a massive disadvantage if you're not minimizing the distance between your team and this user base as much as you can.
+
+384
+00:29:10.600 --> 00:29:24.100
+<v Douwe Maan>And it doesn't get more closely collaborative than actually allowing them into your issue tracker, allowing them to see a roadmap for months and months ahead of time and actually have a strong voice in working out some of the specifications of this work to be done.
+
+385
+00:29:24.200 --> 00:29:33.320
+<v Douwe Maan>And also the general direction that the product is going into to the extent where they can actually come up with features of their own and just contribute them, even if they didn't find a place on our roadmap yet.
+
+386
+00:29:33.320 --> 00:29:38.340
+<v Douwe Maan>yet. So the fact that we're not doing this by ourselves, we're not just a 14 person team who is,
+
+387
+00:29:38.360 --> 00:29:43.320
+<v Douwe Maan>you know, convinced that the world needs this and building it before showing to the world.
+
+388
+00:29:44.200 --> 00:29:49.580
+<v Douwe Maan>We have gotten people to buy into what we're doing and make it happen with us.
+
+389
+00:29:49.700 --> 00:29:53.780
+<v Douwe Maan>And we see ourselves as an extension of the community and the community as an extension
+
+390
+00:29:53.780 --> 00:30:00.680
+<v Douwe Maan>of our own team more than anything else. And we really believe that that's how the best tools
+
+391
+00:30:00.680 --> 00:30:06.400
+<v Douwe Maan>tools are built and how all developer tooling and I'm going to fit data tooling in that
+
+392
+00:30:06.400 --> 00:30:12.340
+<v Douwe Maan>category now as well, the way all successful developer tooling will be built going forward.
+
+393
+00:30:12.540 --> 00:30:15.620
+<v Douwe Maan>And we're already seeing that, of course, in the software development world, just through
+
+394
+00:30:15.620 --> 00:30:20.440
+<v Douwe Maan>the success of open source technologies and the way that things like Postgres and MySQL
+
+395
+00:30:20.440 --> 00:30:25.900
+<v Douwe Maan>have effectively pushed out the Oracle DBs of the world, at least in terms of deployment
+
+396
+00:30:25.900 --> 00:30:30.220
+<v Douwe Maan>footprint and traction and mindshare.
+
+397
+00:30:31.060 --> 00:30:35.940
+<v Douwe Maan>And we're excited that we are starting to see that the data space is ready for the same
+
+398
+00:30:35.940 --> 00:30:41.460
+<v Douwe Maan>thing to happen, with Meltano being a leading force for the software developmentization
+
+399
+00:30:42.620 --> 00:30:44.080
+<v Douwe Maan>of the world of data.
+
+400
+00:30:45.760 --> 00:30:47.120
+<v Noah Labhart>Let's flip the script a little bit.
+
+401
+00:30:47.260 --> 00:30:51.280
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+402
+00:30:51.820 --> 00:30:57.620
+<v Douwe Maan>The one that comes to mind now is a mistake more of myself than of the team or the company.
+
+403
+00:30:57.840 --> 00:31:02.300
+<v Douwe Maan>And I relate it back to the fact that, you know, I worked at GitLab for years.
+
+404
+00:31:02.480 --> 00:31:07.540
+<v Douwe Maan>I went from a 10-person team to being about 1,400 people when I joined the Meltano team.
+
+405
+00:31:07.700 --> 00:31:11.860
+<v Douwe Maan>Then I was on the six-person team for a while, and then I was by myself for a whole year.
+
+406
+00:31:11.960 --> 00:31:16.680
+<v Douwe Maan>For all of 2020, I was Meltano's engineer and Meltano's product manager and the community
+
+407
+00:31:16.680 --> 00:31:21.180
+<v Douwe Maan>community advocates and the product manager and the CEO and the founder and everything
+
+408
+00:31:21.180 --> 00:31:24.200
+<v Douwe Maan>you could be doing everything by myself on the product.
+
+409
+00:31:24.400 --> 00:31:29.860
+<v Douwe Maan>So I also very much got used to not having to write many things down because if it was
+
+410
+00:31:29.860 --> 00:31:33.620
+<v Douwe Maan>in my head, then the product manager knew and the engineer knew and the marketing person
+
+411
+00:31:33.620 --> 00:31:35.260
+<v Douwe Maan>knew because it was all me.
+
+412
+00:31:35.440 --> 00:31:41.300
+<v Douwe Maan>So when we started hiring people again, I realized that just sharing the vision with
+
+413
+00:31:41.300 --> 00:31:48.140
+<v Douwe Maan>the team um and you know taking putting in the time to write a nice deck and explain how i would
+
+414
+00:31:48.140 --> 00:31:53.380
+<v Douwe Maan>see the product progressing and the strategy would need to take to get there just doing that once and
+
+415
+00:31:53.380 --> 00:31:58.380
+<v Douwe Maan>then kind of taking a few months and focusing on other things and then coming back to the team and
+
+416
+00:31:58.380 --> 00:32:03.380
+<v Douwe Maan>assuming we were all still on the first page very much doesn't work that way if you don't actually
+
+417
+00:32:03.380 --> 00:32:10.600
+<v Douwe Maan>all occupy one brain um as i did during 2020 so i realized that a lot of the things that to me felt
+
+418
+00:32:11.300 --> 00:32:16.140
+<v Douwe Maan>natural or obvious evolutions of the vision or implications of what we had originally discussed
+
+419
+00:32:16.140 --> 00:32:23.060
+<v Douwe Maan>rather than explicit changes or explicit kind of things that would need to be discussed again
+
+420
+00:32:23.880 --> 00:32:30.400
+<v Douwe Maan>resulted in everyone with the team their kind of conception of the vision having slowly evolved
+
+421
+00:32:30.400 --> 00:32:35.500
+<v Douwe Maan>in slightly different directions leading to a point where we were all aligned on the high level
+
+422
+00:32:35.500 --> 00:32:40.440
+<v Douwe Maan>vision, but maybe not so much on what is the immediate next step to take to get there.
+
+423
+00:32:40.640 --> 00:32:45.460
+<v Douwe Maan>And how do I evaluate the relative priority of all these possible things I could be doing
+
+424
+00:32:45.460 --> 00:32:45.960
+<v Douwe Maan>today?
+
+425
+00:32:46.200 --> 00:32:52.520
+<v Douwe Maan>And I was able to sort of myself trace that back to the importance of constant communication
+
+426
+00:32:52.520 --> 00:32:57.080
+<v Douwe Maan>and really over communication and repeating yourself time and time again, and making sure
+
+427
+00:32:57.080 --> 00:32:59.760
+<v Douwe Maan>that there's effectively nothing that lives in my head and my head alone.
+
+428
+00:32:59.760 --> 00:33:06.020
+<v Douwe Maan>long um and a year of being used to that working just fine um needed a little bit of time on my
+
+429
+00:33:06.020 --> 00:33:12.000
+<v Douwe Maan>side to get out of that mindset and realize that it's very different when suddenly um yeah you're
+
+430
+00:33:12.000 --> 00:33:18.100
+<v Douwe Maan>you're like a captain steering a ship and and you're not actually manning the oars anymore and
+
+431
+00:33:18.100 --> 00:33:23.680
+<v Douwe Maan>you're not actually the one anymore who's on the lookout um to see whether we're going to you know
+
+432
+00:33:23.680 --> 00:33:30.040
+<v Douwe Maan>know whether we're heading for a tropical island or a titanic sized um ice cliff or not but a cliff
+
+433
+00:33:30.040 --> 00:33:37.600
+<v Douwe Maan>which you know what i mean so that's that's a mistake um and we've solved it by communicating
+
+434
+00:33:37.600 --> 00:33:43.760
+<v Douwe Maan>a lot more making sure we have sort of regular alignment on um the vision as it's evolving and
+
+435
+00:33:43.760 --> 00:33:49.100
+<v Douwe Maan>also just realization on my part that if i feel like i'm repeating myself that's a good thing
+
+436
+00:33:49.100 --> 00:33:55.020
+<v Douwe Maan>and this natural urge you have to not just kind of, you know,
+
+437
+00:33:55.480 --> 00:33:57.380
+<v Douwe Maan>say the same thing again and again and again and again,
+
+438
+00:33:57.860 --> 00:34:01.280
+<v Douwe Maan>which I feel bad when I do it, even when I do it on a podcast,
+
+439
+00:34:01.420 --> 00:34:04.460
+<v Douwe Maan>even when I know it's important that you kind of repeat some of the same beats
+
+440
+00:34:04.460 --> 00:34:06.960
+<v Douwe Maan>in order to get people to take them home with them.
+
+441
+00:34:07.480 --> 00:34:09.760
+<v Douwe Maan>That's something I had to learn over the last six months for sure,
+
+442
+00:34:10.220 --> 00:34:11.740
+<v Douwe Maan>that the same goes within a new company.
+
+443
+00:34:13.860 --> 00:34:18.640
+<v Noah Labhart>Well, for Meltano, what does the future look like for the product and for your team?
+
+444
+00:34:19.360 --> 00:34:27.740
+<v Douwe Maan>Our vision is for Meltano as the open source data ops operating system and the ideal foundation of every team's data stack.
+
+445
+00:34:27.920 --> 00:34:30.680
+<v Douwe Maan>The first thing you install and then you add in all the other components.
+
+446
+00:34:30.800 --> 00:34:39.920
+<v Douwe Maan>And then in the end, you have a data platform that is held together by Meltano, even if the specific capabilities are provided by the various components of your choice that you've brought in.
+
+447
+00:34:39.920 --> 00:34:52.080
+<v Douwe Maan>So today the product is really good at all of this kind of being an operating system, bringing different components together specifically for Singer, to some extent dbt and then also Airflow.
+
+448
+00:34:52.200 --> 00:35:00.340
+<v Douwe Maan>This is workflow orchestration tool that provides the scheduled pipelines functionality in Meltano when you're thinking about it as an EL product.
+
+449
+00:35:00.340 --> 00:35:05.440
+<v Douwe Maan>product. So we have a lot more product evolution to do over the first half of this year or the next
+
+450
+00:35:05.440 --> 00:35:10.820
+<v Douwe Maan>three to six months or so to really change Meltano in terms of the product and also the perception
+
+451
+00:35:10.820 --> 00:35:16.540
+<v Douwe Maan>that the world has from just an open source EL solution that happens to allow you to version
+
+452
+00:35:16.540 --> 00:35:23.720
+<v Douwe Maan>control your pipelines to the framework that you want to bring together your entire data platform
+
+453
+00:35:23.720 --> 00:35:28.140
+<v Douwe Maan>and that you want to stay with your data team for years to come. So that means that we have to add
+
+454
+00:35:28.140 --> 00:35:30.720
+<v Douwe Maan>add support for different types of data tools.
+
+455
+00:35:30.960 --> 00:35:32.760
+<v Douwe Maan>And then also those data tools themselves
+
+456
+00:35:33.360 --> 00:35:35.300
+<v Douwe Maan>built in such a way that the abstractions
+
+457
+00:35:35.300 --> 00:35:40.220
+<v Douwe Maan>are going to be reusable for new data tools
+
+458
+00:35:40.220 --> 00:35:41.900
+<v Douwe Maan>that the community wants to add support for,
+
+459
+00:35:42.040 --> 00:35:44.060
+<v Douwe Maan>or even for data tools that don't exist yet
+
+460
+00:35:44.060 --> 00:35:45.800
+<v Douwe Maan>that will be built in the years to come
+
+461
+00:35:45.800 --> 00:35:48.120
+<v Douwe Maan>and allow them to come together in a framework
+
+462
+00:35:48.120 --> 00:35:49.820
+<v Douwe Maan>that makes them better than the sum of their parts.
+
+463
+00:35:50.000 --> 00:35:51.040
+<v Douwe Maan>So on the product side,
+
+464
+00:35:51.560 --> 00:35:52.920
+<v Douwe Maan>we're still a couple of steps away
+
+465
+00:35:52.920 --> 00:35:54.980
+<v Douwe Maan>from actually being the data ops operating system
+
+466
+00:35:54.980 --> 00:35:56.520
+<v Douwe Maan>that I've described during this chat.
+
+467
+00:35:58.140 --> 00:36:02.180
+<v Douwe Maan>And in terms of the team that requires us to bring on more software engineers.
+
+468
+00:36:02.840 --> 00:36:07.040
+<v Douwe Maan>And then the other thing that we will have to do during the second half of the year or so
+
+469
+00:36:07.040 --> 00:36:10.240
+<v Douwe Maan>is to start building a managed hosting platform,
+
+470
+00:36:10.520 --> 00:36:14.840
+<v Douwe Maan>a platform as a service or software as a service for Meltano
+
+471
+00:36:14.840 --> 00:36:19.840
+<v Douwe Maan>to allow teams that have used Meltano to programmatically define their ideal data platform
+
+472
+00:36:19.840 --> 00:36:22.040
+<v Douwe Maan>and all the different components and the ways they come together.
+
+473
+00:36:22.880 --> 00:36:24.980
+<v Douwe Maan>And then also to be able to deploy it easily,
+
+474
+00:36:24.980 --> 00:36:31.240
+<v Douwe Maan>which right now requires teams to be comfortable deploying open source tooling onto Kubernetes
+
+475
+00:36:31.240 --> 00:36:34.700
+<v Douwe Maan>or using Terraform to deploy it onto their own cloud infrastructure.
+
+476
+00:36:34.980 --> 00:36:39.540
+<v Douwe Maan>But there's a lot of people out there who are comfortable with command line interfaces and Git repos,
+
+477
+00:36:39.640 --> 00:36:42.940
+<v Douwe Maan>but not so much managing Kubernetes infrastructure.
+
+478
+00:36:43.400 --> 00:36:48.440
+<v Douwe Maan>So with our managed hosting solution, we want to make that super easy as well
+
+479
+00:36:48.440 --> 00:36:52.140
+<v Douwe Maan>so that you can set up your data platform in a matter of minutes locally with the CLI
+
+480
+00:36:52.140 --> 00:36:55.220
+<v Douwe Maan>and then push the Git repo up to our platform
+
+481
+00:36:55.220 --> 00:36:59.400
+<v Douwe Maan>where we will take care of getting all of this up and running,
+
+482
+00:36:59.480 --> 00:37:02.760
+<v Douwe Maan>making sure it scales with the amount of pipelines you add
+
+483
+00:37:02.760 --> 00:37:04.620
+<v Douwe Maan>or the amount of users you have on your team.
+
+484
+00:37:05.400 --> 00:37:07.920
+<v Douwe Maan>And from a startup perspective,
+
+485
+00:37:08.320 --> 00:37:11.640
+<v Douwe Maan>that is also how we will start the commercialization
+
+486
+00:37:11.640 --> 00:37:13.740
+<v Douwe Maan>of the open source Meltano project.
+
+487
+00:37:14.320 --> 00:37:17.220
+<v Douwe Maan>Everything I've described up until now is an open source project.
+
+488
+00:37:17.300 --> 00:37:18.220
+<v Douwe Maan>It's free to be downloaded.
+
+489
+00:37:18.460 --> 00:37:19.320
+<v Douwe Maan>The code is out there.
+
+490
+00:37:19.400 --> 00:37:20.140
+<v Douwe Maan>It's MIT licensed.
+
+491
+00:37:20.280 --> 00:37:21.860
+<v Douwe Maan>You can do whatever you want.
+
+492
+00:37:22.140 --> 00:37:26.720
+<v Douwe Maan>But of course, we think that there is a successful company that can be built around this technology.
+
+493
+00:37:27.000 --> 00:37:38.080
+<v Douwe Maan>And the primary way in which we will monetize it is then by making the hosting story easy as can be, if you allow us to take care of that for you.
+
+494
+00:37:38.080 --> 00:37:43.040
+<v Douwe Maan>where the managed hosting solution will also have a certain amount of enterprise functionality
+
+495
+00:37:43.580 --> 00:37:47.260
+<v Douwe Maan>like role-based access control, single sign-on and audit logs
+
+496
+00:37:47.260 --> 00:37:52.580
+<v Douwe Maan>for all of those organizations that need some of that functionality to be in place
+
+497
+00:37:52.580 --> 00:37:54.900
+<v Douwe Maan>in order for this to actually be deployed into production
+
+498
+00:37:54.900 --> 00:37:57.900
+<v Douwe Maan>and become an asset that the organization relies on.
+
+499
+00:37:58.160 --> 00:38:01.580
+<v Douwe Maan>So those are sort of the priorities for the rest of the year in terms of both the product
+
+500
+00:38:01.580 --> 00:38:03.720
+<v Douwe Maan>and then that has a massive impact on the team as well.
+
+501
+00:38:03.720 --> 00:38:10.660
+<v Douwe Maan>Well, the engineering team we have today has been focused mostly on building this really great open source kind of architecture,
+
+502
+00:38:10.740 --> 00:38:17.200
+<v Douwe Maan>infrastructure tooling that runs on an arbitrary machine, whether that's your local machine or continuous integration,
+
+503
+00:38:17.520 --> 00:38:21.360
+<v Douwe Maan>testing box or even your own production environment.
+
+504
+00:38:21.720 --> 00:38:29.160
+<v Douwe Maan>But then next up, we're going to need to bring in people who can build great managed hosting for arbitrary open source components
+
+505
+00:38:29.160 --> 00:38:31.720
+<v Douwe Maan>that we allow people to run on top of Meltano.
+
+506
+00:38:33.760 --> 00:38:38.240
+<v Douwe Maan>managed hosting both within our cloud infrastructure as well as the infrastructure
+
+507
+00:38:38.240 --> 00:38:43.060
+<v Douwe Maan>that is brought in by the user in case we have customers that don't want any of their data to
+
+508
+00:38:43.060 --> 00:38:50.120
+<v Douwe Maan>ever leave their you know privileged namespace within aws or gcp or what have you so those are
+
+509
+00:38:50.120 --> 00:38:55.820
+<v Douwe Maan>different challenges and at the same time we have a marketing team to build out to prepare for the
+
+510
+00:38:55.820 --> 00:38:59.660
+<v Douwe Maan>go-to-market motion once we are ready to start selling this managed hosting platform which we
+
+511
+00:38:59.660 --> 00:39:01.760
+<v Douwe Maan>We expect to be early next year.
+
+512
+00:39:01.960 --> 00:39:08.200
+<v Douwe Maan>We hope to have a private beta for managed hosting by the end of the year.
+
+513
+00:39:08.320 --> 00:39:12.860
+<v Douwe Maan>But then by next year, we will need to have built out a little bit of a sales organization as well
+
+514
+00:39:12.860 --> 00:39:18.140
+<v Douwe Maan>to use that bottoms-up enthusiasm that we're seeing in the open source community
+
+515
+00:39:18.680 --> 00:39:23.700
+<v Douwe Maan>to effectively onboard these people onto our managed hosting platform.
+
+516
+00:39:23.980 --> 00:39:29.260
+<v Douwe Maan>So we have a luxury there where we don't need to really go out there and find users.
+
+517
+00:39:29.660 --> 00:39:35.200
+<v Douwe Maan>because the users will find us directly and love Meltano, want a place for it in their data stack.
+
+518
+00:39:35.440 --> 00:39:41.480
+<v Douwe Maan>But then, of course, we will still need to make it so that they can forget about the whole challenge of deploying it
+
+519
+00:39:41.480 --> 00:39:45.300
+<v Douwe Maan>and maintaining that infrastructure by getting onto our platform.
+
+520
+00:39:46.660 --> 00:39:52.200
+<v Noah Labhart>Well, let's switch to you. Who influences the way that you work? Name a person you look up to and why.
+
+521
+00:39:53.440 --> 00:39:58.100
+<v Douwe Maan>it's funny that in some sense this this podcast interview is becoming just as much a pitch
+
+522
+00:39:58.100 --> 00:40:07.140
+<v Douwe Maan>for GitLab as it is Meltano, but GitLab CEO Sid Sijbrandij by far. When I joined six years ago or
+
+523
+00:40:07.140 --> 00:40:13.280
+<v Douwe Maan>seven years ago now gitlab in 2015 i was just coming out of college i had a couple of options
+
+524
+00:40:13.280 --> 00:40:19.200
+<v Douwe Maan>lined up but gitlab sounded cool but there also wasn't anything necessarily obvious that made it
+
+525
+00:40:19.200 --> 00:40:19.800
+<v Douwe Maan>stand out.
+
+526
+00:40:21.040 --> 00:40:23.300
+<v Douwe Maan>At least not in a way that I was able to evaluate
+
+527
+00:40:23.300 --> 00:40:25.360
+<v Douwe Maan>at that time. But over the years, it's become
+
+528
+00:40:25.360 --> 00:40:27.020
+<v Douwe Maan>clear the many ways in which
+
+529
+00:40:27.020 --> 00:40:28.960
+<v Douwe Maan>Sid and the GitLab culture and
+
+530
+00:40:28.960 --> 00:40:31.200
+<v Douwe Maan>the whole organization that we've built together,
+
+531
+00:40:31.700 --> 00:40:33.400
+<v Douwe Maan>I do also consider myself
+
+532
+00:40:33.400 --> 00:40:35.400
+<v Douwe Maan>part of that, of course, having been there from the early days.
+
+533
+00:40:35.980 --> 00:40:37.240
+<v Douwe Maan>A lot of things we've done have been
+
+534
+00:40:37.240 --> 00:40:37.740
+<v Douwe Maan>really special.
+
+535
+00:40:39.680 --> 00:40:41.120
+<v Douwe Maan>Transparency, the way that
+
+536
+00:40:41.120 --> 00:40:43.020
+<v Douwe Maan>every single thing GitLab does
+
+537
+00:40:43.020 --> 00:40:44.720
+<v Douwe Maan>is documented in the open.
+
+538
+00:40:44.800 --> 00:40:47.060
+<v Douwe Maan>The entire company handbook, you can just find it
+
+539
+00:40:47.060 --> 00:40:48.820
+<v Douwe Maan>on handbook.gitlab.com or
+
+540
+00:40:49.560 --> 00:40:57.920
+<v Douwe Maan>about.gitlab.com. I think it is. And learn how a 2000 person public company now since October
+
+541
+00:40:57.920 --> 00:41:06.460
+<v Douwe Maan>functions. And there's very much a public first, private only in case of exception rule there,
+
+542
+00:41:06.560 --> 00:41:10.940
+<v Douwe Maan>which is very much the inverse of how many other companies organize this. And this goes hand in
+
+543
+00:41:10.940 --> 00:41:15.540
+<v Douwe Maan>hand with this community-based approach to building a product where the entire GitLab
+
+544
+00:41:15.540 --> 00:41:20.480
+<v Douwe Maan>community, which counts thousands of contributors at this point and millions of users, is seen as an
+
+545
+00:41:20.480 --> 00:41:26.300
+<v Douwe Maan>extension of the team. They happen to not be paid to work on it full-time, but they are still just
+
+546
+00:41:26.300 --> 00:41:33.160
+<v Douwe Maan>as invested in the evolution of Meltano, or rather GitLab as a product, and also the way
+
+547
+00:41:33.160 --> 00:41:37.880
+<v Douwe Maan>that the organization scales in a way that doesn't diminish the role of the community over time.
+
+548
+00:41:38.240 --> 00:41:43.580
+<v Douwe Maan>And those are things that we have adopted in Meltano as well, where we think it's extremely
+
+549
+00:41:45.540 --> 00:41:46.940
+<v Douwe Maan>like they are part of this journey we're on.
+
+550
+00:41:47.060 --> 00:41:49.000
+<v Douwe Maan>And the worst thing we can do at any point
+
+551
+00:41:49.000 --> 00:41:53.240
+<v Douwe Maan>is to make our community feel like they are just our users
+
+552
+00:41:53.240 --> 00:41:56.320
+<v Douwe Maan>or just our money flow.
+
+553
+00:41:57.340 --> 00:42:00.860
+<v Douwe Maan>No, they're fundamental to solving this challenge
+
+554
+00:42:00.860 --> 00:42:01.620
+<v Douwe Maan>we've set for ourselves.
+
+555
+00:42:01.860 --> 00:42:04.120
+<v Douwe Maan>And ultimately, it's all about empowering them.
+
+556
+00:42:04.640 --> 00:42:07.800
+<v Douwe Maan>And then finally, the other thing that GitLab has done
+
+557
+00:42:07.800 --> 00:42:10.660
+<v Douwe Maan>really revolutionarily besides the transparency
+
+558
+00:42:10.660 --> 00:42:13.660
+<v Douwe Maan>and the approach to engagement with the open source community
+
+559
+00:42:15.540 --> 00:42:26.100
+<v Douwe Maan>I mentioned this earlier, but GitLab is today, although this step might be a few months outdated, but at some point it was the largest all remote organization in the world.
+
+560
+00:42:26.260 --> 00:42:34.120
+<v Douwe Maan>And when GitLab started doing this in 2015, it was kind of natural because the entire open source community was already spread out over all kinds of companies.
+
+561
+00:42:34.120 --> 00:42:49.960
+<v Douwe Maan>And when GitLab slowly started hiring some of these people, it made sense that it wouldn't require any of them to move to a particular office or to move away from this text-based, Zoom call-based way of working towards synchronous meetings and face-to-face contact.
+
+562
+00:42:50.560 --> 00:42:55.220
+<v Douwe Maan>But what that meant is that from day one, GitLab never cared where you work from as long as you get your work done.
+
+563
+00:42:55.220 --> 00:43:00.840
+<v Douwe Maan>and then of course the pandemic hit two years ago and suddenly every single company in the world had
+
+564
+00:43:00.840 --> 00:43:04.260
+<v Douwe Maan>to figure out a way to make this work without requiring people to come together into the office
+
+565
+00:43:04.260 --> 00:43:08.760
+<v Douwe Maan>and a combination of the radical transparency where every aspect of how GitLab worked
+
+566
+00:43:08.760 --> 00:43:14.420
+<v Douwe Maan>had been documented in the open plus the fact that it had done something really really well
+
+567
+00:43:14.420 --> 00:43:21.120
+<v Douwe Maan>that suddenly the entire world was scrambling to figure out meant that GitLab's handbook and guide
+
+568
+00:43:21.120 --> 00:43:27.840
+<v Douwe Maan>to remote work became probably the most popular asset on the GitLab website ever in those first
+
+569
+00:43:27.840 --> 00:43:32.840
+<v Douwe Maan>weeks and months of the pandemic, because it was literally a playbook for how to do remote work
+
+570
+00:43:32.840 --> 00:43:40.340
+<v Douwe Maan>at scale across time zones, across teams, across everything else. And this is all
+
+571
+00:43:40.340 --> 00:43:48.500
+<v Douwe Maan>kind of flows from Sid, who wasn't afraid to just try and do things differently and see how it would
+
+572
+00:43:48.500 --> 00:43:53.180
+<v Douwe Maan>would play out. And it turns out that a number of things worked out extremely well. And it made
+
+573
+00:43:53.180 --> 00:43:59.020
+<v Douwe Maan>GitLab an example in many ways for companies around the world, open source products that
+
+574
+00:43:59.020 --> 00:44:04.060
+<v Douwe Maan>trying to monetize, and just generally for people who think that there's got to be a better way to
+
+575
+00:44:04.060 --> 00:44:09.820
+<v Douwe Maan>do work. And those are definitely things that I feel extremely blessed having lived through and
+
+576
+00:44:09.820 --> 00:44:15.760
+<v Douwe Maan>the impact that it's had on my life and my ability to now live in Mexico City and work from Milan and
+
+577
+00:44:15.760 --> 00:44:18.160
+<v Douwe Maan>to be able to do the same thing for my team.
+
+578
+00:44:19.440 --> 00:44:23.160
+<v Douwe Maan>And we hope to be a similar example for companies in the future
+
+579
+00:44:23.160 --> 00:44:25.020
+<v Douwe Maan>as GitLab and Sid have been to us.
+
+580
+00:44:26.200 --> 00:44:28.720
+<v Noah Labhart>We talked about a mistake earlier, but a little bit different spin.
+
+581
+00:44:29.000 --> 00:44:31.660
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+582
+00:44:31.700 --> 00:44:33.620
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+583
+00:44:34.740 --> 00:44:36.520
+<v Douwe Maan>I think if we go back all the way to the beginning
+
+584
+00:44:36.520 --> 00:44:40.560
+<v Douwe Maan>and we look at that year and a half or so of time
+
+585
+00:44:40.560 --> 00:44:42.480
+<v Douwe Maan>that the Meltano project was around in GitLab
+
+586
+00:44:42.480 --> 00:44:45.500
+<v Douwe Maan>and was trying to kind of find its footing,
+
+587
+00:44:45.700 --> 00:44:48.560
+<v Douwe Maan>but not necessarily accomplishing that.
+
+588
+00:44:49.540 --> 00:44:52.360
+<v Douwe Maan>One of the things that I took really seriously
+
+589
+00:44:52.360 --> 00:44:55.340
+<v Douwe Maan>from that day that I was tasked with turning Meltano around
+
+590
+00:44:55.340 --> 00:44:59.040
+<v Douwe Maan>and that has helped us so much all the way through since then,
+
+591
+00:44:59.160 --> 00:45:03.200
+<v Douwe Maan>it's just the importance of meeting often
+
+592
+00:45:03.200 --> 00:45:05.700
+<v Douwe Maan>and frequently and closely with those users
+
+593
+00:45:05.700 --> 00:45:08.080
+<v Douwe Maan>and those couple of early enthusiasts that you find.
+
+594
+00:45:08.440 --> 00:45:10.780
+<v Douwe Maan>For a while, the Meltano team was chasing
+
+595
+00:45:12.480 --> 00:45:16.380
+<v Douwe Maan>what the future looked like, maybe more than what they were hearing from the users.
+
+596
+00:45:16.640 --> 00:45:21.420
+<v Douwe Maan>And that meant that a lot of time was spent building in a direction that didn't resonate
+
+597
+00:45:21.420 --> 00:45:25.580
+<v Douwe Maan>as much with the user base as we thought it would, just because we were coming at it with
+
+598
+00:45:25.580 --> 00:45:30.280
+<v Douwe Maan>our own biases and perspectives and sort of software development way of looking at the
+
+599
+00:45:30.280 --> 00:45:30.780
+<v Douwe Maan>world.
+
+600
+00:45:31.220 --> 00:45:38.780
+<v Douwe Maan>And from that point on, I think Meltano could have gone quicker if that realization that
+
+601
+00:45:38.780 --> 00:45:41.000
+<v Douwe Maan>that an end-to-end platform that's going to replace everything else
+
+602
+00:45:41.000 --> 00:45:43.120
+<v Douwe Maan>is going to be a really tough sell.
+
+603
+00:45:43.340 --> 00:45:46.440
+<v Douwe Maan>And if Meltano had started with a more narrow focus of,
+
+604
+00:45:46.560 --> 00:45:48.320
+<v Douwe Maan>okay, let's bring DevOps to EL to start,
+
+605
+00:45:48.480 --> 00:45:50.820
+<v Douwe Maan>and then once people get the hang of that
+
+606
+00:45:50.820 --> 00:45:53.220
+<v Douwe Maan>and start seeing how valuable this is,
+
+607
+00:45:53.360 --> 00:45:56.340
+<v Douwe Maan>then we will step-by-step introduce them to DevOps
+
+608
+00:45:56.340 --> 00:45:57.400
+<v Douwe Maan>for the rest of their data lifecycle,
+
+609
+00:45:58.060 --> 00:46:00.800
+<v Douwe Maan>which is essentially the strategy and the playbook we're following now.
+
+610
+00:46:01.680 --> 00:46:03.320
+<v Douwe Maan>That could have saved a lot of time in retrospect.
+
+611
+00:46:04.220 --> 00:46:07.360
+<v Douwe Maan>So, of course, there's value in having an opinionated vision
+
+612
+00:46:08.780 --> 00:46:15.000
+<v Douwe Maan>needs and just working on it until you have an MVP where people will be able to kind of catch
+
+613
+00:46:15.000 --> 00:46:21.960
+<v Douwe Maan>what you had in mind and then tell you how it lines up with their needs. But definitely don't
+
+614
+00:46:21.960 --> 00:46:28.300
+<v Douwe Maan>just lock yourself up into a room for longer than a few weeks or months, because ultimately nothing
+
+615
+00:46:28.300 --> 00:46:33.980
+<v Douwe Maan>is going to be as valuable as that real world feedback. And that's why progress over perfection
+
+616
+00:46:33.980 --> 00:46:38.600
+<v Douwe Maan>in Meltano and also iteration and GitLab are these fundamental values.
+
+617
+00:46:38.880 --> 00:46:44.660
+<v Douwe Maan>It's all about small steps, rapid feedback, quickly incorporating it, and then taking
+
+618
+00:46:44.660 --> 00:46:49.340
+<v Douwe Maan>a better informed second step than you could ever have if you tried to take steps one,
+
+619
+00:46:49.420 --> 00:46:54.160
+<v Douwe Maan>two, three, four, and five without ever hearing what people thought of your step one.
+
+620
+00:46:55.620 --> 00:46:59.880
+<v Noah Labhart>Well, last question, Douwe, and I think you may have answered it, but I'm going to give
+
+621
+00:46:59.880 --> 00:47:01.560
+<v Noah Labhart>you space if you want to change it.
+
+622
+00:47:01.740 --> 00:47:02.900
+<v Noah Labhart>So last question.
+
+623
+00:47:03.980 --> 00:47:05.760
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+624
+00:47:05.760 --> 00:47:07.240
+<v Noah Labhart>who's built the next big thing.
+
+625
+00:47:07.640 --> 00:47:08.680
+<v Noah Labhart>They're jazzed about it.
+
+626
+00:47:08.700 --> 00:47:09.820
+<v Noah Labhart>They can't wait to show it off to the world
+
+627
+00:47:09.820 --> 00:47:11.020
+<v Noah Labhart>and they can't wait to show it off to you
+
+628
+00:47:11.020 --> 00:47:11.840
+<v Noah Labhart>right there on the plane.
+
+629
+00:47:12.220 --> 00:47:13.900
+<v Noah Labhart>What advice do you give that person
+
+630
+00:47:13.900 --> 00:47:15.500
+<v Noah Labhart>having gone down this road a bit?
+
+631
+00:47:17.660 --> 00:47:18.940
+<v Douwe Maan>Well, one piece of advice,
+
+632
+00:47:19.180 --> 00:47:21.020
+<v Douwe Maan>you know, related to what I was saying a second ago,
+
+633
+00:47:21.140 --> 00:47:23.340
+<v Douwe Maan>get that feedback early and often
+
+634
+00:47:23.340 --> 00:47:26.020
+<v Douwe Maan>and really treat your users
+
+635
+00:47:26.020 --> 00:47:27.780
+<v Douwe Maan>as an extension of your team
+
+636
+00:47:27.780 --> 00:47:29.900
+<v Douwe Maan>more so than just an external party
+
+637
+00:47:29.900 --> 00:47:30.840
+<v Douwe Maan>you have to cater to.
+
+638
+00:47:30.960 --> 00:47:33.380
+<v Douwe Maan>But if you are literally sitting next to a plane to me
+
+639
+00:47:33.980 --> 00:47:40.920
+<v Douwe Maan>excited to share your story to some other random plane occupant then you're probably already having
+
+640
+00:47:40.920 --> 00:47:47.060
+<v Douwe Maan>that right i'll share it with everyone and i'll hear from everyone mindset um the other takeaway
+
+641
+00:47:47.060 --> 00:47:54.180
+<v Douwe Maan>is just to be willing to try stuff and then if it doesn't work just change it and the smaller the
+
+642
+00:47:54.180 --> 00:48:01.080
+<v Douwe Maan>steps you take the less you'll feel that that that sunk cost fallacy where you're like wow well i've
+
+643
+00:48:01.080 --> 00:48:08.180
+<v Douwe Maan>I've invested so much already in this idea that even if the signs are there that it might not have been the right move, I'm going to just commit to it anyway.
+
+644
+00:48:08.280 --> 00:48:13.640
+<v Douwe Maan>Because at this point, it feels like I would be losing something, wasting something if I didn't.
+
+645
+00:48:14.160 --> 00:48:18.920
+<v Douwe Maan>You can minimize that feeling also by taking really short steps and getting really frequent feedback.
+
+646
+00:48:19.120 --> 00:48:20.700
+<v Douwe Maan>So I keep kind of circling back to that.
+
+647
+00:48:20.920 --> 00:48:29.000
+<v Douwe Maan>And then I would say to everyone in the audience that is building tools for technical people, the best tools are building close collaboration with their users.
+
+648
+00:48:29.000 --> 00:48:48.760
+<v Douwe Maan>And if you have users who can actually build their own tool, or if you can motivate a community of users to come together and build tools together, then that tool is always going to be better than a tool built by a specific product team that had to get the community feedback through, you know, three layers of feedback and then the account managers and then the product roadmap.
+
+649
+00:48:48.760 --> 00:48:53.980
+<v Douwe Maan>map and then finally the engineers see it land in the ticket there's no better way to know what
+
+650
+00:48:53.980 --> 00:48:58.700
+<v Douwe Maan>your customer needs than inviting them into your issue tracker and into your code base and figuring
+
+651
+00:48:58.700 --> 00:49:05.360
+<v Douwe Maan>it out with them so if you're building developer tools see if it makes sense for you to build your
+
+652
+00:49:05.360 --> 00:49:09.220
+<v Douwe Maan>tools open source and then come up with some kind of commercial open source business model around it
+
+653
+00:49:09.220 --> 00:49:17.040
+<v Douwe Maan>the examples that this can be done are many GitLab being prime among them but not at all
+
+654
+00:49:19.380 --> 00:49:23.680
+<v Douwe Maan>and if you are not the company that's going to build your developer tool in the open source
+
+655
+00:49:23.680 --> 00:49:29.540
+<v Douwe Maan>then someone else is going to and the longer term arc shows that open source tech outlasts
+
+656
+00:49:29.540 --> 00:49:35.660
+<v Douwe Maan>proprietary tech especially if you have a motivated user base who could do better than
+
+657
+00:49:35.660 --> 00:49:41.700
+<v Douwe Maan>your own team so don't miss out on that opportunity and open source is the future
+
+658
+00:49:42.800 --> 00:49:47.140
+<v Noah Labhart>Well, Douwe, thank you for being on the show today. Thank you for telling the creation story of
+
+659
+00:49:48.760 --> 00:49:49.920
+<v Douwe Maan>having me. It was a blast to
+
+660
+00:49:50.440 --> 00:49:52.660
+<v Douwe Maan>follow the format and give people a bit of an
+
+661
+00:49:52.660 --> 00:49:54.680
+<v Douwe Maan>insight in how Meltano came to be and all the exciting
+
+662
+00:49:54.680 --> 00:49:56.300
+<v Douwe Maan>stuff we have ahead in the year to come.
+
+663
+00:49:56.520 --> 00:49:58.180
+<v Douwe Maan>And if anyone who's been listening
+
+664
+00:49:58.180 --> 00:50:00.340
+<v Douwe Maan>feels similar about data teams
+
+665
+00:50:00.340 --> 00:50:02.660
+<v Douwe Maan>and the opportunity to benefit
+
+666
+00:50:02.660 --> 00:50:04.280
+<v Douwe Maan>from more software development best practices,
+
+667
+00:50:04.480 --> 00:50:06.620
+<v Douwe Maan>or if you're coming from the software development world
+
+668
+00:50:06.620 --> 00:50:08.400
+<v Douwe Maan>and you've always been frustrated
+
+669
+00:50:08.400 --> 00:50:10.360
+<v Douwe Maan>by the sort of backwards nature
+
+670
+00:50:10.360 --> 00:50:12.440
+<v Douwe Maan>of a lot of these data tools you're forced to work with,
+
+671
+00:50:12.660 --> 00:50:13.940
+<v Douwe Maan>come join us on Slack.
+
+672
+00:50:14.420 --> 00:50:16.640
+<v Douwe Maan>meltano.com/slack is where to
+
+673
+00:50:16.640 --> 00:50:18.660
+<v Douwe Maan>go for that. And see if there's an opening
+
+674
+00:50:18.760 --> 00:50:23.400
+<v Douwe Maan>on our team if you'd like to be a full-time part of making this mission and vision a reality.
+
+675
+00:50:23.860 --> 00:50:28.940
+<v Douwe Maan>As I said, we're hiring engineers, we're hiring marketing people, and sometime later this year,
+
+676
+00:50:29.020 --> 00:50:32.720
+<v Douwe Maan>we're going to have to start building out our sales team. But if this mission motivates with
+
+677
+00:50:32.720 --> 00:50:38.380
+<v Douwe Maan>you and you think that you could be valuable to us as we make all of this a reality, then don't
+
+678
+00:50:38.380 --> 00:50:41.260
+<v Douwe Maan>hesitate to reach out and I'd love to see if there's a place for you in New York.
+
+679
+00:50:45.900 --> 00:50:48.780
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+680
+00:50:52.380 --> 00:50:58.720
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or
+
+681
+00:50:58.720 --> 00:51:04.640
+<v Noah Labhart>the podcasting app of your choice. Support the show on patreon.com/CodeStory for just
+
+682
+00:51:04.640 --> 00:51:10.040
+<v Noah Labhart>five to ten bucks a month. And when you get a chance, leave us a review. Both things help us.
+
+683
+00:51:13.120 --> 00:51:14.620
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1479 @@
+WEBVTT
+
+NOTE S13 Bonus: The Enterprise AI Chip War: Rethinking LLM Silicon & Inference with Vasanth Mohan, Director of Product at SambaNova
+
+1
+00:00:04.640 --> 00:00:29.920
+<v Noah Labhart>Hello, listeners. Today, we welcome a special guest to the podcast, Vasanth Mohan, Head of Developer Relations and Product Marketing at SambaNova. SambaNova is transforming AI with efficiency, security, and sovereignty driven by their relentless pursuit of intelligence and running the largest models by maximizing data flow efficiency. Vasanth and I dig into some fun and heavy topics at the backbone of where the industry is going
+
+2
+00:00:30.000 --> 00:00:32.980
+<v Noah Labhart>with AI inference, specifically at the hardware layer.
+
+3
+00:00:34.660 --> 00:00:36.760
+<v Noah Labhart>Vasanth, thank you for being on the show today.
+
+4
+00:00:36.880 --> 00:00:38.060
+<v Noah Labhart>Thanks for being on Code Story.
+
+5
+00:00:38.740 --> 00:00:39.260
+<v Vasanth Mohan>Awesome.
+
+6
+00:00:39.400 --> 00:00:44.640
+<v Vasanth Mohan>Excited to be here and looking forward to explaining a lot more of what's happened behind
+
+7
+00:00:44.640 --> 00:00:49.980
+<v Vasanth Mohan>the scenes when it comes to AI infrastructure and how that really emerges for all of the
+
+8
+00:00:49.980 --> 00:00:53.540
+<v Vasanth Mohan>agents that your audience is actively building and developing with.
+
+9
+00:00:54.060 --> 00:00:54.580
+<v Noah Labhart>Absolutely.
+
+10
+00:00:54.580 --> 00:00:59.580
+<v Noah Labhart>It's such an interesting time when the industry is moving so fast and a lot of people are
+
+11
+00:01:00.000 --> 00:01:08.620
+<v Noah Labhart>putting their hands to keyboard and using AI tools and using generative tools and the models and all the things out there that are improving the lives.
+
+12
+00:01:08.740 --> 00:01:14.860
+<v Noah Labhart>But behind the scenes, the hardware problem, the hardware optimization is real and a lot of people don't get to see that.
+
+13
+00:01:14.940 --> 00:01:16.640
+<v Noah Labhart>So I'm really excited to dive into that.
+
+14
+00:01:16.900 --> 00:01:21.740
+<v Noah Labhart>Before we do, what I'd really like to do is have you tell me in the audience a little bit about you.
+
+15
+00:01:22.100 --> 00:01:22.600
+<v Noah Labhart>I
+
+16
+00:01:22.580 --> 00:01:25.600
+<v Vasanth Mohan>lead product marketing and developer relations at SambaNova.
+
+17
+00:01:25.600 --> 00:01:34.040
+<v Vasanth Mohan>Before that, I've been around Silicon Valley and a bunch of different startups from virtual reality to AI where I am today.
+
+18
+00:01:34.640 --> 00:01:47.440
+<v Vasanth Mohan>And it's super interesting diving in and having been with SambaNova for the last couple of years to really dive into the hardware and infrastructure that is driving this AI revolution.
+
+19
+00:01:47.920 --> 00:01:54.300
+<v Noah Labhart>Curious about if you can tell me a little bit about SambaNova and how you and the team are solving these types of problems.
+
+20
+00:01:55.600 --> 00:02:01.960
+<v Vasanth Mohan>been around since 2017, so it's not new and has produced many chips in that time as a hardware
+
+21
+00:02:01.960 --> 00:02:08.000
+<v Vasanth Mohan>company. It was co-founded by two Stanford professors partnering with a pioneer from
+
+22
+00:02:08.000 --> 00:02:13.520
+<v Vasanth Mohan>the Sun and Oracle days. His name is Rodrigo Liang. And together, they've really come up with
+
+23
+00:02:13.520 --> 00:02:21.800
+<v Vasanth Mohan>this innovative idea, having seen the AI space emerge, to create this chip called a reconfigurable
+
+24
+00:02:21.800 --> 00:02:31.300
+<v Vasanth Mohan>data flow unit, RDU. And it fundamentally works very differently from GPUs in the way that it
+
+25
+00:02:31.300 --> 00:02:38.120
+<v Vasanth Mohan>maps the hardware in a way that is much more spatially oriented to how AI operations work.
+
+26
+00:02:38.320 --> 00:02:44.380
+<v Vasanth Mohan>And it's been taking a lot of the research that's been happening and building that into the silicon
+
+27
+00:02:44.380 --> 00:02:51.700
+<v Vasanth Mohan>layer in a way that's reconfigurable and usable across many different AI models, but also much
+
+28
+00:02:51.700 --> 00:02:58.880
+<v Vasanth Mohan>more tuned to the data flow graphs that AI models are created against so that you can get much more
+
+29
+00:02:58.880 --> 00:03:06.980
+<v Vasanth Mohan>energy efficient operations, as well as also delivering tokens much more faster, which will
+
+30
+00:03:06.980 --> 00:03:13.620
+<v Vasanth Mohan>be incredibly important to a lot of the agentic AI applications that everyone is building today.
+
+31
+00:03:14.380 --> 00:03:23.460
+<v Noah Labhart>So tell me about when you joined the company, what brought you to SambaNova and what problem or what thing really drew you to the mission?
+
+32
+00:03:23.640 --> 00:03:28.860
+<v Vasanth Mohan>When I joined two years ago, the company was at a very different stage in its journey.
+
+33
+00:03:29.040 --> 00:03:42.200
+<v Vasanth Mohan>But one thing that I did see that has been true and how we have really reshaped the way we go to market is that fast tokens are incredibly important.
+
+34
+00:03:42.200 --> 00:03:58.160
+<v Vasanth Mohan>And in the AI applications I was building myself as a technical product marketing and engineer by trade is that fast tokens are always going to be important, especially as you start to chain a lot of these LLM requests together.
+
+35
+00:03:58.160 --> 00:04:02.380
+<v Vasanth Mohan>And I saw some of the early demos that SambaNova had demonstrated.
+
+36
+00:04:02.880 --> 00:04:09.780
+<v Vasanth Mohan>At the time, it was on its fourth generation chip, and we now have our fifth generation chip that's shipping to customers later this year.
+
+37
+00:04:09.980 --> 00:04:19.440
+<v Vasanth Mohan>And I knew that was really going to be absolutely critical for how AI gets deployed in production, and it's going to be incredibly important.
+
+38
+00:04:19.440 --> 00:04:26.060
+<v Vasanth Mohan>And lo and behold, that has started to become even more apparent in whether you look at
+
+39
+00:04:26.060 --> 00:04:33.580
+<v Vasanth Mohan>Anthropic and the need for fast tokens through Claude Opus 4.6, as well as later versions
+
+40
+00:04:33.580 --> 00:04:34.080
+<v Vasanth Mohan>like 5.
+
+41
+00:04:34.460 --> 00:04:37.220
+<v Vasanth Mohan>Definitely true with OpenAI and their fast mode.
+
+42
+00:04:37.440 --> 00:04:42.340
+<v Vasanth Mohan>And it's been interesting to see also the leading inference providers also get really
+
+43
+00:04:42.340 --> 00:04:47.220
+<v Vasanth Mohan>hungry for fast tokens on some of these open source models like Kimi or GLM.
+
+44
+00:04:47.220 --> 00:04:58.800
+<v Vasanth Mohan>And that thesis that I had when I joined has been growing and revalidating itself, which is that as AI gets deployed more and more in production, you need faster and faster tokens.
+
+45
+00:04:58.960 --> 00:05:00.360
+<v Vasanth Mohan>And how do you get that?
+
+46
+00:05:00.420 --> 00:05:04.880
+<v Vasanth Mohan>You get that through really optimized hardware like the SambaNova RDUs.
+
+47
+00:05:05.080 --> 00:05:05.580
+<v Noah Labhart>Awesome.
+
+48
+00:05:05.640 --> 00:05:08.720
+<v Noah Labhart>I appreciate that overview and a bit into SambaNova.
+
+49
+00:05:08.960 --> 00:05:10.980
+<v Noah Labhart>Let's dig into our topics for today.
+
+50
+00:05:11.180 --> 00:05:15.540
+<v Noah Labhart>The first area of topic, the shift to autonomy and chat responses, right?
+
+51
+00:05:17.220 --> 00:05:23.340
+<v Noah Labhart>generating a single response to an autonomous agent executing dozens of background tool calls,
+
+52
+00:05:23.600 --> 00:05:28.180
+<v Noah Labhart>loop checks, and file rewrites, all the things that it can do automatically. How does the
+
+53
+00:05:28.180 --> 00:05:33.160
+<v Noah Labhart>underlying inference profile change, right? And what metrics break first?
+
+54
+00:05:33.540 --> 00:05:40.000
+<v Vasanth Mohan>100%. It's really interesting to see how just in the short span of time, like two years,
+
+55
+00:05:40.000 --> 00:05:50.980
+<v Vasanth Mohan>We've gone from these chatbot single shot responses to agents when you go to Claude Code, Claude Cowork, OpenAI Codex, etc.
+
+56
+00:05:51.340 --> 00:06:04.080
+<v Vasanth Mohan>All of these different tools are now chaining together LLM requests to be able to solve a end-to-end task and really go deep and create even more detail on top of that, which is not just one agent,
+
+57
+00:06:04.080 --> 00:06:10.740
+<v Vasanth Mohan>but sub-agents that are breaking down tasks and are super specialized into a specific domain.
+
+58
+00:06:10.980 --> 00:06:19.020
+<v Vasanth Mohan>And in that, what has occurred is that the amount of inference that you need has grown exponentially.
+
+59
+00:06:19.760 --> 00:06:25.960
+<v Vasanth Mohan>And the challenge that the industry as a whole is trying to figure out when it comes to deploying
+
+60
+00:06:25.960 --> 00:06:32.060
+<v Vasanth Mohan>these agents in production is how do you balance the completeness, especially when you're running
+
+61
+00:06:32.060 --> 00:06:40.180
+<v Vasanth Mohan>really large models like a Opus 5 or a GPT 5.6 Sol, running that efficiently on hardware when
+
+62
+00:06:40.180 --> 00:06:45.620
+<v Vasanth Mohan>these are really massive, 2 trillion, 3 trillion, 5 trillion, and the number of parameters are
+
+63
+00:06:45.620 --> 00:06:51.180
+<v Vasanth Mohan>continuing to grow on these models, which translates to much more memory usage, while also
+
+64
+00:06:52.060 --> 00:06:59.220
+<v Vasanth Mohan>ensuring that these models run really fast so that your agents, which are creating a bunch of
+
+65
+00:06:59.220 --> 00:07:03.820
+<v Vasanth Mohan>of different LLM requests can reduce the time at each and every step with faster
+
+66
+00:07:03.820 --> 00:07:07.760
+<v Vasanth Mohan>and faster inference to reduce the overall time that you get an answer.
+
+67
+00:07:08.000 --> 00:07:13.460
+<v Vasanth Mohan>And this becomes incredibly important in a bunch of different use cases for
+
+68
+00:07:13.880 --> 00:07:18.000
+<v Vasanth Mohan>what, whether that's with coding or even a lot of the cowork use cases that we're
+
+69
+00:07:18.000 --> 00:07:22.600
+<v Vasanth Mohan>seeing emerge as simple as PowerPoint creation, for example, that's still an
+
+70
+00:07:22.600 --> 00:07:26.180
+<v Vasanth Mohan>agent that's behind the scenes creating many different requests if you're familiar
+
+71
+00:07:26.180 --> 00:07:32.340
+<v Vasanth Mohan>and have been using these tools, then you know that these agents can take minutes and oftentimes
+
+72
+00:07:32.340 --> 00:07:39.720
+<v Vasanth Mohan>hours, even days to produce results. And so being able to figure out how we can take each of these
+
+73
+00:07:39.720 --> 00:07:46.140
+<v Vasanth Mohan>individual building blocks of agents and run them significantly faster is really that next hurdle
+
+74
+00:07:46.140 --> 00:07:52.760
+<v Vasanth Mohan>that the market and industry is trying to solve to optimize and get these agents into much shorter
+
+75
+00:07:52.760 --> 00:07:59.280
+<v Vasanth Mohan>time to task completion. And then as a result, creating a lot more usability and productivity
+
+76
+00:07:59.280 --> 00:08:02.900
+<v Vasanth Mohan>that can be emerged by running these agents faster.
+
+77
+00:08:03.160 --> 00:08:03.660
+<v Noah Labhart>Excellent.
+
+78
+00:08:03.680 --> 00:08:07.520
+<v Noah Labhart>So when you're running the agents faster and getting through these tasks faster,
+
+79
+00:08:07.640 --> 00:08:12.500
+<v Noah Labhart>we start to come to the idea of budgeting tokens and things like that. And in the beginning,
+
+80
+00:08:12.660 --> 00:08:17.700
+<v Noah Labhart>token per second throughput was a nice to have metric for human readability. But for multi-agent
+
+81
+00:08:17.700 --> 00:08:21.160
+<v Noah Labhart>workflows that are all running parallel, and you're talking about speeding up the
+
+82
+00:08:22.760 --> 00:08:25.040
+<v Noah Labhart>is critical to prevent the system timeouts.
+
+83
+00:08:25.240 --> 00:08:28.400
+<v Noah Labhart>So how are developers designing prompt structures
+
+84
+00:08:28.400 --> 00:08:31.480
+<v Noah Labhart>and context windows and all the things that go into building
+
+85
+00:08:31.480 --> 00:08:34.020
+<v Noah Labhart>something like a request or an agent
+
+86
+00:08:34.020 --> 00:08:38.160
+<v Noah Labhart>to prevent compounding latencies during multi-agent orchestration?
+
+87
+00:08:38.520 --> 00:08:42.700
+<v Vasanth Mohan>Yeah, so it's really interesting where, again,
+
+88
+00:08:42.920 --> 00:08:44.640
+<v Vasanth Mohan>the industry changes so fast.
+
+89
+00:08:44.840 --> 00:08:48.280
+<v Vasanth Mohan>I think in even a year or a year and a half ago,
+
+90
+00:08:48.840 --> 00:08:51.400
+<v Vasanth Mohan>the way developers would do that is by creating,
+
+91
+00:08:52.760 --> 00:08:57.880
+<v Vasanth Mohan>framework, like a CrewAI exam, for example, and you manually go in and you'd say, I want an agent
+
+92
+00:08:57.880 --> 00:09:05.600
+<v Vasanth Mohan>that's planning and I want a coding agent and I want a QA agent and a CSED agent, I'd manually
+
+93
+00:09:05.600 --> 00:09:11.740
+<v Vasanth Mohan>go in and craft all of my prompts and structures. What has really happened, what I would say just
+
+94
+00:09:11.740 --> 00:09:19.480
+<v Vasanth Mohan>earlier this year with the introduction of Opus 4.6 is, and definitely much, it's just been getting
+
+95
+00:09:19.480 --> 00:09:25.120
+<v Vasanth Mohan>getting better and better is the models are working better with the agentic harnesses.
+
+96
+00:09:25.680 --> 00:09:33.580
+<v Vasanth Mohan>And as a result, developers actually can get to the point where they can keep very high level
+
+97
+00:09:33.580 --> 00:09:39.280
+<v Vasanth Mohan>thoughts and context that they provide to the agent on what they want the end task to be.
+
+98
+00:09:39.640 --> 00:09:46.200
+<v Vasanth Mohan>And the agent itself will actually go out and write all of the structure and sub-agents.
+
+99
+00:09:46.200 --> 00:09:52.240
+<v Vasanth Mohan>That's very true even in my day-to-day when I use OpenClaw or Hermes or even Claude Code,
+
+100
+00:09:52.400 --> 00:09:58.960
+<v Vasanth Mohan>that the agents are smart enough to break down the problem in such a way that you can
+
+101
+00:09:58.960 --> 00:10:02.180
+<v Vasanth Mohan>bifurcate it into a bunch of different subtasks.
+
+102
+00:10:02.340 --> 00:10:09.220
+<v Vasanth Mohan>And that manages and keeps each of these agents relatively isolated where their context windows
+
+103
+00:10:09.220 --> 00:10:13.660
+<v Vasanth Mohan>can be manageable and they can still interoperate with all these different agents.
+
+104
+00:10:13.660 --> 00:10:20.160
+<v Vasanth Mohan>And the beauty of also that architecture is that different agents can use different models
+
+105
+00:10:20.160 --> 00:10:27.740
+<v Vasanth Mohan>and you can reduce your overall cost and improve your overall efficiency in doing so.
+
+106
+00:10:27.860 --> 00:10:34.500
+<v Vasanth Mohan>For example, what the very common archetype that we see is planning is the most complicated
+
+107
+00:10:34.500 --> 00:10:35.000
+<v Vasanth Mohan>bit.
+
+108
+00:10:34.940 --> 00:10:40.520
+<v Vasanth Mohan>You want almost always a frontier model to be doing that, whether that's Fable, Opus,
+
+109
+00:10:40.540 --> 00:10:41.680
+<v Vasanth Mohan>GPT 5.6.
+
+110
+00:10:43.660 --> 00:10:47.780
+<v Vasanth Mohan>especially in code execution, there are so many great open source alternatives there.
+
+111
+00:10:48.300 --> 00:10:54.480
+<v Vasanth Mohan>And they need to generate thousands and thousands of lines of code. And you can take a model like a
+
+112
+00:10:55.240 --> 00:11:03.300
+<v Vasanth Mohan>GLM, or a Kimi, or a MiniMax, and use that for the execution. And even our teams today use that
+
+113
+00:11:03.300 --> 00:11:09.660
+<v Vasanth Mohan>at SambaNova, and dramatically reduce the time that it takes for the agent to run and dramatically
+
+114
+00:11:09.660 --> 00:11:15.120
+<v Vasanth Mohan>reduce the overall cost, which is, I think, the two key variables that any developer is
+
+115
+00:11:15.120 --> 00:11:17.540
+<v Vasanth Mohan>really trying to optimize when bringing these into production.
+
+116
+00:11:17.920 --> 00:11:19.720
+<v Noah Labhart>I think that is interesting.
+
+117
+00:11:19.920 --> 00:11:22.900
+<v Noah Labhart>It's a super fascinating area to kind of dig into.
+
+118
+00:11:23.160 --> 00:11:28.680
+<v Noah Labhart>And moving forward, we think about optimal hardware mix inside the rack.
+
+119
+00:11:29.540 --> 00:11:33.860
+<v Noah Labhart>Hyperscalers historically standardized on monolithic hardware, but nowadays,
+
+120
+00:11:33.860 --> 00:11:39.260
+<v Noah Labhart>nowadays, Neo clouds are increasingly mixing high memory GPUs, specialized inference, ASICs,
+
+121
+00:11:39.280 --> 00:11:44.160
+<v Noah Labhart>and custom interconnects. How do you decide what that optimal hardware mix is inside the rack
+
+122
+00:11:44.160 --> 00:11:51.880
+<v Noah Labhart>when your customer demand fluctuates between the massive long context reasoning models versus rapid
+
+123
+00:11:51.880 --> 00:11:53.040
+<v Noah Labhart>edge-like decoding?
+
+124
+00:11:53.260 --> 00:11:59.360
+<v Vasanth Mohan>Yeah, it builds on this agentic infrastructure, right? So agents are the
+
+125
+00:11:59.360 --> 00:12:04.520
+<v Vasanth Mohan>the ones that are creating this demand that then needs to trickle down into how you plan your data
+
+126
+00:12:04.520 --> 00:12:11.660
+<v Vasanth Mohan>center. And you're right, it's been largely general purpose today with GPUs. But the unfortunate
+
+127
+00:12:11.660 --> 00:12:18.100
+<v Vasanth Mohan>reality is that just because of their architecture being much more well suited, graphics workload,
+
+128
+00:12:18.240 --> 00:12:25.200
+<v Vasanth Mohan>that's what they were optimized for and ported over to AI, they have structural memory bandwidth
+
+129
+00:12:25.200 --> 00:12:31.880
+<v Vasanth Mohan>with problems when it comes to processing AI workloads. And that just leaves a big gap for
+
+130
+00:12:31.880 --> 00:12:37.460
+<v Vasanth Mohan>these premium fast inference workloads that developers and anyone who's using agents are
+
+131
+00:12:37.460 --> 00:12:42.500
+<v Vasanth Mohan>craving. And in that broader data center ecosystem, if you want to serve all of these different
+
+132
+00:12:42.500 --> 00:12:48.380
+<v Vasanth Mohan>requests, and people are already paying and have such a big desire to have these agents run faster
+
+133
+00:12:48.380 --> 00:12:53.020
+<v Vasanth Mohan>because they can get way more productivity out of it, then you have to think about, okay, I might
+
+134
+00:12:53.020 --> 00:12:58.280
+<v Vasanth Mohan>have some use cases where I can have slow tokens and I can use my GPUs that exist today.
+
+135
+00:12:58.580 --> 00:13:02.440
+<v Vasanth Mohan>I obviously have AI training workloads that I need to keep running on GPUs.
+
+136
+00:13:02.460 --> 00:13:08.580
+<v Vasanth Mohan>But then for this emerging class of agents that need fast inference, you need to start
+
+137
+00:13:08.580 --> 00:13:10.900
+<v Vasanth Mohan>bringing that into the data center.
+
+138
+00:13:11.200 --> 00:13:16.020
+<v Vasanth Mohan>And I think it becomes also even interesting, without going into a bunch of detail, although
+
+139
+00:13:16.020 --> 00:13:21.380
+<v Vasanth Mohan>though I'm happy to, where you can use different architectures and infrastructure together
+
+140
+00:13:21.380 --> 00:13:26.680
+<v Vasanth Mohan>to improve that overall utilization in what's called disaggregated inference.
+
+141
+00:13:27.300 --> 00:13:34.580
+<v Vasanth Mohan>And using GPUs on the prefill side, using custom ASICs or RDUs in our case, in the decode
+
+142
+00:13:34.580 --> 00:13:41.880
+<v Vasanth Mohan>side, you can create that best of both worlds scenario where you're maximizing the utilization
+
+143
+00:13:41.880 --> 00:13:43.780
+<v Vasanth Mohan>across your overall stack.
+
+144
+00:13:43.960 --> 00:13:46.800
+<v Vasanth Mohan>You are delivering these faster tokens
+
+145
+00:13:46.800 --> 00:13:49.660
+<v Vasanth Mohan>that are helping these agents run faster.
+
+146
+00:13:49.840 --> 00:13:51.600
+<v Vasanth Mohan>And then the end result is, of course,
+
+147
+00:13:51.660 --> 00:13:52.980
+<v Vasanth Mohan>you're getting much more productivity
+
+148
+00:13:52.980 --> 00:13:55.820
+<v Vasanth Mohan>out of anyone that's using the infrastructure.
+
+149
+00:13:56.140 --> 00:13:58.560
+<v Vasanth Mohan>And that's really the holy grail, if you will,
+
+150
+00:13:58.680 --> 00:14:00.480
+<v Vasanth Mohan>that we're really trying to move towards,
+
+151
+00:14:00.700 --> 00:14:03.640
+<v Vasanth Mohan>where the full stack kind of gets optimized
+
+152
+00:14:03.640 --> 00:14:06.740
+<v Vasanth Mohan>from the infrastructure to the use cases
+
+153
+00:14:06.740 --> 00:14:09.620
+<v Vasanth Mohan>and the outcomes that everyone who's using AI
+
+154
+00:14:09.620 --> 00:14:10.540
+<v Vasanth Mohan>is really craving.
+
+155
+00:14:10.840 --> 00:14:11.420
+<v Noah Labhart>Interesting.
+
+156
+00:14:11.880 --> 00:14:12.780
+<v Noah Labhart>Yeah, that's interesting.
+
+157
+00:14:13.100 --> 00:14:15.560
+<v Noah Labhart>And the word craving makes a lot of sense too.
+
+158
+00:14:15.740 --> 00:14:17.400
+<v Noah Labhart>And craving that optimal mix,
+
+159
+00:14:17.480 --> 00:14:21.240
+<v Noah Labhart>but sticking in the area of NeoCloud data center
+
+160
+00:14:21.240 --> 00:14:24.180
+<v Noah Labhart>and how they're architecting,
+
+161
+00:14:24.180 --> 00:14:25.340
+<v Noah Labhart>maybe it's not the right word,
+
+162
+00:14:25.440 --> 00:14:28.300
+<v Noah Labhart>organizing the layouts, engineering,
+
+163
+00:14:28.440 --> 00:14:30.960
+<v Noah Labhart>cooling and power distribution, all the things,
+
+164
+00:14:31.020 --> 00:14:32.580
+<v Noah Labhart>the high-end inference accelerators,
+
+165
+00:14:32.580 --> 00:14:33.640
+<v Noah Labhart>they draw massive power.
+
+166
+00:14:34.100 --> 00:14:37.640
+<v Noah Labhart>How are NeoCloud data centers going about this?
+
+167
+00:14:37.800 --> 00:14:39.500
+<v Noah Labhart>Again, the re-engineering, liquid cooling,
+
+168
+00:14:39.720 --> 00:14:40.900
+<v Noah Labhart>rack layouts, power distribution,
+
+169
+00:14:41.880 --> 00:14:48.320
+<v Noah Labhart>got to optimize specifically to maximize inference density rather than training throughput?
+
+170
+00:14:48.620 --> 00:14:53.020
+<v Vasanth Mohan>I think there's a lot of challenges that are happening at the data centers around the world.
+
+171
+00:14:53.180 --> 00:14:56.620
+<v Vasanth Mohan>I think that there are some advantages in liquid cooling.
+
+172
+00:14:56.700 --> 00:15:04.180
+<v Vasanth Mohan>The biggest challenge is today, 80% of data centers approximately are air-cooled across
+
+173
+00:15:04.180 --> 00:15:04.680
+<v Vasanth Mohan>the world.
+
+174
+00:15:04.680 --> 00:15:06.620
+<v Vasanth Mohan>20% of them are liquid-cooled.
+
+175
+00:15:06.620 --> 00:15:25.740
+<v Vasanth Mohan>And the challenge that we're seeing when it comes to inference and AI deployments is you need a ton of GPUs orchestrated together in a scale of network to be able to deliver kind of the performance profiles that you might want out of inference.
+
+176
+00:15:25.740 --> 00:15:38.620
+<v Vasanth Mohan>And that has to sit within a liquid-cooled data center, except for the problem that we don't have a ton of liquid-cooled data centers out there, and a large majority of them are currently being built out or with the hyperscalers.
+
+177
+00:15:38.620 --> 00:15:45.000
+<v Vasanth Mohan>which leaves this big opportunity to say, how can we use our existing infrastructure,
+
+178
+00:15:45.420 --> 00:15:50.660
+<v Vasanth Mohan>which is 80% of the data centers out there in the world today, which is not that complicated
+
+179
+00:15:50.660 --> 00:15:55.840
+<v Vasanth Mohan>because of the air cooling, and use that to get the best performance for inference.
+
+180
+00:15:56.240 --> 00:16:02.020
+<v Vasanth Mohan>And because especially given that inference is the predominant workload for AI. And one of the
+
+181
+00:16:02.020 --> 00:16:09.200
+<v Vasanth Mohan>the things with SambaNova that's incredibly important is because of the way the data flow
+
+182
+00:16:09.200 --> 00:16:17.280
+<v Vasanth Mohan>architecture works, we're able to significantly reduce the energy that you take to run AI
+
+183
+00:16:17.280 --> 00:16:24.540
+<v Vasanth Mohan>inference workloads. And the reason at the simplest level is because memory movement is the most
+
+184
+00:16:24.540 --> 00:16:33.140
+<v Vasanth Mohan>energy expensive thing that you can do on any chip. And there's a ton of memory movement that's
+
+185
+00:16:33.140 --> 00:16:38.360
+<v Vasanth Mohan>needed with a lot of these AI workloads. And if you don't have a data flow where operations are
+
+186
+00:16:38.360 --> 00:16:45.960
+<v Vasanth Mohan>moving seamlessly from one to the other without going to HBM, in the GPU paradigm where you don't
+
+187
+00:16:45.960 --> 00:16:52.440
+<v Vasanth Mohan>have that, you end up using a ton of energy and it becomes incredibly inefficient. With our RDU
+
+188
+00:16:52.440 --> 00:16:58.780
+<v Vasanth Mohan>paradigm that that's exactly where we've optimized for. And that allows us then to create these racks
+
+189
+00:16:58.780 --> 00:17:04.920
+<v Vasanth Mohan>that fit into data centers that can be air cooled without the need for liquid cooling.
+
+190
+00:17:05.380 --> 00:17:10.560
+<v Vasanth Mohan>And as a result, you can take advantage of that 80% of the data centers that are out there today
+
+191
+00:17:10.560 --> 00:17:16.280
+<v Vasanth Mohan>and start deploying really high performance inference in them, which I think is just a
+
+192
+00:17:16.280 --> 00:17:22.040
+<v Vasanth Mohan>massive market opportunity that I think a lot of Neo clouds are actively exploring because everyone
+
+193
+00:17:22.440 --> 00:17:27.540
+<v Vasanth Mohan>compute constraint. A lot of enterprises are looking at that as well. And I think that was
+
+194
+00:17:27.540 --> 00:17:32.700
+<v Vasanth Mohan>one of the things with JP Morgan, when they recently signed with us, that was a key
+
+195
+00:17:32.700 --> 00:17:38.260
+<v Vasanth Mohan>attractor is the fact that we can actually have our racks sit within these air-cooled data centers
+
+196
+00:17:38.260 --> 00:17:41.840
+<v Vasanth Mohan>and make it significantly better for them to run their inference workloads.
+
+197
+00:17:42.220 --> 00:17:42.720
+<v Noah Labhart>Interesting.
+
+198
+00:17:42.820 --> 00:17:47.000
+<v Noah Labhart>This is all really fascinating engineering problems to solve and really
+
+199
+00:17:47.000 --> 00:17:48.960
+<v Noah Labhart>really interesting optimization things.
+
+200
+00:17:49.280 --> 00:17:53.360
+<v Noah Labhart>So I want to dig into decoupling, pre-fill, and decode,
+
+201
+00:17:53.360 --> 00:17:56.540
+<v Noah Labhart>and really the biggest real-world friction points
+
+202
+00:17:56.540 --> 00:17:59.980
+<v Noah Labhart>that are present when deploying this in production.
+
+203
+00:18:00.720 --> 00:18:03.960
+<v Noah Labhart>Disaggregated inference splits compute-heavy pre-fill operations
+
+204
+00:18:03.960 --> 00:18:06.460
+<v Noah Labhart>from memory bandwidth-heavy decode operations
+
+205
+00:18:06.460 --> 00:18:08.460
+<v Noah Labhart>onto distinct hardware pools.
+
+206
+00:18:08.820 --> 00:18:11.900
+<v Noah Labhart>So what are those biggest real-world friction points
+
+207
+00:18:11.900 --> 00:18:13.920
+<v Noah Labhart>when deploying this in production?
+
+208
+00:18:14.160 --> 00:18:16.340
+<v Noah Labhart>And I think the area that is interesting
+
+209
+00:18:17.000 --> 00:18:20.560
+<v Noah Labhart>around the KV cache, transfer overhead, and internode networking.
+
+210
+00:18:20.840 --> 00:18:21.600
+<v Noah Labhart>Lots of words there.
+
+211
+00:18:21.780 --> 00:18:22.280
+<v Vasanth Mohan>Yeah,
+
+212
+00:18:22.100 --> 00:18:25.920
+<v Vasanth Mohan>and we hinted at it earlier when we were talking about the data centers.
+
+213
+00:18:26.140 --> 00:18:31.640
+<v Vasanth Mohan>And I think what's really emerging, especially amongst the hyperscalers and sophisticated
+
+214
+00:18:31.640 --> 00:18:38.120
+<v Vasanth Mohan>near clouds, is different chips at the end of the day are specialized and will get higher
+
+215
+00:18:38.120 --> 00:18:40.820
+<v Vasanth Mohan>utilizations for different parts of the inference workload.
+
+216
+00:18:41.460 --> 00:18:43.600
+<v Vasanth Mohan>That's really the real bottleneck.
+
+217
+00:18:43.700 --> 00:18:45.220
+<v Vasanth Mohan>So maybe to break this down, right?
+
+218
+00:18:47.000 --> 00:18:50.840
+<v Vasanth Mohan>when you've typed your input into ChatGPT
+
+219
+00:18:50.840 --> 00:18:54.040
+<v Vasanth Mohan>and it needs to convert your text
+
+220
+00:18:54.040 --> 00:18:58.000
+<v Vasanth Mohan>into all of the tensors and vectors and matrices,
+
+221
+00:18:59.020 --> 00:19:01.640
+<v Vasanth Mohan>the mathematical representation, if you will,
+
+222
+00:19:01.780 --> 00:19:03.020
+<v Vasanth Mohan>which is what we call the KV cache.
+
+223
+00:19:03.700 --> 00:19:06.400
+<v Vasanth Mohan>And that creates the context
+
+224
+00:19:06.400 --> 00:19:08.840
+<v Vasanth Mohan>for it to then move to the next phase,
+
+225
+00:19:09.140 --> 00:19:10.020
+<v Vasanth Mohan>which is decode,
+
+226
+00:19:10.120 --> 00:19:12.720
+<v Vasanth Mohan>which is where you're generating token by token
+
+227
+00:19:12.720 --> 00:19:13.580
+<v Vasanth Mohan>one at a time.
+
+228
+00:19:13.840 --> 00:19:16.500
+<v Vasanth Mohan>And they're very fundamentally different
+
+229
+00:19:17.000 --> 00:19:23.480
+<v Vasanth Mohan>operations. Pre-fill, as you can imagine, the input context links for a lot of these agents
+
+230
+00:19:23.480 --> 00:19:30.420
+<v Vasanth Mohan>is in the hundreds of thousands, approaching a million on some models. And that's a huge
+
+231
+00:19:30.420 --> 00:19:37.440
+<v Vasanth Mohan>amount of context that needs to be computed as fast as you can. And so the workload is
+
+232
+00:19:37.440 --> 00:19:44.400
+<v Vasanth Mohan>really designed for how much compute can I throw at this problem to generate that KV cache.
+
+233
+00:19:44.400 --> 00:19:52.380
+<v Vasanth Mohan>Then you go to decode. And decode is, as we've talked about before, is memory bound. It is how
+
+234
+00:19:52.380 --> 00:19:59.100
+<v Vasanth Mohan>fast can you move this giant KV cache of all of that context and use that to generate token after
+
+235
+00:19:59.100 --> 00:20:04.600
+<v Vasanth Mohan>token while I'm continually adding onto it for each and every token that I generate. And it is
+
+236
+00:20:04.600 --> 00:20:10.720
+<v Vasanth Mohan>a function of these really large models, which have really big parameter counts paired with
+
+237
+00:20:10.720 --> 00:20:16.880
+<v Vasanth Mohan>with really large KV caches that then are creating this big bottleneck when it comes to running large
+
+238
+00:20:16.880 --> 00:20:22.100
+<v Vasanth Mohan>models as fast as you can. But what that tells you is that, okay, I need to think about these
+
+239
+00:20:22.100 --> 00:20:27.040
+<v Vasanth Mohan>problems very differently. And I need to have different hardware that runs in each of those
+
+240
+00:20:27.040 --> 00:20:34.520
+<v Vasanth Mohan>workloads. And the third part is I need to have really good networking that can make sure that
+
+241
+00:20:34.520 --> 00:20:40.320
+<v Vasanth Mohan>that the latency between transferring from chip to chip is as low as possible.
+
+242
+00:20:40.520 --> 00:20:46.940
+<v Vasanth Mohan>If possible, then can I go ahead and do anything to overlap the compute
+
+243
+00:20:46.940 --> 00:20:52.340
+<v Vasanth Mohan>with the memory latency and the network transferring to reduce the perceived latency?
+
+244
+00:20:52.940 --> 00:20:56.680
+<v Vasanth Mohan>And so you have really these three buckets that are all working together in the data center.
+
+245
+00:20:56.900 --> 00:21:00.780
+<v Vasanth Mohan>So on prefill, what we see today is that's largely GPUs.
+
+246
+00:21:00.780 --> 00:21:06.540
+<v Vasanth Mohan>on decode, we're seeing this growing interest around different solutions like some of those
+
+247
+00:21:06.540 --> 00:21:11.140
+<v Vasanth Mohan>already use. And then the networking that ties that all together is this whole separate set of
+
+248
+00:21:11.140 --> 00:21:17.020
+<v Vasanth Mohan>racks that create this kind of scale up and scale out network that ties this all together and moves
+
+249
+00:21:17.020 --> 00:21:23.100
+<v Vasanth Mohan>the bits across all of these different chips as fast as you possibly can. And doing all of those
+
+250
+00:21:23.100 --> 00:21:30.200
+<v Vasanth Mohan>things well is incredibly difficult. But when done well, it allows you to maximize the overall
+
+251
+00:21:30.780 --> 00:21:36.880
+<v Vasanth Mohan>and then improve at the end of the day, from a neoclouds perspective, the ROI that they're
+
+252
+00:21:36.880 --> 00:21:39.420
+<v Vasanth Mohan>actually getting on this infrastructure investment.
+
+253
+00:21:39.900 --> 00:21:42.420
+<v Noah Labhart>It's really interesting. And you can tell by the
+
+254
+00:21:42.420 --> 00:21:47.500
+<v Noah Labhart>points you're making there, the clouds really dig into this and do the hard work right up front into
+
+255
+00:21:47.500 --> 00:21:52.960
+<v Noah Labhart>these optimizations. They're going to see benefit. Let's move into kind of a dynamic orchestration.
+
+256
+00:21:53.280 --> 00:21:59.040
+<v Noah Labhart>In a disaggregated setup, workload spike, or workload spike, excuse me, in long context
+
+257
+00:22:00.780 --> 00:22:04.600
+<v Noah Labhart>in long-context prefill, while leaving decode nodes underutilized. How are leading engineering
+
+258
+00:22:04.600 --> 00:22:10.840
+<v Noah Labhart>teams building smart routing layers and dynamic auto-scaling engines to balance compute across
+
+259
+00:22:10.840 --> 00:22:16.020
+<v Noah Labhart>compute-bound and memory-bound hardware? How are they setting this up to where they can run the
+
+260
+00:22:16.020 --> 00:22:18.060
+<v Noah Labhart>best where there are bounds in place?
+
+261
+00:22:18.420 --> 00:22:23.260
+<v Vasanth Mohan>And I think that's exactly the biggest challenge that these
+
+262
+00:22:23.260 --> 00:22:27.460
+<v Vasanth Mohan>leading engineers are trying to solve. On one hand, you want to maximize the ROI. On the other
+
+263
+00:22:27.460 --> 00:22:34.520
+<v Vasanth Mohan>other hand, you don't want to make your hardware too rigid for a very specific workload that when
+
+264
+00:22:34.520 --> 00:22:39.800
+<v Vasanth Mohan>workloads change and even something as simple as you get a bunch of agent requests during the day
+
+265
+00:22:39.800 --> 00:22:45.000
+<v Vasanth Mohan>and then maybe it falls out overnight, you're not able to scale up and scale down your hardware
+
+266
+00:22:45.000 --> 00:22:50.400
+<v Vasanth Mohan>needs as needed. Or maybe you have a bunch of agents that are just ramping up and they're all
+
+267
+00:22:50.400 --> 00:22:54.260
+<v Vasanth Mohan>really small context length and they haven't really gone to the large context length. So
+
+268
+00:22:54.260 --> 00:22:59.860
+<v Vasanth Mohan>So there's a lot of different factors that our NeoClouds and inference providers have
+
+269
+00:22:59.860 --> 00:23:02.540
+<v Vasanth Mohan>to balance to maximize that utilization of the hardware.
+
+270
+00:23:03.100 --> 00:23:08.960
+<v Vasanth Mohan>And so as a result, you can't over-engineer the underlying hardware infrastructure.
+
+271
+00:23:09.240 --> 00:23:16.300
+<v Vasanth Mohan>But you want to get it to the point where there is a good chip-to-chip ratios when it
+
+272
+00:23:16.300 --> 00:23:22.240
+<v Vasanth Mohan>comes to balancing pre-fill and decode, ideally in the range of 1 to 1 or 1 to 2 or 2 to 1.
+
+273
+00:23:22.240 --> 00:23:34.220
+<v Vasanth Mohan>Because at that level of fungibility, then it's almost equivalent in terms of having your pre-fill and decode nodes fully utilized across a wide range of workloads.
+
+274
+00:23:34.740 --> 00:23:49.200
+<v Vasanth Mohan>What we've seen in some other scenarios is where, let's say you're using an SRAM-only solution, the number of decode nodes that you need balloons because you don't have enough memory with just pure SRAM.
+
+275
+00:23:49.200 --> 00:23:57.300
+<v Vasanth Mohan>and as a result you're going to have way too many nodes of sram and not and compared to the number
+
+276
+00:23:57.300 --> 00:24:03.320
+<v Vasanth Mohan>of pre-fill nodes that you have and as workloads change the balancing act that you have to do and
+
+277
+00:24:03.320 --> 00:24:10.600
+<v Vasanth Mohan>it doesn't really play out and you end up in cases where you have pre-fill is generating way too much
+
+278
+00:24:10.600 --> 00:24:15.440
+<v Vasanth Mohan>too many tokens and decode doesn't have enough and you're oversupplied on decode and that's
+
+279
+00:24:15.440 --> 00:24:20.660
+<v Vasanth Mohan>That's exactly the problem that the engineers are exactly trying to balance, which is really
+
+280
+00:24:20.660 --> 00:24:27.280
+<v Vasanth Mohan>a function of how much throughput can I get out of my chips versus the SLOs that I'm getting
+
+281
+00:24:27.280 --> 00:24:31.820
+<v Vasanth Mohan>out of my hardware in terms of the speed the tokens are coming up per user, which is a
+
+282
+00:24:31.820 --> 00:24:37.600
+<v Vasanth Mohan>very tricky trade-off, but it's one that at SambaNova we're very cognizant of to make sure
+
+283
+00:24:37.880 --> 00:24:42.960
+<v Vasanth Mohan>that the pre-fill and decode can stay in balance across a wide range of workloads and make
+
+284
+00:24:42.960 --> 00:24:49.180
+<v Vasanth Mohan>make sure that these disaggregated setups are then able to be mature, reliably used in production
+
+285
+00:24:49.180 --> 00:24:54.700
+<v Vasanth Mohan>into the future. And I think that's just incredibly important because hardware is such a big
+
+286
+00:24:54.700 --> 00:25:00.140
+<v Vasanth Mohan>investment upfront and needs to pay itself out over many years for it to make sense. And for that
+
+287
+00:25:00.140 --> 00:25:06.100
+<v Vasanth Mohan>to happen, you need to have infrastructure that's able to be flexible and fungible over that lifespan.
+
+288
+00:25:06.440 --> 00:25:12.320
+<v Noah Labhart>No doubt. It's a heavy investment upfront and it's a longer payback period. And I like what
+
+289
+00:25:12.960 --> 00:25:17.680
+<v Noah Labhart>over-engineer it, but you have to balance that. I think in doing so too, it gets to our last point
+
+290
+00:25:17.680 --> 00:25:24.540
+<v Noah Labhart>around the economics, right? Enterprise adoption is oscillating between proprietary API-driven
+
+291
+00:25:24.540 --> 00:25:30.620
+<v Noah Labhart>models and self-hosted open weights. And everybody has the tipping point that they're looking for,
+
+292
+00:25:30.700 --> 00:25:35.460
+<v Noah Labhart>or that they need to be aware of where it's economically imperative to solve some of these
+
+293
+00:25:35.460 --> 00:25:42.180
+<v Noah Labhart>problems or go between these two, go from one model to the other. At what scale does it become
+
+294
+00:25:42.960 --> 00:25:49.260
+<v Noah Labhart>Economically imperative for a company to transition off closed APIs onto self-hosted open infrastructure.
+
+295
+00:25:49.480 --> 00:25:56.560
+<v Noah Labhart>And scale is really measured in inference volumes, latency, SLAs, data privacy constraints, things like that.
+
+296
+00:25:57.120 --> 00:26:06.340
+<v Vasanth Mohan>There's one takeaway from this conversation is you can tell how complicated it is for setting up a really efficient infrastructure.
+
+297
+00:26:06.580 --> 00:26:08.620
+<v Vasanth Mohan>And there's a ton of CapEx involved.
+
+298
+00:26:08.620 --> 00:26:28.500
+<v Vasanth Mohan>That's one of the reasons why all of the Neo clouds are doing so well and inference providers are doing so well is because it is incredibly complicated, right? And from an enterprise perspective, it's not trivial, let alone the cost to also have the talent that's also there to set up this infrastructure as well.
+
+299
+00:26:28.500 --> 00:26:37.040
+<v Vasanth Mohan>This is an incredibly niche set of skills that a lot of the NeoClouds and inference providers have curated over many years.
+
+300
+00:26:37.320 --> 00:26:42.780
+<v Vasanth Mohan>And so I say all of that in the context of on-prem deployments are very challenging.
+
+301
+00:26:43.080 --> 00:26:50.280
+<v Vasanth Mohan>That's not to say that you can't work with a NeoCloud or an inference provider that's done all of this legwork to maximize.
+
+302
+00:26:50.380 --> 00:26:57.000
+<v Vasanth Mohan>And they've mapped this out also to all of the profiles they expect to see from enterprise and run those on those NeoClouds.
+
+303
+00:26:58.500 --> 00:27:03.480
+<v Vasanth Mohan>Then what's deriving, okay, it's really more a choice of less, do I host this on-prem?
+
+304
+00:27:03.600 --> 00:27:09.460
+<v Vasanth Mohan>And then maybe more a question of, do I go to the Togethers or Fireworks or Baseten
+
+305
+00:27:09.460 --> 00:27:13.500
+<v Vasanth Mohan>of the world versus Anthropic and an OpenAI?
+
+306
+00:27:13.860 --> 00:27:17.740
+<v Vasanth Mohan>The vast majority of folks will start in that space.
+
+307
+00:27:17.840 --> 00:27:22.820
+<v Vasanth Mohan>And quite frankly, and then just tying this all back together to where we started, is
+
+308
+00:27:22.820 --> 00:27:26.300
+<v Vasanth Mohan>is that really when you look at deploying these agents,
+
+309
+00:27:26.460 --> 00:27:28.640
+<v Vasanth Mohan>you probably do start in the cloud
+
+310
+00:27:28.640 --> 00:27:30.300
+<v Vasanth Mohan>and OpenAI space of the world.
+
+311
+00:27:30.440 --> 00:27:34.380
+<v Vasanth Mohan>And you use it to create all of this agent infrastructure,
+
+312
+00:27:35.000 --> 00:27:37.280
+<v Vasanth Mohan>which is all of those prompts and frameworks
+
+313
+00:27:37.280 --> 00:27:38.000
+<v Vasanth Mohan>that we talked about.
+
+314
+00:27:38.320 --> 00:27:41.760
+<v Vasanth Mohan>And then you can slowly start peeling it back
+
+315
+00:27:41.760 --> 00:27:45.240
+<v Vasanth Mohan>from that closed model into,
+
+316
+00:27:45.440 --> 00:27:47.720
+<v Vasanth Mohan>okay, let me test this sub-agent on an open model,
+
+317
+00:27:47.840 --> 00:27:48.860
+<v Vasanth Mohan>see how it performs.
+
+318
+00:27:49.340 --> 00:27:52.220
+<v Vasanth Mohan>Evaluations become incredibly important in that regard.
+
+319
+00:27:52.820 --> 00:28:00.640
+<v Vasanth Mohan>But that's the level of testing that every developer and every engineer goes to.
+
+320
+00:28:00.840 --> 00:28:05.420
+<v Vasanth Mohan>And it's really in that framework, that's how enterprises will start to make that decision
+
+321
+00:28:05.420 --> 00:28:06.840
+<v Vasanth Mohan>and peel some of that back off.
+
+322
+00:28:07.410 --> 00:28:13.180
+<v Vasanth Mohan>And then the NeoClouds and inference providers will behind the scenes do all of that optimization
+
+323
+00:28:13.180 --> 00:28:19.240
+<v Vasanth Mohan>to make sure that you get the SLOs that you need in terms of speed and performance across
+
+324
+00:28:19.240 --> 00:28:23.780
+<v Vasanth Mohan>across a wide range of heterogeneous hardware that's really happening behind the scenes.
+
+325
+00:28:24.020 --> 00:28:24.520
+<v Noah Labhart>Yeah,
+
+326
+00:28:24.460 --> 00:28:26.060
+<v Noah Labhart>that makes total sense, Vasanth.
+
+327
+00:28:26.280 --> 00:28:27.940
+<v Noah Labhart>I really appreciate you walking me through this.
+
+328
+00:28:28.000 --> 00:28:31.980
+<v Noah Labhart>This is an area that is not an area that we talk about often on the show.
+
+329
+00:28:32.160 --> 00:28:35.520
+<v Noah Labhart>I can tell that where we're going as an industry,
+
+330
+00:28:35.960 --> 00:28:39.560
+<v Noah Labhart>Neo clouds are interesting, super important, and they're doing well.
+
+331
+00:28:39.760 --> 00:28:45.500
+<v Noah Labhart>They're seeing huge benefits and huge dividends paid off solving the real hard problems, right?
+
+332
+00:28:45.500 --> 00:28:50.740
+<v Noah Labhart>an architect and their data centers, the racks and their setups, and to really increase the
+
+333
+00:28:50.740 --> 00:28:54.960
+<v Noah Labhart>inference and be able to support this AI throughput. And the best engineering teams are
+
+334
+00:28:54.960 --> 00:28:58.960
+<v Noah Labhart>trying to solve these problems of dynamic orchestration amongst these bounded systems.
+
+335
+00:28:59.260 --> 00:29:03.660
+<v Noah Labhart>But as you said, the big takeaway, setting up these Neo clouds, it's incredibly complicated.
+
+336
+00:29:03.880 --> 00:29:09.640
+<v Noah Labhart>So at some point, businesses have to be able to make the call of moving to self-hosted
+
+337
+00:29:09.640 --> 00:29:14.020
+<v Noah Labhart>infrastructure over these closed API systems that they don't have any control
+
+338
+00:29:14.020 --> 00:29:14.520
+<v Noah Labhart>over.
+
+339
+00:29:15.500 --> 00:29:20.840
+<v Vasanth Mohan>happening at the hardware layer. It's really exciting. It's often hidden behind many layers,
+
+340
+00:29:21.060 --> 00:29:27.020
+<v Vasanth Mohan>especially for enterprises and software developers who are just so used to getting one API. But when
+
+341
+00:29:27.020 --> 00:29:31.440
+<v Vasanth Mohan>you start to pull things back, it's really remarkable, like all of the different components
+
+342
+00:29:31.440 --> 00:29:39.620
+<v Vasanth Mohan>that are being built out to make something as simple as you talking to an agent happen. And
+
+343
+00:29:39.620 --> 00:29:43.480
+<v Vasanth Mohan>it's going to continue to evolve and get complicated over the next many years,
+
+344
+00:29:43.480 --> 00:29:45.760
+<v Vasanth Mohan>with so many people working across the stack.
+
+345
+00:29:45.960 --> 00:29:47.540
+<v Vasanth Mohan>But the end goal of all of this
+
+346
+00:29:47.540 --> 00:29:49.440
+<v Vasanth Mohan>is to make these AI agents
+
+347
+00:29:49.440 --> 00:29:51.780
+<v Vasanth Mohan>that everyone who is listening is using
+
+348
+00:29:51.780 --> 00:29:53.740
+<v Vasanth Mohan>perform really well and really efficiently.
+
+349
+00:29:53.920 --> 00:29:55.740
+<v Vasanth Mohan>And that's going to continue to evolve
+
+350
+00:29:55.740 --> 00:29:56.760
+<v Vasanth Mohan>over the next several years,
+
+351
+00:29:56.860 --> 00:29:58.420
+<v Vasanth Mohan>which is going to be really exciting to watch.
+
+352
+00:29:58.740 --> 00:29:59.240
+<v Noah Labhart>Absolutely.
+
+353
+00:29:59.260 --> 00:30:01.620
+<v Noah Labhart>We look forward to following along in that evolution.
+
+354
+00:30:01.900 --> 00:30:03.500
+<v Noah Labhart>And it's been exciting to watch the industry
+
+355
+00:30:03.500 --> 00:30:04.980
+<v Noah Labhart>evolve and take shape
+
+356
+00:30:04.980 --> 00:30:07.480
+<v Noah Labhart>and solve some of these new problems that pop up
+
+357
+00:30:07.480 --> 00:30:09.840
+<v Noah Labhart>as we start to use and make demands
+
+358
+00:30:09.840 --> 00:30:12.080
+<v Noah Labhart>of these tools in the industry today.
+
+359
+00:30:13.480 --> 00:30:13.980
+<v Noah Labhart>today, it's not.
+
+360
+00:30:14.180 --> 00:30:15.160
+<v Vasanth Mohan>Yeah, my pleasure.
+
+361
+00:30:19.120 --> 00:30:23.840
+<v Noah Labhart>AI is changing the game for how we do our business, build applications, and many other
+
+362
+00:30:23.840 --> 00:30:24.340
+<v Noah Labhart>things.
+
+363
+00:30:24.340 --> 00:30:29.700
+<v Noah Labhart>But behind the scenes, hardware setups, data centers, etc. need to be optimized to support
+
+364
+00:30:29.700 --> 00:30:32.200
+<v Noah Labhart>a high volume of throughput of these types of requests.
+
+365
+00:30:32.500 --> 00:30:37.960
+<v Noah Labhart>Not only to support what's happening now, but to be set up for success as AI solidifies
+
+366
+00:30:37.960 --> 00:30:39.660
+<v Noah Labhart>even more in our day-to-day lives.
+
+367
+00:30:39.660 --> 00:30:40.160
+<v Noah Labhart>lives.
+
+368
+00:30:41.420 --> 00:30:45.740
+<v Noah Labhart>If you'd like to learn more about SambaNova, please check out sambanova.ai.
+
+369
+00:30:46.900 --> 00:30:48.260
+<v Noah Labhart>And thanks again for listening.

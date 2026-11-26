@@ -1,0 +1,1615 @@
+WEBVTT
+
+NOTE S2 E20: Data-Driven Supply Chain Logistics & E-Grocery Solutions with Daniel Gebler of Picnic
+
+1
+00:00:00.000 --> 00:00:29.980
+<v Noah Labhart>This episode of Code Story is sponsored by Ladder. Ladder was founded by LeBron James and Arnold Schwarzenegger to change the way supplements are made. They worked with the top scientists to formulate a line of clean performance products. Unlike other supplements, every batch is tested by a third party to verify the highest standards for quality and safety. We all know what a tremendous athlete LeBron is, and Arnold, no explanation needed. If they back it, you know it's got to be good. Ladder's goal is to help you unlock your best in any situation.
+
+2
+00:00:30.000 --> 00:00:34.640
+<v Noah Labhart>situation. Right now, that means access to special offers and expert advice from their community.
+
+3
+00:00:34.880 --> 00:00:41.980
+<v Noah Labhart>Use code BETTEREVERYDAY, all one word, all caps, for 30% off everything site-wide at ladder.sport.
+
+4
+00:00:42.160 --> 00:00:47.640
+<v Noah Labhart>That's BETTEREVERYDAY, all caps, all one word, for 30% off at ladder.sport.
+
+5
+00:00:50.960 --> 00:00:57.000
+<v Daniel Gebler>Each delivery time is now refined based on the observations that we have from deliveries of
+
+6
+00:00:57.000 --> 00:01:02.780
+<v Daniel Gebler>yesterday and the day before. That means the system itself and the delivery accuracy becomes
+
+7
+00:01:02.780 --> 00:01:08.480
+<v Daniel Gebler>day by day better purely by new operational data. There's no software change, it's pure feedback
+
+8
+00:01:08.480 --> 00:01:13.600
+<v Daniel Gebler>from data into our operation systems that make it day by day better. And this is the third stage
+
+9
+00:01:13.600 --> 00:01:18.900
+<v Daniel Gebler>where we are now, which is kind of a self-learning and self-optimizing loop for most of the systems
+
+10
+00:01:18.900 --> 00:01:23.760
+<v Daniel Gebler>across especially the operational supply chain from purchasing front door delivery.
+
+11
+00:01:27.000 --> 00:01:29.200
+<v Daniel Gebler>I'm Daniel Gebler, CTO of Picnic.
+
+12
+00:01:34.680 --> 00:01:39.860
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+13
+00:01:39.860 --> 00:01:44.040
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+14
+00:01:44.040 --> 00:01:47.760
+<v Noah Labhart>and build and lead a team that has your back.
+
+15
+00:01:49.540 --> 00:01:51.060
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+16
+00:01:51.220 --> 00:01:55.900
+<v Noah Labhart>And today, how Daniel Gebler built the tech behind the online supermarket
+
+17
+00:01:57.160 --> 00:01:58.860
+<v Noah Labhart>Revolutionizing the last mile.
+
+18
+00:01:59.700 --> 00:02:01.740
+<v Noah Labhart>All this and more on Code Story.
+
+19
+00:02:04.940 --> 00:02:10.040
+<v Noah Labhart>A resident of Amsterdam, Daniel Gebler found his way into tech through an artistic route.
+
+20
+00:02:10.540 --> 00:02:14.480
+<v Noah Labhart>Through creating demos combining visuals and music through technology.
+
+21
+00:02:14.920 --> 00:02:20.120
+<v Noah Labhart>A husband and a dad of two, he enjoys rock climbing, but mostly bouldering indoors.
+
+22
+00:02:20.720 --> 00:02:23.720
+<v Noah Labhart>Though he loves to get out in the trees with his friends when he can.
+
+23
+00:02:24.440 --> 00:02:29.960
+<v Noah Labhart>After leading R&amp;D at Fredhopper, he took several years to do research on large-scale systems.
+
+24
+00:02:30.380 --> 00:02:39.400
+<v Noah Labhart>Coming out of his research in 2015, he joined Picnic, the online supermarket delivering groceries directly to your home, free of charge.
+
+25
+00:02:40.560 --> 00:02:41.200
+<v Noah Labhart>If
+
+26
+00:02:41.200 --> 00:02:44.380
+<v Daniel Gebler>you build an online retailer, then there's a lot of stuff to build.
+
+27
+00:02:44.380 --> 00:02:59.560
+<v Daniel Gebler>So on the one hand, you need to have an app where customers can place order, but you also have to have systems where you can buy products from suppliers, where you can warehouse management, where you can make route planning, people management, payment, HR planning, all kinds of different tools.
+
+28
+00:03:00.080 --> 00:03:06.800
+<v Daniel Gebler>In an early stage, when you build an MVP, you have very limited resources and you certainly can't build all this stuff.
+
+29
+00:03:07.080 --> 00:03:08.420
+<v Daniel Gebler>So we did it very simple.
+
+30
+00:03:08.460 --> 00:03:12.020
+<v Daniel Gebler>We built only our consumer proposition, meaning our shopping app.
+
+31
+00:03:12.020 --> 00:03:19.480
+<v Daniel Gebler>Everything else was a very simple pen and paper or a Google Sheet solution which got us started.
+
+32
+00:03:19.760 --> 00:03:25.900
+<v Daniel Gebler>And that meant that we could have a proof of demand where we could see if customers like what we do
+
+33
+00:03:25.900 --> 00:03:30.500
+<v Daniel Gebler>and made a fulfillment and the logistics on a pure pen and paper approach.
+
+34
+00:03:30.980 --> 00:03:34.480
+<v Daniel Gebler>And at some point we saw, well, there's a lot of customers that really like the service,
+
+35
+00:03:34.580 --> 00:03:36.460
+<v Daniel Gebler>now we need to scale up the systems.
+
+36
+00:03:36.460 --> 00:03:49.820
+<v Daniel Gebler>And then one by one, we moved this pen and paper or spreadsheet-based solutions into actual real products where we had a full-scale buying solution, a full-scale warehouse management solution, a full-scale route planning solution, etc.
+
+37
+00:03:51.160 --> 00:03:56.300
+<v Noah Labhart>That's very cool. So you started out in an unconstrained model, essentially.
+
+38
+00:03:56.420 --> 00:04:02.720
+<v Noah Labhart>You pen, paper, spreadsheet, and then you figured out what people really needed before you built it. Is that true?
+
+39
+00:04:03.280 --> 00:04:08.980
+<v Daniel Gebler>That's absolutely true. And we did one more step. We actually started in Stealth mode. So that means
+
+40
+00:04:08.980 --> 00:04:15.760
+<v Daniel Gebler>we didn't know exactly will customers like what we have thought about, will customers really love
+
+41
+00:04:15.760 --> 00:04:22.240
+<v Daniel Gebler>our proposition. So we started a mode where we had an unbranded launch. We just shared our idea,
+
+42
+00:04:22.380 --> 00:04:27.580
+<v Daniel Gebler>our proposition to customers and looked what will customers like. And then we saw that customers
+
+43
+00:04:27.580 --> 00:04:31.720
+<v Daniel Gebler>started to really start ordering with us without any real brand without any
+
+44
+00:04:31.720 --> 00:04:37.360
+<v Daniel Gebler>benefit of kind of a big retail corporate we got started said customers
+
+45
+00:04:37.360 --> 00:04:40.980
+<v Daniel Gebler>really placed orders with us and then there's something what we built until
+
+46
+00:04:40.980 --> 00:04:45.500
+<v Daniel Gebler>the scale of a couple of hundred orders on a weekly basis then we felt
+
+47
+00:04:45.500 --> 00:04:49.380
+<v Daniel Gebler>comfortable that we can make a public launch and that was the moment where we
+
+48
+00:04:49.380 --> 00:04:53.220
+<v Daniel Gebler>said well now we need to make a little bit of PR we just invited a few agencies
+
+49
+00:04:53.220 --> 00:04:55.620
+<v Daniel Gebler>and then they started to report about this.
+
+50
+00:04:55.700 --> 00:04:57.380
+<v Daniel Gebler>And we saw in the next stage,
+
+51
+00:04:57.520 --> 00:05:00.100
+<v Daniel Gebler>basically the entire country subscribed to the service.
+
+52
+00:05:00.340 --> 00:05:01.740
+<v Daniel Gebler>And then we had the reality,
+
+53
+00:05:01.900 --> 00:05:03.180
+<v Daniel Gebler>we had just a few cars,
+
+54
+00:05:03.400 --> 00:05:06.200
+<v Daniel Gebler>while actually tens of thousands of customers
+
+55
+00:05:06.200 --> 00:05:07.540
+<v Daniel Gebler>subscribed to the service.
+
+56
+00:05:07.800 --> 00:05:11.100
+<v Daniel Gebler>Now we quickly needed to build a tool
+
+57
+00:05:11.100 --> 00:05:13.080
+<v Daniel Gebler>that allowed us to manage
+
+58
+00:05:13.080 --> 00:05:15.820
+<v Daniel Gebler>which customers can actually immediately place an order
+
+59
+00:05:15.820 --> 00:05:17.060
+<v Daniel Gebler>and which customers place
+
+60
+00:05:17.060 --> 00:05:18.800
+<v Daniel Gebler>at a little bit later stage an order.
+
+61
+00:05:18.980 --> 00:05:21.320
+<v Daniel Gebler>And that is something what we call the waiting list,
+
+62
+00:05:23.220 --> 00:05:25.900
+<v Daniel Gebler>cannot immediately enter the shop, but one by one,
+
+63
+00:05:25.940 --> 00:05:28.000
+<v Daniel Gebler>we let them into the shops that they can place an order.
+
+64
+00:05:29.260 --> 00:05:29.940
+<v Noah Labhart>That's excellent.
+
+65
+00:05:30.260 --> 00:05:33.200
+<v Noah Labhart>So let's dig into the MVP a little bit.
+
+66
+00:05:33.360 --> 00:05:36.080
+<v Noah Labhart>Tell me about the tools that you use to bring it to life.
+
+67
+00:05:36.220 --> 00:05:39.000
+<v Noah Labhart>So you mentioned an app, you mentioned a digital platform.
+
+68
+00:05:39.340 --> 00:05:41.900
+<v Noah Labhart>You know, what sort of software frameworks did you use
+
+69
+00:05:41.900 --> 00:05:44.060
+<v Noah Labhart>to start building the next model, the MVP?
+
+70
+00:05:45.260 --> 00:05:47.520
+<v Daniel Gebler>So on the mobile shopping site,
+
+71
+00:05:47.700 --> 00:05:50.840
+<v Daniel Gebler>we thought a bit about, should we build a web shop?
+
+72
+00:05:50.920 --> 00:05:52.200
+<v Daniel Gebler>Should we build an app?
+
+73
+00:05:53.220 --> 00:05:58.380
+<v Daniel Gebler>app? Should it be a native app or is it one of these hybrid apps? So what we saw is web
+
+74
+00:05:58.380 --> 00:06:02.940
+<v Daniel Gebler>is declining, app traffic is increasing. So we had only money for one platform. So therefore
+
+75
+00:06:02.940 --> 00:06:08.560
+<v Daniel Gebler>we moved to an app approach. And at a later stage, we also realized that it was pretty
+
+76
+00:06:08.560 --> 00:06:15.140
+<v Daniel Gebler>smart and I will get a bit into this later. And for the app solution, we first looked
+
+77
+00:06:15.140 --> 00:06:20.500
+<v Daniel Gebler>into maybe hybrid solutions, but then we learned from the Facebook experience, where it tried
+
+78
+00:06:20.500 --> 00:06:24.140
+<v Daniel Gebler>tried also with HTML5 to build up a hybrid solution
+
+79
+00:06:24.140 --> 00:06:25.680
+<v Daniel Gebler>and that this is not the smartest approach,
+
+80
+00:06:25.820 --> 00:06:27.820
+<v Daniel Gebler>so we built native iOS and Android apps.
+
+81
+00:06:28.060 --> 00:06:30.300
+<v Daniel Gebler>So what we realized at a later stage is,
+
+82
+00:06:30.360 --> 00:06:33.780
+<v Daniel Gebler>said building an app itself is convenient for customers
+
+83
+00:06:33.780 --> 00:06:35.040
+<v Daniel Gebler>for two reasons.
+
+84
+00:06:35.220 --> 00:06:38.540
+<v Daniel Gebler>Number one, is you can place the app wherever you like.
+
+85
+00:06:38.760 --> 00:06:41.480
+<v Daniel Gebler>The second thing is, you can actually mimic
+
+86
+00:06:41.480 --> 00:06:45.580
+<v Daniel Gebler>in all behaviors that all customers have in the app.
+
+87
+00:06:45.700 --> 00:06:49.300
+<v Daniel Gebler>In the old behaviors, said for especially food shopping,
+
+88
+00:06:50.500 --> 00:06:53.100
+<v Daniel Gebler>have a small sticky note on their fridge.
+
+89
+00:06:53.300 --> 00:06:55.380
+<v Daniel Gebler>And the sticky note simply says,
+
+90
+00:06:55.520 --> 00:06:57.720
+<v Daniel Gebler>the next time when I need to go for shopping,
+
+91
+00:06:57.840 --> 00:07:02.600
+<v Daniel Gebler>I need to buy milk, and I need to build butter or cheese.
+
+92
+00:07:02.880 --> 00:07:05.860
+<v Daniel Gebler>And that is a list that is built incrementally
+
+93
+00:07:05.860 --> 00:07:07.760
+<v Daniel Gebler>whenever you run low on a product.
+
+94
+00:07:08.020 --> 00:07:09.520
+<v Daniel Gebler>This is something what in essence,
+
+95
+00:07:09.760 --> 00:07:11.580
+<v Daniel Gebler>most of the customers are doing
+
+96
+00:07:11.580 --> 00:07:13.360
+<v Daniel Gebler>when they're building up their shopping list,
+
+97
+00:07:13.540 --> 00:07:16.160
+<v Daniel Gebler>just incrementally whenever you run low on a product.
+
+98
+00:07:16.160 --> 00:07:17.020
+<v Daniel Gebler>product.
+
+99
+00:07:17.060 --> 00:07:23.620
+<v Daniel Gebler>We see now said the same behavior is mimicked in the app itself, where customers are opening
+
+100
+00:07:23.620 --> 00:07:26.500
+<v Daniel Gebler>the app, adding a product to the basket and close again the app.
+
+101
+00:07:26.700 --> 00:07:30.660
+<v Daniel Gebler>This is a very different shopping behavior than what you see for non-food.
+
+102
+00:07:30.860 --> 00:07:35.480
+<v Daniel Gebler>If you buy electronics, then you just open the app, you compare, for instance, all different
+
+103
+00:07:35.480 --> 00:07:39.720
+<v Daniel Gebler>variants of an iPad or an iPhone, and then you press the buy button and then you become
+
+104
+00:07:39.720 --> 00:07:40.220
+<v Daniel Gebler>happy.
+
+105
+00:07:40.380 --> 00:07:45.980
+<v Daniel Gebler>With food, where you buy not only two or three items, but you buy 30 items, you build incrementally
+
+106
+00:07:46.160 --> 00:07:51.740
+<v Daniel Gebler>list. So you build maybe first dairy products and then meat products. And later you have more
+
+107
+00:07:51.740 --> 00:07:56.080
+<v Daniel Gebler>the kind of special weekend products. And that is something what we now can model with the app,
+
+108
+00:07:56.200 --> 00:08:00.200
+<v Daniel Gebler>which would not be possible on web interface. So
+
+109
+00:08:00.200 --> 00:08:02.640
+<v Noah Labhart>what decisions and trade-offs did you have to
+
+110
+00:08:02.640 --> 00:08:07.920
+<v Noah Labhart>make in the short term when building that MVP? You mentioned some of them deciding to go native
+
+111
+00:08:07.920 --> 00:08:12.220
+<v Noah Labhart>over hybrid, which makes a lot of sense, especially the type of app you're building.
+
+112
+00:08:12.220 --> 00:08:20.840
+<v Noah Labhart>But what other decisions did you have to make in the short term as far as perhaps taking on technical debt or limiting features?
+
+113
+00:08:21.260 --> 00:08:22.440
+<v Noah Labhart>Can you talk through that a little bit?
+
+114
+00:08:23.900 --> 00:08:37.180
+<v Daniel Gebler>So in such a business where you have a huge amount of consumer demand, the key decisions that you have to make is for all kinds of new services that you want to offer or the new scale that you want to achieve is,
+
+115
+00:08:37.180 --> 00:08:42.840
+<v Daniel Gebler>Do you build immediately a large-scale solution or do you build incrementally your scalable solutions up?
+
+116
+00:08:43.020 --> 00:08:45.820
+<v Daniel Gebler>And that has been an ongoing debate.
+
+117
+00:08:46.180 --> 00:08:51.520
+<v Daniel Gebler>If you immediately build a solution or a feature for the scale of a couple of million customers,
+
+118
+00:08:51.720 --> 00:08:58.980
+<v Daniel Gebler>or do we go incrementally, build just an MVP for a thousand customers, then maybe for 10,000, then for 100,000 customers.
+
+119
+00:08:58.980 --> 00:09:04.880
+<v Daniel Gebler>And this kind of balance between building MVPs and building scalable solutions is one
+
+120
+00:09:04.880 --> 00:09:07.100
+<v Daniel Gebler>of the key trade-offs and key decisions to be made.
+
+121
+00:09:07.300 --> 00:09:13.540
+<v Daniel Gebler>The other bigger trade-off decisions that we had to make was the make versus buy.
+
+122
+00:09:13.700 --> 00:09:19.440
+<v Daniel Gebler>And make versus buy is a decision where we very carefully thought about which systems
+
+123
+00:09:19.440 --> 00:09:25.280
+<v Daniel Gebler>are mission critical and which systems or which services can we take from a third party.
+
+124
+00:09:25.480 --> 00:09:26.560
+<v Daniel Gebler>Let me give you an example.
+
+125
+00:09:26.560 --> 00:09:31.520
+<v Daniel Gebler>We started very early on, not only to build our app, but also the route planning.
+
+126
+00:09:31.660 --> 00:09:41.360
+<v Daniel Gebler>Because the model that we have, our last mile model, is a unique milkman-based distribution model, which we wanted and we needed to build ourselves.
+
+127
+00:09:41.640 --> 00:09:44.460
+<v Daniel Gebler>There's simply no solution on the market that can fulfill this.
+
+128
+00:09:44.660 --> 00:09:53.880
+<v Daniel Gebler>On the other hand, there are pretty standard warehouse management solutions, which we could actually in the beginning use as a standard off-shelf solution.
+
+129
+00:09:53.880 --> 00:10:07.080
+<v Daniel Gebler>At a later stage, where we are now, where we're looking more and more in robotic automation, we are now insourcing this entire technology stack to build also fulfillment, especially robotic and automated fulfillment ourselves.
+
+130
+00:10:07.580 --> 00:10:10.460
+<v Daniel Gebler>So these are the key decisions that we had to make on our way.
+
+131
+00:10:10.460 --> 00:10:24.000
+<v Daniel Gebler>If you're talking about the trade-off of speed versus quality or maybe business needs versus technology depth, this is an ongoing debate and a trade-off that we had a lot of debate about it.
+
+132
+00:10:24.060 --> 00:10:38.220
+<v Daniel Gebler>And the way how we solve it and how we solve this dilemma in our case is that we are defining an underlying metric model where we can assess every proposal, even if it's a business proposal or a tech initiative, on the same type of metrics.
+
+133
+00:10:38.220 --> 00:10:43.380
+<v Daniel Gebler>And every tech and business initiative needs to contribute to the same metric model.
+
+134
+00:10:43.580 --> 00:10:44.440
+<v Daniel Gebler>Let me give you an example.
+
+135
+00:10:45.320 --> 00:10:50.240
+<v Daniel Gebler>Tech initiatives are usually not directly enabling new consumer features.
+
+136
+00:10:50.460 --> 00:10:59.400
+<v Daniel Gebler>However, they contribute to the time to market or they contribute to a defect density or they contribute to the uptime.
+
+137
+00:10:59.400 --> 00:11:09.820
+<v Daniel Gebler>So therefore, we are expressing all those kinds of contributions of technical initiatives also in business value and therefore make tech initiatives and business initiatives comparable.
+
+138
+00:11:10.360 --> 00:11:18.660
+<v Daniel Gebler>And that is a much better approach than the classical half-half or 80-20 type of split between business and tech initiatives.
+
+139
+00:11:20.020 --> 00:11:23.460
+<v Noah Labhart>Payoff.com is a paying sponsor of the Code Story podcast.
+
+140
+00:11:23.460 --> 00:11:28.260
+<v Noah Labhart>podcast. You've tried balance transfers and budgeting, but high interest rates and unrelenting
+
+141
+00:11:28.260 --> 00:11:33.480
+<v Noah Labhart>bill cycles make it almost impossible to get out of credit card debt on your own. Instead of another
+
+142
+00:11:33.480 --> 00:11:38.400
+<v Noah Labhart>new savings technique, you need a clear path out of debt. And that's what a payoff loan can do.
+
+143
+00:11:38.560 --> 00:11:44.060
+<v Noah Labhart>A payoff loan is a personal loan backed by member-centric credit unions designed to help
+
+144
+00:11:44.060 --> 00:11:51.360
+<v Noah Labhart>you pay off your credit cards with rates as low as 5.99% APR and loan amounts up to $35,000
+
+145
+00:11:51.360 --> 00:11:57.300
+<v Noah Labhart>with no hidden fees and personal customer service support from Payoff to help you reach your
+
+146
+00:11:57.300 --> 00:12:02.900
+<v Noah Labhart>financial goals. Some of the benefits of a Payoff loan may also include potential credit score boost,
+
+147
+00:12:03.120 --> 00:12:09.020
+<v Noah Labhart>one monthly payment, and savings from lower interest rates. Go to payoff.com slash Code Story
+
+148
+00:12:09.020 --> 00:12:14.660
+<v Noah Labhart>to learn more. Checking loan rates won't affect your credit score. Try something new. Pay off
+
+149
+00:12:14.660 --> 00:12:22.940
+<v Noah Labhart>your credit card debt with Payoff. NMLS ID 1396805. Not all applicants may qualify. Loans
+
+150
+00:12:22.940 --> 00:12:28.240
+<v Noah Labhart>only available within the United States. Loan is not available in all states. Payoff works with
+
+151
+00:12:28.240 --> 00:12:32.300
+<v Noah Labhart>lending partners who originate the loans. Additional terms, conditions, and eligibility
+
+152
+00:12:32.300 --> 00:12:38.000
+<v Noah Labhart>requirements may apply. More information is available at payoff.com slash Code Story.
+
+153
+00:12:39.400 --> 00:12:44.080
+<v Noah Labhart>This message is brought to you by RIMS, the Risk Management Society. RIMS is a global
+
+154
+00:12:44.660 --> 00:12:46.680
+<v Noah Labhart>dedicated to the profession of risk management.
+
+155
+00:12:46.900 --> 00:12:48.280
+<v Noah Labhart>For nearly 60 years,
+
+156
+00:12:48.380 --> 00:12:50.660
+<v Noah Labhart>RIMS has delivered the latest strategies and resources
+
+157
+00:12:50.660 --> 00:12:52.620
+<v Noah Labhart>that allow risk professionals to grow,
+
+158
+00:12:52.840 --> 00:12:55.140
+<v Noah Labhart>innovate, and succeed in any business.
+
+159
+00:12:56.060 --> 00:12:57.580
+<v Noah Labhart>RIMS works with industry leaders
+
+160
+00:12:57.580 --> 00:12:59.460
+<v Noah Labhart>to produce content and online training
+
+161
+00:12:59.460 --> 00:13:01.040
+<v Noah Labhart>that business professionals turn to.
+
+162
+00:13:01.380 --> 00:13:03.080
+<v Noah Labhart>Topics include business continuity,
+
+163
+00:13:03.400 --> 00:13:05.200
+<v Noah Labhart>cyber risk, risk management techniques,
+
+164
+00:13:05.500 --> 00:13:07.340
+<v Noah Labhart>the fundamentals of insurance, and more.
+
+165
+00:13:07.640 --> 00:13:10.120
+<v Noah Labhart>There's also a private members-only site
+
+166
+00:13:10.120 --> 00:13:11.840
+<v Noah Labhart>where people can discuss sensitive issues
+
+167
+00:13:11.840 --> 00:13:13.220
+<v Noah Labhart>and get honest answers.
+
+168
+00:13:14.660 --> 00:13:19.380
+<v Noah Labhart>leaning on each other as we all navigate the global pandemic. If you're concerned about the
+
+169
+00:13:19.380 --> 00:13:24.140
+<v Noah Labhart>safety of your employees and the sustainability of your organization, you need the resources
+
+170
+00:13:24.140 --> 00:13:31.820
+<v Noah Labhart>and connections RIMS provides. Learn more at go.rims.org slash Code Story. You can save 25%
+
+171
+00:13:31.820 --> 00:13:40.220
+<v Noah Labhart>off a year-long membership. Again, that's go.rims.org slash Code Story. How have you progressed
+
+172
+00:13:40.220 --> 00:13:47.960
+<v Noah Labhart>the product past the MVP. Walk me through the maturation process of the product past that
+
+173
+00:13:47.960 --> 00:13:49.800
+<v Noah Labhart>first initial software version.
+
+174
+00:13:50.280 --> 00:13:54.700
+<v Daniel Gebler>So we started first consumer app and all the features around
+
+175
+00:13:54.700 --> 00:13:59.500
+<v Daniel Gebler>it and that went also in a couple of stages. So we started for instance just with the plain
+
+176
+00:13:59.500 --> 00:14:04.420
+<v Daniel Gebler>shopping application where you have a catalog and then now you have a search functionality.
+
+177
+00:14:04.700 --> 00:14:09.960
+<v Daniel Gebler>At the later stage we added one functionality that we thought is maybe a nice and nice to have
+
+178
+00:14:10.220 --> 00:14:15.240
+<v Daniel Gebler>feature, which is the past purchases page. So you can look up what did you buy the last
+
+179
+00:14:15.240 --> 00:14:22.520
+<v Daniel Gebler>week. This is a feature which became similar to Facebook's timeline, one of the most used
+
+180
+00:14:22.520 --> 00:14:27.340
+<v Daniel Gebler>features because customers are actually not building up a shopping list from scratch,
+
+181
+00:14:27.580 --> 00:14:33.280
+<v Daniel Gebler>but they are building up a shopping list by looking what did they buy last week and then
+
+182
+00:14:33.280 --> 00:14:36.960
+<v Daniel Gebler>filter out what they don't want this week and then think about what they additionally
+
+183
+00:14:36.960 --> 00:14:43.180
+<v Daniel Gebler>we want this week. So this is on the consumer side. On the logistical side, we went in three steps.
+
+184
+00:14:43.340 --> 00:14:49.120
+<v Daniel Gebler>And the first step is building up a first version of each product in-house as a native application,
+
+185
+00:14:49.380 --> 00:14:53.680
+<v Daniel Gebler>for instance, for the purchasing application, for the warehouse management, for the logistical
+
+186
+00:14:53.680 --> 00:15:01.000
+<v Daniel Gebler>planning, but also for the driver app. The next step is building very deep analytics around all
+
+187
+00:15:01.000 --> 00:15:07.840
+<v Daniel Gebler>those applications meaning that we can both on real time but also on a reporting basis understand
+
+188
+00:15:07.840 --> 00:15:13.780
+<v Daniel Gebler>what is really happening on the operational angles and therefore do on a day-by-day analysis about
+
+189
+00:15:13.780 --> 00:15:20.180
+<v Daniel Gebler>how do we do on a different operational metrics the third one is building a feedback loop from
+
+190
+00:15:20.180 --> 00:15:26.360
+<v Daniel Gebler>this analytics back to the product itself to in an incremental way to improve the product let me give
+
+191
+00:15:26.360 --> 00:15:32.540
+<v Daniel Gebler>you an example if you are making route planning then we are planning our routes based on a couple
+
+192
+00:15:32.540 --> 00:15:37.740
+<v Daniel Gebler>of criteria but the most simple criteria is you want to have the shortest route in an available
+
+193
+00:15:37.740 --> 00:15:43.140
+<v Daniel Gebler>time window and an available capacity of the vehicle however there are parameters that you
+
+194
+00:15:43.140 --> 00:15:47.460
+<v Daniel Gebler>need to understand over time how long it takes and one of the parameters is for each customer
+
+195
+00:15:47.460 --> 00:15:54.120
+<v Daniel Gebler>you need to understand how long does the stop take and there are parameters like how far is
+
+196
+00:15:54.120 --> 00:15:57.460
+<v Daniel Gebler>Is the customer from the street or the door of the customer from the street?
+
+197
+00:15:57.560 --> 00:16:00.260
+<v Daniel Gebler>Is the customer living in the second or the first floor?
+
+198
+00:16:00.400 --> 00:16:02.620
+<v Daniel Gebler>Is the customer young or old?
+
+199
+00:16:02.820 --> 00:16:04.720
+<v Daniel Gebler>Is the customer living with a family?
+
+200
+00:16:04.840 --> 00:16:06.360
+<v Daniel Gebler>Is it day or nighttime delivery?
+
+201
+00:16:06.660 --> 00:16:11.680
+<v Daniel Gebler>So over time, we understood step by step each of those kind of aspects.
+
+202
+00:16:12.000 --> 00:16:15.420
+<v Daniel Gebler>How does it contribute to the stop time and to the delivery times?
+
+203
+00:16:15.620 --> 00:16:20.100
+<v Daniel Gebler>And now in an incremental manner, each delivery time is now refined
+
+204
+00:16:20.100 --> 00:16:25.240
+<v Daniel Gebler>based on the observations that we have from deliveries of yesterday and the day before.
+
+205
+00:16:25.400 --> 00:16:31.660
+<v Daniel Gebler>That means the system itself and the delivery accuracy becomes day by day better purely by
+
+206
+00:16:31.660 --> 00:16:37.160
+<v Daniel Gebler>new operational data. There's no software change, it's pure feedback from data into our operation
+
+207
+00:16:37.160 --> 00:16:42.460
+<v Daniel Gebler>systems that make it day by day better. And this is the third stage where we are now, which is kind
+
+208
+00:16:42.460 --> 00:16:48.100
+<v Daniel Gebler>of a self-learning and self-optimizing loop for most of the systems across especially the operational
+
+209
+00:16:50.100 --> 00:16:50.900
+<v Daniel Gebler>front-door delivery.
+
+210
+00:16:53.840 --> 00:17:00.660
+<v Noah Labhart>How do you go about building your roadmap and deciding what is the next most important
+
+211
+00:17:00.660 --> 00:17:02.380
+<v Noah Labhart>thing to build in the product?
+
+212
+00:17:03.920 --> 00:17:08.340
+<v Daniel Gebler>We started Picnic by defining autonomous independent teams.
+
+213
+00:17:08.500 --> 00:17:13.360
+<v Daniel Gebler>And for the first two or three years, the teams have been completely autonomous, running
+
+214
+00:17:13.360 --> 00:17:17.240
+<v Daniel Gebler>based on overarching business objectives and business goals.
+
+215
+00:17:17.320 --> 00:17:18.600
+<v Daniel Gebler>There are different product lines.
+
+216
+00:17:20.100 --> 00:17:25.340
+<v Daniel Gebler>after being three years in is that we need a little bit more high-level objectives,
+
+217
+00:17:25.580 --> 00:17:26.880
+<v Daniel Gebler>high-level target setting.
+
+218
+00:17:27.100 --> 00:17:29.380
+<v Daniel Gebler>And then we try to make it annual planning.
+
+219
+00:17:29.520 --> 00:17:33.460
+<v Daniel Gebler>But annual planning is something which is way too far down the road
+
+220
+00:17:33.460 --> 00:17:36.960
+<v Daniel Gebler>if you think about such a fast-moving business as we are in.
+
+221
+00:17:37.060 --> 00:17:41.160
+<v Daniel Gebler>The business itself is characterized by online delivery and food.
+
+222
+00:17:41.300 --> 00:17:45.360
+<v Daniel Gebler>And this is just moving way, way faster than what you can handle
+
+223
+00:17:45.360 --> 00:17:46.300
+<v Daniel Gebler>in a one-year planning.
+
+224
+00:17:46.520 --> 00:17:49.180
+<v Daniel Gebler>So what we now do is we do quarterly planning,
+
+225
+00:17:50.100 --> 00:17:55.880
+<v Daniel Gebler>are aligning especially the cross-product initiatives, meaning all those development initiatives
+
+226
+00:17:55.880 --> 00:18:00.300
+<v Daniel Gebler>that are between the different products we are aligning and then leave the prioritization
+
+227
+00:18:00.300 --> 00:18:01.020
+<v Daniel Gebler>to the product itself.
+
+228
+00:18:01.460 --> 00:18:09.820
+<v Daniel Gebler>The products themselves are defining or prioritizing their backlogs based on objectives and key
+
+229
+00:18:09.820 --> 00:18:12.040
+<v Daniel Gebler>results that they define on an annual level.
+
+230
+00:18:12.300 --> 00:18:19.260
+<v Daniel Gebler>And there is just a kind of weekly and a biweekly cycle, how they define what becomes the workload
+
+231
+00:18:20.100 --> 00:18:21.560
+<v Daniel Gebler>the backlog and what comes next.
+
+232
+00:18:21.780 --> 00:18:24.660
+<v Daniel Gebler>And on a quarterly basis, reviewing the objectives
+
+233
+00:18:24.660 --> 00:18:27.200
+<v Daniel Gebler>and the key results that the team sets for themselves.
+
+234
+00:18:27.700 --> 00:18:28.200
+<v Daniel Gebler>You
+
+235
+00:18:28.200 --> 00:18:29.020
+<v Noah Labhart>mentioned team.
+
+236
+00:18:29.300 --> 00:18:33.120
+<v Noah Labhart>So tell me about how you build your team, how you built it.
+
+237
+00:18:33.220 --> 00:18:38.000
+<v Noah Labhart>What did you look for in these people to deem them the winning horses,
+
+238
+00:18:38.200 --> 00:18:42.040
+<v Noah Labhart>the people that should join Picnic and carry the banner for what you're building?
+
+239
+00:18:42.400 --> 00:18:45.820
+<v Daniel Gebler>So we started at a team where we basically looked for a team
+
+240
+00:18:45.820 --> 00:18:50.220
+<v Daniel Gebler>that is the right team to build the very first version of the product.
+
+241
+00:18:50.380 --> 00:18:54.860
+<v Daniel Gebler>And that was a team with whom I've been working earlier together in a SaaS business.
+
+242
+00:18:55.140 --> 00:18:56.740
+<v Daniel Gebler>We just hired those guys together.
+
+243
+00:18:57.000 --> 00:18:59.200
+<v Daniel Gebler>We knew each other pretty well.
+
+244
+00:18:59.280 --> 00:19:02.640
+<v Daniel Gebler>And we knew that with this team, we can build the very first version.
+
+245
+00:19:03.040 --> 00:19:07.300
+<v Daniel Gebler>This had one disadvantage because the team was not diverse enough.
+
+246
+00:19:07.460 --> 00:19:12.080
+<v Daniel Gebler>It didn't reflect all aspects that you want at a scalable team.
+
+247
+00:19:12.080 --> 00:19:19.480
+<v Daniel Gebler>So therefore, after a couple of months, we looked more actively into which kind of additional profiles do we need.
+
+248
+00:19:19.620 --> 00:19:25.140
+<v Daniel Gebler>And then we looked explicitly for engineers that have a strong engineering, a strong architect angle.
+
+249
+00:19:25.440 --> 00:19:32.720
+<v Daniel Gebler>Somebody who has been very strong on the mobile development side, who understands also the alternatives to the current mobile stack.
+
+250
+00:19:32.860 --> 00:19:37.020
+<v Daniel Gebler>Somebody who is very strong on the SRE side, somebody who can lead on the people side.
+
+251
+00:19:37.020 --> 00:19:42.500
+<v Daniel Gebler>We identified the white spots in the team and then we filled step by step those white spots.
+
+252
+00:19:42.740 --> 00:19:50.040
+<v Daniel Gebler>And this is the way how we have built the team from initially just five engineers to now a little bit more than 100 engineers.
+
+253
+00:19:50.300 --> 00:19:57.560
+<v Daniel Gebler>We are organized now in product teams and the product teams themselves now define what are the profiles that they need.
+
+254
+00:19:57.740 --> 00:20:00.220
+<v Daniel Gebler>So they make a self analysis and self assessment.
+
+255
+00:20:00.360 --> 00:20:05.060
+<v Daniel Gebler>What are the bright spots in their team from both the hard skill and the soft skill side?
+
+256
+00:20:07.020 --> 00:20:09.160
+<v Daniel Gebler>our recruitment and hiring plans going forward.
+
+257
+00:20:09.540 --> 00:20:10.140
+<v Daniel Gebler>Very
+
+258
+00:20:10.140 --> 00:20:10.640
+<v Noah Labhart>good.
+
+259
+00:20:10.500 --> 00:20:12.800
+<v Noah Labhart>Let's talk about scalability a little bit.
+
+260
+00:20:12.920 --> 00:20:16.520
+<v Noah Labhart>Did you build this in the beginning to scale efficiently
+
+261
+00:20:16.520 --> 00:20:19.960
+<v Noah Labhart>or were you fighting this as you grew?
+
+262
+00:20:20.580 --> 00:20:23.000
+<v Daniel Gebler>So there are two angles to this question.
+
+263
+00:20:23.060 --> 00:20:26.360
+<v Daniel Gebler>On the one hand, we knew that some of the core elements
+
+264
+00:20:26.360 --> 00:20:29.340
+<v Daniel Gebler>need to build from day one in a scalable manner.
+
+265
+00:20:29.540 --> 00:20:34.220
+<v Daniel Gebler>This is essentially the planning and the master planning backbone
+
+266
+00:20:34.220 --> 00:20:40.060
+<v Daniel Gebler>backbone where we connect all the pieces from our supply chain in a master planning process that
+
+267
+00:20:40.060 --> 00:20:45.740
+<v Daniel Gebler>runs once per day. This is something what we have built up on day one in a way that it can handle
+
+268
+00:20:45.740 --> 00:20:51.120
+<v Daniel Gebler>tens of thousands, hundreds of thousands of orders on a single day. On the other hand, there are a lot
+
+269
+00:20:51.120 --> 00:21:00.260
+<v Daniel Gebler>of components that we built from a very MVP, very M, so MVP way, going forward to an MVP to a first
+
+270
+00:21:00.260 --> 00:21:06.000
+<v Daniel Gebler>version to a kind of scalable version. An example for this is our warehouse
+
+271
+00:21:06.000 --> 00:21:10.020
+<v Daniel Gebler>management system, our purchase order management, also a lot of consumer
+
+272
+00:21:10.020 --> 00:21:16.840
+<v Daniel Gebler>related features that we built from an MVP based implementation until the full
+
+273
+00:21:16.840 --> 00:21:22.380
+<v Daniel Gebler>scale solution. At the stage where we are now with roughly half a million active
+
+274
+00:21:22.380 --> 00:21:28.080
+<v Daniel Gebler>customers in Netherlands, we can no longer work or we are not completely
+
+275
+00:21:28.080 --> 00:21:30.320
+<v Daniel Gebler>working in this MVP based approach.
+
+276
+00:21:30.580 --> 00:21:37.120
+<v Daniel Gebler>What we are now doing is we are usually implementing MVPs that we are launching to just a few
+
+277
+00:21:37.120 --> 00:21:39.080
+<v Daniel Gebler>thousand customers as a test group.
+
+278
+00:21:39.260 --> 00:21:44.640
+<v Daniel Gebler>And then in parallel, we are building out the scalable solution that we are then launching
+
+279
+00:21:44.640 --> 00:21:46.980
+<v Daniel Gebler>to the larger customer base.
+
+280
+00:21:48.160 --> 00:21:54.320
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built with Picnic,
+
+281
+00:21:54.380 --> 00:21:55.860
+<v Noah Labhart>what are you most proud of?
+
+282
+00:21:58.080 --> 00:21:59.200
+<v Daniel Gebler>That's a pretty cool question.
+
+283
+00:21:59.340 --> 00:22:01.380
+<v Daniel Gebler>And I have asked this myself.
+
+284
+00:22:02.240 --> 00:22:09.760
+<v Daniel Gebler>But on the other hand, this is also a bit like rating your child and scoring your favorite child.
+
+285
+00:22:10.040 --> 00:22:13.480
+<v Daniel Gebler>There are many, many topics that we tackled across our road.
+
+286
+00:22:13.480 --> 00:22:31.300
+<v Daniel Gebler>And the one thing what has formed us as a team and what makes us very happy is that we started with a very small team with just a vision that we wanted to tackle an unsolved problem, the last mile food delivery problem in a radically new way.
+
+287
+00:22:31.400 --> 00:22:42.580
+<v Daniel Gebler>And that this team built up a tech stack and an operational stack that could not only work in a small city where we started, but also at a full scale where we are operating now.
+
+288
+00:22:43.480 --> 00:23:12.340
+<v Daniel Gebler>Zooming in into some of the tech topics that we have tackled in the way that were pretty impressive is that we went along the journey from a system where we build purely on a spreadsheet some very simple rules that we later built in Java or Python as the first version of a product up to the state where we are having now for essentially all products, a feedback loop that goes from the product itself to the ops team to the data warehouse back to the product itself.
+
+289
+00:23:13.480 --> 00:23:19.720
+<v Daniel Gebler>self-learning and self-improvement cycle for a large set of all our business features.
+
+290
+00:23:20.140 --> 00:23:24.920
+<v Daniel Gebler>And this is something which some people call it machine learning and deep learning or AI.
+
+291
+00:23:25.180 --> 00:23:31.260
+<v Daniel Gebler>This is probably the essential piece that will help us also in the future to focus on
+
+292
+00:23:31.260 --> 00:23:37.520
+<v Daniel Gebler>developments of new features, while the optimization of the existing features is
+
+293
+00:23:37.520 --> 00:23:42.540
+<v Daniel Gebler>only driven and only dependent on the size of operation that we are running now.
+
+294
+00:23:43.480 --> 00:23:48.160
+<v Daniel Gebler>probably the essential piece that we are happy about the architectural setup that we have chosen
+
+295
+00:23:48.160 --> 00:23:48.660
+<v Daniel Gebler>so far.
+
+296
+00:23:48.880 --> 00:23:54.520
+<v Noah Labhart>So let's flip the script a little bit. Tell me about a mistake you made and how you and
+
+297
+00:23:54.520 --> 00:23:56.000
+<v Noah Labhart>your team responded to it.
+
+298
+00:23:58.100 --> 00:24:01.740
+<v Daniel Gebler>So in such a journey, you do a lot of mistakes. One thing what you're
+
+299
+00:24:01.740 --> 00:24:07.380
+<v Daniel Gebler>looking for and what you're looking out for is that you're not making fatal mistakes. And even
+
+300
+00:24:07.380 --> 00:24:09.940
+<v Daniel Gebler>But if you make mistakes that are drastic,
+
+301
+00:24:10.160 --> 00:24:13.640
+<v Daniel Gebler>then you find a fast way, an early way to correct them.
+
+302
+00:24:13.860 --> 00:24:17.820
+<v Daniel Gebler>So one of the things what we learned on our way are said,
+
+303
+00:24:18.000 --> 00:24:20.720
+<v Daniel Gebler>when we are aligning our tech priorities
+
+304
+00:24:20.720 --> 00:24:22.920
+<v Daniel Gebler>and our tech movements with the business side,
+
+305
+00:24:23.040 --> 00:24:26.100
+<v Daniel Gebler>that we need to look very careful
+
+306
+00:24:26.370 --> 00:24:28.980
+<v Daniel Gebler>what are hard deadlines and what are soft deadlines.
+
+307
+00:24:29.260 --> 00:24:32.280
+<v Daniel Gebler>An example for this is if you're launching in a new country,
+
+308
+00:24:32.340 --> 00:24:33.520
+<v Daniel Gebler>if you're launching in new cities,
+
+309
+00:24:33.660 --> 00:24:36.340
+<v Daniel Gebler>you have hard deadlines for the simple reason:
+
+310
+00:24:37.560 --> 00:24:42.760
+<v Daniel Gebler>agreements with media agencies, you have agreements with advertisements, you have agreements with
+
+311
+00:24:42.760 --> 00:24:49.060
+<v Daniel Gebler>suppliers. So if you have this kind of fixed agreement on the timeline, if you have fixed
+
+312
+00:24:49.060 --> 00:24:55.880
+<v Daniel Gebler>expectations on the quality, then the only variable in your attack game is the scope. And if the scope
+
+313
+00:24:55.880 --> 00:25:00.940
+<v Daniel Gebler>itself is also defined, because you want to launch a new country and you don't want to regress on your
+
+314
+00:25:00.940 --> 00:25:05.800
+<v Daniel Gebler>existing features, then you are in a pretty difficult situation if you're running low
+
+315
+00:25:07.380 --> 00:25:14.340
+<v Daniel Gebler>and resources. So our learnings here is that at least one of the three angles, so time, resources,
+
+316
+00:25:14.700 --> 00:25:20.080
+<v Daniel Gebler>quality, you want to open up and you want to keep flexible on. One thing what we learned in our
+
+317
+00:25:20.080 --> 00:25:25.700
+<v Daniel Gebler>journey is quality is something you can never debate about, meaning we are monitoring very
+
+318
+00:25:25.700 --> 00:25:33.100
+<v Daniel Gebler>carefully on a week-by-week basis with detailed reports, our technical debt, our code coverage
+
+319
+00:25:33.100 --> 00:25:35.940
+<v Daniel Gebler>by unit tests, but also component tests, integration tests.
+
+320
+00:25:36.080 --> 00:25:38.700
+<v Daniel Gebler>So this is something we don't want to regress at all.
+
+321
+00:25:38.880 --> 00:25:43.260
+<v Daniel Gebler>So the only two angles that we can take in any development project
+
+322
+00:25:43.260 --> 00:25:46.500
+<v Daniel Gebler>is either scope or the development timeline.
+
+323
+00:25:46.820 --> 00:25:50.000
+<v Daniel Gebler>And that is something what we very actively communicate now
+
+324
+00:25:50.000 --> 00:25:52.420
+<v Daniel Gebler>to business teams based on our past experience,
+
+325
+00:25:52.800 --> 00:25:56.200
+<v Daniel Gebler>that these are the only two variables that we can take into account.
+
+326
+00:25:56.620 --> 00:25:59.540
+<v Daniel Gebler>And based on those decisions with the business teams,
+
+327
+00:25:59.580 --> 00:26:02.740
+<v Daniel Gebler>we either decide if we are adjusting the scope,
+
+328
+00:26:03.100 --> 00:26:08.880
+<v Daniel Gebler>timeline is fixed or that we are becoming more flexible on the timeline and or discuss about
+
+329
+00:26:08.880 --> 00:26:11.800
+<v Daniel Gebler>different rollout approaches. It
+
+330
+00:26:11.800 --> 00:26:15.700
+<v Noah Labhart>makes sense. Sounds like a a classic project management problem there.
+
+331
+00:26:16.170 --> 00:26:21.220
+<v Noah Labhart>Tell me what the future looks like for Picnic, for the product and for your team.
+
+332
+00:26:22.750 --> 00:26:28.240
+<v Daniel Gebler>A very early stage of our journey. What we have built so far is a service that customers love.
+
+333
+00:26:28.240 --> 00:26:53.580
+<v Daniel Gebler>But we know that with building a service where you're seeing each customer at least once per week and you have a penetration that you see a large part of every single street in every city, which is very high, then there are so much possibilities that come beyond food, beyond the logistical service that we're offering now, that we are very, very, very happy to look forward to the future opportunities.
+
+334
+00:26:53.580 --> 00:27:05.160
+<v Daniel Gebler>On the short term, what we're working on now and what gives us a lot of energy is the fulfillment operation, meaning the warehouse order picking and replenishment and receiving operation.
+
+335
+00:27:05.160 --> 00:27:35.140
+<v Daniel Gebler>We are now step by step automating. So we are building a fully robotized automated warehouse, which includes robots, conveyor belts and a lot of automated components that need to have local control components, but also cloud based steering components, which is something that we are now building up, which is one of the classical cases of edge computing, where you have very interesting and hard problems to solve on the digital platform.
+
+336
+00:27:35.160 --> 00:27:40.580
+<v Daniel Gebler>decision what do you locally compute and what do you compute in the cloud. So if you have various
+
+337
+00:27:40.580 --> 00:27:46.460
+<v Daniel Gebler>robots in a warehouse, you need to decide, can a robot by itself decide what is the next step to do
+
+338
+00:27:46.460 --> 00:27:51.500
+<v Daniel Gebler>or is it something what from a central control unit needs to be steered. So these are very,
+
+339
+00:27:51.560 --> 00:27:58.180
+<v Daniel Gebler>very interesting problems to solve, which are similar to problems of autonomous drones or
+
+340
+00:27:58.180 --> 00:28:00.700
+<v Daniel Gebler>autonomous driving, but now in a warehousing environment.
+
+341
+00:28:02.320 --> 00:28:03.760
+<v Noah Labhart>Let's flip back to you, Daniel.
+
+342
+00:28:05.160 --> 00:28:12.360
+<v Noah Labhart>that you work? A CEO, CTO, architect, or any person really. Name a person you look up to and why.
+
+343
+00:28:12.920 --> 00:28:18.980
+<v Daniel Gebler>There are probably two groups that I find that influence me on a daily basis, but also on a
+
+344
+00:28:18.980 --> 00:28:23.840
+<v Daniel Gebler>longer horizon. These are on the one hand, the peers on our board level, on the executive level.
+
+345
+00:28:24.160 --> 00:28:30.720
+<v Daniel Gebler>So this is the CEO, this is the COO, all those executives that help to define the prioritization,
+
+346
+00:28:30.920 --> 00:28:34.500
+<v Daniel Gebler>not only for the tech, but for the entire business, on the operations side, on the
+
+347
+00:28:35.160 --> 00:28:41.020
+<v Daniel Gebler>on many angles. On the product team structure, we are looking into an organizational setup where we
+
+348
+00:28:41.020 --> 00:28:48.240
+<v Daniel Gebler>can keep the teams as much as possible autonomous, not building a heavy middle management structure,
+
+349
+00:28:48.500 --> 00:28:56.680
+<v Daniel Gebler>but still have a clear means to steer the teams based on company-wide objectives. And this is
+
+350
+00:28:56.680 --> 00:29:02.380
+<v Daniel Gebler>something where we see now with a little bit more than 100 engineers that all teams need a little
+
+351
+00:29:02.380 --> 00:29:07.260
+<v Daniel Gebler>bit more steering than just full autonomy but on the other hand we don't want to build immediately
+
+352
+00:29:07.260 --> 00:29:14.720
+<v Daniel Gebler>up a full-blown middle management layer and the means of OKRs, company-wide objectives, but
+
+353
+00:29:14.720 --> 00:29:20.140
+<v Daniel Gebler>also a shared vision of what do we do not only in three months time but what do we do in three years
+
+354
+00:29:20.140 --> 00:29:25.060
+<v Daniel Gebler>time or what is the long-term goal in 10 years time this is something what helps the teams to
+
+355
+00:29:25.060 --> 00:29:29.780
+<v Daniel Gebler>define for themselves also this kind of short, mid and long-term roadmaps. Great
+
+356
+00:29:29.780 --> 00:29:31.240
+<v Noah Labhart>answer. If you could,
+
+357
+00:29:32.380 --> 00:29:39.740
+<v Noah Labhart>When you started Picnic, what would you do differently or what would you consider taking a different approach on?
+
+358
+00:29:40.620 --> 00:29:53.040
+<v Daniel Gebler>Many things that you learn along the way that you would do different, but it doesn't make so much sense to reflect about the stuff that you would do different after you know all the stuff that you know ex post.
+
+359
+00:29:53.440 --> 00:29:59.020
+<v Daniel Gebler>What I find much more meaningful is to ask the staff, what should you have done faster?
+
+360
+00:29:59.020 --> 00:30:11.680
+<v Daniel Gebler>Because the only real thing if you make your decisions based on the best knowledge that you have at this point in time, the only thing what you can do is prioritization or how fast you execute things.
+
+361
+00:30:11.900 --> 00:30:15.740
+<v Daniel Gebler>And there are certainly things that I would have loved to do a little bit faster.
+
+362
+00:30:15.740 --> 00:30:28.880
+<v Daniel Gebler>So one thing what is very close to my heart is moving into a purely data-driven engineering, but also data-driven operational approach is something what I would have loved to do a little bit faster.
+
+363
+00:30:29.160 --> 00:30:34.440
+<v Daniel Gebler>Moving into machine learning and deep learning, I would have loved to do a bit faster.
+
+364
+00:30:34.440 --> 00:30:44.360
+<v Daniel Gebler>For the simple reason that we see now the real benefit of what it means to have this feedback loop in real time, but also more on a batch basis.
+
+365
+00:30:44.860 --> 00:30:50.220
+<v Daniel Gebler>If you have feedback from your data warehouse into your operation systems for all the metrics.
+
+366
+00:30:50.420 --> 00:31:01.760
+<v Daniel Gebler>This self-learning loop for logistics, but also for the warehouse management, for the purchasing is a game changer for every business that is running at scale as we do here in logistics.
+
+367
+00:31:01.760 --> 00:31:02.260
+<v Daniel Gebler>things.
+
+368
+00:31:02.140 --> 00:31:07.140
+<v Noah Labhart>Last question, Daniel. You're getting on a plane and you're sitting next to a young
+
+369
+00:31:07.140 --> 00:31:11.920
+<v Noah Labhart>entrepreneur who has built the next big thing. They're jazzed about it. They're super excited
+
+370
+00:31:11.920 --> 00:31:15.540
+<v Noah Labhart>to show you their product. They really think it's going to make an impact on the world.
+
+371
+00:31:15.680 --> 00:31:20.300
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+372
+00:31:20.520 --> 00:31:21.860
+<v Daniel Gebler>The first advice I would
+
+373
+00:31:21.860 --> 00:31:28.740
+<v Daniel Gebler>give him is ask people for advice. Get feedback, but whatever feedback you take or you get,
+
+374
+00:31:28.740 --> 00:31:31.940
+<v Daniel Gebler>take it with a healthy grain of salt.
+
+375
+00:31:32.140 --> 00:31:34.620
+<v Daniel Gebler>You will have a lot of people that will encourage you,
+
+376
+00:31:34.660 --> 00:31:36.640
+<v Daniel Gebler>but don't really understand what you're doing.
+
+377
+00:31:36.800 --> 00:31:38.540
+<v Daniel Gebler>And you will have naysayers,
+
+378
+00:31:38.540 --> 00:31:41.840
+<v Daniel Gebler>which just are jealous about what you're working on.
+
+379
+00:31:41.980 --> 00:31:44.440
+<v Daniel Gebler>So you need to form yourself an opinion
+
+380
+00:31:45.000 --> 00:31:47.400
+<v Daniel Gebler>and a vision on where do you want to go
+
+381
+00:31:47.400 --> 00:31:48.320
+<v Daniel Gebler>and then stick to it.
+
+382
+00:31:48.440 --> 00:31:51.520
+<v Daniel Gebler>This is one angle that what I would share with them.
+
+383
+00:31:51.640 --> 00:31:55.960
+<v Daniel Gebler>The other angle is don't be for too long,
+
+384
+00:31:56.020 --> 00:31:58.420
+<v Daniel Gebler>too stubborn on what you are working on.
+
+385
+00:31:58.740 --> 00:32:04.000
+<v Daniel Gebler>is the change if you need to make a change a course correction then be also open to this of
+
+386
+00:32:04.000 --> 00:32:09.340
+<v Daniel Gebler>this feedback to yourself that you need to maybe adjust something in the model that you need to uh
+
+387
+00:32:09.340 --> 00:32:15.260
+<v Daniel Gebler>that you're working on the tech or the product vision that you have in this sense it is a kind
+
+388
+00:32:15.260 --> 00:32:19.200
+<v Daniel Gebler>of a healthy balance between on the one hand as being a little bit of stubborn but on the other
+
+389
+00:32:19.200 --> 00:32:24.800
+<v Daniel Gebler>hand not being too stubborn and being humble to also take feedback from people around you
+
+390
+00:32:24.800 --> 00:32:26.880
+<v Daniel Gebler>That is probably the most important thing.
+
+391
+00:32:26.940 --> 00:32:32.300
+<v Daniel Gebler>If you find a healthy balance here, then it is only a matter of time until you will be successful.
+
+392
+00:32:32.740 --> 00:32:33.240
+<v Daniel Gebler>That's
+
+393
+00:32:33.180 --> 00:32:33.680
+<v Noah Labhart>great advice.
+
+394
+00:32:34.300 --> 00:32:36.580
+<v Noah Labhart>Well, Daniel, thank you for being on the show today.
+
+395
+00:32:36.680 --> 00:32:39.660
+<v Noah Labhart>Thank you for telling the product creation story of Picnic.
+
+396
+00:32:40.120 --> 00:32:41.060
+<v Daniel Gebler>Thanks for having me.
+
+397
+00:32:42.800 --> 00:32:45.780
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+398
+00:32:53.820 --> 00:33:00.140
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Season two episodes are co-produced and edited by
+
+399
+00:33:00.140 --> 00:33:05.540
+<v Noah Labhart>Bradley Denham. Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your
+
+400
+00:33:05.540 --> 00:33:11.460
+<v Noah Labhart>choice. Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+401
+00:33:11.460 --> 00:33:14.000
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+402
+00:33:14.340 --> 00:33:16.340
+<v Noah Labhart>Both things help us out tremendously.
+
+403
+00:33:17.240 --> 00:33:18.640
+<v Noah Labhart>And thanks again for listening.

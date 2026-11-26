@@ -1,0 +1,1275 @@
+WEBVTT
+
+NOTE Developer Chats - Oleksandr Piekhota
+
+1
+00:00:00.700 --> 00:00:09.060
+<v Noah Labhart>Hello listeners. Today we are dropping another episode in our series Developer chats, hearing from the large scale system builders themselves.
+
+2
+00:00:10.080 --> 00:00:29.320
+<v Noah Labhart>In this episode we are talking with Oleksandr Piekhota, principal software engineer at Teaching Strategies LLC. Oleksandr helps to show us at what point of scale platform approaches are required, when to run experiments, when to stop, and perhaps more importantly, engineering ownership beyond the code.
+
+3
+00:00:30.600 --> 00:00:34.440
+<v Noah Labhart>Oleksandr, thank you for being on the show today. Thank you for being on Code Story.
+
+4
+00:00:34.820 --> 00:00:35.940
+<v Oleksandr Piekhota>Thanks for having me.
+
+5
+00:00:36.440 --> 00:00:42.320
+<v Noah Labhart>Absolutely. Really excited to dive into all of your experience today as moving into more
+
+6
+00:00:42.320 --> 00:00:48.320
+<v Noah Labhart>technical leadership as a principal engineer and platform versus feature thinking and all
+
+7
+00:00:48.320 --> 00:00:52.420
+<v Noah Labhart>the things we're going to dive into. Before we do, tell me in my audience a little bit about you.
+
+8
+00:00:52.640 --> 00:00:53.140
+<v Noah Labhart>So
+
+9
+00:00:53.040 --> 00:00:59.700
+<v Oleksandr Piekhota>basically, I am currently working as a principal software engineer at Teaching Strategies.
+
+10
+00:01:00.000 --> 00:01:06.640
+<v Oleksandr Piekhota>I can count like 14 years in production engineering, so I think I have at least
+
+11
+00:01:06.640 --> 00:01:11.760
+<v Oleksandr Piekhota>of some understanding like what I'm talking about. My background is mostly focused about
+
+12
+00:01:11.760 --> 00:01:19.260
+<v Oleksandr Piekhota>PHP and Golang. I do have some extra experience in different languages, but that is not that rich
+
+13
+00:01:19.260 --> 00:01:26.000
+<v Oleksandr Piekhota>to say that I'm strong in it. I have two master's degrees, one in computer science and the second
+
+14
+00:01:26.000 --> 00:01:32.360
+<v Oleksandr Piekhota>one in high-performance computing. The last one I've got a few years ago in University of Edinburgh.
+
+15
+00:01:32.640 --> 00:01:39.780
+<v Oleksandr Piekhota>Really happy about it. And last year I also founded a community called Tech Talks Edinburgh.
+
+16
+00:01:40.460 --> 00:01:46.320
+<v Oleksandr Piekhota>And we're just trying to make some meetups and events for people to share their technical
+
+17
+00:01:46.320 --> 00:01:50.740
+<v Oleksandr Piekhota>experience and thoughts and to give some richness to the audience.
+
+18
+00:01:51.060 --> 00:01:51.560
+<v Oleksandr Piekhota>Very
+
+19
+00:01:51.520 --> 00:01:55.560
+<v Noah Labhart>cool. Congrats on all your success and your recent degree acquisition. I know that's a lot of
+
+20
+00:01:56.000 --> 00:02:00.500
+<v Noah Labhart>put in to get those advanced degrees. I'd love to dive into my first question, which
+
+21
+00:02:00.500 --> 00:02:05.760
+<v Noah Labhart>you've moved from hands-on engineering into principal and technical leadership roles,
+
+22
+00:02:05.940 --> 00:02:10.520
+<v Noah Labhart>kind of more working on architecture and platforms. At what point did you realize
+
+23
+00:02:10.520 --> 00:02:16.220
+<v Noah Labhart>your work was no longer about individual features, but about the system as a whole?
+
+24
+00:02:16.440 --> 00:02:22.660
+<v Oleksandr Piekhota>Oh, good start. I think it's responsibility shift. So basically, when you realize that
+
+25
+00:02:22.660 --> 00:02:26.440
+<v Oleksandr Piekhota>that your decisions influence performance, cost, reliability,
+
+26
+00:02:27.020 --> 00:02:29.620
+<v Oleksandr Piekhota>maybe team velocity at the same time.
+
+27
+00:02:29.700 --> 00:02:33.640
+<v Oleksandr Piekhota>And when you understand that you're responsible for the system as a whole,
+
+28
+00:02:33.820 --> 00:02:35.340
+<v Oleksandr Piekhota>not individual features,
+
+29
+00:02:35.700 --> 00:02:41.100
+<v Oleksandr Piekhota>then when you understand that your manager can call you during the night
+
+30
+00:02:41.100 --> 00:02:45.160
+<v Oleksandr Piekhota>because of the client issue or something happened to the production instance
+
+31
+00:02:45.160 --> 00:02:50.020
+<v Oleksandr Piekhota>and they need your help, no matter how long it takes and how late it is,
+
+32
+00:02:50.160 --> 00:02:51.740
+<v Oleksandr Piekhota>then this shift starts.
+
+33
+00:02:52.660 --> 00:02:59.560
+<v Oleksandr Piekhota>I remember a case from my PDFfiller public API experience when my manager called me about
+
+34
+00:02:59.560 --> 00:03:04.540
+<v Oleksandr Piekhota>a client's issue and I tried to help him and debug it even though it was late.
+
+35
+00:03:04.720 --> 00:03:11.340
+<v Oleksandr Piekhota>But the problem was that we haven't stored all the necessary traces to figure out what
+
+36
+00:03:11.340 --> 00:03:12.380
+<v Oleksandr Piekhota>exact problem was.
+
+37
+00:03:12.560 --> 00:03:18.500
+<v Oleksandr Piekhota>It was a flaky issue when one time it repeats and the second one it doesn't.
+
+38
+00:03:18.500 --> 00:03:24.520
+<v Oleksandr Piekhota>And because they didn't have all of those necessary traces to reproduce exact particular problem,
+
+39
+00:03:24.520 --> 00:03:31.820
+<v Oleksandr Piekhota>at that moment I understood that I need to think a little bit out of the box, and like you need to
+
+40
+00:03:31.820 --> 00:03:37.340
+<v Oleksandr Piekhota>design those kind of like things, because the next time, like when the manager calls you,
+
+41
+00:03:37.340 --> 00:03:42.560
+<v Oleksandr Piekhota>you need to be prepared like to answer those questions and be ready to handle like various
+
+42
+00:03:42.560 --> 00:03:49.040
+<v Oleksandr Piekhota>situations. Yeah, like, that's kind of like shift, I think is important. And when you get all of
+
+43
+00:03:49.040 --> 00:03:54.640
+<v Oleksandr Piekhota>those responsibilities, like this kind of understanding comes to you like naturally,
+
+44
+00:03:54.880 --> 00:04:02.240
+<v Oleksandr Piekhota>and it's very hard, like, even though it sounds simple, but many developers don't get it unless
+
+45
+00:04:02.240 --> 00:04:05.400
+<v Oleksandr Piekhota>they get into like similar scenario. I
+
+46
+00:04:05.400 --> 00:04:06.860
+<v Noah Labhart>appreciate you walking through that. Okay,
+
+47
+00:04:06.860 --> 00:04:12.180
+<v Noah Labhart>Okay, across several projects, growth doesn't break functionality, right?
+
+48
+00:04:12.220 --> 00:04:14.640
+<v Noah Labhart>Across projects, growth doesn't break functionality.
+
+49
+00:04:14.900 --> 00:04:17.260
+<v Noah Labhart>It can expose architectural limits.
+
+50
+00:04:17.320 --> 00:04:19.100
+<v Noah Labhart>And I'm sure you've experienced this many times.
+
+51
+00:04:19.600 --> 00:04:23.540
+<v Noah Labhart>Can you recall a moment when it became clear that shipping more features wouldn't solve
+
+52
+00:04:23.540 --> 00:04:25.860
+<v Noah Labhart>a problem and a platform approach was required?
+
+53
+00:04:26.100 --> 00:04:28.260
+<v Oleksandr Piekhota>I have one example in my mind.
+
+54
+00:04:28.420 --> 00:04:34.020
+<v Oleksandr Piekhota>So when we were working like in my previous company on a B2B product, we faced a situation
+
+55
+00:04:34.020 --> 00:04:41.900
+<v Oleksandr Piekhota>where we got like rapid team growth. Like we tried to hire like many people from within the company,
+
+56
+00:04:41.900 --> 00:04:48.420
+<v Oleksandr Piekhota>like we tried to hire like some people from like outside the company, and I guess we managed to get
+
+57
+00:04:48.420 --> 00:04:57.000
+<v Oleksandr Piekhota>from maybe 10-15 people as a core to about 80, like 90 people, and it's a huge growth. Like we got that
+
+58
+00:04:57.000 --> 00:05:03.540
+<v Oleksandr Piekhota>that like from like for like during the period of half a year. And lack of standards, like cross
+
+59
+00:05:03.540 --> 00:05:11.720
+<v Oleksandr Piekhota>team development, microservice approach, like pushed development like in such a fast pace,
+
+60
+00:05:12.280 --> 00:05:19.240
+<v Oleksandr Piekhota>that when we eventually get to the point that we have some features, we face the situation that
+
+61
+00:05:19.240 --> 00:05:24.460
+<v Oleksandr Piekhota>local development is terrible. It's nearly impossible to run like the whole environment.
+
+62
+00:05:24.460 --> 00:05:31.380
+<v Oleksandr Piekhota>Integration between services is just a complete mess. We even tried to like assign
+
+63
+00:05:31.380 --> 00:05:38.420
+<v Oleksandr Piekhota>delivery managers from different teams just to make a release possible. So the delivery manager
+
+64
+00:05:38.420 --> 00:05:45.000
+<v Oleksandr Piekhota>like goes to each team and asks them basically, have you guys deployed everything? Did you do this? Did you
+
+65
+00:05:45.000 --> 00:05:52.580
+<v Oleksandr Piekhota>do this, did that? And yeah, like it made those features very complicated. And finally, when we
+
+66
+00:05:54.460 --> 00:06:00.980
+<v Oleksandr Piekhota>like production flow, and our first production flow basically was our internal test, and when we ask
+
+67
+00:06:00.980 --> 00:06:09.160
+<v Oleksandr Piekhota>our internal people to go and test like some flow, we figure out that the product can't handle like
+
+68
+00:06:09.160 --> 00:06:14.420
+<v Oleksandr Piekhota>the load we created like within the company. I'm not even saying like we published it to some other
+
+69
+00:06:14.420 --> 00:06:21.220
+<v Oleksandr Piekhota>external customers. And yeah, so this gave me like the understanding that like with such a pace, like
+
+70
+00:06:21.220 --> 00:06:25.960
+<v Oleksandr Piekhota>Like with such an approach, going further makes no any good progress at all.
+
+71
+00:06:26.340 --> 00:06:32.520
+<v Oleksandr Piekhota>Like things has to be rethought, rethinked in some way that the approach is going to be different.
+
+72
+00:06:33.200 --> 00:06:35.620
+<v Oleksandr Piekhota>And yeah, we started thinking about it.
+
+73
+00:06:35.720 --> 00:06:40.660
+<v Oleksandr Piekhota>And like we tried to make some microservices, try to put them together.
+
+74
+00:06:40.880 --> 00:06:42.780
+<v Oleksandr Piekhota>We tried to introduce tracing.
+
+75
+00:06:43.100 --> 00:06:47.400
+<v Oleksandr Piekhota>We tried to invest in like more mature local development flow,
+
+76
+00:06:47.400 --> 00:06:53.680
+<v Oleksandr Piekhota>hired people that were responsible for like automation tests and integration tests and
+
+77
+00:06:53.680 --> 00:07:00.020
+<v Oleksandr Piekhota>yeah, all of this together gave a lot of experience to understand that we need a platform approach.
+
+78
+00:07:00.020 --> 00:07:00.900
+<v Oleksandr Piekhota>okay
+
+79
+00:07:00.900 --> 00:07:06.520
+<v Noah Labhart>Cool, let's move into my next question here. PDFfiller started as a B2C product,
+
+80
+00:07:06.520 --> 00:07:13.620
+<v Noah Labhart>but entering into b2b required public apis and much higher reliability standards for business
+
+81
+00:07:13.620 --> 00:07:16.480
+<v Noah Labhart>business-to-business side of things, what was the hardest part of that transition
+
+82
+00:07:16.480 --> 00:07:19.400
+<v Noah Labhart>from an engineering perspective, not necessarily a business
+
+83
+00:07:19.400 --> 00:07:19.900
+<v Oleksandr Piekhota>one?
+
+84
+00:07:19.760 --> 00:07:24.480
+<v Oleksandr Piekhota>Yeah, it's actually funny because the hardest part wasn't even like scaling infrastructure,
+
+85
+00:07:25.380 --> 00:07:33.080
+<v Oleksandr Piekhota>but it was more about contracts and formalizing interface, which you develop. So basically,
+
+86
+00:07:33.720 --> 00:07:40.520
+<v Oleksandr Piekhota>when we developed some kind of core functionality for the B2C part of the product, so we knew that
+
+87
+00:07:40.520 --> 00:07:42.540
+<v Oleksandr Piekhota>that we can develop this, we can develop that.
+
+88
+00:07:42.660 --> 00:07:44.980
+<v Oleksandr Piekhota>You can go and talk to front-end engineers,
+
+89
+00:07:45.660 --> 00:07:47.660
+<v Oleksandr Piekhota>or you can talk with mobile devs.
+
+90
+00:07:47.720 --> 00:07:51.360
+<v Oleksandr Piekhota>You can always introduce something else for them.
+
+91
+00:07:51.560 --> 00:07:54.860
+<v Oleksandr Piekhota>If the previous part of the code doesn't work,
+
+92
+00:07:55.040 --> 00:07:57.560
+<v Oleksandr Piekhota>then they can just use another endpoint.
+
+93
+00:07:57.820 --> 00:08:01.620
+<v Oleksandr Piekhota>They can work in any way you agree with them during the call,
+
+94
+00:08:01.800 --> 00:08:04.600
+<v Oleksandr Piekhota>or during the lunch, or something like that.
+
+95
+00:08:05.160 --> 00:08:09.900
+<v Oleksandr Piekhota>And this internal behavior makes things so much easier
+
+96
+00:08:10.520 --> 00:08:12.480
+<v Oleksandr Piekhota>and simpler to work with.
+
+97
+00:08:12.940 --> 00:08:16.160
+<v Oleksandr Piekhota>So basically, you're focusing on completely different things.
+
+98
+00:08:16.720 --> 00:08:22.100
+<v Oleksandr Piekhota>When you go into B2B and you're trying to develop a public API
+
+99
+00:08:22.100 --> 00:08:27.200
+<v Oleksandr Piekhota>that's going to be used by other companies, other teams,
+
+100
+00:08:27.260 --> 00:08:28.800
+<v Oleksandr Piekhota>some third-party engineers,
+
+101
+00:08:29.260 --> 00:08:33.720
+<v Oleksandr Piekhota>then it becomes more about the public contract itself.
+
+102
+00:08:34.240 --> 00:08:39.780
+<v Oleksandr Piekhota>Things like backward compatibility, versioning strategy, rate limiting,
+
+103
+00:08:40.520 --> 00:08:48.020
+<v Oleksandr Piekhota>things like that were like much more important now, and the design that you put into every endpoint.
+
+104
+00:08:48.020 --> 00:08:54.620
+<v Oleksandr Piekhota>It's actually interesting because I was working with my manager a lot, spending like a huge amount
+
+105
+00:08:54.620 --> 00:09:01.760
+<v Oleksandr Piekhota>of time just discussing a single API endpoint and how we should name like the endpoint itself, how we
+
+106
+00:09:01.760 --> 00:09:09.480
+<v Oleksandr Piekhota>should name like the request params, response params, IDs, like errors, like names of those errors,
+
+107
+00:09:10.520 --> 00:09:18.380
+<v Oleksandr Piekhota>messages and stuff like that. This would make public API much more valuable for other people.
+
+108
+00:09:18.380 --> 00:09:25.440
+<v Oleksandr Piekhota>And at some point, how easy it is to read it, how easy it is to work with this, how easy like it
+
+109
+00:09:25.440 --> 00:09:32.340
+<v Oleksandr Piekhota>would be to develop an SDK for such an API. This kind of like predictability and trust,
+
+110
+00:09:32.340 --> 00:09:36.740
+<v Oleksandr Piekhota>this is what makes like just an API a great API, I would say.
+
+111
+00:09:36.740 --> 00:09:39.700
+<v Noah Labhart>cool okay so moving into around
+
+112
+00:09:40.520 --> 00:09:46.040
+<v Noah Labhart>internal systems. Examples like invoicing and HR workflows, they begin as automation,
+
+113
+00:09:46.240 --> 00:09:50.160
+<v Noah Labhart>but eventually they evolve into real products. What tells you that an internal tool is worth
+
+114
+00:09:50.160 --> 00:09:54.600
+<v Noah Labhart>developing seriously rather than treating it as a temporary workaround? When I think about that,
+
+115
+00:09:54.620 --> 00:09:59.080
+<v Noah Labhart>I think about when are you taping processes together for an internal system versus
+
+116
+00:09:59.080 --> 00:10:01.120
+<v Noah Labhart>really productizing something?
+
+117
+00:10:01.460 --> 00:10:06.720
+<v Oleksandr Piekhota>I think that it really depends and it's hard to reflect
+
+118
+00:10:06.720 --> 00:10:14.480
+<v Oleksandr Piekhota>on this question. From my experience, I can say that we try to develop internal tools that we've
+
+119
+00:10:14.480 --> 00:10:20.380
+<v Oleksandr Piekhota>seen a problem with. Because the company I was working in was about document and workflows
+
+120
+00:10:20.380 --> 00:10:26.580
+<v Oleksandr Piekhota>automation. Basically, we've seen that, for example, invoice flow wasn't optimized properly
+
+121
+00:10:26.580 --> 00:10:32.280
+<v Oleksandr Piekhota>inside our company. And on the other hand, when we started developing public API,
+
+122
+00:10:32.280 --> 00:10:38.820
+<v Oleksandr Piekhota>API, we've noticed that before we go into real production with real clients, we still need to
+
+123
+00:10:38.820 --> 00:10:46.080
+<v Oleksandr Piekhota>have some feedback about our API usage. And the best thing is to develop a client for ourselves
+
+124
+00:10:46.080 --> 00:10:54.220
+<v Oleksandr Piekhota>and see how it goes on a scale of some workflow like this. And what we figured out is when
+
+125
+00:10:55.010 --> 00:11:01.140
+<v Oleksandr Piekhota>developing such a tool, such an internal tool, we were able to see all the kind of design issues
+
+126
+00:11:02.280 --> 00:11:08.800
+<v Oleksandr Piekhota>during prototyping this API. And this helped us a lot to get all of those feedback. And on the
+
+127
+00:11:08.800 --> 00:11:14.760
+<v Oleksandr Piekhota>other hand, we managed to create an app that really simplified and optimized internal flow.
+
+128
+00:11:15.400 --> 00:11:21.620
+<v Oleksandr Piekhota>So all of those internal clients that are going to use the tool that you've built, they're going
+
+129
+00:11:21.620 --> 00:11:28.520
+<v Oleksandr Piekhota>to give you a very valuable and important feedback that you probably won't be able to get from
+
+130
+00:11:28.520 --> 00:11:35.160
+<v Oleksandr Piekhota>real customers because they sit outside of your office and maybe like you need to analyze some
+
+131
+00:11:35.160 --> 00:11:40.640
+<v Oleksandr Piekhota>kind of like logs and traces which is completely different story that's like solution that an
+
+132
+00:11:40.640 --> 00:11:47.020
+<v Oleksandr Piekhota>approach that worked for us i'm not sure that it's probably gonna work for everybody and like
+
+133
+00:11:47.020 --> 00:11:53.800
+<v Oleksandr Piekhota>everywhere but again if you're really looking into a good client for your system maybe it makes sense
+
+134
+00:11:53.800 --> 00:11:58.520
+<v Oleksandr Piekhota>to try to use your system itself by your particular needs.
+
+135
+00:11:58.740 --> 00:12:01.880
+<v Oleksandr Piekhota>And this will help you maybe finding some issues
+
+136
+00:12:01.880 --> 00:12:05.720
+<v Oleksandr Piekhota>and maybe solving your own problems in one or another way.
+
+137
+00:12:06.040 --> 00:12:08.080
+<v Noah Labhart>Very good. I appreciate you walking through that.
+
+138
+00:12:08.140 --> 00:12:11.860
+<v Noah Labhart>Okay, so in R&amp;D, you explored CI/CD automation,
+
+139
+00:12:12.340 --> 00:12:13.780
+<v Noah Labhart>serverless infrastructure experiments,
+
+140
+00:12:13.960 --> 00:12:16.860
+<v Noah Labhart>the whole nine yards, not all reached production.
+
+141
+00:12:17.180 --> 00:12:19.540
+<v Noah Labhart>How do you decide when an experiment should continue?
+
+142
+00:12:19.780 --> 00:12:21.940
+<v Noah Labhart>And I don't even add in there when it should start.
+
+143
+00:12:23.800 --> 00:12:24.740
+<v Noah Labhart>the engineering costs
+
+144
+00:12:24.740 --> 00:12:28.420
+<v Oleksandr Piekhota>Basically, like from what I've noticed, like from my personal experience,
+
+145
+00:12:28.420 --> 00:12:35.720
+<v Oleksandr Piekhota>is when you're trying to do some R&amp;D work, it becomes very emotional. When you spend a week
+
+146
+00:12:35.720 --> 00:12:42.720
+<v Oleksandr Piekhota>or two or like even more, like trying to understand some technology, then you spend some time like
+
+147
+00:12:42.720 --> 00:12:48.540
+<v Oleksandr Piekhota>trying to develop a proof of concept and then like maybe prepare some presentation about it,
+
+148
+00:12:48.540 --> 00:12:54.560
+<v Oleksandr Piekhota>you're trying to be like... not, you're not exactly trying, you are gonna be looking like from the
+
+149
+00:12:54.560 --> 00:13:00.400
+<v Oleksandr Piekhota>perspective when you want to sell this tool, because you already invested like so many of your
+
+150
+00:13:00.400 --> 00:13:07.180
+<v Oleksandr Piekhota>personal time in it, and this is the problem, because sometimes it really makes no real sense.
+
+151
+00:13:07.180 --> 00:13:14.400
+<v Oleksandr Piekhota>Or sometimes like perspective, maybe like manager's perspective or like team's perspective, could bring
+
+152
+00:13:14.400 --> 00:13:21.420
+<v Oleksandr Piekhota>you very valuable information, like feedback. So answering the question, I would say that it's very
+
+153
+00:13:21.420 --> 00:13:28.000
+<v Oleksandr Piekhota>nice and good to have a team working with you together so you can share some thoughts and hear
+
+154
+00:13:28.000 --> 00:13:35.480
+<v Oleksandr Piekhota>some feedback, and it's really cool if you're gonna have a skilled manager that can lead you towards
+
+155
+00:13:35.480 --> 00:13:41.980
+<v Oleksandr Piekhota>the right direction or maybe slow you down if you're trying to go too deep or like to
+
+156
+00:13:41.980 --> 00:13:48.160
+<v Oleksandr Piekhota>or trying to become too emotionally attached to some particular R&amp;D work.
+
+157
+00:13:48.320 --> 00:13:48.860
+<v Noah Labhart>Very good.
+
+158
+00:13:48.980 --> 00:13:53.140
+<v Noah Labhart>Okay, so you've hired teams, set standards, and shaped long-term technical direction.
+
+159
+00:13:53.440 --> 00:13:56.480
+<v Noah Labhart>And at what point does an engineer stop being a contributor
+
+160
+00:13:56.480 --> 00:13:58.720
+<v Noah Labhart>and start owning business-level outcomes?
+
+161
+00:13:58.940 --> 00:14:00.960
+<v Noah Labhart>I'm really excited to hear what you have to say here,
+
+162
+00:14:01.020 --> 00:14:03.060
+<v Noah Labhart>because I think it applies across the board.
+
+163
+00:14:03.420 --> 00:14:06.300
+<v Oleksandr Piekhota>Hard to say when exactly this happens.
+
+164
+00:14:06.540 --> 00:14:10.500
+<v Oleksandr Piekhota>And I assume it also depends on the environment you are in
+
+165
+00:14:11.980 --> 00:14:18.160
+<v Oleksandr Piekhota>of company are you working with. So for example, many outsourcing companies, people they are
+
+166
+00:14:18.160 --> 00:14:24.840
+<v Oleksandr Piekhota>working like just from project to project. And like when you talk to such people that their
+
+167
+00:14:24.840 --> 00:14:30.640
+<v Oleksandr Piekhota>focus mostly is shifted towards delivering the project, like doing what requirements are,
+
+168
+00:14:30.880 --> 00:14:35.660
+<v Oleksandr Piekhota>and just working towards this kind of like cadence, like where everything is repeated.
+
+169
+00:14:35.660 --> 00:14:42.440
+<v Oleksandr Piekhota>and even if there are some people that have some kind of like opinion about the architecture about
+
+170
+00:14:42.440 --> 00:14:48.180
+<v Oleksandr Piekhota>like the things how it should be developed they try to like get knowledge about what's products
+
+171
+00:14:48.180 --> 00:14:54.960
+<v Oleksandr Piekhota>gonna do and the problem is that their opinion usually doesn't matter in terms of like business
+
+172
+00:14:54.960 --> 00:15:01.760
+<v Oleksandr Piekhota>and i can say even more that people who make decisions won't even able to hear them or have
+
+173
+00:15:01.760 --> 00:15:07.100
+<v Oleksandr Piekhota>have a conversation with them because they maybe sit like in different country in different office
+
+174
+00:15:07.100 --> 00:15:13.680
+<v Oleksandr Piekhota>and there are a whole bunch of operation managers that just proxy the information and because of
+
+175
+00:15:13.680 --> 00:15:21.200
+<v Oleksandr Piekhota>such a structure, this information would never like reach proper ears. And because of that, people who
+
+176
+00:15:21.200 --> 00:15:26.900
+<v Oleksandr Piekhota>choose to stay in such environments probably won't become owners of business level outcomes
+
+177
+00:15:26.900 --> 00:15:33.200
+<v Oleksandr Piekhota>comes and on the other hand there is small product oriented team or maybe like a small startup
+
+178
+00:15:33.200 --> 00:15:40.380
+<v Oleksandr Piekhota>and there are like very few people there like maybe some founding engineer like few folks that
+
+179
+00:15:40.380 --> 00:15:48.120
+<v Oleksandr Piekhota>works with him and they see what they are doing and the impact they do like the code they deliver
+
+180
+00:15:48.120 --> 00:15:55.060
+<v Oleksandr Piekhota>like reaches the clients instantly just after the deploy they see like how it changes like on the
+
+181
+00:15:56.900 --> 00:16:07.120
+<v Oleksandr Piekhota>Maybe like when they see that their work is appreciated, when they try to have some conversation and they hear like real like discussion.
+
+182
+00:16:07.180 --> 00:16:16.840
+<v Oleksandr Piekhota>And basically like when the moment of appreciations happens, I think this is where like people start in owning like these business level outcomes.
+
+183
+00:16:17.180 --> 00:16:18.780
+<v Noah Labhart>Very cool. Yeah, that makes sense.
+
+184
+00:16:19.040 --> 00:16:24.300
+<v Noah Labhart>So you've contributed to open source tools that later became part of your company's infrastructure.
+
+185
+00:16:24.840 --> 00:16:46.480
+<v Noah Labhart>Why do you see open source contributions as part of serious engineering work rather than a side activity? Because I think some people can see it as side projects and scratching itches that maybe you don't do during the day-to-day job, but really can contribute to the whole picture of what you're trying to build. So tell me about that.
+
+186
+00:16:46.480 --> 00:16:54.160
+<v Oleksandr Piekhota>Basically, when you start any new project, you're basically trying to include some framework or library.
+
+187
+00:16:54.420 --> 00:17:00.160
+<v Oleksandr Piekhota>Like in PHP world, for example, you can use Composer to install something.
+
+188
+00:17:00.380 --> 00:17:02.480
+<v Oleksandr Piekhota>There are many frameworks.
+
+189
+00:17:02.820 --> 00:17:08.440
+<v Oleksandr Piekhota>And the majority of those tools, frameworks, are open source.
+
+190
+00:17:09.230 --> 00:17:11.600
+<v Oleksandr Piekhota>And many people don't think about it.
+
+191
+00:17:11.600 --> 00:17:18.040
+<v Oleksandr Piekhota>but the fact is people invest a huge amount of effort to make those tools which later become
+
+192
+00:17:18.040 --> 00:17:24.640
+<v Oleksandr Piekhota>part of your code. It's funny but we trust many of those libraries blindly just because we trust
+
+193
+00:17:24.640 --> 00:17:32.180
+<v Oleksandr Piekhota>the community. If you take a look at some popular libraries, for example in Golang there is PGX
+
+194
+00:17:32.180 --> 00:17:39.000
+<v Oleksandr Piekhota>library for Postgres. It has a huge amount of likes and community. In PHP world there is like
+
+195
+00:17:39.000 --> 00:17:46.320
+<v Oleksandr Piekhota>Laravel framework. Everyone knows about it. In JavaScript, there is React, and this is also an
+
+196
+00:17:46.320 --> 00:17:56.100
+<v Oleksandr Piekhota>open-source solution. And I think we need to pay our debt back in one form or another. And I can
+
+197
+00:17:56.100 --> 00:18:02.740
+<v Oleksandr Piekhota>say that even in the company I'm working at the moment, and in all of those R&amp;D work in the past,
+
+198
+00:18:02.780 --> 00:18:08.800
+<v Oleksandr Piekhota>and so on, companies do a lot of research, proof of concepts, experiments. Very often,
+
+199
+00:18:09.000 --> 00:18:15.840
+<v Oleksandr Piekhota>you already have the code that is possibly can be open sourced you just need to maybe add a readme
+
+200
+00:18:15.840 --> 00:18:21.920
+<v Oleksandr Piekhota>and publish it and it's very simple to do but like the all of those small steps all of those small
+
+201
+00:18:21.920 --> 00:18:27.920
+<v Oleksandr Piekhota>publications will create a whole bunch of like very interesting open source tools and from a
+
+202
+00:18:27.920 --> 00:18:35.020
+<v Oleksandr Piekhota>practical perspective i can say that if you can publish your poc code and in the future it becomes
+
+203
+00:18:35.020 --> 00:18:40.940
+<v Oleksandr Piekhota>very useful for somebody, they can make a production-ready solution, which means that
+
+204
+00:18:40.940 --> 00:18:46.780
+<v Oleksandr Piekhota>you can get benefits of such a solution for free if your original problem is still relevant.
+
+205
+00:18:47.140 --> 00:18:53.200
+<v Oleksandr Piekhota>What I've noticed recently is developers, for example, in my team, understanding that
+
+206
+00:18:53.200 --> 00:18:58.800
+<v Oleksandr Piekhota>we are going to open source some component, they just started thinking differently.
+
+207
+00:18:59.200 --> 00:19:03.980
+<v Oleksandr Piekhota>They're trying to put much more effort into developing the library because they know
+
+208
+00:19:05.020 --> 00:19:09.340
+<v Oleksandr Piekhota>this work will become their public activity and maybe part of their resume.
+
+209
+00:19:09.680 --> 00:19:12.480
+<v Oleksandr Piekhota>And just saying, let's open source it,
+
+210
+00:19:12.560 --> 00:19:19.120
+<v Oleksandr Piekhota>it helps people to produce much better, much more code quality, stronger solution.
+
+211
+00:19:19.680 --> 00:19:25.320
+<v Oleksandr Piekhota>And maybe last but not least, sometimes you need some experience working with something,
+
+212
+00:19:25.520 --> 00:19:28.540
+<v Oleksandr Piekhota>but you don't have any project that you can work with.
+
+213
+00:19:28.700 --> 00:19:32.640
+<v Oleksandr Piekhota>Or maybe you work in the company and the company doesn't have the stack
+
+214
+00:19:32.640 --> 00:19:34.760
+<v Oleksandr Piekhota>you're interested to work in too.
+
+215
+00:19:35.800 --> 00:19:38.280
+<v Oleksandr Piekhota>And I guess the easiest way here
+
+216
+00:19:38.280 --> 00:19:40.720
+<v Oleksandr Piekhota>is simply become an open source contributor
+
+217
+00:19:40.720 --> 00:19:43.180
+<v Oleksandr Piekhota>and you will get all of that knowledge.
+
+218
+00:19:43.440 --> 00:19:45.060
+<v Oleksandr Piekhota>And just doing so,
+
+219
+00:19:45.440 --> 00:19:46.920
+<v Oleksandr Piekhota>you probably can simply jump
+
+220
+00:19:46.920 --> 00:19:49.040
+<v Oleksandr Piekhota>from one position to another
+
+221
+00:19:49.040 --> 00:19:50.720
+<v Oleksandr Piekhota>in terms of seniority
+
+222
+00:19:50.720 --> 00:19:54.000
+<v Oleksandr Piekhota>by simply expanding maybe an hour of time
+
+223
+00:19:54.000 --> 00:19:56.120
+<v Oleksandr Piekhota>after work or something like on the weekend.
+
+224
+00:19:56.340 --> 00:19:58.020
+<v Oleksandr Piekhota>And this is so simple to do.
+
+225
+00:19:58.180 --> 00:19:58.740
+<v Oleksandr Piekhota>Absolutely,
+
+226
+00:19:58.800 --> 00:19:59.540
+<v Noah Labhart>super simple.
+
+227
+00:19:59.580 --> 00:20:01.000
+<v Noah Labhart>And it doesn't take that long.
+
+228
+00:20:02.640 --> 00:20:05.940
+<v Noah Labhart>these types of things is just astronomically different than it used to be.
+
+229
+00:20:06.600 --> 00:20:13.260
+<v Noah Labhart>If you look across your projects, I'm curious how you recognize a truly mature engineering system.
+
+230
+00:20:13.460 --> 00:20:18.600
+<v Noah Labhart>Is it based on code quality? Is it based on process? Or how teams respond when things go
+
+231
+00:20:18.600 --> 00:20:19.820
+<v Noah Labhart>wrong? How do you measure that?
+
+232
+00:20:20.000 --> 00:20:23.700
+<v Oleksandr Piekhota>To be honest, my thinking about it is going to be maybe funny
+
+233
+00:20:23.700 --> 00:20:31.840
+<v Oleksandr Piekhota>money in some way and maybe like some people won't agree with my like vision but i think like
+
+234
+00:20:31.840 --> 00:20:39.580
+<v Oleksandr Piekhota>a mature system is like the system that makes basically money and where customers have their
+
+235
+00:20:39.580 --> 00:20:45.880
+<v Oleksandr Piekhota>use cases covered this is like the base this is like the foundation if you have this everything
+
+236
+00:20:45.880 --> 00:20:53.120
+<v Oleksandr Piekhota>else is secondary so for example it can be like something with a terrible code base very bad
+
+237
+00:20:53.700 --> 00:20:55.960
+<v Oleksandr Piekhota>Zen practices, no architecture at all.
+
+238
+00:20:56.080 --> 00:21:00.700
+<v Oleksandr Piekhota>But unless it makes money and solves the problem, who cares?
+
+239
+00:21:01.060 --> 00:21:04.080
+<v Oleksandr Piekhota>So on the other hand, we can have a strong team.
+
+240
+00:21:04.260 --> 00:21:09.340
+<v Oleksandr Piekhota>They can do everything SOLID, DRY, Kubernetes, microservices, cloud.
+
+241
+00:21:10.050 --> 00:21:13.340
+<v Oleksandr Piekhota>And their code is written in Kotlin, Golang, Scala.
+
+242
+00:21:13.700 --> 00:21:16.360
+<v Oleksandr Piekhota>It's great from the engineering perspective.
+
+243
+00:21:16.840 --> 00:21:18.740
+<v Oleksandr Piekhota>It's just some kind of Ruby.
+
+244
+00:21:18.740 --> 00:21:25.460
+<v Oleksandr Piekhota>ruby and at some point that the project has no funding or like it's difficult to change product
+
+245
+00:21:25.460 --> 00:21:32.380
+<v Oleksandr Piekhota>perspective make a quick shift like simple cost to pay for the infrastructure and the
+
+246
+00:21:32.380 --> 00:21:39.860
+<v Oleksandr Piekhota>team like actually cost a lot of money itself and funniest part like when somebody is leaving
+
+247
+00:21:39.860 --> 00:21:46.200
+<v Oleksandr Piekhota>the product you can't find replacement due to the fact how complex or like how mature
+
+248
+00:21:46.200 --> 00:21:53.140
+<v Oleksandr Piekhota>sure your particular architecture is so basically like summarizing all of this together i can say
+
+249
+00:21:53.140 --> 00:21:59.020
+<v Oleksandr Piekhota>that like mature system is like a balance of everything and the highest priority i would
+
+250
+00:21:59.020 --> 00:22:05.060
+<v Oleksandr Piekhota>still say that is gonna be like making money if you make money and like you have nice friendly
+
+251
+00:22:05.060 --> 00:22:11.620
+<v Oleksandr Piekhota>responsible team that can do like trade-offs and keep it working and still keep it yet simple
+
+252
+00:22:11.620 --> 00:22:16.400
+<v Oleksandr Piekhota>and probably like architecture that can be like not that strong,
+
+253
+00:22:16.660 --> 00:22:21.100
+<v Oleksandr Piekhota>maybe like somewhere like simple in some terms,
+
+254
+00:22:21.480 --> 00:22:24.260
+<v Oleksandr Piekhota>but yet flexible for like business changes.
+
+255
+00:22:24.340 --> 00:22:28.000
+<v Oleksandr Piekhota>This is where like it became like really mature.
+
+256
+00:22:28.300 --> 00:22:33.500
+<v Oleksandr Piekhota>So yeah, long story short, wise trade-offs and maybe some money income.
+
+257
+00:22:33.720 --> 00:22:34.800
+<v Oleksandr Piekhota>That's pretty much it.
+
+258
+00:22:34.940 --> 00:22:35.440
+<v Oleksandr Piekhota>Very
+
+259
+00:22:35.440 --> 00:22:35.940
+<v Noah Labhart>good.
+
+260
+00:22:35.660 --> 00:22:37.140
+<v Noah Labhart>Okay, Oleksandr, last question.
+
+261
+00:22:37.320 --> 00:22:39.880
+<v Noah Labhart>So if we look five to seven years into the future,
+
+262
+00:22:41.620 --> 00:22:47.560
+<v Noah Labhart>assumptions we treat as standard today are most likely to turn out to be naive or limiting. This
+
+263
+00:22:47.560 --> 00:22:50.720
+<v Noah Labhart>is going to be interesting because there's a little bit of forecasting here. What do you think?
+
+264
+00:22:50.960 --> 00:22:57.440
+<v Oleksandr Piekhota>Yeah, I'm not very good in terms of forecasting things. Let me try to think about it. Basically,
+
+265
+00:22:57.440 --> 00:23:04.340
+<v Oleksandr Piekhota>everything is changing now with AI. And I can say that AI will quietly or maybe loudly
+
+266
+00:23:04.340 --> 00:23:11.500
+<v Oleksandr Piekhota>loudly affect many of our current architectures or maybe like architecture habits i think this
+
+267
+00:23:11.500 --> 00:23:17.220
+<v Oleksandr Piekhota>happens like in one or like another way not because those architectures or like habits are
+
+268
+00:23:17.220 --> 00:23:25.140
+<v Oleksandr Piekhota>wrong but because they were built like for a world where engineers are like a primary operators
+
+269
+00:23:25.140 --> 00:23:31.420
+<v Oleksandr Piekhota>or like integrators right and very soon like places where like those engineers would become
+
+270
+00:23:32.460 --> 00:23:37.400
+<v Oleksandr Piekhota>bottlenecks, like the first places which is going to be affected by this AI boom.
+
+271
+00:23:37.600 --> 00:23:38.760
+<v Oleksandr Piekhota>I have a good example.
+
+272
+00:23:38.960 --> 00:23:43.100
+<v Oleksandr Piekhota>So there is a book called Clean Code by Robert C. Martin.
+
+273
+00:23:43.300 --> 00:23:49.020
+<v Oleksandr Piekhota>And in this book, and overall, this is what we should think about is the way how we treat
+
+274
+00:23:50.220 --> 00:23:53.400
+<v Oleksandr Piekhota>clean code as a primary quality metric, right?
+
+275
+00:23:53.500 --> 00:24:00.440
+<v Oleksandr Piekhota>And in there, like forward, there are phrases, something like honesty is like in small things
+
+276
+00:24:01.420 --> 00:24:07.720
+<v Oleksandr Piekhota>not like a small thing or like maybe God is in the details or maybe something like because small
+
+277
+00:24:07.720 --> 00:24:17.540
+<v Oleksandr Piekhota>things matters and the fun part is if like now most of our code bases are AI generated then all
+
+278
+00:24:17.540 --> 00:24:24.920
+<v Oleksandr Piekhota>of those kind of like small things like about code elegance, it makes no sense anymore. And now what
+
+279
+00:24:24.920 --> 00:24:29.480
+<v Oleksandr Piekhota>What shift is going to be is to focus more on tests and contracts.
+
+280
+00:24:29.680 --> 00:24:37.460
+<v Oleksandr Piekhota>If such an adoption happens, we probably would require to make our CI/CD pipelines much more mature
+
+281
+00:24:37.460 --> 00:24:44.200
+<v Oleksandr Piekhota>and maybe put some much more advanced gateways that will check our code base,
+
+282
+00:24:44.340 --> 00:24:46.040
+<v Oleksandr Piekhota>that will validate that everything works.
+
+283
+00:24:46.630 --> 00:24:51.900
+<v Oleksandr Piekhota>That, for example, test and test coverage would be much more important here.
+
+284
+00:24:51.900 --> 00:24:57.800
+<v Oleksandr Piekhota>or maybe like deployment pipeline supposed to be like exactly something like canary deploy
+
+285
+00:24:57.800 --> 00:25:05.120
+<v Oleksandr Piekhota>where like changes goes to one percent of traffic then five ten or something else and maybe like we
+
+286
+00:25:05.120 --> 00:25:09.800
+<v Oleksandr Piekhota>need to like add some kind of like security checks that will validate all the compliances
+
+287
+00:25:09.800 --> 00:25:17.220
+<v Oleksandr Piekhota>vulnerabilities secrets etc etc maybe like human focus in this case has to be shifted into defining
+
+288
+00:25:17.220 --> 00:25:22.520
+<v Oleksandr Piekhota>finding some kind of like good policies and rollback strategies so the production won't fail
+
+289
+00:25:22.520 --> 00:25:28.900
+<v Oleksandr Piekhota>at some point. I can say also like that and I really like the way how it goes so about model
+
+290
+00:25:28.900 --> 00:25:38.080
+<v Oleksandr Piekhota>context protocol, MCP, the way how popular it became now and how it grows, I can say that maybe like in
+
+291
+00:25:38.080 --> 00:25:45.640
+<v Oleksandr Piekhota>some close future it can replace all of the usual APIs we used to have. And things like OpenClaw
+
+292
+00:25:47.220 --> 00:25:54.960
+<v Oleksandr Piekhota>bot they proved that like you can get 25 000 likes in two weeks which is just crazy maybe like
+
+293
+00:25:54.960 --> 00:26:03.500
+<v Oleksandr Piekhota>monolithic architecture would be much more popular against microservices because again like all of
+
+294
+00:26:03.500 --> 00:26:09.700
+<v Oleksandr Piekhota>those agents are much more productive when they work with a single code base rather than just
+
+295
+00:26:09.700 --> 00:26:15.200
+<v Oleksandr Piekhota>when you're trying to do things across 20 microservices
+
+296
+00:26:15.200 --> 00:26:17.920
+<v Oleksandr Piekhota>and then trying to glue them together
+
+297
+00:26:17.920 --> 00:26:19.800
+<v Oleksandr Piekhota>with some kind of a contract.
+
+298
+00:26:20.220 --> 00:26:21.620
+<v Oleksandr Piekhota>Long story short, right?
+
+299
+00:26:21.760 --> 00:26:23.840
+<v Oleksandr Piekhota>AI will affect a lot of practices.
+
+300
+00:26:24.040 --> 00:26:26.480
+<v Oleksandr Piekhota>I tried to maybe bring some examples,
+
+301
+00:26:27.000 --> 00:26:27.960
+<v Oleksandr Piekhota>but who knows?
+
+302
+00:26:28.180 --> 00:26:29.400
+<v Oleksandr Piekhota>I guess we will see soon.
+
+303
+00:26:29.580 --> 00:26:30.080
+<v Oleksandr Piekhota>Yeah,
+
+304
+00:26:30.020 --> 00:26:30.780
+<v Noah Labhart>for sure.
+
+305
+00:26:30.840 --> 00:26:33.340
+<v Noah Labhart>We will see and no one can predict the future,
+
+306
+00:26:33.420 --> 00:26:35.260
+<v Noah Labhart>but I appreciate you sharing your forecast there.
+
+307
+00:26:35.380 --> 00:26:36.920
+<v Noah Labhart>And I really appreciate you being on the show, Oleksandr.
+
+308
+00:26:37.220 --> 00:26:39.000
+<v Noah Labhart>It's clear you've built and led teams
+
+309
+00:26:39.700 --> 00:26:44.740
+<v Noah Labhart>architecture. You clearly indicated that a mature system is one that strikes a balance between all
+
+310
+00:26:44.740 --> 00:26:49.520
+<v Noah Labhart>the right things. And I really connected with your point on experiments and when to call them done.
+
+311
+00:26:49.660 --> 00:26:53.100
+<v Noah Labhart>So I really appreciate you being on the show today and sharing your industry experience.
+
+312
+00:26:53.320 --> 00:26:53.820
+<v Noah Labhart>Thanks
+
+313
+00:26:53.520 --> 00:26:57.320
+<v Oleksandr Piekhota>for having me and really happy to give such answers.
+
+314
+00:26:59.920 --> 00:27:04.600
+<v Noah Labhart>Oleksandr highlights some really interesting points around moving from hands-on engineering
+
+315
+00:27:04.600 --> 00:27:08.560
+<v Noah Labhart>into principal and technical leadership. You got to think a little bit differently.
+
+316
+00:27:09.700 --> 00:27:15.080
+<v Noah Labhart>architecture, infrastructure, platform thinking, and the like, and how to hire teams and explore
+
+317
+00:27:15.080 --> 00:27:21.980
+<v Noah Labhart>experiments that support bringing features to market. If you'd like to connect with Oleksandr,
+
+318
+00:27:22.220 --> 00:27:27.560
+<v Noah Labhart>check the show notes for all the appropriate links. And thanks again for listening.

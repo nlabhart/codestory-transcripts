@@ -1,0 +1,1855 @@
+WEBVTT
+
+NOTE S6 E14: The Real-Time Ledger: How Banked Scaled Global Account-to-Account Infrastructure with Joe Pettersson
+
+1
+00:00:01.160 --> 00:00:29.980
+<v Joe Pettersson>Our goal has always been just-in-time optimization, to use a compiler term. What we didn't want to do is because we're a payment network, right? Like, there are, our customers have a very low tolerance for resiliency and reliability issues. One of the most amazing things that people like Visa and MasterCard have done over their lifetimes is set the bar so high. So, as an early stage business, there are requirements on us that usually aren't on other types of businesses, right?
+
+2
+00:00:30.000 --> 00:00:33.120
+<v Joe Pettersson>Like if you're a customer of a seed stage business with 20 employees,
+
+3
+00:00:33.420 --> 00:00:36.100
+<v Joe Pettersson>oh, if it goes down every now and then, you kind of understanding.
+
+4
+00:00:36.460 --> 00:00:38.860
+<v Joe Pettersson>That understanding does not exist in payments.
+
+5
+00:00:39.600 --> 00:00:42.220
+<v Joe Pettersson>My name is Joe Pettersson. I'm the CTO at Banked.
+
+6
+00:00:47.560 --> 00:00:49.300
+<v Noah Labhart>This is Code Story,
+
+7
+00:00:49.540 --> 00:00:52.920
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+8
+00:00:52.920 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+9
+00:00:57.120 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+10
+00:01:02.160 --> 00:01:07.740
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Joe Pettersson is creating real-time payment
+
+11
+00:01:07.740 --> 00:01:12.460
+<v Noah Labhart>possibilities built on top of modern banking rails.
+
+12
+00:01:13.300 --> 00:01:15.720
+<v Noah Labhart>All this and more on Code Story.
+
+13
+00:01:20.540 --> 00:01:25.320
+<v Noah Labhart>Joe Pettersson is quite the renaissance man with many interests and ventures he's a part of.
+
+14
+00:01:27.120 --> 00:01:32.680
+<v Noah Labhart>path to tech. He was originally a lawyer many years ago. Funny enough, because he thought that
+
+15
+00:01:32.680 --> 00:01:36.840
+<v Noah Labhart>after the dot-com bubble burst, that people weren't going to make money writing software again.
+
+16
+00:01:37.440 --> 00:01:40.760
+<v Noah Labhart>He hated it though, and left the legal profession as soon as he could.
+
+17
+00:01:41.400 --> 00:01:45.940
+<v Noah Labhart>He's a collector by nature with over a hundred pairs of sneakers, most of which are Jordans,
+
+18
+00:01:45.980 --> 00:01:51.360
+<v Noah Labhart>and several mechanical keyboards. Alongside these hobbies, he has started a few non-profit
+
+19
+00:01:51.360 --> 00:01:55.900
+<v Noah Labhart>organizations, one around equipping young men and another around educating people in the digital
+
+20
+00:01:57.380 --> 00:02:03.260
+<v Noah Labhart>Finally, he's writing a book around scaling engineering teams, which is actually going to be given away for free.
+
+21
+00:02:03.540 --> 00:02:06.620
+<v Noah Labhart>It should be published in June or July of this year, 2022.
+
+22
+00:02:07.720 --> 00:02:13.760
+<v Noah Labhart>Back in January 2020, Joe joined his current venture prior to raising their seed round.
+
+23
+00:02:14.400 --> 00:02:20.000
+<v Noah Labhart>Having gotten regulated in the UK, they were ready to deploy the first product and find their product market fit.
+
+24
+00:02:20.000 --> 00:02:28.620
+<v Noah Labhart>And in doing so, he went about optimizing team, process, and built a platform strategically ready for change in the payment space.
+
+25
+00:02:30.780 --> 00:02:33.500
+<v Noah Labhart>This is the creation story of Banked.
+
+26
+00:02:38.780 --> 00:02:42.140
+<v Joe Pettersson>Banked's a business with a pretty ambitious goal.
+
+27
+00:02:42.320 --> 00:02:44.180
+<v Joe Pettersson>And that goal is to build a payment network.
+
+28
+00:02:44.180 --> 00:02:49.280
+<v Joe Pettersson>and when you think about payment networks, you probably think about cards, the little bits of
+
+29
+00:02:49.280 --> 00:02:55.420
+<v Joe Pettersson>plastic that sit in your pocket. These systems and these tools that were built in the 1950s and 60s
+
+30
+00:02:55.420 --> 00:03:01.520
+<v Joe Pettersson>and 70s to really innovate and put the ability for cashless payments into anybody's pockets.
+
+31
+00:03:01.520 --> 00:03:06.540
+<v Joe Pettersson>But the thing that you also probably realize is that those things were invented in the 50s and
+
+32
+00:03:06.540 --> 00:03:13.340
+<v Joe Pettersson>60s and 70s, and so there are inherent challenges in their application. There are commercial models
+
+33
+00:03:14.180 --> 00:03:18.680
+<v Joe Pettersson>for merchants. There's a bunch of things that have become inherent in the way they've been built or
+
+34
+00:03:18.680 --> 00:03:22.300
+<v Joe Pettersson>inherent in the way they've been deployed. So what Banked wants to do is to say, well,
+
+35
+00:03:22.420 --> 00:03:29.840
+<v Joe Pettersson>what would happen if you were to build a payment network in 2022? How would you authorize? How
+
+36
+00:03:29.840 --> 00:03:35.440
+<v Joe Pettersson>would you incentivize users to choose it? How would you give people points and rewards? How
+
+37
+00:03:35.440 --> 00:03:39.780
+<v Joe Pettersson>would you give merchants the best possible experience? Because the big lesson that we've
+
+38
+00:03:39.780 --> 00:03:45.540
+<v Joe Pettersson>learned and that the industry is learning at the moment is that power is shifting away from
+
+39
+00:03:45.540 --> 00:03:50.680
+<v Joe Pettersson>payment networks like Visa and MasterCard to merchants. Merchants are the ones that own the
+
+40
+00:03:50.680 --> 00:03:55.100
+<v Joe Pettersson>consumer experience. They own the consumer relationship. And so as a payment network,
+
+41
+00:03:55.380 --> 00:04:01.020
+<v Joe Pettersson>we need to do everything that we can to increase conversion, to reduce costs, and generally just
+
+42
+00:04:01.020 --> 00:04:04.820
+<v Joe Pettersson>to provide a much better service to merchants than they've currently been able to expect.
+
+43
+00:04:04.820 --> 00:04:10.400
+<v Joe Pettersson>So Banked, we're an A-stage business. We just actually just announced a raise of 20 million dollars
+
+44
+00:04:10.400 --> 00:04:14.280
+<v Joe Pettersson>led by Bank of America. And Bank of America are particularly important to us because, as you'd
+
+45
+00:04:14.280 --> 00:04:21.600
+<v Joe Pettersson>imagine, having an organization as strategically important as Bank of America as part of this
+
+46
+00:04:21.600 --> 00:04:27.440
+<v Joe Pettersson>journey really helps us. And also there's a really nice marketing story in that Bank of America
+
+47
+00:04:27.440 --> 00:04:34.140
+<v Joe Pettersson>created the concept of Visa. They created cards. There's a nice, there's a nice narrative there
+
+48
+00:04:34.820 --> 00:04:38.240
+<v Joe Pettersson>in the beginning of cards, and now they're here in the beginning of this new payment method.
+
+49
+00:04:38.240 --> 00:04:44.560
+<v Joe Pettersson>And the way we do it is that we enable people to make payments directly out of their accounts, kind
+
+50
+00:04:44.560 --> 00:04:50.700
+<v Joe Pettersson>of disintermediating cards. So the money moves not via our card rails but directly, in the US via
+
+51
+00:04:50.700 --> 00:04:58.120
+<v Joe Pettersson>things like RTP, in the UK via things like Faster Payments, or SEPA in Europe. So as I said, we've
+
+52
+00:04:58.120 --> 00:05:03.180
+<v Joe Pettersson>got some super exciting customers. We're growing super quickly. The team's doubled in size. I think
+
+53
+00:05:04.860 --> 00:05:11.260
+<v Joe Pettersson>we're about 75 people now. As a business we're completely remote, so I think we're in 14 or 15
+
+54
+00:05:11.260 --> 00:05:19.660
+<v Joe Pettersson>countries. I joined in January 2020. Considering COVID and everything else, feels about 86 years
+
+55
+00:05:19.660 --> 00:05:26.620
+<v Joe Pettersson>ago, but I'm assured it was just over two years at this point. And I joined just as the company was
+
+56
+00:05:26.620 --> 00:05:32.160
+<v Joe Pettersson>about to raise its seed round. We've gotten regulated. We're a regulated entity in
+
+57
+00:05:32.160 --> 00:05:37.480
+<v Joe Pettersson>the UK and Europe, and so we got regulated in the UK and we really needed to start to deploy the
+
+58
+00:05:37.480 --> 00:05:42.600
+<v Joe Pettersson>product, right, to build the first version, to try and find product market fit. Like, what exactly were
+
+59
+00:05:42.600 --> 00:05:47.500
+<v Joe Pettersson>what exactly were the set of features and products that would make this compelling for a merchant
+
+60
+00:05:47.500 --> 00:05:52.600
+<v Joe Pettersson>or make this compelling for a partner of ours like Bank of America? And that's kind of the journey
+
+61
+00:05:52.600 --> 00:05:58.280
+<v Joe Pettersson>that we went on. We shipped a bunch of products, we optimized our team and our technology and our
+
+62
+00:05:58.280 --> 00:06:03.780
+<v Joe Pettersson>just ways of working, our culture, to suit a seed stage business, right? So to focus on quick
+
+63
+00:06:03.780 --> 00:06:09.300
+<v Joe Pettersson>iteration, to focus on empowering kind of individual engineers to be really productive and to get stuff
+
+64
+00:06:09.300 --> 00:06:14.800
+<v Joe Pettersson>done and to try a bunch of new things with product. And as we found that product market fit, as we found
+
+65
+00:06:14.800 --> 00:06:19.860
+<v Joe Pettersson>these really exciting opportunities with merchants and partners, now we're on the journey that kind of
+
+66
+00:06:19.860 --> 00:06:25.160
+<v Joe Pettersson>goes beyond that, right? We're to actually build and continue to iterate on and continue to make even
+
+67
+00:06:25.160 --> 00:06:28.860
+<v Joe Pettersson>even more resilient and reliable and deep,
+
+68
+00:06:29.040 --> 00:06:31.920
+<v Joe Pettersson>the products that we've built and we take to market.
+
+69
+00:06:32.180 --> 00:06:35.640
+<v Joe Pettersson>And so the culture shifts, the technology shifts, the product shifts.
+
+70
+00:06:35.920 --> 00:06:39.140
+<v Joe Pettersson>And as I said, we're pretty far along that journey now.
+
+71
+00:06:40.780 --> 00:06:42.560
+<v Noah Labhart>Well, tell me about the MVP.
+
+72
+00:06:42.760 --> 00:06:46.280
+<v Noah Labhart>And maybe that's when you joined or if you know about it before you joined
+
+73
+00:06:46.280 --> 00:06:47.940
+<v Noah Labhart>or wherever you take the story.
+
+74
+00:06:48.020 --> 00:06:49.880
+<v Noah Labhart>But tell me about that first product.
+
+75
+00:06:50.000 --> 00:06:51.160
+<v Noah Labhart>How long did it take to build?
+
+76
+00:06:51.280 --> 00:06:53.340
+<v Noah Labhart>And what sort of tools were used to bring it to life?
+
+77
+00:06:55.160 --> 00:07:00.720
+<v Joe Pettersson>of quite how far our product evolved to actually find kind of product market fit.
+
+78
+00:07:00.940 --> 00:07:06.280
+<v Joe Pettersson>We always kind of knew that payments were going to be the core focus of the business.
+
+79
+00:07:06.400 --> 00:07:12.120
+<v Joe Pettersson>That's been one of the canonical kinds of North Stars since its inception.
+
+80
+00:07:12.240 --> 00:07:15.860
+<v Joe Pettersson>But actually how you enable that and what exactly that looks like
+
+81
+00:07:15.860 --> 00:07:18.160
+<v Joe Pettersson>from a developer experience point of view,
+
+82
+00:07:18.280 --> 00:07:20.180
+<v Joe Pettersson>from a consumer point of view has changed quite a lot.
+
+83
+00:07:20.360 --> 00:07:23.640
+<v Joe Pettersson>And so when I think back to the earliest points of Banked,
+
+84
+00:07:25.440 --> 00:07:32.280
+<v Joe Pettersson>a mobile focused small business and merchant conversion tool, this kind of thing where you'd
+
+85
+00:07:32.280 --> 00:07:38.520
+<v Joe Pettersson>have an app on your phone, as a small business, if you're a retail store, could actually start to take
+
+86
+00:07:38.520 --> 00:07:43.860
+<v Joe Pettersson>payments for via an app on their phone, so you could charge one of your customers 70 dollars
+
+87
+00:07:43.860 --> 00:07:48.460
+<v Joe Pettersson>for a particular service or for some products, and they could get a link on their phone and they
+
+88
+00:07:48.460 --> 00:07:52.900
+<v Joe Pettersson>could use their bank account to pay for it. We thought this was a really interesting way of us
+
+89
+00:07:52.900 --> 00:07:55.780
+<v Joe Pettersson>really quickly iterating the product, right?
+
+90
+00:07:55.840 --> 00:07:58.500
+<v Joe Pettersson>Because we knew that ultimately large merchants
+
+91
+00:07:58.500 --> 00:08:01.160
+<v Joe Pettersson>were going to find this product really compelling.
+
+92
+00:08:01.340 --> 00:08:05.180
+<v Joe Pettersson>But you'd imagine if you go to Nike and you're like,
+
+93
+00:08:05.260 --> 00:08:07.440
+<v Joe Pettersson>actually, we're going to ship a product to you
+
+94
+00:08:07.440 --> 00:08:09.080
+<v Joe Pettersson>that no one's ever really used before.
+
+95
+00:08:09.340 --> 00:08:11.280
+<v Joe Pettersson>We haven't really iterated that much.
+
+96
+00:08:11.380 --> 00:08:13.500
+<v Joe Pettersson>You can imagine the kind of reaction that you're going to get.
+
+97
+00:08:13.840 --> 00:08:17.000
+<v Joe Pettersson>We wanted to find a mechanism with our first version
+
+98
+00:08:17.000 --> 00:08:19.600
+<v Joe Pettersson>where we could dog food our products.
+
+99
+00:08:19.760 --> 00:08:21.140
+<v Joe Pettersson>We could dog food our APIs.
+
+100
+00:08:23.000 --> 00:08:25.740
+<v Joe Pettersson>and we could actually get that into people's hands.
+
+101
+00:08:25.820 --> 00:08:27.320
+<v Joe Pettersson>We could see how the consumers react
+
+102
+00:08:27.320 --> 00:08:29.260
+<v Joe Pettersson>as part of our checkout process.
+
+103
+00:08:29.520 --> 00:08:31.440
+<v Joe Pettersson>Like how can we iterate it and make it better?
+
+104
+00:08:31.580 --> 00:08:33.280
+<v Joe Pettersson>How can we make the developer experience
+
+105
+00:08:33.280 --> 00:08:35.660
+<v Joe Pettersson>for implementing our products better?
+
+106
+00:08:35.920 --> 00:08:38.300
+<v Joe Pettersson>Because ultimately, while banked is a fintech business,
+
+107
+00:08:38.440 --> 00:08:39.420
+<v Joe Pettersson>we're a payments business,
+
+108
+00:08:40.040 --> 00:08:41.320
+<v Joe Pettersson>when it comes right down to it,
+
+109
+00:08:41.380 --> 00:08:43.480
+<v Joe Pettersson>we're a developer tools business, right?
+
+110
+00:08:43.560 --> 00:08:47.420
+<v Joe Pettersson>Like we ship SDKs and APIs and libraries
+
+111
+00:08:47.420 --> 00:08:48.800
+<v Joe Pettersson>and technical documentation.
+
+112
+00:08:49.060 --> 00:08:51.500
+<v Joe Pettersson>Those are the artifacts of things that we ship.
+
+113
+00:08:52.900 --> 00:08:55.840
+<v Joe Pettersson>that Stripe taught the payments industry so acutely
+
+114
+00:08:56.220 --> 00:08:59.580
+<v Joe Pettersson>is that the developer experience of your product
+
+115
+00:08:59.580 --> 00:09:03.320
+<v Joe Pettersson>is one of, if not the largest leverage point that you have.
+
+116
+00:09:03.660 --> 00:09:06.200
+<v Joe Pettersson>And so this ability for us to be able to test that
+
+117
+00:09:06.200 --> 00:09:08.520
+<v Joe Pettersson>and iterate it first time around was really important.
+
+118
+00:09:08.760 --> 00:09:11.700
+<v Joe Pettersson>So we built an iOS app, we shipped it into the store
+
+119
+00:09:11.700 --> 00:09:15.200
+<v Joe Pettersson>and it consumed all of the kind of backend APIs
+
+120
+00:09:15.200 --> 00:09:15.880
+<v Joe Pettersson>that we built.
+
+121
+00:09:15.960 --> 00:09:18.660
+<v Joe Pettersson>And we started building those APIs in Rails.
+
+122
+00:09:18.920 --> 00:09:21.820
+<v Joe Pettersson>It's a very powerful tool to be able to reach for,
+
+123
+00:09:22.900 --> 00:09:26.780
+<v Joe Pettersson>to capture ideas and ship them really quickly
+
+124
+00:09:26.780 --> 00:09:29.100
+<v Joe Pettersson>to your customers and do it in a way
+
+125
+00:09:29.100 --> 00:09:31.540
+<v Joe Pettersson>that has a really powerful ecosystem, right?
+
+126
+00:09:31.640 --> 00:09:34.320
+<v Joe Pettersson>So there are tools and libraries that you can reach for.
+
+127
+00:09:34.660 --> 00:09:36.860
+<v Joe Pettersson>That's kind of where the MVP started, right?
+
+128
+00:09:36.980 --> 00:09:40.480
+<v Joe Pettersson>We had this Rails app that had a bunch of functionality in it
+
+129
+00:09:40.480 --> 00:09:43.420
+<v Joe Pettersson>with kind of Postgres and Redis, as you'd imagine.
+
+130
+00:09:43.640 --> 00:09:45.500
+<v Joe Pettersson>And we deployed that onto Heroku, right?
+
+131
+00:09:45.580 --> 00:09:48.560
+<v Joe Pettersson>To try and get things out there as quickly as we could
+
+132
+00:09:48.560 --> 00:09:49.480
+<v Joe Pettersson>to try and say, all right,
+
+133
+00:09:49.540 --> 00:09:51.260
+<v Joe Pettersson>how can we iterate this and make it better?
+
+134
+00:09:52.900 --> 00:09:58.780
+<v Joe Pettersson>have the monopoly on good ideas and we need people to use it and to test it. And that's the kind of
+
+135
+00:09:58.780 --> 00:10:02.580
+<v Joe Pettersson>place we ended up with. And we iterated that a bunch, added a bunch of new features,
+
+136
+00:10:02.740 --> 00:10:06.780
+<v Joe Pettersson>added a bunch of new technology. But ultimately, that was kind of the heart of where we started.
+
+137
+00:10:07.160 --> 00:10:10.340
+<v Noah Labhart>I can hear your passion about the products and about what you've built.
+
+138
+00:10:10.800 --> 00:10:16.300
+<v Noah Labhart>With the MVP, right, you have to make certain decisions and trade-offs. And you kind of touched
+
+139
+00:10:16.300 --> 00:10:20.060
+<v Noah Labhart>a little bit on some of those as you went about building it. But I want to give space for a full
+
+140
+00:10:20.060 --> 00:10:24.480
+<v Noah Labhart>answer. So tell me about some of those decisions and trade-offs that you had to make when you were
+
+141
+00:10:24.480 --> 00:10:30.080
+<v Noah Labhart>building your MVP, whether it be like feature cut or technical debt or anything like that.
+
+142
+00:10:30.140 --> 00:10:31.900
+<v Noah Labhart>And how did you cope with those decisions?
+
+143
+00:10:32.620 --> 00:10:34.640
+<v Joe Pettersson>I don't think I have a simple answer to that
+
+144
+00:10:34.640 --> 00:10:39.720
+<v Joe Pettersson>question. I think that it was a long and sort of complicated process, I think, just because
+
+145
+00:10:39.720 --> 00:10:44.300
+<v Joe Pettersson>when we thought about the product in that sense and the kind of features that we built,
+
+146
+00:10:44.300 --> 00:10:51.180
+<v Joe Pettersson>We wanted to maximize kind of lowercase a agility in our product, right?
+
+147
+00:10:51.260 --> 00:10:56.680
+<v Joe Pettersson>We wanted to be able to react to opportunities from customers or to opportunities from partners.
+
+148
+00:10:56.900 --> 00:11:01.040
+<v Joe Pettersson>And that was kind of influenced a bunch of the decisions that we made, right?
+
+149
+00:11:01.140 --> 00:11:06.260
+<v Joe Pettersson>So keeping things as simple as possible in Rails enabled us to be able to do that,
+
+150
+00:11:06.320 --> 00:11:13.040
+<v Joe Pettersson>to be able to quickly ship new features, to build tooling that was conducive to individual engineers
+
+151
+00:11:14.300 --> 00:11:19.840
+<v Joe Pettersson>team at the time to be able to kind of own things end to end so that an engineer can have an idea
+
+152
+00:11:19.840 --> 00:11:25.740
+<v Joe Pettersson>and come up with a salesperson or somebody in product and can take it and ship it in a way that
+
+153
+00:11:25.740 --> 00:11:32.020
+<v Joe Pettersson>is kind of conducive to that kind of lowercase a agility so there were a bunch of the decisions
+
+154
+00:11:32.020 --> 00:11:38.100
+<v Joe Pettersson>that we made this kind of keep it keep it simple so that ultimately our team and our product and
+
+155
+00:11:38.100 --> 00:11:43.540
+<v Joe Pettersson>our engineers didn't need to fight the technology the technology that we were using and the decisions
+
+156
+00:11:44.300 --> 00:11:51.120
+<v Joe Pettersson>decisions that we made were conducive to actually getting out of the way. Now, obviously, as we've
+
+157
+00:11:51.120 --> 00:11:54.820
+<v Joe Pettersson>kind of moved on, a bunch of those values have changed and we've made some very different
+
+158
+00:11:54.820 --> 00:11:58.820
+<v Joe Pettersson>technology decisions. But ultimately, that was really valuable for us because it enabled us to
+
+159
+00:11:58.820 --> 00:12:04.180
+<v Joe Pettersson>do things like to partner with Xero, the accounting software, and we could react to that and ship and
+
+160
+00:12:04.180 --> 00:12:09.020
+<v Joe Pettersson>integrate with Xero in a really small amount of time, right? It took us almost no time to be able
+
+161
+00:12:09.020 --> 00:12:13.740
+<v Joe Pettersson>to ship it and get it done. When the opportunity with Bank of America came up, those same values
+
+162
+00:12:14.300 --> 00:12:17.460
+<v Joe Pettersson>of how can we focus on this and get it done
+
+163
+00:12:17.460 --> 00:12:19.520
+<v Joe Pettersson>and ship it really quickly and effectively,
+
+164
+00:12:19.740 --> 00:12:22.360
+<v Joe Pettersson>like really enabled us to be able to do those things.
+
+165
+00:12:24.380 --> 00:12:26.140
+<v Noah Labhart>So, okay, you got your MVP.
+
+166
+00:12:26.280 --> 00:12:27.620
+<v Noah Labhart>You mentioned earlier,
+
+167
+00:12:27.660 --> 00:12:30.160
+<v Noah Labhart>we sort of changed how we make decisions now.
+
+168
+00:12:30.500 --> 00:12:31.520
+<v Noah Labhart>Tell me about that.
+
+169
+00:12:31.600 --> 00:12:33.640
+<v Noah Labhart>Tell me about how you progressed the product
+
+170
+00:12:33.640 --> 00:12:35.680
+<v Noah Labhart>and matured it and built your roadmap.
+
+171
+00:12:35.900 --> 00:12:39.460
+<v Noah Labhart>And specifically in terms of how do you decide
+
+172
+00:12:39.460 --> 00:12:42.580
+<v Noah Labhart>what the next most important thing to build is?
+
+173
+00:12:44.300 --> 00:12:52.100
+<v Joe Pettersson>What we realized is that with the very large customers and partners, Bank of America being one of them, like a very large bank,
+
+174
+00:12:52.240 --> 00:13:03.280
+<v Joe Pettersson>the requirements and sort of non-functional requirements that we had for architectural design and the way that we shipped products and the way that we wrote code needed to pretty profoundly evolve.
+
+175
+00:13:04.100 --> 00:13:10.880
+<v Joe Pettersson>evolve. There were requirements for things like security and compliance that as a business we
+
+176
+00:13:10.880 --> 00:13:14.180
+<v Joe Pettersson>had already obviously worked on because we need to take that stuff seriously from the beginning
+
+177
+00:13:14.180 --> 00:13:19.220
+<v Joe Pettersson>but it needed to have a new level of focus and need to have a new level of investment and so
+
+178
+00:13:19.220 --> 00:13:25.820
+<v Joe Pettersson>as we've gone down that journey, we're breaking out services from our kind of Rails monolith to
+
+179
+00:13:25.820 --> 00:13:31.780
+<v Joe Pettersson>more easily enable us to meet the very high levels of kind of resiliency and reliability
+
+180
+00:13:33.660 --> 00:13:39.900
+<v Joe Pettersson>compliance that are necessary for a payment network. What we've done is not try to do a kind
+
+181
+00:13:39.900 --> 00:13:44.580
+<v Joe Pettersson>of boil the world, we're going to stop everything that we need to be able to, that we've done in
+
+182
+00:13:44.580 --> 00:13:48.640
+<v Joe Pettersson>order to be able to kind of completely re-architecture the platform, but take a much more pragmatic
+
+183
+00:13:48.640 --> 00:13:53.780
+<v Joe Pettersson>approach and say actually where are the opportunities that we have as we build new products, as we build
+
+184
+00:13:53.780 --> 00:13:59.740
+<v Joe Pettersson>new features, as we do new things to be able to build a more resilient, reliable, secure, scalable
+
+185
+00:13:59.740 --> 00:14:05.120
+<v Joe Pettersson>architecture and so that classic example of this is moving from Heroku to GCP and
+
+186
+00:14:05.120 --> 00:14:11.300
+<v Joe Pettersson>actually enabling us to get a much wider set of knobs to turn in order for us to
+
+187
+00:14:11.300 --> 00:14:15.580
+<v Joe Pettersson>be able to meet the kind of SLOs and SLAs that an organization like Bank of
+
+188
+00:14:15.580 --> 00:14:19.520
+<v Joe Pettersson>America would expect. That has implications for the way we think about
+
+189
+00:14:19.520 --> 00:14:23.720
+<v Joe Pettersson>architecture right we think about security in a new way we do bring your
+
+190
+00:14:23.720 --> 00:14:29.240
+<v Joe Pettersson>own keys and HSMs in a way that two or three years ago in the business wouldn't
+
+191
+00:14:29.740 --> 00:14:31.580
+<v Joe Pettersson>something that was higher priority for us.
+
+192
+00:14:32.740 --> 00:14:35.160
+<v Joe Pettersson>That journey has been an incremental one,
+
+193
+00:14:35.240 --> 00:14:37.500
+<v Joe Pettersson>but the speed at which we've been able to achieve it
+
+194
+00:14:37.500 --> 00:14:39.380
+<v Joe Pettersson>is something I'm actually very proud of the team for doing.
+
+195
+00:14:39.600 --> 00:14:43.500
+<v Joe Pettersson>As the team's grown, as the engineering team's 35, 40 people now,
+
+196
+00:14:43.640 --> 00:14:47.360
+<v Joe Pettersson>we can actually have the capacity and the bandwidth
+
+197
+00:14:47.360 --> 00:14:51.680
+<v Joe Pettersson>to be able to make some of these really deep changes to our platform
+
+198
+00:14:51.680 --> 00:14:55.760
+<v Joe Pettersson>in a really kind of safe, reliable, secure, and scalable way.
+
+199
+00:14:57.780 --> 00:14:59.300
+<v Noah Labhart>Well, let's switch to team then.
+
+200
+00:14:59.740 --> 00:15:04.360
+<v Noah Labhart>how did you build your team and what did you look for in those people to indicate that they were the
+
+201
+00:15:04.360 --> 00:15:05.600
+<v Noah Labhart>winning horses to join you?
+
+202
+00:15:06.780 --> 00:15:12.260
+<v Joe Pettersson>I think that the people journey is broadly analogous to the technology
+
+203
+00:15:12.260 --> 00:15:21.780
+<v Joe Pettersson>journey in many ways in that the kind of experience, the kind of culture to optimize for
+
+204
+00:15:21.780 --> 00:15:30.200
+<v Joe Pettersson>an early stage pre-seed and seed stage business is very different to that of a post-A stage,
+
+205
+00:15:30.500 --> 00:15:36.180
+<v Joe Pettersson>B round and growth stage business. And ultimately that journey is one of kind of
+
+206
+00:15:36.180 --> 00:15:44.180
+<v Joe Pettersson>generalism to specialism. Early in our journey, hiring people onto the team who were technology
+
+207
+00:15:44.180 --> 00:15:50.380
+<v Joe Pettersson>generalists, who could work on a front-end user experience, who could build APIs, who could build
+
+208
+00:15:51.780 --> 00:15:52.880
+<v Joe Pettersson>who could help us with ops.
+
+209
+00:15:53.100 --> 00:15:55.680
+<v Joe Pettersson>So that ultimately the groups of people
+
+210
+00:15:55.680 --> 00:15:57.400
+<v Joe Pettersson>that we could put together to work on things
+
+211
+00:15:57.400 --> 00:15:58.740
+<v Joe Pettersson>could be independent, right?
+
+212
+00:15:58.880 --> 00:16:00.660
+<v Joe Pettersson>We could work in teams of one
+
+213
+00:16:00.660 --> 00:16:03.220
+<v Joe Pettersson>and be able to do things in parallel
+
+214
+00:16:03.220 --> 00:16:04.560
+<v Joe Pettersson>and to do things really quickly
+
+215
+00:16:04.560 --> 00:16:08.440
+<v Joe Pettersson>and build a culture that was kind of an ownership culture,
+
+216
+00:16:08.660 --> 00:16:09.600
+<v Joe Pettersson>right, which was to say,
+
+217
+00:16:09.720 --> 00:16:10.880
+<v Joe Pettersson>I'm going to take this on
+
+218
+00:16:10.880 --> 00:16:12.520
+<v Joe Pettersson>and I can push this thing through.
+
+219
+00:16:12.740 --> 00:16:15.360
+<v Joe Pettersson>I can have all of the context of this thing
+
+220
+00:16:15.360 --> 00:16:16.940
+<v Joe Pettersson>in my head at one point
+
+221
+00:16:16.940 --> 00:16:19.660
+<v Joe Pettersson>and I can take ownership of it throughout the process.
+
+222
+00:16:19.660 --> 00:16:25.000
+<v Joe Pettersson>now obviously that's still important to us but as the complexity of things that we've done has
+
+223
+00:16:25.000 --> 00:16:30.680
+<v Joe Pettersson>grown as the number of things we do concurrently has grown it's just not possible for one human
+
+224
+00:16:30.680 --> 00:16:35.800
+<v Joe Pettersson>to be able to maintain that level of information in their brain it's not something humans are very
+
+225
+00:16:35.800 --> 00:16:40.520
+<v Joe Pettersson>good at and so that journey of specialism has kind of come in where we've hired people with
+
+226
+00:16:40.520 --> 00:16:46.660
+<v Joe Pettersson>more specific skills right rather than sort of generalists building a team of sres is a great
+
+227
+00:16:46.660 --> 00:16:52.640
+<v Joe Pettersson>example of this hiring platform engineers whose job is to actually build tooling and libraries
+
+228
+00:16:52.640 --> 00:16:58.700
+<v Joe Pettersson>and an ecosystem a developer ecosystem internally at bank to enable other teams whereas before that
+
+229
+00:16:58.700 --> 00:17:02.580
+<v Joe Pettersson>might have been something that one of our more generalist engineers would take on day-to-day
+
+230
+00:17:02.580 --> 00:17:09.480
+<v Joe Pettersson>and so that culture of generalism to specialism is a journey that all engineering teams take
+
+231
+00:17:09.480 --> 00:17:14.760
+<v Joe Pettersson>but has been one that's been particularly valuable at banked because it's enabled us to as i said go
+
+232
+00:17:16.660 --> 00:17:30.120
+<v Joe Pettersson>Something that was massively optimized for one use case of iteration, trying to find product market fit, to something where we've now found product market fit and we need to go super deep as a business on the technology that we build.
+
+233
+00:17:33.600 --> 00:17:42.940
+<v Noah Labhart>Let's flip to scalability. This will be interesting. Did you build this to scale efficiently from day one or have you been fighting this as you've grown and gained traction?
+
+234
+00:17:42.940 --> 00:17:43.440
+<v Noah Labhart>action?
+
+235
+00:17:43.480 --> 00:17:48.960
+<v Joe Pettersson>We've tried to do the impossible thing and tried to do both. It is an impossible task,
+
+236
+00:17:49.100 --> 00:17:56.100
+<v Joe Pettersson>but our goal has always been just-in-time optimization, to use a compiler term. What
+
+237
+00:17:56.100 --> 00:18:00.940
+<v Joe Pettersson>we didn't want to do is because we're a payment network, right? Our customers have a very low
+
+238
+00:18:00.940 --> 00:18:07.580
+<v Joe Pettersson>tolerance for resiliency and reliability issues. One of the most amazing things that people like
+
+239
+00:18:07.580 --> 00:18:12.920
+<v Joe Pettersson>Visa and MasterCard have done over their lifetimes is set the bar so high. So as an early stage
+
+240
+00:18:12.920 --> 00:18:17.720
+<v Joe Pettersson>business, there are requirements on us that usually aren't on other types of businesses,
+
+241
+00:18:17.860 --> 00:18:21.240
+<v Joe Pettersson>right? Like if you're a customer of a seed stage business with 20 employees,
+
+242
+00:18:21.520 --> 00:18:26.480
+<v Joe Pettersson>oh, if it goes down every now and then, you kind of understanding. That understanding does not exist
+
+243
+00:18:26.480 --> 00:18:30.640
+<v Joe Pettersson>in payments. If our customers can't process payments, they can't make money. And that's
+
+244
+00:18:30.640 --> 00:18:36.220
+<v Joe Pettersson>one of the most important critical parts in their business. So because of that, we could never fall
+
+245
+00:18:37.580 --> 00:18:44.020
+<v Joe Pettersson>fix it when it breaks model simply because if it breaks that's a problem that could be existential
+
+246
+00:18:44.020 --> 00:18:48.060
+<v Joe Pettersson>for us as a business that's something that we couldn't really deal with but on the other hand
+
+247
+00:18:48.060 --> 00:18:55.080
+<v Joe Pettersson>what we didn't want to do was to build a formula one car of a platform from a scalability point of
+
+248
+00:18:55.080 --> 00:19:00.040
+<v Joe Pettersson>view that wouldn't necessitate the level of scale that wasn't necessitated by the level of scale
+
+249
+00:19:00.040 --> 00:19:05.660
+<v Joe Pettersson>our customers were at so the challenge for us has been making smart decisions trying to be pragmatic
+
+250
+00:19:07.580 --> 00:19:13.360
+<v Joe Pettersson>curve to proactively address technical debt in a really in a really sort of systematic way
+
+251
+00:19:13.360 --> 00:19:19.820
+<v Joe Pettersson>so that we can actually like really focus on where we need to invest and for an example of
+
+252
+00:19:19.820 --> 00:19:26.040
+<v Joe Pettersson>one of the ways we'll be able to do this effectively is investing very early in automated load testing
+
+253
+00:19:26.040 --> 00:19:32.620
+<v Joe Pettersson>for example so in a way that we can build very sophisticated simulations that we can use to
+
+254
+00:19:32.620 --> 00:19:36.540
+<v Joe Pettersson>project against growth so we can say all right well if we talk to our sales team and our sales
+
+255
+00:19:37.580 --> 00:19:44.240
+<v Joe Pettersson>this number of payments in the next six months, we can be ahead and we can start to optimize for
+
+256
+00:19:44.240 --> 00:19:48.180
+<v Joe Pettersson>that level of traffic in a way that obviously we're not unique in being able to do that.
+
+257
+00:19:48.280 --> 00:19:53.880
+<v Joe Pettersson>But for a business at our stage a year or two ago, isn't that massively usual?
+
+258
+00:19:54.800 --> 00:19:58.260
+<v Joe Pettersson>There's a classic expression that like when you're teaching something, you need to stay
+
+259
+00:19:58.260 --> 00:20:03.500
+<v Joe Pettersson>two pages ahead of your students. And that's something that we like. That's kind of how we
+
+260
+00:20:03.500 --> 00:20:07.180
+<v Joe Pettersson>thought about scalability, where we want to answer those questions as pragmatically as possible.
+
+261
+00:20:07.580 --> 00:20:12.640
+<v Joe Pettersson>without risking or sacrificing the reliability or resiliency of the things that we do.
+
+262
+00:20:13.980 --> 00:20:18.280
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built,
+
+263
+00:20:18.380 --> 00:20:19.560
+<v Noah Labhart>what are you most proud of?
+
+264
+00:20:20.620 --> 00:20:23.080
+<v Joe Pettersson>The honest answer to this is the culture of Banked.
+
+265
+00:20:23.120 --> 00:20:26.640
+<v Joe Pettersson>There's an openness, there's a transparency, there's an inclusivity.
+
+266
+00:20:26.880 --> 00:20:30.180
+<v Joe Pettersson>It's the thing that brings a huge smile to my face
+
+267
+00:20:30.180 --> 00:20:33.440
+<v Joe Pettersson>when you see it in behaviours every day.
+
+268
+00:20:33.620 --> 00:20:36.420
+<v Joe Pettersson>So that's my definitive answer to that question.
+
+269
+00:20:37.580 --> 00:20:43.140
+<v Joe Pettersson>products and when they think about the technology that supports them I think that what we've been
+
+270
+00:20:43.140 --> 00:20:48.320
+<v Joe Pettersson>able to do and I think one of the things that's been most effective for us is there's this thing
+
+271
+00:20:48.320 --> 00:20:54.360
+<v Joe Pettersson>when you build global payments the variety of implementation details of payments in the UK
+
+272
+00:20:54.360 --> 00:21:01.860
+<v Joe Pettersson>or Italy in the US is enormous how it works that the specific fields the metadata it varies
+
+273
+00:21:01.860 --> 00:21:16.340
+<v Joe Pettersson>And so one of the biggest challenges that payment networks get into when they scale globally is they accrue an enormous amount of technical debt around the differences between the geographies where they operate.
+
+274
+00:21:16.340 --> 00:21:23.760
+<v Joe Pettersson>So you can imagine a very simplistic example of this is that in your code somewhere, you'll have if market equals Italy.
+
+275
+00:21:24.200 --> 00:21:33.460
+<v Joe Pettersson>And what that does, as I'm sure people can understand, is massively proliferate the number of code parts that exist in your platform.
+
+276
+00:21:33.600 --> 00:21:41.120
+<v Joe Pettersson>And so when you want to ship new products, when you want to go into new territories, you have to account for that difference.
+
+277
+00:21:41.120 --> 00:21:44.960
+<v Joe Pettersson>And if you don't control that in a really explicit way,
+
+278
+00:21:45.180 --> 00:21:47.140
+<v Joe Pettersson>it just slows you down.
+
+279
+00:21:47.280 --> 00:21:49.960
+<v Joe Pettersson>And you end up with a very complicated
+
+280
+00:21:49.960 --> 00:21:51.660
+<v Joe Pettersson>kind of big ball of mud.
+
+281
+00:21:52.300 --> 00:21:54.220
+<v Joe Pettersson>One of the things I'm most proud of in a technical sense
+
+282
+00:21:54.220 --> 00:21:59.420
+<v Joe Pettersson>is the internal abstraction that we have for payments.
+
+283
+00:21:59.660 --> 00:22:02.640
+<v Joe Pettersson>This idea to say very early on that our payments team
+
+284
+00:22:02.640 --> 00:22:04.340
+<v Joe Pettersson>had this philosophy of saying
+
+285
+00:22:04.340 --> 00:22:07.100
+<v Joe Pettersson>there will be a single internal abstraction
+
+286
+00:22:07.100 --> 00:22:09.900
+<v Joe Pettersson>and that will be true for the UK, anywhere in Europe,
+
+287
+00:22:11.120 --> 00:22:18.940
+<v Joe Pettersson>So that means everybody else in our product teams who make those payments and consume those APIs, they can code against one interface.
+
+288
+00:22:19.180 --> 00:22:20.680
+<v Joe Pettersson>They can code against one abstraction.
+
+289
+00:22:21.000 --> 00:22:28.340
+<v Joe Pettersson>And so in theory, that proliferation of market differences can be massively reduced in impact.
+
+290
+00:22:28.640 --> 00:22:35.800
+<v Joe Pettersson>And I think that as we scale globally, that's the thing that's had the most profound impact on our technology, I think.
+
+291
+00:22:36.480 --> 00:22:38.420
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+292
+00:22:38.420 --> 00:22:42.880
+<v Noah Labhart>So tell me about a mistake you made and how you and your team responded to it.
+
+293
+00:22:43.920 --> 00:22:44.560
+<v Noah Labhart>One
+
+294
+00:22:44.560 --> 00:23:00.980
+<v Joe Pettersson>of the things that is not going to be unique to Banked, but I think that what we haven't always got right is the amount of investment that we make with time versus the impact of that investment.
+
+295
+00:23:00.980 --> 00:23:07.620
+<v Joe Pettersson>you can imagine in a perfect scenario in the dream scenario where you spend all of your effort
+
+296
+00:23:07.620 --> 00:23:12.780
+<v Joe Pettersson>on things that have the most impact for you as a business right like the dreams know now we all
+
+297
+00:23:12.780 --> 00:23:18.060
+<v Joe Pettersson>recognize that we're all human beings and that's that's not the way the world works with the benefit
+
+298
+00:23:18.060 --> 00:23:23.040
+<v Joe Pettersson>of hindsight i'd look back and say you know what like we probably could have done we could have
+
+299
+00:23:23.040 --> 00:23:29.920
+<v Joe Pettersson>done a more minimal solution to this problem right we could have taken a shorter road or sometimes
+
+300
+00:23:30.980 --> 00:23:32.420
+<v Joe Pettersson>there are some things we could look back at.
+
+301
+00:23:32.440 --> 00:23:36.000
+<v Joe Pettersson>You know what, if we spent a little bit more time on that
+
+302
+00:23:36.000 --> 00:23:37.300
+<v Joe Pettersson>the first time we did it,
+
+303
+00:23:37.360 --> 00:23:39.620
+<v Joe Pettersson>that ultimately we wouldn't have to come back
+
+304
+00:23:39.620 --> 00:23:41.800
+<v Joe Pettersson>and look at it again now in quite the same way.
+
+305
+00:23:42.600 --> 00:23:44.500
+<v Joe Pettersson>One of the key things about our platform
+
+306
+00:23:44.500 --> 00:23:48.180
+<v Joe Pettersson>is incentives and rewards, right?
+
+307
+00:23:48.240 --> 00:23:50.560
+<v Joe Pettersson>So we want to give you as a consumer,
+
+308
+00:23:50.620 --> 00:23:53.680
+<v Joe Pettersson>so Noah, if you see Pay by Bank or Banked at checkout,
+
+309
+00:23:53.940 --> 00:23:56.540
+<v Joe Pettersson>we want to give you rewards and incentives, right?
+
+310
+00:23:56.600 --> 00:23:58.280
+<v Joe Pettersson>So that could be airline miles,
+
+311
+00:23:58.280 --> 00:24:01.580
+<v Joe Pettersson>It could be carbon offset, the thing that you're purchasing.
+
+312
+00:24:01.620 --> 00:24:02.900
+<v Joe Pettersson>There's a bunch of different options there.
+
+313
+00:24:03.320 --> 00:24:07.260
+<v Joe Pettersson>We did that because we had this product hypothesis that it would increase conversion.
+
+314
+00:24:07.540 --> 00:24:08.940
+<v Joe Pettersson>And it turns out it really does.
+
+315
+00:24:09.060 --> 00:24:10.620
+<v Joe Pettersson>And it's become a really important part of our product.
+
+316
+00:24:10.860 --> 00:24:23.260
+<v Joe Pettersson>When we first looked at that, we started with a particular partner who didn't give us the nicest interface for actually how to give our customers those rewards.
+
+317
+00:24:23.460 --> 00:24:24.840
+<v Joe Pettersson>It was kind of old fashioned.
+
+318
+00:24:24.900 --> 00:24:25.680
+<v Joe Pettersson>It was kind of legacy.
+
+319
+00:24:25.680 --> 00:24:32.920
+<v Joe Pettersson>And we spent a lot of time working around the legacy implications for that integration with them.
+
+320
+00:24:33.380 --> 00:24:43.720
+<v Joe Pettersson>Not because it would actually add customer value, but because the way that we integrated with this partner was just challenging and the thing they exposed wasn't great.
+
+321
+00:24:44.160 --> 00:24:49.200
+<v Joe Pettersson>So with hindsight, we could have said, you know what, we need to just prove this as a concept.
+
+322
+00:24:49.200 --> 00:24:56.540
+<v Joe Pettersson>maybe there's a world in which we don't need to go and focus on some of those very obscure edge
+
+323
+00:24:56.540 --> 00:25:01.360
+<v Joe Pettersson>cases because ultimately now now we've come back to this partner and we've got much further down
+
+324
+00:25:01.360 --> 00:25:04.520
+<v Joe Pettersson>the road they've come back said you know what we're going to actually completely change the
+
+325
+00:25:04.520 --> 00:25:08.140
+<v Joe Pettersson>way you integrate with us and give you a much better optionality so there could have been a
+
+326
+00:25:08.140 --> 00:25:12.540
+<v Joe Pettersson>world in which we could have spent less time actually working through some of those edge cases
+
+327
+00:25:12.540 --> 00:25:17.820
+<v Joe Pettersson>and more time focusing around well actually what's the best how could we like have most impact with
+
+328
+00:25:19.380 --> 00:25:21.780
+<v Joe Pettersson>for our customers and for their customers.
+
+329
+00:25:21.960 --> 00:25:23.360
+<v Joe Pettersson>So that's kind of just one example,
+
+330
+00:25:23.440 --> 00:25:26.460
+<v Joe Pettersson>but I suspect everybody in my position
+
+331
+00:25:26.460 --> 00:25:27.380
+<v Joe Pettersson>has these things to say.
+
+332
+00:25:27.400 --> 00:25:29.740
+<v Joe Pettersson>With hindsight, I think we probably could have made
+
+333
+00:25:29.740 --> 00:25:31.640
+<v Joe Pettersson>a different kind of ROI decision
+
+334
+00:25:31.640 --> 00:25:33.540
+<v Joe Pettersson>on some of the places where we spent time.
+
+335
+00:25:35.780 --> 00:25:37.400
+<v Noah Labhart>Well, this will be fun to ask.
+
+336
+00:25:37.500 --> 00:25:39.800
+<v Noah Labhart>I always enjoy asking this question
+
+337
+00:25:39.800 --> 00:25:40.820
+<v Noah Labhart>and hearing the answers.
+
+338
+00:25:40.980 --> 00:25:42.700
+<v Noah Labhart>So what does the future look like
+
+339
+00:25:42.700 --> 00:25:44.320
+<v Noah Labhart>for the product and for your team?
+
+340
+00:25:46.140 --> 00:25:48.740
+<v Joe Pettersson>Banked is, as a payment network,
+
+341
+00:25:49.200 --> 00:25:50.300
+<v Joe Pettersson>We need to be a global business.
+
+342
+00:25:50.900 --> 00:25:54.540
+<v Joe Pettersson>We work with very large tier one merchants
+
+343
+00:25:54.540 --> 00:25:57.600
+<v Joe Pettersson>and they say things to us like,
+
+344
+00:25:57.720 --> 00:26:00.440
+<v Joe Pettersson>we operate in 120 countries.
+
+345
+00:26:00.620 --> 00:26:04.580
+<v Joe Pettersson>And so banked, you need to operate in 120 countries as well.
+
+346
+00:26:05.640 --> 00:26:09.300
+<v Joe Pettersson>That's a real vector for us as an organization.
+
+347
+00:26:09.580 --> 00:26:11.800
+<v Joe Pettersson>They're actually, how do we continue to enable
+
+348
+00:26:11.800 --> 00:26:13.980
+<v Joe Pettersson>these kinds of account to account payments
+
+349
+00:26:13.980 --> 00:26:16.540
+<v Joe Pettersson>in not just in Europe and the US,
+
+350
+00:26:16.540 --> 00:26:22.440
+<v Joe Pettersson>but in South America, in East Africa, in Southeast Asia, in East Asia, in Australia and other places
+
+351
+00:26:22.440 --> 00:26:28.500
+<v Joe Pettersson>and that's a real kind of vector as we move forward and that has profound implications for
+
+352
+00:26:28.500 --> 00:26:33.120
+<v Joe Pettersson>the technology that we build, the products that we build and others. That's kind of one thing.
+
+353
+00:26:33.360 --> 00:26:39.120
+<v Joe Pettersson>The second thing is ultimately we're in the business of conversion, right? We're a payment
+
+354
+00:26:39.120 --> 00:26:45.200
+<v Joe Pettersson>network. Our core goal is to convert as many people as possible from browsers to buyers.
+
+355
+00:26:46.540 --> 00:26:52.940
+<v Joe Pettersson>do for our merchants and for our customers to increase their conversion as much as possible so
+
+356
+00:26:52.940 --> 00:26:57.760
+<v Joe Pettersson>almost like think i almost think about it as like a horizontal and a vertical right so from a
+
+357
+00:26:57.760 --> 00:27:02.980
+<v Joe Pettersson>horizontal point of view we need to get global scale as a business but from a product point of
+
+358
+00:27:02.980 --> 00:27:10.200
+<v Joe Pettersson>view we need to ship more products in more in more countries to enable that kind of conversion
+
+359
+00:27:10.200 --> 00:27:15.660
+<v Joe Pettersson>optimization and that top line growth for our merchants so both of those are really exciting
+
+360
+00:27:16.540 --> 00:27:21.220
+<v Joe Pettersson>really hard things to do. We've got like a long hard road ahead of us. But as I said,
+
+361
+00:27:21.240 --> 00:27:23.600
+<v Joe Pettersson>it's a journey that's a really exciting one.
+
+362
+00:27:26.340 --> 00:27:31.960
+<v Noah Labhart>Let's switch to you, Joe. Who influences the way that you work? Name a CEO, a CTO,
+
+363
+00:27:32.180 --> 00:27:35.280
+<v Noah Labhart>architect, really any person that you look up to and why?
+
+364
+00:27:36.540 --> 00:27:43.100
+<v Joe Pettersson>One of the things that has always resonated with me, so please don't judge me too harshly for this.
+
+365
+00:27:43.100 --> 00:27:44.900
+<v Joe Pettersson>I was at McKinsey and Company for a while.
+
+366
+00:27:45.480 --> 00:27:48.300
+<v Joe Pettersson>I was an associate partner there.
+
+367
+00:27:48.480 --> 00:27:50.500
+<v Joe Pettersson>And it's an amazing organization in many ways.
+
+368
+00:27:50.700 --> 00:27:54.040
+<v Joe Pettersson>But there was a senior partner called Kate Smage,
+
+369
+00:27:54.620 --> 00:27:57.460
+<v Joe Pettersson>who now runs digital analytics at McKinsey.
+
+370
+00:27:57.780 --> 00:28:01.520
+<v Joe Pettersson>There was a thing that she did that had a really profound impact on me as a leader.
+
+371
+00:28:01.900 --> 00:28:04.200
+<v Joe Pettersson>We were in a meeting.
+
+372
+00:28:04.440 --> 00:28:05.720
+<v Joe Pettersson>We were talking with our client.
+
+373
+00:28:05.820 --> 00:28:09.240
+<v Joe Pettersson>And Kate was the ultimate leader of this engagement.
+
+374
+00:28:10.260 --> 00:28:12.920
+<v Joe Pettersson>There was quite a junior person at McKinsey.
+
+375
+00:28:13.100 --> 00:28:14.300
+<v Joe Pettersson>He was a very new business analyst.
+
+376
+00:28:14.560 --> 00:28:16.080
+<v Joe Pettersson>He was fresh out of an MBA.
+
+377
+00:28:16.300 --> 00:28:18.280
+<v Joe Pettersson>He didn't have much experience.
+
+378
+00:28:18.940 --> 00:28:21.280
+<v Joe Pettersson>And during this meeting, we were problem solving.
+
+379
+00:28:21.420 --> 00:28:25.020
+<v Joe Pettersson>We were trying to work out an answer to this particularly thorny question this customer had.
+
+380
+00:28:25.120 --> 00:28:26.460
+<v Joe Pettersson>And I was there working with the team.
+
+381
+00:28:27.340 --> 00:28:33.360
+<v Joe Pettersson>And one of the other people in the team kind of ran over the junior person a little bit, right?
+
+382
+00:28:33.460 --> 00:28:36.380
+<v Joe Pettersson>They were a bit dismissive of their contribution.
+
+383
+00:28:36.440 --> 00:28:38.400
+<v Joe Pettersson>They were a bit dismissive of their ideas.
+
+384
+00:28:39.940 --> 00:28:41.960
+<v Joe Pettersson>And Kate stopped the meeting.
+
+385
+00:28:43.100 --> 00:28:50.220
+<v Joe Pettersson>very explicit point to include this junior person to make sure that their ideas were heard that
+
+386
+00:28:50.220 --> 00:28:56.420
+<v Joe Pettersson>actually if there was feedback that they could be given about their ideas and the things they
+
+387
+00:28:56.420 --> 00:29:01.760
+<v Joe Pettersson>were thinking about that she took the time to do that and it really struck with me she did that a
+
+388
+00:29:01.760 --> 00:29:06.180
+<v Joe Pettersson>lot and that's one of the things that like that has always most influenced me as a leader because
+
+389
+00:29:06.180 --> 00:29:11.800
+<v Joe Pettersson>I mean tritely it can sometimes be called servant leadership I don't think that's necessarily a
+
+390
+00:29:13.100 --> 00:29:21.860
+<v Joe Pettersson>it but ultimately my job is to hire the best group of people that I can and build the best
+
+391
+00:29:21.860 --> 00:29:28.260
+<v Joe Pettersson>environment for them to be successful and for me that includes taking the responsibility I have
+
+392
+00:29:28.260 --> 00:29:35.360
+<v Joe Pettersson>to make sure that everyone is included in that process really seriously it wasn't the first time
+
+393
+00:29:35.360 --> 00:29:39.560
+<v Joe Pettersson>I seen that in my career but it was something that really struck me and like really stayed with me
+
+394
+00:29:39.560 --> 00:29:44.260
+<v Joe Pettersson>and it's something I try to think of quite a lot when I'm leading myself and when I'm trying to
+
+395
+00:29:44.260 --> 00:29:49.600
+<v Joe Pettersson>mentor other leaders to try and get to that inclusion that making sure people are included
+
+396
+00:29:49.600 --> 00:29:55.320
+<v Joe Pettersson>their voice is heard that people who maybe typically wouldn't be included in those kinds
+
+397
+00:29:55.320 --> 00:30:00.580
+<v Joe Pettersson>of conversations are feel valued and feel part of that process we
+
+398
+00:30:00.580 --> 00:30:02.340
+<v Noah Labhart>talked about a mistake earlier
+
+399
+00:30:02.340 --> 00:30:06.320
+<v Noah Labhart>but a little bit different spin if you go back to the beginning what would you do differently
+
+400
+00:30:06.320 --> 00:30:08.600
+<v Noah Labhart>or where would you consider taking a different approach?
+
+401
+00:30:08.840 --> 00:30:11.100
+<v Noah Labhart>And it may be the thing that you mentioned,
+
+402
+00:30:11.160 --> 00:30:12.480
+<v Noah Labhart>because I do recall you saying
+
+403
+00:30:12.960 --> 00:30:16.580
+<v Noah Labhart>that there may have been a bigger ROI for going back there,
+
+404
+00:30:16.620 --> 00:30:17.580
+<v Noah Labhart>but let's see what you say.
+
+405
+00:30:18.180 --> 00:30:20.720
+<v Joe Pettersson>I think this is a very easy question
+
+406
+00:30:20.720 --> 00:30:22.240
+<v Joe Pettersson>to answer in hindsight, right?
+
+407
+00:30:22.320 --> 00:30:24.600
+<v Joe Pettersson>We could spend, I think, three or four hours
+
+408
+00:30:24.600 --> 00:30:26.900
+<v Joe Pettersson>talking about all the things that if I had a time machine,
+
+409
+00:30:27.020 --> 00:30:28.320
+<v Joe Pettersson>I think I'd go back and do differently.
+
+410
+00:30:29.040 --> 00:30:32.700
+<v Joe Pettersson>One of the things that I would certainly say
+
+411
+00:30:32.700 --> 00:30:34.840
+<v Joe Pettersson>I would kind of go back and do differently
+
+412
+00:30:36.440 --> 00:30:45.200
+<v Joe Pettersson>start to grow the engineering leadership team at Banked sooner than we did.
+
+413
+00:30:46.140 --> 00:30:53.040
+<v Joe Pettersson>In the last six months, we've had a VP engineering join us, Adi Topaz, and she's had such a profound
+
+414
+00:30:53.040 --> 00:31:00.540
+<v Joe Pettersson>impact on the engineering team, the culture, the way we do things that it feels like I kind of sit
+
+415
+00:31:00.540 --> 00:31:06.220
+<v Joe Pettersson>and think, wow, I wish I'd done that earlier. I wish that we'd been able to find Adi and bring
+
+416
+00:31:06.320 --> 00:31:10.260
+<v Joe Pettersson>her in earlier during this journey because I think that she'd have had even more impact
+
+417
+00:31:10.620 --> 00:31:15.520
+<v Joe Pettersson>in the things she's doing. So in that sense, that's certainly something that in hindsight,
+
+418
+00:31:15.560 --> 00:31:17.080
+<v Joe Pettersson>I think I would have done a little bit earlier.
+
+419
+00:31:18.540 --> 00:31:21.420
+<v Noah Labhart>Last question, Joe. So you're getting on a plane
+
+420
+00:31:21.420 --> 00:31:25.680
+<v Noah Labhart>and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed
+
+421
+00:31:25.680 --> 00:31:28.520
+<v Noah Labhart>about it. They can't wait to show it off to the world. Can't wait to show it off to you right
+
+422
+00:31:28.520 --> 00:31:32.740
+<v Noah Labhart>there on the plane. What advice do you give that person having gone down this road a bit?
+
+423
+00:31:33.540 --> 00:31:36.700
+<v Joe Pettersson>I founded an investment fund called Havant Park
+
+424
+00:31:36.700 --> 00:31:39.360
+<v Joe Pettersson>and so I do a bunch of kind of pre-seed, seed stage investing
+
+425
+00:31:39.360 --> 00:31:43.020
+<v Joe Pettersson>and a bunch of advisership for kind of companies we've invested in
+
+426
+00:31:43.020 --> 00:31:47.380
+<v Joe Pettersson>I think I'd give them the same advice I give to lots of founders
+
+427
+00:31:47.380 --> 00:31:48.620
+<v Joe Pettersson>particularly technical founders
+
+428
+00:31:49.140 --> 00:31:53.120
+<v Joe Pettersson>which is your organisation is going to look different constantly
+
+429
+00:31:53.120 --> 00:31:55.860
+<v Joe Pettersson>month to month, week to week, quarter to quarter
+
+430
+00:31:55.860 --> 00:31:57.580
+<v Joe Pettersson>it's going to profoundly change
+
+431
+00:31:58.540 --> 00:32:06.400
+<v Joe Pettersson>change. Really the only thing that you can optimize for as a leader is change. You can
+
+432
+00:32:06.400 --> 00:32:13.560
+<v Joe Pettersson>optimize to build an organization that culturally, structurally, and in every other way is optimized
+
+433
+00:32:13.560 --> 00:32:19.760
+<v Joe Pettersson>to be different, is optimized for things to adapt and to change. Because the reality is that the
+
+434
+00:32:19.760 --> 00:32:26.280
+<v Joe Pettersson>most successful seed stage business is going to completely fail as a B round business that's in
+
+435
+00:32:27.580 --> 00:32:33.680
+<v Joe Pettersson>And so optimizing for change is one of the most valuable things that you can do.
+
+436
+00:32:33.760 --> 00:32:38.760
+<v Joe Pettersson>And that comes down to the people that you hire, the expectations that you set for people
+
+437
+00:32:38.760 --> 00:32:39.800
+<v Joe Pettersson>when they join the business.
+
+438
+00:32:39.900 --> 00:32:42.940
+<v Joe Pettersson>And you talk about the kind of road and the journey you're going to go on together.
+
+439
+00:32:43.260 --> 00:32:46.060
+<v Joe Pettersson>But broadly, it's also about communication, right?
+
+440
+00:32:46.120 --> 00:32:49.000
+<v Joe Pettersson>Because change is scary for humans, right?
+
+441
+00:32:49.080 --> 00:32:53.700
+<v Joe Pettersson>As businesses grow and people's roles change and new roles pop up and new opportunities
+
+442
+00:32:53.700 --> 00:32:54.300
+<v Joe Pettersson>pop up.
+
+443
+00:32:54.400 --> 00:32:56.220
+<v Joe Pettersson>And that can be really frightening, right?
+
+444
+00:32:57.800 --> 00:33:00.040
+<v Joe Pettersson>We tend to be scared of change.
+
+445
+00:33:00.420 --> 00:33:08.500
+<v Joe Pettersson>But being open and transparent and keeping your team together and on the same page, oversharing, right?
+
+446
+00:33:08.600 --> 00:33:13.800
+<v Joe Pettersson>Feeling like I feel like I should keep some of this to myself or I shouldn't expose the team to this.
+
+447
+00:33:13.980 --> 00:33:22.080
+<v Joe Pettersson>My experience is that being more open, sharing things, being more transparent is almost never the wrong answer.
+
+448
+00:33:22.340 --> 00:33:23.840
+<v Noah Labhart>I think that's great advice.
+
+449
+00:33:24.080 --> 00:33:26.380
+<v Noah Labhart>Well, Joe, thank you for being on the show today.
+
+450
+00:33:27.580 --> 00:33:29.060
+<v Noah Labhart>creation story of banked.
+
+451
+00:33:29.060 --> 00:33:29.560
+<v Joe Pettersson>Thanks.
+
+452
+00:33:29.620 --> 00:33:30.120
+<v Joe Pettersson>It was great fun.
+
+453
+00:33:32.080 --> 00:33:35.060
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+454
+00:33:38.540 --> 00:33:41.560
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+455
+00:33:41.700 --> 00:33:43.840
+<v Noah Labhart>Be sure to subscribe on Apple podcasts,
+
+456
+00:33:43.940 --> 00:33:44.440
+<v Noah Labhart>Spotify,
+
+457
+00:33:44.480 --> 00:33:46.500
+<v Noah Labhart>or the podcasting app of your choice.
+
+458
+00:33:46.900 --> 00:33:51.820
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to 10 bucks a
+
+459
+00:33:51.820 --> 00:33:52.320
+<v Noah Labhart>month.
+
+460
+00:33:52.360 --> 00:33:53.680
+<v Noah Labhart>And when you get a chance,
+
+461
+00:33:53.800 --> 00:33:54.560
+<v Noah Labhart>leave us a review.
+
+462
+00:33:54.820 --> 00:33:56.760
+<v Noah Labhart>Both things help us out tremendously.
+
+463
+00:33:59.180 --> 00:34:00.680
+<v Noah Labhart>and thanks again for listening.

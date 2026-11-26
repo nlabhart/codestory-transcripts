@@ -1,0 +1,2335 @@
+WEBVTT
+
+NOTE S5 E27: Fixing the Edge: Dropping Traffic by 95% with Max Stoiber of GraphCDN (Stellate)
+
+1
+00:00:01.380 --> 00:00:29.980
+<v Max Stoiber>Nobody else is doing what we're doing. Nobody else is building a GraphQL CDN or gateway that just doesn't exist. Once you're in this unusual position of being the gateway for people's GraphQL APIs, there's a lot of things we could be doing that could potentially provide value to our customers. There's a bunch of these ideas where we're like, this would be insanely cool to do, right? Like nobody else can do this except for us. And it might actually provide value to our customers.
+
+2
+00:00:30.000 --> 00:00:36.540
+<v Max Stoiber>And that's what we're really trying to figure out at the moment is not really what do we do, but what do we do next?
+
+3
+00:00:37.280 --> 00:00:42.160
+<v Max Stoiber>My name is Max Stoiber and I am one of the co-founders of GraphCDN.
+
+4
+00:00:47.660 --> 00:00:58.980
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead.
+
+5
+00:01:00.000 --> 00:01:05.820
+<v Noah Labhart>that has your back. I'm your host, Noah Labhart, and today I'll help Max Stoiber
+
+6
+00:01:05.820 --> 00:01:12.160
+<v Noah Labhart>found a way to give you peace of mind so you never worry about scaling GraphQL again.
+
+7
+00:01:13.480 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+8
+00:01:19.360 --> 00:01:23.520
+<v Noah Labhart>Max Stoiber was born and raised in a small town just outside of Vienna, Austria.
+
+9
+00:01:24.380 --> 00:01:28.960
+<v Noah Labhart>From a young age, his biggest influence was his mother, who left her job to start her own
+
+10
+00:01:30.000 --> 00:01:35.120
+<v Noah Labhart>expert in the courts. It has been inspiring for Max to watch her find her place in the world
+
+11
+00:01:35.120 --> 00:01:40.720
+<v Noah Labhart>and to box through everything life threw at her. He still finds great inspiration from that today,
+
+12
+00:01:40.880 --> 00:01:45.760
+<v Noah Labhart>and very early on he was focused on doing something on his own. When he's not staring
+
+13
+00:01:45.760 --> 00:01:50.260
+<v Noah Labhart>at his computer screens, he likes to get outside and boulder with his friends. He got into the
+
+14
+00:01:50.260 --> 00:01:54.420
+<v Noah Labhart>sport through other fellow geeks and feels that bouldering in Vienna is pretty much a nerd sport.
+
+15
+00:01:55.160 --> 00:01:59.660
+<v Noah Labhart>He's also a trained skiing instructor and really into coffee as a certified barista.
+
+16
+00:02:01.280 --> 00:02:06.320
+<v Noah Labhart>Prior to his current venture, Max has had some great success in the open source world
+
+17
+00:02:06.320 --> 00:02:11.080
+<v Noah Labhart>and building a chat tool called Spectrum, which was a platform for community chat.
+
+18
+00:02:12.020 --> 00:02:16.160
+<v Noah Labhart>Eventually, GitHub acquired the product and opened a whole new set of problems
+
+19
+00:02:16.160 --> 00:02:19.380
+<v Noah Labhart>around architecting a large-scale, real-time system.
+
+20
+00:02:20.360 --> 00:02:23.200
+<v Noah Labhart>Through a difficult period of learning and service outages,
+
+21
+00:02:23.460 --> 00:02:29.060
+<v Noah Labhart>he learned and figured out a better way to reduce traffic up to 95% with edge caching.
+
+22
+00:02:31.680 --> 00:02:34.820
+<v Noah Labhart>This is the creation story of GraphCDN.
+
+23
+00:02:37.820 --> 00:02:39.840
+<v Max Stoiber>My background is in open source.
+
+24
+00:02:40.140 --> 00:02:44.920
+<v Max Stoiber>I've invented a lot of open source projects that lots and lots and lots and lots and lots of people use.
+
+25
+00:02:45.140 --> 00:02:50.040
+<v Max Stoiber>And through that, I got to meet Brian Lovin and Bryn Jackson,
+
+26
+00:02:50.260 --> 00:02:53.780
+<v Max Stoiber>who run the Design Details podcast that some listeners might be familiar with.
+
+27
+00:02:53.900 --> 00:02:55.480
+<v Max Stoiber>Great podcast if you're into design.
+
+28
+00:02:55.480 --> 00:03:03.900
+<v Max Stoiber>And they started using some of my open source projects for a product that they were building that they were calling Spectrum.
+
+29
+00:03:04.500 --> 00:03:09.400
+<v Max Stoiber>And what it was, it was essentially a platform to move their community to.
+
+30
+00:03:09.460 --> 00:03:15.520
+<v Max Stoiber>They had this existing community of design details listeners on Slack that I think 8 or 9,000 people were in.
+
+31
+00:03:15.600 --> 00:03:20.820
+<v Max Stoiber>And Slack essentially came to them and was like, hey, look, it's really cool what you're doing, but please go do it somewhere else.
+
+32
+00:03:20.940 --> 00:03:22.940
+<v Max Stoiber>Like either pay us or go do it somewhere else.
+
+33
+00:03:22.940 --> 00:03:28.400
+<v Max Stoiber>But Slack charges, I think at the time it was like five dollars per member, so this would have been
+
+34
+00:03:28.400 --> 00:03:34.580
+<v Max Stoiber>45,000 a month for a free community of designers that they were running, which obviously they can't
+
+35
+00:03:34.580 --> 00:03:40.880
+<v Max Stoiber>afford. And so they started building this community platform for their community and asked me a bunch
+
+36
+00:03:40.880 --> 00:03:44.700
+<v Max Stoiber>of questions about my open source projects that they were using. And through that, I got introduced
+
+37
+00:03:44.700 --> 00:03:50.760
+<v Max Stoiber>to them and eventually became one of the co-founders of Spectrum. And we took their initial
+
+38
+00:03:50.760 --> 00:03:58.940
+<v Max Stoiber>idea of building a home for their Spec.fm Design Details community and extended it to be the home
+
+39
+00:03:58.940 --> 00:04:04.940
+<v Max Stoiber>for every community. We were building this sort of unified community platform that actually grew
+
+40
+00:04:04.940 --> 00:04:11.440
+<v Max Stoiber>really, really well because it combined the best parts of what forums gave us many years ago, but
+
+41
+00:04:11.440 --> 00:04:17.420
+<v Max Stoiber>also what Slack gave us. So it was all thread-based and it was all sort of async in the same way that
+
+42
+00:04:17.420 --> 00:04:21.980
+<v Max Stoiber>forums are, but the comments underneath each thread were real-time chat.
+
+43
+00:04:22.440 --> 00:04:24.460
+<v Max Stoiber>And so you had a little bit of the best of both worlds.
+
+44
+00:04:24.600 --> 00:04:28.720
+<v Max Stoiber>You could have real-time conversations with people, but simultaneously also had the structure
+
+45
+00:04:28.720 --> 00:04:32.900
+<v Max Stoiber>that comes from a forum where you can have 10,000 people in a forum without a problem,
+
+46
+00:04:33.040 --> 00:04:34.260
+<v Max Stoiber>which is not the same thing with Slack.
+
+47
+00:04:34.420 --> 00:04:40.140
+<v Max Stoiber>If you've ever been in a Slack community that has 10,000 people in it, it's a lot of content
+
+48
+00:04:40.760 --> 00:04:41.740
+<v Max Stoiber>to keep up with.
+
+49
+00:04:41.920 --> 00:04:45.820
+<v Max Stoiber>And so we tried to solve those things and we did that for one and a half years and then
+
+50
+00:04:47.780 --> 00:04:53.180
+<v Noah Labhart>Up, so tell me a little bit more about the, the GitHub acquisition. What, that, what was that like?
+
+51
+00:04:54.680 --> 00:05:03.420
+<v Max Stoiber>So, honestly, going through that acquisition was the most stressful time of my entire life,
+
+52
+00:05:04.720 --> 00:05:10.480
+<v Max Stoiber>and it's not something that I realized before I went through the acquisition, how freaking
+
+53
+00:05:10.480 --> 00:05:17.640
+<v Max Stoiber>stressful they are. Because the way they work is that GitHub was like, okay, we're
+
+54
+00:05:17.640 --> 00:05:22.280
+<v Max Stoiber>interested in acquiring you, and then they start doing due diligence. And what
+
+55
+00:05:22.280 --> 00:05:27.180
+<v Max Stoiber>due diligence means is they basically ask you a thousand questions. That might
+
+56
+00:05:27.180 --> 00:05:31.420
+<v Max Stoiber>be a little bit of an exaggeration, but not by much. Literally every morning we
+
+57
+00:05:31.420 --> 00:05:35.700
+<v Max Stoiber>would wake up to a new email with another dozen questions. And the
+
+58
+00:05:35.700 --> 00:05:41.360
+<v Max Stoiber>the stressful thing about that is that you have no idea what the right answers are. They ask you
+
+59
+00:05:41.360 --> 00:05:46.440
+<v Max Stoiber>everything from what is your background, where did you study, what have you done, to what is your
+
+60
+00:05:46.440 --> 00:05:49.940
+<v Max Stoiber>tech stack, what is your backend infrastructure, where are you hosted, what programming languages
+
+61
+00:05:49.940 --> 00:05:53.900
+<v Max Stoiber>do you use, how many commits have you done? Well, you know, like all of these super detailed
+
+62
+00:05:53.900 --> 00:06:01.080
+<v Max Stoiber>questions. And with every single one, you're like triple thinking about what is the, under air quotes,
+
+63
+00:06:01.080 --> 00:06:07.160
+<v Max Stoiber>right answer here, right? Like, because every single one of these answers feels like it could be a
+
+64
+00:06:07.160 --> 00:06:13.500
+<v Max Stoiber>a no-go for them, right? Like, maybe they don't want Node.js at GitHub. And so then if you say you use
+
+65
+00:06:13.500 --> 00:06:17.860
+<v Max Stoiber>Node.js to write the backend, maybe they're like, actually, we're not interested in this acquisition
+
+66
+00:06:17.860 --> 00:06:23.340
+<v Max Stoiber>anymore, and shut the entire process down. And so it's super stressful to go through that process.
+
+67
+00:06:23.340 --> 00:06:29.480
+<v Max Stoiber>And honestly, I tend to sleep really well, thankfully. I feel very grateful that I
+
+68
+00:06:31.080 --> 00:06:31.920
+<v Max Stoiber>or anything like that.
+
+69
+00:06:32.080 --> 00:06:35.580
+<v Max Stoiber>But during those three months of due diligence,
+
+70
+00:06:36.560 --> 00:06:38.200
+<v Max Stoiber>I did not sleep well at all.
+
+71
+00:06:38.260 --> 00:06:39.840
+<v Max Stoiber>I slept maybe one or two hours every night
+
+72
+00:06:39.840 --> 00:06:42.540
+<v Max Stoiber>because I was so stressed that something that I had done
+
+73
+00:06:42.540 --> 00:06:45.060
+<v Max Stoiber>would fuck up the acquisition for the entire company.
+
+74
+00:06:45.280 --> 00:06:47.160
+<v Max Stoiber>And I put a lot of pressure on myself
+
+75
+00:06:47.160 --> 00:06:48.220
+<v Max Stoiber>and that was really terrible.
+
+76
+00:06:48.400 --> 00:06:50.880
+<v Max Stoiber>And then GitHub got acquired by Microsoft
+
+77
+00:06:50.880 --> 00:06:52.800
+<v Max Stoiber>while they were trying to acquire us.
+
+78
+00:06:53.120 --> 00:06:54.880
+<v Max Stoiber>And so then Microsoft afterwards was like,
+
+79
+00:06:54.940 --> 00:06:58.220
+<v Max Stoiber>well, actually we want to do our due diligence process as well.
+
+80
+00:06:58.320 --> 00:07:00.920
+<v Max Stoiber>And so we had to go through the entire thing once more.
+
+81
+00:07:01.080 --> 00:07:02.200
+<v Max Stoiber>like literally a second time.
+
+82
+00:07:03.240 --> 00:07:05.900
+<v Max Stoiber>And it was like that process was very stressful.
+
+83
+00:07:06.360 --> 00:07:08.140
+<v Max Stoiber>And I'm glad I went through that,
+
+84
+00:07:08.240 --> 00:07:10.320
+<v Max Stoiber>but I'm not sure I would do it again, to be honest.
+
+85
+00:07:10.900 --> 00:07:14.040
+<v Max Stoiber>It was a lot of work and a lot of sleepless nights.
+
+86
+00:07:14.680 --> 00:07:15.180
+<v Noah Labhart>Sure.
+
+87
+00:07:15.100 --> 00:07:17.520
+<v Noah Labhart>Oh, I imagine that was a rough stress
+
+88
+00:07:17.520 --> 00:07:19.900
+<v Noah Labhart>and rough on your health, but you made it through.
+
+89
+00:07:19.980 --> 00:07:22.420
+<v Noah Labhart>You did make it through and you're on the other side now.
+
+90
+00:07:22.480 --> 00:07:23.160
+<v Noah Labhart>I'm glad to hear that.
+
+91
+00:07:24.120 --> 00:07:24.620
+<v Max Stoiber>Absolutely.
+
+92
+00:07:24.740 --> 00:07:26.540
+<v Max Stoiber>It was all worth it in the end, of course,
+
+93
+00:07:26.540 --> 00:07:30.980
+<v Max Stoiber>but while you're in it, it's so stressful.
+
+94
+00:07:31.880 --> 00:07:33.300
+<v Noah Labhart>Tell me about GraphCDN.
+
+95
+00:07:33.420 --> 00:07:35.120
+<v Noah Labhart>Tell me about what the product is
+
+96
+00:07:35.120 --> 00:07:36.680
+<v Noah Labhart>and how you got started building it.
+
+97
+00:07:37.680 --> 00:07:40.700
+<v Max Stoiber>GraphCDN actually was born a little bit
+
+98
+00:07:40.700 --> 00:07:43.660
+<v Max Stoiber>out of our experiences from building Spectrum.
+
+99
+00:07:44.200 --> 00:07:47.260
+<v Max Stoiber>Spectrum grew like mad and I was the CTO there
+
+100
+00:07:47.260 --> 00:07:49.800
+<v Max Stoiber>and I had no idea what I was doing, right?
+
+101
+00:07:49.900 --> 00:07:52.360
+<v Max Stoiber>Like I'd done programming for three years maybe.
+
+102
+00:07:52.460 --> 00:07:54.580
+<v Max Stoiber>I had never run a production back end
+
+103
+00:07:56.540 --> 00:07:59.020
+<v Max Stoiber>in this real-time chat, public platform,
+
+104
+00:07:59.240 --> 00:08:00.740
+<v Max Stoiber>like this public real-time chat.
+
+105
+00:08:01.660 --> 00:08:04.180
+<v Max Stoiber>Architecting and scaling something like that isn't trivial.
+
+106
+00:08:04.740 --> 00:08:06.400
+<v Max Stoiber>And I made a lot of mistakes.
+
+107
+00:08:06.600 --> 00:08:08.920
+<v Max Stoiber>And one of the biggest mistakes I made was that I chose a database
+
+108
+00:08:08.920 --> 00:08:11.460
+<v Max Stoiber>that unfortunately wasn't supported very well.
+
+109
+00:08:11.660 --> 00:08:12.800
+<v Max Stoiber>It was called RethinkDB.
+
+110
+00:08:13.020 --> 00:08:15.000
+<v Max Stoiber>And the company behind it eventually shut down.
+
+111
+00:08:15.200 --> 00:08:17.580
+<v Max Stoiber>And honestly, just not a lot of people were using it.
+
+112
+00:08:17.760 --> 00:08:20.400
+<v Max Stoiber>And so it wasn't super well suited.
+
+113
+00:08:20.500 --> 00:08:24.100
+<v Max Stoiber>And it had a lot of scalability problems that we ran into.
+
+114
+00:08:24.100 --> 00:08:33.100
+<v Max Stoiber>to. And what that led to is our service going down probably once or twice every day over a period of
+
+115
+00:08:33.100 --> 00:08:39.780
+<v Max Stoiber>months. And of course, your entire service going down once or twice a day is ridiculous, right?
+
+116
+00:08:39.860 --> 00:08:45.400
+<v Max Stoiber>Like that makes no sense at all. And we were heavily using GraphQL for all of our API needs.
+
+117
+00:08:45.580 --> 00:08:51.060
+<v Max Stoiber>And we had exposed our entire data set as a GraphQL API, and you could query and mutate everything
+
+118
+00:08:51.060 --> 00:08:55.520
+<v Max Stoiber>everything beautifully from the front end. And that part worked beautifully. But the entire time
+
+119
+00:08:55.520 --> 00:09:01.540
+<v Max Stoiber>while I was fighting these scalability problems in the backend, I was like, we are a public forum.
+
+120
+00:09:01.720 --> 00:09:06.960
+<v Max Stoiber>And sure, there's some real time chat. But fundamentally, most of the posts are exactly
+
+121
+00:09:06.960 --> 00:09:12.400
+<v Max Stoiber>the same for every single user. Why are we even going to the database for every single one of
+
+122
+00:09:12.400 --> 00:09:18.000
+<v Max Stoiber>these requests? We should just be putting a cache in front of our GraphQL API to alleviate a lot of
+
+123
+00:09:18.000 --> 00:09:22.860
+<v Max Stoiber>the load on our backend. We probably could have had a 90% plus cache rate on our API requests
+
+124
+00:09:22.860 --> 00:09:30.380
+<v Max Stoiber>and reduced our traffic tenfold, but that wasn't possible. Like literally nobody had built that
+
+125
+00:09:30.380 --> 00:09:36.540
+<v Max Stoiber>before. And so we were kind of stuck and I had to spend weeks or even months building a custom
+
+126
+00:09:36.540 --> 00:09:42.340
+<v Max Stoiber>caching solution internally that honestly never worked very well. It was pretty terrible. It kind
+
+127
+00:09:42.340 --> 00:09:46.020
+<v Max Stoiber>kind of did the job and prevented us from crashing that often.
+
+128
+00:09:46.520 --> 00:09:47.560
+<v Max Stoiber>But that's about it.
+
+129
+00:09:47.600 --> 00:09:48.580
+<v Max Stoiber>Like it didn't work very well.
+
+130
+00:09:48.620 --> 00:09:49.420
+<v Max Stoiber>It didn't have any validation.
+
+131
+00:09:49.920 --> 00:09:52.180
+<v Max Stoiber>It was just not a great experience.
+
+132
+00:09:52.800 --> 00:09:55.720
+<v Max Stoiber>And so this problem after I worked at GitHub
+
+133
+00:09:55.720 --> 00:09:57.200
+<v Max Stoiber>and then I worked at Gatsby,
+
+134
+00:09:57.280 --> 00:10:01.220
+<v Max Stoiber>this problem kept being in the back of my head.
+
+135
+00:10:02.120 --> 00:10:05.440
+<v Max Stoiber>And then one day at the beginning of this year,
+
+136
+00:10:05.580 --> 00:10:08.380
+<v Max Stoiber>I get an email from a good friend of mine that says,
+
+137
+00:10:08.380 --> 00:10:14.980
+<v Max Stoiber>says, hey, Max, somebody has finally built a prototype of this GraphQL caching thing
+
+138
+00:10:14.980 --> 00:10:16.060
+<v Max Stoiber>that you kept talking about.
+
+139
+00:10:16.380 --> 00:10:19.780
+<v Max Stoiber>And I was like, no way, you've got to be kidding me.
+
+140
+00:10:19.800 --> 00:10:21.020
+<v Max Stoiber>Somebody's finally built this?
+
+141
+00:10:21.080 --> 00:10:21.680
+<v Max Stoiber>That's awesome.
+
+142
+00:10:22.280 --> 00:10:23.780
+<v Max Stoiber>And so I got introduced to Tim.
+
+143
+00:10:23.820 --> 00:10:26.060
+<v Max Stoiber>And Tim is my co-founder now of GraphCDN.
+
+144
+00:10:26.140 --> 00:10:30.960
+<v Max Stoiber>And Tim had built a very early first prototype of this GraphQL caching layer.
+
+145
+00:10:31.100 --> 00:10:32.980
+<v Max Stoiber>And he had essentially made it work.
+
+146
+00:10:33.200 --> 00:10:36.700
+<v Max Stoiber>He'd essentially proved that you could edge cache GraphQL APIs.
+
+147
+00:10:38.380 --> 00:10:41.040
+<v Max Stoiber>enamored and that's really where GraphCDN started.
+
+148
+00:10:43.260 --> 00:10:46.140
+<v Noah Labhart>So tell me about the MVP. Tell me about that first
+
+149
+00:10:46.140 --> 00:10:51.380
+<v Noah Labhart>product you built. What sort of tools you used and how long it took you to bring it to life?
+
+150
+00:10:53.400 --> 00:10:57.660
+<v Max Stoiber>At the time when I was introduced to Tim, Tim had built the first prototype that was
+
+151
+00:10:57.660 --> 00:11:04.080
+<v Max Stoiber>functional and he had spent, I remember he told me afterwards, he had spent three months of nights
+
+152
+00:11:04.080 --> 00:11:12.380
+<v Max Stoiber>and weekends next to his full-time job investigating how to make this work because all of the edge
+
+153
+00:11:12.380 --> 00:11:17.220
+<v Max Stoiber>providers, or a lot of them, are too slow for caching. They're not performance enough, and the
+
+154
+00:11:17.220 --> 00:11:23.420
+<v Max Stoiber>only one that's really super fast is Fastly. And specifically what I'm talking about there is the
+
+155
+00:11:23.420 --> 00:11:29.260
+<v Max Stoiber>invalidation. What's important when you're caching APIs is that a lot of these, this data is super
+
+156
+00:11:29.260 --> 00:11:34.500
+<v Max Stoiber>dynamic, right? A lot of the data that you'll send back from an API is very dynamic, even if it's
+
+157
+00:11:34.500 --> 00:11:40.960
+<v Max Stoiber>a news website. When an article is edited, you can't just have that stale old article sitting
+
+158
+00:11:40.960 --> 00:11:46.120
+<v Max Stoiber>in a cache for 10-15 minutes, right? Like editors expect that typo fix to be live immediately,
+
+159
+00:11:46.340 --> 00:11:51.600
+<v Max Stoiber>not 10 minutes after they fix it. That makes no sense to them. And so whenever data changes,
+
+160
+00:11:51.780 --> 00:11:55.440
+<v Max Stoiber>you need to be able to invalidate the cache really, really, really quickly, which gets even
+
+161
+00:11:55.440 --> 00:12:01.540
+<v Max Stoiber>even harder if you're doing edge caching, if you have worldwide locations where you
+
+162
+00:12:01.540 --> 00:12:03.780
+<v Max Stoiber>need to invalidate that data everywhere.
+
+163
+00:12:05.180 --> 00:12:09.080
+<v Max Stoiber>And so Tim had actually spent months investigating different providers and eventually landed
+
+164
+00:12:09.080 --> 00:12:11.300
+<v Max Stoiber>on Fastly, who have super fast invalidation.
+
+165
+00:12:11.500 --> 00:12:15.740
+<v Max Stoiber>And he had a first prototype running that could cache GraphQL APIs.
+
+166
+00:12:16.900 --> 00:12:21.600
+<v Max Stoiber>And I think at that point, he'd also built the first landing page to collect email addresses
+
+167
+00:12:21.600 --> 00:12:22.600
+<v Max Stoiber>of people that are interested.
+
+168
+00:12:22.600 --> 00:12:25.780
+<v Max Stoiber>I think that was the state of things when I met him and when I joined.
+
+169
+00:12:26.080 --> 00:12:34.520
+<v Max Stoiber>And from that point on, it took us about, I want to say a month to get to a private beta state.
+
+170
+00:12:34.680 --> 00:12:42.400
+<v Max Stoiber>So where we could onboard first real users having production use cases and have them use this in production.
+
+171
+00:12:42.580 --> 00:12:47.200
+<v Max Stoiber>And us not having to be scared that everything would crash and burn and that it wouldn't work well for them.
+
+172
+00:12:47.360 --> 00:12:50.820
+<v Max Stoiber>And so we went through that email list and found a few suitable prospects.
+
+173
+00:12:52.600 --> 00:12:56.880
+<v Max Stoiber>got them onboarded. And that gave us a bunch of really great feedback of stuff that we would need
+
+174
+00:12:56.880 --> 00:13:02.320
+<v Max Stoiber>to improve because it turns out a lot of people use GraphQL in very similar ways, which I think
+
+175
+00:13:02.320 --> 00:13:07.040
+<v Max Stoiber>is because of the strict schema that you have to follow. And so there's a lot of best practices
+
+176
+00:13:07.040 --> 00:13:12.480
+<v Max Stoiber>around that. And most GraphQL APIs look remarkably similar. And a lot of them have remarkably similar
+
+177
+00:13:13.100 --> 00:13:17.980
+<v Max Stoiber>use cases. And one of the first ones we ran into that we hadn't deeply considered before was
+
+178
+00:13:17.980 --> 00:13:19.100
+<v Max Stoiber>was authenticated caching.
+
+179
+00:13:19.420 --> 00:13:22.300
+<v Max Stoiber>If you have users, then,
+
+180
+00:13:22.420 --> 00:13:24.580
+<v Max Stoiber>or if you have like a SaaS product, right?
+
+181
+00:13:24.760 --> 00:13:28.800
+<v Max Stoiber>Then caching public data isn't super useful
+
+182
+00:13:28.800 --> 00:13:31.640
+<v Max Stoiber>because most of your data will be different per user
+
+183
+00:13:31.640 --> 00:13:33.860
+<v Max Stoiber>and will have authorization attached to it
+
+184
+00:13:33.860 --> 00:13:34.440
+<v Max Stoiber>and stuff like that.
+
+185
+00:13:34.820 --> 00:13:36.580
+<v Max Stoiber>And so that was one of the first things we had to add
+
+186
+00:13:37.200 --> 00:13:40.080
+<v Max Stoiber>after we got these first few use cases into production,
+
+187
+00:13:40.260 --> 00:13:41.300
+<v Max Stoiber>because we realized, hey,
+
+188
+00:13:41.360 --> 00:13:43.480
+<v Max Stoiber>a lot of them have authenticated user data
+
+189
+00:13:43.480 --> 00:13:45.020
+<v Max Stoiber>that they would really like to cache,
+
+190
+00:13:45.020 --> 00:13:47.380
+<v Max Stoiber>cash, but currently can't and we can enable them.
+
+191
+00:13:47.840 --> 00:13:49.040
+<v Max Stoiber>So that was sort of the state of things.
+
+192
+00:13:49.220 --> 00:13:52.700
+<v Max Stoiber>When I joined, like I said, it took us a month to get that first private beta out.
+
+193
+00:13:53.000 --> 00:14:00.160
+<v Max Stoiber>And then we launched officially with self-serve and publicly, I think two or three months
+
+194
+00:14:00.160 --> 00:14:00.960
+<v Max Stoiber>after that.
+
+195
+00:14:02.520 --> 00:14:06.720
+<v Noah Labhart>Well, as you're going through the MVP, you have to make certain decisions and trade-offs
+
+196
+00:14:06.720 --> 00:14:12.380
+<v Noah Labhart>in the short term, technical debt or technical decisions or feature cut.
+
+197
+00:14:12.380 --> 00:14:15.480
+<v Noah Labhart>and it sounds like you had to go through some of those.
+
+198
+00:14:15.540 --> 00:14:16.900
+<v Noah Labhart>Tell me about some of those decisions
+
+199
+00:14:16.900 --> 00:14:19.320
+<v Noah Labhart>and how you coped with them specifically.
+
+200
+00:14:21.160 --> 00:14:22.560
+<v Max Stoiber>We did a lot of iterations
+
+201
+00:14:24.200 --> 00:14:28.100
+<v Max Stoiber>on how people configure their cache
+
+202
+00:14:29.000 --> 00:14:30.820
+<v Max Stoiber>because we knew that,
+
+203
+00:14:31.460 --> 00:14:32.920
+<v Max Stoiber>or we very quickly realized
+
+204
+00:14:32.920 --> 00:14:34.580
+<v Max Stoiber>that people have use cases
+
+205
+00:14:34.580 --> 00:14:37.100
+<v Max Stoiber>where they want to cache certain parts of the GraphQL API
+
+206
+00:14:37.100 --> 00:14:38.700
+<v Max Stoiber>differently from others.
+
+207
+00:14:39.380 --> 00:14:41.480
+<v Max Stoiber>And initially we had the system
+
+208
+00:14:42.380 --> 00:14:48.000
+<v Max Stoiber>sort of write a big JSON blob, or I think it was YAML, and you could define, okay, you know,
+
+209
+00:14:48.920 --> 00:14:55.820
+<v Max Stoiber>give me the user type, and on the user type, attach some cache control information, like
+
+210
+00:14:55.820 --> 00:15:03.280
+<v Max Stoiber>a max age of 900 seconds, a stale-while-revalidate time of 900 seconds, and make it cache per user.
+
+211
+00:15:03.460 --> 00:15:09.120
+<v Max Stoiber>And we very quickly realized that that gets unwieldy incredibly quickly, because people have
+
+212
+00:15:09.120 --> 00:15:16.220
+<v Max Stoiber>huge GraphQL schemas. Like we've seen GraphQL schemas with tens of thousands of types and
+
+213
+00:15:16.220 --> 00:15:20.600
+<v Max Stoiber>fields, if not even hundreds of thousands of types and fields. For example, the GitHub GraphQL API is
+
+214
+00:15:20.600 --> 00:15:26.060
+<v Max Stoiber>one of the most prominent examples. Their GraphQL API is massive. They have a huge GraphQL API.
+
+215
+00:15:26.240 --> 00:15:31.440
+<v Max Stoiber>And if you were to try to configure it with that system, it would take you a year probably to get
+
+216
+00:15:31.440 --> 00:15:36.980
+<v Max Stoiber>all of those types written out. And so we spent probably a week or two re-architecting that to
+
+217
+00:15:36.980 --> 00:15:39.960
+<v Max Stoiber>to match what many other CDNs now have,
+
+218
+00:15:40.080 --> 00:15:41.860
+<v Max Stoiber>which is this rules system,
+
+219
+00:15:42.100 --> 00:15:43.840
+<v Max Stoiber>where you can configure cache rules.
+
+220
+00:15:44.160 --> 00:15:45.140
+<v Max Stoiber>And you can say, okay,
+
+221
+00:15:45.840 --> 00:15:48.920
+<v Max Stoiber>if a query contains X, Y, or Z type or field,
+
+222
+00:15:49.100 --> 00:15:50.600
+<v Max Stoiber>then cache it accordingly.
+
+223
+00:15:51.040 --> 00:15:52.500
+<v Max Stoiber>And with that rule system,
+
+224
+00:15:52.700 --> 00:15:56.320
+<v Max Stoiber>you could sort of reuse this cache control information
+
+225
+00:15:56.980 --> 00:15:59.220
+<v Max Stoiber>and group it by logical pieces
+
+226
+00:15:59.220 --> 00:16:02.380
+<v Max Stoiber>that make sense to your specific business use case.
+
+227
+00:16:02.520 --> 00:16:05.220
+<v Max Stoiber>So for example, many of our customers have a rule
+
+228
+00:16:06.980 --> 00:16:11.400
+<v Max Stoiber>And then they just put all the types in there that are authenticated, like user, direct message,
+
+229
+00:16:12.380 --> 00:16:16.620
+<v Max Stoiber>direct message connection, any type that's like different per user, they put in there.
+
+230
+00:16:16.620 --> 00:16:23.800
+<v Max Stoiber>And so immediately they have a logical grouping of why are these types cached the way they are.
+
+231
+00:16:23.800 --> 00:16:28.780
+<v Max Stoiber>And please cache all these the same, because for this specific purpose they are the same. Treat
+
+232
+00:16:28.780 --> 00:16:35.000
+<v Max Stoiber>them as the same, as the same sort of use case, it's the same constraint in, in this example. It
+
+233
+00:16:37.020 --> 00:16:40.900
+<v Max Stoiber>And so even very quickly after the private beta,
+
+234
+00:16:40.920 --> 00:16:42.920
+<v Max Stoiber>we realized, okay, our old configuration system
+
+235
+00:16:42.920 --> 00:16:44.160
+<v Max Stoiber>does not scale like that.
+
+236
+00:16:44.260 --> 00:16:45.880
+<v Max Stoiber>If you have a real production use case
+
+237
+00:16:45.880 --> 00:16:48.380
+<v Max Stoiber>with a really big GraphQL API, that does not work.
+
+238
+00:16:48.640 --> 00:16:50.780
+<v Max Stoiber>And so we switched to the rule system,
+
+239
+00:16:50.920 --> 00:16:52.500
+<v Max Stoiber>which took a week or two.
+
+240
+00:16:53.900 --> 00:16:56.380
+<v Max Stoiber>Now, to be a little bit more close to where we are now,
+
+241
+00:16:56.980 --> 00:17:01.120
+<v Max Stoiber>after we tried to get the product out of the gate
+
+242
+00:17:01.120 --> 00:17:03.540
+<v Max Stoiber>and get it publicly usable by everybody.
+
+243
+00:17:04.020 --> 00:17:05.280
+<v Max Stoiber>But of course, to do that,
+
+244
+00:17:06.980 --> 00:17:08.520
+<v Max Stoiber>in different areas of the code base.
+
+245
+00:17:08.700 --> 00:17:11.100
+<v Max Stoiber>And so a lot of what we've done since then
+
+246
+00:17:11.100 --> 00:17:13.020
+<v Max Stoiber>is stabilizing our systems
+
+247
+00:17:13.780 --> 00:17:17.060
+<v Max Stoiber>because we are critical infrastructure, right?
+
+248
+00:17:17.100 --> 00:17:18.020
+<v Max Stoiber>From a business perspective,
+
+249
+00:17:18.200 --> 00:17:20.980
+<v Max Stoiber>if we go down, our customers go down.
+
+250
+00:17:21.120 --> 00:17:24.320
+<v Max Stoiber>And so we have to have excellent engineering.
+
+251
+00:17:24.540 --> 00:17:26.200
+<v Max Stoiber>There's no way around that.
+
+252
+00:17:26.280 --> 00:17:27.140
+<v Max Stoiber>As an infrastructure provider,
+
+253
+00:17:27.460 --> 00:17:29.640
+<v Max Stoiber>we have to be extremely careful
+
+254
+00:17:29.640 --> 00:17:31.040
+<v Max Stoiber>with the code we write and ship.
+
+255
+00:17:31.240 --> 00:17:32.940
+<v Max Stoiber>And so we spent a lot of time
+
+256
+00:17:32.940 --> 00:17:34.320
+<v Max Stoiber>cleaning up our entire code base,
+
+257
+00:17:34.320 --> 00:17:40.480
+<v Max Stoiber>writing even more exhaustive test suites, doing really good hygiene basically to ensure that
+
+258
+00:17:40.480 --> 00:17:46.160
+<v Max Stoiber>our systems would scale and keep scaling and not break or we would ship something that's broken
+
+259
+00:17:48.620 --> 00:17:49.260
+<v Max Stoiber>so
+
+260
+00:17:49.260 --> 00:17:53.680
+<v Noah Labhart>from that point then how did you progress the product and mature it
+
+261
+00:17:53.680 --> 00:18:00.860
+<v Noah Labhart>and to kind of wrap the question in a box how did you build your roadmap and how did you decide okay
+
+262
+00:18:00.860 --> 00:18:02.980
+<v Noah Labhart>okay, this is the next most important thing
+
+263
+00:18:02.980 --> 00:18:06.220
+<v Noah Labhart>to address or to build in GraphCDN?
+
+264
+00:18:07.700 --> 00:18:09.420
+<v Max Stoiber>That is such a great question
+
+265
+00:18:09.420 --> 00:18:10.720
+<v Max Stoiber>because I think that's the thing
+
+266
+00:18:10.720 --> 00:18:12.560
+<v Max Stoiber>we struggle with the most.
+
+267
+00:18:12.800 --> 00:18:14.760
+<v Max Stoiber>And I don't think I have a good answer for this.
+
+268
+00:18:14.880 --> 00:18:16.500
+<v Max Stoiber>And the reason is that
+
+269
+00:18:17.540 --> 00:18:20.620
+<v Max Stoiber>nobody else is doing what we're doing.
+
+270
+00:18:20.720 --> 00:18:23.560
+<v Max Stoiber>Nobody else is building a GraphQL CDN or gateway.
+
+271
+00:18:23.760 --> 00:18:24.780
+<v Max Stoiber>That just doesn't exist.
+
+272
+00:18:25.540 --> 00:18:27.480
+<v Max Stoiber>But once you're in that position,
+
+273
+00:18:27.680 --> 00:18:29.260
+<v Max Stoiber>and I expect that to change, right?
+
+274
+00:18:29.320 --> 00:18:30.420
+<v Max Stoiber>Like that's not going to be the case
+
+275
+00:18:30.860 --> 00:18:35.600
+<v Max Stoiber>long, I hope. But right now, we're the only ones doing this. And the interesting thing is,
+
+276
+00:18:35.700 --> 00:18:42.680
+<v Max Stoiber>once you're in this unusual position of being the gateway for people's GraphQL APIs,
+
+277
+00:18:43.040 --> 00:18:48.140
+<v Max Stoiber>there's a lot of things we could be doing that could potentially provide value to our customers.
+
+278
+00:18:48.380 --> 00:18:53.020
+<v Max Stoiber>So it's almost like we have this huge list of ideas of things we could do, like, for example,
+
+279
+00:18:53.120 --> 00:18:59.000
+<v Max Stoiber>rate limiting based on the complexity or cost of an individual GraphQL query, because normal CDNs
+
+280
+00:19:00.940 --> 00:19:06.320
+<v Max Stoiber>APIs because a request to slash GraphQL can have many different performance implications
+
+281
+00:19:06.320 --> 00:19:10.860
+<v Max Stoiber>depending on how small or large the query is and which specific data it fetches.
+
+282
+00:19:11.060 --> 00:19:15.520
+<v Max Stoiber>And so you have to understand GraphQL in order to do good rate limiting for GraphQL APIs.
+
+283
+00:19:15.820 --> 00:19:18.020
+<v Max Stoiber>That's something we could provide for our customers, right?
+
+284
+00:19:18.100 --> 00:19:19.700
+<v Max Stoiber>Like we could provide rate limiting for them.
+
+285
+00:19:19.960 --> 00:19:24.100
+<v Max Stoiber>There's a bunch of these ideas where we're like, this would be insanely cool to do, right?
+
+286
+00:19:24.160 --> 00:19:26.420
+<v Max Stoiber>Like nobody else can do this except for us.
+
+287
+00:19:26.460 --> 00:19:28.600
+<v Max Stoiber>And it might actually provide value to our customers.
+
+288
+00:19:28.600 --> 00:19:31.020
+<v Max Stoiber>And so a lot of what I'm actually doing right now,
+
+289
+00:19:31.140 --> 00:19:34.000
+<v Max Stoiber>specifically, is doing customer research.
+
+290
+00:19:34.240 --> 00:19:37.020
+<v Max Stoiber>So speaking with both existing customers
+
+291
+00:19:37.020 --> 00:19:38.980
+<v Max Stoiber>about their problems that they run into
+
+292
+00:19:38.980 --> 00:19:39.700
+<v Max Stoiber>with the GraphQL API,
+
+293
+00:19:39.940 --> 00:19:41.840
+<v Max Stoiber>but also potential future customers
+
+294
+00:19:41.840 --> 00:19:43.080
+<v Max Stoiber>and other users of GraphQL,
+
+295
+00:19:43.220 --> 00:19:46.500
+<v Max Stoiber>with use cases that maybe they don't even
+
+296
+00:19:46.900 --> 00:19:47.900
+<v Max Stoiber>really want caching.
+
+297
+00:19:48.000 --> 00:19:49.800
+<v Max Stoiber>Maybe they have a use case where caching doesn't make sense,
+
+298
+00:19:49.940 --> 00:19:52.500
+<v Max Stoiber>but there's probably still something
+
+299
+00:19:52.960 --> 00:19:56.240
+<v Max Stoiber>where we can provide value to them as this GraphQL CDN.
+
+300
+00:19:56.380 --> 00:19:58.100
+<v Max Stoiber>And that's what we're really trying to figure out
+
+301
+00:19:59.080 --> 00:20:01.100
+<v Max Stoiber>is not really what do we do,
+
+302
+00:20:01.180 --> 00:20:02.580
+<v Max Stoiber>but what do we do next
+
+303
+00:20:02.580 --> 00:20:03.900
+<v Max Stoiber>and what provides the next,
+
+304
+00:20:04.040 --> 00:20:06.700
+<v Max Stoiber>the biggest value to the most people?
+
+305
+00:20:07.300 --> 00:20:09.040
+<v Max Stoiber>And that's really a big question
+
+306
+00:20:09.040 --> 00:20:09.540
+<v Max Stoiber>that honestly,
+
+307
+00:20:09.560 --> 00:20:11.220
+<v Max Stoiber>I don't think we have a good answer for right now, right?
+
+308
+00:20:11.700 --> 00:20:13.640
+<v Max Stoiber>We obviously have a short-term roadmap
+
+309
+00:20:13.640 --> 00:20:14.700
+<v Max Stoiber>over the next two months
+
+310
+00:20:14.700 --> 00:20:16.700
+<v Max Stoiber>where we're going to work on a lot of different things.
+
+311
+00:20:16.740 --> 00:20:17.660
+<v Max Stoiber>But beyond that, it's,
+
+312
+00:20:18.560 --> 00:20:20.000
+<v Max Stoiber>well, what's the next big topic?
+
+313
+00:20:20.440 --> 00:20:21.380
+<v Max Stoiber>I don't really know.
+
+314
+00:20:21.540 --> 00:20:23.440
+<v Max Stoiber>You know, we haven't really figured that out.
+
+315
+00:20:23.480 --> 00:20:24.640
+<v Max Stoiber>There's so many things we could do
+
+316
+00:20:24.640 --> 00:20:25.880
+<v Max Stoiber>that we just got to listen,
+
+317
+00:20:25.980 --> 00:20:26.940
+<v Max Stoiber>put our ears to the ground,
+
+318
+00:20:28.600 --> 00:20:30.640
+<v Max Stoiber>our customers the most and then ship that.
+
+319
+00:20:31.140 --> 00:20:32.120
+<v Noah Labhart>That makes sense.
+
+320
+00:20:32.160 --> 00:20:33.700
+<v Noah Labhart>That's always the most difficult thing.
+
+321
+00:20:33.740 --> 00:20:34.380
+<v Noah Labhart>What do we do next?
+
+322
+00:20:34.720 --> 00:20:39.560
+<v Noah Labhart>What is the most valuable thing for our customers, for our users?
+
+323
+00:20:40.540 --> 00:20:42.260
+<v Noah Labhart>And it's a dance.
+
+324
+00:20:43.620 --> 00:20:44.740
+<v Noah Labhart>It's definitely a dance.
+
+325
+00:20:46.060 --> 00:20:48.360
+<v Noah Labhart>How do you go about building your team?
+
+326
+00:20:48.740 --> 00:20:53.440
+<v Noah Labhart>And in doing that, what do you look for in those people to indicate that they're the
+
+327
+00:20:53.440 --> 00:20:54.660
+<v Noah Labhart>winning horses to join you?
+
+328
+00:20:56.440 --> 00:21:00.000
+<v Max Stoiber>We've gotten incredibly lucky with our team.
+
+329
+00:21:00.000 --> 00:21:02.060
+<v Noah Labhart>we
+
+330
+00:21:02.060 --> 00:21:05.040
+<v Max Stoiber>knew from the basically first day that we
+
+331
+00:21:05.040 --> 00:21:09.640
+<v Max Stoiber>co-founded GraphCDN that ultimately the team that we would build and the people
+
+332
+00:21:09.640 --> 00:21:18.280
+<v Max Stoiber>that we would hire would make or break our success no matter what else happens. If we have a
+
+333
+00:21:18.280 --> 00:21:26.300
+<v Max Stoiber>team of really great people will we have a much, much higher chance of success than any other way.
+
+334
+00:21:26.300 --> 00:21:34.520
+<v Max Stoiber>It's the main reason why companies succeed or not. And so from the get-go, we knew we wanted to invest
+
+335
+00:21:34.520 --> 00:21:42.500
+<v Max Stoiber>in building a really really good team and what that boils down to is one we've we're slightly
+
+336
+00:21:43.220 --> 00:21:46.820
+<v Max Stoiber>We're actually very fortunate in that in the engineering world,
+
+337
+00:21:47.040 --> 00:21:51.240
+<v Max Stoiber>both Tim and I are pretty well known for the open source work we've done.
+
+338
+00:21:51.520 --> 00:21:57.120
+<v Max Stoiber>And so we have a lot more access to really great engineering talent than other people.
+
+339
+00:21:57.280 --> 00:22:02.220
+<v Max Stoiber>And we've been able to hire a lot of really great engineers that we've just known for years.
+
+340
+00:22:02.320 --> 00:22:04.880
+<v Max Stoiber>We've worked with many of these people for years on our open source projects,
+
+341
+00:22:04.940 --> 00:22:08.380
+<v Max Stoiber>or they know us through our open source projects, or they've used our open source projects.
+
+342
+00:22:08.380 --> 00:22:11.640
+<v Max Stoiber>and so we have a way to get to them
+
+343
+00:22:11.640 --> 00:22:12.320
+<v Max Stoiber>and we have an intro
+
+344
+00:22:12.320 --> 00:22:13.440
+<v Max Stoiber>and we can talk to them
+
+345
+00:22:13.440 --> 00:22:15.160
+<v Max Stoiber>and talk to them about GraphQL, right?
+
+346
+00:22:15.620 --> 00:22:16.680
+<v Max Stoiber>And so a lot of the engineers
+
+347
+00:22:16.680 --> 00:22:17.700
+<v Max Stoiber>that are working for us right now
+
+348
+00:22:17.700 --> 00:22:18.280
+<v Max Stoiber>are, for example,
+
+349
+00:22:18.940 --> 00:22:20.980
+<v Max Stoiber>core contributors to GraphQL clients
+
+350
+00:22:20.980 --> 00:22:21.800
+<v Max Stoiber>or they've built,
+
+351
+00:22:21.860 --> 00:22:23.580
+<v Max Stoiber>they've worked on the GraphQL framework itself
+
+352
+00:22:23.580 --> 00:22:25.800
+<v Max Stoiber>or they've worked on the GraphQL playground
+
+353
+00:22:25.800 --> 00:22:26.660
+<v Max Stoiber>or they've worked on
+
+354
+00:22:26.660 --> 00:22:28.920
+<v Max Stoiber>many of these different GraphQL related
+
+355
+00:22:29.900 --> 00:22:31.360
+<v Max Stoiber>open source projects and products.
+
+356
+00:22:31.640 --> 00:22:32.540
+<v Max Stoiber>And so they have,
+
+357
+00:22:32.580 --> 00:22:34.180
+<v Max Stoiber>we have so deep GraphQL experience
+
+358
+00:22:34.180 --> 00:22:36.020
+<v Max Stoiber>that I feel like an absolute noob.
+
+359
+00:22:36.020 --> 00:22:37.140
+<v Max Stoiber>Like I've used GraphQL
+
+360
+00:22:38.380 --> 00:22:42.800
+<v Max Stoiber>four years now and I feel like I do not know anything compared to any of the engineers on
+
+361
+00:22:42.800 --> 00:22:48.220
+<v Max Stoiber>our team it is absolutely bonkers to me really fortunate of course great problem to have but I
+
+362
+00:22:48.220 --> 00:22:53.340
+<v Max Stoiber>feel like I'm the biggest idiot on the team right now which is very it's a great problem to have but
+
+363
+00:22:53.340 --> 00:22:58.940
+<v Max Stoiber>I gotta I gotta solve that problem the other thing I would say that we are doing slightly unusually
+
+364
+00:22:58.940 --> 00:23:04.460
+<v Max Stoiber>is that we invested in our people function immediately as soon as we knew that um
+
+365
+00:23:05.120 --> 00:23:10.680
+<v Max Stoiber>GraphCDN had some, whatever product market fit you could call that.
+
+366
+00:23:11.580 --> 00:23:14.300
+<v Max Stoiber>And we were going to build out a team to actually do this.
+
+367
+00:23:14.580 --> 00:23:19.380
+<v Max Stoiber>We knew we would need to hire somebody to manage that part of the company.
+
+368
+00:23:19.440 --> 00:23:22.740
+<v Max Stoiber>Because if we fucked that up, then if we hire the best people,
+
+369
+00:23:22.800 --> 00:23:25.440
+<v Max Stoiber>but then don't treat them well, they're just going to leave.
+
+370
+00:23:25.680 --> 00:23:27.860
+<v Max Stoiber>And it's not going to be the outcome that we want.
+
+371
+00:23:28.160 --> 00:23:32.740
+<v Max Stoiber>And so we got even more lucky because we were able to hire Sue Odeo,
+
+372
+00:23:34.460 --> 00:23:37.100
+<v Max Stoiber>previously scaled startups from zero to over 100 employees.
+
+373
+00:23:37.500 --> 00:23:40.260
+<v Max Stoiber>And I have people, the funny thing is,
+
+374
+00:23:40.300 --> 00:23:42.360
+<v Max Stoiber>when we announced that Sue was joining GraphCDN,
+
+375
+00:23:42.910 --> 00:23:45.360
+<v Max Stoiber>at least half a dozen other founders reached out to me
+
+376
+00:23:45.360 --> 00:23:47.720
+<v Max Stoiber>and were like, how the hell did you convince somebody
+
+377
+00:23:47.720 --> 00:23:51.020
+<v Max Stoiber>of Sue's experience to join your early stage startup?
+
+378
+00:23:51.300 --> 00:23:52.940
+<v Max Stoiber>And the honest to God answer is,
+
+379
+00:23:53.000 --> 00:23:55.000
+<v Max Stoiber>I have absolutely no idea.
+
+380
+00:23:55.140 --> 00:23:58.040
+<v Max Stoiber>I have no clue why out of all her options,
+
+381
+00:23:58.080 --> 00:23:59.440
+<v Max Stoiber>she decided to join GraphCDN,
+
+382
+00:23:59.540 --> 00:24:01.360
+<v Max Stoiber>but I'm extremely grateful that she did.
+
+383
+00:24:01.880 --> 00:24:04.240
+<v Max Stoiber>And she's really elevated the company
+
+384
+00:24:04.460 --> 00:24:07.200
+<v Max Stoiber>to a whole other level bringing in even just,
+
+385
+00:24:07.260 --> 00:24:10.080
+<v Max Stoiber>we had our first offsite last month with the entire team.
+
+386
+00:24:10.880 --> 00:24:13.840
+<v Max Stoiber>And I can tell you that offsite went extremely well,
+
+387
+00:24:13.960 --> 00:24:15.540
+<v Max Stoiber>but if Sue hadn't been here,
+
+388
+00:24:15.580 --> 00:24:17.400
+<v Max Stoiber>if Tim and I were the ones organizing that offsite,
+
+389
+00:24:17.520 --> 00:24:19.580
+<v Max Stoiber>it would have been a catastrophe, right?
+
+390
+00:24:19.740 --> 00:24:22.240
+<v Max Stoiber>Just in hindsight, I am so glad that we hired
+
+391
+00:24:22.240 --> 00:24:24.500
+<v Max Stoiber>for that position this early on.
+
+392
+00:24:24.640 --> 00:24:27.440
+<v Max Stoiber>And I'm super grateful that we got Sue on board specifically
+
+393
+00:24:27.440 --> 00:24:29.260
+<v Max Stoiber>who has that much experience and that much knowledge
+
+394
+00:24:29.260 --> 00:24:30.580
+<v Max Stoiber>to bring to the company.
+
+395
+00:24:30.800 --> 00:24:33.940
+<v Max Stoiber>But if there's other early stage founders listening,
+
+396
+00:24:34.460 --> 00:24:36.140
+<v Max Stoiber>Invest in your people function if you can.
+
+397
+00:24:36.220 --> 00:24:39.760
+<v Max Stoiber>If you have the money to hire somebody to help with that part of the business
+
+398
+00:24:39.760 --> 00:24:43.320
+<v Max Stoiber>because it is going to change your trajectory meaningfully.
+
+399
+00:24:46.800 --> 00:24:48.760
+<v Noah Labhart>Well, let's talk about scalability then.
+
+400
+00:24:48.900 --> 00:24:51.920
+<v Noah Labhart>So did you build this to scale efficiently from day one
+
+401
+00:24:51.920 --> 00:24:54.000
+<v Noah Labhart>or are you fighting this as you grow?
+
+402
+00:24:56.580 --> 00:25:01.580
+<v Max Stoiber>Thankfully, the way we've built this means we can scale very, very, very far.
+
+403
+00:25:01.720 --> 00:25:04.220
+<v Max Stoiber>We are based on Fastly's Compute@Edge product.
+
+404
+00:25:04.460 --> 00:25:08.340
+<v Max Stoiber>which means essentially we're relying on Fastly's infrastructure.
+
+405
+00:25:08.620 --> 00:25:09.860
+<v Max Stoiber>And that was a very conscious decision.
+
+406
+00:25:10.100 --> 00:25:13.140
+<v Max Stoiber>It has some limitations and constraints that we have to work around,
+
+407
+00:25:13.300 --> 00:25:16.600
+<v Max Stoiber>but Fastly handles so much traffic.
+
+408
+00:25:16.780 --> 00:25:18.420
+<v Max Stoiber>If you remember three months ago,
+
+409
+00:25:18.540 --> 00:25:19.660
+<v Max Stoiber>now this was slightly unfortunate,
+
+410
+00:25:19.920 --> 00:25:21.660
+<v Max Stoiber>but they went down for an hour.
+
+411
+00:25:21.820 --> 00:25:25.620
+<v Max Stoiber>And so many popular websites were dead during that time
+
+412
+00:25:25.620 --> 00:25:28.520
+<v Max Stoiber>because so many companies rely on Fastly.
+
+413
+00:25:29.000 --> 00:25:31.340
+<v Max Stoiber>So Fastly sees a level of traffic
+
+414
+00:25:31.340 --> 00:25:35.400
+<v Max Stoiber>where I know that no matter which customer happens to sign up and deploy
+
+415
+00:25:35.400 --> 00:25:40.000
+<v Max Stoiber>as a production today today we'll be fine we'll be able to handle it as long
+
+416
+00:25:40.000 --> 00:25:43.620
+<v Max Stoiber>as our code the code that we run on their infrastructure isn't completely
+
+417
+00:25:43.620 --> 00:25:48.580
+<v Max Stoiber>broken we're fine you know I mean like we can handle a very high level of
+
+418
+00:25:48.580 --> 00:25:51.640
+<v Max Stoiber>traffic that I don't think any single company on the planet even can reach
+
+419
+00:25:52.740 --> 00:25:57.920
+<v Max Stoiber>which thankfully is a very very very good benefit of using fastly which was
+
+420
+00:25:57.920 --> 00:26:01.420
+<v Max Stoiber>We chose Fastly, or I should say Tim actually did a lot of this research.
+
+421
+00:26:02.060 --> 00:26:06.500
+<v Max Stoiber>Fastly has one of the, currently, like 2021, end of 2021,
+
+422
+00:26:06.980 --> 00:26:10.400
+<v Max Stoiber>one of the worst developer experiences you can imagine.
+
+423
+00:26:10.700 --> 00:26:12.260
+<v Max Stoiber>Their platform is very early.
+
+424
+00:26:12.620 --> 00:26:16.140
+<v Max Stoiber>There is so much, there's so many rough edges that you have to work around,
+
+425
+00:26:16.240 --> 00:26:19.420
+<v Max Stoiber>that you have to circumvent, where you have to hack around their systems.
+
+426
+00:26:20.400 --> 00:26:25.320
+<v Max Stoiber>But it is by far the fastest edge provider there is.
+
+427
+00:26:25.360 --> 00:26:26.620
+<v Max Stoiber>We've tested every single other one.
+
+428
+00:26:27.920 --> 00:26:32.880
+<v Max Stoiber>in a class of its own. It is so fast that we're happy to incur that developer experience hit
+
+429
+00:26:32.880 --> 00:26:36.380
+<v Max Stoiber>in return for our customers having a much, much, much faster experience.
+
+430
+00:26:37.340 --> 00:26:43.520
+<v Max Stoiber>Because ultimately, to a lot of our customers, performance is money, right? Particularly if you
+
+431
+00:26:43.520 --> 00:26:47.840
+<v Max Stoiber>think about e-commerce use cases, right? Like every millisecond that you can reduce the latency
+
+432
+00:26:48.400 --> 00:26:57.460
+<v Max Stoiber>is critical to their income, essentially. And so we knew we had to focus on that,
+
+433
+00:26:57.920 --> 00:26:59.660
+<v Max Stoiber>part of the reason why we use Fastly.
+
+434
+00:27:01.620 --> 00:27:05.300
+<v Noah Labhart>Well, as you step out on the balcony and you look across
+
+435
+00:27:05.300 --> 00:27:08.300
+<v Noah Labhart>what you've built with GraphCDN, what are you most proud of?
+
+436
+00:27:08.900 --> 00:27:11.480
+<v Max Stoiber>I think for the most part, it's
+
+437
+00:27:11.480 --> 00:27:19.660
+<v Max Stoiber>the combination of helping our customers and the team we've built. We really help our customers,
+
+438
+00:27:19.840 --> 00:27:26.320
+<v Max Stoiber>which feels fantastic. We have customers that were getting traffic spikes repeatedly every
+
+439
+00:27:27.920 --> 00:27:33.120
+<v Max Stoiber>potential customer recently, and I was telling them a story about, you know, traffic spikes and downtime,
+
+440
+00:27:33.620 --> 00:27:40.340
+<v Max Stoiber>and their team looked at each other and they went, yeah, that's Tuesdays. And for some reason that
+
+441
+00:27:40.340 --> 00:27:45.220
+<v Max Stoiber>specific customer just always has a huge traffic spike on Tuesdays. They don't even know why, but for
+
+442
+00:27:45.220 --> 00:27:50.460
+<v Max Stoiber>some reason people use their thing on Tuesdays, and they always have a huge traffic spike, and they
+
+443
+00:27:50.460 --> 00:27:55.860
+<v Max Stoiber>always, always, always have scalability problems. And with our product, we can essentially alleviate
+
+444
+00:27:55.860 --> 00:27:57.460
+<v Max Stoiber>alleviate those concerns entirely.
+
+445
+00:27:57.680 --> 00:28:02.460
+<v Max Stoiber>And we've had teams that were previously super stressed out and couldn't sleep well, because
+
+446
+00:28:02.460 --> 00:28:06.400
+<v Max Stoiber>similar to my story with Spectrum, they just had to be there and had to be on call and
+
+447
+00:28:06.400 --> 00:28:08.420
+<v Max Stoiber>they got paged and woken up frequently.
+
+448
+00:28:09.020 --> 00:28:14.140
+<v Max Stoiber>And we've been able to reduce that for them basically entirely and to take been able to
+
+449
+00:28:14.140 --> 00:28:19.160
+<v Max Stoiber>take so much traffic and load off of their plate that they can essentially sleep at night.
+
+450
+00:28:19.160 --> 00:28:27.020
+<v Max Stoiber>Right? And that to me is so incredibly powerful and so incredibly gratifying to
+
+451
+00:28:27.020 --> 00:28:32.400
+<v Max Stoiber>be able to have that impact on somebody else's day, or in this case night. But
+
+452
+00:28:32.840 --> 00:28:36.060
+<v Max Stoiber>that, that definitely always makes my day when customers tell me story like that,
+
+453
+00:28:36.060 --> 00:28:39.000
+<v Max Stoiber>stories like that. The other thing is the team we've built, the people we've been
+
+454
+00:28:39.000 --> 00:28:42.600
+<v Max Stoiber>able to hire, like I said, incredible, incredible people, and I'm so, so glad
+
+455
+00:28:42.600 --> 00:28:45.860
+<v Max Stoiber>that we've been able to assemble the team that we have that we have the
+
+456
+00:28:45.860 --> 00:28:50.100
+<v Max Stoiber>the expertise in the team that we have, because literally everybody is better at what they do
+
+457
+00:28:50.100 --> 00:28:56.140
+<v Max Stoiber>than I am. And that's incredibly scary because it always feels like I'm the bottleneck for the
+
+458
+00:28:56.140 --> 00:29:00.240
+<v Max Stoiber>entire company, right? Like I'm the person that's the worst at everything they do compared to
+
+459
+00:29:00.240 --> 00:29:04.360
+<v Max Stoiber>everybody else. But that's kind of also my job, right? Like I got to find the people together
+
+460
+00:29:04.360 --> 00:29:08.300
+<v Max Stoiber>with Tim that are better at what they do than we are. And we've been able to do that so far. And
+
+461
+00:29:08.300 --> 00:29:14.260
+<v Max Stoiber>that feels incredible. And every single day I get to spend with that team is a joy. Honestly,
+
+462
+00:29:15.860 --> 00:29:20.220
+<v Max Stoiber>smart people that are so invested and interested in what we're working on is mind-blowing.
+
+463
+00:29:22.400 --> 00:29:25.820
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made
+
+464
+00:29:25.820 --> 00:29:28.380
+<v Noah Labhart>and how you and your team responded to it.
+
+465
+00:29:30.520 --> 00:29:36.060
+<v Max Stoiber>The reason this question is a little bit difficult for me to answer is because we don't,
+
+466
+00:29:37.180 --> 00:29:44.200
+<v Max Stoiber>at GraphCDN culturally, we don't really care about mistakes as much. What we care about is that we
+
+467
+00:29:45.860 --> 00:29:50.660
+<v Max Stoiber>we do is, always, we look at it through the lens of, okay, what have we learned, right? We certainly
+
+468
+00:29:50.660 --> 00:29:53.960
+<v Max Stoiber>made mistakes. We've shipped things that we shouldn't have shipped, that weren't ironed out,
+
+469
+00:29:53.960 --> 00:29:59.740
+<v Max Stoiber>where our customers were frustrated. We've messed up sales conversations. We've sent proposals that
+
+470
+00:29:59.740 --> 00:30:06.660
+<v Max Stoiber>were way out of, way out of bounds. We've, we've, I've learned so much over the past months, but
+
+471
+00:30:06.660 --> 00:30:11.360
+<v Max Stoiber>none of it really is like, oh, I made a mistake, you know what I mean? It's, it's always, I learned
+
+472
+00:30:11.360 --> 00:30:18.000
+<v Max Stoiber>something new and I've gotten better because I did this thing which I think
+
+473
+00:30:18.000 --> 00:30:22.360
+<v Max Stoiber>is similar to one of the one of these anecdotes that gets passed around I feel
+
+474
+00:30:22.360 --> 00:30:25.200
+<v Max Stoiber>like in the engineering community of a junior developer that drops the
+
+475
+00:30:25.200 --> 00:30:29.240
+<v Max Stoiber>production database and it takes them hours to restore it and it costs the
+
+476
+00:30:29.240 --> 00:30:34.200
+<v Max Stoiber>company's the company millions of dollars and the CEO wants to fire the
+
+477
+00:30:34.200 --> 00:30:38.660
+<v Max Stoiber>junior developer and the CTO says no you you can't fire the junior developer we
+
+478
+00:30:38.660 --> 00:30:43.740
+<v Max Stoiber>We just paid millions of dollars for them to learn the lesson that they're never going to do that again.
+
+479
+00:30:44.420 --> 00:30:45.760
+<v Max Stoiber>Why would we fire them?
+
+480
+00:30:46.400 --> 00:30:48.880
+<v Max Stoiber>They've just learned something and they're never going to do that again.
+
+481
+00:30:49.240 --> 00:30:51.460
+<v Max Stoiber>Of course, if it happens again, then you do have to fire them.
+
+482
+00:30:51.460 --> 00:30:53.080
+<v Max Stoiber>If people don't learn, that's bad.
+
+483
+00:30:53.300 --> 00:30:58.160
+<v Max Stoiber>But as long as you're learning, I feel like there isn't really that many bad mistakes you can make.
+
+484
+00:31:00.820 --> 00:31:05.040
+<v Noah Labhart>What does the future look like for GraphCDN and the product and for your team?
+
+485
+00:31:07.800 --> 00:31:15.440
+<v Max Stoiber>For us, product-wise, like I said, a lot of it is about figuring out what do we do next out of all
+
+486
+00:31:15.440 --> 00:31:19.480
+<v Max Stoiber>these great ideas that we have. What is the most important thing for us to tackle next? Where do
+
+487
+00:31:19.480 --> 00:31:25.220
+<v Max Stoiber>our customers and potential customers have problems that we can help them with, where they're, that are
+
+488
+00:31:25.220 --> 00:31:29.560
+<v Max Stoiber>really painful. And it's a lot of what we got to figure out. On the other side, we got to figure out
+
+489
+00:31:29.560 --> 00:31:32.880
+<v Max Stoiber>how do we build a larger organization, right?
+
+490
+00:31:32.940 --> 00:31:34.280
+<v Max Stoiber>Like how do we scale up this team
+
+491
+00:31:35.740 --> 00:31:38.040
+<v Max Stoiber>without breaking the processes?
+
+492
+00:31:38.160 --> 00:31:39.480
+<v Max Stoiber>How do we put the processes in place
+
+493
+00:31:39.480 --> 00:31:41.440
+<v Max Stoiber>to be able to scale to a large organization?
+
+494
+00:31:41.740 --> 00:31:45.820
+<v Max Stoiber>How do we match our team growth to our customer growth
+
+495
+00:31:45.820 --> 00:31:47.960
+<v Max Stoiber>so we can support them, so we can sell them,
+
+496
+00:31:48.000 --> 00:31:50.660
+<v Max Stoiber>so we can ship features for them that they want?
+
+497
+00:31:51.420 --> 00:31:53.900
+<v Max Stoiber>And a lot of that is what we're trying to figure out right now,
+
+498
+00:31:53.980 --> 00:31:55.280
+<v Max Stoiber>putting these processes in place,
+
+499
+00:31:55.940 --> 00:31:59.100
+<v Max Stoiber>figuring out things like SOC 2 compliance, right?
+
+500
+00:31:59.560 --> 00:32:04.480
+<v Max Stoiber>Big companies are asking for SOC 2 compliance. We kind of got to get it, but it's, it's a really
+
+501
+00:32:04.480 --> 00:32:10.300
+<v Max Stoiber>intense process. Ultimately it'll make us better as an organization, and it'll put processes in
+
+502
+00:32:10.300 --> 00:32:16.740
+<v Max Stoiber>place that are good for both us and our customers, but you just gotta do those things, right? And it's
+
+503
+00:32:16.740 --> 00:32:23.300
+<v Max Stoiber>a little bit, again, almost hygiene, right? It's like, we ship the thing and people like it. Now
+
+504
+00:32:23.860 --> 00:32:27.740
+<v Max Stoiber>let's make it into a company and a business that can scale up to a very big size
+
+505
+00:32:30.880 --> 00:32:36.220
+<v Noah Labhart>Let's switch to you, Max. Who influences the way that you work? You name a CEO, a CTO,
+
+506
+00:32:36.460 --> 00:32:39.640
+<v Noah Labhart>an architect, really any person that you look up to and why?
+
+507
+00:32:41.580 --> 00:32:44.340
+<v Max Stoiber>So many names come to mind. I have to figure out which one I'm going to say.
+
+508
+00:32:45.020 --> 00:32:46.140
+<v Noah Labhart>That's a good problem to have.
+
+509
+00:32:48.020 --> 00:32:54.740
+<v Max Stoiber>I would say one of the people that has influenced my career the most is Nick Graf, who is an
+
+510
+00:32:54.740 --> 00:32:58.360
+<v Max Stoiber>an engineer also from Vienna who runs the React Vienna meeting.
+
+511
+00:32:58.680 --> 00:33:05.120
+<v Max Stoiber>And I had the pleasure of meeting him and becoming friends with him five, six years ago.
+
+512
+00:33:05.340 --> 00:33:13.160
+<v Max Stoiber>And he's always thought so much bigger than I was thinking at the time.
+
+513
+00:33:13.240 --> 00:33:18.540
+<v Max Stoiber>And he's always pushed me to go a step beyond what I was planning on achieving.
+
+514
+00:33:18.740 --> 00:33:24.320
+<v Max Stoiber>And I think without Nick Graf's influence and his mentorship and him pushing me to say,
+
+515
+00:33:24.740 --> 00:33:26.400
+<v Max Stoiber>look, you can do more than this.
+
+516
+00:33:26.460 --> 00:33:28.320
+<v Max Stoiber>You don't have to be satisfied with this level.
+
+517
+00:33:28.380 --> 00:33:29.520
+<v Max Stoiber>You can do more.
+
+518
+00:33:29.580 --> 00:33:30.920
+<v Max Stoiber>You can achieve bigger things.
+
+519
+00:33:31.400 --> 00:33:34.160
+<v Max Stoiber>And pushing me there and really showing me it's possible,
+
+520
+00:33:34.280 --> 00:33:37.360
+<v Max Stoiber>you can do it, that's definitely influenced me the most.
+
+521
+00:33:37.440 --> 00:33:41.560
+<v Max Stoiber>And I would not be where I am today without Nick on my side,
+
+522
+00:33:43.580 --> 00:33:48.120
+<v Max Stoiber>which makes me very grateful to have found such a great friend and mentor.
+
+523
+00:33:48.400 --> 00:33:50.600
+<v Max Stoiber>Although I'm not sure if he would agree with the word mentor.
+
+524
+00:33:50.720 --> 00:33:51.980
+<v Max Stoiber>I think to him, I'm just a friend.
+
+525
+00:33:51.980 --> 00:33:55.240
+<v Max Stoiber>But he's definitely what I would categorize as a mentor.
+
+526
+00:33:55.360 --> 00:34:00.700
+<v Max Stoiber>He's influenced my career in ways that pretty much nobody else has.
+
+527
+00:34:03.700 --> 00:34:07.200
+<v Noah Labhart>Well, we talked about mistakes, right?
+
+528
+00:34:07.280 --> 00:34:10.380
+<v Noah Labhart>And I get where you're coming from on your answer.
+
+529
+00:34:10.560 --> 00:34:14.800
+<v Noah Labhart>I'm going to ask it in a little bit different way and with a little bit different spin.
+
+530
+00:34:14.980 --> 00:34:17.820
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+531
+00:34:17.880 --> 00:34:20.560
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+532
+00:34:23.580 --> 00:34:30.820
+<v Max Stoiber>I think one of the things that I've only recently realized is how much of a game
+
+533
+00:34:30.820 --> 00:34:38.040
+<v Max Stoiber>changer working with great people is, and if I were to do it again, I think I
+
+534
+00:34:38.040 --> 00:34:43.240
+<v Max Stoiber>would start hiring a lot earlier because the people we've been able to bring on
+
+535
+00:34:43.240 --> 00:34:48.140
+<v Max Stoiber>board have meaningfully seriously changed the trajectory of our company
+
+536
+00:34:48.140 --> 00:34:56.580
+<v Max Stoiber>And if honestly we waited too long to hire people like that was, I think one of the biggest things I would change nowadays.
+
+537
+00:34:56.700 --> 00:35:02.280
+<v Max Stoiber>I've learned that people matter, but they matter even more than I already thought they did.
+
+538
+00:35:02.700 --> 00:35:08.180
+<v Max Stoiber>And the earlier you can bring them on board, the more time they have to impact the trajectory of a company.
+
+539
+00:35:08.460 --> 00:35:13.000
+<v Max Stoiber>And the earlier the companies, the bigger, the more influence that change in trajectory has.
+
+540
+00:35:13.180 --> 00:35:18.120
+<v Max Stoiber>If you're already huge, changing the trajectory a little bit makes a difference, but not as much as for us.
+
+541
+00:35:18.140 --> 00:35:24.600
+<v Max Stoiber>Right? A one percentage change now is going to be, I don't know, how many thousands or tens of
+
+542
+00:35:24.600 --> 00:35:29.000
+<v Max Stoiber>thousands or millions of percent in a year or two, right? Like every single slight adjusting
+
+543
+00:35:29.000 --> 00:35:35.280
+<v Max Stoiber>adjustment of our trajectory makes a huge impact over time. And, and I, if I were to do it again,
+
+544
+00:35:35.280 --> 00:35:37.980
+<v Max Stoiber>I would hire great people earlier if I could.
+
+545
+00:35:40.200 --> 00:35:44.880
+<v Noah Labhart>well last question max so you're getting on a plane and you're sitting next to a young
+
+546
+00:35:44.880 --> 00:35:49.320
+<v Noah Labhart>entrepreneur builder who's built the next big thing they're jazzed about it
+
+547
+00:35:49.320 --> 00:35:52.000
+<v Noah Labhart>they can't wait to show it off to the world can't wait to show it off to you
+
+548
+00:35:52.000 --> 00:35:56.140
+<v Noah Labhart>right there on the plane what advice to give that person having gone down this
+
+549
+00:35:56.140 --> 00:35:56.640
+<v Noah Labhart>road a bit
+
+550
+00:35:56.580 --> 00:36:04.780
+<v Max Stoiber>I'm gonna give a very specific recommendation which is read a
+
+551
+00:36:04.780 --> 00:36:10.540
+<v Max Stoiber>book called The Mom Test. Just, honestly, I think it's a terrible name, but the
+
+552
+00:36:10.540 --> 00:36:14.820
+<v Max Stoiber>the contents of the book changed my life for sure,
+
+553
+00:36:14.900 --> 00:36:16.740
+<v Max Stoiber>particularly my entrepreneurial journey.
+
+554
+00:36:17.020 --> 00:36:18.840
+<v Max Stoiber>And what that book is about is
+
+555
+00:36:18.840 --> 00:36:21.940
+<v Max Stoiber>how do you build something people want?
+
+556
+00:36:22.060 --> 00:36:23.580
+<v Max Stoiber>How do you figure out what people want?
+
+557
+00:36:23.700 --> 00:36:26.120
+<v Max Stoiber>Because what I often see young founders do particularly
+
+558
+00:36:26.120 --> 00:36:30.920
+<v Max Stoiber>is they go to people that either are friends
+
+559
+00:36:30.920 --> 00:36:33.000
+<v Max Stoiber>or are acquaintances or random people they meet
+
+560
+00:36:33.000 --> 00:36:36.240
+<v Max Stoiber>that might not even match the audience
+
+561
+00:36:36.240 --> 00:36:37.580
+<v Max Stoiber>of the thing they're building.
+
+562
+00:36:37.700 --> 00:36:39.480
+<v Max Stoiber>And then they go there and they say,
+
+563
+00:36:40.540 --> 00:36:46.620
+<v Max Stoiber>look at what I've built, isn't it awesome? And of course nobody goes, no, that isn't awesome, right?
+
+564
+00:36:46.620 --> 00:36:51.380
+<v Max Stoiber>Like, that just does not happen. Nobody goes, hey, I don't think this is great. People will go, yeah, this
+
+565
+00:36:51.380 --> 00:36:55.900
+<v Max Stoiber>is great, what if you also did this, right? Um, and they'll add suggestions that don't really add any
+
+566
+00:36:55.900 --> 00:37:01.760
+<v Max Stoiber>value. And what that book essentially taught me is how do you talk with potential customers? And the
+
+567
+00:37:02.260 --> 00:37:06.060
+<v Max Stoiber>the, the answer is you don't talk about your solution, you talk about their problems, right?
+
+568
+00:37:06.060 --> 00:37:10.360
+<v Max Stoiber>I think that's what it mainly boils down to. You ask them, hey, what problems do you have? And if the
+
+569
+00:37:10.540 --> 00:37:14.820
+<v Max Stoiber>you're solving comes up in the problems that they think about, that's a great sign that you're
+
+570
+00:37:14.820 --> 00:37:19.420
+<v Max Stoiber>building something people want. If it does not come up, then maybe think about solving one of
+
+571
+00:37:19.420 --> 00:37:23.060
+<v Max Stoiber>their actual problems, because you're obviously not providing any value to them. And ultimately,
+
+572
+00:37:23.060 --> 00:37:27.940
+<v Max Stoiber>if you don't solve somebody's problem, they're not gonna use your thing, never mind pay for it.
+
+573
+00:37:27.940 --> 00:37:32.880
+<v Max Stoiber>You have to solve a problem for a person, and I think that's one of the biggest lessons that I
+
+574
+00:37:32.880 --> 00:37:37.280
+<v Max Stoiber>learned, and I would highly recommend any, any young entrepreneur to read The Mom Test. It really
+
+575
+00:37:37.280 --> 00:37:40.980
+<v Max Stoiber>really changed the way I communicate and the way I build products.
+
+576
+00:37:42.700 --> 00:37:47.140
+<v Noah Labhart>Fantastic. That's great advice. Well, Max, thank you for being on the show today. Thank you for
+
+577
+00:37:47.140 --> 00:37:49.620
+<v Noah Labhart>telling the creation story of GraphCDN.
+
+578
+00:37:49.820 --> 00:37:51.760
+<v Max Stoiber>Thank you for having me. It was great to be here.
+
+579
+00:37:54.000 --> 00:37:56.860
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+580
+00:38:00.200 --> 00:38:05.580
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+581
+00:38:07.280 --> 00:38:13.200
+<v Noah Labhart>your choice. Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+582
+00:38:13.580 --> 00:38:17.980
+<v Noah Labhart>And when you get a chance, leave us a review. Both things help us out tremendously.
+
+583
+00:38:20.400 --> 00:38:21.900
+<v Noah Labhart>And thanks again for listening.

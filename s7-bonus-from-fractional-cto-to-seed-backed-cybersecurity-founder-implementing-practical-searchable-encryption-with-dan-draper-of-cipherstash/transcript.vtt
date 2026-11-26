@@ -1,0 +1,1263 @@
+WEBVTT
+
+NOTE S7 Bonus: From Fractional CTO to Seed-Backed Cybersecurity Founder: Implementing Practical Searchable Encryption with Dan Draper of CipherStash
+
+1
+00:00:01.900 --> 00:00:02.400
+<v Clip>Dan Draper, CipherStash Founder, CipherStash.com
+
+2
+00:00:02.380 --> 00:00:05.860
+<v Dan Draper>The first product took many goes to get right.
+
+3
+00:00:06.040 --> 00:00:09.960
+<v Dan Draper>I think I had four or five attempts at it before I got it working.
+
+4
+00:00:10.920 --> 00:00:15.460
+<v Dan Draper>It was in part me understanding kind of the sharp edges of the problem,
+
+5
+00:00:15.580 --> 00:00:19.020
+<v Dan Draper>but also just trying to find technologies that were going to help me solve it.
+
+6
+00:00:19.400 --> 00:00:23.720
+<v Dan Draper>There are probably three main dimensions that we still think about today,
+
+7
+00:00:23.820 --> 00:00:25.520
+<v Dan Draper>and I certainly thought about in the early stages.
+
+8
+00:00:26.240 --> 00:00:28.780
+<v Dan Draper>Security being the obvious one, performance,
+
+9
+00:00:30.000 --> 00:00:35.880
+<v Dan Draper>And the final trade-off is what kinds of search capabilities can you make?
+
+10
+00:00:37.180 --> 00:00:38.660
+<v Dan Draper>My name is Dan Draper.
+
+11
+00:00:38.760 --> 00:00:41.360
+<v Dan Draper>I'm the CEO and co-founder at CipherStash.
+
+12
+00:00:47.460 --> 00:00:49.300
+<v Noah Labhart>This is Code Story,
+
+13
+00:00:49.540 --> 00:00:52.880
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+14
+00:00:52.880 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+15
+00:00:57.120 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+16
+00:01:02.220 --> 00:01:03.840
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+17
+00:01:04.000 --> 00:01:08.720
+<v Noah Labhart>and today how Dan Draper created a way for you to encrypt your data
+
+18
+00:01:08.720 --> 00:01:11.600
+<v Noah Labhart>and enable blazing fast search.
+
+19
+00:01:13.340 --> 00:01:15.820
+<v Noah Labhart>All this and more on Code Story.
+
+20
+00:01:20.340 --> 00:01:23.980
+<v Noah Labhart>Dan Draper is from South Australia, specifically Adelaide,
+
+21
+00:01:24.040 --> 00:01:25.660
+<v Noah Labhart>but his family now lives in Sydney.
+
+22
+00:01:27.120 --> 00:01:31.900
+<v Noah Labhart>He does not drink Foster's beer, which is not surprising, and doesn't know what a Bloomin' Onion is.
+
+23
+00:01:32.720 --> 00:01:35.980
+<v Noah Labhart>Outside of tech, he's been a lifelong martial artist.
+
+24
+00:01:36.260 --> 00:01:45.180
+<v Noah Labhart>He finds that there's an overlap between coding and martial arts, as they are very technical, require a lot of solo focus, and, jokingly, you have to be ready to take a beating.
+
+25
+00:01:45.640 --> 00:01:50.680
+<v Noah Labhart>Five years ago, Dan got the idea of his current venture while he was a CTO at Expert360.
+
+26
+00:01:51.180 --> 00:01:56.620
+<v Noah Labhart>He was approached by his clients as they demanded proof of how his organization was protecting their data.
+
+27
+00:01:57.120 --> 00:02:00.300
+<v Noah Labhart>He was never fully satisfied with the answers they gave those clients.
+
+28
+00:02:00.660 --> 00:02:05.640
+<v Noah Labhart>He desired to bridge the worlds between encrypted data and queryable information.
+
+29
+00:02:07.140 --> 00:02:10.180
+<v Noah Labhart>This is the creation story of CipherStash.
+
+30
+00:02:12.420 --> 00:02:21.720
+<v Dan Draper>CipherStash, we think of it as the solution to the final reason why a developer wouldn't use encryption in their application.
+
+31
+00:02:22.080 --> 00:02:23.320
+<v Dan Draper>So let's unpack that.
+
+32
+00:02:23.320 --> 00:02:29.780
+<v Dan Draper>application level encryption or field level encryption as we call it is one of the best
+
+33
+00:02:29.780 --> 00:02:34.420
+<v Dan Draper>ways to protect data in an application not talking about you know encryption at rest
+
+34
+00:02:34.420 --> 00:02:40.280
+<v Dan Draper>encrypting the file system i'm talking about encrypting records in a database column with
+
+35
+00:02:40.280 --> 00:02:44.780
+<v Dan Draper>keys that only your application knows now that's a great piece of technology there's plenty of
+
+36
+00:02:44.780 --> 00:02:50.440
+<v Dan Draper>open source libraries that do that the challenge of course is when you implement field level
+
+37
+00:02:50.440 --> 00:02:57.500
+<v Dan Draper>encryption, you lose a whole swag of capabilities. So for example, Ruby on Rails in version 7
+
+38
+00:02:57.500 --> 00:03:03.480
+<v Dan Draper>introduced this idea of active record encryption, which does that for active record models. If I
+
+39
+00:03:03.480 --> 00:03:09.460
+<v Dan Draper>was to use that technology to encrypt, say, an email address or somebody's name or date of birth,
+
+40
+00:03:09.680 --> 00:03:14.940
+<v Dan Draper>I can no longer do queries on those fields. So if I wanted to look up somebody by their
+
+41
+00:03:14.940 --> 00:03:20.000
+<v Dan Draper>email address or part of their email address, like a partial text match search,
+
+42
+00:03:20.440 --> 00:03:25.140
+<v Dan Draper>or I wanted to order people by their first name on a dashboard or something like that.
+
+43
+00:03:25.180 --> 00:03:26.820
+<v Dan Draper>None of those queries are possible anymore.
+
+44
+00:03:27.960 --> 00:03:30.440
+<v Dan Draper>And so CipherStash is the solution to that.
+
+45
+00:03:30.600 --> 00:03:33.600
+<v Dan Draper>CipherStash is what we call a searchable encrypted index
+
+46
+00:03:33.600 --> 00:03:37.260
+<v Dan Draper>that sits on top of your existing application and database
+
+47
+00:03:37.260 --> 00:03:42.940
+<v Dan Draper>and provides a way for you to index your encrypted data using an encrypted index
+
+48
+00:03:42.940 --> 00:03:46.100
+<v Dan Draper>so that you can perform encrypted searches of your data.
+
+49
+00:03:46.720 --> 00:03:49.960
+<v Dan Draper>It's very fast. It's very easy to add to your application.
+
+50
+00:03:50.440 --> 00:03:56.680
+<v Dan Draper>And we find it is really that removes the final blocker for developers using encryption in their applications.
+
+51
+00:03:58.240 --> 00:04:02.600
+<v Dan Draper>CipherStash, or the idea for CipherStash, was born a few years ago.
+
+52
+00:04:02.640 --> 00:04:04.680
+<v Dan Draper>I've been working on this problem for about five years now.
+
+53
+00:04:05.100 --> 00:04:09.000
+<v Dan Draper>When I was the CTO for an organization here in Australia called Expert360,
+
+54
+00:04:09.460 --> 00:04:13.400
+<v Dan Draper>we were selling to large corporates, some of the biggest companies in Australia.
+
+55
+00:04:13.900 --> 00:04:18.080
+<v Dan Draper>They were asking us to prove to them how we were protecting their data.
+
+56
+00:04:18.080 --> 00:04:22.960
+<v Dan Draper>the data that they were giving us responsibility for. And frankly I was
+
+57
+00:04:22.960 --> 00:04:26.540
+<v Dan Draper>never fully satisfied with the answers that we were giving and it was certainly
+
+58
+00:04:26.540 --> 00:04:30.120
+<v Dan Draper>not a reflection of the team or the company, it was more a reflection of the
+
+59
+00:04:30.120 --> 00:04:35.060
+<v Dan Draper>available technology. We wanted to be able to encrypt this data but as soon as
+
+60
+00:04:35.060 --> 00:04:38.080
+<v Dan Draper>we did that we were not able to query it, we weren't able to implement
+
+61
+00:04:38.080 --> 00:04:43.100
+<v Dan Draper>encryption and retain application functionality that we needed. And so this
+
+62
+00:04:43.100 --> 00:04:46.780
+<v Dan Draper>sparked the journey for me, I went and studied at Stanford, I did their graduate
+
+63
+00:04:48.300 --> 00:04:50.220
+<v Dan Draper>I found some researchers.
+
+64
+00:04:50.380 --> 00:04:53.720
+<v Dan Draper>One paper in particular that sparked a lot of interest for me
+
+65
+00:04:53.720 --> 00:04:57.080
+<v Dan Draper>was from some researchers at Stanford in 2016.
+
+66
+00:04:57.220 --> 00:05:00.700
+<v Dan Draper>They published a paper called Order Revealing Encryption,
+
+67
+00:05:00.820 --> 00:05:05.320
+<v Dan Draper>which was a really interesting new form of searchable encryption technology.
+
+68
+00:05:05.540 --> 00:05:08.520
+<v Dan Draper>It was very, very difficult to apply to traditional databases.
+
+69
+00:05:09.300 --> 00:05:12.560
+<v Dan Draper>And so I spent the next three years trying to work out
+
+70
+00:05:12.560 --> 00:05:15.780
+<v Dan Draper>how to apply that to a B-tree or an inverted index.
+
+71
+00:05:15.780 --> 00:05:22.180
+<v Dan Draper>And eventually in 2020, I came up with a working prototype, raised some funds off the back of that prototype.
+
+72
+00:05:22.740 --> 00:05:29.520
+<v Dan Draper>Now I'm very fortunate to have an incredible team around me and together we're building out the platform that is now known as CipherStash.
+
+73
+00:05:31.360 --> 00:05:38.480
+<v Noah Labhart>Tell me about the MVP. How long did it take you to build and what sort of tools did you use to bring it to life, that first product you built?
+
+74
+00:05:40.060 --> 00:05:43.980
+<v Dan Draper>The first product took many goes to get right.
+
+75
+00:05:45.780 --> 00:05:52.260
+<v Dan Draper>four or five attempts at it before I got it working. It was in part me understanding kind
+
+76
+00:05:52.260 --> 00:05:56.400
+<v Dan Draper>of the sharp edges of the problem but also just trying to find technologies that were going to
+
+77
+00:05:56.400 --> 00:06:03.260
+<v Dan Draper>help me solve it. The technology that I ended up using for the prototype was originally based on
+
+78
+00:06:03.260 --> 00:06:09.920
+<v Dan Draper>PostgreSQL as a database. I wrote a bunch of custom extensions or plugins for Postgres written in C.
+
+79
+00:06:10.160 --> 00:06:14.300
+<v Dan Draper>The underlying cryptography library was originally written in C, nowadays it's written in Rust.
+
+80
+00:06:15.780 --> 00:06:21.120
+<v Dan Draper>And I added a bunch of application layers on top of that, and they were all written in Elixir.
+
+81
+00:06:21.220 --> 00:06:30.500
+<v Dan Draper>Writing a high-performance data service, many of the characteristics of Elixir and the Beam virtual machine made sense for this kind of problem.
+
+82
+00:06:30.800 --> 00:06:33.360
+<v Dan Draper>Supervision trees and high availability and so forth.
+
+83
+00:06:33.660 --> 00:06:41.140
+<v Dan Draper>We're gradually moving more and more of that code to Rust, but certainly in the early days, Elixir and C were my go-to tools.
+
+84
+00:06:42.640 --> 00:06:47.240
+<v Noah Labhart>When building an MVP, you got to make certain decisions and trade-offs around, you know,
+
+85
+00:06:47.260 --> 00:06:52.460
+<v Noah Labhart>tech debt or feature cut or scope, you know, minimization. What's that? What's the, you know,
+
+86
+00:06:52.460 --> 00:06:56.640
+<v Noah Labhart>the most impactful thing we can build in the beginning and how fast can we build it? Tell
+
+87
+00:06:56.640 --> 00:07:00.040
+<v Noah Labhart>me about some of those decisions and trade-offs you had to make and how you coped with those
+
+88
+00:07:00.040 --> 00:07:00.540
+<v Noah Labhart>decisions.
+
+89
+00:07:01.340 --> 00:07:06.560
+<v Dan Draper>I think the interesting one for CipherStash is it is a very clear set of trade-offs.
+
+90
+00:07:07.160 --> 00:07:12.300
+<v Dan Draper>there are probably three main dimensions that we still think about today and I certainly thought
+
+91
+00:07:12.300 --> 00:07:17.520
+<v Dan Draper>about in the early stages security being the obvious one you know how secure is it what
+
+92
+00:07:17.520 --> 00:07:23.120
+<v Dan Draper>trade-offs are you making that might reduce security or improve security performance sometimes
+
+93
+00:07:23.120 --> 00:07:28.000
+<v Dan Draper>we think of security and performance being at odds with each other and certainly that is true in
+
+94
+00:07:28.000 --> 00:07:34.920
+<v Dan Draper>most systems and it is true in CipherStash as well to an extent and then the final trade-off is what
+
+95
+00:07:36.700 --> 00:07:41.820
+<v Dan Draper>capabilities can you make? How accurate is your free text search? Can you do range queries?
+
+96
+00:07:42.340 --> 00:07:47.140
+<v Dan Draper>Can you do joins and grouping and all those kinds of things? And so I was looking at all three of
+
+97
+00:07:47.140 --> 00:07:52.220
+<v Dan Draper>these dimensions and trying to find the fastest way to build something that was pretty fast,
+
+98
+00:07:52.420 --> 00:07:56.660
+<v Dan Draper>as secure as I could make it, and supported a number of different query operations.
+
+99
+00:07:59.120 --> 00:08:05.360
+<v Noah Labhart>Okay, so from that point, you've got your MVP, you've made your decisions, and it's working.
+
+100
+00:08:06.560 --> 00:08:11.280
+<v Noah Labhart>the product or how did you progress the product from there and how have you matured it and i'm
+
+101
+00:08:11.280 --> 00:08:16.240
+<v Noah Labhart>curious how you built your roadmap and decided okay this is the next most important thing to
+
+102
+00:08:16.240 --> 00:08:19.500
+<v Noah Labhart>build or address was for CipherStash. I think
+
+103
+00:08:19.500 --> 00:08:21.920
+<v Dan Draper>one of the hardest parts of building our roadmap was that a
+
+104
+00:08:21.920 --> 00:08:28.740
+<v Dan Draper>lot of the features and capabilities that we wanted to include in the product we weren't even sure if
+
+105
+00:08:28.740 --> 00:08:35.100
+<v Dan Draper>they were possible so a lot of a lot of the work we've done has been highly r&amp;d focused you know
+
+106
+00:08:36.560 --> 00:08:39.200
+<v Dan Draper>Our free text search worked really well.
+
+107
+00:08:39.320 --> 00:08:41.340
+<v Dan Draper>You could get quite accurate matches.
+
+108
+00:08:41.740 --> 00:08:46.060
+<v Dan Draper>Query performance was great, but ingest performance was abysmal.
+
+109
+00:08:46.140 --> 00:08:52.160
+<v Dan Draper>It took forever to ingest data because it had to do all of this highly complex computation.
+
+110
+00:08:53.000 --> 00:08:59.780
+<v Dan Draper>Part of the R&amp;D focus there was trying to find smarter ways or faster ways that we could ingest the data
+
+111
+00:08:59.780 --> 00:09:03.220
+<v Dan Draper>and still get the same query performance and the same security parameters.
+
+112
+00:09:03.220 --> 00:09:09.560
+<v Dan Draper>parameters. We're also very heavily reliant on customer feedback. How do customers want to
+
+113
+00:09:10.440 --> 00:09:16.500
+<v Dan Draper>use CipherStash within their existing systems? In the early days, we wanted people to use
+
+114
+00:09:16.500 --> 00:09:21.020
+<v Dan Draper>CipherStash as a primary data store. And you can actually still do that. You can still use it as
+
+115
+00:09:21.020 --> 00:09:29.160
+<v Dan Draper>a searchable, simple data store. We realized that most people didn't want to change the technologies
+
+116
+00:09:29.160 --> 00:09:30.020
+<v Dan Draper>that they were using.
+
+117
+00:09:30.160 --> 00:09:32.440
+<v Dan Draper>And so a lot of our roadmap then focused to
+
+118
+00:09:32.440 --> 00:09:34.420
+<v Dan Draper>how do we plug into existing systems?
+
+119
+00:09:34.660 --> 00:09:36.640
+<v Dan Draper>Do we want to plug into Ruby on Rails?
+
+120
+00:09:36.840 --> 00:09:37.920
+<v Dan Draper>Do we want to plug into Node.js?
+
+121
+00:09:38.080 --> 00:09:40.840
+<v Dan Draper>Now we're talking about plugging into Golang,
+
+122
+00:09:40.980 --> 00:09:43.520
+<v Dan Draper>Docker containers, a sidecar for Kubernetes.
+
+123
+00:09:43.660 --> 00:09:46.700
+<v Dan Draper>There's so many different ways that CipherStash
+
+124
+00:09:46.700 --> 00:09:48.900
+<v Dan Draper>could be used within your existing system.
+
+125
+00:09:49.120 --> 00:09:52.260
+<v Dan Draper>How we think about that now is working with customers
+
+126
+00:09:52.260 --> 00:09:54.500
+<v Dan Draper>to find how they want to use CipherStash
+
+127
+00:09:54.500 --> 00:09:56.620
+<v Dan Draper>and then letting that define our roadmap.
+
+128
+00:09:56.620 --> 00:10:01.480
+<v Dan Draper>map. It's very easy to fall into the trap of, we think we know how people want to use it, and so
+
+129
+00:10:01.480 --> 00:10:05.940
+<v Dan Draper>we're going to go and build that. It's so important to go and get the feedback from customers, other
+
+130
+00:10:05.940 --> 00:10:10.120
+<v Dan Draper>developers, and find how they think they'd like to use it and work with them to build that.
+
+131
+00:10:11.880 --> 00:10:16.480
+<v Noah Labhart>Let's switch to team then. So how did you go about building your team and what did you look
+
+132
+00:10:16.480 --> 00:10:19.940
+<v Noah Labhart>for in those people to indicate that they were the winning horses to join you?
+
+133
+00:10:21.640 --> 00:10:27.180
+<v Dan Draper>the team you bring into a an early stage company is it's one of the most important decisions you
+
+134
+00:10:27.180 --> 00:10:33.020
+<v Dan Draper>can make as a founder and i i've been incredibly fortunate to have some amazing people join our
+
+135
+00:10:33.020 --> 00:10:39.460
+<v Dan Draper>team for example uh the first two people that joined um james sadler is our chief technology
+
+136
+00:10:39.460 --> 00:10:43.600
+<v Dan Draper>officer and he's a he's an old friend of mine and we've worked together several times in the past
+
+137
+00:10:44.200 --> 00:10:49.500
+<v Dan Draper>i've been talking to him about this technology what eventually became CipherStash for years and
+
+138
+00:10:49.940 --> 00:10:54.740
+<v Dan Draper>I remember him saying to me one afternoon over a beer, he said, Dan, CipherStash checks all my boxes.
+
+139
+00:10:55.060 --> 00:10:56.020
+<v Dan Draper>How do I get in?
+
+140
+00:10:56.760 --> 00:10:59.700
+<v Dan Draper>So he was very excited about it from a very early stage.
+
+141
+00:10:59.840 --> 00:11:02.160
+<v Dan Draper>And so I was thrilled when he decided to join.
+
+142
+00:11:02.680 --> 00:11:08.520
+<v Dan Draper>And then our chief product officer, a guy by the name of Lindsay Homewood, actually was a former boss of mine.
+
+143
+00:11:08.640 --> 00:11:14.840
+<v Dan Draper>So we worked together a few years ago at an organization here in Australia called the Digital Transformation Agency.
+
+144
+00:11:15.500 --> 00:11:20.380
+<v Dan Draper>I remember going to him and asking him for advice and feedback on the product
+
+145
+00:11:20.380 --> 00:11:23.040
+<v Dan Draper>and we were speaking about it so often
+
+146
+00:11:23.040 --> 00:11:25.160
+<v Dan Draper>I thought to myself one day
+
+147
+00:11:25.160 --> 00:11:28.440
+<v Dan Draper>maybe I should just ask Lindsay if he wants to join the company
+
+148
+00:11:28.440 --> 00:11:30.900
+<v Dan Draper>and I thought he'll probably say no
+
+149
+00:11:30.900 --> 00:11:34.140
+<v Dan Draper>but hey look you miss 100% of the shots you don't take right
+
+150
+00:11:34.140 --> 00:11:35.080
+<v Dan Draper>so let's just ask
+
+151
+00:11:35.080 --> 00:11:37.420
+<v Dan Draper>and he originally said to me
+
+152
+00:11:37.420 --> 00:11:38.720
+<v Dan Draper>oh yeah maybe one day
+
+153
+00:11:38.720 --> 00:11:41.380
+<v Dan Draper>and then a few days later he sent me an email saying
+
+154
+00:11:41.920 --> 00:11:43.080
+<v Dan Draper>maybe we should chat
+
+155
+00:11:44.660 --> 00:11:51.620
+<v Dan Draper>history. He decided that CipherStash was something he wanted to be a part of. And, you know, now is
+
+156
+00:11:51.620 --> 00:11:57.240
+<v Dan Draper>the time. Since then, as all three of us have been in the tech industry here in Australia for many
+
+157
+00:11:57.240 --> 00:12:02.560
+<v Dan Draper>years, we have a great network. And so we actually just hired several of our former teammates. We've
+
+158
+00:12:02.560 --> 00:12:07.220
+<v Dan Draper>built out a really, really stunning team, I would have to say. We've also hired a few new folks that
+
+159
+00:12:07.220 --> 00:12:12.000
+<v Dan Draper>we hadn't worked with before. And I'm proud to say we actually haven't had a great deal of trouble
+
+160
+00:12:12.000 --> 00:12:16.740
+<v Dan Draper>hiring fantastic people as much as a lot of startups do struggle in this space. I
+
+161
+00:12:16.740 --> 00:12:20.760
+<v Dan Draper>think it's because lots of folks really resonate with this problem. It's cool
+
+162
+00:12:20.760 --> 00:12:24.980
+<v Dan Draper>tech. Plus we're using languages like Rust and Elixir and that gets
+
+163
+00:12:24.980 --> 00:12:27.800
+<v Dan Draper>people excited. There are a lot of developers out there that want to
+
+164
+00:12:27.800 --> 00:12:31.420
+<v Dan Draper>use Rust in production that maybe haven't had the opportunity to do so. And
+
+165
+00:12:31.420 --> 00:12:36.140
+<v Dan Draper>so CipherStash is one of the few companies in Australia at least that is hiring for
+
+166
+00:12:36.140 --> 00:12:39.920
+<v Dan Draper>Rust roles. So that's certainly worked in our favor I think.
+
+167
+00:12:43.920 --> 00:12:51.420
+<v Noah Labhart>so then let's talk about scalability and you know given given the you know nature of your product
+
+168
+00:12:51.420 --> 00:12:55.640
+<v Noah Labhart>it'll be interesting to hear how you approached it so did you build this to scale efficiently
+
+169
+00:12:55.640 --> 00:12:59.680
+<v Noah Labhart>from day one or have you been fighting this or are you fighting this as you grow
+
+170
+00:13:01.140 --> 00:13:01.640
+<v Noah Labhart>so
+
+171
+00:13:01.620 --> 00:13:05.860
+<v Dan Draper>efficiency and performance is one of the first questions we get asked about CipherStash
+
+172
+00:13:05.860 --> 00:13:15.820
+<v Dan Draper>I always knew that it would be a factor. You know, it's actually relatively easy to implement this idea of searchable encryption over a few hundred or a few thousand records.
+
+173
+00:13:16.180 --> 00:13:22.480
+<v Dan Draper>What makes it difficult is how do you do that efficiently for millions or even billions of rows of data?
+
+174
+00:13:22.880 --> 00:13:26.440
+<v Dan Draper>So it was something that I thought about right from the very beginning.
+
+175
+00:13:26.600 --> 00:13:34.320
+<v Dan Draper>And I wanted to try to use the kinds of technologies that search systems or information retrieval systems use already.
+
+176
+00:13:35.860 --> 00:13:41.380
+<v Dan Draper>indexes and b-trees. So the challenge was to find a way to apply searchable encryption,
+
+177
+00:13:41.720 --> 00:13:45.680
+<v Dan Draper>particularly order-revealing encryption, to those kinds of data structures.
+
+178
+00:13:46.300 --> 00:13:51.040
+<v Dan Draper>And so that's really the secret sauce. How we were able to do that is what made CipherStash
+
+179
+00:13:51.040 --> 00:13:57.500
+<v Dan Draper>possible. So the query performance, if you think about algorithmic complexity as an example,
+
+180
+00:13:57.660 --> 00:14:03.440
+<v Dan Draper>it's sublinear. So that means that a query of a million records can take 20 milliseconds,
+
+181
+00:14:03.440 --> 00:14:08.420
+<v Dan Draper>milliseconds and that scales sub-linearly. So if we had to change the amount of data we're
+
+182
+00:14:08.420 --> 00:14:13.340
+<v Dan Draper>querying to 10 million, it doesn't jump to 200 milliseconds, it might be 22 or 23 milliseconds.
+
+183
+00:14:13.720 --> 00:14:19.480
+<v Dan Draper>And so it was incredibly important for us as we designed CipherStash and as I built the prototypes
+
+184
+00:14:19.480 --> 00:14:24.620
+<v Dan Draper>and as the team have continued to develop it, that we always have that scalability factor in mind.
+
+185
+00:14:25.560 --> 00:14:29.280
+<v Dan Draper>It's not an easy thing to achieve, mind you. There's lots of things to consider.
+
+186
+00:14:29.280 --> 00:14:35.440
+<v Dan Draper>you can't fall back on some of the techniques that you would fall back on in an unencrypted
+
+187
+00:14:35.440 --> 00:14:40.240
+<v Dan Draper>setting. You have to think about so many different things in a different way. And that's been a huge
+
+188
+00:14:40.240 --> 00:14:45.520
+<v Dan Draper>challenge, but thankfully one that we've managed to solve and are continuing to improve on to this
+
+189
+00:14:45.520 --> 00:14:46.020
+<v Dan Draper>day.
+
+190
+00:14:47.200 --> 00:14:51.260
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built,
+
+191
+00:14:51.420 --> 00:14:52.460
+<v Noah Labhart>what are you most proud of?
+
+192
+00:14:54.120 --> 00:14:58.020
+<v Dan Draper>It would be easy for me to say the underlying technology for
+
+193
+00:14:59.280 --> 00:15:05.440
+<v Dan Draper>and this sounds like it sounds like a cliche but I'm most proud of the team I've built. I think one
+
+194
+00:15:05.440 --> 00:15:11.380
+<v Dan Draper>of the things that I was afraid of as a founder who was working on you know really quite groundbreaking
+
+195
+00:15:11.380 --> 00:15:17.120
+<v Dan Draper>technology I was afraid that I wasn't going to be able to find people that could take the mantle
+
+196
+00:15:17.120 --> 00:15:22.320
+<v Dan Draper>and run with it. I was afraid that I wasn't going to be able to find people that I could give this
+
+197
+00:15:22.320 --> 00:15:28.080
+<v Dan Draper>technology to and I could step away from and it would would still be successful. I really do feel
+
+198
+00:15:29.280 --> 00:15:33.820
+<v Dan Draper>that if I take a vacation or if I'm focused on sales or raising capital,
+
+199
+00:15:33.940 --> 00:15:39.900
+<v Dan Draper>that they will continue to build this product in a way that is in line with the vision for the company.
+
+200
+00:15:40.660 --> 00:15:43.160
+<v Dan Draper>I'm absolutely thrilled to have this team around me.
+
+201
+00:15:43.220 --> 00:15:50.020
+<v Dan Draper>And the next challenge for us is to continue to grow that team in a way that continues that trend.
+
+202
+00:15:50.620 --> 00:15:52.900
+<v Dan Draper>I think the team is the thing that I'm most proud of.
+
+203
+00:15:54.360 --> 00:15:56.400
+<v Noah Labhart>Well, let's flip the script a little bit, Dan.
+
+204
+00:15:56.400 --> 00:16:00.600
+<v Noah Labhart>Dan, tell me about a mistake you made and how you and your team responded to it.
+
+205
+00:16:01.180 --> 00:16:05.760
+<v Dan Draper>There are so many mistakes I've made in my career and certainly many at CipherStash.
+
+206
+00:16:06.120 --> 00:16:09.100
+<v Dan Draper>I see every mistake as an opportunity to learn something.
+
+207
+00:16:10.040 --> 00:16:12.580
+<v Dan Draper>The biggest mistake is the one you make twice.
+
+208
+00:16:13.180 --> 00:16:18.860
+<v Dan Draper>But I certainly think one of the major mistakes we made in the early days of the CipherStash journey
+
+209
+00:16:18.860 --> 00:16:22.060
+<v Dan Draper>was trying to get developers to come to us,
+
+210
+00:16:22.180 --> 00:16:25.060
+<v Dan Draper>trying to get people to come and work in the way that we wanted them to work.
+
+211
+00:16:26.400 --> 00:16:31.260
+<v Dan Draper>a big ask, frankly, not only to get developers to change the way that they work, but to do so
+
+212
+00:16:31.260 --> 00:16:35.120
+<v Dan Draper>with a product that they've never even heard of, or a technology that they're unfamiliar with.
+
+213
+00:16:35.860 --> 00:16:41.760
+<v Dan Draper>So I think the lesson for us was try and find the ways that developers are using encryption
+
+214
+00:16:41.760 --> 00:16:47.740
+<v Dan Draper>technology now, or find ways that they're trying to protect or keep sensitive data safe,
+
+215
+00:16:47.900 --> 00:16:51.860
+<v Dan Draper>and how do we plug into that? It was a difficult lesson, frankly,
+
+216
+00:16:52.380 --> 00:16:54.500
+<v Dan Draper>but one of the most important ones that we've had.
+
+217
+00:16:57.780 --> 00:17:01.100
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+218
+00:17:02.360 --> 00:17:06.560
+<v Dan Draper>We see opportunities for CipherStash in a range of different settings.
+
+219
+00:17:06.640 --> 00:17:09.880
+<v Dan Draper>At the moment, it's mostly smaller organizations that are using it.
+
+220
+00:17:10.240 --> 00:17:13.240
+<v Dan Draper>We think there's big opportunities for it in the enterprise as well.
+
+221
+00:17:13.460 --> 00:17:19.720
+<v Dan Draper>So a big part of our focus now is doing very large-scale tests, demonstrations,
+
+222
+00:17:20.340 --> 00:17:24.400
+<v Dan Draper>to show that CipherStash can scale to hundreds of millions or even billions of records.
+
+223
+00:17:26.400 --> 00:17:32.620
+<v Dan Draper>interesting kind of search capabilities on a roadmap as well. So things like geospatial indexes,
+
+224
+00:17:32.640 --> 00:17:38.820
+<v Dan Draper>we can do geospatial queries across, you know, encrypted longitude and latitude values, which is
+
+225
+00:17:38.820 --> 00:17:45.140
+<v Dan Draper>really interesting to me. Things like simple ranked search, the ability to do basic aggregate
+
+226
+00:17:45.140 --> 00:17:50.120
+<v Dan Draper>queries. So we can do counts at the moment, or we want to be able to do summations and averages.
+
+227
+00:17:50.360 --> 00:17:54.900
+<v Dan Draper>There's some interesting technology there, technology called Paillier encryption, which is a
+
+228
+00:17:56.540 --> 00:18:01.600
+<v Dan Draper>encryption, which I'm sure we could do a whole conversation about. But that provides the ability
+
+229
+00:18:01.600 --> 00:18:09.160
+<v Dan Draper>to do summations and averages over data in a really efficient way. And really beyond that,
+
+230
+00:18:09.220 --> 00:18:14.700
+<v Dan Draper>it's about making CipherStash as accessible to as many developers as possible. So as I mentioned,
+
+231
+00:18:14.720 --> 00:18:21.660
+<v Dan Draper>right now we support Ruby on Rails and Node.js. We're building out our integrations for Golang,
+
+232
+00:18:21.660 --> 00:18:25.800
+<v Dan Draper>for C Sharp, for Java, and Python.
+
+233
+00:18:26.340 --> 00:18:29.260
+<v Dan Draper>The goal is to make it available to as many people as we possibly can.
+
+234
+00:18:30.720 --> 00:18:32.200
+<v Noah Labhart>So let's switch to you, Dan.
+
+235
+00:18:32.400 --> 00:18:34.320
+<v Noah Labhart>Who influences the way that you work?
+
+236
+00:18:34.480 --> 00:18:36.140
+<v Noah Labhart>Name a person you look up to and why.
+
+237
+00:18:37.740 --> 00:18:41.300
+<v Dan Draper>I've been very fortunate to have lots of great mentors in my life.
+
+238
+00:18:41.600 --> 00:18:43.700
+<v Dan Draper>I think there's a few people that I'll mention,
+
+239
+00:18:43.800 --> 00:18:45.240
+<v Dan Draper>or maybe I'll mention one or two.
+
+240
+00:18:45.600 --> 00:18:48.180
+<v Dan Draper>One in particular was a mentor of mine.
+
+241
+00:18:48.240 --> 00:18:49.840
+<v Dan Draper>We used to spend a lot of time together,
+
+242
+00:18:51.660 --> 00:18:54.320
+<v Dan Draper>but he was incredibly influential in my life.
+
+243
+00:18:54.360 --> 00:18:56.320
+<v Dan Draper>A guy named Hugh Williams,
+
+244
+00:18:56.420 --> 00:19:01.220
+<v Dan Draper>who was a former professor of computer science at RMIT here in Australia.
+
+245
+00:19:01.880 --> 00:19:05.220
+<v Dan Draper>But he also spent lots of time in senior leadership roles
+
+246
+00:19:05.220 --> 00:19:07.300
+<v Dan Draper>at Google, Microsoft and eBay.
+
+247
+00:19:07.540 --> 00:19:09.140
+<v Dan Draper>And he's kind of the search guy.
+
+248
+00:19:09.280 --> 00:19:12.440
+<v Dan Draper>So his PhD was on information retrieval systems.
+
+249
+00:19:12.780 --> 00:19:15.880
+<v Dan Draper>So what I really enjoyed about my time with Hugh
+
+250
+00:19:15.880 --> 00:19:20.140
+<v Dan Draper>was learning the connection between technology and people.
+
+251
+00:19:21.660 --> 00:19:26.940
+<v Dan Draper>to find people in our industry that understand how to lead teams, but also how to build great
+
+252
+00:19:26.940 --> 00:19:32.780
+<v Dan Draper>technology. And Hugh was certainly one of those people and had a massive impact on how I think
+
+253
+00:19:32.780 --> 00:19:38.140
+<v Dan Draper>about the world. And the other person I should mention is a guy called Kevin Rowney, who's a
+
+254
+00:19:38.140 --> 00:19:42.080
+<v Dan Draper>mentor of mine who I just had dinner with in San Francisco a couple of weeks ago.
+
+255
+00:19:42.740 --> 00:19:48.080
+<v Dan Draper>He's a math nerd, which I really, really resonate with, but he's also worked in enterprise sales.
+
+256
+00:19:48.080 --> 00:19:50.220
+<v Dan Draper>and that's an interesting combination.
+
+257
+00:19:51.000 --> 00:19:54.920
+<v Dan Draper>What I appreciated about Kevin was he helped me as an engineer,
+
+258
+00:19:55.020 --> 00:19:58.300
+<v Dan Draper>as a tech guy, understand how to sell.
+
+259
+00:19:58.960 --> 00:20:01.280
+<v Dan Draper>It's been a really fruitful relationship.
+
+260
+00:20:02.100 --> 00:20:06.520
+<v Dan Draper>He helps me cut through the bull crap when it comes to enterprise sales
+
+261
+00:20:06.520 --> 00:20:11.860
+<v Dan Draper>and it's been a really rewarding relationship as well.
+
+262
+00:20:12.680 --> 00:20:14.640
+<v Dan Draper>I feel like I should mention one more.
+
+263
+00:20:14.640 --> 00:20:23.840
+<v Dan Draper>The two mentors I mentioned so far are both men, but there's also a woman who has been a wonderful source of inspiration for me.
+
+264
+00:20:23.940 --> 00:20:33.640
+<v Dan Draper>Her name is Emma Jones, and she specializes in helping developer teams and tech companies more broadly build more diversity in their workforce.
+
+265
+00:20:34.020 --> 00:20:42.740
+<v Dan Draper>And she's helped me understand that a diverse team is a productive team and a successful team, and she's been a huge influence in my career and life as well.
+
+266
+00:20:44.640 --> 00:20:47.120
+<v Noah Labhart>Dan, we talked about a mistake earlier, right?
+
+267
+00:20:47.220 --> 00:20:48.220
+<v Noah Labhart>But a little bit different spin.
+
+268
+00:20:48.520 --> 00:20:51.220
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+269
+00:20:51.300 --> 00:20:53.620
+<v Noah Labhart>Or where would you consider taking maybe a different approach?
+
+270
+00:20:54.800 --> 00:20:58.340
+<v Dan Draper>I wish that I had learned about cryptography earlier.
+
+271
+00:20:59.080 --> 00:21:06.880
+<v Dan Draper>I remember I studied electrical engineering at university back in Adelaide in the early 2000s.
+
+272
+00:21:06.880 --> 00:21:09.840
+<v Dan Draper>And I've always been fascinated by technology.
+
+273
+00:21:09.920 --> 00:21:13.160
+<v Dan Draper>I've always been fascinated by programming and developing software.
+
+274
+00:21:14.640 --> 00:21:21.880
+<v Dan Draper>at university, probably in about 2002, there was an elective called cryptography. And I thought,
+
+275
+00:21:21.900 --> 00:21:28.020
+<v Dan Draper>why would anyone do that? That sounds really boring. Oh, had I realized then what I know now,
+
+276
+00:21:28.160 --> 00:21:34.260
+<v Dan Draper>that cryptography is the thing that has shaped my career of the last five years. I wish that I knew
+
+277
+00:21:34.260 --> 00:21:38.360
+<v Dan Draper>more about it earlier on in my career. Frankly, I wish more developers understood cryptography.
+
+278
+00:21:38.740 --> 00:21:43.460
+<v Dan Draper>It's one of the most important things in our modern world. I know that sounds slightly overblown,
+
+279
+00:21:44.780 --> 00:21:50.400
+<v Dan Draper>form safe e-commerce. You can't have safe messaging on the internet without cryptography.
+
+280
+00:21:51.040 --> 00:21:55.000
+<v Dan Draper>Our whole world runs on data. If we can't protect it, society collapses.
+
+281
+00:21:56.340 --> 00:22:00.200
+<v Dan Draper>So I really do believe cryptography is one of the most important things in our industry.
+
+282
+00:22:00.380 --> 00:22:05.900
+<v Dan Draper>And I really wish that I had explored it and understood it better earlier on in my career.
+
+283
+00:22:07.560 --> 00:22:11.920
+<v Noah Labhart>Well, last question, Dan. So you're getting on a plane and you're sitting next to a young
+
+284
+00:22:11.920 --> 00:22:16.320
+<v Noah Labhart>entrepreneur who's built the next big thing they're jazzed about it they can't wait to show
+
+285
+00:22:16.320 --> 00:22:19.780
+<v Noah Labhart>it off to the world and can't wait to show it off to you right there on the plane what advice
+
+286
+00:22:19.780 --> 00:22:22.320
+<v Noah Labhart>do you give that person having gone down this road a bit
+
+287
+00:22:22.320 --> 00:22:25.820
+<v Dan Draper>it's difficult to give this advice
+
+288
+00:22:25.820 --> 00:22:29.980
+<v Dan Draper>to somebody who's has just come up with an idea and they're really excited about selling it to
+
+289
+00:22:29.980 --> 00:22:35.680
+<v Dan Draper>the world but the advice i give to anyone that has an entrepreneurial instinct is to go and work for
+
+290
+00:22:35.680 --> 00:22:43.840
+<v Dan Draper>another startup first. I did my first startup when I was something like 21 years old. I had
+
+291
+00:22:43.840 --> 00:22:50.760
+<v Dan Draper>no experience. I had no idea what I was getting myself into. And it took me a number of years
+
+292
+00:22:50.760 --> 00:22:57.340
+<v Dan Draper>to work stuff out. Probably things that I would have learned a lot more quickly had I learned
+
+293
+00:22:57.340 --> 00:23:01.760
+<v Dan Draper>from another founder or just spent time in another startup. Since then, I've worked for
+
+294
+00:23:01.760 --> 00:23:06.360
+<v Dan Draper>several other startups and I think I'm a much, much better entrepreneur and a much better leader
+
+295
+00:23:06.360 --> 00:23:13.280
+<v Dan Draper>because of it. If you have an opportunity to work in a startup for two or three years before trying
+
+296
+00:23:13.280 --> 00:23:17.680
+<v Dan Draper>your own, I think it's going to set you up for success. You'll not only understand some of the
+
+297
+00:23:17.680 --> 00:23:23.900
+<v Dan Draper>challenges associated with building a business, you'll understand what the investment ecosystem
+
+298
+00:23:23.900 --> 00:23:29.840
+<v Dan Draper>is like, how to find investors, how to talk to investors. You'll understand more about the
+
+299
+00:23:31.760 --> 00:23:37.520
+<v Dan Draper>talking to customers. It's not just about technology. In fact, one of the hardest lessons
+
+300
+00:23:37.520 --> 00:23:44.000
+<v Dan Draper>I've learned over the years as a tech guy is the technology really, even in a company like
+
+301
+00:23:44.000 --> 00:23:49.640
+<v Dan Draper>CipherStash, which is highly technical, is really only a small fraction of the overall pie.
+
+302
+00:23:50.040 --> 00:23:55.720
+<v Dan Draper>You have to understand all of the aspects of how a business runs to be a successful entrepreneur.
+
+303
+00:23:56.420 --> 00:23:59.780
+<v Dan Draper>And one of the greatest ways to do that is to work for another startup.
+
+304
+00:24:01.760 --> 00:24:02.820
+<v Noah Labhart>I completely agree with that.
+
+305
+00:24:03.080 --> 00:24:05.340
+<v Noah Labhart>Well, Dan, thank you for being on the show today.
+
+306
+00:24:05.440 --> 00:24:08.320
+<v Noah Labhart>Thank you for telling the creation story of CipherStash.
+
+307
+00:24:08.520 --> 00:24:09.740
+<v Dan Draper>Thanks so much for having me, Noah.
+
+308
+00:24:09.760 --> 00:24:10.260
+<v Dan Draper>It's been great.
+
+309
+00:24:12.600 --> 00:24:15.420
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+310
+00:24:20.260 --> 00:24:23.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+311
+00:24:23.400 --> 00:24:28.180
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+312
+00:24:28.180 --> 00:24:33.660
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+313
+00:24:34.040 --> 00:24:36.260
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+314
+00:24:36.560 --> 00:24:38.460
+<v Noah Labhart>Both things help us out tremendously.
+
+315
+00:24:40.880 --> 00:24:42.360
+<v Noah Labhart>And thanks again for listening.

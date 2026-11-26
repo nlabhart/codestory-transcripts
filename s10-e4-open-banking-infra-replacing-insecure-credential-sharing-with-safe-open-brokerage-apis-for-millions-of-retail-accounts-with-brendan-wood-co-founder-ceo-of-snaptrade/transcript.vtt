@@ -1,0 +1,1363 @@
+WEBVTT
+
+NOTE S10 E4: Open Banking Infra: Replacing Insecure Credential-Sharing with Safe Open Brokerage APIs for Millions of Retail Accounts with Brendan Wood, Co-Founder & CEO of SnapTrade
+
+1
+00:00:07.620 --> 00:00:11.600
+<v Brendan Wood>Talking to customers, we realized, oh, it turns out that coverage isn't the single most important thing.
+
+2
+00:00:11.700 --> 00:00:14.700
+<v Brendan Wood>It's more important to have reliability and feature depth first.
+
+3
+00:00:14.840 --> 00:00:20.800
+<v Brendan Wood>If you don't have the ability to do an on-demand account sync, that's not very useful for most of the applications who are interested in our API.
+
+4
+00:00:21.380 --> 00:00:26.320
+<v Brendan Wood>If you don't have the ability to place orders, that's another thing that's a deal breaker.
+
+5
+00:00:26.420 --> 00:00:29.600
+<v Brendan Wood>It's like, why would you even integrate with a trading API if it doesn't trade, right?
+
+6
+00:00:29.780 --> 00:00:33.900
+<v Brendan Wood>We realized pretty quickly that we don't need to support every broker in the world.
+
+7
+00:00:33.900 --> 00:00:39.680
+<v Brendan Wood>We can pick a few of the big ones in the U.S. market and a few other markets that are important to us and just do a really good job at those.
+
+8
+00:00:40.080 --> 00:00:43.440
+<v Brendan Wood>My name is Brendan Wood, and I'm the co-founder and CEO at SnapTrade.
+
+9
+00:00:46.840 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+10
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+11
+00:00:53.920 --> 00:00:55.180
+<v Clip>Nothing like the bedcams.
+
+12
+00:00:55.480 --> 00:00:58.080
+<v Noah Labhart>Who share what it takes to change an industry.
+
+13
+00:00:58.280 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+14
+00:01:00.220 --> 00:01:01.240
+<v Clip>It took many goes to get right.
+
+15
+00:01:01.860 --> 00:01:04.540
+<v Noah Labhart>Who built the teams that have their back.
+
+16
+00:01:04.700 --> 00:01:06.120
+<v Clip>The company is its people.
+
+17
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+18
+00:01:07.440 --> 00:01:08.560
+<v Clip>Most proud of our team.
+
+19
+00:01:08.900 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+20
+00:01:11.480 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+21
+00:01:12.860 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+22
+00:01:14.420 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+23
+00:01:15.580 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+24
+00:01:18.280 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dude.
+
+25
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+26
+00:01:22.500 --> 00:01:23.000
+<v Clip>To
+
+27
+00:01:22.940 --> 00:01:25.840
+<v Noah Labhart>ride the ups and downs of the startup life.
+
+28
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+29
+00:01:27.560 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+30
+00:01:28.940 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+31
+00:01:32.340 --> 00:01:33.880
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+32
+00:01:34.160 --> 00:01:38.780
+<v Noah Labhart>And today, how Brendan Wood focused in on the pain of broker integrations
+
+33
+00:01:38.780 --> 00:01:42.140
+<v Noah Labhart>and built the platform to connect them all.
+
+34
+00:01:48.980 --> 00:01:55.820
+<v Noah Labhart>In August of 2021, we interviewed Brendan Wood on the podcast to tell the creation story of Passiv.
+
+35
+00:01:56.520 --> 00:02:00.300
+<v Noah Labhart>After the recording, the company decided to pivot into a new market,
+
+36
+00:02:00.480 --> 00:02:04.140
+<v Noah Labhart>focusing on solving their biggest pain point for other platforms.
+
+37
+00:02:04.860 --> 00:02:09.400
+<v Noah Labhart>They were running into the problems surrounding integrations into brokers.
+
+38
+00:02:09.660 --> 00:02:13.440
+<v Noah Labhart>In fact, they were spending 80% of engineering time on integrations.
+
+39
+00:02:13.880 --> 00:02:18.360
+<v Noah Labhart>People started to reach out to his team to ask if they could use the integrations.
+
+40
+00:02:18.580 --> 00:02:22.420
+<v Noah Labhart>And they started ideating about making this its own product.
+
+41
+00:02:24.040 --> 00:02:26.980
+<v Noah Labhart>This is the creation story of SnapTrade.
+
+42
+00:02:26.980 --> 00:02:36.780
+<v Brendan Wood>trade. SnapTrade is a unified trading API. If you're familiar with a service like Plaid,
+
+43
+00:02:36.980 --> 00:02:41.460
+<v Brendan Wood>we think of ourselves like Plaid, but for trading specifically. So from like a user's perspective,
+
+44
+00:02:41.760 --> 00:02:45.160
+<v Brendan Wood>you might not even be aware you're using SnapTrade for the most part. It's not like a
+
+45
+00:02:45.160 --> 00:02:49.100
+<v Brendan Wood>direct consumer facing brand, but essentially what we do is we make it easy for you to connect
+
+46
+00:02:49.100 --> 00:02:52.420
+<v Brendan Wood>your stock trading account into third-party applications that you use
+
+47
+00:02:52.420 --> 00:02:56.280
+<v Brendan Wood>to help you make decisions about the market or analyze your portfolio or do tax planning
+
+48
+00:02:56.280 --> 00:02:57.540
+<v Brendan Wood>or whatever it is you need to do.
+
+49
+00:02:58.040 --> 00:03:01.580
+<v Brendan Wood>Investors are relying more and more on third-party tools.
+
+50
+00:03:01.820 --> 00:03:05.520
+<v Brendan Wood>They're not necessarily making all of their trading decisions at their stockbroker,
+
+51
+00:03:05.600 --> 00:03:09.240
+<v Brendan Wood>and there's usually a bunch of additional tooling that's helpful for them to manage their accounts outside.
+
+52
+00:03:09.460 --> 00:03:13.780
+<v Brendan Wood>So the lack of integration has been a problem that we've seen in the market for a long time.
+
+53
+00:03:13.860 --> 00:03:19.380
+<v Brendan Wood>It's something that I faced personally at Passiv, which was the previous iteration of this business.
+
+54
+00:03:19.380 --> 00:03:25.300
+<v Brendan Wood>The integrations were the biggest problem to our growth at Passiv because nobody offered off-the-shelf solutions.
+
+55
+00:03:25.560 --> 00:03:27.060
+<v Brendan Wood>And so essentially we're trying to tackle that.
+
+56
+00:03:27.140 --> 00:03:31.400
+<v Brendan Wood>It's a larger problem and we think if we do a really good job at it, it's going to fundamentally change the industry.
+
+57
+00:03:33.140 --> 00:03:37.560
+<v Noah Labhart>So tell me what you would consider the MVP for SnapTrade.
+
+58
+00:03:37.620 --> 00:03:44.960
+<v Noah Labhart>Tell me about that first version of SnapTrade, how long it took to build or to bring it to life, and what sort of tools you're using.
+
+59
+00:03:45.920 --> 00:03:49.540
+<v Brendan Wood>The longest part of bringing SnapTrade to life was deciding we were going to do it.
+
+60
+00:03:49.580 --> 00:03:53.680
+<v Brendan Wood>We were building the Passiv app before that, sort of like a build-your-own-robo-advisor
+
+61
+00:03:53.680 --> 00:03:56.220
+<v Brendan Wood>tool, run it in your own brokerage account, that sort of thing.
+
+62
+00:03:56.300 --> 00:03:59.880
+<v Brendan Wood>And that depended on high-quality trading integrations to a brokerage account.
+
+63
+00:04:00.040 --> 00:04:02.960
+<v Brendan Wood>In order to be able to place trades through a third-party app, you need an API.
+
+64
+00:04:03.260 --> 00:04:05.340
+<v Brendan Wood>Like I said, we were running into these integrations problems.
+
+65
+00:04:05.520 --> 00:04:08.240
+<v Brendan Wood>We were spending probably 80% of our engineering budget on integrations.
+
+66
+00:04:08.300 --> 00:04:10.760
+<v Brendan Wood>It was hard to even focus on our own product quality at that point.
+
+67
+00:04:10.760 --> 00:04:17.280
+<v Brendan Wood>In the summer of 2021, we were kicking around the idea of maybe we should consider selling our integrations.
+
+68
+00:04:17.280 --> 00:04:22.840
+<v Brendan Wood>Wouldn't it be easier for us to justify the engineering effort on integrations if we could make money off them in some other way?
+
+69
+00:04:23.000 --> 00:04:26.220
+<v Brendan Wood>So we had some friends who were running other B2C fintech applications.
+
+70
+00:04:26.400 --> 00:04:31.220
+<v Brendan Wood>And occasionally these people would reach out and say, listen, you guys got these integrations to a few brokers that we like.
+
+71
+00:04:31.300 --> 00:04:31.900
+<v Brendan Wood>Can we use that?
+
+72
+00:04:32.220 --> 00:04:35.400
+<v Brendan Wood>And our answer was always, no, that's like our proprietary technology.
+
+73
+00:04:35.880 --> 00:04:37.420
+<v Brendan Wood>That's our competitive advantage.
+
+74
+00:04:37.560 --> 00:04:39.780
+<v Brendan Wood>We're not just going to license that to anybody else.
+
+75
+00:04:40.760 --> 00:04:45.320
+<v Brendan Wood>it happening more and more frequently in 2021. And we started really thinking about it. If the
+
+76
+00:04:45.320 --> 00:04:49.160
+<v Brendan Wood>integrations are our biggest problem, wouldn't this be so much better if we had a hundred
+
+77
+00:04:49.160 --> 00:04:52.380
+<v Brendan Wood>applications that we can power with these integrations or a thousand applications?
+
+78
+00:04:53.120 --> 00:04:56.360
+<v Brendan Wood>It snowballed from there. We said, let's like have a few conversations with people.
+
+79
+00:04:56.860 --> 00:05:01.900
+<v Brendan Wood>And we, in, let me see, early fall 2021, we started like cold calling a few other companies
+
+80
+00:05:01.900 --> 00:05:06.560
+<v Brendan Wood>just to test the water. And I remember the first call that we cold called, it was on a whim. We'd
+
+81
+00:05:06.560 --> 00:05:09.460
+<v Brendan Wood>never spoken to this guy before. We found his phone number randomly. He was running,
+
+82
+00:05:10.760 --> 00:05:15.380
+<v Brendan Wood>tool for self-directed traders. We called the guy up and said, here's what we're thinking about
+
+83
+00:05:15.380 --> 00:05:19.640
+<v Brendan Wood>doing. We see you guys have built one of your own integrations to this stock broker. How would you
+
+84
+00:05:19.640 --> 00:05:23.020
+<v Brendan Wood>like to have more? We have eight of those that are currently functioning in our own product.
+
+85
+00:05:23.040 --> 00:05:27.260
+<v Brendan Wood>We're thinking about commercializing this. Does that sound interesting? And his quote was,
+
+86
+00:05:27.400 --> 00:05:31.780
+<v Brendan Wood>shut up and take my money. I was like, this could be useful. So we looked into it a bit more.
+
+87
+00:05:31.980 --> 00:05:36.700
+<v Brendan Wood>We kept having responses like that of people saying, this is a huge need. If you build this,
+
+88
+00:05:36.800 --> 00:05:39.860
+<v Brendan Wood>I will buy it. That's when we realized, okay, we really need to take this seriously.
+
+89
+00:05:40.760 --> 00:05:46.640
+<v Brendan Wood>actually decided to pivot the focus of the company in November 2021 or October 2021, one or the other.
+
+90
+00:05:46.740 --> 00:05:50.460
+<v Brendan Wood>And it wasn't a hard pivot, not like we're shutting down the Passiv app, but let's just
+
+91
+00:05:50.460 --> 00:05:55.220
+<v Brendan Wood>not put a ton of effort into this app at the moment and let's instead focus on the integrations
+
+92
+00:05:55.220 --> 00:05:58.960
+<v Brendan Wood>and see if we can get a few other applications on there. But in order for that to work, you need
+
+93
+00:05:58.960 --> 00:06:03.240
+<v Brendan Wood>an MVP. That's where we said, all right, what's the quickest way we can smoke test this? Yeah,
+
+94
+00:06:03.300 --> 00:06:06.980
+<v Brendan Wood>we're talking to people, we're cold calling them, we're cold emailing them, we're getting a really
+
+95
+00:06:06.980 --> 00:06:07.680
+<v Brendan Wood>really strong signal.
+
+96
+00:06:07.820 --> 00:06:11.720
+<v Brendan Wood>If we build an API, build an MVP, will people actually launch with it and use it?
+
+97
+00:06:11.800 --> 00:06:15.800
+<v Brendan Wood>So one of the things that we had in our favor was that we already had a lot of the integrations
+
+98
+00:06:15.800 --> 00:06:17.100
+<v Brendan Wood>in-house for the path of that.
+
+99
+00:06:17.300 --> 00:06:21.960
+<v Brendan Wood>It was roughly three to four months between that initial focus period and when we actually
+
+100
+00:06:21.960 --> 00:06:22.580
+<v Brendan Wood>launched the MVP.
+
+101
+00:06:22.860 --> 00:06:26.460
+<v Brendan Wood>And we were able to do it quickly because essentially what we were doing is using our
+
+102
+00:06:26.460 --> 00:06:30.680
+<v Brendan Wood>existing API and adding a new authentication front end to it to allow other applications
+
+103
+00:06:30.680 --> 00:06:31.960
+<v Brendan Wood>to use our same backend.
+
+104
+00:06:32.100 --> 00:06:34.700
+<v Brendan Wood>So it wasn't like a fundamental technology change for us.
+
+105
+00:06:34.740 --> 00:06:35.560
+<v Brendan Wood>And so that's what we did.
+
+106
+00:06:38.600 --> 00:06:40.340
+<v Noah Labhart>So you've got the MVP now.
+
+107
+00:06:40.500 --> 00:06:41.260
+<v Noah Labhart>It's working.
+
+108
+00:06:41.580 --> 00:06:44.640
+<v Noah Labhart>You're getting those early folks on it, and you're getting some traction.
+
+109
+00:06:44.820 --> 00:06:47.780
+<v Noah Labhart>How have you progressed it from that point and matured it?
+
+110
+00:06:47.860 --> 00:06:50.420
+<v Noah Labhart>I'm curious about just the same with Passiv.
+
+111
+00:06:50.480 --> 00:06:51.500
+<v Noah Labhart>How did you build your roadmap?
+
+112
+00:06:51.660 --> 00:06:59.060
+<v Noah Labhart>How did you go about deciding this is the next most important thing or integration or enhancement to add to SnapTrade?
+
+113
+00:06:59.580 --> 00:07:01.380
+<v Brendan Wood>So we got a few early customers on there.
+
+114
+00:07:01.640 --> 00:07:06.060
+<v Brendan Wood>And one of the things we quickly realized is that coverage is not the most important thing.
+
+115
+00:07:06.980 --> 00:07:10.740
+<v Brendan Wood>thinking, oh my goodness, this is going to be a huge lift for us. We're going to have to build
+
+116
+00:07:10.740 --> 00:07:15.340
+<v Brendan Wood>a hundred integrations very quickly. But talking to customers, we realized, oh, it turns out that
+
+117
+00:07:15.340 --> 00:07:18.720
+<v Brendan Wood>coverage isn't the single most important thing. Obviously it's important to have coverage because
+
+118
+00:07:18.720 --> 00:07:23.180
+<v Brendan Wood>that's like kind of your serviceable market, right? It's more important to have reliability
+
+119
+00:07:23.180 --> 00:07:27.180
+<v Brendan Wood>and feature depth first. If you don't have the ability to do an on-demand account sync,
+
+120
+00:07:27.340 --> 00:07:30.340
+<v Brendan Wood>that's not very useful for most of the applications who are interested in our API.
+
+121
+00:07:30.920 --> 00:07:35.840
+<v Brendan Wood>If you don't have the ability to place orders, that's another thing that's a deal breaker.
+
+122
+00:07:36.980 --> 00:07:41.060
+<v Brendan Wood>integrate with a trading API if it doesn't trade, right? We realized pretty quickly that we don't
+
+123
+00:07:41.060 --> 00:07:46.400
+<v Brendan Wood>need to support every broker in the world. We can pick a few of the big ones in the US market and a
+
+124
+00:07:46.400 --> 00:07:50.100
+<v Brendan Wood>few other markets that are important to us and just do a really good job at those. Just build
+
+125
+00:07:50.100 --> 00:07:55.520
+<v Brendan Wood>a reliable product that has the features that our customers need and we can get to the rest of the
+
+126
+00:07:55.520 --> 00:08:00.640
+<v Brendan Wood>market eventually. But we can only do that if we do a good job at keeping the scope minimal and
+
+127
+00:08:00.640 --> 00:08:04.780
+<v Brendan Wood>having a high quality product, even though it's limited in terms of coverage. And that really has
+
+128
+00:08:04.780 --> 00:08:07.660
+<v Brendan Wood>has been the focus for a long time because of the way that we built the MVP.
+
+129
+00:08:08.120 --> 00:08:13.540
+<v Brendan Wood>From a pure engineering perspective, it may have been better to go back and redesign the API from the ground up
+
+130
+00:08:13.540 --> 00:08:17.000
+<v Brendan Wood>and rebuild the back end from the ground up with some of the assumptions that were changing
+
+131
+00:08:17.000 --> 00:08:19.080
+<v Brendan Wood>now that we're allowing third parties to access the API.
+
+132
+00:08:19.220 --> 00:08:22.100
+<v Brendan Wood>Would have reduced the technical debt that we're still dealing with today.
+
+133
+00:08:22.440 --> 00:08:24.660
+<v Brendan Wood>But we wouldn't have been able to validate demand quickly enough.
+
+134
+00:08:24.800 --> 00:08:27.920
+<v Brendan Wood>It probably wouldn't have taken us a better part of a year to actually go launch something like that.
+
+135
+00:08:28.060 --> 00:08:30.640
+<v Brendan Wood>And we were able to do it in a couple of months and launch with our first few customers.
+
+136
+00:08:30.980 --> 00:08:33.360
+<v Brendan Wood>Yeah, in terms of how we look at the roadmap going forward,
+
+137
+00:08:35.440 --> 00:08:39.360
+<v Brendan Wood>feedback. Usually customers will tell us if there's a broker that's very important to them,
+
+138
+00:08:39.400 --> 00:08:43.240
+<v Brendan Wood>or if they'll say, you have trading at these institutions, but you don't have it on this one
+
+139
+00:08:43.240 --> 00:08:47.460
+<v Brendan Wood>yet. What do we do to get that? So then we can focus on those things. But it's largely a question
+
+140
+00:08:47.460 --> 00:08:50.620
+<v Brendan Wood>of which effort we put in is going to drive the needle the most for our customers.
+
+141
+00:08:52.000 --> 00:08:57.340
+<v Noah Labhart>Tell me about team. So is this the same team from Passiv? Have you had to expand the team?
+
+142
+00:08:57.440 --> 00:09:02.320
+<v Noah Labhart>Tell me a little bit more about how have you gone about that process of ensuring you've got
+
+143
+00:09:02.320 --> 00:09:03.120
+<v Noah Labhart>got the right team in place?
+
+144
+00:09:03.960 --> 00:09:07.120
+<v Brendan Wood>A lot of the core people are the same. We've expanded the team,
+
+145
+00:09:07.180 --> 00:09:11.560
+<v Brendan Wood>we've doubled in size. Some people have left, some people have joined. In turn, what we look for,
+
+146
+00:09:11.600 --> 00:09:15.820
+<v Brendan Wood>we essentially have a positive filter on intelligence and grit. That's what we really
+
+147
+00:09:15.820 --> 00:09:20.720
+<v Brendan Wood>look for, first of all. Like, how quickly can you solve novel problems that you've faced with,
+
+148
+00:09:20.760 --> 00:09:24.940
+<v Brendan Wood>you've never come across before? And really, that's about having people who have the capability
+
+149
+00:09:24.940 --> 00:09:29.360
+<v Brendan Wood>to be generalists on the team. It's nice to have a few really sharp employees who have specialties,
+
+150
+00:09:29.360 --> 00:09:36.500
+<v Brendan Wood>But early stage startup, you really need people that can wear a lot of different hats and be able to pivot quickly into something a little bit different from what they were doing.
+
+151
+00:09:36.860 --> 00:09:41.760
+<v Brendan Wood>Most of the problems that we encounter are fairly hairy and you can't give up at the first sign of trouble.
+
+152
+00:09:41.860 --> 00:09:44.820
+<v Brendan Wood>You have to really just find a way to grind through it and bust through the wall.
+
+153
+00:09:45.200 --> 00:09:48.320
+<v Brendan Wood>So those are like the two things we look for in terms of a positive filter.
+
+154
+00:09:48.480 --> 00:09:50.580
+<v Brendan Wood>And then we have a negative filter on attitude.
+
+155
+00:09:50.820 --> 00:09:52.960
+<v Brendan Wood>Excuse my language, but it's no assholes rule, right?
+
+156
+00:09:53.040 --> 00:09:58.160
+<v Brendan Wood>It's a culture fit thing and we want to make sure that everybody's working together constructively and collaboratively.
+
+157
+00:09:59.360 --> 00:10:03.880
+<v Brendan Wood>across like absolutely brilliant potential employees who could potentially be game changers
+
+158
+00:10:03.880 --> 00:10:09.180
+<v Brendan Wood>for the company. But we found maybe there's a little bit of arrogance or maybe they're a little
+
+159
+00:10:09.180 --> 00:10:13.400
+<v Brendan Wood>bristly to work with. And that's enough for us to say that. No, sorry. Like the team has to jive
+
+160
+00:10:13.400 --> 00:10:15.060
+<v Brendan Wood>if this is going to work in the long run.
+
+161
+00:10:18.800 --> 00:10:22.380
+<v Noah Labhart>Tell me about scalability, right? This is,
+
+162
+00:10:22.380 --> 00:10:25.880
+<v Noah Labhart>this will be interesting. So you're building the integrations into Passiv and then you
+
+163
+00:10:25.880 --> 00:10:28.840
+<v Noah Labhart>You take and pivot and use that as your product.
+
+164
+00:10:28.940 --> 00:10:33.000
+<v Noah Labhart>How are you approaching scalability for SnapTrade?
+
+165
+00:10:33.020 --> 00:10:35.860
+<v Noah Labhart>And has there been any interesting areas where you've had to fight it as you've grown?
+
+166
+00:10:36.920 --> 00:10:40.700
+<v Brendan Wood>It's hard to know where the scaling problems are going to be until you run headfirst into them.
+
+167
+00:10:40.800 --> 00:10:43.200
+<v Brendan Wood>So really what we did is like on day one, we built it to work.
+
+168
+00:10:43.300 --> 00:10:47.220
+<v Brendan Wood>Like it's just going to work and we'll address the scaling problems as they come up.
+
+169
+00:10:47.320 --> 00:10:53.340
+<v Brendan Wood>We even moved cloud providers in the last couple of years because like the cloud provider we were with, it just wasn't scaling to meet our needs.
+
+170
+00:10:53.380 --> 00:10:54.140
+<v Brendan Wood>So we had to migrate.
+
+171
+00:10:55.880 --> 00:10:59.980
+<v Brendan Wood>easily foreseen. And so it's probably good that we didn't do it in advance and we did it when it
+
+172
+00:10:59.980 --> 00:11:04.260
+<v Brendan Wood>was important to do it. And that way we can use our resources most effectively as we need them.
+
+173
+00:11:05.500 --> 00:11:10.780
+<v Noah Labhart>Okay. So as you step out on the balcony with SnapTrade and look across all that you've built
+
+174
+00:11:10.780 --> 00:11:12.120
+<v Noah Labhart>thus far, what are you most proud of?
+
+175
+00:11:12.380 --> 00:11:13.940
+<v Brendan Wood>I think it's that we're building something
+
+176
+00:11:13.940 --> 00:11:18.120
+<v Brendan Wood>that's really hard. It's a two-sided market. You've got, well, it's even more than that.
+
+177
+00:11:18.220 --> 00:11:22.340
+<v Brendan Wood>Like you've got stockbrokers or huge billion-dollar financial institutions on one side,
+
+178
+00:11:22.340 --> 00:11:26.320
+<v Brendan Wood>And you've got scrappy startup apps and founders and entrepreneurs on the other side.
+
+179
+00:11:26.420 --> 00:11:30.080
+<v Brendan Wood>And then you've got users who are customers of both the app and the broker.
+
+180
+00:11:30.260 --> 00:11:31.960
+<v Brendan Wood>And then we have to facilitate the data access.
+
+181
+00:11:32.200 --> 00:11:33.200
+<v Brendan Wood>There's a lot of moving pieces.
+
+182
+00:11:33.820 --> 00:11:37.380
+<v Brendan Wood>Starting from like ground zero, like how do you even get started?
+
+183
+00:11:37.540 --> 00:11:43.300
+<v Brendan Wood>It's a network effect driven thing where on day one, say we were pitching this API to apps and we had nothing built already.
+
+184
+00:11:43.480 --> 00:11:45.140
+<v Brendan Wood>And we said, yeah, unified broker API.
+
+185
+00:11:45.420 --> 00:11:47.380
+<v Brendan Wood>And they'd say, what brokers do you support?
+
+186
+00:11:47.520 --> 00:11:48.020
+<v Brendan Wood>And we say, none.
+
+187
+00:11:48.000 --> 00:11:49.100
+<v Brendan Wood>It's not very useful, right?
+
+188
+00:11:49.900 --> 00:11:51.520
+<v Brendan Wood>And it works the other way around as well.
+
+189
+00:11:52.860 --> 00:11:57.220
+<v Brendan Wood>financial institution, listen, we're building a unified API to have an ecosystem of apps.
+
+190
+00:11:57.300 --> 00:12:01.960
+<v Brendan Wood>And they said, what apps do you have? It's a chicken and egg problem. So getting over that
+
+191
+00:12:01.960 --> 00:12:07.140
+<v Brendan Wood>is very difficult. And we were able to do it because we had the Passiv app. So we effectively
+
+192
+00:12:07.140 --> 00:12:12.580
+<v Brendan Wood>built customer number one and use that to justify the early integrations with a lot of these brokers
+
+193
+00:12:12.580 --> 00:12:16.020
+<v Brendan Wood>and build relationships with them over a few years. And then once we had that, we went and
+
+194
+00:12:16.020 --> 00:12:19.400
+<v Brendan Wood>just opened it up to a bunch of apps. And once we started getting some big logos on the platform,
+
+195
+00:12:19.400 --> 00:12:23.520
+<v Brendan Wood>farm, then we go back to the brokers and we get even bigger names and so on, right? So laddering
+
+196
+00:12:23.520 --> 00:12:27.800
+<v Brendan Wood>out of that bootstrapping problem is probably the hardest thing that we've done. And I'm super proud
+
+197
+00:12:27.800 --> 00:12:30.980
+<v Brendan Wood>that we've been able to make it this far. It feels like we're at a point where the network is fairly
+
+198
+00:12:30.980 --> 00:12:35.280
+<v Brendan Wood>stable. Both sides are moderately well satisfied and that sets us up really well for growth.
+
+199
+00:12:36.900 --> 00:12:41.660
+<v Noah Labhart>Okay, tell me about a mistake you made with SnapTrade and how you and your team responded to
+
+200
+00:12:41.660 --> 00:12:42.160
+<v Noah Labhart>it.
+
+201
+00:12:42.320 --> 00:12:47.680
+<v Brendan Wood>This probably goes back to the hiring. So we used to hire based on code tests. They weren't
+
+202
+00:12:49.400 --> 00:12:52.900
+<v Brendan Wood>Google style CS problems or anything. We're going to throw something out of left field at you and
+
+203
+00:12:52.900 --> 00:12:56.860
+<v Brendan Wood>just see how you figure it out. So that was the only way that we filtered previously. And we
+
+204
+00:12:56.860 --> 00:13:00.320
+<v Brendan Wood>didn't have a strong filter for culture. And we ended up making a few terrible hires and then
+
+205
+00:13:00.320 --> 00:13:04.240
+<v Brendan Wood>having to deal with the fallout from that. That was a huge learning moment for me. Effectively,
+
+206
+00:13:04.240 --> 00:13:09.960
+<v Brendan Wood>the way that we do things now is we don't give people coding tests. Essentially what we do is
+
+207
+00:13:09.960 --> 00:13:15.280
+<v Brendan Wood>we'll meet somebody, interview them, ask them questions, get to know them a bit. And if it
+
+208
+00:13:15.280 --> 00:13:20.340
+<v Brendan Wood>it sounds like they're competent at whatever the role is that we want them to do, we hire them on
+
+209
+00:13:20.340 --> 00:13:24.840
+<v Brendan Wood>contract. And I know that doesn't work for everybody and it's a huge ask for a perspective
+
+210
+00:13:24.840 --> 00:13:29.200
+<v Brendan Wood>employee. Go take a week off with your other job and work for us in the meantime. But we pay people
+
+211
+00:13:29.200 --> 00:13:34.540
+<v Brendan Wood>quite well for doing those one week trials with us. And we've actually found that most people are
+
+212
+00:13:34.540 --> 00:13:38.900
+<v Brendan Wood>excited about the idea. If you're pitching somebody on, go quit your job and join us,
+
+213
+00:13:39.080 --> 00:13:42.380
+<v Brendan Wood>that's a big unknown. They don't really know us. So we give them the opportunity,
+
+214
+00:13:42.380 --> 00:13:46.340
+<v Brendan Wood>come work with us for a week. You can work on practical problems. You'll have a dedicated
+
+215
+00:13:46.340 --> 00:13:49.560
+<v Brendan Wood>person on our team who's going to be your handler while you're here and helping you
+
+216
+00:13:49.560 --> 00:13:53.300
+<v Brendan Wood>get on board and so on. And you can see if you like it. And we can see if we like you.
+
+217
+00:14:01.600 --> 00:14:04.480
+<v Brendan Wood>We're going to keep doing the same thing. We have to keep doing what we're doing.
+
+218
+00:14:04.640 --> 00:14:10.120
+<v Brendan Wood>We're not planning on adding vastly new features. It's really more about adding more integrations
+
+219
+00:14:10.120 --> 00:14:14.280
+<v Brendan Wood>as we go, improving the integrations we have, legitimizing a lot of the integrations with
+
+220
+00:14:14.280 --> 00:14:18.100
+<v Brendan Wood>official partnerships with financial institutions, that kind of stuff. The future is exciting.
+
+221
+00:14:18.300 --> 00:14:22.400
+<v Brendan Wood>So we have really strong traction on both sides of the market, both on the financial institution
+
+222
+00:14:22.400 --> 00:14:27.400
+<v Brendan Wood>side and on the demand side with applications. We're approaching a tipping point in the market
+
+223
+00:14:27.400 --> 00:14:31.920
+<v Brendan Wood>where brokers are actually coming to us and we have large potential customers coming to us and
+
+224
+00:14:31.920 --> 00:14:36.240
+<v Brendan Wood>saying, hey, we've heard about you guys and we have an idea for how an integration or how we
+
+225
+00:14:36.240 --> 00:14:41.320
+<v Brendan Wood>we might be able to use your functionality. And so it feels like the boulder is just tipping over
+
+226
+00:14:41.320 --> 00:14:45.180
+<v Brendan Wood>the top of the hill and it's starting to pick up steam on its own. And it's really an amazing
+
+227
+00:14:45.180 --> 00:14:45.680
+<v Brendan Wood>feeling.
+
+228
+00:14:46.620 --> 00:14:50.220
+<v Noah Labhart>Let's switch to you, Brendan. And then maybe this is the same answer that you had on
+
+229
+00:14:50.220 --> 00:14:53.820
+<v Noah Labhart>a prior recording. Tell me about who influences the way that you work.
+
+230
+00:14:54.360 --> 00:14:59.700
+<v Brendan Wood>I really look up to people who have a vision and who have grit. Those are the things that I admire
+
+231
+00:14:59.700 --> 00:15:03.940
+<v Brendan Wood>the most. People who strongly believe something should exist and they're just going to go make
+
+232
+00:15:03.940 --> 00:15:08.500
+<v Brendan Wood>make that happen, regardless of what the naysayers say. And there are a lot of naysayers when you try
+
+233
+00:15:08.500 --> 00:15:12.880
+<v Brendan Wood>to do something new, especially when you ask people for their support. And one of the metrics
+
+234
+00:15:12.880 --> 00:15:16.820
+<v Brendan Wood>that I've come across to help identify something truly new is if you pitch something and the answer
+
+235
+00:15:16.820 --> 00:15:20.380
+<v Brendan Wood>you get is, oh yeah, I understand what you're doing, but it doesn't look like a market exists
+
+236
+00:15:20.380 --> 00:15:25.600
+<v Brendan Wood>for that, right? If I get that answer, I'm like, that's because it's probably generally new. It may
+
+237
+00:15:25.600 --> 00:15:30.120
+<v Brendan Wood>be that it doesn't exist for a reason because it's a terrible idea. But if the market doesn't exist
+
+238
+00:15:30.120 --> 00:15:32.420
+<v Brendan Wood>and nobody really understands what the application is,
+
+239
+00:15:32.500 --> 00:15:34.440
+<v Brendan Wood>but the person has a bit of vision
+
+240
+00:15:34.440 --> 00:15:35.540
+<v Brendan Wood>and they think there's something there
+
+241
+00:15:35.540 --> 00:15:36.900
+<v Brendan Wood>and they're going to go explore that.
+
+242
+00:15:36.940 --> 00:15:38.820
+<v Brendan Wood>That is the epitome of entrepreneurship
+
+243
+00:15:38.820 --> 00:15:39.600
+<v Brendan Wood>and I just love it.
+
+244
+00:15:39.700 --> 00:15:42.260
+<v Brendan Wood>I can admire and respect some aspects
+
+245
+00:15:42.260 --> 00:15:44.520
+<v Brendan Wood>of people's personality while not appreciating others.
+
+246
+00:15:44.780 --> 00:15:46.500
+<v Brendan Wood>Steve Jobs is a great example of that.
+
+247
+00:15:46.620 --> 00:15:49.160
+<v Brendan Wood>His initial vision, along with Woz,
+
+248
+00:15:49.200 --> 00:15:52.040
+<v Brendan Wood>of creating graphical user interfaces and computers
+
+249
+00:15:52.040 --> 00:15:53.440
+<v Brendan Wood>and defining that entire market,
+
+250
+00:15:53.520 --> 00:15:55.140
+<v Brendan Wood>and then the eventual comeback
+
+251
+00:15:55.140 --> 00:15:57.320
+<v Brendan Wood>with the reinvention of Apple
+
+252
+00:15:57.320 --> 00:15:58.640
+<v Brendan Wood>and the creation of the iPod,
+
+253
+00:15:58.660 --> 00:15:59.780
+<v Brendan Wood>like, just incredible.
+
+254
+00:16:00.120 --> 00:16:02.920
+<v Brendan Wood>Just creating things left and right that nobody thought were doable.
+
+255
+00:16:03.120 --> 00:16:12.420
+<v Brendan Wood>One of the things I like about that was the story of the iPod and how it was created and how Apple knew exactly what was needed to make a successful product with the iPod before the technology was even there.
+
+256
+00:16:12.620 --> 00:16:15.540
+<v Brendan Wood>They knew the core problem was storage density at a reasonable price.
+
+257
+00:16:15.660 --> 00:16:17.740
+<v Brendan Wood>And as soon as they found that, it was like it's go time.
+
+258
+00:16:17.980 --> 00:16:22.820
+<v Brendan Wood>They bought the entire world supply of mini hard drives because they knew exactly what to do with it.
+
+259
+00:16:23.300 --> 00:16:25.080
+<v Brendan Wood>Another example would be Tolkien.
+
+260
+00:16:25.280 --> 00:16:28.940
+<v Brendan Wood>I only found this out recently, but he worked on Lord of the Rings for 14 years.
+
+261
+00:16:30.120 --> 00:16:35.460
+<v Brendan Wood>before he finished it. And he did like a whole, three books in one go. It was intended to be one
+
+262
+00:16:35.460 --> 00:16:40.040
+<v Brendan Wood>large volume. Even after he got that done, his publisher wouldn't publish it. He spent years
+
+263
+00:16:40.040 --> 00:16:44.420
+<v Brendan Wood>trying to get this thing published. And I guess fantasy genre didn't really exist, but the
+
+264
+00:16:44.420 --> 00:16:48.380
+<v Brendan Wood>publisher didn't think it would sell. And as evidence of this, like the reason why there's
+
+265
+00:16:48.380 --> 00:16:51.720
+<v Brendan Wood>three books for it was like risk mitigation on part of the publishers. They were like,
+
+266
+00:16:51.760 --> 00:16:55.680
+<v Brendan Wood>we're not sure we can sell 2000 pages of this. We're going to sell a third of that.
+
+267
+00:16:55.680 --> 00:17:00.720
+<v Brendan Wood>That 14 years of work only to have people tell you that, what, probably there's no market for this.
+
+268
+00:17:00.780 --> 00:17:01.500
+<v Brendan Wood>No one's going to buy it.
+
+269
+00:17:01.720 --> 00:17:04.320
+<v Brendan Wood>But then powering through it anyway, like a ton of respect for that.
+
+270
+00:17:05.000 --> 00:17:06.180
+<v Brendan Wood>I mean, I mentioned Plaid earlier.
+
+271
+00:17:06.300 --> 00:17:09.360
+<v Brendan Wood>I have a ton of respect for the founders of Plaid, Zach Perret, Will Hockey.
+
+272
+00:17:09.540 --> 00:17:14.060
+<v Brendan Wood>I actually had lunch with Will back in 2013, shortly after they raised their round.
+
+273
+00:17:14.240 --> 00:17:15.480
+<v Brendan Wood>Will was telling me what they're doing.
+
+274
+00:17:15.540 --> 00:17:16.440
+<v Brendan Wood>I'm like, I don't get it.
+
+275
+00:17:16.580 --> 00:17:22.180
+<v Brendan Wood>He even suggested that I join the team at one point because I was involved in like web scraping and a bunch of stuff that would have been relevant for them.
+
+276
+00:17:22.680 --> 00:17:26.420
+<v Brendan Wood>And I was like, no, I don't really understand who could possibly have use for a bank account integration.
+
+277
+00:17:27.060 --> 00:17:34.440
+<v Brendan Wood>And there's interviews with Zach out there, same sort of thing, where that was one of the big early problems they had was how do you convince people to fund something where the market doesn't exist?
+
+278
+00:17:35.000 --> 00:17:35.540
+<v Brendan Wood>They laugh.
+
+279
+00:17:35.540 --> 00:17:37.400
+<v Brendan Wood>I'm like, oh, I really understand what they saw now.
+
+280
+00:17:39.100 --> 00:17:39.600
+<v Noah Labhart>Okay.
+
+281
+00:17:39.620 --> 00:17:40.720
+<v Noah Labhart>Well, Brendan, last question.
+
+282
+00:17:40.900 --> 00:17:45.100
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+283
+00:17:45.200 --> 00:17:46.060
+<v Noah Labhart>You asked about it.
+
+284
+00:17:46.140 --> 00:17:47.340
+<v Noah Labhart>They can't wait to show it off to the world.
+
+285
+00:17:47.380 --> 00:17:49.140
+<v Noah Labhart>And can we show it off to you right there on the plane?
+
+286
+00:17:49.420 --> 00:17:50.940
+<v Noah Labhart>What advice do you give that person?
+
+287
+00:17:52.180 --> 00:17:56.340
+<v Noah Labhart>wrote a bit multiple times in different manners. And I'm curious if it'll be the same that you
+
+288
+00:17:56.340 --> 00:17:58.840
+<v Noah Labhart>mentioned in the last podcast, or it'll be something new.
+
+289
+00:17:59.560 --> 00:18:03.380
+<v Brendan Wood>Overall, I'd encourage them to have confidence in their vision and lean into it.
+
+290
+00:18:03.600 --> 00:18:08.780
+<v Brendan Wood>If the entrepreneur is not confident, they say, I'm having a hard time really buying in and
+
+291
+00:18:08.780 --> 00:18:13.960
+<v Brendan Wood>jumping in. Okay. Probably have questions. You probably have some concerns and you should answer
+
+292
+00:18:13.960 --> 00:18:18.240
+<v Brendan Wood>those concerns first and foremost. And I think that's hard for a lot of new entrepreneurs because
+
+293
+00:18:18.240 --> 00:18:22.980
+<v Brendan Wood>Because there's a strong risk of you go to measure this thing and you realize the answer is not what you hoped.
+
+294
+00:18:23.100 --> 00:18:25.200
+<v Brendan Wood>It's getting punched in the mouth repeatedly, right?
+
+295
+00:18:25.360 --> 00:18:27.940
+<v Brendan Wood>Like, it's hard to say, yeah, I'm going to go take another one of those.
+
+296
+00:18:28.400 --> 00:18:34.300
+<v Brendan Wood>If the answer you find is based in reality, then it's better to find that sooner rather than later in almost every case.
+
+297
+00:18:34.680 --> 00:18:43.040
+<v Brendan Wood>One of our closely held beliefs at SnapTrade is that our product, this unified trading API, it won't work without the support of stockbrokers in the long run, right?
+
+298
+00:18:43.120 --> 00:18:44.520
+<v Brendan Wood>Like, we're not a broker-dealer ourselves.
+
+299
+00:18:44.780 --> 00:18:45.880
+<v Brendan Wood>We had no plans on being one.
+
+300
+00:18:45.880 --> 00:18:48.540
+<v Brendan Wood>and we essentially partner with stock brokers around the world,
+
+301
+00:18:48.560 --> 00:18:50.860
+<v Brendan Wood>and we see them as like hardware that we're running on, right?
+
+302
+00:18:50.900 --> 00:18:52.900
+<v Brendan Wood>Like they provide custody, compliance, and execution.
+
+303
+00:18:53.160 --> 00:18:55.400
+<v Brendan Wood>And we're never going to do that because that's just not our jam.
+
+304
+00:18:55.600 --> 00:19:00.780
+<v Brendan Wood>So they are the regulated bag holders for all of this stuff.
+
+305
+00:19:00.980 --> 00:19:03.120
+<v Brendan Wood>And so if they're not on side with what we're doing,
+
+306
+00:19:03.700 --> 00:19:05.860
+<v Brendan Wood>eventually the shoe is going to drop and it's going to be a problem.
+
+307
+00:19:06.220 --> 00:19:09.840
+<v Brendan Wood>As a result of that, we make a point of talking to these brokers
+
+308
+00:19:09.840 --> 00:19:11.560
+<v Brendan Wood>as soon as it makes sense to have a conversation
+
+309
+00:19:11.560 --> 00:19:13.180
+<v Brendan Wood>and we have something we can share with them.
+
+310
+00:19:13.240 --> 00:19:14.040
+<v Brendan Wood>We go and do it.
+
+311
+00:19:14.060 --> 00:19:15.540
+<v Brendan Wood>And that's super risky, right?
+
+312
+00:19:15.880 --> 00:19:23.440
+<v Brendan Wood>You go to a billion-dollar company and say, listen, we're scraping your API and pushing trades through your API through these other applications.
+
+313
+00:19:23.640 --> 00:19:24.240
+<v Brendan Wood>What do you think of that?
+
+314
+00:19:24.480 --> 00:19:27.660
+<v Brendan Wood>And a lot of the time, the reaction is just like shock and horror, right?
+
+315
+00:19:27.860 --> 00:19:28.520
+<v Brendan Wood>You're doing what?
+
+316
+00:19:29.260 --> 00:19:32.820
+<v Brendan Wood>We're radically candid with financial institutions about what we do.
+
+317
+00:19:33.060 --> 00:19:37.440
+<v Brendan Wood>And yeah, we can fly under the radar for now, but in the long run, we need them to be on side.
+
+318
+00:19:37.560 --> 00:19:39.840
+<v Brendan Wood>And so we make a point of telling them what we're doing.
+
+319
+00:19:39.980 --> 00:19:41.220
+<v Brendan Wood>And so sometimes that sucks.
+
+320
+00:19:41.220 --> 00:19:45.500
+<v Brendan Wood>Sometimes you do get punched in the mouth and they say, shut down your integrations or they'll threaten you.
+
+321
+00:19:45.640 --> 00:19:50.700
+<v Brendan Wood>But we actually find that the overwhelming majority are very supportive of what we're doing.
+
+322
+00:19:50.780 --> 00:19:53.580
+<v Brendan Wood>Even if they have some concerns about it, they'll say, that's interesting.
+
+323
+00:19:53.740 --> 00:19:56.200
+<v Brendan Wood>Let's tell you what, we're not going to tell you to shut it down right away.
+
+324
+00:19:56.280 --> 00:19:57.380
+<v Brendan Wood>Let's explore this a little bit.
+
+325
+00:19:58.100 --> 00:20:02.240
+<v Brendan Wood>And even if they choose not to go with it in that conversation, we're building trust with them.
+
+326
+00:20:02.340 --> 00:20:05.220
+<v Brendan Wood>And that's the single most important thing in this industry is trust.
+
+327
+00:20:05.220 --> 00:20:06.120
+<v Brendan Wood>It's financial services.
+
+328
+00:20:06.120 --> 00:20:10.700
+<v Brendan Wood>we're constantly doing the same thing of challenging our assumptions trying to answer
+
+329
+00:20:10.700 --> 00:20:14.840
+<v Brendan Wood>the hairiest questions around is this going to work is this broker going to be supportive
+
+330
+00:20:14.840 --> 00:20:18.960
+<v Brendan Wood>even if they're not and the answer sucks it's better to find that out now instead of two years
+
+331
+00:20:18.960 --> 00:20:22.360
+<v Brendan Wood>from now when we have customers depending on this and it becomes a much bigger problem
+
+332
+00:20:22.360 --> 00:20:23.140
+<v Brendan Wood>for sure
+
+333
+00:20:23.140 --> 00:20:27.920
+<v Noah Labhart>That's fantastic advice. Well, Brendan, thanks for coming back on the show and telling
+
+334
+00:20:27.920 --> 00:20:32.000
+<v Noah Labhart>the creation story of SnapTrade. It's great to hear all the updates and the new product.
+
+335
+00:20:32.000 --> 00:20:35.560
+<v Brendan Wood>Excited to root you on from the Code Story sidelines. Awesome, thanks, Noah.
+
+336
+00:20:37.360 --> 00:20:40.200
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+337
+00:20:44.340 --> 00:20:47.320
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+338
+00:20:47.520 --> 00:20:52.220
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+339
+00:20:52.920 --> 00:20:54.640
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+340
+00:20:54.640 --> 00:21:01.660
+<v Noah Labhart>a review. Both things help us out tremendously. And thanks again for listening.

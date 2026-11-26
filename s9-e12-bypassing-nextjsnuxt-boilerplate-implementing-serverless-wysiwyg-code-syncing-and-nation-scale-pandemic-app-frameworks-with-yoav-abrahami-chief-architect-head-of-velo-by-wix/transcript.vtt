@@ -1,0 +1,1299 @@
+WEBVTT
+
+NOTE S9 E12: Bypassing NextJS/Nuxt Boilerplate: Implementing Serverless WYSIWYG Code Syncing and Nation-Scale Pandemic App Frameworks with Yoav Abrahami, Chief Architect & Head of Velo by Wix
+
+1
+00:00:00.980 --> 00:00:05.780
+<v Yoav Abrahami>Normally, when you're doing regular backend software, you need to have a server, and then
+
+2
+00:00:05.780 --> 00:00:07.280
+<v Yoav Abrahami>you need to have a second one for resilience.
+
+3
+00:00:07.600 --> 00:00:11.500
+<v Yoav Abrahami>And normally, you're going to have another two servers in another region or another availability
+
+4
+00:00:11.500 --> 00:00:12.000
+<v Yoav Abrahami>zone.
+
+5
+00:00:12.360 --> 00:00:16.360
+<v Yoav Abrahami>So we're starting with four servers, each one costs $20 per month, even before doing
+
+6
+00:00:17.280 --> 00:00:21.240
+<v Yoav Abrahami>But if we can spin up a server in 100 milliseconds, then you don't need them live.
+
+7
+00:00:21.400 --> 00:00:25.800
+<v Yoav Abrahami>When a request comes, you spin it up, do whatever you need, keep it live for a few minutes,
+
+8
+00:00:25.840 --> 00:00:26.880
+<v Yoav Abrahami>and then shut it down.
+
+9
+00:00:26.880 --> 00:00:32.020
+<v Yoav Abrahami>And that means that the cost of server per website goes down by a factor of about a thousand.
+
+10
+00:00:32.180 --> 00:00:34.020
+<v Yoav Abrahami>But that means that it's free.
+
+11
+00:00:34.440 --> 00:00:36.740
+<v Yoav Abrahami>We can give you a server for free.
+
+12
+00:00:37.560 --> 00:00:43.880
+<v Yoav Abrahami>My name is Yoav Abrahami and I am Chief Architect at Wix and Head of Wix Code &amp; Products.
+
+13
+00:00:46.460 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+14
+00:00:52.340 --> 00:00:55.220
+<v Clip>It's six months moonlighting. There's nothing on the backhand.
+
+15
+00:00:55.460 --> 00:00:59.500
+<v Noah Labhart>Who share what it takes to change an industry. I don't exactly know
+
+16
+00:00:59.500 --> 00:01:00.220
+<v Clip>what to do next.
+
+17
+00:01:00.240 --> 00:01:01.240
+<v Clip>It took many goes to get right.
+
+18
+00:01:01.720 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+19
+00:01:04.460 --> 00:01:06.120
+<v Clip>The company is its people.
+
+20
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+21
+00:01:07.440 --> 00:01:08.560
+<v Clip>Most proud of our team.
+
+22
+00:01:08.880 --> 00:01:11.200
+<v Noah Labhart>Keeping scalability top of mind.
+
+23
+00:01:11.480 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+24
+00:01:12.860 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+25
+00:01:14.420 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+26
+00:01:15.540 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+27
+00:01:18.260 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, mind you.
+
+28
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+29
+00:01:22.880 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+30
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+31
+00:01:27.640 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+32
+00:01:29.060 --> 00:01:30.940
+<v Noah Labhart>All this and more on Code Story.
+
+33
+00:01:32.340 --> 00:01:33.820
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+34
+00:01:34.460 --> 00:01:42.940
+<v Noah Labhart>And today, how Yoav Abrahami is architecting the way towards the creation of your website without any limits.
+
+35
+00:01:49.220 --> 00:01:51.540
+<v Noah Labhart>Yoav Abrahami was born and raised in Israel.
+
+36
+00:01:51.760 --> 00:01:54.880
+<v Noah Labhart>Currently, he lives in Tel Aviv and has spent 30 years in technology.
+
+37
+00:01:55.240 --> 00:02:02.000
+<v Noah Labhart>He studied high-energy physics in college, and today he finds similarities in how you solve problems in building products and physics.
+
+38
+00:02:02.640 --> 00:02:10.320
+<v Noah Labhart>Outside of tech, he is the father of two children and enjoys hiking and mountain biking in the diverse climates and terrains that Israel has to offer.
+
+39
+00:02:11.520 --> 00:02:17.140
+<v Noah Labhart>In 2006, Yoav helped his brothers get Wix started up and build it to what it is today.
+
+40
+00:02:17.500 --> 00:02:23.980
+<v Noah Labhart>Fast forward, Wix has collected infrastructure and application partners allowing them to offer these integrations to Wix users.
+
+41
+00:02:24.460 --> 00:02:31.780
+<v Noah Labhart>What they figured out next was that people wanted it done for them, turnkey, without having to learn how to spin up a server.
+
+42
+00:02:33.780 --> 00:02:36.900
+<v Noah Labhart>This is the creation story of Velo by Wix.
+
+43
+00:02:42.940 --> 00:02:49.580
+<v Yoav Abrahami>In 2006, Avishai Abrahami, which is my older brother, and Nadav Abrahami, which is my younger brother,
+
+44
+00:02:49.840 --> 00:02:54.300
+<v Yoav Abrahami>they came to me and said, we have that idea of a website builder.
+
+45
+00:02:54.500 --> 00:02:56.280
+<v Yoav Abrahami>And they also had Giora Kaplan with them.
+
+46
+00:02:56.400 --> 00:02:59.760
+<v Yoav Abrahami>We were going to build a company, so help us hire the first backend developer.
+
+47
+00:03:00.120 --> 00:03:01.000
+<v Yoav Abrahami>And I did.
+
+48
+00:03:02.000 --> 00:03:03.160
+<v Yoav Abrahami>And that turned out to be Wix.
+
+49
+00:03:03.960 --> 00:03:08.760
+<v Yoav Abrahami>Four years ahead, I'm coming to Wix to figure out what to do with the iPhone.
+
+50
+00:03:08.960 --> 00:03:12.980
+<v Yoav Abrahami>Because at the time, Wix didn't support mobile or the iPhone.
+
+51
+00:03:13.180 --> 00:03:17.040
+<v Yoav Abrahami>And since then, I'm at Wix already for 14 years.
+
+52
+00:03:17.440 --> 00:03:21.200
+<v Yoav Abrahami>In 2012, we built the Wix App Market.
+
+53
+00:03:21.480 --> 00:03:26.580
+<v Yoav Abrahami>It's allowing partners to create applications that you can install into Wix website.
+
+54
+00:03:26.580 --> 00:03:32.760
+<v Yoav Abrahami>website. Now that's interesting for partners because Wix has a huge reach to users. We
+
+55
+00:03:32.760 --> 00:03:38.880
+<v Yoav Abrahami>are now over 300 million users, a significant part of the internet running on Wix. And the
+
+56
+00:03:38.880 --> 00:03:44.340
+<v Yoav Abrahami>target that we set out was to build a solution where anyone can create their own online presence
+
+57
+00:03:44.340 --> 00:03:49.760
+<v Yoav Abrahami>using Wix. What the App Market allowed us to do is to let partners leverage that infrastructure
+
+58
+00:03:50.540 --> 00:03:55.840
+<v Yoav Abrahami>and sell their applications on top of that infrastructure for Wix users. But what we
+
+59
+00:03:56.580 --> 00:04:00.080
+<v Yoav Abrahami>is that to build an application required quite a lot of effort.
+
+60
+00:04:00.240 --> 00:04:03.100
+<v Yoav Abrahami>You needed to start by bringing your own database,
+
+61
+00:04:03.520 --> 00:04:04.800
+<v Yoav Abrahami>reading your own server,
+
+62
+00:04:05.080 --> 00:04:08.640
+<v Yoav Abrahami>setting up quite a few different things with your application,
+
+63
+00:04:08.860 --> 00:04:10.280
+<v Yoav Abrahami>with the interaction with Wix and so on.
+
+64
+00:04:11.020 --> 00:04:12.940
+<v Yoav Abrahami>That's actually quite complicated to do.
+
+65
+00:04:13.520 --> 00:04:15.180
+<v Yoav Abrahami>That is where Velo came out.
+
+66
+00:04:15.360 --> 00:04:20.340
+<v Yoav Abrahami>And the idea of Velo is to give you a cloud-based development environment,
+
+67
+00:04:20.740 --> 00:04:23.360
+<v Yoav Abrahami>one that is connected to Wix on one end,
+
+68
+00:04:26.580 --> 00:04:27.760
+<v Yoav Abrahami>you want on our platform.
+
+69
+00:04:28.040 --> 00:04:33.980
+<v Yoav Abrahami>And you get a database, you get a server, you get the ability to code client code.
+
+70
+00:04:34.200 --> 00:04:35.820
+<v Yoav Abrahami>And so it gives you all that freedom.
+
+71
+00:04:36.080 --> 00:04:38.620
+<v Yoav Abrahami>And it is all in a fully managed environment.
+
+72
+00:04:39.760 --> 00:04:44.280
+<v Yoav Abrahami>And you actually can create an application start to finish in five minutes.
+
+73
+00:04:44.620 --> 00:04:51.380
+<v Yoav Abrahami>And once you click on the publish or deploy button, it's live globally, you know, in minutes.
+
+74
+00:04:53.980 --> 00:04:57.780
+<v Noah Labhart>Tell me about what would be the MVP for Velo.
+
+75
+00:04:57.920 --> 00:05:01.500
+<v Noah Labhart>So that first version of the product you built, how long did it take to build?
+
+76
+00:05:01.640 --> 00:05:04.720
+<v Noah Labhart>And what sort of tools were you using to bring it to life?
+
+77
+00:05:06.060 --> 00:05:09.100
+<v Yoav Abrahami>Velo is running for millions of websites.
+
+78
+00:05:09.340 --> 00:05:17.980
+<v Yoav Abrahami>And when you have a solution that runs a server, you give each one of those million websites their own server, you have a big challenge.
+
+79
+00:05:18.240 --> 00:05:19.200
+<v Yoav Abrahami>No one can do that.
+
+80
+00:05:19.200 --> 00:05:21.420
+<v Yoav Abrahami>So we needed first to find a solution for that.
+
+81
+00:05:21.460 --> 00:05:27.000
+<v Yoav Abrahami>And keep in mind, the product we're giving is we're letting any user code their own code,
+
+82
+00:05:27.120 --> 00:05:27.760
+<v Yoav Abrahami>their own backend code.
+
+83
+00:05:28.280 --> 00:05:32.520
+<v Yoav Abrahami>And now we have a million sites that each one has a different backend code,
+
+84
+00:05:32.600 --> 00:05:36.840
+<v Yoav Abrahami>and we need to run them in isolation, each one in a way that they cannot interfere with each other.
+
+85
+00:05:37.540 --> 00:05:42.580
+<v Yoav Abrahami>So what we've understood is that we needed a way to make it work in a very efficient way
+
+86
+00:05:42.580 --> 00:05:44.520
+<v Yoav Abrahami>and a very cost-effective way.
+
+87
+00:05:44.520 --> 00:05:51.160
+<v Yoav Abrahami>and that way was to be able to spin up a container or a server in 100 milliseconds.
+
+88
+00:05:51.820 --> 00:05:56.440
+<v Yoav Abrahami>That means that if you have a website, and most websites don't really have a lot of traffic,
+
+89
+00:05:56.500 --> 00:05:58.660
+<v Yoav Abrahami>you have 100 million websites in the world,
+
+90
+00:05:58.720 --> 00:06:03.840
+<v Yoav Abrahami>the website number million ordered by traffic is a few visitors each day.
+
+91
+00:06:04.100 --> 00:06:08.260
+<v Yoav Abrahami>Most of the time during the day, there's no traffic, there's no one on the website.
+
+92
+00:06:09.040 --> 00:06:12.480
+<v Yoav Abrahami>And normally when you're doing regular backend software,
+
+93
+00:06:12.480 --> 00:06:16.540
+<v Yoav Abrahami>software you need to have a server and then you need to have a second one for resilience and
+
+94
+00:06:16.540 --> 00:06:20.680
+<v Yoav Abrahami>normally you're going to have another two servers in another region or another availability zone
+
+95
+00:06:20.680 --> 00:06:25.400
+<v Yoav Abrahami>so we're starting with four servers each one costs $20 per month even before doing anything
+
+96
+00:06:25.920 --> 00:06:30.980
+<v Yoav Abrahami>but if we can spin up a server in 100 milliseconds then you don't need them live when a request comes
+
+97
+00:06:30.980 --> 00:06:36.200
+<v Yoav Abrahami>you spin it up do whatever you need keep it live for a few minutes and then shut it down and that
+
+98
+00:06:36.200 --> 00:06:40.760
+<v Yoav Abrahami>That means that the cost of server per website goes down by a factor of about a thousand.
+
+99
+00:06:41.500 --> 00:06:43.440
+<v Yoav Abrahami>But that means that it's free.
+
+100
+00:06:43.840 --> 00:06:46.120
+<v Yoav Abrahami>We can give you a server for free.
+
+101
+00:06:46.360 --> 00:06:52.140
+<v Yoav Abrahami>Obviously, there's limits and there's terms and conditions, but there's lots of users that don't need to pay.
+
+102
+00:06:52.760 --> 00:07:01.060
+<v Yoav Abrahami>So the MVP, or the first version of Velo, was basically create that very fast to spin up server that you can code against.
+
+103
+00:07:01.060 --> 00:07:06.160
+<v Yoav Abrahami>Same thing for a database that you also get it at a price of zero, basically.
+
+104
+00:07:06.400 --> 00:07:11.120
+<v Yoav Abrahami>And the ability to just write simple HTML pages that show that.
+
+105
+00:07:11.180 --> 00:07:14.580
+<v Yoav Abrahami>That was the first version, and that took about a year and a half to build.
+
+106
+00:07:16.200 --> 00:07:21.280
+<v Noah Labhart>In that year and a half, when you're building that first version and figuring out how to solve that problem,
+
+107
+00:07:21.800 --> 00:07:27.440
+<v Noah Labhart>which sounds like an amazingly fun engineering problem to solve with spinning up servers that fast,
+
+108
+00:07:27.440 --> 00:07:29.980
+<v Noah Labhart>you got to make certain decisions and trade-offs, right?
+
+109
+00:07:30.060 --> 00:07:31.560
+<v Noah Labhart>About how you're going to approach the problem
+
+110
+00:07:31.560 --> 00:07:33.140
+<v Noah Labhart>as you discover new information.
+
+111
+00:07:33.460 --> 00:07:35.540
+<v Noah Labhart>Tell me about some of those you had to make
+
+112
+00:07:35.540 --> 00:07:37.060
+<v Noah Labhart>and how you coped with those decisions.
+
+113
+00:07:37.680 --> 00:07:38.180
+<v Yoav Abrahami>I
+
+114
+00:07:38.080 --> 00:07:39.800
+<v Yoav Abrahami>think the way that we did it
+
+115
+00:07:39.800 --> 00:07:41.560
+<v Yoav Abrahami>was first to define criteria
+
+116
+00:07:41.560 --> 00:07:43.660
+<v Yoav Abrahami>for what would be a successful product.
+
+117
+00:07:43.840 --> 00:07:46.420
+<v Yoav Abrahami>And that 100 milliseconds was one of those criteria.
+
+118
+00:07:47.280 --> 00:07:48.880
+<v Yoav Abrahami>Now, as we started to do that,
+
+119
+00:07:48.900 --> 00:07:51.120
+<v Yoav Abrahami>we started to try different approaches.
+
+120
+00:07:51.860 --> 00:07:53.300
+<v Yoav Abrahami>One approach was to take
+
+121
+00:07:53.300 --> 00:07:55.440
+<v Yoav Abrahami>one of the big cloud vendors platform
+
+122
+00:07:55.440 --> 00:07:57.240
+<v Yoav Abrahami>and try to see if it works for us.
+
+123
+00:07:57.440 --> 00:07:58.440
+<v Yoav Abrahami>and it didn't.
+
+124
+00:07:58.440 --> 00:08:00.640
+<v Yoav Abrahami>It took about two seconds to get a call start.
+
+125
+00:08:01.000 --> 00:08:03.620
+<v Yoav Abrahami>And then we started looking at using containers.
+
+126
+00:08:03.740 --> 00:08:06.220
+<v Yoav Abrahami>And container, which just in a low-old application,
+
+127
+00:08:06.400 --> 00:08:07.920
+<v Yoav Abrahami>takes about two seconds to spin up.
+
+128
+00:08:08.160 --> 00:08:09.640
+<v Yoav Abrahami>So again, that was a dead end.
+
+129
+00:08:10.080 --> 00:08:12.500
+<v Yoav Abrahami>And then we looked at process hibernation,
+
+130
+00:08:12.560 --> 00:08:14.240
+<v Yoav Abrahami>and we looked at some other alternatives.
+
+131
+00:08:14.460 --> 00:08:16.920
+<v Yoav Abrahami>And then we found the right alternative that works for us.
+
+132
+00:08:17.040 --> 00:08:21.440
+<v Yoav Abrahami>But it was trying to fail fast on different approaches
+
+133
+00:08:21.440 --> 00:08:23.460
+<v Yoav Abrahami>by that KPI that we've set,
+
+134
+00:08:23.600 --> 00:08:25.340
+<v Yoav Abrahami>and then find the one that works for us.
+
+135
+00:08:26.640 --> 00:08:32.040
+<v Noah Labhart>you've got the mvp it's working it's been that year and a half you you're excited about the
+
+136
+00:08:32.040 --> 00:08:35.820
+<v Noah Labhart>product how did you progress it from that point how did you mature it and i think what i'm curious
+
+137
+00:08:35.820 --> 00:08:41.740
+<v Noah Labhart>about there is how do you go about building your roadmap for velo and what you know what sort of
+
+138
+00:08:41.740 --> 00:08:45.860
+<v Noah Labhart>criteria or what sort of process are you going through to decide okay this is the next most
+
+139
+00:08:45.860 --> 00:08:49.700
+<v Noah Labhart>important thing to build or to address when
+
+140
+00:08:49.700 --> 00:08:51.920
+<v Yoav Abrahami>we started velo there were two other similar
+
+141
+00:08:51.920 --> 00:08:58.600
+<v Yoav Abrahami>similar products in concept of a backend as a service, Firebase and Parse, Parse.com.
+
+142
+00:08:59.180 --> 00:09:04.420
+<v Yoav Abrahami>What happened is that both of them were taken towards support mobile applications.
+
+143
+00:09:05.140 --> 00:09:11.600
+<v Yoav Abrahami>Parse was shut down a few years later, and Firebase is still strong on mobile in Google Cloud.
+
+144
+00:09:12.080 --> 00:09:17.600
+<v Yoav Abrahami>At that time, we had a product, and it has the ability to render basic HTML pages,
+
+145
+00:09:17.600 --> 00:09:20.860
+<v Yoav Abrahami>but it had all the database and the Node.js backend.
+
+146
+00:09:21.100 --> 00:09:22.900
+<v Yoav Abrahami>And we need to decide what we want to do with it.
+
+147
+00:09:23.000 --> 00:09:28.240
+<v Yoav Abrahami>Do we want to try an approach of let's make it a generic platform for websites,
+
+148
+00:09:28.480 --> 00:09:30.480
+<v Yoav Abrahami>but we're only generating basic HTML?
+
+149
+00:09:30.660 --> 00:09:35.220
+<v Yoav Abrahami>Or maybe we'll take a different route and connect it with Wix.
+
+150
+00:09:35.400 --> 00:09:40.960
+<v Yoav Abrahami>And with Wix, you get a drag-and-drop experience to draw websites similar to PowerPoint.
+
+151
+00:09:41.240 --> 00:09:45.040
+<v Yoav Abrahami>And we asked ourselves, what if we connect the two?
+
+152
+00:09:45.040 --> 00:09:50.360
+<v Yoav Abrahami>You draw your UI using Wix, but then you can code against it using Velo.
+
+153
+00:09:50.880 --> 00:09:54.420
+<v Yoav Abrahami>That is actually something that no one actually ever tried before.
+
+154
+00:09:54.800 --> 00:09:57.220
+<v Yoav Abrahami>Keep in mind, that is not a low-code tool.
+
+155
+00:09:57.340 --> 00:10:03.440
+<v Yoav Abrahami>It is a cloud platform with Node.js and database connected to Wix, which is a drag-and-drop website builder.
+
+156
+00:10:04.310 --> 00:10:05.840
+<v Yoav Abrahami>So that's the direction we've chosen.
+
+157
+00:10:06.080 --> 00:10:11.560
+<v Yoav Abrahami>It was an harder direction simply because that becomes a big integration effort.
+
+158
+00:10:11.560 --> 00:10:21.080
+<v Yoav Abrahami>Fort. About a year later, we went and did a usability for that product with 12 Wix partners.
+
+159
+00:10:21.240 --> 00:10:26.540
+<v Yoav Abrahami>And we were sitting in a room. We were not going to try to announce the product. It was just,
+
+160
+00:10:26.680 --> 00:10:30.300
+<v Yoav Abrahami>hey, we want to show you something cool. Let's see how you react. What do you think about it?
+
+161
+00:10:30.840 --> 00:10:36.320
+<v Yoav Abrahami>And I couldn't talk anymore at that point because they were like, yeah, amazing. Do me off and so
+
+162
+00:10:36.320 --> 00:10:40.260
+<v Yoav Abrahami>on. And at that point, what was the point? We knew we have something that's really cool.
+
+163
+00:10:41.560 --> 00:10:42.440
+<v Noah Labhart>I'm hearing you say we.
+
+164
+00:10:42.580 --> 00:10:47.480
+<v Noah Labhart>Tell me about how the team was built around Velo.
+
+165
+00:10:47.660 --> 00:10:52.020
+<v Noah Labhart>And what were you looking for in those people to indicate that they were the winning horses to join you?
+
+166
+00:10:52.420 --> 00:10:56.860
+<v Yoav Abrahami>So when I started Velo, the first thing I did was create the founding team.
+
+167
+00:10:57.420 --> 00:11:01.020
+<v Yoav Abrahami>And I've taken two people with me, Ziv and Gil.
+
+168
+00:11:01.900 --> 00:11:04.740
+<v Yoav Abrahami>One is a very experienced manager.
+
+169
+00:11:04.880 --> 00:11:08.520
+<v Yoav Abrahami>And Gil Tayar is a very experienced anything techie.
+
+170
+00:11:08.520 --> 00:11:14.560
+<v Yoav Abrahami>Both a great speaker, a great engineer, a great architect, and both of them amazing people.
+
+171
+00:11:14.840 --> 00:11:19.040
+<v Yoav Abrahami>And with those three, we started hiring more people and creating the product.
+
+172
+00:11:19.180 --> 00:11:33.020
+<v Yoav Abrahami>And that team got us all the way to launching the product to a point where all of Wix transformed from thinking just do-it-yourself consumers to also think about developers, which was amazing.
+
+173
+00:11:33.020 --> 00:11:33.520
+<v Yoav Abrahami>Amazing.
+
+174
+00:11:36.360 --> 00:11:45.560
+<v Noah Labhart>This will be really interesting given what has been built for Wix, what you're building and the engineering problems you've already mentioned that you had to solve.
+
+175
+00:11:45.660 --> 00:11:47.520
+<v Noah Labhart>But I'm curious about scalability.
+
+176
+00:11:47.980 --> 00:11:55.580
+<v Noah Labhart>Did you build this to scale efficiently from day one or has there been any interesting areas where you had to fight it as you grew?
+
+177
+00:11:56.620 --> 00:12:01.220
+<v Yoav Abrahami>We did build it for scalability from day one, but still there were some challenges.
+
+178
+00:12:03.020 --> 00:12:04.680
+<v Yoav Abrahami>in Velo, Kubernetes didn't exist.
+
+179
+00:12:04.920 --> 00:12:06.740
+<v Yoav Abrahami>So we had to build our own infrastructure
+
+180
+00:12:06.740 --> 00:12:09.020
+<v Yoav Abrahami>to scale out servers, and then
+
+181
+00:12:09.020 --> 00:12:10.900
+<v Yoav Abrahami>on each server to run multiple containers
+
+182
+00:12:10.900 --> 00:12:12.680
+<v Yoav Abrahami>with the unique setup that we have.
+
+183
+00:12:13.360 --> 00:12:15.020
+<v Yoav Abrahami>Now, keep in mind that we
+
+184
+00:12:15.020 --> 00:12:17.040
+<v Yoav Abrahami>have a system that when you need a server,
+
+185
+00:12:17.160 --> 00:12:18.740
+<v Yoav Abrahami>it's there. You get it immediately.
+
+186
+00:12:18.960 --> 00:12:21.060
+<v Yoav Abrahami>And we had a system to try to figure out
+
+187
+00:12:21.060 --> 00:12:22.520
+<v Yoav Abrahami>where when a host
+
+188
+00:12:23.140 --> 00:12:25.180
+<v Yoav Abrahami>doesn't work, when you have a problem in the host
+
+189
+00:12:25.180 --> 00:12:26.940
+<v Yoav Abrahami>to kill it. And that system had a malfunction
+
+190
+00:12:27.400 --> 00:12:29.000
+<v Yoav Abrahami>in that it would kill
+
+191
+00:12:29.000 --> 00:12:30.840
+<v Yoav Abrahami>hosts which run in servers
+
+192
+00:12:30.840 --> 00:12:32.400
+<v Yoav Abrahami>of users randomly.
+
+193
+00:12:33.380 --> 00:12:35.680
+<v Yoav Abrahami>and we didn't know about it for four months.
+
+194
+00:12:36.020 --> 00:12:38.200
+<v Yoav Abrahami>And the reason why we didn't know about it
+
+195
+00:12:38.200 --> 00:12:42.360
+<v Yoav Abrahami>is because you would kill a host that runs 100 user servers,
+
+196
+00:12:42.460 --> 00:12:45.440
+<v Yoav Abrahami>and they just get their servers from some other place immediately.
+
+197
+00:12:45.820 --> 00:12:48.020
+<v Yoav Abrahami>So we don't even see that on any metric
+
+198
+00:12:48.020 --> 00:12:49.820
+<v Yoav Abrahami>because there's no impact on users.
+
+199
+00:12:49.960 --> 00:12:51.840
+<v Yoav Abrahami>But you have a critical problem in your system.
+
+200
+00:12:52.400 --> 00:12:55.900
+<v Yoav Abrahami>It turned out that maintaining that system is tough,
+
+201
+00:12:56.120 --> 00:13:00.280
+<v Yoav Abrahami>and then we actually have rewritten it on top of Kubernetes.
+
+202
+00:13:00.280 --> 00:13:06.000
+<v Yoav Abrahami>On our database side, what we did in order to give you a database at zero cost is basically a shared database.
+
+203
+00:13:06.200 --> 00:13:09.240
+<v Yoav Abrahami>It's like a logical database on top of a physical database.
+
+204
+00:13:09.540 --> 00:13:13.600
+<v Yoav Abrahami>That works pretty well when you have lots of small databases.
+
+205
+00:13:13.980 --> 00:13:17.280
+<v Yoav Abrahami>Right now we have over 140 million tables.
+
+206
+00:13:17.540 --> 00:13:26.880
+<v Yoav Abrahami>But when one of them starts becoming large, you can't really optimize because they're all on the same physical table, just logical partitioning.
+
+207
+00:13:27.740 --> 00:13:31.620
+<v Yoav Abrahami>So what we've done, we actually created different tiers of databases.
+
+208
+00:13:32.000 --> 00:13:35.880
+<v Yoav Abrahami>So today in Velo, we actually have the basic database, which is free,
+
+209
+00:13:35.980 --> 00:13:41.620
+<v Yoav Abrahami>and you can scale with it to about 10,000 items, depending on the workload.
+
+210
+00:13:42.400 --> 00:13:46.340
+<v Yoav Abrahami>As part of Wix Elite plan, we have a database which is a dedicated table.
+
+211
+00:13:46.500 --> 00:13:49.620
+<v Yoav Abrahami>It's basically a physical table, and that can scale more.
+
+212
+00:13:49.820 --> 00:13:53.340
+<v Yoav Abrahami>We're having the option for you to bring your own database,
+
+213
+00:13:53.340 --> 00:13:58.120
+<v Yoav Abrahami>database so you can decide that you're going to install your own MySQL or whatever and just
+
+214
+00:13:58.120 --> 00:14:01.920
+<v Yoav Abrahami>connect it to our system and then scale it as much as you want. We don't care at that point.
+
+215
+00:14:02.680 --> 00:14:08.920
+<v Yoav Abrahami>When you have a long tail distribution, a lot of the times the product for one edge is not the same
+
+216
+00:14:08.920 --> 00:14:13.960
+<v Yoav Abrahami>product for the other edge. A product for lots and lots of small users is not the same as a product
+
+217
+00:14:13.960 --> 00:14:18.320
+<v Yoav Abrahami>for a few large users. And trying to build them together as one doesn't really work out.
+
+218
+00:14:19.500 --> 00:14:24.640
+<v Noah Labhart>Yoav, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+219
+00:14:25.680 --> 00:14:28.520
+<v Yoav Abrahami>I think Velo is definitely number one.
+
+220
+00:14:29.220 --> 00:14:30.320
+<v Yoav Abrahami>Definitely number one.
+
+221
+00:14:30.380 --> 00:14:37.500
+<v Yoav Abrahami>It's the one that I've taken from an idea all the way to where it is today, which is just amazing.
+
+222
+00:14:38.220 --> 00:14:43.220
+<v Yoav Abrahami>There are quite a few other things that I've created and grew and are successful.
+
+223
+00:14:43.540 --> 00:14:45.960
+<v Yoav Abrahami>The Wix App Market is, again, just another one.
+
+224
+00:14:46.500 --> 00:14:48.420
+<v Yoav Abrahami>But I think Velo is definitely the one.
+
+225
+00:14:50.000 --> 00:14:51.380
+<v Noah Labhart>Let's flip the script a little bit.
+
+226
+00:14:51.540 --> 00:14:55.780
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+227
+00:14:56.980 --> 00:15:00.960
+<v Yoav Abrahami>One of my employees reminded me when we launched Velo.
+
+228
+00:15:01.180 --> 00:15:03.360
+<v Yoav Abrahami>Actually, we actually launched it to everyone.
+
+229
+00:15:03.580 --> 00:15:07.600
+<v Yoav Abrahami>We were 12 people at the time, and that guy was an engineer.
+
+230
+00:15:07.760 --> 00:15:11.760
+<v Yoav Abrahami>And we were all in a circle, and I told him, I don't know how or when,
+
+231
+00:15:11.760 --> 00:15:17.580
+<v Yoav Abrahami>but I do know that we're going to create a downtime of two days for weeks because of velo.
+
+232
+00:15:18.100 --> 00:15:22.980
+<v Yoav Abrahami>And I have no idea when, how, why, or how to prevent it,
+
+233
+00:15:23.020 --> 00:15:24.960
+<v Yoav Abrahami>but I just know that it's going to happen sometime next year.
+
+234
+00:15:25.160 --> 00:15:26.760
+<v Yoav Abrahami>And that's the risk we're taking.
+
+235
+00:15:26.900 --> 00:15:27.500
+<v Yoav Abrahami>That's okay.
+
+236
+00:15:27.720 --> 00:15:29.280
+<v Yoav Abrahami>Let's just be prepared for that.
+
+237
+00:15:29.740 --> 00:15:33.500
+<v Yoav Abrahami>And actually, we didn't create a downtime for all of weeks for two days,
+
+238
+00:15:33.980 --> 00:15:35.820
+<v Yoav Abrahami>but it put us in the right mindset.
+
+239
+00:15:35.820 --> 00:15:43.660
+<v Yoav Abrahami>I can share one example that we had was that we had two servers.
+
+240
+00:15:43.900 --> 00:15:46.800
+<v Yoav Abrahami>One was a proxy server and the other one was some application.
+
+241
+00:15:47.080 --> 00:15:48.980
+<v Yoav Abrahami>And the first one was Java.
+
+242
+00:15:49.020 --> 00:15:54.660
+<v Yoav Abrahami>It was using a Java HTTP client, which is set to follow redirects by default.
+
+243
+00:15:54.800 --> 00:15:57.740
+<v Yoav Abrahami>And the other server, it had a great idea.
+
+244
+00:15:57.780 --> 00:16:02.420
+<v Yoav Abrahami>If there is a problem, there is an exception, it would just return a redirect to the homepage.
+
+245
+00:16:02.420 --> 00:16:08.700
+<v Yoav Abrahami>page and that other server at some point had an exception on the home page so what happened is
+
+246
+00:16:08.700 --> 00:16:15.380
+<v Yoav Abrahami>that the request came went through the proxy got to the second server had an exception got a redirect
+
+247
+00:16:15.380 --> 00:16:20.580
+<v Yoav Abrahami>to the home page got it back to the first server which would follow redirect went out to the router
+
+248
+00:16:20.580 --> 00:16:26.700
+<v Yoav Abrahami>and to the load balancer got to another server which got to the first application proxy to the
+
+249
+00:16:26.700 --> 00:16:31.880
+<v Yoav Abrahami>second application again got an exception on the home page got a redirect to the home page back to
+
+250
+00:16:32.420 --> 00:16:35.120
+<v Yoav Abrahami>and basically it dropped the whole data center in one request.
+
+251
+00:16:35.320 --> 00:16:36.280
+<v Yoav Abrahami>That was really funny.
+
+252
+00:16:39.220 --> 00:16:42.300
+<v Noah Labhart>Okay, Yoav, what does the future look like
+
+253
+00:16:42.300 --> 00:16:44.860
+<v Noah Labhart>for Velo, the product, and for your team?
+
+254
+00:16:46.280 --> 00:16:50.240
+<v Yoav Abrahami>I think Velo right now is in a very good place.
+
+255
+00:16:50.520 --> 00:16:54.720
+<v Yoav Abrahami>Velo is well accepted in the Wix developer community,
+
+256
+00:16:54.960 --> 00:16:56.100
+<v Yoav Abrahami>Wix partners community,
+
+257
+00:16:56.800 --> 00:16:59.840
+<v Yoav Abrahami>and we're trying to ramp up Velo
+
+258
+00:16:59.840 --> 00:17:04.380
+<v Yoav Abrahami>Velo to support more and more complex use cases like enterprise companies.
+
+259
+00:17:04.860 --> 00:17:09.460
+<v Yoav Abrahami>We're introducing VS Code as part of the Velo Online IDE.
+
+260
+00:17:09.820 --> 00:17:12.720
+<v Yoav Abrahami>More tools around the pro-development workflows.
+
+261
+00:17:13.100 --> 00:17:18.280
+<v Yoav Abrahami>And at the same time, we're investing quite a lot in Wix Blocks, which is, if you remember,
+
+262
+00:17:18.500 --> 00:17:21.580
+<v Yoav Abrahami>when we started Velo, we wanted to build applications for the app market.
+
+263
+00:17:21.980 --> 00:17:23.800
+<v Yoav Abrahami>And Velo turned out to be the website.
+
+264
+00:17:24.100 --> 00:17:28.180
+<v Yoav Abrahami>So Blocks is actually the option to build applications for the app market using the
+
+265
+00:17:28.180 --> 00:17:29.380
+<v Yoav Abrahami>same Velo and the same Wix.
+
+266
+00:17:29.840 --> 00:17:36.560
+<v Yoav Abrahami>of that as well and it's starting to get more and more traction and getting lots of growth
+
+267
+00:17:37.200 --> 00:17:45.560
+<v Yoav Abrahami>the future for velo is going to be a better and larger in what it does in making building websites
+
+268
+00:17:45.560 --> 00:17:51.820
+<v Yoav Abrahami>and building web applications easier and easier and to be able to support larger and more complex
+
+269
+00:17:51.820 --> 00:17:57.220
+<v Yoav Abrahami>teams and larger and more complex projects basically getting that point where your next
+
+270
+00:17:58.220 --> 00:17:59.940
+<v Yoav Abrahami>it's going to be obvious you're going to use Velo.
+
+271
+00:18:02.020 --> 00:18:03.140
+<v Noah Labhart>Yoav, let's switch to you.
+
+272
+00:18:03.220 --> 00:18:05.480
+<v Noah Labhart>Who influences the way that you work?
+
+273
+00:18:05.680 --> 00:18:09.220
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+274
+00:18:11.920 --> 00:18:16.700
+<v Yoav Abrahami>One definite influence is my brother, Avishai, which is the CEO of Wix.
+
+275
+00:18:17.200 --> 00:18:18.840
+<v Yoav Abrahami>There's lots of stuff I have learned from him.
+
+276
+00:18:18.920 --> 00:18:21.700
+<v Yoav Abrahami>There's lots of stuff that I brought to the company.
+
+277
+00:18:21.920 --> 00:18:23.220
+<v Yoav Abrahami>I think that's definitely one.
+
+278
+00:18:23.220 --> 00:18:29.840
+<v Yoav Abrahami>I think more than that, I'm trying to take and learn from almost anyone I'm working with.
+
+279
+00:18:30.120 --> 00:18:38.100
+<v Yoav Abrahami>Today, I have a partner that is Avi Gozhansky, which is managing three of our groups.
+
+280
+00:18:38.200 --> 00:18:44.780
+<v Yoav Abrahami>We're managing together those three groups, and I'm learning from him a lot about being a manager, being a better manager.
+
+281
+00:18:44.960 --> 00:18:49.220
+<v Yoav Abrahami>And I think those are things that I'm taking on a day-to-day basis.
+
+282
+00:18:49.220 --> 00:18:55.020
+<v Yoav Abrahami>There's also the superstars, Uncle Bob and other people like that, that you're learning
+
+283
+00:18:55.020 --> 00:19:00.480
+<v Yoav Abrahami>a lot from, especially in terms of attitude and how they approach problems and being fearless
+
+284
+00:19:00.480 --> 00:19:02.060
+<v Yoav Abrahami>about challenges.
+
+285
+00:19:02.380 --> 00:19:09.240
+<v Yoav Abrahami>Two people that really influenced me a lot in 2011, Avishai again, was challenging me
+
+286
+00:19:09.240 --> 00:19:14.920
+<v Yoav Abrahami>about working in Java in Wix and it took us four months to make a release.
+
+287
+00:19:15.100 --> 00:19:16.160
+<v Yoav Abrahami>That was 2011.
+
+288
+00:19:16.640 --> 00:19:18.180
+<v Yoav Abrahami>The quality was really bad.
+
+289
+00:19:19.220 --> 00:19:20.900
+<v Yoav Abrahami>How do we solve something like that?
+
+290
+00:19:21.020 --> 00:19:23.840
+<v Yoav Abrahami>And at the same time, I met a person called Ishai Smith.
+
+291
+00:19:24.180 --> 00:19:30.300
+<v Yoav Abrahami>He was working in a company that was just managing stock options and doing 50 releases a day.
+
+292
+00:19:30.400 --> 00:19:33.520
+<v Yoav Abrahami>And so I asked, how can you do that and release so fast?
+
+293
+00:19:33.800 --> 00:19:36.480
+<v Yoav Abrahami>And that was basically a continuous delivery.
+
+294
+00:19:36.740 --> 00:19:38.440
+<v Yoav Abrahami>And there's lots going on behind that.
+
+295
+00:19:38.880 --> 00:19:44.240
+<v Yoav Abrahami>And basically, long story short, Wix today is working in that concept of continuous delivery.
+
+296
+00:19:44.240 --> 00:19:48.200
+<v Yoav Abrahami>and is a test-driven company with 20,000 releases a year
+
+297
+00:19:48.200 --> 00:19:50.960
+<v Yoav Abrahami>to 30,000 releases a year, something like that.
+
+298
+00:19:51.080 --> 00:19:53.580
+<v Yoav Abrahami>I think that was one amazing influence.
+
+299
+00:19:54.560 --> 00:19:58.200
+<v Yoav Abrahami>Another part of that was I went to QCon at the time,
+
+300
+00:19:58.220 --> 00:20:01.520
+<v Yoav Abrahami>I think the same year, and did a workshop with Marty Friedman
+
+301
+00:20:01.520 --> 00:20:03.140
+<v Yoav Abrahami>and I forgot the name of the other one.
+
+302
+00:20:03.280 --> 00:20:07.560
+<v Yoav Abrahami>They wrote the growing object-oriented software guided by test,
+
+303
+00:20:07.700 --> 00:20:12.900
+<v Yoav Abrahami>which kind of was a complement, complementary to what Ishai was talking about.
+
+304
+00:20:14.240 --> 00:20:19.840
+<v Yoav Abrahami>again something that I brought back was a big influence about the culture in Wix and actually
+
+305
+00:20:19.840 --> 00:20:22.060
+<v Yoav Abrahami>if you go into Wix offices you'll see this book everywhere.
+
+306
+00:20:23.400 --> 00:20:25.360
+<v Noah Labhart>Yoav, I have last question so you're
+
+307
+00:20:25.360 --> 00:20:29.760
+<v Noah Labhart>getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing
+
+308
+00:20:29.760 --> 00:20:33.740
+<v Noah Labhart>they're jazzed about it they can't wait to show it off to the world and can't wait to show off to
+
+309
+00:20:33.740 --> 00:20:38.180
+<v Noah Labhart>you right there on the plane what advice do you give that person having you know gone down this
+
+310
+00:20:38.180 --> 00:20:40.280
+<v Noah Labhart>wrote a bit with Wix, but also with Velo.
+
+311
+00:20:41.040 --> 00:20:44.280
+<v Yoav Abrahami>The best advice is that if everyone is telling you
+
+312
+00:20:44.280 --> 00:20:49.180
+<v Yoav Abrahami>that you're hallucinating and you're wrong, you're probably right. You're probably doing
+
+313
+00:20:49.180 --> 00:20:53.460
+<v Yoav Abrahami>something that no one thought about. And I think after that, I would just listen to him
+
+314
+00:20:53.460 --> 00:20:57.160
+<v Yoav Abrahami>and try to give him the best advice I can from my experience.
+
+315
+00:20:57.720 --> 00:20:58.220
+<v Noah Labhart>I
+
+316
+00:20:58.200 --> 00:21:02.520
+<v Noah Labhart>love that. I really appreciate that. That's fantastic advice. Well, Yoav,
+
+317
+00:21:02.580 --> 00:21:07.680
+<v Noah Labhart>thank you for being on the show today. Thank you for telling the creation story of Velo by Wix.
+
+318
+00:21:08.180 --> 00:21:09.540
+<v Yoav Abrahami>Thank you very much. Glad to be here.
+
+319
+00:21:11.700 --> 00:21:14.420
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+320
+00:21:19.260 --> 00:21:22.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+321
+00:21:22.400 --> 00:21:27.180
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+322
+00:21:27.820 --> 00:21:30.000
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+323
+00:21:30.320 --> 00:21:32.320
+<v Noah Labhart>Both things help us out tremendously.
+
+324
+00:21:35.160 --> 00:21:36.640
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1139 @@
+WEBVTT
+
+NOTE S5 E9: The Science of Changing Minds: Valerie Coffman’s Journey Architecting Swayable’s Analytics Engine
+
+1
+00:00:01.340 --> 00:00:06.680
+<v Valerie Coffman>When we sat down to think about architecture, we basically punted on it completely.
+
+2
+00:00:08.260 --> 00:00:16.880
+<v Valerie Coffman>The thinking was that, well, we don't know. We can't predict what this product is going to be in the long run, which was true.
+
+3
+00:00:18.660 --> 00:00:25.680
+<v Valerie Coffman>But if we had maybe spent half a day thinking through, like, what could limit us in the future?
+
+4
+00:00:25.680 --> 00:00:27.920
+<v Valerie Coffman>or how might we be painting ourselves into a corner?
+
+5
+00:00:28.040 --> 00:00:30.920
+<v Valerie Coffman>What assumptions are we making that might be wrong?
+
+6
+00:00:31.180 --> 00:00:34.360
+<v Valerie Coffman>We might have saved ourselves a little bit of technical debt.
+
+7
+00:00:37.020 --> 00:00:38.900
+<v Valerie Coffman>My name is Valerie Coffman.
+
+8
+00:00:39.000 --> 00:00:41.900
+<v Valerie Coffman>I'm CTO and co-founder of Swayable.
+
+9
+00:00:47.520 --> 00:00:49.300
+<v Noah Labhart>This is Code Story,
+
+10
+00:00:49.560 --> 00:00:52.920
+<v Noah Labhart>the podcast bringing you interviews with tech visionaries
+
+11
+00:00:52.920 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+12
+00:00:57.120 --> 00:01:00.840
+<v Noah Labhart>and build and lead a team that has your back.
+
+13
+00:01:02.360 --> 00:01:04.000
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+14
+00:01:04.140 --> 00:01:07.940
+<v Noah Labhart>and today, how Valerie Coffman created a way to measure
+
+15
+00:01:07.940 --> 00:01:11.700
+<v Noah Labhart>the persuasive impact of your messages.
+
+16
+00:01:13.360 --> 00:01:15.780
+<v Noah Labhart>All this and more on Code Story.
+
+17
+00:01:19.960 --> 00:01:27.760
+<v Noah Labhart>Valerie Coffman has a family in San Francisco with two cats, both 18 pounds each, and two kids, the oldest being three and a half.
+
+18
+00:01:28.160 --> 00:01:31.920
+<v Noah Labhart>So you could say she has a lot to juggle, even outside of a startup.
+
+19
+00:01:32.640 --> 00:01:40.540
+<v Noah Labhart>Her family spends time outside in parks, the zoo, museums, etc., as much as she can since they are opening up again post-pandemic.
+
+20
+00:01:40.540 --> 00:01:48.260
+<v Noah Labhart>She graduated from Cornell with her PhD in Theoretical Condensed Matter Physics, which I had to Google to understand.
+
+21
+00:01:48.860 --> 00:01:57.980
+<v Noah Labhart>Prior to her current venture, she was the CTO and Chief Science Officer at Xometry, an on-demand marketplace for custom manufacturing, building their software team from scratch.
+
+22
+00:01:59.400 --> 00:02:07.060
+<v Noah Labhart>She and her co-founders started their current venture by exploring why people resist believing scientifically-backed factual information.
+
+23
+00:02:07.060 --> 00:02:13.020
+<v Noah Labhart>She wanted to figure out which messages and stories were more effective at communicating these true facts.
+
+24
+00:02:14.100 --> 00:02:17.340
+<v Noah Labhart>This is the creation story of Swayable.
+
+25
+00:02:20.180 --> 00:02:21.100
+<v Noah Labhart>Swayable
+
+26
+00:02:21.100 --> 00:02:28.680
+<v Valerie Coffman>is a data science platform for measuring the persuasive impact of advertisements.
+
+27
+00:02:28.680 --> 00:02:37.460
+<v Valerie Coffman>We use randomized control trial survey experiments to rigorously measure how an advertisement
+
+28
+00:02:37.980 --> 00:02:42.060
+<v Valerie Coffman>changes someone's opinions on the topic of the advertisement.
+
+29
+00:02:42.800 --> 00:02:48.920
+<v Valerie Coffman>We've worked with many political campaigns and we're working more and more with a growing
+
+30
+00:02:48.920 --> 00:02:50.160
+<v Valerie Coffman>list of brands.
+
+31
+00:02:51.020 --> 00:03:00.480
+<v Valerie Coffman>We started by exploring a broad problem of why people resist believing things that are true.
+
+32
+00:03:01.060 --> 00:03:05.420
+<v Valerie Coffman>One of the motivating issues was around climate change.
+
+33
+00:03:05.880 --> 00:03:08.640
+<v Valerie Coffman>Why do people not believe climate change when there's over,
+
+34
+00:03:08.820 --> 00:03:11.880
+<v Valerie Coffman>but climate change is real and caused by humans when there's overwhelming evidence.
+
+35
+00:03:12.200 --> 00:03:19.460
+<v Valerie Coffman>And one of one of the ideas, among a few others, was using RCTs to test messages.
+
+36
+00:03:20.160 --> 00:03:29.500
+<v Valerie Coffman>and stories and short videos or audio or text to see which messages and stories and images and audio are more effective.
+
+37
+00:03:30.360 --> 00:03:38.460
+<v Valerie Coffman>Through a series of conversations with many customers, we identified one customer was interested in testing a set of advertisements.
+
+38
+00:03:38.740 --> 00:03:43.940
+<v Valerie Coffman>They're an agency that was building ads for convincing people that climate change is real.
+
+39
+00:03:44.560 --> 00:03:48.980
+<v Valerie Coffman>So we had actually identified a customer who wanted to pay for a pilot.
+
+40
+00:03:50.160 --> 00:03:56.440
+<v Valerie Coffman>even built it. And at that point, I was actually on maternity leave and we hadn't formed a company
+
+41
+00:03:56.440 --> 00:04:02.440
+<v Valerie Coffman>yet. So we built a fabulously hacky prototype just to see, can we even do this? Can we even
+
+42
+00:04:02.440 --> 00:04:07.560
+<v Valerie Coffman>pull this off? We weren't sure we would be able to. This first client, they knew that they were
+
+43
+00:04:07.560 --> 00:04:13.880
+<v Valerie Coffman>taking a risk to see if it would work. And they paid us $5,000 to test seven or eight different
+
+44
+00:04:13.880 --> 00:04:19.220
+<v Valerie Coffman>clips. And we thought we were going to spend all of that on the data. So we ran a survey,
+
+45
+00:04:20.160 --> 00:04:27.220
+<v Valerie Coffman>First survey we ran on Mechanical Turk, because that was the most obvious place to start, really, that was accessible.
+
+46
+00:04:27.600 --> 00:04:34.800
+<v Valerie Coffman>And we gathered the data, and I basically took that data and downloaded it into a spreadsheet,
+
+47
+00:04:34.920 --> 00:04:40.160
+<v Valerie Coffman>and I analyzed it in basically a Jupyter notebook that I wrote as a one-off notebook.
+
+48
+00:04:40.520 --> 00:04:48.460
+<v Valerie Coffman>And to our surprise and amazement, we were able to detect a statistically significant movement
+
+49
+00:04:50.260 --> 00:04:56.360
+<v Valerie Coffman>answered questions like, you know, on a scale of zero to 10, do you believe that climate change
+
+50
+00:04:56.360 --> 00:05:01.300
+<v Valerie Coffman>is real? So we were somewhat shocked because we weren't sure it was going to work. The other piece
+
+51
+00:05:01.300 --> 00:05:07.560
+<v Valerie Coffman>of it, the client facing piece of it was basically a pretty simple web interface that displayed those
+
+52
+00:05:07.560 --> 00:05:13.160
+<v Valerie Coffman>results. We didn't even have a database at that point. We just used that sort of a flat file
+
+53
+00:05:13.900 --> 00:05:15.560
+<v Valerie Coffman>and displayed the results.
+
+54
+00:05:16.180 --> 00:05:20.660
+<v Valerie Coffman>So our very, very first prototype was really laser focused
+
+55
+00:05:20.660 --> 00:05:23.360
+<v Valerie Coffman>on proving that we can even do this thing.
+
+56
+00:05:25.580 --> 00:05:27.620
+<v Noah Labhart>Let me switch gears then.
+
+57
+00:05:27.740 --> 00:05:31.540
+<v Noah Labhart>You proved that this could work by piecing together Jupyter,
+
+58
+00:05:31.900 --> 00:05:34.940
+<v Noah Labhart>flat file, rendering to the front end.
+
+59
+00:05:35.100 --> 00:05:37.420
+<v Noah Labhart>Tell me about the next phase, the MVP.
+
+60
+00:05:37.780 --> 00:05:39.040
+<v Noah Labhart>How long did it take to build,
+
+61
+00:05:39.100 --> 00:05:41.400
+<v Noah Labhart>and what sort of tools did you use to bring it to life?
+
+62
+00:05:43.160 --> 00:05:46.960
+<v Valerie Coffman>Once we've had this prototype, we use that to apply to Y Combinator.
+
+63
+00:05:47.140 --> 00:05:55.020
+<v Valerie Coffman>So basically, we built the MVP during Y Combinator in the very beginning of 2018.
+
+64
+00:05:55.820 --> 00:06:03.000
+<v Valerie Coffman>So at this point, you know, I had officially joined as a co-founder and we were starting to build out the real product.
+
+65
+00:06:03.580 --> 00:06:11.840
+<v Valerie Coffman>So, you know, after we moved to San Francisco and I sat down to write out a whole bunch of pivotal tickets, brand new, fresh project.
+
+66
+00:06:13.160 --> 00:06:17.900
+<v Valerie Coffman>And I found myself writing tickets like a user should be able to create a survey.
+
+67
+00:06:18.060 --> 00:06:20.240
+<v Valerie Coffman>A user should be able to add a question.
+
+68
+00:06:20.540 --> 00:06:24.860
+<v Valerie Coffman>A user should be able to delete a question, etc.
+
+69
+00:06:25.620 --> 00:06:34.740
+<v Valerie Coffman>And I had this moment where I realized, OK, a whole lot of this stuff is kind of boring and we can, you know, hack it together on the back end somehow.
+
+70
+00:06:34.740 --> 00:06:44.900
+<v Valerie Coffman>The money page, the real thing that's most important where the customers are getting all of their value is the dashboard where they see their results.
+
+71
+00:06:46.040 --> 00:06:55.780
+<v Valerie Coffman>So we decided to just hack together whatever we can for, you know, creating the surveys, setting it up, user logins, etc.
+
+72
+00:06:56.340 --> 00:07:02.620
+<v Valerie Coffman>We use a service called Auth0 at first to just sort of manage the authentication.
+
+73
+00:07:02.620 --> 00:07:08.240
+<v Valerie Coffman>And we decided to focus all of our energies on the data collection, the analysis, and
+
+74
+00:07:08.240 --> 00:07:09.240
+<v Valerie Coffman>the front end.
+
+75
+00:07:09.480 --> 00:07:16.480
+<v Valerie Coffman>So the tools we were using, we basically took that notebook from the MVP and took it out
+
+76
+00:07:16.480 --> 00:07:23.080
+<v Valerie Coffman>of a notebook and started building out a real Python package, which can take the survey
+
+77
+00:07:23.080 --> 00:07:25.420
+<v Valerie Coffman>responses and generate the results.
+
+78
+00:07:25.680 --> 00:07:31.660
+<v Valerie Coffman>And then we started building out a web application where people log in and they basically go
+
+79
+00:07:32.400 --> 00:07:37.720
+<v Valerie Coffman>pages. So they have, you know, if they have multiple tests, they can see a list of those.
+
+80
+00:07:37.840 --> 00:07:43.160
+<v Valerie Coffman>But all of the focus was really on building out the results page where people get their answers.
+
+81
+00:07:45.020 --> 00:07:50.080
+<v Noah Labhart>So with any MVP, you got to make certain decisions and trade-offs. And you started to kind of
+
+82
+00:07:50.080 --> 00:07:54.140
+<v Noah Labhart>dig into those a little bit towards the end of your explanation. But tell me a little bit more
+
+83
+00:07:54.140 --> 00:07:59.580
+<v Noah Labhart>about those trade-offs, either feature cuts or technical debt that you had to accept,
+
+84
+00:07:59.580 --> 00:08:03.560
+<v Noah Labhart>and decisions and trade-offs you had to make and how you coped with them.
+
+85
+00:08:04.820 --> 00:08:11.860
+<v Valerie Coffman>One of the big trade-offs we made was in the self-service nature of creating your survey.
+
+86
+00:08:12.400 --> 00:08:18.440
+<v Valerie Coffman>We still needed a way to discuss the survey design, the experiment design with the client.
+
+87
+00:08:19.220 --> 00:08:28.620
+<v Valerie Coffman>So a trade-off that we made was to create a nice, well-designed Google Doc template, essentially,
+
+88
+00:08:29.580 --> 00:08:30.560
+<v Valerie Coffman>the questions are listed.
+
+89
+00:08:31.380 --> 00:08:35.800
+<v Valerie Coffman>And the process became one where we go over that doc
+
+90
+00:08:35.800 --> 00:08:38.640
+<v Valerie Coffman>with clients and they can comment on it.
+
+91
+00:08:38.680 --> 00:08:40.140
+<v Valerie Coffman>It actually had some nice features
+
+92
+00:08:40.140 --> 00:08:43.420
+<v Valerie Coffman>that they can leverage the collaborative benefits
+
+93
+00:08:44.060 --> 00:08:45.920
+<v Valerie Coffman>of Google Docs.
+
+94
+00:08:46.560 --> 00:08:50.140
+<v Valerie Coffman>And the trade-off on our end, the technical debt on our end,
+
+95
+00:08:50.200 --> 00:08:51.780
+<v Valerie Coffman>was now we've got to take that doc
+
+96
+00:08:51.780 --> 00:08:53.580
+<v Valerie Coffman>and put it into the system somehow.
+
+97
+00:08:53.960 --> 00:08:56.060
+<v Valerie Coffman>And there's been several iterations of that.
+
+98
+00:08:56.060 --> 00:09:07.880
+<v Valerie Coffman>One of them was early on, we had members of the team translating it into basically a JSON file that gets uploaded to a database or imported to the code.
+
+99
+00:09:08.260 --> 00:09:16.420
+<v Valerie Coffman>In the very early days, for the first several clients, we didn't even have a fully functional database for everything.
+
+100
+00:09:16.580 --> 00:09:20.300
+<v Valerie Coffman>The results were a flat file for the first several customers.
+
+101
+00:09:20.300 --> 00:09:28.980
+<v Valerie Coffman>So there was some technical debt involved in retrofitting a database, basically, but we did that pretty early on.
+
+102
+00:09:29.500 --> 00:09:39.940
+<v Valerie Coffman>But the biggest tradeoff has been the internal tooling and the self-service, which is something we're still working on.
+
+103
+00:09:40.580 --> 00:09:43.680
+<v Noah Labhart>What did you end up choosing from a database standpoint?
+
+104
+00:09:43.840 --> 00:09:47.320
+<v Noah Labhart>Did you end up going SQL-based or doc-based, no SQL?
+
+105
+00:09:47.840 --> 00:09:49.080
+<v Valerie Coffman>We're using Mongo Atlas.
+
+106
+00:09:50.300 --> 00:09:57.620
+<v Noah Labhart>How has that transition been? You said you did it pretty quickly. Has it been a challenge or was it pretty easy step over to Mongo?
+
+107
+00:09:58.760 --> 00:10:08.300
+<v Valerie Coffman>It was straightforward to step over. We definitely have been iterating on our schema continuously.
+
+108
+00:10:08.300 --> 00:10:26.600
+<v Valerie Coffman>I think the main challenge of doing the step over was typical building the airplane while you fly it, starting the step over and then making another change and then having to do that change twice until the transition was done.
+
+109
+00:10:28.360 --> 00:10:32.420
+<v Noah Labhart>So you got your working MVP, you're making some progress.
+
+110
+00:10:32.420 --> 00:10:36.360
+<v Noah Labhart>How did you progress and mature the product from there?
+
+111
+00:10:36.540 --> 00:10:42.260
+<v Noah Labhart>And how did you build your roadmap and decide, okay, this is the next most important thing to build?
+
+112
+00:10:42.920 --> 00:10:56.460
+<v Valerie Coffman>I think in the early days, a lot of what we started adding on, very quickly we found out that people wanted powerful segmentation.
+
+113
+00:10:56.460 --> 00:11:06.160
+<v Valerie Coffman>Early on, a big focus was on adding more capabilities to find subsegments of the survey sample.
+
+114
+00:11:06.580 --> 00:11:08.160
+<v Valerie Coffman>So all the possibilities.
+
+115
+00:11:08.400 --> 00:11:09.840
+<v Valerie Coffman>There's a numerical range.
+
+116
+00:11:10.200 --> 00:11:12.040
+<v Valerie Coffman>You can do quantiles.
+
+117
+00:11:12.080 --> 00:11:14.280
+<v Valerie Coffman>You can do categorical segments.
+
+118
+00:11:14.660 --> 00:11:18.160
+<v Valerie Coffman>You can create logical combinations of all of those.
+
+119
+00:11:18.200 --> 00:11:20.400
+<v Valerie Coffman>It took a while to build that out.
+
+120
+00:11:20.680 --> 00:11:24.220
+<v Valerie Coffman>So very early on, that was just the top request from customers.
+
+121
+00:11:25.580 --> 00:11:33.660
+<v Valerie Coffman>later on we started to get questions about the sort of dominant feedback was are my results good
+
+122
+00:11:33.660 --> 00:11:40.200
+<v Valerie Coffman>or bad but essentially what do these numbers actually mean so I would say our product roadmap
+
+123
+00:11:40.200 --> 00:11:47.540
+<v Valerie Coffman>has been driven a lot by taking the various feedback we get and synthesizing it to find like
+
+124
+00:11:47.540 --> 00:11:53.760
+<v Valerie Coffman>what what is the overarching theme and then and then we build basically to solve that that sort
+
+125
+00:11:54.220 --> 00:11:59.040
+<v Valerie Coffman>problem statement. We try to find sort of the underlying problem statement of the synthesized
+
+126
+00:11:59.040 --> 00:12:04.400
+<v Valerie Coffman>feedback that we get. So one theme has been segmentation. Another theme had been,
+
+127
+00:12:04.500 --> 00:12:09.540
+<v Valerie Coffman>how do I even interpret this dashboard? How do I even interpret these results?
+
+128
+00:12:10.200 --> 00:12:17.260
+<v Valerie Coffman>One very early version, we present a lot of bar charts. One very early version had
+
+129
+00:12:17.740 --> 00:12:21.840
+<v Valerie Coffman>many different colors in it. And we found out that people expect the colors to mean something.
+
+130
+00:12:21.840 --> 00:12:27.160
+<v Valerie Coffman>thing. They're distracted by different colors if they don't mean something. So we spent some time
+
+131
+00:12:27.160 --> 00:12:34.200
+<v Valerie Coffman>iterating on that. We also found that people open up this dashboard and they see, okay,
+
+132
+00:12:34.300 --> 00:12:45.340
+<v Valerie Coffman>the baseline score is 50.2 and my top performing ad moved people by 7.8 points on 100 point scale.
+
+133
+00:12:45.480 --> 00:12:51.660
+<v Valerie Coffman>It's not good or bad, right? So after building up thousands of tests, we're able to offer what
+
+134
+00:12:51.840 --> 00:12:58.540
+<v Valerie Coffman>called benchmarks, which basically show how you rank compared to similar tests. So that really
+
+135
+00:12:58.540 --> 00:13:00.500
+<v Valerie Coffman>gets to the heart of, are the results good or bad?
+
+136
+00:13:01.380 --> 00:13:04.560
+<v Noah Labhart>So let's flip the team then. So how did you go
+
+137
+00:13:04.560 --> 00:13:09.140
+<v Noah Labhart>about building your team? And what did you look for in those people to indicate that they were
+
+138
+00:13:09.140 --> 00:13:10.540
+<v Noah Labhart>the winning horses to join you?
+
+139
+00:13:11.700 --> 00:13:15.080
+<v Valerie Coffman>You know, obviously there's hard skills in the technical
+
+140
+00:13:15.080 --> 00:13:23.300
+<v Valerie Coffman>technical fields. One thing that we try to do when we're looking for that is, you know, I don't copy
+
+141
+00:13:23.300 --> 00:13:28.420
+<v Valerie Coffman>code challenges off of LeetCode or whatever, you know, I'm not giving people sort of the same code
+
+142
+00:13:28.420 --> 00:13:34.840
+<v Valerie Coffman>challenges they get everywhere. So we try to make sure that the coding challenges that we're
+
+143
+00:13:35.500 --> 00:13:43.360
+<v Valerie Coffman>giving people are representative of what they would be doing, both because I want it, we want
+
+144
+00:13:45.080 --> 00:13:51.860
+<v Valerie Coffman>based on something that is closely aligned to what they'll do, but also fully recognizing that
+
+145
+00:13:51.860 --> 00:13:57.860
+<v Valerie Coffman>the job candidates are vetting us just as much as we're vetting them. And we want to get them
+
+146
+00:13:57.860 --> 00:14:02.340
+<v Valerie Coffman>excited about what they might be working on at Swayable. So that's one part of it.
+
+147
+00:14:03.020 --> 00:14:11.280
+<v Valerie Coffman>Other things that we look for are, we like to see people who are motivated by the overarching
+
+148
+00:14:11.280 --> 00:14:12.980
+<v Valerie Coffman>overarching mission of the business.
+
+149
+00:14:13.460 --> 00:14:17.260
+<v Noah Labhart>So is there any particular process you go through
+
+150
+00:14:17.260 --> 00:14:23.420
+<v Noah Labhart>when you're talking to someone to gauge their interest or any reaction that shows you that,
+
+151
+00:14:23.520 --> 00:14:27.740
+<v Noah Labhart>okay, this person is bought into what we're doing here?
+
+152
+00:14:28.460 --> 00:14:31.360
+<v Valerie Coffman>No, I would say it varies with each
+
+153
+00:14:31.360 --> 00:14:37.780
+<v Valerie Coffman>individual. When I'm actively reaching out to people, which is one part of the process,
+
+154
+00:14:37.780 --> 00:14:43.040
+<v Valerie Coffman>I don't necessarily just put up a job description and then wait for people to apply.
+
+155
+00:14:43.480 --> 00:14:48.080
+<v Valerie Coffman>I will frequently go on to a platform like AngelList or LinkedIn.
+
+156
+00:14:48.500 --> 00:14:52.300
+<v Valerie Coffman>Y Combinator has a platform as well where I reach out to people.
+
+157
+00:14:52.600 --> 00:14:56.080
+<v Valerie Coffman>And I like to highlight who we've worked with.
+
+158
+00:14:56.360 --> 00:15:01.680
+<v Valerie Coffman>I find that talking about the clients that we've worked on and the overarching mission of the company
+
+159
+00:15:01.680 --> 00:15:06.120
+<v Valerie Coffman>is something that motivates the right people to reply.
+
+160
+00:15:07.780 --> 00:15:11.360
+<v Valerie Coffman>get excited about about a potential role with Swayable.
+
+161
+00:15:15.880 --> 00:15:21.040
+<v Noah Labhart>Let's flip to scalability. Did you build this to scale efficiently from day one,
+
+162
+00:15:21.140 --> 00:15:22.700
+<v Noah Labhart>or are you fighting this as you grow?
+
+163
+00:15:23.260 --> 00:15:27.860
+<v Valerie Coffman>We explicitly were not focused on scalability
+
+164
+00:15:27.860 --> 00:15:36.860
+<v Valerie Coffman>on day one. And it's actually, it's a somewhat contrarian advice that is circulated widely in
+
+165
+00:15:38.680 --> 00:15:45.680
+<v Valerie Coffman>community they say do things that don't scale because in the early days of trying to get
+
+166
+00:15:45.680 --> 00:15:52.420
+<v Valerie Coffman>product market fit it doesn't make sense to to be too focused on scalability so spending time
+
+167
+00:15:52.420 --> 00:15:57.600
+<v Valerie Coffman>talking to customers there were some early versions of the segmentation were very unscalable
+
+168
+00:15:58.720 --> 00:16:03.540
+<v Noah Labhart>you know in the early days you didn't engineer it to where you didn't over engineer it which
+
+169
+00:16:03.540 --> 00:16:07.500
+<v Noah Labhart>makes total sense you kind of want to engineer as you grow how are you addressing those problems
+
+170
+00:16:07.780 --> 00:16:12.020
+<v Noah Labhart>today? What are the types of approaches you're taking or tools you're using?
+
+171
+00:16:12.820 --> 00:16:18.240
+<v Valerie Coffman>It's a really good question because there's so many different aspects to the scalability.
+
+172
+00:16:18.620 --> 00:16:23.660
+<v Valerie Coffman>It's hard to even know where to start. One of the areas, one of the things that's really been
+
+173
+00:16:23.660 --> 00:16:29.380
+<v Valerie Coffman>interesting to see that we could not have foreseen, by the way, in the early days, is how
+
+174
+00:16:29.380 --> 00:16:36.400
+<v Valerie Coffman>how things have scaled horizontally, basically within each individual test.
+
+175
+00:16:36.700 --> 00:16:42.440
+<v Valerie Coffman>And by that I mean every content test has the pieces of content that are being tested.
+
+176
+00:16:42.980 --> 00:16:48.960
+<v Valerie Coffman>It could be we've done tests with one piece of content, we've done tests with 20 or 30
+
+177
+00:16:48.960 --> 00:16:49.800
+<v Valerie Coffman>pieces of content.
+
+178
+00:16:50.120 --> 00:16:55.040
+<v Valerie Coffman>Then there are the metrics that you are measuring, and then there's the segments, essentially.
+
+179
+00:16:55.040 --> 00:17:06.580
+<v Valerie Coffman>And in the early days, we would typically test maybe three metrics and 10 different breakdowns of which are collections of segments, age, gender, ethnicity, etc.
+
+180
+00:17:07.120 --> 00:17:11.020
+<v Valerie Coffman>But we found that the tests have gotten more complex over time.
+
+181
+00:17:11.220 --> 00:17:19.740
+<v Valerie Coffman>So there's more and more metrics that people are interested in looking at, probing questions like, is that a leading indicator of that measure over there?
+
+182
+00:17:19.900 --> 00:17:24.600
+<v Valerie Coffman>Can we understand why certain ads are more effective than others?
+
+183
+00:17:25.640 --> 00:17:29.820
+<v Valerie Coffman>But with that, there's been way more calculations to do.
+
+184
+00:17:30.460 --> 00:17:41.420
+<v Valerie Coffman>And so we're finding that what has been a background task, the time that it takes to do that, well, it expands as the test becomes more complex and there's more calculations.
+
+185
+00:17:42.600 --> 00:17:45.520
+<v Valerie Coffman>Also, the amount of data that comes out the other end.
+
+186
+00:17:45.520 --> 00:17:51.840
+<v Valerie Coffman>Sometimes, you know, a survey of 5,000 people will have way more than 5,000 different results,
+
+187
+00:17:52.040 --> 00:17:57.260
+<v Valerie Coffman>which are aggregate statistics because we're just slicing and dicing the data so many different
+
+188
+00:17:57.260 --> 00:17:57.760
+<v Valerie Coffman>ways.
+
+189
+00:17:57.920 --> 00:18:03.280
+<v Valerie Coffman>So some of the things that we've had to do to accommodate that have been the scalability,
+
+190
+00:18:03.560 --> 00:18:08.080
+<v Valerie Coffman>I mean, that have been the database schema, updating that to accommodate that.
+
+191
+00:18:08.080 --> 00:18:13.160
+<v Valerie Coffman>If you remember, the early versions used flat files for results.
+
+192
+00:18:13.480 --> 00:18:19.480
+<v Valerie Coffman>Well, that doesn't work in Mongo if your results are larger than 16 megabytes.
+
+193
+00:18:19.580 --> 00:18:23.580
+<v Valerie Coffman>That's a document size limit built into Mongo, which we hit.
+
+194
+00:18:23.660 --> 00:18:26.780
+<v Valerie Coffman>We hit until we, you know, revised the schema.
+
+195
+00:18:27.960 --> 00:18:33.040
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+196
+00:18:33.040 --> 00:18:48.180
+<v Valerie Coffman>I would say that I'm most proud of the actual impact that this product has had, especially in the political space.
+
+197
+00:18:49.200 --> 00:18:54.840
+<v Valerie Coffman>We've worked with both Georgia runoff elections, which were quite close.
+
+198
+00:18:55.220 --> 00:19:00.580
+<v Valerie Coffman>It's not unreasonable to think that we had a role in that outcome.
+
+199
+00:19:00.580 --> 00:19:01.080
+<v Valerie Coffman>come.
+
+200
+00:19:02.360 --> 00:19:06.940
+<v Noah Labhart>So let's flip the script a little bit. Tell me about a mistake you made and how you and your
+
+201
+00:19:06.940 --> 00:19:08.360
+<v Noah Labhart>team responded to it.
+
+202
+00:19:09.600 --> 00:19:13.780
+<v Valerie Coffman>That's a great question because I think we've made a few mistakes in the
+
+203
+00:19:13.780 --> 00:19:20.540
+<v Valerie Coffman>technical space. I think if I could go back in time, we might have spent a little bit of time
+
+204
+00:19:20.540 --> 00:19:27.920
+<v Valerie Coffman>thinking about the architecture and trying to anticipate in the early days. We think about
+
+205
+00:19:27.920 --> 00:19:32.460
+<v Valerie Coffman>architecture a lot now but in very early days when we sat down to think about architecture
+
+206
+00:19:33.180 --> 00:19:39.880
+<v Valerie Coffman>we basically punted on it uh completely but the thinking was that well we don't know enough
+
+207
+00:19:40.320 --> 00:19:46.920
+<v Valerie Coffman>to to decide we can't predict what what this product is going to be uh in the long run which
+
+208
+00:19:46.920 --> 00:19:54.320
+<v Valerie Coffman>was true but if we had maybe spent half a day thinking through like what what could limit limit
+
+209
+00:19:54.320 --> 00:19:58.360
+<v Valerie Coffman>limit us in the future? How might we be painting ourselves into a corner? What assumptions are we
+
+210
+00:19:58.360 --> 00:20:03.700
+<v Valerie Coffman>making that might be wrong? We might have saved ourselves a little bit of technical debt.
+
+211
+00:20:05.400 --> 00:20:09.880
+<v Noah Labhart>Well, this will be exciting. So tell me what the future looks like for your product and for your
+
+212
+00:20:09.880 --> 00:20:10.380
+<v Noah Labhart>team.
+
+213
+00:20:12.060 --> 00:20:18.620
+<v Valerie Coffman>The future is a lot of data science capabilities. We're building, you know,
+
+214
+00:20:18.620 --> 00:20:23.520
+<v Valerie Coffman>data visualization capabilities. And there's potential that that can be applied to
+
+215
+00:20:24.320 --> 00:20:31.980
+<v Valerie Coffman>more than content pre-testing. We recently have launched a new product line effectively,
+
+216
+00:20:32.300 --> 00:20:39.880
+<v Valerie Coffman>which is a time series tracker survey. So this is a survey that it's not tied to content. It's
+
+217
+00:20:39.880 --> 00:20:46.200
+<v Valerie Coffman>not a randomized control trial, but it's ongoing. And so you can see a time series of how a metric
+
+218
+00:20:46.200 --> 00:20:53.440
+<v Valerie Coffman>is tracking. We've gathered quite a bit of data over the last several months about how consumer
+
+219
+00:20:54.480 --> 00:21:00.400
+<v Valerie Coffman>are changing related to products and services that are affected by COVID.
+
+220
+00:21:00.780 --> 00:21:08.260
+<v Valerie Coffman>So the likelihood that you would see a movie in a theater or fly on an airplane or shop in a shopping mall.
+
+221
+00:21:08.400 --> 00:21:14.920
+<v Valerie Coffman>We're also tracking the ESG perception. ESG stands for environmental, social and governance.
+
+222
+00:21:15.420 --> 00:21:21.680
+<v Valerie Coffman>Tracking the perception of several hundred different brands in seven different verticals
+
+223
+00:21:21.680 --> 00:21:24.680
+<v Valerie Coffman>to see how people's perception of those brands change over time.
+
+224
+00:21:26.120 --> 00:21:27.420
+<v Noah Labhart>Well, let's switch to you.
+
+225
+00:21:27.520 --> 00:21:29.380
+<v Noah Labhart>Who influences the way that you work?
+
+226
+00:21:29.780 --> 00:21:31.860
+<v Noah Labhart>CTO, an architect, really any person.
+
+227
+00:21:31.920 --> 00:21:33.740
+<v Noah Labhart>Name a person you look up to and why.
+
+228
+00:21:35.140 --> 00:21:37.180
+<v Valerie Coffman>Oh, it's hard to choose a single person.
+
+229
+00:21:37.280 --> 00:21:43.100
+<v Valerie Coffman>I think I've learned a ton from every software engineer I've worked with.
+
+230
+00:21:43.700 --> 00:21:47.960
+<v Valerie Coffman>In terms of software engineering, I've learned a lot from software engineer,
+
+231
+00:21:48.140 --> 00:21:49.540
+<v Valerie Coffman>every software engineer I've worked with.
+
+232
+00:21:50.280 --> 00:21:56.520
+<v Valerie Coffman>I've learned good and bad things over the last decade plus of doing this stuff.
+
+233
+00:21:58.080 --> 00:22:02.860
+<v Valerie Coffman>I mean, I've also been influenced quite a bit by my co-founder, James,
+
+234
+00:22:03.760 --> 00:22:09.440
+<v Valerie Coffman>and learned a lot about sort of how to think about different aspects of the business
+
+235
+00:22:09.440 --> 00:22:12.640
+<v Valerie Coffman>by working closely with him.
+
+236
+00:22:14.500 --> 00:22:18.500
+<v Noah Labhart>Well, we talked about a mistake, but a little bit different spin.
+
+237
+00:22:19.540 --> 00:22:23.560
+<v Noah Labhart>go back to the beginning what would you do differently or where would you consider taking
+
+238
+00:22:23.560 --> 00:22:24.700
+<v Noah Labhart>a different approach
+
+239
+00:22:24.700 --> 00:22:30.740
+<v Valerie Coffman>i think we may have taken a somewhat different approach to some of the internal
+
+240
+00:22:31.300 --> 00:22:39.680
+<v Valerie Coffman>tooling potentially looked for more sort of out of the box solutions for that or started a little
+
+241
+00:22:39.680 --> 00:22:46.640
+<v Valerie Coffman>bit earlier on on building our own internal tooling has definitely been kind of a pain point
+
+242
+00:22:46.640 --> 00:22:53.720
+<v Valerie Coffman>point. There are some out of the box solutions. It's very hard to adapt those for a product
+
+243
+00:22:54.360 --> 00:23:01.080
+<v Valerie Coffman>that has a lot of settings. There's a fair amount of setup involved with the survey.
+
+244
+00:23:01.200 --> 00:23:06.020
+<v Valerie Coffman>You've got to add all the questions and then you've got to tie those questions to the metrics
+
+245
+00:23:06.020 --> 00:23:12.000
+<v Valerie Coffman>and the segments, et cetera, that you're tracking. So the out of the box solutions for that,
+
+246
+00:23:12.000 --> 00:23:15.700
+<v Valerie Coffman>which are sort of doing like crud on your database.
+
+247
+00:23:16.100 --> 00:23:18.340
+<v Valerie Coffman>They might work better for simpler products.
+
+248
+00:23:18.580 --> 00:23:20.660
+<v Valerie Coffman>For this product, it's been kind of a pain point.
+
+249
+00:23:21.280 --> 00:23:24.540
+<v Valerie Coffman>So I might have searched a little more for different ones
+
+250
+00:23:24.540 --> 00:23:26.900
+<v Valerie Coffman>or potentially just bit the bullet
+
+251
+00:23:26.900 --> 00:23:29.760
+<v Valerie Coffman>and started building something like that from the beginning.
+
+252
+00:23:30.340 --> 00:23:34.800
+<v Valerie Coffman>It's hard to say, but we definitely put a lot of that off,
+
+253
+00:23:34.980 --> 00:23:39.360
+<v Valerie Coffman>put a lot of that work off in favor of building,
+
+254
+00:23:39.540 --> 00:23:40.880
+<v Valerie Coffman>like I said, the money page.
+
+255
+00:23:42.620 --> 00:23:44.620
+<v Valerie Coffman>the results page.
+
+256
+00:23:45.640 --> 00:23:47.680
+<v Valerie Coffman>But it has been a pain point
+
+257
+00:23:47.680 --> 00:23:49.640
+<v Valerie Coffman>in terms of internal operations.
+
+258
+00:23:49.760 --> 00:23:52.820
+<v Valerie Coffman>I don't think it really affects customers as much,
+
+259
+00:23:53.660 --> 00:23:55.500
+<v Valerie Coffman>but internally it's a little bit difficult.
+
+260
+00:23:57.740 --> 00:23:59.320
+<v Noah Labhart>So you're getting on a plane
+
+261
+00:23:59.320 --> 00:24:01.100
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+262
+00:24:01.100 --> 00:24:02.720
+<v Noah Labhart>who's built the next big thing.
+
+263
+00:24:02.920 --> 00:24:04.100
+<v Noah Labhart>They're jazzed about it.
+
+264
+00:24:04.200 --> 00:24:05.740
+<v Noah Labhart>They can't wait to show it off to the world.
+
+265
+00:24:05.820 --> 00:24:06.860
+<v Noah Labhart>Can't wait to show it off to you
+
+266
+00:24:06.860 --> 00:24:07.840
+<v Noah Labhart>right there on the plane.
+
+267
+00:24:08.420 --> 00:24:10.000
+<v Noah Labhart>What advice do you give that person
+
+268
+00:24:10.000 --> 00:24:11.620
+<v Noah Labhart>having gone down this road a bit?
+
+269
+00:24:13.220 --> 00:24:16.180
+<v Valerie Coffman>One bit of advice is just never stop asking questions.
+
+270
+00:24:16.940 --> 00:24:21.740
+<v Valerie Coffman>I think it's tempting to get an idea and run with it,
+
+271
+00:24:21.840 --> 00:24:26.020
+<v Valerie Coffman>but always be cognizant that you could have cognitive biases.
+
+272
+00:24:26.620 --> 00:24:27.860
+<v Valerie Coffman>Try to avoid them.
+
+273
+00:24:27.960 --> 00:24:32.880
+<v Valerie Coffman>Be aware of what the possible cognitive biases are to build the best product.
+
+274
+00:24:33.360 --> 00:24:34.360
+<v Noah Labhart>That's great advice.
+
+275
+00:24:34.700 --> 00:24:37.000
+<v Noah Labhart>Well, Valerie, thank you for being on the show today.
+
+276
+00:24:37.100 --> 00:24:39.860
+<v Noah Labhart>Thank you for telling the creation story of Swayable.
+
+277
+00:24:40.440 --> 00:24:41.160
+<v Noah Labhart>Thank you.
+
+278
+00:24:43.640 --> 00:24:46.660
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+279
+00:24:50.260 --> 00:24:53.320
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+280
+00:24:53.500 --> 00:24:58.300
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+281
+00:24:58.700 --> 00:25:03.740
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just $5 to $10 a month.
+
+282
+00:25:04.120 --> 00:25:06.360
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+283
+00:25:06.620 --> 00:25:08.680
+<v Noah Labhart>Both things help us out tremendously.
+
+284
+00:25:10.960 --> 00:25:12.460
+<v Noah Labhart>And thanks again for listening.

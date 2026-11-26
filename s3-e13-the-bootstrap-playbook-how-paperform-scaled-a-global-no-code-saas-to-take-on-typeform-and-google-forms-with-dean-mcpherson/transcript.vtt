@@ -1,0 +1,1915 @@
+WEBVTT
+
+NOTE S3 E13: The Bootstrap Playbook: How Paperform Scaled a Global No-Code SaaS to Take On Typeform and Google Forms with Dean McPherson
+
+1
+00:00:00.960 --> 00:00:04.720
+<v Dean McPherson>It's probably not what all the cool kids are doing these days, but what I found is
+
+2
+00:00:05.320 --> 00:00:09.380
+<v Dean McPherson>generally the simpler your tech stack, the better, because it's easier to scale.
+
+3
+00:00:09.520 --> 00:00:14.160
+<v Dean McPherson>So if it's a popular framework like something like Laravel or if you're in another language,
+
+4
+00:00:14.340 --> 00:00:16.160
+<v Dean McPherson>there's plenty of big frameworks out there.
+
+5
+00:00:16.780 --> 00:00:20.080
+<v Dean McPherson>The good thing about it is there's a lot written on how you scale it.
+
+6
+00:00:20.120 --> 00:00:23.080
+<v Dean McPherson>There's a lot of expertise out there if you do need to bring it in.
+
+7
+00:00:23.480 --> 00:00:27.300
+<v Dean McPherson>The way I generally think about it is we're in a monolithic structure, but we still write
+
+8
+00:00:27.300 --> 00:00:28.040
+<v Dean McPherson>microservices.
+
+9
+00:00:30.000 --> 00:00:35.680
+<v Dean McPherson>something that's better written in some other language, then we'll write it in that and have
+
+10
+00:00:35.680 --> 00:00:42.700
+<v Dean McPherson>it integrated into our monolith. My name is Dean McPherson. I am CTO and co-founder of Paperform.
+
+11
+00:00:47.600 --> 00:00:52.720
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+12
+00:00:52.720 --> 00:00:56.980
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+13
+00:00:56.980 --> 00:01:00.720
+<v Noah Labhart>and build and lead a team that has your back.
+
+14
+00:01:02.300 --> 00:01:08.840
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Dean McPherson was inspired to build the best tool around
+
+15
+00:01:09.480 --> 00:01:11.680
+<v Noah Labhart>when building a form for a friend.
+
+16
+00:01:13.500 --> 00:01:15.900
+<v Noah Labhart>All this and more on Code Story.
+
+17
+00:01:20.500 --> 00:01:24.140
+<v Noah Labhart>Dean McPherson, you guessed it, has always been interested in tech.
+
+18
+00:01:24.140 --> 00:01:30.040
+<v Noah Labhart>Though unlike many of our guests, he taught himself how to code after he finished his degree in music and philosophy.
+
+19
+00:01:31.400 --> 00:01:37.300
+<v Noah Labhart>He has a small family, two little boys, and his wife is not only his partner in life, but in business as well.
+
+20
+00:01:37.920 --> 00:01:40.880
+<v Noah Labhart>He loves the idea of fishing, but doesn't really go much.
+
+21
+00:01:41.040 --> 00:01:45.200
+<v Noah Labhart>And he is a well-rounded musician, but most interestingly, he plays the didgeridoo.
+
+22
+00:01:46.380 --> 00:01:50.960
+<v Noah Labhart>In 2013, Dean's friend asked him to build a registration form for his business.
+
+23
+00:01:50.960 --> 00:01:56.180
+<v Noah Labhart>He was baffled that he would ask for something like this, given there are solutions out there for this sort of thing.
+
+24
+00:01:57.340 --> 00:02:01.220
+<v Noah Labhart>However, after searching for options, he couldn't find anything to recommend.
+
+25
+00:02:01.500 --> 00:02:05.440
+<v Noah Labhart>In 2016, he and his wife set out to build something to solve this problem.
+
+26
+00:02:05.660 --> 00:02:11.060
+<v Noah Labhart>Something easy to use, that doesn't require coding, and offers a well-rounded, branded solution.
+
+27
+00:02:12.940 --> 00:02:15.640
+<v Noah Labhart>This is the creation story of Paperform.
+
+28
+00:02:18.380 --> 00:02:21.580
+<v Dean McPherson>So Paperform in its simplest terms is a form builder.
+
+29
+00:02:21.760 --> 00:02:25.640
+<v Dean McPherson>You're probably aware if you're listening, there's a lot of form builders out there.
+
+30
+00:02:25.800 --> 00:02:29.600
+<v Dean McPherson>We think of ourselves as playing in the no-code space.
+
+31
+00:02:30.460 --> 00:02:34.140
+<v Dean McPherson>So it's a form builder, but you can use it for lots of creative things.
+
+32
+00:02:34.300 --> 00:02:37.020
+<v Dean McPherson>We're not restricted to just surveys and quizzes.
+
+33
+00:02:37.500 --> 00:02:43.920
+<v Dean McPherson>People use this for all kinds of use cases from event registration through to client onboarding,
+
+34
+00:02:45.640 --> 00:02:50.620
+<v Dean McPherson>generation and all those kind of classic form use cases. I suppose the gap we saw in the market
+
+35
+00:02:50.620 --> 00:02:56.760
+<v Dean McPherson>when we first launched Paperform was particularly around event registration. I had a friend who runs
+
+36
+00:02:56.760 --> 00:03:02.040
+<v Dean McPherson>a weekend kids club kind of thing, like a holiday program for children. And he asked me to build a
+
+37
+00:03:02.040 --> 00:03:07.720
+<v Dean McPherson>registration for him back in about 2013. And I was like, why on earth are you asking me to do this?
+
+38
+00:03:07.780 --> 00:03:11.880
+<v Dean McPherson>There are so many form builders out there. But when I had a look, I couldn't find anything that
+
+39
+00:03:11.880 --> 00:03:16.580
+<v Dean McPherson>I would recommend that would allow him to have a form that captured all the information that was
+
+40
+00:03:16.580 --> 00:03:20.240
+<v Dean McPherson>required because it wasn't a trivial amount of information he needed you know parent guardian
+
+41
+00:03:20.240 --> 00:03:26.180
+<v Dean McPherson>information dietary requirements who the kids were friends with you know 30 40 questions per child
+
+42
+00:03:26.180 --> 00:03:31.460
+<v Dean McPherson>that could actually take payments and that looked like his brand because he had a bit of a brand
+
+43
+00:03:31.460 --> 00:03:35.820
+<v Dean McPherson>around this program and he didn't want it to you know come in and just have this very generic form
+
+44
+00:03:35.820 --> 00:03:40.060
+<v Dean McPherson>So that was the three prongs that were missing in the market.
+
+45
+00:03:40.220 --> 00:03:43.360
+<v Dean McPherson>There was definitely some players that do parts of those,
+
+46
+00:03:43.440 --> 00:03:45.420
+<v Dean McPherson>but nothing that really offered a rounded solution
+
+47
+00:03:45.420 --> 00:03:47.140
+<v Dean McPherson>that you could make your own form with.
+
+48
+00:03:47.480 --> 00:03:49.360
+<v Dean McPherson>So Paperform was born.
+
+49
+00:03:49.460 --> 00:03:51.840
+<v Dean McPherson>And we've obviously grown a lot since then
+
+50
+00:03:51.840 --> 00:03:55.760
+<v Dean McPherson>and found that there's a whole lot more gaps in the form builder space
+
+51
+00:03:55.760 --> 00:03:57.940
+<v Dean McPherson>for something that is a well-rounded tool
+
+52
+00:03:57.940 --> 00:04:01.780
+<v Dean McPherson>that allows non-technical people to build their own cool solutions.
+
+53
+00:04:05.860 --> 00:04:11.260
+<v Noah Labhart>So tell me about the MVP. Tell me about that first product you made. It sounds like a form
+
+54
+00:04:11.260 --> 00:04:16.620
+<v Noah Labhart>for a friend, we'll call it. How long did it take you to build and what sort of tools did you use
+
+55
+00:04:16.620 --> 00:04:17.400
+<v Noah Labhart>to bring it to life?
+
+56
+00:04:18.040 --> 00:04:21.040
+<v Dean McPherson>So that form for a friend was actually just the inspiration. So I built that way
+
+57
+00:04:21.040 --> 00:04:29.360
+<v Dean McPherson>back in 2013. When I would say we built Paperform in 2016, our MVP was, I mean, we were saying this
+
+58
+00:04:29.360 --> 00:04:33.260
+<v Dean McPherson>is an inspiration point from where we have started, but let's have a go at building something bigger.
+
+59
+00:04:33.260 --> 00:04:37.140
+<v Dean McPherson>I sat down and started writing an MVP.
+
+60
+00:04:37.460 --> 00:04:41.100
+<v Dean McPherson>My background is very front-end heavy in terms of tech.
+
+61
+00:04:41.200 --> 00:04:42.960
+<v Dean McPherson>We're very much a React shop.
+
+62
+00:04:43.480 --> 00:04:48.620
+<v Dean McPherson>Back-end, we are a little bit all over the place, but our primary app is Laravel, which is PHP,
+
+63
+00:04:48.840 --> 00:04:51.380
+<v Dean McPherson>which I've used in the past in previous jobs.
+
+64
+00:04:51.560 --> 00:04:58.920
+<v Dean McPherson>And when you're first getting started, it's really great if you have a solid basis in what tech you're using
+
+65
+00:04:58.920 --> 00:05:02.580
+<v Dean McPherson>because you don't want to be learning tech at the same time you're trying to figure out what you're building.
+
+66
+00:05:03.260 --> 00:05:05.800
+<v Dean McPherson>The more things you can have pre-answered, the better.
+
+67
+00:05:06.000 --> 00:05:10.660
+<v Dean McPherson>I built our MVP kind of in three months while we're working full-time.
+
+68
+00:05:10.760 --> 00:05:11.800
+<v Dean McPherson>We're both working full-time.
+
+69
+00:05:12.200 --> 00:05:15.880
+<v Dean McPherson>Just got up an hour early every morning and wrote something.
+
+70
+00:05:16.060 --> 00:05:18.920
+<v Dean McPherson>I found that to be a really helpful way to just keep everything moving.
+
+71
+00:05:19.080 --> 00:05:22.600
+<v Dean McPherson>Even if I got up and I got nothing done, the next day you generally would.
+
+72
+00:05:22.760 --> 00:05:24.700
+<v Dean McPherson>So you just maintain that steady momentum.
+
+73
+00:05:24.980 --> 00:05:28.540
+<v Dean McPherson>And eventually got to this stage where we had, it was a really raw MVP.
+
+74
+00:05:28.740 --> 00:05:30.600
+<v Dean McPherson>Our first MVP was, it was polished.
+
+75
+00:05:30.780 --> 00:05:32.920
+<v Dean McPherson>So it looked good and it felt really nice to play with.
+
+76
+00:05:33.260 --> 00:05:37.000
+<v Dean McPherson>It was very restricted in terms of what features we offered.
+
+77
+00:05:37.300 --> 00:05:41.560
+<v Dean McPherson>So I think that was about August 2016 that we were like,
+
+78
+00:05:41.660 --> 00:05:45.940
+<v Dean McPherson>okay, this MVP is at this stage where you can really use it to make a form now.
+
+79
+00:05:46.200 --> 00:05:48.560
+<v Dean McPherson>It obviously doesn't have everything that we'd ever want to be in it,
+
+80
+00:05:48.640 --> 00:05:51.180
+<v Dean McPherson>but it's at this stage where we need to get in people's hands.
+
+81
+00:05:51.580 --> 00:05:53.200
+<v Dean McPherson>So we put it up on BetaList.
+
+82
+00:05:53.520 --> 00:05:55.600
+<v Dean McPherson>From that, we actually got approached by AppSumo.
+
+83
+00:05:55.820 --> 00:05:58.080
+<v Dean McPherson>Some of your fellow Texans reached out to us
+
+84
+00:05:58.080 --> 00:06:03.940
+<v Dean McPherson>and asked us if we'd like to run a deal with them to launch it.
+
+85
+00:06:04.020 --> 00:06:05.800
+<v Dean McPherson>So we said, yeah, why not?
+
+86
+00:06:05.960 --> 00:06:06.900
+<v Dean McPherson>We're at that early stage.
+
+87
+00:06:07.000 --> 00:06:07.940
+<v Dean McPherson>This is our first business.
+
+88
+00:06:07.960 --> 00:06:09.500
+<v Dean McPherson>And we had no idea whether what we built
+
+89
+00:06:09.500 --> 00:06:11.900
+<v Dean McPherson>was even going to be interesting to anyone else.
+
+90
+00:06:12.480 --> 00:06:15.220
+<v Dean McPherson>Launching with an AppSumo deal was really valuable for us
+
+91
+00:06:15.220 --> 00:06:17.640
+<v Dean McPherson>because it brought us something like 3,000 people
+
+92
+00:06:17.640 --> 00:06:19.880
+<v Dean McPherson>who bought a lifetime deal into the product.
+
+93
+00:06:20.300 --> 00:06:23.360
+<v Dean McPherson>And then all of a sudden you have that many active users
+
+94
+00:06:23.360 --> 00:06:25.480
+<v Dean McPherson>in your product screaming at you for features.
+
+95
+00:06:25.480 --> 00:06:34.420
+<v Dean McPherson>So that was our refining process of how we went from MVP to polished product was a lot of people trying to use the product at once.
+
+96
+00:06:36.480 --> 00:06:43.080
+<v Noah Labhart>On the MVP, what sort of decisions and trade-offs did you have to make where you're getting up that hour early and you're building it?
+
+97
+00:06:43.180 --> 00:06:44.740
+<v Noah Labhart>What features were you cutting?
+
+98
+00:06:44.880 --> 00:06:52.200
+<v Noah Labhart>What decisions were you making to kind of hold off on building things a certain way in order to build it faster?
+
+99
+00:06:52.340 --> 00:06:53.760
+<v Noah Labhart>And how did you cope with those decisions?
+
+100
+00:06:55.480 --> 00:07:00.900
+<v Dean McPherson>What I really wanted to create around Paperform when we first started was a really fantastic editing experience.
+
+101
+00:07:01.300 --> 00:07:03.860
+<v Dean McPherson>So it's something that I think gets missed a lot.
+
+102
+00:07:04.060 --> 00:07:10.800
+<v Dean McPherson>Maybe not so much these days, but definitely back when we were first starting Paperform was thinking about how people are actually going to use your product.
+
+103
+00:07:10.880 --> 00:07:16.120
+<v Dean McPherson>And if they were going to use it a lot, how you could make that more efficient and more useful over time.
+
+104
+00:07:16.260 --> 00:07:20.840
+<v Dean McPherson>So our editing experience was heavily inspired by the Medium editor.
+
+105
+00:07:20.840 --> 00:07:25.600
+<v Dean McPherson>This is a content publishing website, but they were popular at the time for a place
+
+106
+00:07:25.600 --> 00:07:30.120
+<v Dean McPherson>to blog and they were one of the first people to do that kind of block style text editing
+
+107
+00:07:30.120 --> 00:07:33.700
+<v Dean McPherson>where you know, it's like writing a word doc, but then you can insert images, you can insert
+
+108
+00:07:33.700 --> 00:07:34.200
+<v Dean McPherson>content.
+
+109
+00:07:34.240 --> 00:07:36.820
+<v Dean McPherson>It's very, what you see is what you get, document based.
+
+110
+00:07:37.400 --> 00:07:39.040
+<v Dean McPherson>And I was really heavily inspired by that.
+
+111
+00:07:39.100 --> 00:07:42.880
+<v Dean McPherson>And it made me think, what if something like form creation wasn't, you know, your classic
+
+112
+00:07:42.880 --> 00:07:47.360
+<v Dean McPherson>drag and drop experience, but was far more this kind of rich document creation experience.
+
+113
+00:07:47.960 --> 00:07:50.220
+<v Dean McPherson>That's why we were striving to create when we first started.
+
+114
+00:07:50.660 --> 00:07:53.140
+<v Dean McPherson>There's so many different features which people want out of forms.
+
+115
+00:07:53.320 --> 00:07:57.500
+<v Dean McPherson>We made sure we ticked off the ones that were really important to us early on.
+
+116
+00:07:57.600 --> 00:08:04.280
+<v Dean McPherson>So, you know, we wanted our forms to be engaging so you could add images, change the typography, have headings and text and add questions.
+
+117
+00:08:04.700 --> 00:08:08.080
+<v Dean McPherson>That was about it. I think we could send emails on our first MVP.
+
+118
+00:08:08.360 --> 00:08:12.000
+<v Dean McPherson>So you could send at least a summary to yourself, maybe a summary to someone else.
+
+119
+00:08:12.000 --> 00:08:16.480
+<v Dean McPherson>no integrations, which again for form builders is pretty rough
+
+120
+00:08:16.480 --> 00:08:18.800
+<v Dean McPherson>because generally you capture a submission
+
+121
+00:08:18.800 --> 00:08:20.480
+<v Dean McPherson>and you need to do something with that information.
+
+122
+00:08:20.820 --> 00:08:24.740
+<v Dean McPherson>So not having any integrations early on was definitely a pain point.
+
+123
+00:08:25.120 --> 00:08:27.940
+<v Dean McPherson>But we obviously had very clear vision at that stage
+
+124
+00:08:27.940 --> 00:08:30.620
+<v Dean McPherson>of all the big missing things that we'd want to add.
+
+125
+00:08:30.760 --> 00:08:32.640
+<v Dean McPherson>But we really needed to get into people's hands
+
+126
+00:08:32.640 --> 00:08:36.880
+<v Dean McPherson>just to tell whether people actually wanted it or not at all,
+
+127
+00:08:36.980 --> 00:08:41.180
+<v Dean McPherson>especially coming into such a crowded space in terms of mind share.
+
+128
+00:08:42.000 --> 00:08:47.080
+<v Noah Labhart>So I understand the decisions and trade-offs and what you're basing the early product off of.
+
+129
+00:08:47.180 --> 00:08:54.260
+<v Noah Labhart>And then you mentioned you got into the hands or into this ecosystem of AppSumo that got you a bunch of users, right?
+
+130
+00:08:54.600 --> 00:08:57.040
+<v Noah Labhart>How did you progress the product from there?
+
+131
+00:08:57.160 --> 00:09:02.660
+<v Noah Labhart>How did you mature the product and how did you figure out what the next most important thing was to build?
+
+132
+00:09:03.620 --> 00:09:07.380
+<v Dean McPherson>So at that stage, the business was just my wife, Dionne, and I.
+
+133
+00:09:07.520 --> 00:09:10.760
+<v Dean McPherson>We quit our jobs kind of March 2017.
+
+134
+00:09:12.000 --> 00:09:16.860
+<v Dean McPherson>was a little bit of overlap of working full-time and trying to run pay perform at the same time
+
+135
+00:09:16.860 --> 00:09:21.920
+<v Dean McPherson>was a little bit of overlap of working full-time and trying to run Paperform at the same time, but from really early on, what Dionnie really focused on the business and pushed as a priority,
+
+136
+00:09:21.920 --> 00:09:27.840
+<v Dean McPherson>which wasn't my natural tendency, but I'm so glad she did, was live, well, as live as possible customer
+
+137
+00:09:27.840 --> 00:09:32.920
+<v Dean McPherson>support. So doing live chat on site. We talked to our customers pretty much all day, every day, which
+
+138
+00:09:32.920 --> 00:09:37.560
+<v Dean McPherson>gives you a pretty clear idea of what pain points people are feeling in your product,
+
+139
+00:09:37.560 --> 00:09:41.720
+<v Dean McPherson>and nothing really beats that, and that's why I really like to talk about that AppSumo,
+
+140
+00:09:42.000 --> 00:09:45.140
+<v Dean McPherson>as really foundational in that early part of our business, because actually
+
+141
+00:09:45.140 --> 00:09:49.460
+<v Dean McPherson>having people in your product who have paid money to be there makes such an
+
+142
+00:09:49.460 --> 00:09:52.720
+<v Dean McPherson>incredible difference in the quality of feedback you get. I'd mentioned a little
+
+143
+00:09:52.720 --> 00:09:55.380
+<v Dean McPherson>bit earlier that we launched on BetaList. We've got something like two or
+
+144
+00:09:55.380 --> 00:09:59.420
+<v Dean McPherson>three hundred beta testers out of that, but the feedback we got from them was, in
+
+145
+00:09:59.420 --> 00:10:04.140
+<v Dean McPherson>my opinion, pretty useless, mostly because people that sign up to something like
+
+146
+00:10:04.140 --> 00:10:07.060
+<v Dean McPherson>BetaList are the kind of people that are their early adopters, and they're not
+
+147
+00:10:07.060 --> 00:10:09.720
+<v Dean McPherson>your target market, really. They're people who like to play with new technology
+
+148
+00:10:09.720 --> 00:10:12.140
+<v Dean McPherson>because they're not really your target market.
+
+149
+00:10:12.240 --> 00:10:14.400
+<v Dean McPherson>They're not actually trying to use your software.
+
+150
+00:10:14.580 --> 00:10:16.800
+<v Dean McPherson>They're trying to think about it.
+
+151
+00:10:16.900 --> 00:10:18.580
+<v Dean McPherson>So they'll tell you what they think
+
+152
+00:10:18.580 --> 00:10:19.740
+<v Dean McPherson>and they'll tell you like,
+
+153
+00:10:19.840 --> 00:10:20.980
+<v Dean McPherson>oh, this might be nice to have,
+
+154
+00:10:21.160 --> 00:10:23.200
+<v Dean McPherson>but they're not actually trying to solve problems
+
+155
+00:10:23.200 --> 00:10:23.800
+<v Dean McPherson>in their business.
+
+156
+00:10:24.320 --> 00:10:26.300
+<v Dean McPherson>Somebody who's paid a small amount of money
+
+157
+00:10:26.300 --> 00:10:27.440
+<v Dean McPherson>for a lifetime deal though,
+
+158
+00:10:27.500 --> 00:10:29.400
+<v Dean McPherson>to actually use the software within their business,
+
+159
+00:10:29.840 --> 00:10:30.900
+<v Dean McPherson>they're going to tell you when,
+
+160
+00:10:30.980 --> 00:10:32.620
+<v Dean McPherson>hey, I can't send emails
+
+161
+00:10:32.620 --> 00:10:35.540
+<v Dean McPherson>or hey, I really need to integrate
+
+162
+00:10:35.540 --> 00:10:37.100
+<v Dean McPherson>with ActiveCampaign right now
+
+163
+00:10:37.100 --> 00:10:41.140
+<v Dean McPherson>or whatever's important for their business need at that time,
+
+164
+00:10:41.260 --> 00:10:44.320
+<v Dean McPherson>the quality of feedback is so much more valuable.
+
+165
+00:10:44.540 --> 00:10:47.000
+<v Dean McPherson>So it was actually really easy, I think,
+
+166
+00:10:47.000 --> 00:10:48.960
+<v Dean McPherson>because of the volume of people to determine
+
+167
+00:10:48.960 --> 00:10:51.420
+<v Dean McPherson>what were the really big things that were missing in the product.
+
+168
+00:10:51.620 --> 00:10:55.780
+<v Dean McPherson>So for that first, I'd say probably nearly year and a half
+
+169
+00:10:55.780 --> 00:10:57.540
+<v Dean McPherson>after launching Paperform,
+
+170
+00:10:57.740 --> 00:11:00.640
+<v Dean McPherson>it wasn't a tough call to figure out what to build next.
+
+171
+00:11:00.720 --> 00:11:01.960
+<v Dean McPherson>The trick was just building it.
+
+172
+00:11:02.060 --> 00:11:05.080
+<v Dean McPherson>So we added something like a significant feature a week
+
+173
+00:11:05.080 --> 00:11:07.060
+<v Dean McPherson>for the first like 50, 60 weeks.
+
+174
+00:11:07.260 --> 00:11:09.320
+<v Dean McPherson>Every newsletter every week was,
+
+175
+00:11:09.380 --> 00:11:10.720
+<v Dean McPherson>hey, we've got a new feature for you,
+
+176
+00:11:10.800 --> 00:11:12.680
+<v Dean McPherson>which was an incredible way
+
+177
+00:11:12.680 --> 00:11:13.980
+<v Dean McPherson>of actually growing the business as well
+
+178
+00:11:13.980 --> 00:11:15.660
+<v Dean McPherson>because people got really excited
+
+179
+00:11:15.660 --> 00:11:17.000
+<v Dean McPherson>about this momentum of,
+
+180
+00:11:17.120 --> 00:11:19.040
+<v Dean McPherson>oh man, every time I get an email from Paperform,
+
+181
+00:11:19.120 --> 00:11:20.820
+<v Dean McPherson>there's a new feature being added.
+
+182
+00:11:21.040 --> 00:11:23.320
+<v Dean McPherson>And obviously we can't sustain that forever,
+
+183
+00:11:23.460 --> 00:11:25.020
+<v Dean McPherson>but it was a really beautiful way
+
+184
+00:11:25.020 --> 00:11:26.180
+<v Dean McPherson>of growing the product
+
+185
+00:11:26.180 --> 00:11:28.060
+<v Dean McPherson>from something that was polished,
+
+186
+00:11:28.120 --> 00:11:29.340
+<v Dean McPherson>but feature incomplete
+
+187
+00:11:29.340 --> 00:11:31.440
+<v Dean McPherson>to something that's a whole lot more rounded.
+
+188
+00:11:32.880 --> 00:11:34.440
+<v Noah Labhart>So it's you and your wife
+
+189
+00:11:35.080 --> 00:11:40.380
+<v Noah Labhart>beginning, you started this, you launched it, you went full time, but then you had to grow your team.
+
+190
+00:11:40.680 --> 00:11:46.000
+<v Noah Labhart>How did you go about building your team and what did you look for in those people to indicate that
+
+191
+00:11:46.000 --> 00:11:46.980
+<v Noah Labhart>they were the winning horses?
+
+192
+00:11:49.100 --> 00:11:52.000
+<v Dean McPherson>When we first started Paperform, the intent was really to run it as a
+
+193
+00:11:52.000 --> 00:11:57.100
+<v Dean McPherson>lifestyle business. So we were kind of hoping early on that we would be able to just manage it
+
+194
+00:11:57.100 --> 00:12:01.920
+<v Dean McPherson>ourselves and that we would grow to a size where we could pay our own salaries, work from home.
+
+195
+00:12:01.920 --> 00:12:06.580
+<v Dean McPherson>we've been remote from day one which obviously makes sense when you're a two-person team and you
+
+196
+00:12:06.580 --> 00:12:12.940
+<v Dean McPherson>are married and live together um we actually hit this stage mid-2018 so we've been running
+
+197
+00:12:12.940 --> 00:12:17.440
+<v Dean McPherson>Paperform for like a year and a half and we kind of hit that goal we were running the business
+
+198
+00:12:17.440 --> 00:12:22.020
+<v Dean McPherson>pretty well just the two of us but the business was still growing and it was starting to turn into
+
+199
+00:12:22.020 --> 00:12:26.500
+<v Dean McPherson>more work than two people could handle so we we hit this tension point where we were like
+
+200
+00:12:26.500 --> 00:12:27.960
+<v Dean McPherson>Like, things are really good now.
+
+201
+00:12:28.480 --> 00:12:37.160
+<v Dean McPherson>We could either put the brakes on growth and try and actively slow down how the business is growing so that we can keep it at a size that we can manage just the two of us.
+
+202
+00:12:37.420 --> 00:12:43.360
+<v Dean McPherson>Or we need to actually get help and re-evaluate the idea of this being a lifestyle business.
+
+203
+00:12:44.240 --> 00:12:52.020
+<v Dean McPherson>Late 2018, we decided that we were going to give up the lifestyle idea and actually run Paperform as a legitimate business, so to speak.
+
+204
+00:12:52.160 --> 00:12:56.040
+<v Dean McPherson>Not that a lifestyle business isn't a legitimate business, but actively trying to grow the business.
+
+205
+00:12:56.500 --> 00:12:57.780
+<v Dean McPherson>which is when we decided to start hiring.
+
+206
+00:12:58.260 --> 00:13:00.940
+<v Dean McPherson>In terms of who we hired and how we hired,
+
+207
+00:13:01.880 --> 00:13:03.960
+<v Dean McPherson>we started working with a consultant in marketing
+
+208
+00:13:03.960 --> 00:13:05.820
+<v Dean McPherson>who ended up being an employee.
+
+209
+00:13:05.980 --> 00:13:09.680
+<v Dean McPherson>So he consulted with us for six months or so before we hired him.
+
+210
+00:13:09.720 --> 00:13:11.380
+<v Dean McPherson>We actually started consulting with him
+
+211
+00:13:11.380 --> 00:13:13.820
+<v Dean McPherson>for him to help us find a good growth hire
+
+212
+00:13:13.820 --> 00:13:15.640
+<v Dean McPherson>because neither of our backgrounds in growth.
+
+213
+00:13:16.480 --> 00:13:18.640
+<v Dean McPherson>So he was doing some growth work for us
+
+214
+00:13:18.640 --> 00:13:21.320
+<v Dean McPherson>and then consulting with us to help us find our first growth hire,
+
+215
+00:13:21.460 --> 00:13:22.100
+<v Dean McPherson>which he did.
+
+216
+00:13:22.220 --> 00:13:24.560
+<v Dean McPherson>So he wasn't our first growth hire.
+
+217
+00:13:24.680 --> 00:13:25.760
+<v Dean McPherson>He helped us hire.
+
+218
+00:13:26.520 --> 00:13:31.640
+<v Dean McPherson>hire our first and then we ended up bringing him on board too. That was a really helpful way of
+
+219
+00:13:31.640 --> 00:13:37.000
+<v Dean McPherson>hiring him because obviously we got to kind of work with him up front for six months before we
+
+220
+00:13:37.000 --> 00:13:40.360
+<v Dean McPherson>even pulled the trigger and brought him as an employee. By the time he came in as an employee
+
+221
+00:13:40.360 --> 00:13:44.880
+<v Dean McPherson>we knew him very well, we knew how we worked together. Other than growth we also have brought
+
+222
+00:13:44.880 --> 00:13:50.220
+<v Dean McPherson>on another developer who happens to be my brother-in-law which certainly also makes life
+
+223
+00:13:50.220 --> 00:13:55.420
+<v Dean McPherson>pretty easy because I've known him for 10 years or something like that and you know all those
+
+224
+00:13:56.500 --> 00:14:00.840
+<v Dean McPherson>aspects of working with someone are a whole lot easier when you know somebody that well
+
+225
+00:14:01.160 --> 00:14:03.160
+<v Dean McPherson>and are a lot less of a gamble.
+
+226
+00:14:03.840 --> 00:14:12.080
+<v Dean McPherson>But in general when we're hiring we are looking for really attitude above skill set at this
+
+227
+00:14:12.080 --> 00:14:12.720
+<v Dean McPherson>stage in our business.
+
+228
+00:14:12.820 --> 00:14:13.760
+<v Dean McPherson>I think it's really important.
+
+229
+00:14:14.000 --> 00:14:21.160
+<v Dean McPherson>So we're about 10 employees now and the way we've decided to focus on that is these people
+
+230
+00:14:21.160 --> 00:14:23.440
+<v Dean McPherson>People really need to take ownership of their roles.
+
+231
+00:14:23.620 --> 00:14:27.980
+<v Dean McPherson>So we need people that are self-motivated, really excited to work.
+
+232
+00:14:28.080 --> 00:14:33.200
+<v Dean McPherson>We're remote, so having people that can kind of manage themselves to a degree is really important
+
+233
+00:14:33.200 --> 00:14:36.140
+<v Dean McPherson>because you can't micromanage from the other side of the world.
+
+234
+00:14:36.240 --> 00:14:38.040
+<v Dean McPherson>It doesn't work and it shouldn't work.
+
+235
+00:14:38.400 --> 00:14:42.620
+<v Dean McPherson>If you do have somebody on the other side of the world, you need them to be relatively responsible human beings
+
+236
+00:14:43.300 --> 00:14:46.980
+<v Dean McPherson>who are willing to manage their own enthusiasm for their work.
+
+237
+00:14:46.980 --> 00:14:51.880
+<v Dean McPherson>So attitude, I think, has been really a deciding factor for a lot of our hires.
+
+238
+00:14:52.840 --> 00:14:57.840
+<v Dean McPherson>Obviously, some hires require a skill base, but if you gave us two people and one person's
+
+239
+00:14:57.840 --> 00:15:01.680
+<v Dean McPherson>attitude was slightly better, but they were slightly less technically able, we would pick
+
+240
+00:15:01.680 --> 00:15:03.940
+<v Dean McPherson>attitude over skill any day of the week.
+
+241
+00:15:05.080 --> 00:15:10.880
+<v Noah Labhart>You focused on fit, and I like what you said, attitude, because that can encapsulate a lot
+
+242
+00:15:10.880 --> 00:15:13.380
+<v Noah Labhart>of things really over skill.
+
+243
+00:15:13.620 --> 00:15:15.160
+<v Noah Labhart>So I totally get that.
+
+244
+00:15:16.980 --> 00:15:19.760
+<v Noah Labhart>some technical bits a little bit and talk about scalability.
+
+245
+00:15:20.240 --> 00:15:23.860
+<v Noah Labhart>So did you build this to scale efficiently in the beginning
+
+246
+00:15:23.860 --> 00:15:26.780
+<v Noah Labhart>or were you fighting this as you grew?
+
+247
+00:15:27.660 --> 00:15:29.700
+<v Dean McPherson>It's probably not what all the cool kids are doing these days,
+
+248
+00:15:29.760 --> 00:15:33.880
+<v Dean McPherson>but what I found is generally the simpler your tech stack,
+
+249
+00:15:34.040 --> 00:15:36.360
+<v Dean McPherson>the better because it's easier to scale.
+
+250
+00:15:36.480 --> 00:15:39.560
+<v Dean McPherson>So if it's a popular framework like something like Laravel
+
+251
+00:15:39.560 --> 00:15:40.760
+<v Dean McPherson>or if you're in another language,
+
+252
+00:15:40.940 --> 00:15:42.780
+<v Dean McPherson>there's plenty of big frameworks out there.
+
+253
+00:15:43.100 --> 00:15:46.440
+<v Dean McPherson>The good thing about it is there's a lot written on how you scale it.
+
+254
+00:15:46.980 --> 00:15:49.420
+<v Dean McPherson>of expertise out there if you do need to bring it in.
+
+255
+00:15:49.600 --> 00:15:52.880
+<v Dean McPherson>So we haven't really had any structural design problems
+
+256
+00:15:52.880 --> 00:15:54.440
+<v Dean McPherson>with scaling our business at all.
+
+257
+00:15:54.580 --> 00:16:00.520
+<v Dean McPherson>We migrated hosting in like 2017 from DigitalOcean over to AWS
+
+258
+00:16:00.520 --> 00:16:03.720
+<v Dean McPherson>kind of to enable a whole lot more of the AWS ecosystem,
+
+259
+00:16:03.940 --> 00:16:05.380
+<v Dean McPherson>which helps us scale out as well.
+
+260
+00:16:05.540 --> 00:16:10.040
+<v Dean McPherson>But generally the way we handle our design is with scaling
+
+261
+00:16:10.040 --> 00:16:11.200
+<v Dean McPherson>in mind from the ground up.
+
+262
+00:16:11.320 --> 00:16:13.860
+<v Dean McPherson>So we do a lot on Lambda these days.
+
+263
+00:16:13.860 --> 00:16:16.680
+<v Dean McPherson>if we're doing any component of our ecosystem
+
+264
+00:16:16.680 --> 00:16:19.700
+<v Dean McPherson>that needs to dynamically handle quite a bit of load,
+
+265
+00:16:19.860 --> 00:16:21.760
+<v Dean McPherson>then we try and push it into a serverless environment.
+
+266
+00:16:22.160 --> 00:16:25.280
+<v Dean McPherson>But our primary app stack runs just on EC2 instances.
+
+267
+00:16:25.560 --> 00:16:28.340
+<v Dean McPherson>That's been generally pretty manageable and fine.
+
+268
+00:16:28.580 --> 00:16:31.380
+<v Dean McPherson>We might consider changing our infrastructure at some stage,
+
+269
+00:16:31.500 --> 00:16:34.960
+<v Dean McPherson>but I doubt there'll be any application level rewrite
+
+270
+00:16:34.960 --> 00:16:37.660
+<v Dean McPherson>or big pieces of work there.
+
+271
+00:16:37.820 --> 00:16:39.160
+<v Dean McPherson>It's all been pretty manageable.
+
+272
+00:16:39.800 --> 00:16:43.020
+<v Noah Labhart>And so you're using PHP, Laravel, in the backend.
+
+273
+00:16:43.160 --> 00:16:43.660
+<v Dean McPherson>That's right.
+
+274
+00:16:43.860 --> 00:16:46.380
+<v Noah Labhart>And you're on a monolithic structure right now.
+
+275
+00:16:46.720 --> 00:16:47.220
+<v Dean McPherson>Yeah,
+
+276
+00:16:47.240 --> 00:16:50.560
+<v Dean McPherson>so the way I generally think about it is we're on a monolithic structure,
+
+277
+00:16:50.740 --> 00:16:52.180
+<v Dean McPherson>but we still write microservices.
+
+278
+00:16:52.380 --> 00:16:55.760
+<v Dean McPherson>So if we've got something that's better written in some other language,
+
+279
+00:16:55.920 --> 00:16:58.760
+<v Dean McPherson>and especially if we can run it in a serverless environment,
+
+280
+00:16:59.040 --> 00:17:03.320
+<v Dean McPherson>then we'll write it in that and have it integrated into our monolith.
+
+281
+00:17:03.460 --> 00:17:05.220
+<v Dean McPherson>So a monolith is kind of our control center,
+
+282
+00:17:05.360 --> 00:17:10.140
+<v Dean McPherson>which I think is, it would still fall under the monolithic pattern of application design,
+
+283
+00:17:10.380 --> 00:17:13.700
+<v Dean McPherson>but it allows us to have our cake and eat it too.
+
+284
+00:17:13.860 --> 00:17:17.740
+<v Dean McPherson>It means we've got a fairly simple infrastructure level as well.
+
+285
+00:17:17.800 --> 00:17:22.200
+<v Dean McPherson>We don't need to worry about orchestrating thousands of services to offer our product.
+
+286
+00:17:22.420 --> 00:17:27.200
+<v Dean McPherson>It means if you just need to do something quick and simple and PHP, then you can do that too.
+
+287
+00:17:28.460 --> 00:17:35.040
+<v Noah Labhart>Well, as you step out on the balcony and you look across what you've built with Paperform, what are you most proud of?
+
+288
+00:17:35.660 --> 00:17:41.000
+<v Dean McPherson>I'm really proud of what we've built and I'm really proud of the team that we're growing.
+
+289
+00:17:41.000 --> 00:17:45.600
+<v Dean McPherson>I really love the people who work with us and we all get along really well.
+
+290
+00:17:45.680 --> 00:17:49.080
+<v Dean McPherson>And I'm really loving the culture that we're building piece by piece.
+
+291
+00:17:49.240 --> 00:17:53.860
+<v Dean McPherson>I think one of the most rewarding things I see when I look out across our business is
+
+292
+00:17:53.860 --> 00:17:55.440
+<v Dean McPherson>really our customer base.
+
+293
+00:17:55.620 --> 00:18:00.040
+<v Dean McPherson>When you actually build something and then you see thousands of people use it to actually
+
+294
+00:18:00.040 --> 00:18:02.820
+<v Dean McPherson>solve problems in their own businesses, it's really rewarding.
+
+295
+00:18:03.240 --> 00:18:07.200
+<v Dean McPherson>We actually, we offer not-for-profit organizations pay what you want.
+
+296
+00:18:07.200 --> 00:18:13.680
+<v Dean McPherson>So we actually see quite a few not-for-profit organizations come through and use us for like a dollar a month, which is completely awesome.
+
+297
+00:18:13.920 --> 00:18:23.160
+<v Dean McPherson>But that gives us these amazing stories of people coming in and scouring out, you know, sometimes really boring infrastructure things in their businesses and sometimes really exciting campaigns.
+
+298
+00:18:23.560 --> 00:18:32.880
+<v Dean McPherson>But regardless, it's really awesome to know that something that we've taken the time to put together is valued and used to do really amazing things.
+
+299
+00:18:32.880 --> 00:18:38.780
+<v Dean McPherson>Like one really cool story, we did a case study on a couple months ago, when it was probably like
+
+300
+00:18:38.780 --> 00:18:45.580
+<v Dean McPherson>a month or two into the pandemic, and this software agency in, I think they're somewhere in Germany,
+
+301
+00:18:45.580 --> 00:18:52.040
+<v Dean McPherson>started using Paperform to make online booking forms for florists. So his local florists obviously
+
+302
+00:18:52.040 --> 00:18:56.000
+<v Dean McPherson>had to shut their doors, so he was just making them forms and giving them to them essentially
+
+303
+00:18:56.000 --> 00:19:00.500
+<v Dean McPherson>for free. They were doing, you know, thousands of dollars of sales through these free forms and
+
+304
+00:19:00.500 --> 00:19:03.820
+<v Dean McPherson>and keeping the German florists afloat during this crazy time.
+
+305
+00:19:04.060 --> 00:19:06.100
+<v Dean McPherson>And it's, I mean, that's so rewarding.
+
+306
+00:19:06.340 --> 00:19:09.660
+<v Dean McPherson>What we've built can actually make that kind of a difference
+
+307
+00:19:09.660 --> 00:19:12.200
+<v Dean McPherson>in some random florist in Germany.
+
+308
+00:19:12.380 --> 00:19:13.600
+<v Dean McPherson>I'm really proud of that.
+
+309
+00:19:14.420 --> 00:19:16.220
+<v Noah Labhart>Let's flip the script a little bit.
+
+310
+00:19:16.400 --> 00:19:18.260
+<v Noah Labhart>Tell me about a mistake you made
+
+311
+00:19:18.260 --> 00:19:21.260
+<v Noah Labhart>and how you and your team responded to it.
+
+312
+00:19:22.060 --> 00:19:23.660
+<v Dean McPherson>We make mistakes all the time.
+
+313
+00:19:23.880 --> 00:19:26.300
+<v Dean McPherson>I think definitely in strategy,
+
+314
+00:19:26.300 --> 00:19:31.040
+<v Dean McPherson>like we'll explore a partnership and get to this stage where...
+
+315
+00:19:31.960 --> 00:19:32.780
+<v Dean McPherson>Here's an example.
+
+316
+00:19:32.920 --> 00:19:36.220
+<v Dean McPherson>So AppSumo was a really fantastic way for us to launch.
+
+317
+00:19:36.800 --> 00:19:39.980
+<v Dean McPherson>If we went to them, they would be very happy for us to run another deal.
+
+318
+00:19:40.200 --> 00:19:45.480
+<v Dean McPherson>And that was definitely tempting early on to kind of get onto that deals bandwagon.
+
+319
+00:19:46.280 --> 00:19:50.060
+<v Dean McPherson>AppSumo ended up launching a subscription service called Briefcase,
+
+320
+00:19:50.240 --> 00:19:51.660
+<v Dean McPherson>which we are actually a part of.
+
+321
+00:19:51.760 --> 00:19:54.140
+<v Dean McPherson>So it's like a SaaS bundle.
+
+322
+00:19:54.140 --> 00:19:59.760
+<v Dean McPherson>You pay AppSumo a certain amount a month and it gives you access to a bunch of software solutions.
+
+323
+00:20:00.080 --> 00:20:01.660
+<v Dean McPherson>And that's completely fine.
+
+324
+00:20:01.780 --> 00:20:04.560
+<v Dean McPherson>They're a great company and they're doing great things.
+
+325
+00:20:05.040 --> 00:20:10.760
+<v Dean McPherson>But we found the value association of the brand of AppSumo to be detrimental over time.
+
+326
+00:20:10.980 --> 00:20:21.500
+<v Dean McPherson>So we definitely don't want to be associated with deals going forward because it certainly portrays a certain level of value in your product if you're always trying to sell it for the lowest buck possible.
+
+327
+00:20:22.020 --> 00:20:24.280
+<v Dean McPherson>While it wasn't a mistake launching with AppSumo,
+
+328
+00:20:24.460 --> 00:20:27.480
+<v Dean McPherson>it's definitely been one of those things that we've had to re-evaluate over time
+
+329
+00:20:27.480 --> 00:20:30.420
+<v Dean McPherson>about how we want to portray ourselves in the market.
+
+330
+00:20:30.600 --> 00:20:33.060
+<v Dean McPherson>We don't want to be viewed as the cheap form solution
+
+331
+00:20:33.520 --> 00:20:35.540
+<v Dean McPherson>or the budget form solution,
+
+332
+00:20:35.720 --> 00:20:38.300
+<v Dean McPherson>mostly because that doesn't reflect the product.
+
+333
+00:20:38.420 --> 00:20:40.040
+<v Dean McPherson>The product's of great quality,
+
+334
+00:20:40.120 --> 00:20:42.080
+<v Dean McPherson>and we want people to think that it's of great quality.
+
+335
+00:20:43.580 --> 00:20:44.080
+<v Dean McPherson>Yeah.
+
+336
+00:20:45.600 --> 00:20:48.980
+<v Noah Labhart>You know, it's interesting that you say that about the deals package,
+
+337
+00:20:49.060 --> 00:20:49.960
+<v Noah Labhart>and I think that's true.
+
+338
+00:20:51.680 --> 00:20:55.220
+<v Noah Labhart>that can be had and a product can be labeled as such.
+
+339
+00:20:55.360 --> 00:20:58.720
+<v Noah Labhart>So that makes a ton of sense that you kind of wanted to move away from that.
+
+340
+00:20:59.280 --> 00:21:03.120
+<v Noah Labhart>So what does the future look like for your product and for your team?
+
+341
+00:21:03.660 --> 00:21:05.420
+<v Dean McPherson>We've still got heaps of product vision.
+
+342
+00:21:05.540 --> 00:21:08.900
+<v Dean McPherson>We're at this stage where we're releasing on a much slower cadence
+
+343
+00:21:08.900 --> 00:21:12.160
+<v Dean McPherson>because we've obviously got a lot more existing product to support.
+
+344
+00:21:12.360 --> 00:21:14.780
+<v Dean McPherson>We're being a lot more intentional about what we release.
+
+345
+00:21:14.960 --> 00:21:18.080
+<v Dean McPherson>So we're definitely not in that like we were in the early days,
+
+346
+00:21:18.100 --> 00:21:19.880
+<v Dean McPherson>releasing a new big feature every week.
+
+347
+00:21:21.500 --> 00:21:27.840
+<v Dean McPherson>and as we've grown the team, we've gotten much better at reflecting on what it is we're exactly trying to do as a company
+
+348
+00:21:28.880 --> 00:21:30.840
+<v Dean McPherson>and how we'd like to get there.
+
+349
+00:21:30.960 --> 00:21:33.060
+<v Dean McPherson>And that's all pretty flexible.
+
+350
+00:21:33.240 --> 00:21:42.420
+<v Dean McPherson>So the overarching vision of our business is really to enable non-technical people to build their own solutions to their own problems.
+
+351
+00:21:42.500 --> 00:21:45.460
+<v Dean McPherson>And Paperform as a product fits really well within that vision.
+
+352
+00:21:45.620 --> 00:21:48.380
+<v Dean McPherson>But we would love to build auxiliary products.
+
+353
+00:21:48.380 --> 00:21:53.000
+<v Dean McPherson>We would love to continue to expand our forms product to open up even more possibilities
+
+354
+00:21:53.000 --> 00:21:55.000
+<v Dean McPherson>about what people can use it for.
+
+355
+00:21:55.340 --> 00:21:58.300
+<v Dean McPherson>And a lot of that's also around the people themselves.
+
+356
+00:21:58.640 --> 00:22:03.000
+<v Dean McPherson>So unlike a lot of technical products out there, a lot of people who come to use us
+
+357
+00:22:03.000 --> 00:22:07.840
+<v Dean McPherson>as small business owners that don't really have a huge amount of experience using SaaS
+
+358
+00:22:07.840 --> 00:22:08.940
+<v Dean McPherson>products at all.
+
+359
+00:22:09.080 --> 00:22:14.420
+<v Dean McPherson>So we are heavily investing in things like customer support or customer success, whatever
+
+360
+00:22:14.420 --> 00:22:15.660
+<v Dean McPherson>if you want to, whatever you want to call it.
+
+361
+00:22:15.800 --> 00:22:18.740
+<v Dean McPherson>And actually up-training our own internal people
+
+362
+00:22:18.740 --> 00:22:21.040
+<v Dean McPherson>to help our customers figure out
+
+363
+00:22:21.040 --> 00:22:22.140
+<v Dean McPherson>how to build their own solutions.
+
+364
+00:22:22.220 --> 00:22:24.000
+<v Dean McPherson>So we've got some amazing support people
+
+365
+00:22:24.000 --> 00:22:26.440
+<v Dean McPherson>that spend most of their day talking to customers.
+
+366
+00:22:26.720 --> 00:22:28.060
+<v Dean McPherson>And a lot of what they're talking about
+
+367
+00:22:28.060 --> 00:22:30.720
+<v Dean McPherson>is those very in-depth business use cases,
+
+368
+00:22:30.920 --> 00:22:34.600
+<v Dean McPherson>which they're helping them guide through the technicality
+
+369
+00:22:34.600 --> 00:22:35.660
+<v Dean McPherson>of how they can set that up
+
+370
+00:22:35.660 --> 00:22:36.940
+<v Dean McPherson>with some of our more advanced features.
+
+371
+00:22:37.120 --> 00:22:38.040
+<v Dean McPherson>Trying to bridge that gap
+
+372
+00:22:38.040 --> 00:22:41.460
+<v Dean McPherson>between where an end user's expertise might end
+
+373
+00:22:41.460 --> 00:22:42.360
+<v Dean McPherson>and where they want to be.
+
+374
+00:22:42.360 --> 00:22:48.800
+<v Dean McPherson>So a lot of education and a lot of time spent trying to help them get to their solution.
+
+375
+00:22:48.800 --> 00:22:52.380
+<v Dean McPherson>I think between those two things, between where we want to go with the product and really
+
+376
+00:22:52.380 --> 00:22:58.380
+<v Dean McPherson>trying to support our existing and new customer base as best as we can, we've got our work cut out
+
+377
+00:22:58.380 --> 00:22:58.880
+<v Dean McPherson>for us.
+
+378
+00:22:58.780 --> 00:23:03.160
+<v Noah Labhart>Sounds like you have a lot on the plate that you have in the vision, which is
+
+379
+00:23:03.160 --> 00:23:10.020
+<v Noah Labhart>important and good for the future. Let's switch to you a little bit, Dean. Who influences the way that
+
+380
+00:23:10.020 --> 00:23:17.400
+<v Noah Labhart>you work? Name a CEO, CTO, architect, or really any person. Name a person you look up to and why.
+
+381
+00:23:17.840 --> 00:23:22.820
+<v Dean McPherson>I'd like probably a lot of entrepreneurs out there. I don't spend a lot of time reading or
+
+382
+00:23:22.820 --> 00:23:27.840
+<v Dean McPherson>thinking about how other people work. I think I probably did when I was younger, but I think a
+
+383
+00:23:27.840 --> 00:23:33.120
+<v Dean McPherson>lot of the way I work has been picked up by osmosis from previous bosses in previous jobs
+
+384
+00:23:33.120 --> 00:23:39.900
+<v Dean McPherson>and different aspects of that. So my first boss was a fantastic salesman, great client manager,
+
+385
+00:23:40.020 --> 00:23:42.000
+<v Dean McPherson>that taught me a lot about managing expectations
+
+386
+00:23:42.000 --> 00:23:44.000
+<v Dean McPherson>and how to handle people,
+
+387
+00:23:44.640 --> 00:23:46.920
+<v Dean McPherson>which is, I think, something that a lot of developers
+
+388
+00:23:46.920 --> 00:23:48.280
+<v Dean McPherson>in particular don't get,
+
+389
+00:23:48.380 --> 00:23:50.840
+<v Dean McPherson>especially if they work straight for larger corporations.
+
+390
+00:23:51.100 --> 00:23:53.400
+<v Dean McPherson>They get protected from the people side of business,
+
+391
+00:23:53.680 --> 00:23:55.760
+<v Dean McPherson>which if you want to run your own product,
+
+392
+00:23:55.940 --> 00:23:58.980
+<v Dean McPherson>then more of my day is spent handling people
+
+393
+00:23:58.980 --> 00:24:00.220
+<v Dean McPherson>than it is writing code.
+
+394
+00:24:00.520 --> 00:24:02.580
+<v Dean McPherson>And then in a few other roles,
+
+395
+00:24:02.620 --> 00:24:05.600
+<v Dean McPherson>I learned, I suppose, more straight up productivity things.
+
+396
+00:24:05.680 --> 00:24:08.520
+<v Dean McPherson>So really thinking about when are you productive in your day
+
+397
+00:24:10.020 --> 00:24:15.120
+<v Dean McPherson>as an organization. A lot of those problems go away when you're not in an office. Like, as a programmer,
+
+398
+00:24:15.120 --> 00:24:21.020
+<v Dean McPherson>I found it harder working in offices where you're around a lot of other business professionals that,
+
+399
+00:24:21.020 --> 00:24:27.100
+<v Dean McPherson>you know, are far more prone to water cooler chat or that quick coffee break or just coming up to
+
+400
+00:24:27.100 --> 00:24:30.380
+<v Dean McPherson>you at any time and asking you questions. You know, I don't want to be one of those developer prima
+
+401
+00:24:30.380 --> 00:24:34.220
+<v Dean McPherson>donnas, but I think we all are to a degree, where when you're really focused on something,
+
+402
+00:24:34.220 --> 00:24:37.660
+<v Dean McPherson>you like to not be disturbed because you don't want to lose that train of thought and
+
+403
+00:24:37.660 --> 00:24:42.960
+<v Dean McPherson>have to start again. So definitely learned a lot from those two roles. I suppose in terms of more
+
+404
+00:24:42.960 --> 00:24:50.900
+<v Dean McPherson>popular or known external thinkers, Seth Godin had an impact on me pretty early on. I think
+
+405
+00:24:50.900 --> 00:24:56.420
+<v Dean McPherson>somebody gave me one of his books a year or two before we launched Paperform. I think before I
+
+406
+00:24:56.420 --> 00:25:02.420
+<v Dean McPherson>started thinking about it, and Seth Godin definitely jogged my thought processes into
+
+407
+00:25:02.420 --> 00:25:08.500
+<v Dean McPherson>to action in this case. I kind of assumed that the classic model of being an employee was the
+
+408
+00:25:08.500 --> 00:25:14.120
+<v Dean McPherson>safest, most stable way forward in life. It really questioned the modern, I suppose, the modern
+
+409
+00:25:14.120 --> 00:25:20.220
+<v Dean McPherson>in our case has been really true. So like we've bootstrapped Paperform from the ground up.
+
+410
+00:25:20.220 --> 00:25:24.840
+<v Dean McPherson>in our case has been really true. So like we've bootstrapped paper form from the ground up.
+
+411
+00:25:24.940 --> 00:25:29.880
+<v Dean McPherson>We didn't sell our house to fund it. We didn't go knocking on all of our family members' doors
+
+412
+00:25:29.880 --> 00:25:34.780
+<v Dean McPherson>was asking for cash to fund it. We were able to do it with two people and a bit of elbow grease.
+
+413
+00:25:34.980 --> 00:25:41.900
+<v Dean McPherson>And a lot of that, I'm sure, is market timing. And I'm a developer, which is probably a bit of
+
+414
+00:25:41.900 --> 00:25:48.240
+<v Dean McPherson>an advantage. In general, I think it's never been easier to start a new business and requires way
+
+415
+00:25:48.240 --> 00:25:54.480
+<v Dean McPherson>less upfront capital, requires way less upfront expertise or experience. Seth Godin definitely
+
+416
+00:25:54.480 --> 00:26:00.520
+<v Dean McPherson>definitely made me reevaluate what's the most stable career path going forward. Kind of kicked
+
+417
+00:26:00.520 --> 00:26:05.360
+<v Dean McPherson>the legs out from under me a little bit by making me question how stable working for other people
+
+418
+00:26:05.360 --> 00:26:10.420
+<v Dean McPherson>would be forever. And I think that's probably even more true today than it was five years ago.
+
+419
+00:26:10.560 --> 00:26:13.900
+<v Dean McPherson>And I can't see how it would change anytime soon.
+
+420
+00:26:15.500 --> 00:26:17.860
+<v Noah Labhart>So if you could go back to the beginning,
+
+421
+00:26:18.560 --> 00:26:22.980
+<v Noah Labhart>what would you do differently? Or where would you consider taking a different approach?
+
+422
+00:26:24.480 --> 00:26:30.700
+<v Dean McPherson>Hindsight, everything's 20/20, so it's really easy to say, oh, I wouldn't do that, or I would,
+
+423
+00:26:30.700 --> 00:26:34.740
+<v Dean McPherson>you know. There are definitely some architectural problems in our code base which I
+
+424
+00:26:34.740 --> 00:26:40.320
+<v Dean McPherson>would go back and do differently. Nothing that's going to cause significant pain, but definitely
+
+425
+00:26:40.320 --> 00:26:45.760
+<v Dean McPherson>things that I'll go, oh, why did I design it that way around, why did I name it like that?
+
+426
+00:26:45.760 --> 00:26:50.520
+<v Dean McPherson>So definitely, there's definitely lots of small things that I would go back and do differently.
+
+427
+00:26:50.520 --> 00:26:57.080
+<v Dean McPherson>I would probably hire earlier, bringing other people in who are actually focused on areas of
+
+428
+00:26:57.080 --> 00:27:01.220
+<v Dean McPherson>the business that you want strong in. So for us, that was definitely growth and marketing,
+
+429
+00:27:01.800 --> 00:27:06.360
+<v Dean McPherson>was really healthy for the business and really healthy for us, because it's when somebody else
+
+430
+00:27:06.360 --> 00:27:09.440
+<v Dean McPherson>isn't doing it, you're thinking that you should be doing it, and you're
+
+431
+00:27:09.440 --> 00:27:15.020
+<v Dean McPherson>half doing it but you're not very good at it. If you are able to hire people into those roles,
+
+432
+00:27:15.020 --> 00:27:20.180
+<v Dean McPherson>and that's great, which is something that we're still adjusting on how to do well. The way we
+
+433
+00:27:20.520 --> 00:27:25.500
+<v Dean McPherson>hire is we wait to the, to get so painful that we need to put somebody else in that position.
+
+434
+00:27:26.100 --> 00:27:32.620
+<v Dean McPherson>So yeah, but hiring earlier, I think, is something that I would definitely do if I had a time machine.
+
+435
+00:27:33.800 --> 00:27:39.700
+<v Noah Labhart>last question dean so you're getting on a plane and you're sitting next to a young entrepreneur
+
+436
+00:27:39.700 --> 00:27:44.900
+<v Noah Labhart>who's built the next big thing they're jazzed about it they can't wait to show it off to the
+
+437
+00:27:44.900 --> 00:27:50.140
+<v Noah Labhart>world they really think it's going to be a game changer what advice do you give that person having
+
+438
+00:27:50.520 --> 00:27:51.380
+<v Noah Labhart>down this road a bit?
+
+439
+00:27:52.380 --> 00:27:56.900
+<v Dean McPherson>There'd be a couple of pieces of advice I'd give. One is who's your
+
+440
+00:27:56.900 --> 00:28:03.160
+<v Dean McPherson>customer and how are you going to get to them? A lot of builders in particular, myself, one of them
+
+441
+00:28:03.580 --> 00:28:09.400
+<v Dean McPherson>love the solution, but not so much the problem or not so much the person who's experiencing the
+
+442
+00:28:09.400 --> 00:28:13.440
+<v Dean McPherson>problem. If they were sitting next to me and they built something, I would be very curious to know
+
+443
+00:28:13.440 --> 00:28:17.780
+<v Dean McPherson>how they're actually going to get it out into the market, which is probably the bigger piece
+
+444
+00:28:17.780 --> 00:28:24.420
+<v Dean McPherson>of the puzzle in a lot of cases. Other than that, I think really healthy pieces of advice is
+
+445
+00:28:24.420 --> 00:28:29.840
+<v Dean McPherson>stop listening to advice to a degree. I think if you're going to be successful in a lot of business,
+
+446
+00:28:29.920 --> 00:28:34.920
+<v Dean McPherson>you really need to make sure you've got good critical thinking capabilities. You need to be
+
+447
+00:28:34.920 --> 00:28:41.200
+<v Dean McPherson>able to make decisions on your own. So relying on third-party advice or mentors, I don't think it's
+
+448
+00:28:41.200 --> 00:28:46.300
+<v Dean McPherson>unhealthy. I think it can be a crutch for a lot of early entrepreneurs thinking that they need
+
+449
+00:28:47.960 --> 00:28:52.880
+<v Dean McPherson>seniority or advice or wisdom to really tell them how to do things. A lot of business that we found
+
+450
+00:28:52.880 --> 00:28:59.500
+<v Dean McPherson>is common sense. Try and think about why people would suggest the things that they do. And when
+
+451
+00:28:59.500 --> 00:29:04.060
+<v Dean McPherson>you're working with other businesses, know that business is business and people are going to do
+
+452
+00:29:04.060 --> 00:29:09.340
+<v Dean McPherson>what's in their best interest. Make sure you really try and think for yourself before you
+
+453
+00:29:09.340 --> 00:29:13.160
+<v Dean McPherson>let other people tell you how you should be thinking. That's something that I think we've
+
+454
+00:29:13.160 --> 00:29:14.840
+<v Dean McPherson>We've actually done really well.
+
+455
+00:29:15.380 --> 00:29:17.140
+<v Dean McPherson>You know, when we launched Paperform,
+
+456
+00:29:17.320 --> 00:29:21.120
+<v Dean McPherson>the dominant media around how you would start a business like ours
+
+457
+00:29:21.120 --> 00:29:22.720
+<v Dean McPherson>is you would build an MVP
+
+458
+00:29:22.720 --> 00:29:25.300
+<v Dean McPherson>and then you would shop it around at every VC firm
+
+459
+00:29:25.300 --> 00:29:29.220
+<v Dean McPherson>within flight distance until somebody gave you a huge check
+
+460
+00:29:29.220 --> 00:29:31.620
+<v Dean McPherson>and then you would try and scale it up within 18 months
+
+461
+00:29:31.620 --> 00:29:35.000
+<v Dean McPherson>and it would crash and burn or you would make a billion dollars.
+
+462
+00:29:36.740 --> 00:29:40.860
+<v Dean McPherson>We definitely went the more grow-it-yourself, bootstrap way
+
+463
+00:29:40.860 --> 00:29:47.200
+<v Dean McPherson>way and uh and i wouldn't change that especially for our first product because it gave it gave us
+
+464
+00:29:47.200 --> 00:29:52.140
+<v Dean McPherson>the pace to be able to figure out what on earth we were doing as as we were doing it without the
+
+465
+00:29:52.140 --> 00:29:57.740
+<v Dean McPherson>added pressure of external stakeholders you know looking for a return or looking for a quick buck
+
+466
+00:29:57.740 --> 00:30:03.060
+<v Noah Labhart>no that's great advice well dean thank you for being on the show today thank you for being on
+
+467
+00:30:03.060 --> 00:30:07.400
+<v Noah Labhart>Code Story and telling the creation story of Paperform. Amazing.
+
+468
+00:30:07.400 --> 00:30:08.800
+<v Dean McPherson>Thanks, Noah. It's been awesome.
+
+469
+00:30:08.800 --> 00:30:09.300
+<v Dean McPherson>And
+
+470
+00:30:09.300 --> 00:30:12.240
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+471
+00:30:12.240 --> 00:30:12.740
+<v Noah Labhart>Code Story.
+
+472
+00:30:16.120 --> 00:30:18.780
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+473
+00:30:19.120 --> 00:30:23.940
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+474
+00:30:24.340 --> 00:30:29.440
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+475
+00:30:29.800 --> 00:30:32.020
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+476
+00:30:32.280 --> 00:30:34.340
+<v Noah Labhart>Both things help us out tremendously.
+
+477
+00:30:36.860 --> 00:30:38.380
+<v Noah Labhart>And thanks again for listening.
+
+478
+00:30:44.220 --> 00:30:45.240
+<v Noah Labhart>Thank you.

@@ -1,0 +1,1747 @@
+WEBVTT
+
+NOTE S5 Bonus: How to Architect Trustworthy, Multi-Modal AI Systems with Seekar’s Kordel France
+
+1
+00:00:00.880 --> 00:00:06.640
+<v Kordel France>The first MVP just did object detection of vehicles, right? We started with just vehicles.
+
+2
+00:00:06.860 --> 00:00:10.620
+<v Kordel France>And then we actually ended up scaling it up to being able to detect different objects
+
+3
+00:00:10.960 --> 00:00:16.000
+<v Kordel France>and being able to be customized by the user. So the very core MVP that we actually released
+
+4
+00:00:16.000 --> 00:00:22.300
+<v Kordel France>to users to buy was a custom trainable computer vision platform that they could go and train
+
+5
+00:00:22.300 --> 00:00:26.600
+<v Kordel France>their own object detector on. So they have a set of cameras. We're going to give you
+
+6
+00:00:26.600 --> 00:00:32.160
+<v Kordel France>the software that you can basically feed it a bunch of data and it will be able to detect what
+
+7
+00:00:32.160 --> 00:00:36.200
+<v Kordel France>you know what you want within the camera imagery you're able to use it from there and retrain it
+
+8
+00:00:36.200 --> 00:00:42.360
+<v Kordel France>as necessary. I am Kordel France and I am co-founder and CEO of Seekar Technologies.
+
+9
+00:00:47.700 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+10
+00:00:52.920 --> 00:01:00.840
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+11
+00:01:02.200 --> 00:01:12.600
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Kordel France created the ultimate computer vision platform around mobility, ethics, and explainability.
+
+12
+00:01:13.300 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+13
+00:01:21.240 --> 00:01:25.300
+<v Noah Labhart>Kordel France has always been infatuated with finding order and chaos,
+
+14
+00:01:25.580 --> 00:01:28.060
+<v Noah Labhart>and has carried that way of living throughout his life.
+
+15
+00:01:28.920 --> 00:01:32.360
+<v Noah Labhart>He's an engineer by training and schooling, but grew up on a farm.
+
+16
+00:01:32.880 --> 00:01:36.660
+<v Noah Labhart>What triggered his interest in AI was the day that his father brought home
+
+17
+00:01:36.660 --> 00:01:39.020
+<v Noah Labhart>autonomous driving systems for the farm equipment.
+
+18
+00:01:39.840 --> 00:01:42.880
+<v Noah Labhart>His dad let him tinker with it, and Kordel was hooked.
+
+19
+00:01:42.880 --> 00:01:50.980
+<v Noah Labhart>In college he studied physics and mathematics as his father always told him that there was a lot of math involved with autonomous systems.
+
+20
+00:01:51.920 --> 00:01:54.620
+<v Noah Labhart>Aligned with this he really enjoyed studying calculus.
+
+21
+00:01:55.140 --> 00:02:01.860
+<v Noah Labhart>He saw the relationship between time series and control theory, essentially autonomous guidance of a vehicle.
+
+22
+00:02:02.840 --> 00:02:06.220
+<v Noah Labhart>And to learn to code he tried to automate the calculation of derivatives.
+
+23
+00:02:07.300 --> 00:02:13.000
+<v Noah Labhart>All in all, he considers math a beautiful thing and sees it behind everything throughout our day-to-day life.
+
+24
+00:02:14.180 --> 00:02:17.100
+<v Noah Labhart>For fun, he practices jujitsu and plays the drums.
+
+25
+00:02:17.820 --> 00:02:20.460
+<v Noah Labhart>In another life, he says he might have been a drummer.
+
+26
+00:02:20.720 --> 00:02:25.900
+<v Noah Labhart>But in this life, he plays along with a wide spectrum of music, from punk rock to country.
+
+27
+00:02:26.660 --> 00:02:29.160
+<v Noah Labhart>Both hobbies allow his brain to turn off.
+
+28
+00:02:29.440 --> 00:02:35.460
+<v Noah Labhart>But at the same time, Kordel solves some of his biggest technical problems while he is doing his hobbies.
+
+29
+00:02:36.420 --> 00:02:41.720
+<v Noah Labhart>Way back in college, Kordel started building a code base around computer vision and detection.
+
+30
+00:02:42.380 --> 00:02:49.240
+<v Noah Labhart>He started adding to it over time, made it quite impressive, and figured out a way to monetize the platform.
+
+31
+00:02:50.120 --> 00:02:57.700
+<v Noah Labhart>However, coming from the defense industry, he and his co-founder understood the apprehension around the use of AI commercially.
+
+32
+00:02:58.380 --> 00:03:00.280
+<v Noah Labhart>They set out to change that.
+
+33
+00:03:02.120 --> 00:03:05.460
+<v Noah Labhart>This is the creation story of Seekar Technologies.
+
+34
+00:03:10.760 --> 00:03:16.000
+<v Kordel France>Seekar Technologies is an artificial intelligence company that builds computer vision products
+
+35
+00:03:16.000 --> 00:03:22.560
+<v Kordel France>specifically to address adverse environments with an emphasis on explainability, mobility,
+
+36
+00:03:22.840 --> 00:03:29.520
+<v Kordel France>and ethics. So that's this concise single sentence elevator pitch, right? Let's break that down for a
+
+37
+00:03:29.520 --> 00:03:33.820
+<v Kordel France>moment. When I say we build computer vision products for adverse environments, it's pretty
+
+38
+00:03:33.820 --> 00:03:37.620
+<v Kordel France>easy to go anywhere or then there's a lot of suppliers a lot of vendors that build neural
+
+39
+00:03:37.620 --> 00:03:43.160
+<v Kordel France>network to detect objects and things right and do object recognition we see a lot and see it a lot
+
+40
+00:03:43.160 --> 00:03:47.460
+<v Kordel France>in self-driving cars for example they're doing obstacle avoidance they're looking for cars stop
+
+41
+00:03:47.460 --> 00:03:54.520
+<v Kordel France>lights stop signs etc what we specialize is uh we actually look we actually our platform is
+
+42
+00:03:55.120 --> 00:03:59.280
+<v Kordel France>specializes in detecting these kinds of patterns and doing object detection and guidance
+
+43
+00:03:59.280 --> 00:04:05.720
+<v Kordel France>specifically through cameras, but in like smoky environments, environments where it's more adverse,
+
+44
+00:04:06.660 --> 00:04:11.680
+<v Kordel France>there's, you know, the camera lens is broken, or there's rain, there's rain smudge, right? So
+
+45
+00:04:11.680 --> 00:04:19.700
+<v Kordel France>you can imagine where scenarios where it's not exactly clear daylight, right, maybe perhaps in
+
+46
+00:04:19.700 --> 00:04:25.160
+<v Kordel France>defense or agriculture where it's really dusty, being able to apply the same neural network that
+
+47
+00:04:25.160 --> 00:04:30.740
+<v Kordel France>detects something in clear day color imagery isn't going to have the same performance. So you really
+
+48
+00:04:30.740 --> 00:04:36.860
+<v Kordel France>have to, you have to build it in a different way. So that's where, that's where our, our expertise
+
+49
+00:04:36.860 --> 00:04:42.620
+<v Kordel France>comes in. That's where our product comes in is, is we excel in that. And on top of that, we're
+
+50
+00:04:42.620 --> 00:04:48.300
+<v Kordel France>actually able to provide explainability on why the classifications made were actually made and
+
+51
+00:04:48.300 --> 00:04:53.640
+<v Kordel France>pinpoint to the exact, you know, neuron essentially within the neural network that suggests this is
+
+52
+00:04:55.160 --> 00:05:00.400
+<v Kordel France>essentially, and we can go back and tweak our models accordingly. Mobility, which is the second
+
+53
+00:05:00.400 --> 00:05:07.120
+<v Kordel France>tier, we emphasize our products in being mobile. So we don't want to have a tie to the cloud for a
+
+54
+00:05:07.120 --> 00:05:12.820
+<v Kordel France>couple of reasons. We really want to have our products run fast, run at the edge, not have to
+
+55
+00:05:12.820 --> 00:05:18.360
+<v Kordel France>make a transaction with the cloud. Some of our applications that we build for can't talk to the
+
+56
+00:05:18.360 --> 00:05:25.060
+<v Kordel France>the cloud. So they've got to be used on edge on the device and be really fast, really quick within
+
+57
+00:05:25.060 --> 00:05:29.960
+<v Kordel France>the control loop. There's also a protection of privacy with that. So you're not risking exposure
+
+58
+00:05:29.960 --> 00:05:36.500
+<v Kordel France>of any data by going to the cloud and having to receive something back. That third tier is ethics,
+
+59
+00:05:36.660 --> 00:05:44.060
+<v Kordel France>so if anyone, I don't know if you've seen the show on Netflix called Coded Bias, it really shows
+
+60
+00:05:44.060 --> 00:05:49.700
+<v Kordel France>some interesting problems today in AI. That's some things that need to be
+
+61
+00:05:49.700 --> 00:05:53.960
+<v Kordel France>solved. Just to give a brief example, there's a lot of facial recognition
+
+62
+00:05:53.960 --> 00:05:59.140
+<v Kordel France>systems that incorrectly classify certain types of people over the other
+
+63
+00:05:59.140 --> 00:06:02.640
+<v Kordel France>and wrongly convict them, or there's certain credit systems that approve
+
+64
+00:06:02.640 --> 00:06:08.640
+<v Kordel France>certain demographics for higher credit limits than others due to these AI
+
+65
+00:06:08.640 --> 00:06:13.580
+<v Kordel France>models that are inherently biased due to the data they were trained on. So
+
+66
+00:06:14.060 --> 00:06:23.260
+<v Kordel France>And that really comes down to an engineering problem and making sure your data sets are well-rounded and that your algorithm is attributing equal weight to all aspects of the data.
+
+67
+00:06:23.500 --> 00:06:38.900
+<v Kordel France>So we take a particular focus on that to try to mitigate bias in any regard whatsoever by having multiple organizations come in, actual experts from the field that we're building come in, to really try to negate that and build a better name for AI, essentially.
+
+68
+00:06:39.660 --> 00:06:44.500
+<v Kordel France>I started building the code base for Seekar when I was actually in college and again,
+
+69
+00:06:44.680 --> 00:06:49.760
+<v Kordel France>you know, I've always been kind of infatuated with autonomous systems and, you know, one
+
+70
+00:06:49.760 --> 00:06:53.700
+<v Kordel France>way to guide an autonomous system or to guide a robot essentially is through cameras, is
+
+71
+00:06:53.700 --> 00:06:54.200
+<v Kordel France>through vision.
+
+72
+00:06:54.240 --> 00:06:59.760
+<v Kordel France>So I really took hold of computer vision, again, kind of seeing how that math aspect
+
+73
+00:06:59.760 --> 00:07:04.680
+<v Kordel France>related to computer vision and being able to incorporate my expertise and influence
+
+74
+00:07:04.680 --> 00:07:07.260
+<v Kordel France>in that regard into code, I was able to,
+
+75
+00:07:07.280 --> 00:07:09.280
+<v Kordel France>I started building a computer vision platform
+
+76
+00:07:09.280 --> 00:07:12.280
+<v Kordel France>that was pretty intelligent in some regard.
+
+77
+00:07:12.540 --> 00:07:15.500
+<v Kordel France>And it kind of turned in from a hobby
+
+78
+00:07:15.500 --> 00:07:17.160
+<v Kordel France>into something that was actually quite impressive
+
+79
+00:07:17.160 --> 00:07:19.040
+<v Kordel France>and something that turned into something
+
+80
+00:07:19.040 --> 00:07:20.300
+<v Kordel France>that we could actually monetize.
+
+81
+00:07:20.500 --> 00:07:22.400
+<v Kordel France>I kind of held onto it for a while
+
+82
+00:07:22.400 --> 00:07:24.640
+<v Kordel France>and just kind of kept adding capability to it.
+
+83
+00:07:24.740 --> 00:07:28.160
+<v Kordel France>And then my co-founder and I, Zach Newman,
+
+84
+00:07:28.360 --> 00:07:31.520
+<v Kordel France>we both came from defense industries
+
+85
+00:07:31.520 --> 00:07:35.380
+<v Kordel France>And we saw a lot of potential for artificial intelligence to be used.
+
+86
+00:07:35.540 --> 00:07:42.140
+<v Kordel France>But in defense, it's really hard for those things to take hold because the consequences for AI being wrong are very severe.
+
+87
+00:07:42.240 --> 00:07:44.160
+<v Kordel France>Right. And sometimes AI is a black box.
+
+88
+00:07:44.340 --> 00:07:49.560
+<v Kordel France>So you can't really determine why it made a decision it made.
+
+89
+00:07:49.760 --> 00:07:51.320
+<v Kordel France>There's some apprehension there.
+
+90
+00:07:51.660 --> 00:07:54.260
+<v Kordel France>And we wanted to try to change that.
+
+91
+00:07:54.260 --> 00:08:00.940
+<v Kordel France>So that was one of the primary reasons in which we started Seekar is trying to kind of change that notion of,
+
+92
+00:08:00.980 --> 00:08:09.500
+<v Kordel France>OK, well, we need to make these decisions explainable by AI in order to capture use and capture appreciation from industries such as defense and medicine,
+
+93
+00:08:09.600 --> 00:08:12.900
+<v Kordel France>because there's a lot of capability that we have that we aren't exploiting right now.
+
+94
+00:08:15.060 --> 00:08:20.100
+<v Noah Labhart>So tell me about the MVP, so that first product you built, the first version of Seekar Technologies.
+
+95
+00:08:20.400 --> 00:08:23.920
+<v Noah Labhart>How long did it take to build and what sort of tools did you use to bring it to life?
+
+96
+00:08:25.120 --> 00:08:32.820
+<v Kordel France>The very first product we built was, so we started with a computer vision platform that could be scaled in different verticals.
+
+97
+00:08:32.840 --> 00:08:36.220
+<v Kordel France>Because we really didn't know exactly where our first customers were going to come.
+
+98
+00:08:36.320 --> 00:08:37.260
+<v Kordel France>We knew where we wanted to go.
+
+99
+00:08:37.460 --> 00:08:44.260
+<v Kordel France>But the first MVP just did object detection of vehicles, right?
+
+100
+00:08:44.400 --> 00:08:45.840
+<v Kordel France>We started with just vehicles.
+
+101
+00:08:45.840 --> 00:08:54.180
+<v Kordel France>And then we actually ended up scaling it up to different, being able to detect different objects and being able to be customized by the user.
+
+102
+00:08:54.320 --> 00:09:05.560
+<v Kordel France>So the very core MVP that we actually released to users to buy was a custom trainable computer vision platform that they could go and train their own object detector on.
+
+103
+00:09:05.800 --> 00:09:07.640
+<v Kordel France>So they have a set of cameras.
+
+104
+00:09:07.640 --> 00:09:12.740
+<v Kordel France>we're going to give you the software that you can basically feed it a bunch of data
+
+105
+00:09:12.740 --> 00:09:16.360
+<v Kordel France>and it will be able to detect what you want within the camera imagery.
+
+106
+00:09:16.600 --> 00:09:21.540
+<v Kordel France>The software will automatically build the neural network for you, it will automatically
+
+107
+00:09:21.540 --> 00:09:27.320
+<v Kordel France>build the code that you can integrate into your camera for multiple languages and you're
+
+108
+00:09:28.260 --> 00:09:30.420
+<v Kordel France>able to use it from there and retrain it as necessary.
+
+109
+00:09:31.080 --> 00:09:32.560
+<v Kordel France>That's what we started out as, right?
+
+110
+00:09:32.560 --> 00:09:38.700
+<v Kordel France>So basically just building a plain vanilla object detector that you could basically customize yourself.
+
+111
+00:09:40.340 --> 00:09:48.080
+<v Noah Labhart>With any MVP, you got to make certain decisions and trade-offs about, okay, we're going to build it this way first.
+
+112
+00:09:48.220 --> 00:09:49.560
+<v Noah Labhart>And you talked about vehicles first.
+
+113
+00:09:49.980 --> 00:09:52.720
+<v Noah Labhart>Or we're going to take on this sort of technical debt.
+
+114
+00:09:52.840 --> 00:09:54.820
+<v Noah Labhart>We're going to build it in this way so that it's fast.
+
+115
+00:09:55.440 --> 00:10:00.460
+<v Noah Labhart>Tell me about some of those decisions and trade-offs you had to make in that MVP and how you cope with them.
+
+116
+00:10:01.360 --> 00:10:07.500
+<v Kordel France>One of the biggest things that I struggled with was we didn't know exactly what vertical we were going to scale up into.
+
+117
+00:10:07.680 --> 00:10:11.940
+<v Kordel France>And so it was very simple to basically pick, OK, health care.
+
+118
+00:10:12.000 --> 00:10:16.500
+<v Kordel France>We're going to build for health care and we're going to market that and we're going to spend all of our calories on that.
+
+119
+00:10:16.600 --> 00:10:21.360
+<v Kordel France>And we're going to make health care work and we're going to build all of our tech to specialize in just that.
+
+120
+00:10:21.680 --> 00:10:28.440
+<v Kordel France>But if you're wrong, especially, you know, as trying to be a lean startup, the consequences are more severe.
+
+121
+00:10:28.440 --> 00:10:33.440
+<v Kordel France>here. So the decision we made to kind of de-risk it was to basically build a platform that could
+
+122
+00:10:33.440 --> 00:10:38.240
+<v Kordel France>be leveraged in different industries, whether it's agriculture, defense, manufacturing, medicine,
+
+123
+00:10:38.460 --> 00:10:43.400
+<v Kordel France>et cetera. And that took a bit more time and more effort, obviously a little more, a lot,
+
+124
+00:10:43.460 --> 00:10:49.260
+<v Kordel France>a few more man hours, a lot more coding. But we also went a step further in making it adaptable
+
+125
+00:10:49.260 --> 00:10:53.640
+<v Kordel France>to multiple programming languages because we didn't ever want to have to turn a customer down
+
+126
+00:10:53.640 --> 00:10:58.320
+<v Kordel France>on because, well, you know, you guys, your AI models are written in Python, but we really
+
+127
+00:10:58.320 --> 00:11:04.820
+<v Kordel France>need it in C++ or we really need it in to fit on an iPhone that runs in Swift or an
+
+128
+00:11:04.820 --> 00:11:06.240
+<v Kordel France>Android that runs in Java, whatever.
+
+129
+00:11:06.580 --> 00:11:12.040
+<v Kordel France>So we built it to be adaptable to multiple languages and being able to kind of say, OK,
+
+130
+00:11:12.100 --> 00:11:15.820
+<v Kordel France>this is where we're going to take our spend our money is building this platform out in
+
+131
+00:11:15.820 --> 00:11:23.000
+<v Kordel France>that regard instead of actually probably acquiring customers at this point was a bit of a difficult
+
+132
+00:11:23.640 --> 00:11:36.420
+<v Kordel France>A bit of a difficult decision to make, but I think it ended up being the right decision in the long run because we were able to kind of fill out different industries in order to kind of gather our niche to say, okay, we see that these guys are taking hold a lot more.
+
+133
+00:11:36.520 --> 00:11:44.340
+<v Kordel France>This is where we should focus our effort because we have market knowledge, market feedback on what people want in specific industries.
+
+134
+00:11:46.920 --> 00:11:51.720
+<v Noah Labhart>So from that point then, how did you mature and progress the product?
+
+135
+00:11:53.640 --> 00:12:00.200
+<v Noah Labhart>What was next? And create a roadmap, and even, you know, I say build what's next, but decide what
+
+136
+00:12:00.200 --> 00:12:02.400
+<v Noah Labhart>is the next most important thing to build.
+
+137
+00:12:02.400 --> 00:12:06.820
+<v Kordel France>a couple of steps that we took right after that was to
+
+138
+00:12:07.380 --> 00:12:12.620
+<v Kordel France>actually try to integrate with different sensor mediums so you have a computer vision platform
+
+139
+00:12:12.620 --> 00:12:17.560
+<v Kordel France>well vision is just one thing right uh we try we so we actually built it be coupled with radar
+
+140
+00:12:17.560 --> 00:12:22.260
+<v Kordel France>be coupled with lidar be coupled with different type of you know in camera imagery you could have
+
+141
+00:12:23.640 --> 00:12:27.740
+<v Kordel France>vision, you could have all these different types of things. So being able to make it adaptable to
+
+142
+00:12:27.740 --> 00:12:33.060
+<v Kordel France>all these different situations was one thing that we took it to the next level with. The other was
+
+143
+00:12:33.060 --> 00:12:38.660
+<v Kordel France>being able to really make it work in these adverse environments. So, you know, in agriculture,
+
+144
+00:12:38.920 --> 00:12:43.120
+<v Kordel France>you've got a very dusty environment where our platform wasn't going to work very well. So we
+
+145
+00:12:43.120 --> 00:12:50.000
+<v Kordel France>had to take the steps to make our technology, our AI, be able to still detect everything it needed
+
+146
+00:12:50.000 --> 00:12:55.900
+<v Kordel France>to with the cloud of dust going through it right um so and and you know the same thing with rain
+
+147
+00:12:55.900 --> 00:13:00.460
+<v Kordel France>and you know you have aerial imagery of a drone coming through and it's got smudges on the camera
+
+148
+00:13:00.460 --> 00:13:04.080
+<v Kordel France>or whatever right like all these or cloud cover all these different things that you've got to
+
+149
+00:13:04.080 --> 00:13:09.700
+<v Kordel France>accommodate for that really make the product robust in real world environments those are the
+
+150
+00:13:09.700 --> 00:13:15.520
+<v Kordel France>next steps that we've took to to outside off of the mvp in order to kind of make it more appealing
+
+151
+00:13:15.520 --> 00:13:30.200
+<v Kordel France>Another thing that we, it's interesting that we didn't anticipate, but that we learned a lot with and really has influenced a lot of our development in regards to privacy is our first few products we built for medicine.
+
+152
+00:13:30.400 --> 00:13:42.680
+<v Kordel France>We actually put them through a clinical trial, but the standards around HIPAA compliancy, which is basically a standard that protects, particularly in the United States,
+
+153
+00:13:42.680 --> 00:13:47.300
+<v Kordel France>it's a standard that protects patients data from being sold to third parties by the medical
+
+154
+00:13:47.300 --> 00:13:54.040
+<v Kordel France>provider, or the person, the entity collecting the data, we had to be very strict in how we handle
+
+155
+00:13:54.040 --> 00:14:00.040
+<v Kordel France>data. And that in, you know, we had to have server audits and data transaction audits and all these
+
+156
+00:14:00.040 --> 00:14:04.420
+<v Kordel France>different things in order to make sure we were compliant. And we kind of carry those practices
+
+157
+00:14:04.420 --> 00:14:10.000
+<v Kordel France>with us in into every one of our products, not just medicine, because it kind of gives people
+
+158
+00:14:10.000 --> 00:14:14.940
+<v Kordel France>a better sense of security that, okay, I can trust this device because I know it's going to be
+
+159
+00:14:14.940 --> 00:14:20.060
+<v Kordel France>handling my data in a more appropriate manner than it otherwise would be if it wasn't implementing
+
+160
+00:14:20.060 --> 00:14:26.580
+<v Kordel France>these standards. And I think that's one thing in order to kind of garner trust with artificial
+
+161
+00:14:26.580 --> 00:14:31.520
+<v Kordel France>intelligence from some of these industries or some of these players that may be a little
+
+162
+00:14:31.520 --> 00:14:36.740
+<v Kordel France>apprehensive at first to enter and use AI is being able to say, hey, we'll make sure to protect your
+
+163
+00:14:36.740 --> 00:14:42.960
+<v Kordel France>privacy. We're not trying to sell your data and monetize it in that regard. And, you know, being
+
+164
+00:14:42.960 --> 00:14:47.000
+<v Kordel France>able to kind of, that's kind of angled our development a little bit and been a good learning
+
+165
+00:14:47.000 --> 00:14:49.180
+<v Kordel France>lesson that we've been able to accommodate.
+
+166
+00:14:50.320 --> 00:14:52.740
+<v Noah Labhart>Well, let's switch to team then. So tell me about how
+
+167
+00:14:52.740 --> 00:14:57.580
+<v Noah Labhart>you built your team and what you looked for in those individuals to indicate that they were the
+
+168
+00:14:57.580 --> 00:14:58.780
+<v Noah Labhart>winning horses to join you.
+
+169
+00:15:00.060 --> 00:15:06.260
+<v Kordel France>One thing I particularly look for in building a team is being able to take
+
+170
+00:15:06.700 --> 00:15:12.980
+<v Kordel France>feedback, right? And constructive feedback, but negative feedback. And I don't mean like being
+
+171
+00:15:13.800 --> 00:15:17.540
+<v Kordel France>berated, right? Like in a super negative manner, but being able to say, hey,
+
+172
+00:15:18.320 --> 00:15:22.000
+<v Kordel France>this is where our product's going wrong. This is where your work might've gone wrong. Let's
+
+173
+00:15:22.000 --> 00:15:27.560
+<v Kordel France>take a look at it. I think being able to, especially with a technology that's as pivotal
+
+174
+00:15:27.560 --> 00:15:32.480
+<v Kordel France>as artificial intelligence in some of the applications, which it's being used in, right?
+
+175
+00:15:32.480 --> 00:15:35.240
+<v Kordel France>with sensitive applications like AI and defense,
+
+176
+00:15:35.540 --> 00:15:39.000
+<v Kordel France>it's very important to admit when you're wrong.
+
+177
+00:15:39.260 --> 00:15:42.040
+<v Kordel France>Whoever caused the problem,
+
+178
+00:15:42.100 --> 00:15:43.620
+<v Kordel France>maybe it's not some particular person,
+
+179
+00:15:43.680 --> 00:15:46.880
+<v Kordel France>but it's an algorithm or whatever it is,
+
+180
+00:15:46.940 --> 00:15:48.880
+<v Kordel France>it's very important that you find the problem
+
+181
+00:15:48.880 --> 00:15:49.500
+<v Kordel France>and you solve it.
+
+182
+00:15:49.700 --> 00:15:51.840
+<v Kordel France>And there can't be pride in the way
+
+183
+00:15:51.840 --> 00:15:52.980
+<v Kordel France>because there's people's lives
+
+184
+00:15:52.980 --> 00:15:54.060
+<v Kordel France>that are affected by these products.
+
+185
+00:15:54.480 --> 00:15:57.200
+<v Kordel France>So I think obviously being able to take negative feedback
+
+186
+00:15:57.200 --> 00:16:00.440
+<v Kordel France>is one aspect we look for in our team.
+
+187
+00:16:01.380 --> 00:16:07.220
+<v Kordel France>it's it's very important like if you have a software engineer on your team and that software
+
+188
+00:16:07.220 --> 00:16:13.020
+<v Kordel France>engineer leaves uh they're not necessarily replaceable right you've got to because you
+
+189
+00:16:13.020 --> 00:16:18.260
+<v Kordel France>you have a certain you you drive a certain way with them and you you kind of become synchronous
+
+190
+00:16:18.260 --> 00:16:24.400
+<v Kordel France>and uh you're you know calling the same wavelength as them and their work and you can just 2x 3x 4x
+
+191
+00:16:24.400 --> 00:16:27.560
+<v Kordel France>your work versus you what you'd be able to do with someone that you don't necessarily
+
+192
+00:16:27.560 --> 00:16:31.880
+<v Kordel France>necessarily, uh, work as well with. So being able to find people that you blend well with
+
+193
+00:16:31.880 --> 00:16:40.540
+<v Kordel France>and you can get along with. And, um, you know, I, I, I, I try to, I try to like, think of it
+
+194
+00:16:40.540 --> 00:16:44.600
+<v Kordel France>like a family, right? Like, uh, you, you want to try to build a relationship both within work and
+
+195
+00:16:44.600 --> 00:16:50.140
+<v Kordel France>without and outside of work. Um, you want to try to separate the two to some degree, but I want to
+
+196
+00:16:50.140 --> 00:16:55.080
+<v Kordel France>be able to say, you know, that I've got your back outside of work and that we, you know, we're,
+
+197
+00:16:55.080 --> 00:17:00.020
+<v Kordel France>building a family and that, you know, it's this level of trust and a little security to know that
+
+198
+00:17:00.020 --> 00:17:05.380
+<v Kordel France>they're going to basically perform better. They're going to enjoy their job. I, you know, I know that
+
+199
+00:17:05.380 --> 00:17:09.440
+<v Kordel France>they're going to come into work the next day because they're happy and making sure that,
+
+200
+00:17:09.520 --> 00:17:13.840
+<v Kordel France>you know, it's the relationship goes on just a little bit past regular employment.
+
+201
+00:17:14.980 --> 00:17:21.100
+<v Kordel France>The third thing we look for is basically passion for what you're doing, right? Obviously,
+
+202
+00:17:21.100 --> 00:17:26.360
+<v Kordel France>Obviously, you're coming to work for a paycheck, but you want to make sure you're coming to work for a lot more than that, right?
+
+203
+00:17:26.420 --> 00:17:35.060
+<v Kordel France>You're actually coming to work because you want to mature the goal or your career goals, your passions align with the goals of Seekar and what we're trying to do.
+
+204
+00:17:36.060 --> 00:17:42.620
+<v Kordel France>Because if that's the case, your quality of work is going to be a lot higher and we're going to be all the better for it.
+
+205
+00:17:42.660 --> 00:17:45.140
+<v Kordel France>And it's going to be a much longer lasting relationship.
+
+206
+00:17:45.140 --> 00:17:50.160
+<v Kordel France>relationship. So being able to see that, you'd like them, you have projects that demonstrate you have
+
+207
+00:17:50.160 --> 00:17:54.940
+<v Kordel France>passion, like you, you're passionate about robotics or artificial intelligence or whatever outside of
+
+208
+00:17:54.940 --> 00:17:59.660
+<v Kordel France>your regular work is something we particularly look for when we at least interview people.
+
+209
+00:18:02.620 --> 00:18:06.560
+<v Noah Labhart>let's talk about scalability a little bit so did you build this to scale
+
+210
+00:18:06.560 --> 00:18:10.300
+<v Noah Labhart>efficiently from day one or are you kind of fighting this as you grow
+
+211
+00:18:11.800 --> 00:18:12.520
+<v Noah Labhart>a little
+
+212
+00:18:12.520 --> 00:18:16.920
+<v Kordel France>bit of both. So we built it to scale from day one, but there's different ways in which it
+
+213
+00:18:16.920 --> 00:18:21.720
+<v Kordel France>could scale. Uh, like there's, there's certain scenarios where or at least one particular
+
+214
+00:18:21.720 --> 00:18:26.220
+<v Kordel France>scenario that I could think of where there was a more, there was a more optimal way to,
+
+215
+00:18:26.220 --> 00:18:32.660
+<v Kordel France>there was an optimal way to write the code, uh, for this next phase of the design that, uh, would scale
+
+216
+00:18:32.660 --> 00:18:39.040
+<v Kordel France>a lot better, but we had a strict deadline and we had a really big, um, customer contract that
+
+217
+00:18:40.300 --> 00:18:46.580
+<v Kordel France>that. So we kind of had a bandaid, right? And so it actually took a little bit of effort to
+
+218
+00:18:46.580 --> 00:18:51.980
+<v Kordel France>reverse that decision. And, you know, in hindsight, we don't regret it because we were able to acquire
+
+219
+00:18:51.980 --> 00:18:58.740
+<v Kordel France>that customer and secure the contract. But there's definitely an optimal way to go about it. And
+
+220
+00:18:58.740 --> 00:19:04.540
+<v Kordel France>sometimes I think that it's worth almost like just taking a step back before you engineer anything
+
+221
+00:19:04.540 --> 00:19:09.580
+<v Kordel France>and just saying, okay, what is the second, third, fourth, and fifth step of this look like
+
+222
+00:19:10.300 --> 00:19:14.920
+<v Kordel France>I actually write any code or before I actually design anything or before I go hire somebody
+
+223
+00:19:15.540 --> 00:19:18.700
+<v Kordel France>to make sure that what we're about to do is scalable.
+
+224
+00:19:18.860 --> 00:19:23.900
+<v Kordel France>And it's in both in in costs and both in time and all the above.
+
+225
+00:19:24.060 --> 00:19:25.520
+<v Kordel France>And to make sure the runtime is efficient.
+
+226
+00:19:26.700 --> 00:19:32.400
+<v Kordel France>I definitely appreciate kind of thinking before you shoot a lot more than I used to.
+
+227
+00:19:32.420 --> 00:19:35.040
+<v Kordel France>I used to just kind of, OK, I've got my I know we need to do.
+
+228
+00:19:35.080 --> 00:19:35.580
+<v Kordel France>Let's go.
+
+229
+00:19:35.440 --> 00:19:36.420
+<v Kordel France>That kind of mentality.
+
+230
+00:19:36.420 --> 00:19:41.340
+<v Kordel France>mentality. And now I'm more of a, all right, just let's take, you know, a breather for five minutes
+
+231
+00:19:41.340 --> 00:19:45.360
+<v Kordel France>and actually, you know, let the subconscious kick in and try to mull everything over and make sure
+
+232
+00:19:45.360 --> 00:19:47.240
+<v Kordel France>that we're actually doing things the optimal way.
+
+233
+00:19:48.660 --> 00:19:51.620
+<v Noah Labhart>Well, as you step out on the balcony and you look
+
+234
+00:19:51.620 --> 00:19:54.640
+<v Noah Labhart>across what you've built, what are you most proud of?
+
+235
+00:19:55.320 --> 00:19:57.880
+<v Kordel France>I think the first thing is probably the team.
+
+236
+00:19:58.880 --> 00:20:05.060
+<v Kordel France>I've, we've assembled a great team that has taught me a lot more than anything.
+
+237
+00:20:06.420 --> 00:20:11.700
+<v Kordel France>Uh, and, and the way we work so well together that we're able to accomplish so much more. I mean, the
+
+238
+00:20:11.700 --> 00:20:15.400
+<v Kordel France>amount of things that we can get done in such a short amount of time is honestly, it's incredible,
+
+239
+00:20:15.400 --> 00:20:20.120
+<v Kordel France>right? And it goes back to that notion I was mentioning a minute ago, where if you, you know,
+
+240
+00:20:20.120 --> 00:20:25.820
+<v Kordel France>one, one person, one teammates not necessarily replaceable by another person if, if something
+
+241
+00:20:25.820 --> 00:20:32.680
+<v Kordel France>happens. So, uh, the team by far is probably the most thing I'm proud of that we've built. Uh, and
+
+242
+00:20:32.680 --> 00:20:43.740
+<v Kordel France>And, you know, they've built a lot in me in some regard, made me a better leader, a better engineer, a better, you know, more, helped me acquire more business acumen in that regard.
+
+243
+00:20:45.160 --> 00:20:55.980
+<v Kordel France>The second thing is probably the effort that or the awareness that we've built in some regard for explainable and ethical AI.
+
+244
+00:20:55.980 --> 00:21:04.640
+<v Kordel France>AI. There's, you know, in Silicon Valley, there's a lot of, of, there's a lot of demand to move fast
+
+245
+00:21:04.640 --> 00:21:10.020
+<v Kordel France>and break things, right? I think it's the Facebook's model, but it's, there's, when you have
+
+246
+00:21:10.020 --> 00:21:14.460
+<v Kordel France>a technology that's as pivotal as artificial intelligence and has, can have as much of an
+
+247
+00:21:14.460 --> 00:21:21.680
+<v Kordel France>impact, but also has, can have the effect on people's livelihoods in the ways in which it's
+
+248
+00:21:21.680 --> 00:21:25.960
+<v Kordel France>used and the industries in which it's used, that takes some, that's kind of a sobering thing to
+
+249
+00:21:25.960 --> 00:21:31.160
+<v Kordel France>think about. And that takes some, there's some careful things that we've got to consider in
+
+250
+00:21:31.160 --> 00:21:36.860
+<v Kordel France>order to make sure that the progress of development in AI in that regard is actually, it's good,
+
+251
+00:21:36.980 --> 00:21:41.160
+<v Kordel France>right? And it's beneficial. And it actually protects people's privacy. And it actually
+
+252
+00:21:41.160 --> 00:21:47.300
+<v Kordel France>is for the benefit of, you know, of mankind in general. And it sounds like a little bit of
+
+253
+00:21:47.300 --> 00:21:52.660
+<v Kordel France>doomsday approach of what I'm painting here. But I there's some of these things really do have
+
+254
+00:21:52.660 --> 00:21:58.840
+<v Kordel France>catastrophic consequences that are deployed today. And it's important that we try to, you know,
+
+255
+00:21:58.840 --> 00:22:00.500
+<v Kordel France>try to rectify that as much as possible.
+
+256
+00:22:01.840 --> 00:22:04.680
+<v Noah Labhart>So let's flip the script a little bit. So tell me about a
+
+257
+00:22:04.680 --> 00:22:07.560
+<v Noah Labhart>mistake you made and how you and your team responded to it.
+
+258
+00:22:08.800 --> 00:22:10.700
+<v Kordel France>The biggest mistake I made early
+
+259
+00:22:10.700 --> 00:22:16.640
+<v Kordel France>on was not adhering to negative feedback. We're actually really not even seeking negative feedback.
+
+260
+00:22:17.400 --> 00:22:23.360
+<v Kordel France>And I, there's a lot of emphasis, especially like, especially for entrepreneurial support
+
+261
+00:22:23.360 --> 00:22:28.300
+<v Kordel France>and entrepreneurial media that you've got to be really bold in your vision and you've
+
+262
+00:22:28.300 --> 00:22:33.020
+<v Kordel France>got to, you know, don't compromise anything for what anyone else says and, and be really
+
+263
+00:22:33.020 --> 00:22:34.640
+<v Kordel France>bold about the way you go things.
+
+264
+00:22:34.840 --> 00:22:40.280
+<v Kordel France>And I do, I do agree to that with some regard, but there's, I think it's very necessary to
+
+265
+00:22:40.280 --> 00:22:46.140
+<v Kordel France>seek negative feedback because it's, it's not necessarily a compromise in your vision
+
+266
+00:22:46.140 --> 00:22:46.640
+<v Kordel France>and right.
+
+267
+00:22:47.300 --> 00:22:50.480
+<v Kordel France>between when people are naysayers and when you actually have negative feedback.
+
+268
+00:22:50.860 --> 00:22:58.240
+<v Kordel France>But if you can build the art to discern the two, negative feedback actually can save you
+
+269
+00:22:58.240 --> 00:22:58.960
+<v Kordel France>a lot of time.
+
+270
+00:22:59.060 --> 00:23:03.800
+<v Kordel France>There's a few scenarios that I can think of, particularly with Seekar, where if I would
+
+271
+00:23:03.800 --> 00:23:07.740
+<v Kordel France>have actually sought negative feedback or where I actually would have listened to people
+
+272
+00:23:07.740 --> 00:23:12.240
+<v Kordel France>who were coming from a place of love on why not to do something or why I should do something
+
+273
+00:23:12.240 --> 00:23:14.500
+<v Kordel France>that I didn't see the benefit of at the time.
+
+274
+00:23:14.500 --> 00:23:21.920
+<v Kordel France>I would have I regret that now and I and I because I was too hard charging or I was too you know
+
+275
+00:23:21.920 --> 00:23:28.340
+<v Kordel France>not compromising in the way I wanted to do things but being able to support or construct a support
+
+276
+00:23:28.340 --> 00:23:33.280
+<v Kordel France>group that actually will give you negative feedback is difficult in general too because a
+
+277
+00:23:33.280 --> 00:23:38.100
+<v Kordel France>lot of people don't want to disappoint you but it it really can make or break your company and your
+
+278
+00:23:38.100 --> 00:23:43.080
+<v Kordel France>product because it's uh you know your customers especially are going to tell you what they hate
+
+279
+00:23:44.500 --> 00:23:51.680
+<v Kordel France>are willing to actually listen and really kind of support them along the way, then you can really
+
+280
+00:23:51.680 --> 00:23:57.460
+<v Kordel France>gain some very valuable insight that can save you honestly months or years of development and a lot
+
+281
+00:23:57.460 --> 00:23:58.260
+<v Kordel France>of money in development.
+
+282
+00:24:00.580 --> 00:24:05.060
+<v Noah Labhart>What does the future look like for Seekar, for the product and for your team?
+
+283
+00:24:07.600 --> 00:24:14.360
+<v Kordel France>So my ultimate career goal has always been to, uh, I've always wanted to try to simulate
+
+284
+00:24:14.360 --> 00:24:22.620
+<v Kordel France>consciousness in some regard, or try to build AI that we can say replicates a very significant
+
+285
+00:24:22.620 --> 00:24:27.200
+<v Kordel France>portion of consciousness. Right now, artificial intelligence has a lot of these very narrow,
+
+286
+00:24:27.200 --> 00:24:33.320
+<v Kordel France>um, these very narrow applications, whether it's, uh, you know, object detection that we just spoke
+
+287
+00:24:35.060 --> 00:24:40.140
+<v Kordel France>language processing, all these different very narrow applications that don't necessarily
+
+288
+00:24:40.140 --> 00:24:46.500
+<v Kordel France>constitute general artificial intelligence as a whole. I'd like to be a part of that movement,
+
+289
+00:24:46.620 --> 00:24:52.500
+<v Kordel France>right? Obviously, that's my career goal. So if we can build our products to represent
+
+290
+00:24:52.500 --> 00:24:58.540
+<v Kordel France>more and more structure of how we know the human brain is constructed and how it behaves,
+
+291
+00:24:58.540 --> 00:25:05.600
+<v Kordel France>um, you know, I'm, that's, that's, that's the goal for Seekar. We have, uh, we don't advertise it
+
+292
+00:25:05.600 --> 00:25:10.760
+<v Kordel France>particularly, but a lot of our AI, a lot of our computer vision that we built actually is
+
+293
+00:25:10.760 --> 00:25:15.460
+<v Kordel France>constructed to partially emulate the visual cortex, and not just in the neural network architecture,
+
+294
+00:25:15.460 --> 00:25:20.660
+<v Kordel France>right, but just in the way, uh, the flow of information is handled and everything. And so
+
+295
+00:25:20.660 --> 00:25:25.220
+<v Kordel France>we're actually trying to, uh, you know, it's, it's a, it's a rudimentary start, but it's a start
+
+296
+00:25:25.220 --> 00:25:32.140
+<v Kordel France>nonetheless. And, um, if we can, if we can acquire the necessary expertise from experts in the field
+
+297
+00:25:32.140 --> 00:25:37.260
+<v Kordel France>of neuroscience that can advise us along the way, which we have already started, um, you know, that's
+
+298
+00:25:37.260 --> 00:25:44.700
+<v Kordel France>that's something I'd be, um, a pretty big fan of, because if a lot of people right now see like
+
+299
+00:25:44.700 --> 00:25:50.160
+<v Kordel France>AI in the future as Terminator or iRobot, right? And it's probably safe to say that it's inevitable
+
+300
+00:25:50.160 --> 00:25:55.120
+<v Kordel France>that we're going to get to a point where we're going to, if we don't sim, if we don't actually
+
+301
+00:25:55.120 --> 00:25:59.360
+<v Kordel France>replicate consciousness, we're able to simulate very extensive parts of it. And maybe it's a
+
+302
+00:25:59.360 --> 00:26:04.820
+<v Kordel France>hundred years away, but there's an opportunity to be, to make that outcome good and right.
+
+303
+00:26:04.840 --> 00:26:09.780
+<v Kordel France>And to make that outcome beneficial. And so we can actually learn from what that becomes,
+
+304
+00:26:09.980 --> 00:26:13.520
+<v Kordel France>right. Or what that simulation is to say, okay, let's use this to try to cure some
+
+305
+00:26:14.080 --> 00:26:18.080
+<v Kordel France>diseases, right. Some neurodegenerative diseases, or let's use this to try to understand humans a
+
+306
+00:26:18.080 --> 00:26:21.700
+<v Kordel France>a little bit more instead of trying to build Terminator.
+
+307
+00:26:22.380 --> 00:26:24.720
+<v Kordel France>If I can be a part of the process
+
+308
+00:26:24.720 --> 00:26:26.100
+<v Kordel France>and Seekar can be a part of the process
+
+309
+00:26:26.100 --> 00:26:28.280
+<v Kordel France>that makes sure that outcome is good
+
+310
+00:26:28.280 --> 00:26:29.960
+<v Kordel France>and it's obviously beneficial,
+
+311
+00:26:31.940 --> 00:26:34.260
+<v Kordel France>then we've accomplished the vision for Seekar for sure.
+
+312
+00:26:34.620 --> 00:26:37.220
+<v Noah Labhart>I'm glad you brought up iRobot and Terminator
+
+313
+00:26:37.600 --> 00:26:39.900
+<v Noah Labhart>because I do think that that tends to be
+
+314
+00:26:39.900 --> 00:26:41.780
+<v Noah Labhart>what people picture in the front of their mind of,
+
+315
+00:26:41.820 --> 00:26:44.300
+<v Noah Labhart>okay, this is what AI is, or this is what robotics is,
+
+316
+00:26:44.380 --> 00:26:46.180
+<v Noah Labhart>or this is all of the above, right?
+
+317
+00:26:48.080 --> 00:26:53.780
+<v Noah Labhart>Make that a good outcome of a, of an area where we're probably, trajectory, we're probably tracking
+
+318
+00:26:53.780 --> 00:26:59.360
+<v Noah Labhart>towards anyway. Uh, not that specific outcome, but towards consciousness, towards AI, towards
+
+319
+00:26:59.360 --> 00:27:02.840
+<v Noah Labhart>replicating that. Uh, that makes a ton of sense. Absolutely.
+
+320
+00:27:02.840 --> 00:27:05.360
+<v Kordel France>and it's interesting because you see
+
+321
+00:27:05.360 --> 00:27:10.900
+<v Kordel France>this beautiful dance between artificial artificial intelligence and neuroscience right our ai was
+
+322
+00:27:10.900 --> 00:27:15.380
+<v Kordel France>originally developed to uh or the reason it succeeded is because it partially replicated
+
+323
+00:27:15.380 --> 00:27:21.080
+<v Kordel France>replicated or attempted to replicate a portion of the way the human brain behaves and then we
+
+324
+00:27:21.080 --> 00:27:26.740
+<v Kordel France>actually able to understand more aspects of neuroscience by the AI we construct and so you
+
+325
+00:27:26.740 --> 00:27:31.600
+<v Kordel France>have this beautiful feedback loop in which one helps build the progress of the other and you
+
+326
+00:27:31.600 --> 00:27:37.880
+<v Kordel France>know if we can continue that to a point where we can build an AI system that's you know nearly
+
+327
+00:27:37.880 --> 00:27:41.560
+<v Kordel France>replicable of the human brain that we can understand how it operates and how certain
+
+328
+00:27:41.560 --> 00:27:46.200
+<v Kordel France>certain things happen, then we can treat so many more potentially diseases, right?
+
+329
+00:27:46.300 --> 00:27:48.000
+<v Kordel France>Or potentially the conditions of the human brain.
+
+330
+00:27:48.460 --> 00:27:50.380
+<v Kordel France>And it doesn't end up as iRobot.
+
+331
+00:27:50.460 --> 00:27:55.980
+<v Kordel France>And when you kind of explain some of these things to people, you see them light up, right?
+
+332
+00:27:56.080 --> 00:28:01.100
+<v Kordel France>And you see them kind of like, oh, I didn't think about that because all I see in pop
+
+333
+00:28:01.100 --> 00:28:03.060
+<v Kordel France>culture is Terminator and iRobot.
+
+334
+00:28:03.120 --> 00:28:04.840
+<v Kordel France>I don't see the good side of what could happen of it.
+
+335
+00:28:05.640 --> 00:28:09.620
+<v Kordel France>So let's hope that there's a lot more players in there that influence that good outcome.
+
+336
+00:28:11.560 --> 00:28:12.560
+<v Noah Labhart>So let's switch to you, Kordel.
+
+337
+00:28:12.600 --> 00:28:14.840
+<v Noah Labhart>Who influences the way that you work?
+
+338
+00:28:14.960 --> 00:28:20.060
+<v Noah Labhart>Name a CEO, CTO, really any person, a person that you look up to and why.
+
+339
+00:28:21.140 --> 00:28:23.460
+<v Kordel France>My father taught me how to multitask really well.
+
+340
+00:28:23.600 --> 00:28:28.400
+<v Kordel France>He runs multiple businesses and doesn't sleep.
+
+341
+00:28:28.540 --> 00:28:32.480
+<v Kordel France>And so he's taught me a lot about how to kind of manage things in parallel paths.
+
+342
+00:28:32.840 --> 00:28:37.420
+<v Kordel France>So I look up to him in that regard and for a lot of other reasons.
+
+343
+00:28:38.020 --> 00:28:44.020
+<v Kordel France>I've had some incredible mentors along the way throughout both at Seekar and outside of Seekar.
+
+344
+00:28:44.720 --> 00:28:52.240
+<v Kordel France>A gentleman by the name of John Bugie was a chief engineer of mine and he was very direct and he was
+
+345
+00:28:52.240 --> 00:29:00.940
+<v Kordel France>very blunt but I actually liked that because it cut through all of the noise and said exactly what
+
+346
+00:29:00.940 --> 00:29:06.540
+<v Kordel France>I needed to do to improve and that's kind of a hard skill that I admire, right? Because it's
+
+347
+00:29:07.420 --> 00:29:14.300
+<v Kordel France>do something like that. But working under him, I shaped up into, you know, I turned three years
+
+348
+00:29:14.300 --> 00:29:22.980
+<v Kordel France>into one year probably because of his expertise and influence. I've always been a fan of Da Vinci,
+
+349
+00:29:23.040 --> 00:29:28.440
+<v Kordel France>right? And his curiosity and just having always having that childlike curiosity and being able to
+
+350
+00:29:29.280 --> 00:29:32.920
+<v Kordel France>just always marvel at what you're looking at, always question why something works,
+
+351
+00:29:32.920 --> 00:29:35.020
+<v Kordel France>and always trying to figure it out on your own.
+
+352
+00:29:35.620 --> 00:29:39.960
+<v Kordel France>And I mean, he was an incredible person in general,
+
+353
+00:29:40.060 --> 00:29:42.520
+<v Kordel France>but that part of him was quite remarkable.
+
+354
+00:29:42.980 --> 00:29:46.480
+<v Kordel France>And it's something I've tried to carry
+
+355
+00:29:46.480 --> 00:29:49.220
+<v Kordel France>throughout my whole life is just always be curious
+
+356
+00:29:49.220 --> 00:29:52.820
+<v Kordel France>and always try to kind of question why things are done
+
+357
+00:29:52.820 --> 00:29:57.400
+<v Kordel France>and how things are done and try to really understand it.
+
+358
+00:29:58.760 --> 00:30:00.560
+<v Noah Labhart>Well, we talked about a mistake,
+
+359
+00:30:00.640 --> 00:30:01.800
+<v Noah Labhart>but a little bit different spin.
+
+360
+00:30:02.920 --> 00:30:06.320
+<v Noah Labhart>go back to the beginning, what would you do differently? Or where would you consider taking
+
+361
+00:30:06.320 --> 00:30:07.340
+<v Noah Labhart>a different approach?
+
+362
+00:30:09.100 --> 00:30:13.820
+<v Kordel France>Again, I probably have to go back and say that I tell myself to definitely
+
+363
+00:30:13.820 --> 00:30:20.460
+<v Kordel France>seek out negative feedback and to definitely, you know, look, talk to customers a lot more and to
+
+364
+00:30:20.460 --> 00:30:26.800
+<v Kordel France>and honestly, advisors, right, that try to make sure that we are that I'm running things in the
+
+365
+00:30:26.800 --> 00:30:30.520
+<v Kordel France>way that they should be done, and that we're pursuing the right things in parallel.
+
+366
+00:30:32.960 --> 00:30:36.580
+<v Kordel France>Another thing is to probably not be such a control freak.
+
+367
+00:30:37.260 --> 00:30:39.340
+<v Kordel France>So I'm a control freak in general, right?
+
+368
+00:30:39.440 --> 00:30:43.380
+<v Kordel France>Like I'm a micromanager and that's just like, that's how I am.
+
+369
+00:30:43.480 --> 00:30:48.420
+<v Kordel France>But I found that getting out of people's way, like we have some really incredible people
+
+370
+00:30:48.420 --> 00:30:53.740
+<v Kordel France>that work for Seekar and some really smart people that have taught me along the way.
+
+371
+00:30:53.820 --> 00:30:58.380
+<v Kordel France>And if you just get out of their way and let them do things, they'll do things better than
+
+372
+00:30:58.380 --> 00:30:59.140
+<v Kordel France>you can do, right?
+
+373
+00:30:59.140 --> 00:31:04.440
+<v Kordel France>Right. So like I was the I was the original software engineer behind all of Seekar's code base.
+
+374
+00:31:04.600 --> 00:31:09.300
+<v Kordel France>And so being able to hand that off to other people is kind of difficult because I'm like, why did you do things that way?
+
+375
+00:31:09.440 --> 00:31:12.280
+<v Kordel France>This is a more this is an optimal way to do it. You shouldn't do it that way.
+
+376
+00:31:12.540 --> 00:31:16.740
+<v Kordel France>And but you come back to find later that now they might have been right.
+
+377
+00:31:16.860 --> 00:31:23.140
+<v Kordel France>And, you know, if you just let them get to the solution in their own manner, they'll probably end up doing it better than you could do it.
+
+378
+00:31:23.960 --> 00:31:25.820
+<v Kordel France>So that's that's been a hard lesson to learn.
+
+379
+00:31:25.820 --> 00:31:35.180
+<v Kordel France>And if I could go back, I'd probably try to convince myself to ease up a little bit and to just let the experts do their job.
+
+380
+00:31:36.040 --> 00:31:37.560
+<v Noah Labhart>I don't know if you have kids. I have kids.
+
+381
+00:31:37.720 --> 00:31:43.920
+<v Noah Labhart>So it's really a different mindset of being like, okay, I want to make you better than I am.
+
+382
+00:31:44.020 --> 00:31:47.420
+<v Noah Labhart>I want you to do things better than I would have done it.
+
+383
+00:31:47.540 --> 00:31:50.000
+<v Noah Labhart>And it's hard because you know a way that works.
+
+384
+00:31:50.340 --> 00:31:53.700
+<v Noah Labhart>And you want to be like, I know this works, so I want to teach you this way.
+
+385
+00:31:53.700 --> 00:31:59.740
+<v Noah Labhart>But ultimately, you want your team and you want the product to be better than you could have made it yourself.
+
+386
+00:32:00.080 --> 00:32:00.840
+<v Noah Labhart>It's difficult.
+
+387
+00:32:00.940 --> 00:32:01.700
+<v Noah Labhart>It's for an engineer.
+
+388
+00:32:01.900 --> 00:32:02.640
+<v Noah Labhart>I know I relate to that.
+
+389
+00:32:04.640 --> 00:32:05.840
+<v Noah Labhart>Well, last question, Kordel.
+
+390
+00:32:06.320 --> 00:32:11.600
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+391
+00:32:11.740 --> 00:32:12.860
+<v Noah Labhart>They're jazzed about it.
+
+392
+00:32:12.900 --> 00:32:14.120
+<v Noah Labhart>They can't wait to show it off to the world.
+
+393
+00:32:14.200 --> 00:32:16.100
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+394
+00:32:16.520 --> 00:32:19.660
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+395
+00:32:19.660 --> 00:32:20.160
+<v Noah Labhart>it?
+
+396
+00:32:20.300 --> 00:32:26.680
+<v Kordel France>So I asked them to kind of give me their elevator pitch, right. And kind of talk, tell me
+
+397
+00:32:26.680 --> 00:32:32.780
+<v Kordel France>everything that they can about their product, because you kind of people start to explain what
+
+398
+00:32:32.780 --> 00:32:37.600
+<v Kordel France>they know. And you can kind of that you can kind of detect how authentic their product really is,
+
+399
+00:32:37.640 --> 00:32:42.300
+<v Kordel France>or how much they've actually developed, right. And how passionate they are about what they're doing.
+
+400
+00:32:42.620 --> 00:32:47.860
+<v Kordel France>And so I, you know, hearing people out, or hearing the the entrepreneur out would obviously be the
+
+401
+00:32:49.800 --> 00:33:15.200
+<v Kordel France>Again, to sound like a broken record, I would emphasize, seek negative feedback, assemble a great team, make sure that you are very, you're very stringent on the people that you want to be a part of your company because it, you know, it's, it's a smaller team of quality people that you are like your family are going to excel and propel you much further than, you know, twice as many engineers that you're maybe not as close with and you don't work as well with.
+
+402
+00:33:15.200 --> 00:33:19.840
+<v Kordel France>So be very selective about who you include within your company.
+
+403
+00:33:21.220 --> 00:33:29.060
+<v Kordel France>And then the third thing I think would be to try to address things from multiple angles,
+
+404
+00:33:29.180 --> 00:33:29.680
+<v Kordel France>right?
+
+405
+00:33:29.360 --> 00:33:30.000
+<v Kordel France>Multiple disciplines.
+
+406
+00:33:30.040 --> 00:33:35.640
+<v Kordel France>So for example, like a software engineering problem, having a mechanical engineering problem,
+
+407
+00:33:35.740 --> 00:33:38.440
+<v Kordel France>having like a software engineer's expertise sounds crazy.
+
+408
+00:33:38.540 --> 00:33:39.120
+<v Kordel France>It really does.
+
+409
+00:33:39.260 --> 00:33:41.660
+<v Kordel France>But sometimes they think of things that you don't think of, right?
+
+410
+00:33:41.760 --> 00:33:44.600
+<v Kordel France>And I'm using mechanical and software engineering as one example.
+
+411
+00:33:45.200 --> 00:33:50.220
+<v Kordel France>having another discipline come in to kind of look at a problem that you're looking at actually has
+
+412
+00:33:50.220 --> 00:33:55.860
+<v Kordel France>significant impact in in my personal experience and just from what I've seen with Seekar that
+
+413
+00:33:56.200 --> 00:34:02.300
+<v Kordel France>you because you when you're when you're very good at one discipline you actually you kind of like
+
+414
+00:34:02.300 --> 00:34:07.600
+<v Kordel France>channel your thinking into one way and it's kind of hard as you become more and more uh more and
+
+415
+00:34:07.600 --> 00:34:12.260
+<v Kordel France>more of an expert in that discipline your thinking becomes more and more aligned in that regard and
+
+416
+00:34:12.260 --> 00:34:16.420
+<v Kordel France>And so sometimes it's hard to see things from a different angle, but that's pretty invaluable.
+
+417
+00:34:17.160 --> 00:34:21.320
+<v Kordel France>And so I would encourage the entrepreneur to kind of seek counsel from multiple sources,
+
+418
+00:34:23.040 --> 00:34:24.880
+<v Kordel France>especially domain expertise, right?
+
+419
+00:34:24.980 --> 00:34:28.420
+<v Kordel France>Not just engineering expertise, but domain expertise for the product you're actually
+
+420
+00:34:28.420 --> 00:34:28.960
+<v Kordel France>trying to sell.
+
+421
+00:34:29.480 --> 00:34:30.060
+<v Noah Labhart>Right on.
+
+422
+00:34:30.100 --> 00:34:30.720
+<v Noah Labhart>That's great advice.
+
+423
+00:34:31.340 --> 00:34:33.380
+<v Noah Labhart>Well, Kordel, thank you for being on the show today.
+
+424
+00:34:33.500 --> 00:34:36.020
+<v Noah Labhart>Thank you for telling the creation story of Seekar.
+
+425
+00:34:36.520 --> 00:34:37.380
+<v Kordel France>Noah, thank you.
+
+426
+00:34:37.460 --> 00:34:38.660
+<v Kordel France>And thank you for all of your audience.
+
+427
+00:34:38.880 --> 00:34:41.360
+<v Kordel France>I'm a big fan of the show and continue to support it.
+
+428
+00:34:41.420 --> 00:34:41.920
+<v Kordel France>Thank you.
+
+429
+00:34:44.080 --> 00:34:44.840
+<v Kordel France>And
+
+430
+00:34:44.840 --> 00:34:47.260
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+431
+00:34:49.800 --> 00:34:52.800
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+432
+00:34:52.980 --> 00:34:57.700
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+433
+00:34:58.220 --> 00:35:03.200
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+434
+00:35:03.640 --> 00:35:05.120
+<v Noah Labhart>And when you get a chance, leave a...
+
+435
+00:35:05.120 --> 00:35:11.880
+<v Noah Labhart>And thanks again for listening.
+
+436
+00:35:22.100 --> 00:35:24.900
+<v Kordel France>Thank you.

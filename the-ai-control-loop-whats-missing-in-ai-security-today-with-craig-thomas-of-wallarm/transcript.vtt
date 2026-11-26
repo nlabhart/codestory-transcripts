@@ -1,0 +1,1011 @@
+WEBVTT
+
+NOTE The AI Control Loop: What's Missing in AI Security Today - with Craig Thomas of Wallarm
+
+1
+00:00:01.380 --> 00:00:12.680
+<v Noah Labhart>Hello listeners. Today we are dropping another episode in our series, The AI Control Loop. How enterprises govern the AI they've already deployed. Sponsored by our friends at Wallarm.
+
+2
+00:00:13.140 --> 00:00:26.040
+<v Noah Labhart>Wallarm is the AI control platform for enterprise AI, protecting every AI workload, API, and application in production. Giving CISOs the governance they need and CIOs the speed they demand.
+
+3
+00:00:26.040 --> 00:00:31.980
+<v Noah Labhart>demand. Organizations choose Wallarm for a complete inventory of APIs, AI agents, and
+
+4
+00:00:31.980 --> 00:00:37.800
+<v Noah Labhart>AI apps using patented AI ML-based threat detection and blocking that operates at production
+
+5
+00:00:37.800 --> 00:00:44.420
+<v Noah Labhart>speeds. In today's episode, Craig Thomas, Senior Solutions Engineer at Wallarm, returns
+
+6
+00:00:44.420 --> 00:00:50.520
+<v Noah Labhart>to the show to dive into why runtime behavior is the critical blind spot, and what CISOs
+
+7
+00:00:50.520 --> 00:00:53.920
+<v Noah Labhart>should demand if they want to move from policy to control.
+
+8
+00:00:56.340 --> 00:01:01.460
+<v Noah Labhart>Craig, welcome back to the show. Thank you for being in a return episode on Code Story.
+
+9
+00:01:01.720 --> 00:01:05.020
+<v Craig Thomas>Yeah, great to be back. I know last time we talked about rogue AI,
+
+10
+00:01:05.360 --> 00:01:10.720
+<v Craig Thomas>so excited to dive in deeper about the threats and how to solve some of the AI problems today.
+
+11
+00:01:11.220 --> 00:01:15.480
+<v Noah Labhart>Absolutely. Really digging in, really enjoying this, the series we're putting together here.
+
+12
+00:01:15.480 --> 00:01:19.800
+<v Noah Labhart>Your title for today is what's missing in AI security today.
+
+13
+00:01:19.940 --> 00:01:25.700
+<v Noah Labhart>We're going to dive into runtime behavior, being a critical blind spot and what CISOs
+
+14
+00:01:25.700 --> 00:01:26.440
+<v Noah Labhart>should demand.
+
+15
+00:01:26.680 --> 00:01:28.040
+<v Noah Labhart>And let's dive right into it.
+
+16
+00:01:28.100 --> 00:01:33.500
+<v Noah Labhart>So security teams are used to detecting incidents and responding after the fact, right?
+
+17
+00:01:33.560 --> 00:01:35.700
+<v Noah Labhart>We've covered that quite a bit in this series.
+
+18
+00:01:35.800 --> 00:01:39.220
+<v Noah Labhart>Why is that model becoming insufficient for AI driven systems?
+
+19
+00:01:39.620 --> 00:01:40.820
+<v Craig Thomas>Yeah, great question, Noah.
+
+20
+00:01:40.820 --> 00:01:48.900
+<v Craig Thomas>So first of all, just kind of like the frame of this whole discussion, right, that traditional security really was built to answer one question.
+
+21
+00:01:49.040 --> 00:01:49.800
+<v Craig Thomas>Who gets access?
+
+22
+00:01:50.000 --> 00:01:56.280
+<v Craig Thomas>Firewall rules, identity access policies, network segmentation, all of it's fundamentally controlling the gate.
+
+23
+00:01:56.620 --> 00:01:59.420
+<v Craig Thomas>But AI has to move that problem past the gate.
+
+24
+00:01:59.560 --> 00:02:03.040
+<v Craig Thomas>And so you asked about detect and respond to systems.
+
+25
+00:02:03.280 --> 00:02:07.180
+<v Craig Thomas>Traditional IR assumes a human attacker moving at human speed.
+
+26
+00:02:07.280 --> 00:02:10.080
+<v Craig Thomas>You have time to detect, triage, contain that.
+
+27
+00:02:10.820 --> 00:02:15.700
+<v Craig Thomas>attack. But as we talked about before in some of the other episodes, AI compresses that timeline
+
+28
+00:02:15.700 --> 00:02:22.260
+<v Craig Thomas>dramatically. Models connect, exfiltrate, manipulate, corrupt data in milliseconds versus hours, days,
+
+29
+00:02:22.280 --> 00:02:28.620
+<v Craig Thomas>or even weeks. And so this incident with AI may not look like an incident, looks like normal API
+
+30
+00:02:28.620 --> 00:02:34.460
+<v Craig Thomas>calls, normal outputs in traffic. I like to think about it, about how incident response was designed.
+
+31
+00:02:34.900 --> 00:02:40.000
+<v Craig Thomas>Traditionally, someone breaches the perimeter, they move laterally out over hours, days, weeks,
+
+32
+00:02:40.820 --> 00:02:47.820
+<v Craig Thomas>fires an alert, SOC analyst opens a ticket. That mental model all assumes time. AI just doesn't
+
+33
+00:02:47.820 --> 00:02:53.040
+<v Craig Thomas>give you that time anymore. And so if that prompt injection or that attack causes your AI agent to
+
+34
+00:02:53.040 --> 00:02:58.580
+<v Craig Thomas>start dumping customer records to an external endpoint, that loop closes in seconds. So by the
+
+35
+00:02:58.580 --> 00:03:04.100
+<v Craig Thomas>time your SIEM would normally fire, the data's already gone. And detect and respond built for
+
+36
+00:03:04.100 --> 00:03:10.020
+<v Craig Thomas>a world where attackers are slower than defenders. But as we've talked about, AI flips that assumption
+
+37
+00:03:10.820 --> 00:03:16.120
+<v Noah Labhart>It sure does. It moves so fast. And these models that have been built in the past just really don't,
+
+38
+00:03:16.120 --> 00:03:20.880
+<v Noah Labhart>they really don't keep up. And building on that, when we talk about response today,
+
+39
+00:03:21.080 --> 00:03:26.760
+<v Noah Labhart>and enforcement often means actions like restarting pods or rotating credentials or
+
+40
+00:03:26.760 --> 00:03:31.680
+<v Noah Labhart>shutting down services, things like that. Why can those measures come too late, even in an AI
+
+41
+00:03:31.680 --> 00:03:37.220
+<v Craig Thomas>environment? Those are stateless remediations applied to stateful harm. The damage is already
+
+42
+00:03:37.220 --> 00:03:43.320
+<v Craig Thomas>done. It's already materialized. AI agents often hold open sessions with those external services.
+
+43
+00:03:43.560 --> 00:03:49.000
+<v Craig Thomas>So rotating a credential after the agent has already acted doesn't undo the action. And so
+
+44
+00:03:49.000 --> 00:03:54.720
+<v Craig Thomas>that's really what we have to fundamentally look at. I like to equate it to restarting a pod is
+
+45
+00:03:54.720 --> 00:04:00.320
+<v Craig Thomas>like locking a door after someone's already walked out with your files. It's good. They're clean.
+
+46
+00:04:00.520 --> 00:04:05.180
+<v Craig Thomas>You're good now, but it doesn't matter. And really in that traditional sense, that traditional web
+
+47
+00:04:05.180 --> 00:04:10.800
+<v Craig Thomas>web app, the worst case of a single compromise is usually bounded, a one record touch, a single
+
+48
+00:04:10.800 --> 00:04:17.360
+<v Craig Thomas>session hijacked. But an AI agent that has that tool use, that single compromise session, might
+
+49
+00:04:17.360 --> 00:04:22.440
+<v Craig Thomas>have already browsed your internal wiki, drafted an email, scheduled a meeting, queried your CRM.
+
+50
+00:04:22.540 --> 00:04:28.240
+<v Craig Thomas>All that happened before your orchestration layer or those pod restarts happened, right? You can't
+
+51
+00:04:28.240 --> 00:04:34.220
+<v Craig Thomas>unsend that email by rotating their credential or simply restarting that pod. Right on. Okay,
+
+52
+00:04:35.180 --> 00:04:36.640
+<v Noah Labhart>Traditional response isn't enough.
+
+53
+00:04:36.740 --> 00:04:38.920
+<v Noah Labhart>And I think we have established that for sure.
+
+54
+00:04:39.160 --> 00:04:44.440
+<v Noah Labhart>Why does AI behavior require controls that operate so much closer to runtime?
+
+55
+00:04:44.640 --> 00:04:47.980
+<v Noah Labhart>And the engineer in me is being like, we're touching on this in different areas, but I
+
+56
+00:04:47.980 --> 00:04:49.680
+<v Noah Labhart>want to be clear in why that's important.
+
+57
+00:04:50.280 --> 00:04:51.780
+<v Craig Thomas>It's really static controls.
+
+58
+00:04:51.960 --> 00:04:55.620
+<v Craig Thomas>These firewall rules, IAM policies, they can't evaluate intent.
+
+59
+00:04:55.940 --> 00:05:01.160
+<v Craig Thomas>And so a lot of looking at AI is really about that intent, that semantic drift.
+
+60
+00:05:01.160 --> 00:05:06.260
+<v Craig Thomas>Rift, this threat's moved from who gets in to what happens after they're in.
+
+61
+00:05:06.420 --> 00:05:12.180
+<v Craig Thomas>So you're assuming these credentials are legit, but then once they get in, that spreads.
+
+62
+00:05:12.400 --> 00:05:18.820
+<v Craig Thomas>So the shift really moves from traditional security being essentially that gate I talked a little bit about earlier.
+
+63
+00:05:19.100 --> 00:05:21.740
+<v Craig Thomas>You check their credentials, check, they're good.
+
+64
+00:05:21.920 --> 00:05:24.020
+<v Craig Thomas>You check the traffic, yep, that looks good.
+
+65
+00:05:24.120 --> 00:05:25.440
+<v Craig Thomas>You let it through or you don't.
+
+66
+00:05:25.440 --> 00:05:32.440
+<v Craig Thomas>But once that AI agent with legitimate credentials, legitimate network access happens, your gate controls are done.
+
+67
+00:05:32.560 --> 00:05:33.060
+<v Craig Thomas>They're in.
+
+68
+00:05:33.120 --> 00:05:34.420
+<v Craig Thomas>They've already done their job.
+
+69
+00:05:34.560 --> 00:05:38.640
+<v Craig Thomas>So now that question, it moves from what the agent does next.
+
+70
+00:05:38.820 --> 00:05:42.680
+<v Craig Thomas>Does it behave consistently with business intent that you desire?
+
+71
+00:05:42.940 --> 00:05:44.000
+<v Craig Thomas>Does it stay in scope?
+
+72
+00:05:44.180 --> 00:05:47.400
+<v Craig Thomas>Does it just keep within that small frame that you wanted it to do?
+
+73
+00:05:47.540 --> 00:05:52.300
+<v Craig Thomas>Or does it start doing things that look fine individually but harmful in aggregate?
+
+74
+00:05:52.580 --> 00:05:54.100
+<v Craig Thomas>None of that happens at the gate.
+
+75
+00:05:55.440 --> 00:06:01.200
+<v Craig Thomas>runtime question. So if you don't have controls that operate at runtime, as we've been talking
+
+76
+00:06:01.200 --> 00:06:05.840
+<v Craig Thomas>about for AI security and API security for a while, right? If you don't have those controls
+
+77
+00:06:05.840 --> 00:06:10.040
+<v Craig Thomas>that operate at runtime, you really have no controls for that class of the problem.
+
+78
+00:06:10.260 --> 00:06:15.000
+<v Craig Thomas>Don't like to just be a scaremonger, right? There are solutions and we're starting to see those
+
+79
+00:06:15.000 --> 00:06:20.820
+<v Craig Thomas>solutions for how a CISO can gain this access and enable the business, but it has to shift
+
+80
+00:06:20.820 --> 00:06:22.720
+<v Craig Thomas>from gate controls to runtime controls.
+
+81
+00:06:23.120 --> 00:06:23.920
+<v Noah Labhart>Right on.
+
+82
+00:06:23.980 --> 00:06:26.060
+<v Noah Labhart>Okay, so we're going a level down there.
+
+83
+00:06:26.140 --> 00:06:27.900
+<v Noah Labhart>When people hear runtime enforcement,
+
+84
+00:06:28.380 --> 00:06:30.740
+<v Noah Labhart>they may think of existing security controls, right?
+
+85
+00:06:30.860 --> 00:06:32.820
+<v Noah Labhart>What changes when enforcement happens
+
+86
+00:06:32.820 --> 00:06:34.700
+<v Noah Labhart>at the kernel level in the runtime
+
+87
+00:06:34.700 --> 00:06:36.980
+<v Noah Labhart>rather than only at the network identity
+
+88
+00:06:36.980 --> 00:06:38.760
+<v Noah Labhart>or application layers?
+
+89
+00:06:39.200 --> 00:06:41.600
+<v Craig Thomas>Yeah, so those network identity layers
+
+90
+00:06:41.600 --> 00:06:43.360
+<v Craig Thomas>we talked a little bit about already,
+
+91
+00:06:43.540 --> 00:06:45.200
+<v Craig Thomas>but they see who and where,
+
+92
+00:06:45.400 --> 00:06:47.080
+<v Craig Thomas>but they aren't really seeing what.
+
+93
+00:06:47.300 --> 00:06:50.220
+<v Craig Thomas>The application layer does see inputs and outputs,
+
+94
+00:06:50.820 --> 00:06:56.180
+<v Craig Thomas>no kind of intermediate behavior, what tools were called, what memory was accessed, what reasoning
+
+95
+00:06:56.180 --> 00:07:02.640
+<v Craig Thomas>steps were taking. And so shifting that to kernel level visibility, it actually sees those system
+
+96
+00:07:02.640 --> 00:07:09.300
+<v Craig Thomas>calls, the file IO, the process behavior, what the model is actually doing versus just what
+
+97
+00:07:09.300 --> 00:07:16.000
+<v Craig Thomas>model is called on the host and not just what it's saying at that API boundary. And if you're only
+
+98
+00:07:16.000 --> 00:07:21.480
+<v Craig Thomas>watching certain layers, you're only watching that front door aspect. And so as you dive in
+
+99
+00:07:21.480 --> 00:07:26.940
+<v Craig Thomas>the kernel layer, you get the aggregate of all these things. And you need all those things at
+
+100
+00:07:26.940 --> 00:07:34.780
+<v Craig Thomas>runtime to truly see and shift and protect in real time the whole picture. And then, like we talked
+
+101
+00:07:34.780 --> 00:07:40.460
+<v Craig Thomas>about, that enables you to leverage AI within your environments to get the most from the AI that
+
+102
+00:07:40.460 --> 00:07:45.820
+<v Craig Thomas>you're investing in for both internal processes as well as customers. Can you make that a bit more
+
+103
+00:07:46.000 --> 00:07:50.720
+<v Noah Labhart>tangible for us. And I think for the audience, what does it actually mean to revoke or contain
+
+104
+00:07:50.720 --> 00:07:56.340
+<v Noah Labhart>a compromised AI session without disrupting the broader deployment? Because if you think linear
+
+105
+00:07:56.340 --> 00:08:01.000
+<v Noah Labhart>and it's all part of the same, a similar workflow and there's a process, if you cut a chink in that
+
+106
+00:08:01.000 --> 00:08:06.060
+<v Noah Labhart>workflow, kills the workflow. So tell me a little bit more about that. Make it more tangible for us.
+
+107
+00:08:06.220 --> 00:08:12.700
+<v Craig Thomas>Yeah. Yeah. Great question. You've got to shift from these broad controls to being more scalpel
+
+108
+00:08:12.700 --> 00:08:18.720
+<v Craig Thomas>like, right? So session level containment talks about terminating or sandboxing just a single
+
+109
+00:08:18.720 --> 00:08:24.600
+<v Craig Thomas>agent's execution without taking down the model, the infrastructure, or adjacent sessions, right?
+
+110
+00:08:24.660 --> 00:08:31.500
+<v Craig Thomas>So you have to continue to enable the business while blocking that individual attacker or rogue
+
+111
+00:08:31.500 --> 00:08:38.100
+<v Craig Thomas>AI agent from there. So look at it like killing a single process without rebooting the whole server.
+
+112
+00:08:38.100 --> 00:08:42.740
+<v Craig Thomas>But in order to do that, you need the instrumentation to identify the right process.
+
+113
+00:08:42.960 --> 00:08:49.840
+<v Craig Thomas>In practice, Noah, you revoke the session token or you freeze pending tool calls in that execution context.
+
+114
+00:08:50.220 --> 00:08:57.720
+<v Craig Thomas>You also need to preserve the session artifacts for forensics so you can see what has happened, but you allow those other sessions to continue.
+
+115
+00:08:57.720 --> 00:09:03.800
+<v Craig Thomas>you. So I always like to, from an analogy perspective, if you have a compromised account
+
+116
+00:09:03.800 --> 00:09:10.060
+<v Craig Thomas>in an enterprise SaaS environment like Salesforce, if a single user session gets hijacked, you don't
+
+117
+00:09:10.060 --> 00:09:15.080
+<v Craig Thomas>shut down for everyone. You kill that session, you invalidate that token, you audit what that
+
+118
+00:09:15.080 --> 00:09:22.040
+<v Craig Thomas>session touched. AI needs those same primitives. The problem is most organizations don't have them
+
+119
+00:09:22.040 --> 00:09:26.500
+<v Craig Thomas>yet. They kill the pod, which we talked about earlier, which kills everything, or they do
+
+120
+00:09:27.720 --> 00:09:34.180
+<v Craig Thomas>middle option. So what real containment looks like, that I can identify the session that's
+
+121
+00:09:34.180 --> 00:09:40.600
+<v Craig Thomas>misbehaving, terminate exactly that execution context, and preserve what it did for investigation.
+
+122
+00:09:41.340 --> 00:09:45.620
+<v Craig Thomas>Providing some feedback. We're going to talk about how do you provide feedback to developers,
+
+123
+00:09:45.860 --> 00:09:50.000
+<v Craig Thomas>but provide that feedback, but then leave everything else running. So that's a technical
+
+124
+00:09:50.000 --> 00:09:55.040
+<v Craig Thomas>capability gap for most teams right now that folks are looking at. How do we do that? But that's
+
+125
+00:09:55.040 --> 00:10:00.640
+<v Craig Thomas>really the end goal of being able to revoke or contain that session without breaking everything.
+
+126
+00:10:00.920 --> 00:10:07.060
+<v Noah Labhart>That makes sense. Okay. So when we move into this type of real-time containment and thinking about
+
+127
+00:10:07.060 --> 00:10:12.020
+<v Noah Labhart>the risk for AI agents and them having access to things, how does this kind of real-time
+
+128
+00:10:12.020 --> 00:10:17.420
+<v Noah Labhart>containment change the risk equation? When AI agents have access to sensitive data, external
+
+129
+00:10:17.420 --> 00:10:22.960
+<v Noah Labhart>services, production workflows, they're essentially doing the work of it that a human would do.
+
+130
+00:10:22.960 --> 00:10:25.740
+<v Noah Labhart>How does the real-time containment change the risk?
+
+131
+00:10:25.960 --> 00:10:27.620
+<v Craig Thomas>Let's look at what it looks like without.
+
+132
+00:10:27.760 --> 00:10:32.760
+<v Craig Thomas>Without that containment, that blast radius of a compromised agent is unbounded, right?
+
+133
+00:10:32.820 --> 00:10:35.580
+<v Craig Thomas>It has whatever access it was granted.
+
+134
+00:10:35.780 --> 00:10:42.080
+<v Craig Thomas>So if that user or that session has full access to go do whatever it wants, you're unbounded.
+
+135
+00:10:42.160 --> 00:10:45.200
+<v Craig Thomas>With containment, that blast radius shrinks dramatically.
+
+136
+00:10:45.540 --> 00:10:47.360
+<v Craig Thomas>It's bounded by detection latency.
+
+137
+00:10:47.660 --> 00:10:50.320
+<v Craig Thomas>The faster you see it, the less damage can accumulate.
+
+138
+00:10:50.320 --> 00:10:54.160
+<v Craig Thomas>And so this changes how you reason about those agent permissions.
+
+139
+00:10:54.540 --> 00:10:58.900
+<v Craig Thomas>You can grant broader access if you have confidence in your ability to contain quickly.
+
+140
+00:10:59.140 --> 00:11:04.700
+<v Craig Thomas>Without that confidence, you're forced into over-restriction, which then ultimately limits utility.
+
+141
+00:11:05.240 --> 00:11:11.300
+<v Craig Thomas>And I think it's really important reframe for CISOs thinking about AI agent architecture, right?
+
+142
+00:11:11.420 --> 00:11:19.640
+<v Craig Thomas>As a previous CISO and dealing with those day in and day out, right now the dominant strategy is least privilege taken to an extreme.
+
+143
+00:11:20.320 --> 00:11:25.600
+<v Craig Thomas>agent almost nothing and hope it can still be useful. Then the business comes back to you.
+
+144
+00:11:25.640 --> 00:11:32.220
+<v Craig Thomas>They're mad that this agent isn't very useful and you're the bad guy again, right? So that works
+
+145
+00:11:32.220 --> 00:11:36.840
+<v Craig Thomas>until the business decides it really needs that agent to actually be useful and now you're in a
+
+146
+00:11:36.840 --> 00:11:41.940
+<v Craig Thomas>fight. But the good news is if you have real containment capability, really that calculus
+
+147
+00:11:41.940 --> 00:11:47.520
+<v Craig Thomas>can change, can grant broader permissions because you're confident that if something goes wrong,
+
+148
+00:11:47.520 --> 00:11:51.240
+<v Craig Thomas>You can catch it fast and the damage is bounded like we talked about.
+
+149
+00:11:51.440 --> 00:11:58.140
+<v Craig Thomas>Security stops being the ceiling on that utility and starts being the foundation that makes higher utility possible.
+
+150
+00:11:58.540 --> 00:12:11.200
+<v Craig Thomas>I really like to see so can now enable the business, provide the security, provide the governance versus just having to stop the progress as you start to get this additional visibility and confidence.
+
+151
+00:12:11.620 --> 00:12:17.300
+<v Noah Labhart>Right on. What are some examples of AI behaviors that organizations should be able to stop them?
+
+152
+00:12:17.520 --> 00:12:19.640
+<v Noah Labhart>when they move to your runtime enforcement?
+
+153
+00:12:20.040 --> 00:12:22.360
+<v Craig Thomas>Yeah, a couple jumped to mind right away.
+
+154
+00:12:22.540 --> 00:12:25.160
+<v Craig Thomas>You know, a data movement outside the approved endpoint.
+
+155
+00:12:25.420 --> 00:12:28.700
+<v Craig Thomas>If a model is exfiltrating to unexpected destinations,
+
+156
+00:12:29.020 --> 00:12:31.500
+<v Craig Thomas>you need to know when your data is leaving, right?
+
+157
+00:12:31.560 --> 00:12:34.160
+<v Craig Thomas>Because that becomes a real pain point
+
+158
+00:12:34.160 --> 00:12:37.380
+<v Craig Thomas>and has some real legal and monetary consequences.
+
+159
+00:12:37.780 --> 00:12:38.740
+<v Craig Thomas>So that's one.
+
+160
+00:12:38.920 --> 00:12:40.980
+<v Craig Thomas>Another is prompt injection executing,
+
+161
+00:12:41.300 --> 00:12:44.660
+<v Craig Thomas>especially when it alters the agent's stated goal
+
+162
+00:12:44.660 --> 00:12:46.400
+<v Craig Thomas>or override systems instructions.
+
+163
+00:12:47.520 --> 00:12:49.060
+<v Craig Thomas>A tool that exceeds its scope.
+
+164
+00:12:49.120 --> 00:12:52.380
+<v Craig Thomas>It's supposed to do A and B, but now it's doing C, right?
+
+165
+00:12:52.540 --> 00:12:56.460
+<v Craig Thomas>Or it's supposed to have read access only, but now it's making write and delete calls.
+
+166
+00:12:56.660 --> 00:12:58.860
+<v Craig Thomas>You should be able to see and stop that immediately.
+
+167
+00:12:59.500 --> 00:13:06.160
+<v Craig Thomas>Another one similar to what we've looked at for APIs for a while, we've looked at even WAFs and DDoS, right?
+
+168
+00:13:06.260 --> 00:13:07.280
+<v Craig Thomas>Rate anomalies.
+
+169
+00:13:07.480 --> 00:13:15.500
+<v Craig Thomas>If you have sudden spikes in query volume, especially to sensitive systems, that suggests the agent's being used as a proxy.
+
+170
+00:13:15.500 --> 00:13:18.200
+<v Craig Thomas>And so you need to be able to detect and block that.
+
+171
+00:13:18.580 --> 00:13:22.240
+<v Craig Thomas>And then traditional security perspective lateral movement.
+
+172
+00:13:22.380 --> 00:13:26.800
+<v Craig Thomas>If you have one agent accessing credentials or contacts intended for a different agent,
+
+173
+00:13:26.900 --> 00:13:31.680
+<v Craig Thomas>now you certainly have a problem and you need to be able to see that and block it pretty
+
+174
+00:13:31.680 --> 00:13:32.180
+<v Craig Thomas>quickly.
+
+175
+00:13:32.140 --> 00:13:39.320
+<v Noah Labhart>So you mentioned this a bit already where security teams don't want to create or limit
+
+176
+00:13:39.320 --> 00:13:40.260
+<v Noah Labhart>the functionality.
+
+177
+00:13:40.280 --> 00:13:43.940
+<v Noah Labhart>So we have business leaders coming back to you and be like, hey, this isn't very useful
+
+178
+00:13:45.500 --> 00:13:50.040
+<v Noah Labhart>down. Security teams don't want to be the bottleneck. How do organizations balance strong
+
+179
+00:13:50.040 --> 00:13:55.440
+<v Noah Labhart>enforcement with the need to keep AI development and deployment moving fast, as fast as innovation
+
+180
+00:13:55.440 --> 00:14:01.460
+<v Craig Thomas>can move? For too often that a lot of organizations, the security organization is operated
+
+181
+00:14:01.460 --> 00:14:06.960
+<v Craig Thomas>kind of outside the bounds of, or outside the parameters that we ask developers to do. So I'd
+
+182
+00:14:06.960 --> 00:14:12.760
+<v Craig Thomas>start with policy as code. Those enforcement rules can live in version control right alongside the
+
+183
+00:14:12.760 --> 00:14:18.240
+<v Craig Thomas>the agent code. They're reviewed in your CI/CD pipeline before reaching production. So take a
+
+184
+00:14:18.240 --> 00:14:23.880
+<v Craig Thomas>similar approach you're taking to code with policy as well. Observe before enforce, right? That crawl,
+
+185
+00:14:23.940 --> 00:14:29.160
+<v Craig Thomas>walk, run approach. Start in audit mode. Understand the baseline behavior before writing those
+
+186
+00:14:29.160 --> 00:14:35.320
+<v Craig Thomas>blocking rules. This helps avoid false positives. It's slow development. But then you have to come
+
+187
+00:14:35.320 --> 00:14:39.380
+<v Craig Thomas>back to it. You have to move to enforce. You can't just leave it in observe for forever.
+
+188
+00:14:39.380 --> 00:14:43.800
+<v Craig Thomas>whatever. Tiered enforcement could be another one, similar to what we've done with other blocking
+
+189
+00:14:43.800 --> 00:14:49.120
+<v Craig Thomas>mechanisms in the past. No, like dev and staging might have more permissive monitoring, whereas
+
+190
+00:14:49.120 --> 00:14:55.600
+<v Craig Thomas>production has enforced policy. Same tooling in place, just different modes. And then developer
+
+191
+00:14:55.600 --> 00:15:00.780
+<v Craig Thomas>self-service. I believe being able to allow teams to see their own agent's behavioral profile,
+
+192
+00:15:00.980 --> 00:15:06.560
+<v Craig Thomas>understand what it will block before they deploy. Because one of the things that I think kills
+
+193
+00:15:06.560 --> 00:15:11.360
+<v Craig Thomas>developer velocity, and we've seen this over and over, right? It's an enforcement, but it's
+
+194
+00:15:11.360 --> 00:15:17.120
+<v Craig Thomas>enforcement that nobody understands. As a CISO and security professional, I saw this too often.
+
+195
+00:15:17.460 --> 00:15:23.180
+<v Craig Thomas>Security blocks or flags things, but don't give that feedback back to the developers. So the
+
+196
+00:15:23.180 --> 00:15:29.400
+<v Craig Thomas>insight as to when and how and why. And if that rule blocks your agent, you have no idea why,
+
+197
+00:15:29.720 --> 00:15:34.820
+<v Craig Thomas>you file a ticket, you wait, you're frustrated. But if you can look at that dashboard that shows,
+
+198
+00:15:36.560 --> 00:15:41.180
+<v Craig Thomas>did in staging. Here's which of those calls would have been blocked in production. Here's why.
+
+199
+00:15:41.580 --> 00:15:46.380
+<v Craig Thomas>That's actually a developer accelerant, all right? They catch issues before deployment.
+
+200
+00:15:46.540 --> 00:15:51.340
+<v Craig Thomas>The security team isn't the bottleneck or reactive after it's in prod. They actually
+
+201
+00:15:51.340 --> 00:15:56.980
+<v Craig Thomas>enable the business and the developers. And so the shift really then is from security as the team
+
+202
+00:15:56.980 --> 00:16:02.340
+<v Craig Thomas>that says no at the end to security as the team that gives you the signal you need to be able to
+
+203
+00:16:02.340 --> 00:16:09.320
+<v Craig Thomas>ship that code faster with confidence. It really turns traditional stereotypes of security on its
+
+204
+00:16:09.320 --> 00:16:15.660
+<v Craig Thomas>head and really enables things to move fast and be secure, which is incredibly important and really
+
+205
+00:16:15.660 --> 00:16:19.920
+<v Craig Thomas>exciting, honestly, when you think about it. Okay, I got one more question. When organizations have
+
+206
+00:16:19.920 --> 00:16:26.800
+<v Noah Labhart>the ability to discover, observe, and enforce AI behavior in real time, which you are illustrating
+
+207
+00:16:26.800 --> 00:16:31.800
+<v Noah Labhart>is so important, how does that change accountability at the enterprise level? What does good
+
+208
+00:16:32.340 --> 00:16:38.800
+<v Craig Thomas>look like from there? You see this in modern EGRC tools. You see this in modern security programs,
+
+209
+00:16:39.100 --> 00:16:44.540
+<v Craig Thomas>right? Governance becomes evidence-based rather than attestation-based. It's not just a checkmark
+
+210
+00:16:44.540 --> 00:16:49.940
+<v Craig Thomas>once a year, once every three years, when you just roll it out. You're not just asking,
+
+211
+00:16:49.980 --> 00:16:54.900
+<v Craig Thomas>do you have a policy? You're producing logs and evidence that show the policy was actually
+
+212
+00:16:54.900 --> 00:17:00.600
+<v Craig Thomas>enforced. So that accountability then, though, it gets tied to specific AI sessions, specific
+
+213
+00:17:02.340 --> 00:17:09.280
+<v Craig Thomas>tool calls, not just, hey, we use this model and those artifacts now are continuous, not a point
+
+214
+00:17:09.280 --> 00:17:14.580
+<v Craig Thomas>in time. When a border regulator asks, you pull the timeline, not just a self-assessment from
+
+215
+00:17:14.580 --> 00:17:20.840
+<v Craig Thomas>six months ago. This also can now limit the impact if there is an actual security event, right? A
+
+216
+00:17:20.840 --> 00:17:28.280
+<v Craig Thomas>story I've heard in the past is once you have that actual attestation based, even if you do have an
+
+217
+00:17:28.280 --> 00:17:33.860
+<v Craig Thomas>incident, you can say how it was limited, how it was contained, right? Those notifications don't
+
+218
+00:17:33.860 --> 00:17:39.500
+<v Craig Thomas>have to go to all 5 million, 10 million customers. You can say, hey, these five customers were
+
+219
+00:17:39.500 --> 00:17:45.280
+<v Craig Thomas>impacted. So fewer notifications, lesser fines, even if there is an incident because you have
+
+220
+00:17:45.280 --> 00:17:49.980
+<v Craig Thomas>that attestation and that limit. And so then that risk quantification becomes possible.
+
+221
+00:17:50.240 --> 00:17:57.700
+<v Craig Thomas>You can say this agent accessed this data 4,000 times in Q2. Every access was within policy rather
+
+222
+00:17:58.280 --> 00:18:04.400
+<v Craig Thomas>hey, we think our controls are good. And so fundamentally that changes. The thing that
+
+223
+00:18:04.400 --> 00:18:09.400
+<v Craig Thomas>changes most for the CISO is the conversation with the board. Right now, the board asks,
+
+224
+00:18:09.600 --> 00:18:14.900
+<v Craig Thomas>how do we know our AI systems are behaving appropriately? The honest answer for most
+
+225
+00:18:14.900 --> 00:18:20.340
+<v Craig Thomas>organization is, hey, we reviewed the design. We approved the deployment. We have a policy document.
+
+226
+00:18:20.660 --> 00:18:26.100
+<v Craig Thomas>That's attestation, right? That's not evidence. What governance looks like when you have a closed
+
+227
+00:18:26.100 --> 00:18:32.720
+<v Craig Thomas>control loop is I can pull a time frame of every action that every agent took, every tool it called,
+
+228
+00:18:32.920 --> 00:18:38.200
+<v Craig Thomas>every piece of data it touched, and I can show you exactly where policy was enforced and where it
+
+229
+00:18:38.200 --> 00:18:44.200
+<v Craig Thomas>wasn't. So that's fundamentally a different conversation, and that's what moves AI security
+
+230
+00:18:44.200 --> 00:18:51.040
+<v Craig Thomas>from a framework exercise to an operational capability. So these, I like to say those good
+
+231
+00:18:51.040 --> 00:18:55.600
+<v Craig Thomas>Good runtime controls enable broader AI adoption, not restricting it.
+
+232
+00:18:55.740 --> 00:18:59.980
+<v Craig Thomas>And this reframe lands well with CISOs tired of being seen as blockers,
+
+233
+00:19:00.480 --> 00:19:03.600
+<v Craig Thomas>and security becomes the foundation, not the ceiling.
+
+234
+00:19:04.140 --> 00:19:06.680
+<v Noah Labhart>Absolutely. Craig, that just makes too much sense.
+
+235
+00:19:06.840 --> 00:19:09.220
+<v Noah Labhart>I really appreciate you returning to the show today.
+
+236
+00:19:09.520 --> 00:19:12.640
+<v Noah Labhart>It's clear that businesses have to move to runtime containment.
+
+237
+00:19:12.820 --> 00:19:14.700
+<v Noah Labhart>I think we have nailed that on the head today.
+
+238
+00:19:14.860 --> 00:19:17.200
+<v Noah Labhart>The days of older, slower models are over.
+
+239
+00:19:17.200 --> 00:19:21.620
+<v Noah Labhart>CISOs have to acknowledge this blind spot and change the way they think about their
+
+240
+00:19:21.620 --> 00:19:22.120
+<v Noah Labhart>operation.
+
+241
+00:19:22.140 --> 00:19:25.920
+<v Noah Labhart>You have to catch these issues fast and lower the blast radius.
+
+242
+00:19:26.120 --> 00:19:30.160
+<v Noah Labhart>And in doing so, you actually maintain speed of innovation rather than hinder it.
+
+243
+00:19:30.620 --> 00:19:34.880
+<v Noah Labhart>Enterprises can move this to an operational capability through these runtime controls.
+
+244
+00:19:35.100 --> 00:19:36.780
+<v Noah Labhart>I think you've made that very clear, Craig.
+
+245
+00:19:36.880 --> 00:19:41.040
+<v Noah Labhart>Really appreciate you coming back to the show and telling us what's missing in AI security
+
+246
+00:19:41.040 --> 00:19:41.540
+<v Noah Labhart>today.
+
+247
+00:19:41.840 --> 00:19:42.560
+<v Craig Thomas>Thanks, Noah.
+
+248
+00:19:42.560 --> 00:19:48.760
+<v Noah Labhart>It was great to have Craig back on the show to point out what's missing in AI security today.
+
+249
+00:19:48.900 --> 00:19:55.140
+<v Noah Labhart>And that is changing the models of security away from reactive to proactive at runtime.
+
+250
+00:19:56.420 --> 00:20:00.540
+<v Noah Labhart>If you'd like to learn more about Wallarm, you can visit wallarm.com.
+
+251
+00:20:00.700 --> 00:20:04.600
+<v Noah Labhart>That's W-A-L-L-A-R-M dot com.
+
+252
+00:20:06.040 --> 00:20:07.620
+<v Noah Labhart>And thanks again for listening.

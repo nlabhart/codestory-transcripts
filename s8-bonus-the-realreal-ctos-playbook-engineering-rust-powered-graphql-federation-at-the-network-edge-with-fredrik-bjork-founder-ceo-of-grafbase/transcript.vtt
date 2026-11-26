@@ -1,0 +1,1095 @@
+WEBVTT
+
+NOTE S8 Bonus: The RealReal CTO's Playbook: Engineering Rust-Powered GraphQL Federation at the Network Edge with Fredrik Björk, Founder & CEO of Grafbase
+
+1
+00:00:00.000 --> 00:00:13.300
+<v Fredrik Björk>The thing that I wanted to start with was kind of the marketing pitch. That was actually harder than I expected, just to see what people got attracted to, what people didn't understand. That's something we're doing today, in fact.
+
+2
+00:00:13.300 --> 00:00:22.720
+<v Fredrik Björk>And then the decision between kind of buy versus build, you know, like, do I actually want to build something that works end to end before I get feedback?
+
+3
+00:00:22.960 --> 00:00:24.280
+<v Fredrik Björk>You know, no, right?
+
+4
+00:00:24.380 --> 00:00:29.880
+<v Fredrik Björk>You want to optimize for shipping something that something can see as soon as possible, right?
+
+5
+00:00:29.960 --> 00:00:38.960
+<v Fredrik Björk>Because, you know, you're trying to validate your idea and you don't want to spend too much time because you're paying contractors out of pockets to actually build this with you.
+
+6
+00:00:39.660 --> 00:00:41.100
+<v Fredrik Björk>My name is Fredrik Björk.
+
+7
+00:00:41.100 --> 00:00:43.660
+<v Fredrik Björk>I'm the founder and CEO of Grafbase.
+
+8
+00:00:46.520 --> 00:00:52.260
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+10
+00:00:53.700 --> 00:00:55.220
+<v Clip>There's nothing like the bedcams.
+
+11
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+12
+00:00:58.280 --> 00:00:59.840
+<v Clip>I don't exactly know what to do next.
+
+13
+00:00:59.840 --> 00:01:01.240
+<v Clip>It took many goes to get right.
+
+14
+00:01:01.760 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+15
+00:01:04.740 --> 00:01:06.120
+<v Clip>The company is its people.
+
+16
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+17
+00:01:07.440 --> 00:01:08.560
+<v Clip>Most proud of our team.
+
+18
+00:01:08.860 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:11.280 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+20
+00:01:12.880 --> 00:01:14.200
+<v Clip>Yes, we've been fighting it as a group.
+
+21
+00:01:14.440 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+22
+00:01:15.600 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+23
+00:01:18.320 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, mind you.
+
+24
+00:01:20.040 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+25
+00:01:22.940 --> 00:01:25.860
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+26
+00:01:26.120 --> 00:01:27.600
+<v Clip>You need to really want it.
+
+27
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+28
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+29
+00:01:32.540 --> 00:01:33.940
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+30
+00:01:33.940 --> 00:01:42.220
+<v Noah Labhart>Today, how Fredrik Björk is giving you a way to combine your data to a centralized GraphQL endpoint.
+
+31
+00:01:48.320 --> 00:01:52.200
+<v Noah Labhart>Fredrik Björk is originally from Sweden, but has spent many years in San Francisco.
+
+32
+00:01:52.460 --> 00:01:57.780
+<v Noah Labhart>He got started coding in BASIC on his Commodore 64, while also playing video games, of course.
+
+33
+00:01:58.460 --> 00:02:04.240
+<v Noah Labhart>Post-graduating from RIT, he's been involved in many startups, like Avatars United and The Real Real.
+
+34
+00:02:04.860 --> 00:02:09.180
+<v Noah Labhart>Outside of tech, he's a dad of two kids and likes to run, specifically marathons.
+
+35
+00:02:10.320 --> 00:02:15.640
+<v Noah Labhart>Fredrik noticed that the patterns of development has changed towards outsourcing over building everything in-house.
+
+36
+00:02:15.980 --> 00:02:21.140
+<v Noah Labhart>Fast forward to 2021, great services exist to empower developers to ship faster.
+
+37
+00:02:21.860 --> 00:02:26.260
+<v Noah Labhart>Fredrik wanted to build a service like this for the API layer and below.
+
+38
+00:02:27.780 --> 00:02:30.320
+<v Noah Labhart>This is the creation story of Grafbase.
+
+39
+00:02:33.800 --> 00:02:39.600
+<v Fredrik Björk>I've always been looking for tools and services to make you ship faster, essentially.
+
+40
+00:02:39.840 --> 00:02:45.540
+<v Fredrik Björk>You know, abstractions on top of cloud infrastructure, database, search, CICD,
+
+41
+00:02:45.600 --> 00:02:50.480
+<v Fredrik Björk>and anything that you have to rebuild over and over in every company you start.
+
+42
+00:02:50.720 --> 00:02:55.920
+<v Fredrik Björk>I always try to look for things that are not the core value of the company
+
+43
+00:02:57.780 --> 00:03:03.360
+<v Fredrik Björk>happened. 20, 15, 20 years ago, most companies like to build in-house, but I would say the
+
+44
+00:03:03.360 --> 00:03:10.620
+<v Fredrik Björk>pattern the past decade is to try to outsource as much as possible. So when AWS came out,
+
+45
+00:03:10.680 --> 00:03:15.960
+<v Fredrik Björk>I immediately adopted it. It kind of just clicked for me, but then I also started looking
+
+46
+00:03:15.960 --> 00:03:22.380
+<v Fredrik Björk>for companies that made it easier to build on top. So early on, it was Engine Yard, RightScale,
+
+47
+00:03:22.380 --> 00:03:36.300
+<v Fredrik Björk>And then when Heroku came out in 2008, that was really kind of instrumental and really changed the mindset to kind of empower more developers to ship, being empowered to ship to production.
+
+48
+00:03:36.440 --> 00:03:38.100
+<v Fredrik Björk>I think that's really, really powerful.
+
+49
+00:03:38.400 --> 00:03:49.840
+<v Fredrik Björk>And that's always been kind of a philosophy that I've had at companies is to use tools that make you go faster, but also that you enjoy your day-to-day developer experience.
+
+50
+00:03:49.840 --> 00:04:01.040
+<v Fredrik Björk>So fast forward to 2021, then you have great services like Netlify, Vercel, PlanetScale,
+
+51
+00:04:01.120 --> 00:04:02.120
+<v Fredrik Björk>and today Neon.
+
+52
+00:04:02.360 --> 00:04:08.600
+<v Fredrik Björk>And it's those companies that have built great platforms that have empowered developers to
+
+53
+00:04:09.060 --> 00:04:15.680
+<v Fredrik Björk>build magnificent kind of applications really fast and without worrying about a DevOps team
+
+54
+00:04:15.680 --> 00:04:18.100
+<v Fredrik Björk>or complicated CI CD pipelines.
+
+55
+00:04:19.840 --> 00:04:27.000
+<v Fredrik Björk>ship faster than ever. I wanted to do something like that for the API layer and below. I didn't
+
+56
+00:04:27.000 --> 00:04:33.140
+<v Fredrik Björk>really find anything on the market that did this. I think the closest thing to what we are building
+
+57
+00:04:33.140 --> 00:04:39.340
+<v Fredrik Björk>is a service called AWS AppSync, which is a managed GraphQL service they have. The early
+
+58
+00:04:39.340 --> 00:04:44.800
+<v Fredrik Björk>days of Prisma, which was called Graphcool, had a similar feature. This was many years ago.
+
+59
+00:04:44.800 --> 00:04:50.820
+<v Fredrik Björk>But I always kind of liked that approach of sticking to something that's really simple
+
+60
+00:04:50.820 --> 00:04:54.240
+<v Fredrik Björk>to adopt, simple to use with a good developer experience.
+
+61
+00:04:54.880 --> 00:05:01.600
+<v Fredrik Björk>But again, Graphcool doesn't exist anymore, AppSync, AWS, so it doesn't have the greatest
+
+62
+00:05:01.600 --> 00:05:02.920
+<v Fredrik Björk>DX in my mind.
+
+63
+00:05:03.100 --> 00:05:04.960
+<v Fredrik Björk>So that's something I started prototyping.
+
+64
+00:05:05.160 --> 00:05:11.220
+<v Fredrik Björk>I built something in a few months, I showed it to a bunch of full stack mobile developers.
+
+65
+00:05:11.220 --> 00:05:17.340
+<v Fredrik Björk>person after leaving The Real Real and late 2021 to build Grafbase.
+
+66
+00:05:19.560 --> 00:05:20.560
+<v Fredrik Björk>So what is Grafbase?
+
+67
+00:05:20.740 --> 00:05:25.260
+<v Fredrik Björk>I think the number one thing is we provide a fully managed GraphQL
+
+68
+00:05:25.760 --> 00:05:27.440
+<v Fredrik Björk>gateway deployed to the edge.
+
+69
+00:05:27.620 --> 00:05:30.940
+<v Fredrik Björk>And then the second thing is we offer an edge network.
+
+70
+00:05:31.180 --> 00:05:36.120
+<v Fredrik Björk>So it's accelerate your API, but also existing data sources you might have,
+
+71
+00:05:36.240 --> 00:05:41.120
+<v Fredrik Björk>such as databases that are on premise or APIs, third-party APIs that you don't
+
+72
+00:05:41.220 --> 00:05:47.000
+<v Fredrik Björk>control. So we want to unify them behind a GraphQL endpoint as well as make them go faster globally.
+
+73
+00:05:49.420 --> 00:05:54.300
+<v Noah Labhart>Let's dive into the MVP. So tell me about that first version of the product you built. How long
+
+74
+00:05:54.300 --> 00:05:57.760
+<v Noah Labhart>did it take you to build and what sort of tools did you use to bring it to life?
+
+75
+00:05:59.620 --> 00:06:06.980
+<v Fredrik Björk>I was kind of sitting during COVID as everyone else in my garage brainstorming. And the MVP in
+
+76
+00:06:06.980 --> 00:06:10.180
+<v Fredrik Björk>in my mind at the time was really a serverless database
+
+77
+00:06:10.640 --> 00:06:12.220
+<v Fredrik Björk>that within GraphQL interface.
+
+78
+00:06:12.700 --> 00:06:15.800
+<v Fredrik Björk>I want something that where a front end developer
+
+79
+00:06:15.800 --> 00:06:18.760
+<v Fredrik Björk>could essentially build the whole backend end to end.
+
+80
+00:06:19.600 --> 00:06:20.860
+<v Fredrik Björk>That's what I set out to do.
+
+81
+00:06:20.980 --> 00:06:24.020
+<v Fredrik Björk>And it took me about two to three months to build it.
+
+82
+00:06:24.160 --> 00:06:27.720
+<v Fredrik Björk>I got a front end developer and a designer,
+
+83
+00:06:27.820 --> 00:06:30.640
+<v Fredrik Björk>part-time designer to help me build the kind of the dashboard.
+
+84
+00:06:31.160 --> 00:06:34.200
+<v Fredrik Björk>So we built a pretty simple Next.js app
+
+85
+00:06:34.200 --> 00:06:36.460
+<v Fredrik Björk>deployed to Vercel with Firebase.
+
+86
+00:06:36.800 --> 00:06:39.800
+<v Fredrik Björk>We kind of experimented with a bunch of different databases.
+
+87
+00:06:39.800 --> 00:06:42.040
+<v Fredrik Björk>I actually ended up using Dgraph,
+
+88
+00:06:42.320 --> 00:06:44.480
+<v Fredrik Björk>which is also a graph database,
+
+89
+00:06:44.740 --> 00:06:47.080
+<v Fredrik Björk>behind the scenes just to get things going.
+
+90
+00:06:47.280 --> 00:06:50.440
+<v Fredrik Björk>And that was enough to kind of showcase it to people.
+
+91
+00:06:50.680 --> 00:06:53.400
+<v Fredrik Björk>And some people actually built some applications
+
+92
+00:06:53.400 --> 00:06:55.440
+<v Fredrik Björk>on top of the first version of Grafbase.
+
+93
+00:06:55.640 --> 00:06:56.860
+<v Fredrik Björk>This was almost three years ago.
+
+94
+00:06:58.240 --> 00:07:00.540
+<v Noah Labhart>Let's stay on that MVP for a minute.
+
+95
+00:07:00.740 --> 00:07:03.020
+<v Noah Labhart>Tell me about some of the decisions and trade-offs
+
+96
+00:07:04.200 --> 00:07:09.400
+<v Noah Labhart>building that MVP. You kind of touched on them at a high level, but dive into them for me about,
+
+97
+00:07:09.520 --> 00:07:15.060
+<v Noah Labhart>you know, maybe technical debt, technical choices, or approach, abstractions, limitations,
+
+98
+00:07:15.260 --> 00:07:19.360
+<v Noah Labhart>all the things, right? Tell me about some of those decisions and trade-offs you had to work through
+
+99
+00:07:19.360 --> 00:07:20.400
+<v Noah Labhart>and how you cope with them.
+
+100
+00:07:21.640 --> 00:07:25.040
+<v Fredrik Björk>The thing that I wanted to start with was kind of the marketing
+
+101
+00:07:25.040 --> 00:07:29.820
+<v Fredrik Björk>pitch. That was actually harder than I expected, just like the landing page, like what is this
+
+102
+00:07:29.820 --> 00:07:34.560
+<v Fredrik Björk>thing so i spent a great amount of time on that actually and like i tried to iterate on that
+
+103
+00:07:34.560 --> 00:07:39.640
+<v Fredrik Björk>before we built the dashboard and the product itself that was a pretty good learning experience
+
+104
+00:07:39.640 --> 00:07:45.240
+<v Fredrik Björk>just to see what people got attracted to what people didn't understand that's something we're
+
+105
+00:07:45.240 --> 00:07:51.120
+<v Fredrik Björk>doing today in fact so it's an ongoing thing but that was a good learning experience and then
+
+106
+00:07:51.120 --> 00:07:57.200
+<v Fredrik Björk>i think the decision between kind of buy versus build you know like do we actually want to build
+
+107
+00:07:57.200 --> 00:08:00.500
+<v Fredrik Björk>build something that works end to end before I get feedback?
+
+108
+00:08:00.700 --> 00:08:02.060
+<v Fredrik Björk>You know, no, right?
+
+109
+00:08:02.200 --> 00:08:07.400
+<v Fredrik Björk>You want to optimize for shipping something that something can see as soon as possible,
+
+110
+00:08:07.500 --> 00:08:08.000
+<v Fredrik Björk>right?
+
+111
+00:08:07.740 --> 00:08:12.140
+<v Fredrik Björk>Because, you know, you're trying to validate your idea and you don't want to spend too
+
+112
+00:08:12.140 --> 00:08:16.200
+<v Fredrik Björk>much time because you're paying contractors out of pockets to actually build this with
+
+113
+00:08:16.200 --> 00:08:16.700
+<v Fredrik Björk>you.
+
+114
+00:08:16.580 --> 00:08:19.820
+<v Fredrik Björk>So that was kind of the trade-off and a really good learning experience.
+
+115
+00:08:20.120 --> 00:08:24.020
+<v Fredrik Björk>You know, today we're 20 people and I'm still trying to apply those first principles.
+
+116
+00:08:24.020 --> 00:08:24.520
+<v Fredrik Björk>goals.
+
+117
+00:08:25.620 --> 00:08:30.960
+<v Noah Labhart>So you've got your MVP, it's working. How have you progressed the product from that point
+
+118
+00:08:30.960 --> 00:08:35.300
+<v Noah Labhart>and matured it? And I think, you know, to wrap that in a box a little bit, how did you go about
+
+119
+00:08:35.300 --> 00:08:38.900
+<v Noah Labhart>building your roadmap? And how did you go about deciding, okay, this is the next most important
+
+120
+00:08:38.900 --> 00:08:40.680
+<v Noah Labhart>thing to build with Grafbase?
+
+121
+00:08:43.320 --> 00:08:46.800
+<v Fredrik Björk>First version, we started building for production. So this was
+
+122
+00:08:46.800 --> 00:08:53.140
+<v Fredrik Björk>essentially after I decided six months or so, or maybe more after the prototype was live,
+
+123
+00:08:54.020 --> 00:08:59.660
+<v Fredrik Björk>a few hundred people to test it. I raised capital, started hiring people. So the first version that
+
+124
+00:08:59.660 --> 00:09:04.660
+<v Fredrik Björk>we started building was December 2021. It was really more of a back-end as a service product.
+
+125
+00:09:05.040 --> 00:09:12.260
+<v Fredrik Björk>Think about Firebase or Supabase and we wanted to make it really, really easy to build a stateful
+
+126
+00:09:12.260 --> 00:09:18.380
+<v Fredrik Björk>GraphQL API deployed to the edge. The first versions of Grafbase was serverless and it was
+
+127
+00:09:18.380 --> 00:09:23.100
+<v Fredrik Björk>deployed to a single region, which is something that I wanted to offer to end
+
+128
+00:09:23.100 --> 00:09:27.340
+<v Fredrik Björk>users, because I think that's the way these days, is to offer usage-based
+
+129
+00:09:27.340 --> 00:09:32.640
+<v Fredrik Björk>pricing and also not have to worry about servers. But then, as I started thinking
+
+130
+00:09:32.640 --> 00:09:38.380
+<v Fredrik Björk>about the coming decade of API, there was this emerging technology
+
+131
+00:09:38.380 --> 00:09:43.140
+<v Fredrik Björk>called WebAssembly, which is both available on the browser as well as the
+
+132
+00:09:43.140 --> 00:09:47.460
+<v Fredrik Björk>server side. I was focused on the server side and I wanted to build something
+
+133
+00:09:48.380 --> 00:09:51.540
+<v Fredrik Björk>the API is deployed close to the end user.
+
+134
+00:09:52.320 --> 00:09:56.160
+<v Fredrik Björk>No static content has seen this in the past 20 plus years
+
+135
+00:09:56.160 --> 00:10:00.180
+<v Fredrik Björk>with CDNs, you don't deploy a website today without a CDN.
+
+136
+00:10:00.300 --> 00:10:01.500
+<v Fredrik Björk>It's very rare, I would say.
+
+137
+00:10:01.620 --> 00:10:05.100
+<v Fredrik Björk>And I think the coming decade is also gonna see
+
+138
+00:10:05.100 --> 00:10:08.100
+<v Fredrik Björk>that revolution for dynamic experiences,
+
+139
+00:10:08.500 --> 00:10:11.260
+<v Fredrik Björk>compute essentially through an edge network.
+
+140
+00:10:11.640 --> 00:10:14.080
+<v Fredrik Björk>So that's one of our big bets at Grafbase.
+
+141
+00:10:14.080 --> 00:10:21.120
+<v Fredrik Björk>So we deploy every project as a GraphQL gateway that's deployed to the edge automatically for you.
+
+142
+00:10:21.180 --> 00:10:28.280
+<v Fredrik Björk>So you get a GraphQL endpoint that sits in 300 plus data centers within five seconds, essentially.
+
+143
+00:10:28.560 --> 00:10:30.900
+<v Fredrik Björk>For some businesses, it matters more than others.
+
+144
+00:10:31.080 --> 00:10:35.420
+<v Fredrik Björk>But for most companies, you have users in more than one region.
+
+145
+00:10:35.560 --> 00:10:38.560
+<v Fredrik Björk>So user experience performance matters.
+
+146
+00:10:38.560 --> 00:10:44.600
+<v Fredrik Björk>matters. But the second thing is, you know, most APIs and databases are deployed to a single region.
+
+147
+00:10:44.720 --> 00:10:50.440
+<v Fredrik Björk>So it doesn't always help. But if you apply edge caching on top of that, then you can effectively
+
+148
+00:10:50.440 --> 00:10:56.080
+<v Fredrik Björk>make experiences go faster for everyone across the globe by deploying, you know,
+
+149
+00:10:56.120 --> 00:11:00.680
+<v Fredrik Björk>a GraphQL gateway next to the user and then caching it using that same edge network.
+
+150
+00:11:02.220 --> 00:11:06.640
+<v Noah Labhart>Let's switch to team then. So how did you go about building your team? And what did you look for in
+
+151
+00:11:08.560 --> 00:11:09.740
+<v Noah Labhart>the winning horses to join you?
+
+152
+00:11:10.800 --> 00:11:13.240
+<v Fredrik Björk>Well, what I did is first few hires,
+
+153
+00:11:13.260 --> 00:11:15.500
+<v Fredrik Björk>I actually posted on Hacker News,
+
+154
+00:11:15.740 --> 00:11:16.880
+<v Fredrik Björk>who's hiring post.
+
+155
+00:11:17.640 --> 00:11:19.840
+<v Fredrik Björk>The thing we spelled out there was,
+
+156
+00:11:19.840 --> 00:11:21.100
+<v Fredrik Björk>you know, people who know Rust,
+
+157
+00:11:21.240 --> 00:11:23.580
+<v Fredrik Björk>people who want to build for developers
+
+158
+00:11:23.580 --> 00:11:25.680
+<v Fredrik Björk>and people who are remote first.
+
+159
+00:11:26.000 --> 00:11:30.420
+<v Fredrik Björk>So I think those three filters got really a good amount
+
+160
+00:11:30.420 --> 00:11:33.280
+<v Fredrik Björk>of really good people attracted to Grafbase.
+
+161
+00:11:33.340 --> 00:11:35.720
+<v Fredrik Björk>So we went from just me to I think seven people
+
+162
+00:11:35.720 --> 00:11:36.500
+<v Fredrik Björk>in three weeks.
+
+163
+00:11:36.500 --> 00:11:41.520
+<v Fredrik Björk>And then we've been slowly kind of adding to the team over the past year and a half.
+
+164
+00:11:41.600 --> 00:11:42.440
+<v Fredrik Björk>Now we're close.
+
+165
+00:11:42.600 --> 00:11:45.000
+<v Fredrik Björk>We're 19 people today, all remote.
+
+166
+00:11:45.120 --> 00:11:49.780
+<v Fredrik Björk>So mostly throughout Europe, but we have a couple of people in the U.S., predominantly developers.
+
+167
+00:11:50.240 --> 00:11:54.760
+<v Fredrik Björk>We have two people doing a DevRel, one product manager, and then two designers.
+
+168
+00:11:54.960 --> 00:11:59.220
+<v Fredrik Björk>But the rest is mostly Rust backend devs and then two frontend devs.
+
+169
+00:12:01.820 --> 00:12:03.400
+<v Noah Labhart>So this will be interesting.
+
+170
+00:12:03.400 --> 00:12:09.400
+<v Noah Labhart>Given all the things we've talked about with Edge and how you're approaching this problem, and really just in general, I find this question interesting.
+
+171
+00:12:09.780 --> 00:12:10.980
+<v Noah Labhart>Let's talk about scalability.
+
+172
+00:12:11.320 --> 00:12:17.680
+<v Noah Labhart>So did you build this to scale efficiently from day one, or have you been finding this as you grow in any sort of capacity?
+
+173
+00:12:19.400 --> 00:12:20.840
+<v Fredrik Björk>So a few things there.
+
+174
+00:12:20.920 --> 00:12:25.000
+<v Fredrik Björk>The number one thing is internally, everything we build is serverless.
+
+175
+00:12:25.040 --> 00:12:29.060
+<v Fredrik Björk>So we don't have any ongoing, always-on costs.
+
+176
+00:12:29.420 --> 00:12:32.820
+<v Fredrik Björk>And then two, because it's serverless, it scales by nature.
+
+177
+00:12:33.400 --> 00:12:35.600
+<v Fredrik Björk>Like I mentioned before, we're deployed to Cloudflare.
+
+178
+00:12:35.780 --> 00:12:39.600
+<v Fredrik Björk>They're the world's most advanced and high-performance edge network.
+
+179
+00:12:40.180 --> 00:12:46.280
+<v Fredrik Björk>And the rest lives in AWS, which is also running on serverless services like Dynamo and Lambda.
+
+180
+00:12:46.520 --> 00:12:51.560
+<v Fredrik Björk>So from a scalability perspective and cost, we're really set up to handle anything.
+
+181
+00:12:53.160 --> 00:13:00.100
+<v Noah Labhart>Okay, so as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+182
+00:13:01.500 --> 00:13:05.460
+<v Fredrik Björk>We just launched the public beta in April, so I'm kind of digesting that.
+
+183
+00:13:05.600 --> 00:13:08.580
+<v Fredrik Björk>But I would say I'm really proud of the local dev experience.
+
+184
+00:13:09.140 --> 00:13:12.160
+<v Fredrik Björk>That's something that we're continuously kind of working on.
+
+185
+00:13:12.160 --> 00:13:30.020
+<v Fredrik Björk>But the fact that you can through one command, an NPX command, an NPX grafbase dev, you can get a production parity, local development environment with a GraphQL API, a kind of GraphQL explorer that we call Pathfinder, as well as the database and full text search.
+
+186
+00:13:30.220 --> 00:13:30.980
+<v Fredrik Björk>That's pretty magic.
+
+187
+00:13:31.140 --> 00:13:39.720
+<v Fredrik Björk>And I think going from that to actually deploying its production within 10 seconds or less using either the CLI or through GitHub integration.
+
+188
+00:13:40.080 --> 00:13:41.020
+<v Fredrik Björk>That's magic.
+
+189
+00:13:42.160 --> 00:13:43.600
+<v Fredrik Björk>deploying to production, but production means
+
+190
+00:13:43.600 --> 00:13:45.920
+<v Fredrik Björk>deployed to the edge, so it's globally fast
+
+191
+00:13:45.920 --> 00:13:48.040
+<v Fredrik Björk>without you spending any effort on it.
+
+192
+00:13:48.540 --> 00:13:51.220
+<v Fredrik Björk>And it's just worth noting, it has branching built in,
+
+193
+00:13:51.340 --> 00:13:53.380
+<v Fredrik Björk>so each branch has a dedicated database
+
+194
+00:13:53.380 --> 00:13:56.680
+<v Fredrik Björk>as well as search and fronted by a GraphQL gateway.
+
+195
+00:13:57.180 --> 00:14:00.520
+<v Fredrik Björk>We've just really tried to feel that magic
+
+196
+00:14:00.520 --> 00:14:02.420
+<v Fredrik Björk>from your terminal to production.
+
+197
+00:14:02.700 --> 00:14:06.520
+<v Fredrik Björk>So having an idea or tweaking, adding, removing a field
+
+198
+00:14:06.520 --> 00:14:10.080
+<v Fredrik Björk>to your GraphQL API should be really, really low effort
+
+199
+00:14:10.080 --> 00:14:11.540
+<v Fredrik Björk>and it should feel like magic.
+
+200
+00:14:12.160 --> 00:14:12.660
+<v Fredrik Björk>proud of that.
+
+201
+00:14:13.740 --> 00:14:18.500
+<v Noah Labhart>So let's flip the script a little bit. Tell me about a mistake you made and how you
+
+202
+00:14:18.500 --> 00:14:20.240
+<v Noah Labhart>and your team responded to it.
+
+203
+00:14:21.780 --> 00:14:25.520
+<v Fredrik Björk>After we launched, you know, the private beta last year, we were
+
+204
+00:14:25.520 --> 00:14:31.720
+<v Fredrik Björk>essentially a backend as a service company. In my opinion, we still have that really magic
+
+205
+00:14:31.720 --> 00:14:38.040
+<v Fredrik Björk>feel where you can kind of stand up an API with the database and search and all of that kind of
+
+206
+00:14:38.040 --> 00:14:43.380
+<v Fredrik Björk>of built in, but you know, you realize that it's really hard to sell it into bigger companies.
+
+207
+00:14:43.620 --> 00:14:49.460
+<v Fredrik Björk>They usually have a database they trust, they like, so that the data portion is a really
+
+208
+00:14:49.460 --> 00:14:50.180
+<v Fredrik Björk>tough challenge.
+
+209
+00:14:50.340 --> 00:14:53.200
+<v Fredrik Björk>So I think I wouldn't call it a mistake, but just an insight.
+
+210
+00:14:53.400 --> 00:14:59.020
+<v Fredrik Björk>So then based on that kind of feedback from customers, when we talked, you know, mid to
+
+211
+00:14:59.020 --> 00:15:04.140
+<v Fredrik Björk>larger size companies was that, you know, I think we're going to accelerate the brownfield
+
+212
+00:15:04.140 --> 00:15:06.900
+<v Fredrik Björk>portion of Grafbase sooner than we expected.
+
+213
+00:15:07.700 --> 00:15:13.820
+<v Fredrik Björk>What we're much more focused on is to provide a unified data layer at the edge via GraphQL
+
+214
+00:15:13.820 --> 00:15:18.620
+<v Fredrik Björk>to talk to and connect with existing databases and APIs.
+
+215
+00:15:19.060 --> 00:15:21.500
+<v Fredrik Björk>And that's a much easier conversation to have.
+
+216
+00:15:21.620 --> 00:15:28.300
+<v Fredrik Björk>You might have a GraphQL API already, and we can provide edge caching for that or analytics
+
+217
+00:15:28.300 --> 00:15:32.000
+<v Fredrik Björk>that you might not have, or just a better DX for local dev,
+
+218
+00:15:32.160 --> 00:15:34.540
+<v Fredrik Björk>or CICD, faster deploys.
+
+219
+00:15:35.080 --> 00:15:39.320
+<v Fredrik Björk>There's many, many pain points that people who have GraphQL in production
+
+220
+00:15:39.320 --> 00:15:41.920
+<v Fredrik Björk>can bring to the table, and we can solve for them.
+
+221
+00:15:42.060 --> 00:15:45.540
+<v Fredrik Björk>So I think that's been the biggest repositioning of Grafbase
+
+222
+00:15:45.540 --> 00:15:46.140
+<v Fredrik Björk>since we started.
+
+223
+00:15:48.260 --> 00:15:52.880
+<v Noah Labhart>Okay, what does the future look like for the product and for your team?
+
+224
+00:15:54.260 --> 00:15:56.780
+<v Fredrik Björk>We launched the public beta in April,
+
+225
+00:15:58.300 --> 00:16:02.740
+<v Fredrik Björk>Now we're working with our early customers, which is super rewarding.
+
+226
+00:16:03.220 --> 00:16:11.680
+<v Fredrik Björk>And now we just want to try to scale that out and get Grafbase on the map and get into Fortune 500.
+
+227
+00:16:12.080 --> 00:16:13.580
+<v Fredrik Björk>GraphQL is on the rise.
+
+228
+00:16:14.120 --> 00:16:16.300
+<v Fredrik Björk>Adoption is increasing every year.
+
+229
+00:16:16.460 --> 00:16:22.460
+<v Fredrik Björk>So we want to make sure that Grafbase is the best option to build and deploy GraphQL APIs.
+
+230
+00:16:22.460 --> 00:16:29.460
+<v Fredrik Björk>In order to do that, we've now shifted the focus from not just building to actually talking about what we're building.
+
+231
+00:16:29.660 --> 00:16:37.080
+<v Fredrik Björk>So we have an emphasis now on, in addition to just guides and changelogs, which is what we've been doing all along, is also to do some blogging.
+
+232
+00:16:37.180 --> 00:16:39.940
+<v Fredrik Björk>And the whole company is doing that right now.
+
+233
+00:16:40.060 --> 00:16:41.660
+<v Fredrik Björk>And we started doing that a few weeks ago.
+
+234
+00:16:41.880 --> 00:16:49.760
+<v Fredrik Björk>And even this podcast, trying to talk about what we've done, because we've done some pretty interesting and remarkable things that I'm sure a lot of people will want to hear about.
+
+235
+00:16:51.560 --> 00:16:59.460
+<v Noah Labhart>Okay, Fredrik, let's switch to you. Who influences the way that you work? Name a person or many persons or something you look up to and why.
+
+236
+00:17:01.260 --> 00:17:08.540
+<v Fredrik Björk>Most founders in general, I think, are really interesting to talk to about their learnings, where they failed, where they succeeded.
+
+237
+00:17:08.840 --> 00:17:16.000
+<v Fredrik Björk>And me living in San Francisco really has shaped the way I think and view the world, and especially when it comes to developer experience.
+
+238
+00:17:16.000 --> 00:17:34.100
+<v Fredrik Björk>You know, thankful to have investors of companies like, you know, Vercel, Netlify, Datadog, who I've been fortunate enough to have on my cap table, as well as who helped me shape Grafbase and also helped with fundraising, blog posts and just like sounding board for products, features.
+
+239
+00:17:34.340 --> 00:17:40.820
+<v Fredrik Björk>Right. So I'd say most of the people who are part of my pre-seed for Grafbase have been people I look up to.
+
+240
+00:17:42.160 --> 00:17:45.640
+<v Noah Labhart>Okay, we talked about a mistake earlier, but this is a little different spin.
+
+241
+00:17:45.940 --> 00:17:48.600
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+242
+00:17:48.720 --> 00:17:50.620
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+243
+00:17:50.720 --> 00:17:53.500
+<v Noah Labhart>Could have been something that worked pretty well, but maybe tweak it a little bit.
+
+244
+00:17:55.980 --> 00:18:04.680
+<v Fredrik Björk>Definitely focus a lot more on fewer things and just really get to the bottom of what the customers want.
+
+245
+00:18:04.940 --> 00:18:06.620
+<v Fredrik Björk>What are they really looking for?
+
+246
+00:18:06.740 --> 00:18:09.160
+<v Fredrik Björk>What are they paying points and solving for that?
+
+247
+00:18:10.820 --> 00:18:13.720
+<v Fredrik Björk>to get into this dream mode, which is good too.
+
+248
+00:18:14.100 --> 00:18:17.340
+<v Fredrik Björk>You know, when you're inspired, you start to crank out things.
+
+249
+00:18:17.560 --> 00:18:19.500
+<v Fredrik Björk>And I have a lot of kind of parallel thoughts.
+
+250
+00:18:19.720 --> 00:18:20.820
+<v Fredrik Björk>That's just the way I operate.
+
+251
+00:18:21.000 --> 00:18:25.440
+<v Fredrik Björk>But just because you are 19 people doesn't mean you should be working on 19 things.
+
+252
+00:18:25.660 --> 00:18:30.900
+<v Fredrik Björk>So that's something we started doing early this year is to be much more focused and build fewer things,
+
+253
+00:18:31.080 --> 00:18:33.060
+<v Fredrik Björk>but focus on them and do them better.
+
+254
+00:18:34.460 --> 00:18:35.580
+<v Noah Labhart>Fredrik, last question.
+
+255
+00:18:35.580 --> 00:18:41.200
+<v Noah Labhart>Question. So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+256
+00:18:41.540 --> 00:18:43.720
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world.
+
+257
+00:18:43.820 --> 00:18:45.360
+<v Noah Labhart>Can we show it to you right there on the plane?
+
+258
+00:18:45.680 --> 00:18:48.660
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+259
+00:18:50.060 --> 00:18:55.900
+<v Fredrik Björk>I mean, I think it's the most important thing is to have fun and to build it because you're passionate about it.
+
+260
+00:18:55.980 --> 00:18:59.060
+<v Fredrik Björk>And you think it's going to change the world to a better place.
+
+261
+00:18:59.300 --> 00:19:01.720
+<v Fredrik Björk>And like that, that's my number one advice.
+
+262
+00:19:01.720 --> 00:19:07.560
+<v Fredrik Björk>advice. Have fun every day. Go to bed enjoying what you did. Wake up looking forward to the
+
+263
+00:19:07.560 --> 00:19:12.820
+<v Fredrik Björk>next day of doing it. And remember, there's other things outside your startup. So try
+
+264
+00:19:12.820 --> 00:19:18.080
+<v Fredrik Björk>to take a break. And if you have a partner or a family, don't forget them.
+
+265
+00:19:18.580 --> 00:19:22.440
+<v Noah Labhart>Fantastic advice. Well, Fredrik, thank you for being on the show today. And thank you
+
+266
+00:19:22.440 --> 00:19:24.460
+<v Noah Labhart>for telling the creation story of Grafbase.
+
+267
+00:19:24.680 --> 00:19:26.120
+<v Fredrik Björk>Thanks so much. It's been super fun.
+
+268
+00:19:28.400 --> 00:19:31.180
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+269
+00:19:35.960 --> 00:19:39.000
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+270
+00:19:39.120 --> 00:19:43.920
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+271
+00:19:44.500 --> 00:19:46.740
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+272
+00:19:47.020 --> 00:19:48.940
+<v Noah Labhart>Both things help us out tremendously.
+
+273
+00:19:51.860 --> 00:19:53.360
+<v Noah Labhart>And thanks again for listening.

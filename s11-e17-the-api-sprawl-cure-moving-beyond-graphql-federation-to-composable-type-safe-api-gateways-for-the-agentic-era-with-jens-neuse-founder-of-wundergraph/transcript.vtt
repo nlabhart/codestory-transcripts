@@ -1,0 +1,1647 @@
+WEBVTT
+
+NOTE S11 E17: The API Sprawl Cure: Moving Beyond GraphQL Federation to Composable, Type-Safe API Gateways for the Agentic Era with Jens Neuse, Founder of WunderGraph
+
+1
+00:00:00.000 --> 00:00:29.340
+<v Jens Neuse>There was a company, it was called Apollo, and they built a solution. And I was super smart, or I thought I was super smart. So I took their solution and made it much, much better. From a business perspective, it was the worst idea ever. After one and a half years and almost going broke. So Apollo changed their licenses. They had a product and they changed the license from open source to closed source. And we sat together in the Netherlands, it was a retreat.
+
+2
+00:00:30.000 --> 00:00:33.660
+<v Jens Neuse>We figured out one evening, we looked at the numbers and we figured out we're dead.
+
+3
+00:00:33.800 --> 00:00:36.260
+<v Jens Neuse>So at that point, it was clear it's over.
+
+4
+00:00:36.400 --> 00:00:38.120
+<v Jens Neuse>So we killed our first product.
+
+5
+00:00:38.500 --> 00:00:43.940
+<v Jens Neuse>My name is Jens Neuse and I'm the CEO and one of the co-founders of WunderGraph.
+
+6
+00:00:46.700 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+7
+00:00:52.340 --> 00:00:53.700
+<v Clip>Six months moonlighting.
+
+8
+00:00:53.760 --> 00:00:55.240
+<v Clip>There's nothing on the back end.
+
+9
+00:00:55.500 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+10
+00:00:58.280 --> 00:00:59.840
+<v Clip>I don't exactly know what to do.
+
+11
+00:01:00.000 --> 00:01:01.240
+<v Clip>Too many goes to get right.
+
+12
+00:01:01.880 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:01:04.560 --> 00:01:06.120
+<v Clip>A company is its people.
+
+14
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+15
+00:01:07.500 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+16
+00:01:08.920 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+17
+00:01:11.460 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+18
+00:01:12.880 --> 00:01:14.320
+<v Clip>Yes, we've been fighting it as we've grown.
+
+19
+00:01:14.480 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+20
+00:01:15.580 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+21
+00:01:18.300 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+22
+00:01:20.020 --> 00:01:22.060
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+23
+00:01:22.700 --> 00:01:25.820
+<v Noah Labhart>Drive the ups and downs of the startup life.
+
+24
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+25
+00:01:27.580 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+26
+00:01:29.060 --> 00:01:29.680
+<v Clip>All this and more.
+
+27
+00:01:30.000 --> 00:01:37.740
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today, how Jens Neuse has built the open-source
+
+28
+00:01:37.740 --> 00:01:43.800
+<v Noah Labhart>solution for federation that avoids drift under a single trusted contract model.
+
+29
+00:01:49.040 --> 00:01:53.760
+<v Noah Labhart>Jens Neuse grew up in Germany, originally planning to be a carpenter. In his second
+
+30
+00:01:53.760 --> 00:01:59.280
+<v Noah Labhart>year as an apprentice, he was in a motorcycle wreck that thrust him into a process of surgery
+
+31
+00:02:00.420 --> 00:02:05.040
+<v Noah Labhart>Eventually, he decided he wouldn't be doing carpentry and got into sysadmin work.
+
+32
+00:02:05.480 --> 00:02:09.080
+<v Noah Labhart>Once he got bored with this, he moved into startups, learned how to code,
+
+33
+00:02:09.100 --> 00:02:13.760
+<v Noah Labhart>and started digging into programming, APIs, and eventually GraphQL Federation.
+
+34
+00:02:14.520 --> 00:02:16.900
+<v Noah Labhart>Outside of tech, he's married with three young kids.
+
+35
+00:02:17.140 --> 00:02:21.640
+<v Noah Labhart>He loves to sit-ski on the mountain, which is the coolest carbon fiber chair on a ski,
+
+36
+00:02:21.840 --> 00:02:23.820
+<v Noah Labhart>where you steer with your knees and hips.
+
+37
+00:02:25.640 --> 00:02:33.440
+<v Noah Labhart>After chasing building a better Apollo, Jens and his team ran into a point where their prior product and company was doomed to go under.
+
+38
+00:02:33.640 --> 00:02:42.100
+<v Noah Labhart>When they accepted this fact, they started to think about what people actually wanted and started to dig into the federation of GraphQL.
+
+39
+00:02:43.920 --> 00:02:46.780
+<v Noah Labhart>This is the creation story of WunderGraph.
+
+40
+00:02:52.240 --> 00:03:00.200
+<v Jens Neuse>WunderGraph is a tech company. We're 30 people, most of us are engineers, and we build a platform.
+
+41
+00:03:00.200 --> 00:03:07.220
+<v Jens Neuse>We call it Cosmo. It's fully open source, and we offer a managed version of that. And at the very
+
+42
+00:03:07.220 --> 00:03:13.540
+<v Jens Neuse>core, what we do is you can do GraphQL federation with our platform. And for everybody who doesn't
+
+43
+00:03:13.540 --> 00:03:21.180
+<v Jens Neuse>know what that means, is imagine you have a very large API. And this API, it's actually, it's like a
+
+44
+00:03:21.180 --> 00:03:27.400
+<v Jens Neuse>tree, and this tree is split down into subtrees. So it's split down into sub-services. If you put
+
+45
+00:03:27.400 --> 00:03:33.040
+<v Jens Neuse>all these services together, you have the one API, but the implementation is actually split into these
+
+46
+00:03:33.040 --> 00:03:39.860
+<v Jens Neuse>subsystems. And what is cool about this is on the consumer side, it looks like a monolith, and on the
+
+47
+00:03:39.860 --> 00:03:42.480
+<v Jens Neuse>the implementation side, it's actually microservices.
+
+48
+00:03:42.720 --> 00:03:46.080
+<v Jens Neuse>So that means you can have a lot of different apps
+
+49
+00:03:46.080 --> 00:03:49.740
+<v Jens Neuse>and use cases and mobile and LLMs and AI agents,
+
+50
+00:03:49.840 --> 00:03:52.460
+<v Jens Neuse>and you can have all sorts of API consumers.
+
+51
+00:03:52.720 --> 00:03:54.800
+<v Jens Neuse>They all think they talk to a monolith,
+
+52
+00:03:54.980 --> 00:03:57.900
+<v Jens Neuse>but on the other side, there can actually be 100 teams
+
+53
+00:03:57.900 --> 00:04:01.560
+<v Jens Neuse>and each team responsible for one little part of this tree.
+
+54
+00:04:01.780 --> 00:04:05.100
+<v Jens Neuse>It's an approach that allows an organization
+
+55
+00:04:05.100 --> 00:04:08.440
+<v Jens Neuse>that is growing or that has a very large domain
+
+56
+00:04:09.860 --> 00:04:12.080
+<v Jens Neuse>It allows them to scale that across many teams.
+
+57
+00:04:12.280 --> 00:04:14.360
+<v Jens Neuse>And there are super interesting problems to solve.
+
+58
+00:04:14.540 --> 00:04:18.400
+<v Jens Neuse>For example, if you change one field in one of the services,
+
+59
+00:04:18.720 --> 00:04:22.460
+<v Jens Neuse>you need to figure out that it's compatible with all the other services.
+
+60
+00:04:22.680 --> 00:04:28.300
+<v Jens Neuse>And maybe you want to have some governance in place that if you create a user type
+
+61
+00:04:28.300 --> 00:04:31.000
+<v Jens Neuse>and I want to add a field to the user type,
+
+62
+00:04:31.140 --> 00:04:35.920
+<v Jens Neuse>maybe we should have a process where you can propose the change and I can review it
+
+63
+00:04:35.920 --> 00:04:38.880
+<v Jens Neuse>and we can agree on good schema design and these kind of things.
+
+64
+00:04:39.860 --> 00:04:45.980
+<v Jens Neuse>can't have wild west with 100 teams building APIs. You can, but there's a certain point where
+
+65
+00:04:45.980 --> 00:04:52.160
+<v Jens Neuse>people, like the specialists in the market, they will then say this is called API sprawl. When
+
+66
+00:04:52.160 --> 00:04:57.580
+<v Jens Neuse>everybody does whatever they want, then it's not gonna end well. And we solve all these kind of
+
+67
+00:04:57.580 --> 00:05:03.680
+<v Jens Neuse>problems of scaling APIs and making sure that this all fits together. And yeah, it's interesting stuff.
+
+68
+00:05:03.680 --> 00:05:11.740
+<v Jens Neuse>It started like very typical. And by the way, if technical founders are listening, this is where you
+
+69
+00:05:11.740 --> 00:05:17.540
+<v Jens Neuse>should listen very carefully, because you can learn a lot from our mistakes, especially my mistakes.
+
+70
+00:05:17.540 --> 00:05:25.040
+<v Jens Neuse>Okay, so there was a company, it was called Apollo, and they built a solution. And I was super smart,
+
+71
+00:05:25.040 --> 00:05:32.440
+<v Jens Neuse>or I thought I was super smart. So I took their solution and made it much, much better. Like it
+
+72
+00:05:33.680 --> 00:05:38.700
+<v Jens Neuse>They had over 100 million in funding and our company had 3 million in funding.
+
+73
+00:05:38.880 --> 00:05:48.880
+<v Jens Neuse>And I said, okay, let's take what they have, make it better and create like a new standard, a better standard and go to the world and they will take the better solution.
+
+74
+00:05:49.500 --> 00:05:53.080
+<v Jens Neuse>From a business perspective, it was the worst idea ever.
+
+75
+00:05:53.560 --> 00:06:02.560
+<v Jens Neuse>This old idea of I take something and then I have good intentions and I want to build a better thing and I want to solve it in a better way.
+
+76
+00:06:03.680 --> 00:06:09.720
+<v Jens Neuse>miss you. And I would say I have made a very interesting transition, like when I started
+
+77
+00:06:09.720 --> 00:06:17.000
+<v Jens Neuse>WunderGraph, I was very much like super focused on the tech and how to build things and how to make
+
+78
+00:06:17.000 --> 00:06:22.120
+<v Jens Neuse>them fast and efficient and everything. And over the years, I have completely transitioned into
+
+79
+00:06:22.120 --> 00:06:27.200
+<v Jens Neuse>how can we build something that people will buy, because there's a huge gap between amazing
+
+80
+00:06:27.200 --> 00:06:30.300
+<v Jens Neuse>amazing solution and solution that people want to buy.
+
+81
+00:06:30.460 --> 00:06:34.680
+<v Jens Neuse>So after one and a half years and almost going broke,
+
+82
+00:06:34.960 --> 00:06:38.640
+<v Jens Neuse>like we were almost dead and we had to let go some people.
+
+83
+00:06:38.740 --> 00:06:42.140
+<v Jens Neuse>And one of the founders actually was ready to leave the ship
+
+84
+00:06:42.140 --> 00:06:44.220
+<v Jens Neuse>because it was sinking too fast.
+
+85
+00:06:44.420 --> 00:06:47.860
+<v Jens Neuse>He wanted to stay outside on the sideline and help us reduce the burn.
+
+86
+00:06:48.140 --> 00:06:51.560
+<v Jens Neuse>But what we figured out after, I think, one and a half, two years,
+
+87
+00:06:51.720 --> 00:06:55.160
+<v Jens Neuse>and that was our pivot is, so Apollo changed their licenses.
+
+88
+00:06:55.160 --> 00:06:59.460
+<v Jens Neuse>They had a product and they changed the license from open source to closed source.
+
+89
+00:06:59.680 --> 00:07:02.840
+<v Jens Neuse>And we sat together in the Netherlands. It was a retreat.
+
+90
+00:07:03.060 --> 00:07:07.300
+<v Jens Neuse>And we figured out one evening, we looked at the numbers and we figured out we're dead.
+
+91
+00:07:07.880 --> 00:07:10.460
+<v Jens Neuse>So at that point it was clear, it's over.
+
+92
+00:07:10.840 --> 00:07:14.600
+<v Jens Neuse>So we killed our first product and we built Cosmo.
+
+93
+00:07:14.760 --> 00:07:16.040
+<v Jens Neuse>It's so stupid simple.
+
+94
+00:07:16.300 --> 00:07:19.920
+<v Jens Neuse>We sat in Netherlands, there was like an old sheep house.
+
+95
+00:07:20.040 --> 00:07:22.560
+<v Jens Neuse>We sat all together and we were like, okay, what are we going to do?
+
+96
+00:07:23.120 --> 00:07:29.240
+<v Jens Neuse>Stefan, one of my co-founders, he opened his black notebook and he looked at it and he said,
+
+97
+00:07:29.360 --> 00:07:32.080
+<v Jens Neuse>I have some notes from a couple of meetings.
+
+98
+00:07:32.260 --> 00:07:39.660
+<v Jens Neuse>And like our last straw is that a couple of people said, could you do Apollo Federation, but open source?
+
+99
+00:07:39.960 --> 00:07:48.320
+<v Jens Neuse>And so we sat there in this old sheep house and we were like, OK, if that's the thing what people want, let's build Cosmo.
+
+100
+00:07:48.320 --> 00:07:52.540
+<v Jens Neuse>And then two weeks after this retreat, he was like, it is typical fashion.
+
+101
+00:07:52.700 --> 00:07:54.800
+<v Jens Neuse>Hey, guys, I have built something.
+
+102
+00:07:55.440 --> 00:07:56.580
+<v Jens Neuse>It's called Cosmo.
+
+103
+00:07:56.680 --> 00:07:58.880
+<v Jens Neuse>And we were, holy, it cannot be.
+
+104
+00:07:59.000 --> 00:07:59.640
+<v Jens Neuse>What did you do?
+
+105
+00:07:59.740 --> 00:08:04.300
+<v Jens Neuse>And he built the first MVP of Cosmo and he just pulled something together.
+
+106
+00:08:06.480 --> 00:08:08.520
+<v Noah Labhart>What I want to dive into is that MVP.
+
+107
+00:08:08.780 --> 00:08:13.560
+<v Noah Labhart>And so maybe it was when your co-founder brought the solution and then you took it from there.
+
+108
+00:08:13.640 --> 00:08:16.200
+<v Noah Labhart>Or maybe it's a little bit before or after in all of that.
+
+109
+00:08:16.240 --> 00:08:17.660
+<v Noah Labhart>I'm curious about that MVP.
+
+110
+00:08:18.320 --> 00:08:22.980
+<v Noah Labhart>about it what sort of tools you were using to bring it to life and how long it took you to
+
+111
+00:08:22.980 --> 00:08:26.960
+<v Noah Labhart>basically take it to the users where they could use cosmo
+
+112
+00:08:26.960 --> 00:08:30.840
+<v Jens Neuse>So this was in the pre-AI era.
+
+113
+00:08:31.920 --> 00:08:36.420
+<v Jens Neuse>So I don't know, when, like, two years ago or something. So it's, it was a different time.
+
+114
+00:08:36.420 --> 00:08:41.440
+<v Jens Neuse>You didn't have Cursor. So, you know, the old guys like us, we wrote code by hand.
+
+115
+00:08:41.440 --> 00:08:49.140
+<v Jens Neuse>What we did is actually, on one day in the on-site, we had the realization, okay, we're dead. And then
+
+116
+00:08:49.140 --> 00:08:55.620
+<v Jens Neuse>next day what we did is we sat together, like the whole team, and we talked a bit to customers
+
+117
+00:08:55.620 --> 00:09:00.040
+<v Jens Neuse>and looked at the notes and figure out and looked a bit at Apollo, and we were like, okay, what's the
+
+118
+00:09:00.040 --> 00:09:07.440
+<v Jens Neuse>minimum thing we need? What would make people buy? And we built that. That first version, it was like
+
+119
+00:09:07.440 --> 00:09:10.220
+<v Jens Neuse>like really bare bones, like compared to today.
+
+120
+00:09:10.380 --> 00:09:13.400
+<v Jens Neuse>I would say it was like 5% of the scope,
+
+121
+00:09:13.500 --> 00:09:16.060
+<v Jens Neuse>but we knew we need an API gateway.
+
+122
+00:09:16.280 --> 00:09:19.540
+<v Jens Neuse>It needs to be compatible with the Apollo Federation spec.
+
+123
+00:09:19.740 --> 00:09:24.080
+<v Jens Neuse>We knew we need a backend to somehow manage the state and everything.
+
+124
+00:09:24.260 --> 00:09:26.640
+<v Jens Neuse>So Dustin built like a Node.js backend.
+
+125
+00:09:26.860 --> 00:09:29.140
+<v Jens Neuse>And we knew that we need a studio.
+
+126
+00:09:29.300 --> 00:09:32.380
+<v Jens Neuse>So we built a Next.js studio with Tailwind,
+
+127
+00:09:32.460 --> 00:09:34.520
+<v Jens Neuse>like not waste time on UI or anything.
+
+128
+00:09:34.520 --> 00:09:40.660
+<v Jens Neuse>We also knew that we want to build everything on open source and keep things super simple.
+
+129
+00:09:40.780 --> 00:09:42.500
+<v Jens Neuse>We didn't want to roll our own auth.
+
+130
+00:09:42.660 --> 00:09:44.300
+<v Jens Neuse>So we used Keycloak.
+
+131
+00:09:44.420 --> 00:09:46.220
+<v Jens Neuse>It's ugly, but it is complete.
+
+132
+00:09:46.400 --> 00:09:47.380
+<v Jens Neuse>It has a lot of features.
+
+133
+00:09:47.560 --> 00:09:48.340
+<v Jens Neuse>It's well maintained.
+
+134
+00:09:48.580 --> 00:09:50.620
+<v Jens Neuse>And today we have a Keycloak provider.
+
+135
+00:09:50.900 --> 00:09:52.760
+<v Jens Neuse>They are ISO certified and everything.
+
+136
+00:09:53.020 --> 00:09:57.080
+<v Jens Neuse>We're now SOC 2 and we're working on ISO 27001.
+
+137
+00:09:57.200 --> 00:09:59.420
+<v Jens Neuse>When you have enterprise customers, you have new problems.
+
+138
+00:09:59.420 --> 00:10:04.460
+<v Jens Neuse>But coming back to the MVP, it was really like we had a router in Go.
+
+139
+00:10:04.900 --> 00:10:10.780
+<v Jens Neuse>We had a CLI in TypeScript, a backend in TypeScript, and frontend, Next.js, and bare bones.
+
+140
+00:10:11.000 --> 00:10:18.880
+<v Jens Neuse>And I think one of our big advantages, and this is also something I would recommend someone if they also want to build a successful business.
+
+141
+00:10:19.080 --> 00:10:23.600
+<v Jens Neuse>We try to use the most boring stack we can actually use.
+
+142
+00:10:24.120 --> 00:10:27.580
+<v Jens Neuse>That means the most boring database in the world, Postgres.
+
+143
+00:10:29.420 --> 00:10:34.020
+<v Jens Neuse>this thing on the most boring Kubernetes cluster on GCP.
+
+144
+00:10:34.200 --> 00:10:36.180
+<v Jens Neuse>We use GCP Autopilot.
+
+145
+00:10:36.360 --> 00:10:40.240
+<v Jens Neuse>We don't use any fancy features or any fancy tech.
+
+146
+00:10:40.420 --> 00:10:45.680
+<v Jens Neuse>If you want to be fast and innovative, use tech that is proven and boring.
+
+147
+00:10:45.840 --> 00:10:50.400
+<v Jens Neuse>Because the last thing you really want to do is build on top of something that keeps
+
+148
+00:10:50.400 --> 00:10:50.900
+<v Jens Neuse>breaking.
+
+149
+00:10:51.260 --> 00:10:52.420
+<v Jens Neuse>You know what's interesting?
+
+150
+00:10:52.600 --> 00:10:54.180
+<v Jens Neuse>We have this GCP cluster.
+
+151
+00:10:54.180 --> 00:11:02.320
+<v Jens Neuse>And I think now for three years in a row, our backend, it's 100% up, although it's just a Node.js container on GCP.
+
+152
+00:11:02.500 --> 00:11:07.600
+<v Jens Neuse>But this is, it's, I don't know, it's such a great architecture to deploy to.
+
+153
+00:11:09.840 --> 00:11:14.040
+<v Noah Labhart>Now, how did you progress and mature the product from that point?
+
+154
+00:11:14.140 --> 00:11:16.500
+<v Noah Labhart>I'm curious about how you built your roadmap.
+
+155
+00:11:16.680 --> 00:11:22.280
+<v Noah Labhart>And, you know, you mentioned enterprise customers, there are probably enterprise customers now, maybe not in the early days.
+
+156
+00:11:24.460 --> 00:11:29.300
+<v Noah Labhart>decided that, okay, this is the next most important thing to build or to address with WunderGraph?
+
+157
+00:11:30.200 --> 00:11:36.660
+<v Jens Neuse>I think there's two parts. And I think this was one of the most stressful periods of my life
+
+158
+00:11:36.660 --> 00:11:42.560
+<v Jens Neuse>because so I'm ultimately I'm responsible for the product. So I have a vision of things I would like
+
+159
+00:11:42.560 --> 00:11:48.740
+<v Jens Neuse>to do. And then one thing I have to admit, and I hope not so many customers are listening to us
+
+160
+00:11:48.740 --> 00:11:55.540
+<v Jens Neuse>us here, but one thing we did in the beginning is we had enterprises in the pipeline, and what we
+
+161
+00:11:55.540 --> 00:12:02.780
+<v Jens Neuse>tried to sell them, it never really worked and it never really existed. Like, you cannot imagine how
+
+162
+00:12:02.780 --> 00:12:09.960
+<v Jens Neuse>stressful this was, but we tried to make deals, but we knew it's not working somehow. I don't know, it
+
+163
+00:12:09.960 --> 00:12:16.480
+<v Jens Neuse>was, as a founder, you need to find customers who need something so desperately that they hop on a
+
+164
+00:12:16.480 --> 00:12:22.800
+<v Jens Neuse>a call with you, the founder, you can build trust. They are not buying your solution because your
+
+165
+00:12:22.800 --> 00:12:29.860
+<v Jens Neuse>solution is garbage. They buy you. You are the product. So I was on calls constantly and we
+
+166
+00:12:29.860 --> 00:12:35.620
+<v Jens Neuse>educated people. We were consulting, we were helping, we were doing everything we can. Plus
+
+167
+00:12:35.620 --> 00:12:44.060
+<v Jens Neuse>my CTO, Dustin, we call him the machine. Somehow we figured things out. There was always this
+
+168
+00:12:44.060 --> 00:12:48.420
+<v Jens Neuse>is balancing between the vision where I think if we go there,
+
+169
+00:12:48.640 --> 00:12:52.180
+<v Jens Neuse>we will be able to have a larger total addressable market.
+
+170
+00:12:52.300 --> 00:12:59.220
+<v Jens Neuse>As a founder, as a CEO, like one of your major goals is not just add fancy features or something,
+
+171
+00:12:59.280 --> 00:13:03.540
+<v Jens Neuse>but you want to add stuff that allows you to have a bigger funnel,
+
+172
+00:13:03.700 --> 00:13:05.600
+<v Jens Neuse>talk to more people, sell to more people.
+
+173
+00:13:05.700 --> 00:13:08.180
+<v Jens Neuse>So that's like your long-term North Star.
+
+174
+00:13:08.280 --> 00:13:13.140
+<v Jens Neuse>But then you have this constant problem of we need this and that to close that deal.
+
+175
+00:13:14.060 --> 00:13:22.000
+<v Jens Neuse>So for a very long time, I had to give up my vision and just do what secured us deals because we were broke.
+
+176
+00:13:22.220 --> 00:13:24.600
+<v Jens Neuse>And so we went from deal to deal.
+
+177
+00:13:24.740 --> 00:13:31.060
+<v Jens Neuse>And then our ARR was, burn was still high, but our investors gave us another 500k.
+
+178
+00:13:31.400 --> 00:13:37.060
+<v Jens Neuse>And then we landed some bigger deals and then we quickly became profitable.
+
+179
+00:13:37.060 --> 00:13:46.720
+<v Jens Neuse>And that was a year where we, in that year, within 12 months, we went from we're dead in two months to we're profitable.
+
+180
+00:13:46.900 --> 00:13:48.280
+<v Jens Neuse>That was a huge year.
+
+181
+00:13:48.440 --> 00:13:51.100
+<v Jens Neuse>And yeah, it was actually last year.
+
+182
+00:13:53.820 --> 00:13:56.160
+<v Noah Labhart>So there's people involved, right?
+
+183
+00:13:56.220 --> 00:13:58.280
+<v Noah Labhart>You mentioned you're a 30-person team here.
+
+184
+00:13:58.360 --> 00:13:59.720
+<v Noah Labhart>How do you build that team?
+
+185
+00:13:59.780 --> 00:14:00.780
+<v Noah Labhart>How did you build that team?
+
+186
+00:14:00.860 --> 00:14:05.200
+<v Noah Labhart>And I'm curious what you look for in those people to indicate that they're the winning horses to join you.
+
+187
+00:14:07.060 --> 00:14:13.860
+<v Jens Neuse>When you try to hire, you will realize that nobody wants to join you because you're nobody. Like, I can
+
+188
+00:14:13.860 --> 00:14:20.800
+<v Jens Neuse>work for so many established companies, why would I join you guys? And so you hire what you can and
+
+189
+00:14:20.800 --> 00:14:28.300
+<v Jens Neuse>and I think this is one of my first points in, in terms of helping other founders to start with
+
+190
+00:14:28.300 --> 00:14:33.900
+<v Jens Neuse>something. It's not just I build a company and then I raise money and then success, but maybe before
+
+191
+00:14:33.900 --> 00:14:36.020
+<v Jens Neuse>Before you build a company, build a network.
+
+192
+00:14:36.220 --> 00:14:38.720
+<v Jens Neuse>Like you need that network already.
+
+193
+00:14:38.900 --> 00:14:40.460
+<v Jens Neuse>You need the people.
+
+194
+00:14:40.600 --> 00:14:45.500
+<v Jens Neuse>And maybe if you don't have the network and you don't have the people, maybe it's not yet the right time.
+
+195
+00:14:45.660 --> 00:14:49.680
+<v Jens Neuse>Maybe you should work in a startup and build the network.
+
+196
+00:14:50.560 --> 00:14:53.740
+<v Jens Neuse>Okay, we didn't have that because we made every mistake in the book.
+
+197
+00:14:53.940 --> 00:15:00.240
+<v Jens Neuse>One funny thing we did in the beginning is we used a tool and one month later the company shut down.
+
+198
+00:15:00.240 --> 00:15:05.020
+<v Jens Neuse>And so we like the people and they ask us, hey, we have two guys here from India.
+
+199
+00:15:05.180 --> 00:15:06.820
+<v Jens Neuse>Maybe they can work for you.
+
+200
+00:15:07.460 --> 00:15:10.720
+<v Jens Neuse>We hired two guys, two young guys from India.
+
+201
+00:15:10.840 --> 00:15:13.820
+<v Jens Neuse>I think in the end, this was like they were juniors.
+
+202
+00:15:14.000 --> 00:15:20.880
+<v Jens Neuse>It was one of our luckiest hires, I would say, because and this is something you need to think about.
+
+203
+00:15:20.940 --> 00:15:24.880
+<v Jens Neuse>If you have a machine like Dustin, so you need Dustin, the CTO machine.
+
+204
+00:15:25.020 --> 00:15:28.460
+<v Jens Neuse>If you don't have the best CTO in the world, you will fail.
+
+205
+00:15:30.300 --> 00:15:33.940
+<v Jens Neuse>someone who is capable of building back-end, front-end, everything.
+
+206
+00:15:34.220 --> 00:15:35.600
+<v Jens Neuse>Like, you need that.
+
+207
+00:15:35.700 --> 00:15:41.060
+<v Jens Neuse>But if you give him two guys from India who are junior but extremely ambitious,
+
+208
+00:15:41.400 --> 00:15:43.320
+<v Jens Neuse>they will work day and night,
+
+209
+00:15:43.440 --> 00:15:48.280
+<v Jens Neuse>and they will help your Dustin to get the front-end done and some other things.
+
+210
+00:15:48.460 --> 00:15:51.820
+<v Jens Neuse>And the coolest thing is they are now with us like three years,
+
+211
+00:15:51.980 --> 00:15:55.240
+<v Jens Neuse>and they know, like, they might not be seniors yet,
+
+212
+00:15:55.380 --> 00:15:58.300
+<v Jens Neuse>but they know our domain better than everybody else.
+
+213
+00:16:00.400 --> 00:16:06.540
+<v Jens Neuse>recommendation: have someone extremely senior and maybe give them a junior, and this junior can grow
+
+214
+00:16:06.540 --> 00:16:11.760
+<v Jens Neuse>and everything. Now, the other question is, who do we hire today and what are we looking for?
+
+215
+00:16:12.100 --> 00:16:18.680
+<v Jens Neuse>And I would say like you need a skill set. It needs to be good enough so that you can do the
+
+216
+00:16:18.680 --> 00:16:26.480
+<v Jens Neuse>job. But I think most importantly, what we look for is attitude. It's do you care? Is it important
+
+217
+00:16:26.480 --> 00:16:33.380
+<v Jens Neuse>to you to build something great, and to not just finish the ticket, but do you really want to build
+
+218
+00:16:33.380 --> 00:16:41.160
+<v Jens Neuse>something great. And this can be like marketing, sales, whatever. And, and I think attitude is
+
+219
+00:16:41.160 --> 00:16:46.260
+<v Jens Neuse>everything, because if you need a programmer and we need a senior, you cannot be a junior. But if
+
+220
+00:16:46.260 --> 00:16:51.820
+<v Jens Neuse>you're a senior and you don't care, it, it just won't work. And on the other side, if you're lacking
+
+221
+00:16:51.820 --> 00:16:58.340
+<v Jens Neuse>some skills but you really care, that gap, it will be filled quickly. If I send and
+
+222
+00:16:58.340 --> 00:17:03.580
+<v Jens Neuse>you don't know Go, but you really care, you will pick it up so fast. And I think
+
+223
+00:17:03.580 --> 00:17:08.380
+<v Jens Neuse>in, especially in a small startup, we want to find people who are into this problem
+
+224
+00:17:08.380 --> 00:17:13.920
+<v Jens Neuse>who care, who want to grow together. And so we don't have like superstars in the
+
+225
+00:17:13.920 --> 00:17:20.160
+<v Jens Neuse>team. We have, Dustin's really good but very humble. We, I would say, and this is
+
+226
+00:17:21.820 --> 00:17:32.000
+<v Jens Neuse>We're working hard. Everybody helps each other. And we have that common nonstop. We want to hit it big. And it's nice, humble people.
+
+227
+00:17:35.340 --> 00:17:46.660
+<v Noah Labhart>Okay, let's flip to scalability. And this will be interesting because it's critical to what you're building, not only to support the enterprise, but to federate GraphQL in general.
+
+228
+00:17:46.660 --> 00:17:52.000
+<v Noah Labhart>So, you know, I'm curious where scalability has sort of reared its ugly head, right?
+
+229
+00:17:52.100 --> 00:17:55.100
+<v Noah Labhart>Have there been interesting areas where you've had to fight it as you've grown?
+
+230
+00:17:56.600 --> 00:18:10.320
+<v Jens Neuse>Scalability on the software side, this is, I would say, it's very interesting because in the first year where we built our software, we ran into some customers who had ridiculous queries.
+
+231
+00:18:10.320 --> 00:18:17.980
+<v Jens Neuse>You have to think about like the way GraphQL Federation works is you have this monolithic schema.
+
+232
+00:18:18.240 --> 00:18:23.160
+<v Jens Neuse>You send a query to the, you have the router, that's the API gateway.
+
+233
+00:18:23.380 --> 00:18:28.680
+<v Jens Neuse>And the router, it takes this GraphQL query and then looks into the query.
+
+234
+00:18:28.900 --> 00:18:35.140
+<v Jens Neuse>And like I said earlier, GraphQL Federation is like you take a tree and you cut it into subtrees.
+
+235
+00:18:35.300 --> 00:18:38.880
+<v Jens Neuse>And each service is responsible for a subtree.
+
+236
+00:18:40.320 --> 00:18:44.100
+<v Jens Neuse>If I write a query that covers some part of this tree,
+
+237
+00:18:44.510 --> 00:18:50.380
+<v Jens Neuse>it needs to be resolved by always a different combination of subtrees.
+
+238
+00:18:50.560 --> 00:18:54.880
+<v Jens Neuse>And this gets especially complicated to figure out what to do
+
+239
+00:18:54.880 --> 00:18:59.240
+<v Jens Neuse>is when you have abstract types like unions or interfaces.
+
+240
+00:18:59.500 --> 00:19:06.120
+<v Jens Neuse>And let's say one service implements some structs that are members of a union.
+
+241
+00:19:06.320 --> 00:19:09.080
+<v Jens Neuse>Another subgraph implements some other structs.
+
+242
+00:19:10.320 --> 00:19:15.600
+<v Jens Neuse>We call this query planning, very complex engineering behind that to figure out
+
+243
+00:19:15.600 --> 00:19:19.780
+<v Jens Neuse>how do we get the data and how do we get it in the right order, and in the end
+
+244
+00:19:19.780 --> 00:19:25.280
+<v Jens Neuse>when this process is done, we have a query plan, which, again, it's a tree of
+
+245
+00:19:25.280 --> 00:19:29.560
+<v Jens Neuse>fetches. By the way, if you learn programming and you think data
+
+246
+00:19:29.560 --> 00:19:35.080
+<v Jens Neuse>structures are stupid, we do a lot of things with data structures and trees
+
+247
+00:19:35.080 --> 00:19:40.260
+<v Jens Neuse>and everything, and you do tree walking every day, and I personally love tree
+
+248
+00:19:40.320 --> 00:19:45.900
+<v Jens Neuse>walking from a mental model like walking through ASTs. I love it and transforming ASTs. It's fun.
+
+249
+00:19:46.080 --> 00:19:52.980
+<v Jens Neuse>But okay, coming back to this scalability issue, we had customers who would send more than 10
+
+250
+00:19:52.980 --> 00:19:59.160
+<v Jens Neuse>kilobytes of query to the router. And then the router for I don't know, a minute or something
+
+251
+00:19:59.160 --> 00:20:06.220
+<v Jens Neuse>tries to build up query. And so we had issues where we needed to figure out, okay, how can we
+
+252
+00:20:06.220 --> 00:20:13.780
+<v Jens Neuse>built caches so that the query planner can look up things faster so that query planning time is
+
+253
+00:20:13.780 --> 00:20:19.800
+<v Jens Neuse>faster. Now, like our p95 query planning time is like 10 seconds, which is still not good enough.
+
+254
+00:20:19.800 --> 00:20:26.620
+<v Jens Neuse>We also build a query planning cache, because when you start a new router or when you send a router
+
+255
+00:20:26.620 --> 00:20:33.460
+<v Jens Neuse>a new config, that cache is empty. We also build a heuristics based system that looks into your
+
+256
+00:20:33.460 --> 00:20:40.760
+<v Jens Neuse>analytics and builds a list of queries we should warm up a router before it gets a new config. That
+
+257
+00:20:40.760 --> 00:20:46.640
+<v Jens Neuse>means you never really plan a query, because we have planned it ahead of time. That's quite smart.
+
+258
+00:20:46.640 --> 00:20:53.080
+<v Jens Neuse>And it helps us to make the router extremely efficient. One other problem we had is with this
+
+259
+00:20:53.080 --> 00:21:00.780
+<v Jens Neuse>customer with those weird queries. We realized that due to the structure of the queries, we would build
+
+260
+00:21:00.780 --> 00:21:05.920
+<v Jens Neuse>like this query of 10 kilobytes, we would actually build a sub query that we sent
+
+261
+00:21:05.920 --> 00:21:10.740
+<v Jens Neuse>to the service of, I don't know, like a couple of megabytes. It was too big, and
+
+262
+00:21:10.740 --> 00:21:15.200
+<v Jens Neuse>we looked into it and we figured out that the problem is the query we
+
+263
+00:21:15.200 --> 00:21:21.480
+<v Jens Neuse>generate for the subservice, it actually has some duplicate fields because of the
+
+264
+00:21:21.480 --> 00:21:27.380
+<v Jens Neuse>way we plan queries. As a solution, we build to that reduces the query size by
+
+265
+00:21:27.380 --> 00:21:33.860
+<v Jens Neuse>99%. It's actually pretty, pretty cool. So I built an algorithm that would traverse this query.
+
+266
+00:21:34.740 --> 00:21:42.420
+<v Jens Neuse>And every time it walks through a selection set, it would print the selection set into a printer,
+
+267
+00:21:42.560 --> 00:21:48.420
+<v Jens Neuse>which in this case was a hash function. And so we would build a hash map where we keep track of
+
+268
+00:21:48.420 --> 00:21:54.160
+<v Jens Neuse>all the selection set in this gigantic query, and then try to figure out do we have duplicate
+
+269
+00:21:54.160 --> 00:22:09.660
+<v Jens Neuse>And then if you find these duplicates, you go from the leaf nodes all the way up step by step to the parent nodes and you replace all duplicate selection sets with a single fragment.
+
+270
+00:22:09.880 --> 00:22:17.360
+<v Jens Neuse>A fragment is like a reference to a selection set, which you can then with an inline fragment, you can inline it back.
+
+271
+00:22:17.480 --> 00:22:21.640
+<v Jens Neuse>It's like creating a function and then instead of calling code, calling the function.
+
+272
+00:22:21.640 --> 00:22:24.540
+<v Jens Neuse>And so, yeah, I built this algorithm.
+
+273
+00:22:24.560 --> 00:22:25.600
+<v Jens Neuse>Quite simple.
+
+274
+00:22:25.660 --> 00:22:27.180
+<v Jens Neuse>A little bit stupid, actually.
+
+275
+00:22:27.400 --> 00:22:32.000
+<v Jens Neuse>But it's able to reduce the query size by 99%.
+
+276
+00:22:32.000 --> 00:22:35.140
+<v Jens Neuse>And yeah, we have it on for quite some time.
+
+277
+00:22:35.200 --> 00:22:38.980
+<v Jens Neuse>And this allows us to send the smallest possible query.
+
+278
+00:22:39.180 --> 00:22:42.360
+<v Jens Neuse>So that was some challenges on the technical side.
+
+279
+00:22:44.280 --> 00:22:47.800
+<v Noah Labhart>Okay, so as you step out on the balcony,
+
+280
+00:22:47.940 --> 00:22:50.760
+<v Noah Labhart>you look across all that you've built at WunderGraph.
+
+281
+00:22:51.640 --> 00:22:52.140
+<v Noah Labhart>proud of?
+
+282
+00:22:52.800 --> 00:22:58.360
+<v Jens Neuse>I think I'm most proud of the team. The team we have built, I like to meet them.
+
+283
+00:22:58.520 --> 00:23:06.080
+<v Jens Neuse>Sometimes we do retreats. Maybe investors don't like to hear it so much, but for me,
+
+284
+00:23:06.120 --> 00:23:13.140
+<v Jens Neuse>it was always important to do something important with my time in life. And just becoming rich,
+
+285
+00:23:13.380 --> 00:23:19.940
+<v Jens Neuse>it's not enough. It cannot be the goal. Once you have the money you need to keep the family
+
+286
+00:23:21.640 --> 00:23:25.040
+<v Jens Neuse>For the vacation, money is not the big topic anymore.
+
+287
+00:23:25.200 --> 00:23:26.540
+<v Jens Neuse>You want to go beyond that.
+
+288
+00:23:26.740 --> 00:23:30.020
+<v Jens Neuse>And my answer would have been different a couple of years ago.
+
+289
+00:23:30.140 --> 00:23:36.160
+<v Jens Neuse>But when I look at our company, we have built a group of really smart, amazing people.
+
+290
+00:23:36.280 --> 00:23:37.600
+<v Jens Neuse>I really like them.
+
+291
+00:23:37.740 --> 00:23:40.160
+<v Jens Neuse>And I think we're doing something meaningful together.
+
+292
+00:23:40.420 --> 00:23:49.740
+<v Jens Neuse>And it makes me proud that we have built an environment where these people can spend so much time of their life together.
+
+293
+00:23:51.640 --> 00:23:52.140
+<v Jens Neuse>Super meaningful.
+
+294
+00:23:54.120 --> 00:23:56.000
+<v Noah Labhart>Okay, let's flip the script a little bit.
+
+295
+00:23:56.040 --> 00:24:00.100
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+296
+00:24:00.860 --> 00:24:06.960
+<v Jens Neuse>I hinted it, but our first product was completely wrong and we wasted so much energy.
+
+297
+00:24:07.160 --> 00:24:08.780
+<v Jens Neuse>We had an SDK.
+
+298
+00:24:09.040 --> 00:24:13.840
+<v Jens Neuse>This SDK, it would allow you to combine multiple APIs together.
+
+299
+00:24:14.120 --> 00:24:19.000
+<v Jens Neuse>So it was designed for a single user or a small team to be efficient.
+
+300
+00:24:19.000 --> 00:24:24.200
+<v Jens Neuse>And we didn't really have a lot of success with this solution.
+
+301
+00:24:24.540 --> 00:24:26.420
+<v Jens Neuse>I thought it's a great solution.
+
+302
+00:24:26.620 --> 00:24:29.640
+<v Jens Neuse>Some people in open source, they really liked it.
+
+303
+00:24:29.740 --> 00:24:36.860
+<v Jens Neuse>Quickly, we had 2K stars and people were really engaged and we got a lot of feedback on GitHub and everything.
+
+304
+00:24:37.180 --> 00:24:42.100
+<v Jens Neuse>So from an outside perspective, you would say this looks quite successful.
+
+305
+00:24:42.320 --> 00:24:45.420
+<v Jens Neuse>Like it's a good thing and people ask questions and we kept improving.
+
+306
+00:24:45.420 --> 00:25:01.480
+<v Jens Neuse>Proving what I didn't realize is when you build a solution and you listen to people and you listen to feedback from people who are not paying you, you can keep building forever, but you're paving the road for the wrong people.
+
+307
+00:25:01.980 --> 00:25:11.200
+<v Jens Neuse>I think one of the biggest mistakes here was that I was in love with my solution and I wanted to build what I think is right.
+
+308
+00:25:11.200 --> 00:25:15.960
+<v Jens Neuse>and what we didn't figure out early on
+
+309
+00:25:15.960 --> 00:25:18.180
+<v Jens Neuse>and we should have focused much more on that
+
+310
+00:25:18.180 --> 00:25:20.740
+<v Jens Neuse>is to think about monetization and everything.
+
+311
+00:25:21.520 --> 00:25:25.280
+<v Jens Neuse>So we said, okay, nobody is buying our support.
+
+312
+00:25:25.500 --> 00:25:29.460
+<v Jens Neuse>We now build a cloud, the Vercel for backend
+
+313
+00:25:29.460 --> 00:25:32.260
+<v Jens Neuse>so that people can host our thing.
+
+314
+00:25:32.400 --> 00:25:35.980
+<v Jens Neuse>And we build CI pipelines like GitHub Actions
+
+315
+00:25:35.980 --> 00:25:39.460
+<v Jens Neuse>and deployments on fly.io,
+
+316
+00:25:41.200 --> 00:25:42.320
+<v Jens Neuse>because it keeps breaking.
+
+317
+00:25:42.700 --> 00:25:45.620
+<v Jens Neuse>And we built this whole cloud service
+
+318
+00:25:45.620 --> 00:25:47.940
+<v Jens Neuse>where you could deploy our SDK
+
+319
+00:25:47.940 --> 00:25:50.400
+<v Jens Neuse>because we thought if we do that,
+
+320
+00:25:50.560 --> 00:25:52.840
+<v Jens Neuse>if we only automate that problem,
+
+321
+00:25:53.100 --> 00:25:54.320
+<v Jens Neuse>then everybody would come.
+
+322
+00:25:54.500 --> 00:25:56.200
+<v Jens Neuse>And then we had two customers
+
+323
+00:25:56.200 --> 00:25:57.940
+<v Jens Neuse>and they were horrible customers
+
+324
+00:25:57.940 --> 00:25:59.860
+<v Jens Neuse>because they were super demanding
+
+325
+00:25:59.860 --> 00:26:01.900
+<v Jens Neuse>and they paid like 50 bucks per month
+
+326
+00:26:01.900 --> 00:26:03.860
+<v Jens Neuse>and it just didn't work out.
+
+327
+00:26:04.040 --> 00:26:06.620
+<v Jens Neuse>I think the biggest learning here is
+
+328
+00:26:06.620 --> 00:26:10.700
+<v Jens Neuse>and like technical founders love to hide in code.
+
+329
+00:26:11.200 --> 00:26:18.480
+<v Jens Neuse>And they love to be like, I'm just going to build and I just add more features and eventually we will be successful.
+
+330
+00:26:19.440 --> 00:26:22.140
+<v Jens Neuse>And I did that for a very long time.
+
+331
+00:26:22.460 --> 00:26:23.420
+<v Jens Neuse>Biggest mistake.
+
+332
+00:26:23.600 --> 00:26:36.040
+<v Jens Neuse>And I can tell you, if you want to be a good founder, your number one job is to talk to people, talk to customers and get them to commit to buying something or to commit to anything.
+
+333
+00:26:36.680 --> 00:26:40.820
+<v Jens Neuse>Like these days, it's like when you stop being needy, it's so simple.
+
+334
+00:26:41.200 --> 00:26:47.300
+<v Jens Neuse>You don't want to admit it because you're just so hopeful, but it's wrong.
+
+335
+00:26:47.480 --> 00:26:51.180
+<v Jens Neuse>Today, we do very simple mechanisms because we're not needy.
+
+336
+00:26:51.240 --> 00:26:53.620
+<v Jens Neuse>We're like, okay, we engage with the customer.
+
+337
+00:26:53.740 --> 00:26:56.260
+<v Jens Neuse>Then we say, can we please do an NDA?
+
+338
+00:26:56.840 --> 00:27:00.720
+<v Jens Neuse>Because without NDA, we cannot talk with you about financials.
+
+339
+00:27:00.900 --> 00:27:03.460
+<v Jens Neuse>And then they would say, you know what?
+
+340
+00:27:03.680 --> 00:27:05.280
+<v Jens Neuse>NDA, that's too much work.
+
+341
+00:27:05.280 --> 00:27:13.200
+<v Jens Neuse>So at that point, if they don't want to go the way to create an NDA, it's not a problem for them.
+
+342
+00:27:13.240 --> 00:27:13.960
+<v Jens Neuse>It's not important.
+
+343
+00:27:14.260 --> 00:27:14.840
+<v Jens Neuse>Move on.
+
+344
+00:27:15.000 --> 00:27:20.960
+<v Jens Neuse>Find someone who wants to sign an NDA because get the other side to do something for you.
+
+345
+00:27:21.120 --> 00:27:26.720
+<v Jens Neuse>Nobody will ever give you money if they are not even willing to get someone else to sign an NDA or something.
+
+346
+00:27:26.860 --> 00:27:28.840
+<v Jens Neuse>Get people to commit to something.
+
+347
+00:27:29.020 --> 00:27:30.540
+<v Jens Neuse>And also another big thing.
+
+348
+00:27:30.640 --> 00:27:32.880
+<v Jens Neuse>You want to operate in a big market.
+
+349
+00:27:32.880 --> 00:27:46.320
+<v Jens Neuse>If you operate in a very small market and it's hard to get some leads, it's much easier to be in an extremely large market than just because you can talk to more people.
+
+350
+00:27:46.420 --> 00:27:51.720
+<v Jens Neuse>Yeah, like big conclusion, stop building, like really never stop building.
+
+351
+00:27:52.080 --> 00:28:00.780
+<v Jens Neuse>Talk to people, get them to commit to something and only build stuff when you really have an opportunity where people want to buy something from you.
+
+352
+00:28:05.880 --> 00:28:10.600
+<v Noah Labhart>Let's move forward then. I'm curious about what the future looks like for WunderGraph, for the
+
+353
+00:28:10.600 --> 00:28:14.440
+<v Noah Labhart>what you've built, the product, and for your team.
+
+354
+00:28:14.440 --> 00:28:16.500
+<v Jens Neuse>Very straightforward. The cool thing is
+
+355
+00:28:16.500 --> 00:28:22.300
+<v Jens Neuse>when you start in a niche and you master it, and you, we now have, I don't know, 50-plus enterprise
+
+356
+00:28:22.300 --> 00:28:28.840
+<v Jens Neuse>customers. If you talk with them enough, you learn a lot. And so what we're currently doing is
+
+357
+00:28:28.840 --> 00:28:35.800
+<v Jens Neuse>essentially two things. One is we want to be in a much bigger TAM, so bigger total addressable market.
+
+358
+00:28:35.800 --> 00:28:43.040
+<v Jens Neuse>So we take the principles of federation. Currently, you can only really use Cosmo with GraphQL,
+
+359
+00:28:43.040 --> 00:28:50.920
+<v Jens Neuse>and we're opening that up, and we apply the same principles and tooling to REST APIs and other
+
+360
+00:28:50.920 --> 00:28:57.580
+<v Jens Neuse>APIs, so we, we allow anybody to, to use that, even companies that don't want to use GraphQL at all.
+
+361
+00:28:58.840 --> 00:29:10.440
+<v Jens Neuse>And the second part is we learn a lot through our customers that software engineering is actually not so much about tech also, but it's a lot about people and process.
+
+362
+00:29:10.800 --> 00:29:21.300
+<v Jens Neuse>And so we're investing heavily in tooling for API design and collaboration and helping people build great APIs together.
+
+363
+00:29:21.300 --> 00:29:30.140
+<v Jens Neuse>And that's really the focus is like less on queries and query planning and these kind of things, but much more on how can people work together better.
+
+364
+00:29:30.320 --> 00:29:34.140
+<v Jens Neuse>And we're the next couple of months, we're launching something super exciting.
+
+365
+00:29:34.780 --> 00:29:36.040
+<v Noah Labhart>Let's switch to you.
+
+366
+00:29:36.220 --> 00:29:38.800
+<v Noah Labhart>Jens, who influences the way that you work?
+
+367
+00:29:38.880 --> 00:29:41.760
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+368
+00:29:42.460 --> 00:29:46.320
+<v Jens Neuse>I would say in the past, read a lot of books.
+
+369
+00:29:46.320 --> 00:29:53.620
+<v Jens Neuse>One, one person is Steve Jobs, because he always felt like he really cares about his stuff and
+
+370
+00:29:53.620 --> 00:29:59.500
+<v Jens Neuse>quality. He was a bit crazy, but he really cared and he wanted to build a great product, and he
+
+371
+00:29:59.500 --> 00:30:06.120
+<v Jens Neuse>cared about aesthetics and things like that. So I wouldn't say it's a role model, but it's definitely
+
+372
+00:30:06.120 --> 00:30:14.080
+<v Jens Neuse>inspiration. And I think my biggest critic is myself, and I'm, I don't know, I'm, for me it's
+
+373
+00:30:14.080 --> 00:30:14.620
+<v Jens Neuse>It's never enough.
+
+374
+00:30:14.820 --> 00:30:15.740
+<v Jens Neuse>So I don't know.
+
+375
+00:30:16.080 --> 00:30:23.300
+<v Jens Neuse>Even though you could say we have some level of success, for me, we're still very early
+
+376
+00:30:23.300 --> 00:30:24.480
+<v Jens Neuse>and we have a lot to learn.
+
+377
+00:30:24.620 --> 00:30:28.520
+<v Jens Neuse>And yeah, I think it's important to stay on the ground and humble.
+
+378
+00:30:28.660 --> 00:30:33.320
+<v Jens Neuse>And sometimes it's good to have a wife and kids and family who keep you grounded.
+
+379
+00:30:33.320 --> 00:30:36.160
+<v Jens Neuse>And otherwise, you're just a weird tech guy.
+
+380
+00:30:36.280 --> 00:30:41.120
+<v Jens Neuse>But having a family in the back, I think it really helps you to stay a normal person.
+
+381
+00:30:41.660 --> 00:30:42.760
+<v Noah Labhart>100% agree.
+
+382
+00:30:44.080 --> 00:30:48.240
+<v Noah Labhart>question. So you're getting on a plane, you're sitting next to a young entrepreneur who's built
+
+383
+00:30:48.240 --> 00:30:52.140
+<v Noah Labhart>the next big thing. They're jazzed about it. They can't wait to show it off to the world. And
+
+384
+00:30:52.140 --> 00:30:55.840
+<v Noah Labhart>can we show it off to you right there on the plane? What advice do you give that person having
+
+385
+00:30:55.840 --> 00:30:57.100
+<v Noah Labhart>gone down this road a bit?
+
+386
+00:30:57.440 --> 00:31:03.060
+<v Jens Neuse>I think when you're a young entrepreneur, it is very hard to filter
+
+387
+00:31:03.060 --> 00:31:11.000
+<v Jens Neuse>inputs and feedback from other people. Like there will be very experienced people who can tell you
+
+388
+00:31:11.000 --> 00:31:17.260
+<v Jens Neuse>how they were successful. The problem typically is they were successful in a different market
+
+389
+00:31:17.260 --> 00:31:24.240
+<v Jens Neuse>or maybe in a different time, and tech has changed and time has changed and the world has changed
+
+390
+00:31:24.240 --> 00:31:31.660
+<v Jens Neuse>and maybe you should just go your way. I think you should have your own North Star, like where
+
+391
+00:31:31.660 --> 00:31:37.640
+<v Jens Neuse>do you want to go long term. Be stubborn long term, but short term, don't be like too stubborn.
+
+392
+00:31:37.640 --> 00:31:44.360
+<v Jens Neuse>Burn. Like, you can adjust. Like me, I wanted to help people build great APIs. I came up with my own
+
+393
+00:31:44.360 --> 00:31:51.220
+<v Jens Neuse>solution. It didn't work. I adopted something from Apollo that worked, and now I can actually go back
+
+394
+00:31:51.220 --> 00:31:57.120
+<v Jens Neuse>to my solution. I can now make it better again, but I first had to go a different path. So my advice
+
+395
+00:31:57.120 --> 00:32:04.520
+<v Jens Neuse>for you, yeah, listen to people, like, don't be stupid, but don't listen too much. Find your own way, because
+
+396
+00:32:04.520 --> 00:32:11.660
+<v Jens Neuse>Because how will we build the next unicorns if you're doing what we did?
+
+397
+00:32:11.920 --> 00:32:13.500
+<v Jens Neuse>Then we already did it.
+
+398
+00:32:13.580 --> 00:32:15.080
+<v Jens Neuse>You need to do something else.
+
+399
+00:32:15.100 --> 00:32:16.000
+<v Jens Neuse>Figure out your own
+
+400
+00:32:16.000 --> 00:32:16.500
+<v Noah Labhart>way.
+
+401
+00:32:16.360 --> 00:32:17.560
+<v Noah Labhart>That's fantastic advice.
+
+402
+00:32:17.780 --> 00:32:18.360
+<v Noah Labhart>Couldn't agree more.
+
+403
+00:32:18.800 --> 00:32:20.920
+<v Noah Labhart>Well, Jens, thank you for being on the show today.
+
+404
+00:32:21.100 --> 00:32:23.500
+<v Noah Labhart>Thank you for telling the creation story of WunderGraph.
+
+405
+00:32:23.780 --> 00:32:24.560
+<v Jens Neuse>Thank you, Noah.
+
+406
+00:32:26.500 --> 00:32:29.280
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+407
+00:32:36.220 --> 00:32:39.240
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+408
+00:32:39.360 --> 00:32:44.140
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+409
+00:32:44.720 --> 00:32:46.980
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+410
+00:32:47.240 --> 00:32:49.180
+<v Noah Labhart>Both things help us out tremendously.
+
+411
+00:32:52.080 --> 00:32:53.580
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1595 @@
+WEBVTT
+
+NOTE S13 Bonus: Dynamic Observability: Eliminating Telemetry Waste at Scale with Peter Morelli, Co-Founder & CEO of Bitdrift
+
+1
+00:00:00.000 --> 00:00:11.160
+<v Peter Morelli>Most observability tools are built with the same pattern in that you have an agent or an SDK or a sidecar that collects data and then it pushes it into a big database somewhere, whether it's a time series database or store, whatever it is.
+
+2
+00:00:11.480 --> 00:00:18.660
+<v Peter Morelli>That works really well in data centers where you have a lot of bandwidth, that your network is reliable, you have a lot of CPU and storage running all the time.
+
+3
+00:00:18.980 --> 00:00:20.480
+<v Peter Morelli>None of that's actually true for mobile.
+
+4
+00:00:20.620 --> 00:00:28.660
+<v Peter Morelli>And so what we found was if you had a good network connection for a little bit and you caught some telemetry and tried to push it up to a big database in the cloud, it worked.
+
+5
+00:00:30.000 --> 00:00:33.580
+<v Peter Morelli>isn't the normal case. A lot of the time your network isn't good or you walk from inside to
+
+6
+00:00:33.580 --> 00:00:38.420
+<v Peter Morelli>outside or into a tunnel and then suddenly your network connection drops. We were seeing that the
+
+7
+00:00:38.420 --> 00:00:43.600
+<v Peter Morelli>data was being dropped on the ground. My name is Pete Morelli, co-founder and CEO of BitDrift.
+
+8
+00:00:46.640 --> 00:00:52.160
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:52.320 --> 00:00:55.260
+<v Clip>Six months moonlighting. There's nothing on the back end.
+
+10
+00:00:55.500 --> 00:00:59.100
+<v Noah Labhart>Who share what it takes to change an industry. I don't exactly
+
+11
+00:00:59.100 --> 00:00:59.860
+<v Clip>know what to do.
+
+12
+00:01:00.000 --> 00:01:01.280
+<v Clip>Many goes to get right.
+
+13
+00:01:01.900 --> 00:01:04.500
+<v Noah Labhart>Who built the teams that have their back.
+
+14
+00:01:04.580 --> 00:01:06.140
+<v Clip>A company is its people.
+
+15
+00:01:06.140 --> 00:01:07.520
+<v Clip>The teams help each other achieve more.
+
+16
+00:01:07.520 --> 00:01:08.600
+<v Clip>Most proud of our team.
+
+17
+00:01:08.940 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+18
+00:01:11.540 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+19
+00:01:12.880 --> 00:01:14.320
+<v Clip>Yes, we've been fighting it as we've grown.
+
+20
+00:01:14.520 --> 00:01:15.320
+<v Clip>Total waste of time.
+
+21
+00:01:15.600 --> 00:01:17.840
+<v Noah Labhart>The stories you don't read in the headlines.
+
+22
+00:01:18.320 --> 00:01:20.040
+<v Clip>It's not an easy thing to achieve, my dear.
+
+23
+00:01:20.040 --> 00:01:22.120
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+24
+00:01:22.500 --> 00:01:25.820
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+25
+00:01:26.040 --> 00:01:27.580
+<v Clip>You need to really want it.
+
+26
+00:01:27.600 --> 00:01:28.960
+<v Clip>It's not just about technology.
+
+27
+00:01:29.080 --> 00:01:29.700
+<v Clip>All this and more.
+
+28
+00:01:30.000 --> 00:01:37.180
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today, how Peter Morelli is making your
+
+29
+00:01:37.180 --> 00:01:43.040
+<v Noah Labhart>mobile observability not suck, so you can define what matters most to capture.
+
+30
+00:01:49.000 --> 00:01:53.460
+<v Noah Labhart>Peter Morelli was born and raised in San Francisco, one of the few natives of the area.
+
+31
+00:01:53.620 --> 00:01:57.360
+<v Noah Labhart>He was front and center watching the tech scene explode in front of him,
+
+32
+00:01:57.360 --> 00:01:59.280
+<v Noah Labhart>and also blow up in front of him.
+
+33
+00:01:59.340 --> 00:02:02.800
+<v Noah Labhart>He's lived all over, like New York, San Diego, Texas, London,
+
+34
+00:02:03.020 --> 00:02:05.260
+<v Noah Labhart>but always ends up returning to the Bay Area.
+
+35
+00:02:05.720 --> 00:02:07.740
+<v Noah Labhart>Outside of tech, he's married with three kids,
+
+36
+00:02:07.840 --> 00:02:09.680
+<v Noah Labhart>one in college and the other two in high school.
+
+37
+00:02:10.120 --> 00:02:12.020
+<v Noah Labhart>He's a foodie and loves cooking,
+
+38
+00:02:12.180 --> 00:02:16.800
+<v Noah Labhart>enjoying the communal, connective aspect of having a meal with his family and friends.
+
+39
+00:02:19.920 --> 00:02:21.920
+<v Noah Labhart>Peter spent many years at Lyft,
+
+40
+00:02:21.980 --> 00:02:25.820
+<v Noah Labhart>where he and his team became frustrated by traditional observability tools
+
+41
+00:02:27.360 --> 00:02:28.500
+<v Noah Labhart>storing unused data.
+
+42
+00:02:29.120 --> 00:02:33.000
+<v Noah Labhart>They started to build a solution based on dynamic real-time
+
+43
+00:02:33.000 --> 00:02:36.760
+<v Noah Labhart>control paired with local on-device telemetry storage.
+
+44
+00:02:37.880 --> 00:02:40.820
+<v Noah Labhart>Once they figured this out and realized their breakthrough,
+
+45
+00:02:41.400 --> 00:02:43.820
+<v Noah Labhart>they spun off the solution into its own company.
+
+46
+00:02:45.720 --> 00:02:48.400
+<v Noah Labhart>This is the creation story of BitDrift.
+
+47
+00:02:52.680 --> 00:02:55.820
+<v Peter Morelli>BitDrift is a company that focuses on mobile
+
+48
+00:02:55.820 --> 00:02:56.740
+<v Peter Morelli>and edge observability.
+
+49
+00:02:57.360 --> 00:03:02.700
+<v Peter Morelli>not the normal observability in data centers, but stuff on your phone, stuff on devices like kiosks
+
+50
+00:03:02.700 --> 00:03:06.620
+<v Peter Morelli>that you see out in the world. And there's a fundamental difference in how that works if you
+
+51
+00:03:06.620 --> 00:03:13.300
+<v Peter Morelli>can go into that, but that was what it was founded to serve. Its origin story is a little unique.
+
+52
+00:03:13.500 --> 00:03:19.440
+<v Peter Morelli>The co-founders and a lot of the initial group of engineers still at BitDrift all are out of Lyft,
+
+53
+00:03:19.540 --> 00:03:24.100
+<v Peter Morelli>the sort of the ride-sharing company. I was the VP of engineering there for eight years. My
+
+54
+00:03:24.100 --> 00:03:26.920
+<v Peter Morelli>My co-founders were there at the same time or longer.
+
+55
+00:03:27.080 --> 00:03:32.300
+<v Peter Morelli>And we all ran into a lot of the problems that trying to make a good consumer service,
+
+56
+00:03:32.480 --> 00:03:36.560
+<v Peter Morelli>trying to understand what your customers are experiencing is really difficult on phones.
+
+57
+00:03:37.040 --> 00:03:41.880
+<v Peter Morelli>And so a lot of the things that we faced, that's what we started building the first parts of BitDrift.
+
+58
+00:03:42.040 --> 00:03:46.460
+<v Peter Morelli>And about three years ago, we spun out after building it for, I think, six or seven years there.
+
+59
+00:03:46.880 --> 00:03:50.940
+<v Peter Morelli>And so it's a pretty mature and scalable product, but that's more of the origin story.
+
+60
+00:03:50.940 --> 00:03:58.120
+<v Peter Morelli>It really was to solve an actual problem that we had in spades at Lyft and we couldn't really find in the market and still can't.
+
+61
+00:03:58.300 --> 00:04:00.080
+<v Peter Morelli>So that's sort of BitDrift's origin story.
+
+62
+00:04:02.540 --> 00:04:04.780
+<v Noah Labhart>Let's dive into the MVP then.
+
+63
+00:04:04.900 --> 00:04:09.200
+<v Noah Labhart>So maybe it's the version inside of Lyft or maybe it's when you spun out.
+
+64
+00:04:09.560 --> 00:04:15.880
+<v Noah Labhart>You tell me, tell me about the MVP and that first version you built and how long it took to build and what sort of tools you're using to bring it to life.
+
+65
+00:04:18.140 --> 00:04:26.560
+<v Peter Morelli>The first version really was driven by the fact that most observability tools are built with the same pattern.
+
+66
+00:04:26.660 --> 00:04:32.420
+<v Peter Morelli>And that you have an agent or an SDK or a sidecar that collects data and then it pushes it into a big database somewhere.
+
+67
+00:04:32.620 --> 00:04:35.100
+<v Peter Morelli>Whether it's a time series database or store, whatever it is.
+
+68
+00:04:35.660 --> 00:04:40.400
+<v Peter Morelli>And that works really well in data centers where you have a lot of bandwidth, that your network is reliable.
+
+69
+00:04:40.640 --> 00:04:43.260
+<v Peter Morelli>You have a lot of CPU and storage running all the time.
+
+70
+00:04:43.620 --> 00:04:45.100
+<v Peter Morelli>None of that's actually true for mobile.
+
+71
+00:04:45.880 --> 00:04:53.300
+<v Peter Morelli>What we found was if you had a good network connection for a little bit and you caught some telemetry and tried to push it up to a big database in the cloud, it worked.
+
+72
+00:04:53.720 --> 00:04:55.700
+<v Peter Morelli>But that really isn't the normal case.
+
+73
+00:04:55.840 --> 00:05:01.180
+<v Peter Morelli>A lot of time your network isn't good or you walk from inside to outside or into a tunnel and then suddenly your network connection drops.
+
+74
+00:05:01.340 --> 00:05:04.420
+<v Peter Morelli>We were seeing that the data was being dropped on the ground.
+
+75
+00:05:04.580 --> 00:05:05.240
+<v Peter Morelli>That's still the case.
+
+76
+00:05:05.500 --> 00:05:07.740
+<v Peter Morelli>We'll try it for a few times and then drop it on the floor.
+
+77
+00:05:07.740 --> 00:05:11.580
+<v Peter Morelli>So when you have those really frustrating experiences where you don't have enough bars,
+
+78
+00:05:11.760 --> 00:05:15.220
+<v Peter Morelli>and if you do have bars, it's not working, and you can't get to your car,
+
+79
+00:05:15.300 --> 00:05:19.640
+<v Peter Morelli>or couldn't see that it was there, or it wasn't updating, that was when we lost the visibility.
+
+80
+00:05:19.900 --> 00:05:24.380
+<v Peter Morelli>And so when your customers are having a bad experience, they'll go to your biggest competitor and maybe never come back.
+
+81
+00:05:24.580 --> 00:05:27.080
+<v Peter Morelli>So it was existential to us to have that visibility.
+
+82
+00:05:27.340 --> 00:05:31.380
+<v Peter Morelli>So the first version really was collecting all that data onto the phone itself
+
+83
+00:05:31.380 --> 00:05:36.500
+<v Peter Morelli>and just making sure that we could upload it later when we did have a good network connection.
+
+84
+00:05:37.740 --> 00:05:39.140
+<v Peter Morelli>It's actually really hard to do.
+
+85
+00:05:39.380 --> 00:05:42.920
+<v Peter Morelli>You don't want to blow out the storage on the device.
+
+86
+00:05:43.120 --> 00:05:45.400
+<v Peter Morelli>So you have to make sure you're not collecting too much data.
+
+87
+00:05:45.700 --> 00:05:47.880
+<v Peter Morelli>You don't want to affect the user experience.
+
+88
+00:05:48.020 --> 00:05:52.680
+<v Peter Morelli>You have about 16 milliseconds before you start to, a human can notice a lag or freeze.
+
+89
+00:05:53.040 --> 00:05:57.540
+<v Peter Morelli>And so how do you do and collect a lot of data without affecting the rest of your app's performance?
+
+90
+00:05:57.700 --> 00:06:02.220
+<v Peter Morelli>So a lot of the initial work we did was around performance and memory safety,
+
+91
+00:06:02.600 --> 00:06:05.440
+<v Peter Morelli>making sure everything was asynchronous and didn't affect the UX,
+
+92
+00:06:05.440 --> 00:06:09.360
+<v Peter Morelli>getting network reliability, detecting when it was going, working well or not.
+
+93
+00:06:09.480 --> 00:06:14.420
+<v Peter Morelli>So we ended up with a solution that really wrapped a sort of native libraries.
+
+94
+00:06:14.540 --> 00:06:17.280
+<v Peter Morelli>We wrote it in Rust and it still is to this day.
+
+95
+00:06:17.380 --> 00:06:19.800
+<v Peter Morelli>It gave us a lot of speed, performance and memory safety.
+
+96
+00:06:20.040 --> 00:06:23.900
+<v Peter Morelli>And so we wrapped that in sort of the native layers, Swift and Kotlin.
+
+97
+00:06:24.000 --> 00:06:25.240
+<v Peter Morelli>So a lot of that work was done there.
+
+98
+00:06:25.680 --> 00:06:30.480
+<v Peter Morelli>And so that really was the use cases that we were trying to do were the Lyft consumer cases.
+
+99
+00:06:30.480 --> 00:06:35.860
+<v Peter Morelli>In fact, we actually were at the time exploring writing our own native networking stack based
+
+100
+00:06:35.860 --> 00:06:36.360
+<v Peter Morelli>on Envoy.
+
+101
+00:06:36.480 --> 00:06:40.600
+<v Peter Morelli>One of my co-founders had done the server version of that Envoy proxy.
+
+102
+00:06:40.920 --> 00:06:41.860
+<v Peter Morelli>Matt Klein did that.
+
+103
+00:06:42.300 --> 00:06:43.820
+<v Peter Morelli>And we were looking at Envoy mobile.
+
+104
+00:06:44.020 --> 00:06:48.480
+<v Peter Morelli>And so debugging a networking stack and all of the varied conditions that a network sees
+
+105
+00:06:48.480 --> 00:06:52.400
+<v Peter Morelli>out in the wild, that was the initial use case that we started this on and expanded
+
+106
+00:06:52.400 --> 00:06:52.980
+<v Peter Morelli>it since then.
+
+107
+00:06:53.320 --> 00:06:56.840
+<v Peter Morelli>The other part that we faced is where the Lyft was still scaling quite a lot.
+
+108
+00:06:56.840 --> 00:07:03.880
+<v Peter Morelli>And so we had tens of millions of clients on a daily basis, like connecting and uploading data.
+
+109
+00:07:04.260 --> 00:07:09.460
+<v Peter Morelli>And so at that scale, most of their solutions were too expensive or they couldn't scale to that level.
+
+110
+00:07:09.620 --> 00:07:14.400
+<v Peter Morelli>I know we took down a couple of providers when we tried to turn them on past 5 or 6 percent.
+
+111
+00:07:14.880 --> 00:07:17.580
+<v Peter Morelli>So I think the other thing, and they handle it by sampling.
+
+112
+00:07:17.760 --> 00:07:24.200
+<v Peter Morelli>And so the other thing that we really wanted to solve was being able to deal with the mobile scale, which is millions and millions of devices.
+
+113
+00:07:26.840 --> 00:07:32.800
+<v Noah Labhart>I'm curious about then from that point, so that MVP is built and you're achieving what you want to.
+
+114
+00:07:32.840 --> 00:07:35.740
+<v Noah Labhart>I'm curious about how you progress it from that point and matured it.
+
+115
+00:07:35.880 --> 00:07:39.060
+<v Noah Labhart>And I think to wrap that in a box a little bit, what I'm looking for is how you build your roadmap.
+
+116
+00:07:39.200 --> 00:07:44.400
+<v Noah Labhart>How do you go about deciding that, okay, this is the next most important thing to build or to address with BitDrift?
+
+117
+00:07:45.660 --> 00:07:47.600
+<v Peter Morelli>I think we built a lot of the core infrastructure.
+
+118
+00:07:47.800 --> 00:07:50.620
+<v Peter Morelli>And I'll go into the sort of the next few generations that we built.
+
+119
+00:07:51.000 --> 00:07:52.880
+<v Peter Morelli>Right now, it's very customer focused.
+
+120
+00:07:53.080 --> 00:07:56.640
+<v Peter Morelli>We're very lucky to have very large customers and a lot of customers coming to us.
+
+121
+00:07:56.840 --> 00:07:59.520
+<v Peter Morelli>And so we have a very priority-driven approach.
+
+122
+00:07:59.740 --> 00:08:02.900
+<v Peter Morelli>We try not to build point solutions like just one officer or a customer.
+
+123
+00:08:03.260 --> 00:08:07.560
+<v Peter Morelli>And so what are the ways that we can extend our platform in a way that benefits lots of customers?
+
+124
+00:08:07.780 --> 00:08:11.500
+<v Peter Morelli>And so we tend to prioritize them based on the customer requests coming in.
+
+125
+00:08:11.760 --> 00:08:15.140
+<v Peter Morelli>And though we have a pretty healthy sort of roadmap for the long term,
+
+126
+00:08:15.240 --> 00:08:19.720
+<v Peter Morelli>and we make big investments where we see, I think a lot of it is very customer-driven now.
+
+127
+00:08:20.220 --> 00:08:23.980
+<v Peter Morelli>I think early on, we were our own customer, and so we had a lot of pain points.
+
+128
+00:08:23.980 --> 00:08:30.120
+<v Peter Morelli>I think the next thing we did was we realized that we now had reliable upload of a lot of
+
+129
+00:08:30.120 --> 00:08:31.220
+<v Peter Morelli>telemetry that you can collect.
+
+130
+00:08:31.480 --> 00:08:33.600
+<v Peter Morelli>A lot of that data was never being looked at, right?
+
+131
+00:08:33.660 --> 00:08:35.780
+<v Peter Morelli>That's actually true of most observability systems.
+
+132
+00:08:35.940 --> 00:08:37.620
+<v Peter Morelli>Like 90% of the data is never looked at.
+
+133
+00:08:37.700 --> 00:08:38.600
+<v Peter Morelli>It's only the bad conditions.
+
+134
+00:08:39.900 --> 00:08:45.740
+<v Peter Morelli>And so why were we wasting all this bandwidth and storage and ingest for data we weren't
+
+135
+00:08:45.740 --> 00:08:46.240
+<v Peter Morelli>looking at?
+
+136
+00:08:46.360 --> 00:08:50.000
+<v Peter Morelli>And so the next thing we did was add a little bit of processing at the edge.
+
+137
+00:08:50.000 --> 00:08:55.940
+<v Peter Morelli>So instead of saying, hey, I'm going to upload all these logs, maybe I just summarize or metricize them at the edge.
+
+138
+00:08:56.020 --> 00:08:59.860
+<v Peter Morelli>And so instead of megabytes of logs, I could send very small counters.
+
+139
+00:09:00.240 --> 00:09:06.640
+<v Peter Morelli>Saved a huge amount of bandwidth and really allowed us to create metrics on the fly based on what was happening on the device.
+
+140
+00:09:06.860 --> 00:09:08.700
+<v Peter Morelli>So that was a really powerful feature we added.
+
+141
+00:09:09.280 --> 00:09:12.660
+<v Peter Morelli>And then the next thing we did was making this all runtime configurable.
+
+142
+00:09:12.840 --> 00:09:16.780
+<v Peter Morelli>Now, most observability systems are, you make decisions at compile time.
+
+143
+00:09:17.000 --> 00:09:18.880
+<v Peter Morelli>You add a log line, you add a metric.
+
+144
+00:09:20.000 --> 00:09:23.800
+<v Peter Morelli>is done when you compile and then you release. If you're doing five or six hundred releases a day
+
+145
+00:09:23.800 --> 00:09:29.180
+<v Peter Morelli>on the server side, which is what we were, that's not a problem. That's like a few minutes or 10
+
+146
+00:09:29.180 --> 00:09:35.800
+<v Peter Morelli>minutes, like 20 minutes of delay. On mobile, an average release cycle was anywhere between 10 and
+
+147
+00:09:35.800 --> 00:09:40.380
+<v Peter Morelli>15 days. You have your weekly trains, you have your alphas and betas the next week, then you
+
+148
+00:09:40.380 --> 00:09:44.260
+<v Peter Morelli>have to go to the app store, you have to get it approved, and then it has to propagate to everyone's
+
+149
+00:09:44.260 --> 00:09:49.280
+<v Peter Morelli>customer devices. So by the time you hear about a customer problem and add a log line, all of a
+
+150
+00:09:50.080 --> 00:09:55.080
+<v Peter Morelli>really long delay and god forbid you didn't get it right you'd have to do that again and then after
+
+151
+00:09:55.080 --> 00:09:59.480
+<v Peter Morelli>all that you'd have to turn it off at the end because it was so expensive so the other thing
+
+152
+00:09:59.480 --> 00:10:03.620
+<v Peter Morelli>we did and this is i think one of the really things that unlocked a lot of the rest of what
+
+153
+00:10:03.620 --> 00:10:09.540
+<v Peter Morelli>these set of people i can but runtime choose what i want to do and so observability has now become
+
+154
+00:10:09.540 --> 00:10:14.920
+<v Peter Morelli>these set of people i can but runtime choose what i want to do and so observability has now become
+
+155
+00:10:14.920 --> 00:10:18.700
+<v Peter Morelli>runtime for mobile which makes it really nice you can say i heard this problem get more information
+
+156
+00:10:20.000 --> 00:10:23.620
+<v Peter Morelli>anymore, turn it off. And that's something that used to take you weeks or months, and now you can
+
+157
+00:10:23.620 --> 00:10:29.180
+<v Peter Morelli>do it in a few minutes. So you combine like the local storage, the ability to edge process, and
+
+158
+00:10:29.180 --> 00:10:34.800
+<v Peter Morelli>the ability to be able to turn it on and control it on runtime. We built that last part. That really
+
+159
+00:10:34.800 --> 00:10:39.300
+<v Peter Morelli>is the core of the platform. And we've layered all the sort of traditional usability use cases on top.
+
+160
+00:10:40.500 --> 00:10:45.160
+<v Noah Labhart>I'm curious about team. How did you go about building your team? I know some of the folks
+
+161
+00:10:45.160 --> 00:10:49.320
+<v Noah Labhart>came from Lyft. I'm curious about what you looked for in those people to indicate that they are the
+
+162
+00:10:50.000 --> 00:10:50.500
+<v Noah Labhart>to join you.
+
+163
+00:10:50.820 --> 00:10:56.580
+<v Peter Morelli>For us, going from a larger, more established company to a small startup where it
+
+164
+00:10:56.580 --> 00:11:00.540
+<v Peter Morelli>was just going to be a little bit more chaotic, you needed to have people who were in for that
+
+165
+00:11:00.540 --> 00:11:05.480
+<v Peter Morelli>type of ride, whether they'd done it before or were interested in doing it. You're looking for
+
+166
+00:11:05.480 --> 00:11:09.740
+<v Peter Morelli>people who are self-starters, who understand that someone's not going to be sitting there
+
+167
+00:11:09.740 --> 00:11:13.680
+<v Peter Morelli>telling you exactly what to do every single second of the day. We were also going to be a remote
+
+168
+00:11:13.680 --> 00:11:19.180
+<v Peter Morelli>company, remote only. There's no central office. We're still like that. And so we generally skewed
+
+169
+00:11:20.000 --> 00:11:25.780
+<v Peter Morelli>who had done things across a wide variety of technical areas. They weren't just a specialist
+
+170
+00:11:26.280 --> 00:11:30.760
+<v Peter Morelli>and just were willing to be able to understand and go after problems on their own. So think of
+
+171
+00:11:30.760 --> 00:11:34.560
+<v Peter Morelli>self-starters. And so we took about, I think about a third of the team that we were working on when
+
+172
+00:11:34.560 --> 00:11:41.300
+<v Peter Morelli>we spun out of Lyft. We've since hired specifically for that style of engineer. Again, tended to skew
+
+173
+00:11:41.300 --> 00:11:47.120
+<v Peter Morelli>very senior. It's harder to have it as a junior engineer, just to have no person sitting next
+
+174
+00:11:47.120 --> 00:11:50.280
+<v Peter Morelli>next to you and helping you coach. I think it's one of the tougher problems the industry faces now,
+
+175
+00:11:50.420 --> 00:11:54.700
+<v Peter Morelli>but that's how we selected for it. And obviously you look for the highest talent that you can.
+
+176
+00:11:54.980 --> 00:11:58.360
+<v Peter Morelli>And I think I've been very lucky in my two co-founders, which some of the best engineers
+
+177
+00:11:58.360 --> 00:12:01.860
+<v Peter Morelli>I've ever worked with. They are the best engineers I've ever worked with and they tend to attract
+
+178
+00:12:01.860 --> 00:12:06.760
+<v Peter Morelli>that talent. And I'd say of the initial team that's been out of Lyft, we probably are still
+
+179
+00:12:06.760 --> 00:12:07.960
+<v Peter Morelli>have two thirds of them.
+
+180
+00:12:10.680 --> 00:12:14.740
+<v Noah Labhart>Okay. I'm curious about scale, right? And specifically this type of
+
+181
+00:12:14.740 --> 00:12:18.580
+<v Noah Labhart>a problem, especially when you solved it early. You're collecting data on the device, but then
+
+182
+00:12:18.580 --> 00:12:23.820
+<v Noah Labhart>you've got to scale and get that data somewhere. And it's a lot of data and all the things, right?
+
+183
+00:12:23.880 --> 00:12:27.140
+<v Noah Labhart>I'm curious about how you approach that in the beginning, but I'm also interested in,
+
+184
+00:12:27.160 --> 00:12:30.660
+<v Noah Labhart>have there been interesting areas where you've had to fight that as you've grown?
+
+185
+00:12:31.860 --> 00:12:35.900
+<v Peter Morelli>The fun part of this is that we, this was originally built to solve lift scale,
+
+186
+00:12:36.060 --> 00:12:41.500
+<v Peter Morelli>which is tens of millions of mobile clients communicating every day. And you have the
+
+187
+00:12:41.500 --> 00:12:44.720
+<v Peter Morelli>the drivers and the riders and they're all trying to talk to each other in real time.
+
+188
+00:12:44.940 --> 00:12:51.260
+<v Peter Morelli>So a nasty problem in terms of scale and something that we had to solve as we built this. So out of
+
+189
+00:12:51.260 --> 00:12:57.100
+<v Peter Morelli>the gate, we, I think, had the ability to get to tens of millions of devices. And as we started
+
+190
+00:12:57.100 --> 00:13:01.980
+<v Peter Morelli>talking to various customers, the ones that were the most interested in what we did were that size
+
+191
+00:13:01.980 --> 00:13:09.880
+<v Peter Morelli>or bigger. And so we have a lot of very large, we're installed now over a billion times. I think
+
+192
+00:13:11.500 --> 00:13:15.060
+<v Peter Morelli>concurrent connections because a lot of our clients have these real-time use cases.
+
+193
+00:13:15.120 --> 00:13:18.260
+<v Peter Morelli>We have a streaming company in India that they were streaming cricket matches and
+
+194
+00:13:18.260 --> 00:13:20.640
+<v Peter Morelli>hitting 120 million concurrent connections a day.
+
+195
+00:13:20.900 --> 00:13:24.920
+<v Peter Morelli>There's actually a great post we did with the Amazon technical teams about how we were
+
+196
+00:13:24.920 --> 00:13:29.300
+<v Peter Morelli>able to scale with that. So I think very quickly we started to get customers at the
+
+197
+00:13:29.300 --> 00:13:31.140
+<v Peter Morelli>scale that pushed even where we were.
+
+198
+00:13:31.340 --> 00:13:36.720
+<v Peter Morelli>But a lot of it is really how you think about building these systems in a resilient way.
+
+199
+00:13:36.880 --> 00:13:41.280
+<v Peter Morelli>I think I'll credit my co-founders who've done this at many companies beyond Lyft, like
+
+200
+00:13:41.500 --> 00:13:46.260
+<v Peter Morelli>and Amazon, all sorts of places where you've had to deal with sort of this type of scale.
+
+201
+00:13:46.440 --> 00:13:51.520
+<v Peter Morelli>And BitDrift is built with that in mind, because I think the whole point of it is that it's
+
+202
+00:13:51.520 --> 00:13:55.720
+<v Peter Morelli>as efficient as possible with the resources that it has, but it still has to deal with
+
+203
+00:13:55.720 --> 00:13:57.440
+<v Peter Morelli>consumer scale and mobile devices.
+
+204
+00:13:58.240 --> 00:14:02.740
+<v Peter Morelli>Just to give you a sense, I think, like Lyft, I think, was ingesting 45 terabytes or more
+
+205
+00:14:02.740 --> 00:14:04.860
+<v Peter Morelli>a day of data from mobile devices.
+
+206
+00:14:05.100 --> 00:14:07.100
+<v Peter Morelli>And again, like most of that wasn't being looked at.
+
+207
+00:14:07.100 --> 00:14:14.280
+<v Peter Morelli>We have customers who 70% of their data bandwidth was being used for telemetry, not for their actual customer production usage.
+
+208
+00:14:15.080 --> 00:14:18.900
+<v Peter Morelli>And we can come in and cut that down to 2% because of how the system works.
+
+209
+00:14:18.980 --> 00:14:26.140
+<v Peter Morelli>It keeps data at the edge on the devices until something on the control plane, our server layer that says, hey, what am I interested in?
+
+210
+00:14:26.240 --> 00:14:27.660
+<v Peter Morelli>What observability do we need right now?
+
+211
+00:14:27.860 --> 00:14:29.660
+<v Peter Morelli>Sort of says, hey, go out and find this.
+
+212
+00:14:30.840 --> 00:14:35.840
+<v Peter Morelli>Inherent in the system, there's a very different way of thinking about data storage and architecture and where it is.
+
+213
+00:14:37.100 --> 00:14:41.140
+<v Peter Morelli>having this one big database that you have to scale as you dump everything possible in the
+
+214
+00:14:41.140 --> 00:14:46.500
+<v Peter Morelli>world at it, nip sharded or split the data, it's still a vertical scaling exercise. There we have
+
+215
+00:14:46.500 --> 00:14:51.760
+<v Peter Morelli>a much more of a distributed approach to how we collect and use data. That fundamental architecture
+
+216
+00:14:52.260 --> 00:14:56.560
+<v Peter Morelli>gives us huge advantages in terms of how we scale the level of data that we're able to collect
+
+217
+00:14:56.560 --> 00:15:01.680
+<v Peter Morelli>and also pricing, which is what you'll see. The redesign that we did helps us do that scale,
+
+218
+00:15:01.820 --> 00:15:06.080
+<v Peter Morelli>but there's a lot of systems thinking in how we built the system to be resilient,
+
+219
+00:15:07.100 --> 00:15:08.140
+<v Peter Morelli>a lot more failure.
+
+220
+00:15:08.260 --> 00:15:10.580
+<v Peter Morelli>Like I said, the data center is a lot more
+
+221
+00:15:10.580 --> 00:15:12.460
+<v Peter Morelli>of a sanitary environment.
+
+222
+00:15:12.540 --> 00:15:14.900
+<v Peter Morelli>It's much cleaner as opposed to mobile phones.
+
+223
+00:15:15.060 --> 00:15:16.300
+<v Peter Morelli>Just think of your mobile phone.
+
+224
+00:15:16.380 --> 00:15:18.320
+<v Peter Morelli>How many apps are you using in any given day?
+
+225
+00:15:18.480 --> 00:15:20.300
+<v Peter Morelli>You use Wi-Fi, then you walk outside,
+
+226
+00:15:20.600 --> 00:15:21.860
+<v Peter Morelli>then you're driving down the street
+
+227
+00:15:21.860 --> 00:15:23.680
+<v Peter Morelli>at 50 miles an hour, switching cell towers,
+
+228
+00:15:23.800 --> 00:15:25.000
+<v Peter Morelli>and maybe it starts to rain,
+
+229
+00:15:25.160 --> 00:15:27.660
+<v Peter Morelli>or like a concert gets out in your neighborhood
+
+230
+00:15:27.660 --> 00:15:28.940
+<v Peter Morelli>and saturates the cell towers.
+
+231
+00:15:29.080 --> 00:15:31.620
+<v Peter Morelli>There's a lot of noise in the system.
+
+232
+00:15:31.760 --> 00:15:35.000
+<v Peter Morelli>And I think building for that is one of the things
+
+233
+00:15:35.000 --> 00:15:37.240
+<v Peter Morelli>that BitDrift had to do very early on
+
+234
+00:15:37.240 --> 00:15:38.440
+<v Peter Morelli>and has continued to invest in.
+
+235
+00:15:41.060 --> 00:15:42.900
+<v Noah Labhart>So as you step out on the balcony,
+
+236
+00:15:43.060 --> 00:15:44.680
+<v Noah Labhart>you look across all that you've built.
+
+237
+00:15:44.780 --> 00:15:46.600
+<v Noah Labhart>With BitDrift, what are you most proud of?
+
+238
+00:15:48.100 --> 00:15:50.380
+<v Peter Morelli>It's taken the focus away on observability
+
+239
+00:15:50.380 --> 00:15:53.040
+<v Peter Morelli>of managing the spend and managing these data flows
+
+240
+00:15:53.040 --> 00:15:56.800
+<v Peter Morelli>and putting it squarely back on the customer experience.
+
+241
+00:15:57.400 --> 00:15:59.680
+<v Peter Morelli>You spend all these people and all this time saying,
+
+242
+00:15:59.780 --> 00:16:01.080
+<v Peter Morelli>how do I get this data in there?
+
+243
+00:16:01.240 --> 00:16:02.060
+<v Peter Morelli>How do I pay for it?
+
+244
+00:16:02.120 --> 00:16:04.280
+<v Peter Morelli>Okay, who shouldn't log now and who should log there?
+
+245
+00:16:05.000 --> 00:16:06.880
+<v Peter Morelli>feels like the incentives were really misaligned.
+
+246
+00:16:07.480 --> 00:16:09.920
+<v Peter Morelli>It was all about like a tax on your system.
+
+247
+00:16:10.160 --> 00:16:11.700
+<v Peter Morelli>When in fact, you should be saying,
+
+248
+00:16:11.840 --> 00:16:13.580
+<v Peter Morelli>are my customers having a good experience?
+
+249
+00:16:13.740 --> 00:16:17.040
+<v Peter Morelli>And not just the main ones, but every single one, right?
+
+250
+00:16:17.140 --> 00:16:19.300
+<v Peter Morelli>Like you don't have that nice clean paraded curve
+
+251
+00:16:19.300 --> 00:16:21.940
+<v Peter Morelli>of like everything is a big sort of fat 80%.
+
+252
+00:16:21.940 --> 00:16:24.320
+<v Peter Morelli>You have a very long tail of terrible experiences.
+
+253
+00:16:24.660 --> 00:16:26.620
+<v Peter Morelli>And most teams are getting to 10 or 15,
+
+254
+00:16:26.720 --> 00:16:29.800
+<v Peter Morelli>maybe 20% of them just in terms of prioritization,
+
+255
+00:16:29.920 --> 00:16:30.760
+<v Peter Morelli>in terms of engineering.
+
+256
+00:16:30.760 --> 00:16:36.980
+<v Peter Morelli>hearing. And I think this system allows you to address all of those things. You're not missing
+
+257
+00:16:37.420 --> 00:16:41.860
+<v Peter Morelli>the things that you normally would drop or normally would sample away. You're able to like
+
+258
+00:16:41.860 --> 00:16:46.780
+<v Peter Morelli>now access it. Like we just released an AI layer on top of our platform that allows agents to go
+
+259
+00:16:46.780 --> 00:16:49.940
+<v Peter Morelli>out and do this. So it's not just humans doing it. The agents can go out and do a lot of the
+
+260
+00:16:49.940 --> 00:16:55.900
+<v Peter Morelli>investigations and some of the fixes, propose some fixes. And so all of a sudden you've moved
+
+261
+00:16:55.900 --> 00:16:59.840
+<v Peter Morelli>what I think the industry standard is of addressing a very small percentage of the issues,
+
+262
+00:17:00.760 --> 00:17:05.400
+<v Peter Morelli>smaller than most and being able to say, actually, now we can actually do really awesome apps and
+
+263
+00:17:05.400 --> 00:17:09.300
+<v Peter Morelli>the customers are going to have a great experience of it. So I think we need to shift the industry
+
+264
+00:17:09.300 --> 00:17:13.820
+<v Peter Morelli>toward that. I like working on things that shift the industry forward a bit. And I think it is a
+
+265
+00:17:13.820 --> 00:17:19.460
+<v Peter Morelli>sort of a shift in how you're allocating your time and your dollars and observability. And I think
+
+266
+00:17:19.460 --> 00:17:20.400
+<v Peter Morelli>it's a much healthier one.
+
+267
+00:17:23.060 --> 00:17:25.880
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made
+
+268
+00:17:25.880 --> 00:17:27.960
+<v Noah Labhart>and how you and your team responded to it.
+
+269
+00:17:29.060 --> 00:17:33.060
+<v Peter Morelli>I think the early contracts that you do tend to be,
+
+270
+00:17:33.100 --> 00:17:35.640
+<v Peter Morelli>you're trying to get your customers, you're trying to get those things.
+
+271
+00:17:35.720 --> 00:17:39.000
+<v Peter Morelli>I think there are certain ones where we cut too good of a deal, I think,
+
+272
+00:17:39.000 --> 00:17:43.440
+<v Peter Morelli>to basically we're either break-even or losing a little bit on some of the original deals.
+
+273
+00:17:43.640 --> 00:17:45.940
+<v Peter Morelli>I think we caught those quickly, and a lot of those,
+
+274
+00:17:46.140 --> 00:17:49.920
+<v Peter Morelli>I think we fundamentally believe in our pricing model, which is different than everyone else's.
+
+275
+00:17:50.460 --> 00:17:52.940
+<v Peter Morelli>And I think it aligned incentives in a good way,
+
+276
+00:17:52.940 --> 00:17:55.660
+<v Peter Morelli>and that we were able to work with the customers and get to,
+
+277
+00:17:56.060 --> 00:18:00.380
+<v Peter Morelli>I think things that we did not expect led to very high cost overruns on our side.
+
+278
+00:18:00.600 --> 00:18:03.640
+<v Peter Morelli>And we were able to handle them with the customer and get to a pretty healthy state.
+
+279
+00:18:03.800 --> 00:18:06.540
+<v Peter Morelli>And a lot of that was very good engineering to help the system scale well.
+
+280
+00:18:06.960 --> 00:18:10.360
+<v Peter Morelli>And we're fortunate to have great customers who are going to work with us and say,
+
+281
+00:18:10.420 --> 00:18:11.500
+<v Peter Morelli>okay, that makes sense to us.
+
+282
+00:18:11.580 --> 00:18:15.340
+<v Peter Morelli>We can happily tweak this or how we use it on our side to make it work.
+
+283
+00:18:15.440 --> 00:18:20.060
+<v Peter Morelli>And those are still customers that are with us today and are growing with us today.
+
+284
+00:18:20.060 --> 00:18:27.080
+<v Peter Morelli>So I think for the most part is we try to best to predict what, how people would use our systems, but everyone is very different.
+
+285
+00:18:27.180 --> 00:18:28.200
+<v Peter Morelli>The real world is really interesting.
+
+286
+00:18:28.340 --> 00:18:30.560
+<v Peter Morelli>And so not everything was optimal.
+
+287
+00:18:30.680 --> 00:18:32.720
+<v Peter Morelli>Those are sort of the first few conflicts that we made.
+
+288
+00:18:33.340 --> 00:18:37.940
+<v Peter Morelli>I think those are the ones that like highlight to me or the things that we had to spend a lot of time on.
+
+289
+00:18:38.260 --> 00:18:44.180
+<v Peter Morelli>There are lots of features that we thought would be really popular that didn't end up being, that we had to recover from.
+
+290
+00:18:44.280 --> 00:18:49.100
+<v Peter Morelli>Some scale decisions we made early on that were painful that we had to fix pretty quickly as we grew.
+
+291
+00:18:50.060 --> 00:18:51.580
+<v Peter Morelli>pretty standard in any growing company.
+
+292
+00:18:55.360 --> 00:18:57.400
+<v Noah Labhart>Okay, Peter, let's move forward then.
+
+293
+00:18:57.440 --> 00:18:58.200
+<v Noah Labhart>This will be exciting.
+
+294
+00:18:58.400 --> 00:19:01.100
+<v Noah Labhart>I'm curious about what the future looks like for BitDrift.
+
+295
+00:19:01.180 --> 00:19:02.920
+<v Noah Labhart>The industry is moving very fast.
+
+296
+00:19:03.180 --> 00:19:04.780
+<v Noah Labhart>Where things are heading with AI
+
+297
+00:19:04.780 --> 00:19:07.840
+<v Noah Labhart>and the way people are viewing software.
+
+298
+00:19:08.080 --> 00:19:09.540
+<v Noah Labhart>Tell me what the future looks like for BitDrift.
+
+299
+00:19:10.640 --> 00:19:12.500
+<v Peter Morelli>I think it's still super exciting.
+
+300
+00:19:12.760 --> 00:19:14.380
+<v Peter Morelli>I'm one of those people who think AI
+
+301
+00:19:14.380 --> 00:19:16.440
+<v Peter Morelli>is like a net positive to engineers.
+
+302
+00:19:16.700 --> 00:19:18.640
+<v Peter Morelli>And I think I've seen the best engineers
+
+303
+00:19:20.060 --> 00:19:25.260
+<v Peter Morelli>even better. I think they're very powerful tools. I've seen our customers use it in fantastic ways.
+
+304
+00:19:25.400 --> 00:19:30.340
+<v Peter Morelli>I think things that used to take weeks or months to integrate our systems and start using us now
+
+305
+00:19:30.340 --> 00:19:35.300
+<v Peter Morelli>take a day or two. And I think we've really been helped by that. And I think I've seen
+
+306
+00:19:35.300 --> 00:19:40.280
+<v Peter Morelli>our customers, both their internal development, as well as interacting with us, it's greatly
+
+307
+00:19:40.280 --> 00:19:50.040
+<v Peter Morelli>accelerated. I think that where do we see that going? What parts are going to be built? What's
+
+308
+00:19:50.060 --> 00:19:54.420
+<v Peter Morelli>That'll be interesting. I think we're in for a huge amount of change in how things are going.
+
+309
+00:19:54.580 --> 00:20:03.180
+<v Peter Morelli>I think for us, though, when I look at what we provide, we're giving customers access to a data set that they typically have not had access to.
+
+310
+00:20:03.280 --> 00:20:10.460
+<v Peter Morelli>They have sampled it at 1%, they haven't done it, they haven't logged enough, or they've lost it because they haven't been able to get it due to instability.
+
+311
+00:20:11.120 --> 00:20:19.600
+<v Peter Morelli>So I think we're giving both their customers, engineers, and their agents a lot of the data that they really haven't been able to use before.
+
+312
+00:20:20.060 --> 00:20:23.360
+<v Peter Morelli>That's great for existing mobile applications and solutions.
+
+313
+00:20:23.880 --> 00:20:29.820
+<v Peter Morelli>What I've seen happen is that this acceleration, we made software cheap to build, not as cheap to maintain and observe.
+
+314
+00:20:30.240 --> 00:20:33.920
+<v Peter Morelli>But I see us continuing to invest in how do we make this more automated?
+
+315
+00:20:34.020 --> 00:20:37.760
+<v Peter Morelli>Like I said earlier, capture more of the issues that people are seeing and facing.
+
+316
+00:20:38.760 --> 00:20:48.340
+<v Peter Morelli>And beyond that, it's an expansion beyond just people and mobile phones and interacting, computing moving to the edge in all these different ways.
+
+317
+00:20:50.060 --> 00:20:54.580
+<v Peter Morelli>it's only going to accelerate like how many devices are now being built at the edge your tv
+
+318
+00:20:54.580 --> 00:21:00.340
+<v Peter Morelli>is running android right most kiosks that you see around the world are running all the variants of
+
+319
+00:21:00.340 --> 00:21:05.160
+<v Peter Morelli>android or linux so i i see that compute at the edge is just happening more and more we have
+
+320
+00:21:05.160 --> 00:21:10.720
+<v Peter Morelli>several customers who are effectively devices and not mobile phones so i think software is only
+
+321
+00:21:10.720 --> 00:21:15.340
+<v Peter Morelli>going to get more prolific it's only going to get more expanded beyond just our core business of
+
+322
+00:21:15.340 --> 00:21:19.900
+<v Peter Morelli>mobile apps which is doubling and tripling the you know submissions to the app store you're going to
+
+323
+00:21:20.060 --> 00:21:26.120
+<v Peter Morelli>it permeate the rest of our lives even more. So for me, that's exciting. I think it's an
+
+324
+00:21:26.120 --> 00:21:31.560
+<v Peter Morelli>interesting era to live in, which has a little bit of chaos and the industry is, like you said,
+
+325
+00:21:31.620 --> 00:21:36.120
+<v Peter Morelli>is moving super fast. So what worked one week does not work the next week. So I think you'll,
+
+326
+00:21:36.200 --> 00:21:40.180
+<v Peter Morelli>you have to be able to roll with those punches and comfortable with that. I find that exciting.
+
+327
+00:21:41.740 --> 00:21:45.720
+<v Noah Labhart>Good deal. Okay. Let's switch to you, Peter. Who influences the way that you work?
+
+328
+00:21:45.880 --> 00:21:48.960
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+329
+00:21:50.060 --> 00:21:53.120
+<v Peter Morelli>I feel I'm always drowning under a huge amount of work.
+
+330
+00:21:53.300 --> 00:21:54.340
+<v Peter Morelli>So it's interesting.
+
+331
+00:21:54.500 --> 00:21:55.780
+<v Peter Morelli>I think my co-founders do.
+
+332
+00:21:55.900 --> 00:21:58.880
+<v Peter Morelli>They both have different ways of approaching work
+
+333
+00:21:58.880 --> 00:22:01.020
+<v Peter Morelli>and thinking about systems in a very deep way.
+
+334
+00:22:01.360 --> 00:22:04.760
+<v Peter Morelli>I go back and a lot of my job has been hiring engineers
+
+335
+00:22:04.760 --> 00:22:05.740
+<v Peter Morelli>and groups of engineers.
+
+336
+00:22:06.000 --> 00:22:09.220
+<v Peter Morelli>And they're always the people that have influenced me the most
+
+337
+00:22:09.220 --> 00:22:12.360
+<v Peter Morelli>have been those spectacular engineers that you've worked with.
+
+338
+00:22:12.840 --> 00:22:16.440
+<v Peter Morelli>And you just watch them as they approach problems
+
+339
+00:22:16.440 --> 00:22:17.540
+<v Peter Morelli>and decompose them.
+
+340
+00:22:17.960 --> 00:22:20.360
+<v Peter Morelli>The best ones knew that the business mattered as well.
+
+341
+00:22:20.480 --> 00:22:25.200
+<v Peter Morelli>They would build software in a way and technology in a way that would serve the business.
+
+342
+00:22:25.400 --> 00:22:28.940
+<v Peter Morelli>And for me, that was always the thing where I was like, I learned the most.
+
+343
+00:22:29.680 --> 00:22:34.100
+<v Peter Morelli>The other one was, as I'm in my new role, I do a lot more sales and marketing.
+
+344
+00:22:34.480 --> 00:22:38.800
+<v Peter Morelli>And those are just areas that as a VP of engineering, you were peripherally aware of them.
+
+345
+00:22:38.840 --> 00:22:39.460
+<v Peter Morelli>They were important.
+
+346
+00:22:39.540 --> 00:22:40.180
+<v Peter Morelli>You enabled them.
+
+347
+00:22:40.440 --> 00:22:44.900
+<v Peter Morelli>But it wasn't really the core thing that you would spend your time on.
+
+348
+00:22:45.080 --> 00:22:47.000
+<v Peter Morelli>And now that's what I do most of my time on.
+
+349
+00:22:47.540 --> 00:22:52.060
+<v Peter Morelli>I think it's like a whole new set of people and industry leaders in that area.
+
+350
+00:22:52.400 --> 00:22:54.420
+<v Peter Morelli>And it's, for me, been great to learn.
+
+351
+00:22:54.480 --> 00:22:55.900
+<v Peter Morelli>That's also been frustrating.
+
+352
+00:22:56.100 --> 00:22:58.340
+<v Peter Morelli>Sales is a frustrating experience, a lot of rejection.
+
+353
+00:22:58.900 --> 00:23:06.560
+<v Peter Morelli>And I think, for me, it's been great to stretch what my set of expertise or knowledge was that I would apply here.
+
+354
+00:23:08.180 --> 00:23:09.700
+<v Noah Labhart>Okay, Peter, last question.
+
+355
+00:23:09.880 --> 00:23:14.380
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+356
+00:23:14.580 --> 00:23:15.740
+<v Noah Labhart>They're jazzed about it.
+
+357
+00:23:17.540 --> 00:23:21.660
+<v Noah Labhart>showed off to you right there on the plane. What advice to give that person having gone down this
+
+358
+00:23:21.660 --> 00:23:22.160
+<v Noah Labhart>road a bit?
+
+359
+00:23:23.080 --> 00:23:26.840
+<v Peter Morelli>I'm going to assume that it was a very technical entrepreneur, given that's sort of my
+
+360
+00:23:26.840 --> 00:23:33.780
+<v Peter Morelli>world. But I think not to underestimate the story that you tell around these things. I think a lot
+
+361
+00:23:33.780 --> 00:23:39.600
+<v Peter Morelli>of times every engineer does this, no matter how experienced they are, they focus on the technology.
+
+362
+00:23:39.820 --> 00:23:44.660
+<v Peter Morelli>They tend not to focus on the customer and the story and how the people will use it. And so
+
+363
+00:23:44.660 --> 00:23:47.040
+<v Peter Morelli>So one of my formative experiences
+
+364
+00:23:47.040 --> 00:23:49.480
+<v Peter Morelli>was working very early at Salesforce.
+
+365
+00:23:49.620 --> 00:23:51.280
+<v Peter Morelli>I was like engineer 30 or 40 then.
+
+366
+00:23:51.580 --> 00:23:55.080
+<v Peter Morelli>And I remember how Mark Benioff
+
+367
+00:23:55.080 --> 00:23:58.340
+<v Peter Morelli>made every engineer go through customer support.
+
+368
+00:23:58.420 --> 00:24:00.520
+<v Peter Morelli>Customer support people were on their team, right?
+
+369
+00:24:00.860 --> 00:24:03.780
+<v Peter Morelli>And it was such a customer-focused company
+
+370
+00:24:03.780 --> 00:24:06.680
+<v Peter Morelli>as opposed to a technology company that had customers.
+
+371
+00:24:07.140 --> 00:24:08.500
+<v Peter Morelli>That's always stayed with me,
+
+372
+00:24:08.520 --> 00:24:09.460
+<v Peter Morelli>no matter where I've gone,
+
+373
+00:24:09.600 --> 00:24:10.440
+<v Peter Morelli>is just to say,
+
+374
+00:24:10.520 --> 00:24:12.860
+<v Peter Morelli>hey, you need to understand your customer deeply
+
+375
+00:24:14.660 --> 00:24:17.760
+<v Peter Morelli>time with them, more time than you have, and understand what they are.
+
+376
+00:24:18.180 --> 00:24:21.180
+<v Peter Morelli>So that would be one of the pieces of advice.
+
+377
+00:24:21.320 --> 00:24:26.560
+<v Peter Morelli>The other one would be, do not underestimate how hard it is getting what you do and how
+
+378
+00:24:26.560 --> 00:24:27.800
+<v Peter Morelli>awesome it is in front of people.
+
+379
+00:24:28.040 --> 00:24:32.260
+<v Peter Morelli>Everyone hears and sees the viral explosions of things, and we've seen a lot of them these
+
+380
+00:24:32.260 --> 00:24:32.760
+<v Peter Morelli>days.
+
+381
+00:24:32.740 --> 00:24:36.620
+<v Peter Morelli>But for the vast majority of products, it's really hard rising above the noise.
+
+382
+00:24:36.860 --> 00:24:40.480
+<v Peter Morelli>And there's a lot of noise and a lot of speed because it's easy to generate software these
+
+383
+00:24:40.480 --> 00:24:40.980
+<v Peter Morelli>days.
+
+384
+00:24:40.740 --> 00:24:47.240
+<v Peter Morelli>So that part of being an entrepreneur, I think, is the harder and more underestimated one.
+
+385
+00:24:48.000 --> 00:24:50.200
+<v Peter Morelli>Everyone focuses on what they know, which is technology.
+
+386
+00:24:50.440 --> 00:24:55.680
+<v Peter Morelli>And I think the other parts are actually equally as hard and equally as interesting problems.
+
+387
+00:24:55.940 --> 00:24:57.360
+<v Peter Morelli>And so they need to spend more time on that.
+
+388
+00:24:57.480 --> 00:24:58.700
+<v Noah Labhart>I think that's amazing advice.
+
+389
+00:24:58.820 --> 00:24:59.340
+<v Noah Labhart>That's fantastic.
+
+390
+00:24:59.640 --> 00:25:01.780
+<v Noah Labhart>Peter, thank you for being on the show today.
+
+391
+00:25:01.860 --> 00:25:04.520
+<v Noah Labhart>And thank you for telling the creation story of BitDrift.
+
+392
+00:25:04.760 --> 00:25:05.500
+<v Noah Labhart>Thanks very much.
+
+393
+00:25:07.560 --> 00:25:10.260
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+394
+00:25:18.400 --> 00:25:24.780
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or
+
+395
+00:25:24.780 --> 00:25:30.660
+<v Noah Labhart>the podcasting app of your choice. And when you get a chance, leave us a review. Both things help
+
+396
+00:25:30.660 --> 00:25:31.540
+<v Noah Labhart>us out tremendously
+
+397
+00:25:31.540 --> 00:25:34.520
+<v Noah Labhart>and
+
+398
+00:25:34.520 --> 00:25:35.940
+<v Noah Labhart>Thanks again for listening.

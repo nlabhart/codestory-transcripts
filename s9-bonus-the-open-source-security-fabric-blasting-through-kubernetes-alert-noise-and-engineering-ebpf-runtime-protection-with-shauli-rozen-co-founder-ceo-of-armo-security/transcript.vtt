@@ -1,0 +1,1079 @@
+WEBVTT
+
+NOTE S9 Bonus: The Open-Source Security Fabric: Blasting Through Kubernetes Alert Noise and Engineering eBPF Runtime Protection with Shauli Rozen, Co-Founder & CEO of ARMO Security
+
+1
+00:00:01.040 --> 00:00:07.100
+<v Shauli Rozen>It took us too long in my mind, and it's on me, to flip the switch from a completely
+
+2
+00:00:07.100 --> 00:00:13.620
+<v Shauli Rozen>security company to an open-source driven company. It's a cultural change. I think the
+
+3
+00:00:13.620 --> 00:00:20.460
+<v Shauli Rozen>team was amazing in embracing it, but it took us a little bit too long to actually put our
+
+4
+00:00:20.460 --> 00:00:25.480
+<v Shauli Rozen>actions where our mouth is. We would always say we're an open-source company, we're going
+
+5
+00:00:25.480 --> 00:00:29.540
+<v Shauli Rozen>to open-source everything. Everything in the cluster is going to be open-source and then
+
+6
+00:00:30.000 --> 00:00:30.880
+<v Shauli Rozen>will come in.
+
+7
+00:00:30.960 --> 00:00:32.140
+<v Shauli Rozen>Are you really going to open it?
+
+8
+00:00:32.620 --> 00:00:34.480
+<v Shauli Rozen>And in the beginning, we were very hesitant.
+
+9
+00:00:34.960 --> 00:00:37.980
+<v Shauli Rozen>Now I think we, as a company, embraced it.
+
+10
+00:00:39.140 --> 00:00:43.220
+<v Shauli Rozen>My name is Shauli Rozen, and I'm co-founder and CEO at ARMO.
+
+11
+00:00:46.600 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+12
+00:00:52.340 --> 00:00:53.680
+<v Clip>It's six months moonlighting.
+
+13
+00:00:53.720 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+14
+00:00:55.480 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+15
+00:00:58.280 --> 00:00:59.840
+<v Clip>I don't exactly know what to do.
+
+16
+00:01:00.000 --> 00:01:00.500
+<v Clip>Who
+
+17
+00:01:00.260 --> 00:01:04.560
+<v Noah Labhart>built the teams that have their back.
+
+18
+00:01:08.880 --> 00:01:11.200
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:15.040 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+20
+00:01:22.760 --> 00:01:25.860
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+21
+00:01:26.100 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+22
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+23
+00:01:29.060 --> 00:01:29.680
+<v Clip>All this and more.
+
+24
+00:01:30.000 --> 00:01:36.720
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today how Shauli Rozen is giving you
+
+25
+00:01:36.720 --> 00:01:42.540
+<v Noah Labhart>actionable and contextual security so you can cancel the noise and fix your Kubernetes.
+
+26
+00:01:48.820 --> 00:01:53.120
+<v Noah Labhart>Shauli Rozen grew up in Israel, and besides a five-year stint stateside,
+
+27
+00:01:53.260 --> 00:01:58.300
+<v Noah Labhart>he has spent his whole life there. Shauli loves the beach and the ocean, spending time surfing,
+
+28
+00:02:00.400 --> 00:02:05.440
+<v Noah Labhart>Freediving piqued my interest, and he described it as diving with fins without scuba gear, holding your breath.
+
+29
+00:02:05.660 --> 00:02:10.920
+<v Noah Labhart>He has made it 26 meters deep, which requires him to hold his breath for 60 seconds.
+
+30
+00:02:12.580 --> 00:02:17.080
+<v Noah Labhart>In the past, Shauli noticed that the world was not actually ready for Kubernetes.
+
+31
+00:02:17.360 --> 00:02:22.300
+<v Noah Labhart>The adoption curve proved to his team that businesses had different problems outside of security.
+
+32
+00:02:22.860 --> 00:02:26.200
+<v Noah Labhart>After spending two years of discovery and intimately learning Kubernetes,
+
+33
+00:02:26.560 --> 00:02:29.520
+<v Noah Labhart>they spent two weeks to change the game and security.
+
+34
+00:02:30.000 --> 00:02:31.120
+<v Noah Labhart>using open source.
+
+35
+00:02:33.140 --> 00:02:36.180
+<v Noah Labhart>This is the creation story of ARMO Security.
+
+36
+00:02:42.320 --> 00:02:46.120
+<v Shauli Rozen>Our vision and our product is the only product you need
+
+37
+00:02:46.120 --> 00:02:50.260
+<v Shauli Rozen>to secure any Kubernetes cluster or Kubernetes environment from end to end.
+
+38
+00:02:50.400 --> 00:02:54.420
+<v Shauli Rozen>Not only the posture, what we call Kubernetes security posture management,
+
+39
+00:02:54.960 --> 00:02:58.820
+<v Shauli Rozen>but also runtime security, compliance, code security.
+
+40
+00:03:00.000 --> 00:03:05.400
+<v Shauli Rozen>the cluster and within your Kubernetes environments. The reason we believe we
+
+41
+00:03:05.400 --> 00:03:10.780
+<v Shauli Rozen>are special is because that dedication on Kubernetes and taking the context of
+
+42
+00:03:10.780 --> 00:03:14.220
+<v Shauli Rozen>everything that is running within Kubernetes, runtime information,
+
+43
+00:03:14.760 --> 00:03:21.860
+<v Shauli Rozen>Kube API, logs, CI CD data, role-based access control data, all of that data
+
+44
+00:03:21.860 --> 00:03:27.840
+<v Shauli Rozen>together creates a context that enables us to provide remediation advice that is
+
+45
+00:03:27.840 --> 00:03:32.580
+<v Shauli Rozen>much much better any comparable solutions not breaking the applications
+
+46
+00:03:32.580 --> 00:03:37.380
+<v Shauli Rozen>and continuously making your environment more secure without breaking it.
+
+47
+00:03:37.980 --> 00:03:45.500
+<v Shauli Rozen>About four years ago I met my co-founders Ben and Leonid. I am not the smart guy in the room.
+
+48
+00:03:45.780 --> 00:03:50.100
+<v Shauli Rozen>Ben and Leonid are much smarter than I. They are super technological.
+
+49
+00:03:50.260 --> 00:03:54.720
+<v Shauli Rozen>They go into the depth of every bit and byte. Those people who can read binary
+
+50
+00:03:54.720 --> 00:03:58.020
+<v Shauli Rozen>and ones and zeros and hexa and stuff like that.
+
+51
+00:03:59.220 --> 00:04:02.180
+<v Shauli Rozen>They came with the idea of a really advanced way
+
+52
+00:04:02.180 --> 00:04:06.260
+<v Shauli Rozen>to do runtime security within Kubernetes clusters.
+
+53
+00:04:07.420 --> 00:04:11.640
+<v Shauli Rozen>Back then, what we saw is that the world was not ready.
+
+54
+00:04:11.820 --> 00:04:14.400
+<v Shauli Rozen>Companies were just starting to use Kubernetes in production.
+
+55
+00:04:14.720 --> 00:04:16.740
+<v Shauli Rozen>So in the adoption curve of Kubernetes,
+
+56
+00:04:17.140 --> 00:04:21.620
+<v Shauli Rozen>we actually figured out that companies have different problems than security.
+
+57
+00:04:21.800 --> 00:04:24.240
+<v Shauli Rozen>They were handling problems of complexity.
+
+58
+00:04:24.720 --> 00:04:28.740
+<v Shauli Rozen>of the operation and just getting things done within Kubernetes.
+
+59
+00:04:29.760 --> 00:04:36.440
+<v Shauli Rozen>And that's actually where it hit us that Kubernetes security is different in the way that developers
+
+60
+00:04:36.440 --> 00:04:42.440
+<v Shauli Rozen>and specifically DevOps and platform engineers play a much, much bigger role also in the ongoing
+
+61
+00:04:42.440 --> 00:04:46.880
+<v Shauli Rozen>and the responsibility of security when it comes to Kubernetes security.
+
+62
+00:04:47.300 --> 00:04:52.700
+<v Shauli Rozen>And we decided to take a completely different approach and reverse our journey.
+
+63
+00:04:52.700 --> 00:05:08.760
+<v Shauli Rozen>And instead of starting from runtime, we decided to start from very simple compliance tests, posture management tests, just really covering the basics for any DevOps that would like to understand what's going on security-wise in their clusters.
+
+64
+00:05:08.760 --> 00:05:23.260
+<v Shauli Rozen>We decided to open source a tool that will help any developer, any DevOps guy, to test their clusters in three minutes to know how it stands against the best and the most popular compliance frameworks.
+
+65
+00:05:23.480 --> 00:05:35.020
+<v Shauli Rozen>Back in the days, the NSA and CISA issued hardening guidance for Kubernetes and just in a click of a button, understanding how you stand against those hardening guidelines was a hit.
+
+66
+00:05:35.020 --> 00:05:39.600
+<v Shauli Rozen>It, Kubescape, which is this open source, took off like crazy.
+
+67
+00:05:40.180 --> 00:05:42.800
+<v Shauli Rozen>8,000 stars in less than, I think, four months.
+
+68
+00:05:42.920 --> 00:05:47.540
+<v Shauli Rozen>GitHub, plenty of users, adoption, big companies, small companies.
+
+69
+00:05:48.280 --> 00:05:52.680
+<v Shauli Rozen>And that's when we decided to make that a big, the central part of our offering
+
+70
+00:05:52.680 --> 00:05:56.540
+<v Shauli Rozen>and built the ARMO platform around that open source.
+
+71
+00:05:59.060 --> 00:06:03.060
+<v Noah Labhart>Let's dive into what you would consider the MVP of ARMO.
+
+72
+00:06:05.020 --> 00:06:09.560
+<v Noah Labhart>you built, right? How long did it take you to build and what sort of tools were you using to
+
+73
+00:06:09.560 --> 00:06:10.160
+<v Noah Labhart>bring it to life?
+
+74
+00:06:11.500 --> 00:06:17.760
+<v Shauli Rozen>If I gave you like a straight, informal answer, it would be, it took us like a
+
+75
+00:06:17.760 --> 00:06:24.640
+<v Shauli Rozen>couple of weeks to build the MVP. And the MVP was basically scanning any cluster against those
+
+76
+00:06:24.640 --> 00:06:31.440
+<v Shauli Rozen>hardening guidelines from the NSA and CISA that I mentioned earlier. Very simple, just take it,
+
+77
+00:06:31.440 --> 00:06:34.640
+<v Shauli Rozen>run it against your cluster, and get the results.
+
+78
+00:06:34.980 --> 00:06:37.680
+<v Shauli Rozen>You might say two weeks, it's very quick.
+
+79
+00:06:38.280 --> 00:06:42.020
+<v Shauli Rozen>It took us two weeks to build it after we had two years of experience
+
+80
+00:06:42.020 --> 00:06:45.040
+<v Shauli Rozen>working around Kubernetes, understanding Kubernetes,
+
+81
+00:06:45.500 --> 00:06:48.800
+<v Shauli Rozen>building different runtime elements around it.
+
+82
+00:06:48.900 --> 00:06:54.380
+<v Shauli Rozen>It was a very focused effort, but after a very long discovery period
+
+83
+00:06:54.380 --> 00:06:57.180
+<v Shauli Rozen>and understanding period of what is important in Kubernetes.
+
+84
+00:06:57.180 --> 00:06:57.680
+<v Shauli Rozen>that is.
+
+85
+00:06:58.660 --> 00:07:02.960
+<v Noah Labhart>With any MVP, you've got to make certain decisions and trade-offs. And I assume during that
+
+86
+00:07:02.960 --> 00:07:09.160
+<v Noah Labhart>two-year time frame of discovery, you figured out what not to do and what to do or where to start,
+
+87
+00:07:09.300 --> 00:07:13.480
+<v Noah Labhart>how to limit your scope, how to do it a certain way, right? So tell me about some of those
+
+88
+00:07:13.480 --> 00:07:16.100
+<v Noah Labhart>decisions you had to work through and how you coped with the decisions.
+
+89
+00:07:17.320 --> 00:07:19.120
+<v Shauli Rozen>The first thing, and
+
+90
+00:07:19.120 --> 00:07:26.220
+<v Shauli Rozen>it's going to sound so trivial, but it is listening to the users and to the customers and to people
+
+91
+00:07:27.180 --> 00:07:33.840
+<v Shauli Rozen>with and test your technology with. When you think about it, it's very easy to have what I call
+
+92
+00:07:33.840 --> 00:07:41.000
+<v Shauli Rozen>happy ears and hearing what you want to hear, even though the nuance of what the user is saying is
+
+93
+00:07:41.000 --> 00:07:47.400
+<v Shauli Rozen>telling you, I'm not yet ready for this technology, give me something more simple. So I think the main
+
+94
+00:07:47.400 --> 00:07:52.620
+<v Shauli Rozen>decisions that it took us about six months to start making them, but once we started to make
+
+95
+00:07:52.620 --> 00:07:59.860
+<v Shauli Rozen>them, I think it was very clear that usability and the ability for the user to understand
+
+96
+00:07:59.860 --> 00:08:05.400
+<v Shauli Rozen>very quickly what they are getting, what is the outcome of every action that they are
+
+97
+00:08:05.400 --> 00:08:11.160
+<v Shauli Rozen>doing within the platform, even compromising, I would say completeness or easier understanding
+
+98
+00:08:11.160 --> 00:08:16.000
+<v Shauli Rozen>of the results, for example, that's where we made most of the trade-offs.
+
+99
+00:08:16.340 --> 00:08:20.980
+<v Shauli Rozen>And you need to decide to leave functionality out of the product many times in order to
+
+100
+00:08:20.980 --> 00:08:21.680
+<v Shauli Rozen>keep it simple.
+
+101
+00:08:23.980 --> 00:08:28.240
+<v Noah Labhart>let's move forward then so you've got the mvp you've made those decisions from trade-offs you're
+
+102
+00:08:28.240 --> 00:08:33.240
+<v Noah Labhart>getting some traction how did you progress the product from that point and mature it i think to
+
+103
+00:08:33.240 --> 00:08:37.160
+<v Noah Labhart>wrap in a box a little bit i'm looking for is how did you build your roadmap how did you go about
+
+104
+00:08:37.160 --> 00:08:43.120
+<v Noah Labhart>deciding okay this is the next most important thing to build or to address with ARMO. So
+
+105
+00:08:43.120 --> 00:08:43.620
+<v Shauli Rozen>the
+
+106
+00:08:43.580 --> 00:08:49.860
+<v Shauli Rozen>great thing was the user engagement in the community engagement because once you have so
+
+107
+00:08:49.860 --> 00:09:03.520
+<v Shauli Rozen>So many users speaking with you on the community Slack, opening GitHub issues, engaging with you on an onboarding calls and coming to conferences and knowing about you and testing you.
+
+108
+00:09:03.600 --> 00:09:09.840
+<v Shauli Rozen>The volume of, I would say, new feature recommendations is really big.
+
+109
+00:09:10.360 --> 00:09:15.840
+<v Shauli Rozen>And the good thing about volume is you can start to talk about statistical significance.
+
+110
+00:09:15.840 --> 00:09:22.020
+<v Shauli Rozen>and it's not science but even intuitively when you have enough community and when you have enough
+
+111
+00:09:22.020 --> 00:09:28.760
+<v Shauli Rozen>users speaking with you it is relatively easy to see what comes up again and again and what is more
+
+112
+00:09:28.760 --> 00:09:34.640
+<v Shauli Rozen>important and then we started to run community days and we started to run advisory sessions with
+
+113
+00:09:34.640 --> 00:09:40.000
+<v Shauli Rozen>our users and starting to build the roadmap based on what they say but also starting to think beyond
+
+114
+00:09:40.000 --> 00:09:45.240
+<v Shauli Rozen>what they say it took us back into runtime but it could have taken us in in in several different
+
+115
+00:09:45.840 --> 00:09:56.080
+<v Shauli Rozen>So I think it's a little bit to our head of product, Yossi, who did a great job of analyzing and synthesizing what users are saying and also thinking a little bit beyond that.
+
+116
+00:09:56.220 --> 00:09:58.800
+<v Shauli Rozen>But in the same lines, it gives you a very good direction.
+
+117
+00:09:58.960 --> 00:10:00.360
+<v Shauli Rozen>And that's the good thing about it.
+
+118
+00:10:01.860 --> 00:10:03.880
+<v Noah Labhart>So I hear you mentioning some team members.
+
+119
+00:10:04.040 --> 00:10:06.320
+<v Noah Labhart>Tell me about how you went about building your team.
+
+120
+00:10:06.480 --> 00:10:10.180
+<v Noah Labhart>What did you look for in those people to indicate that they were the winning horses to join you?
+
+121
+00:10:11.220 --> 00:10:17.200
+<v Shauli Rozen>in different stages of the company you need sometimes different people when in the beginning
+
+122
+00:10:17.200 --> 00:10:24.980
+<v Shauli Rozen>you build around a few very excellent executors that know the topic very well we have our core
+
+123
+00:10:24.980 --> 00:10:32.240
+<v Shauli Rozen>team around that and then as we grew and we needed to build you know more structures and
+
+124
+00:10:32.240 --> 00:10:38.120
+<v Shauli Rozen>more processes then we brought in more management people with the background of actually running
+
+125
+00:10:38.120 --> 00:10:42.740
+<v Shauli Rozen>running processes, even if they are less in the details of the technology.
+
+126
+00:10:42.940 --> 00:10:44.620
+<v Shauli Rozen>But I think it's a combination.
+
+127
+00:10:45.480 --> 00:10:51.700
+<v Shauli Rozen>And what I did find is that it is very hard to find all-rounders,
+
+128
+00:10:51.760 --> 00:10:55.520
+<v Shauli Rozen>people who are good managers, they're good in front of customers,
+
+129
+00:10:56.040 --> 00:10:59.540
+<v Shauli Rozen>they are very strong in technology, and they have all of it.
+
+130
+00:10:59.940 --> 00:11:03.480
+<v Shauli Rozen>You're going to have a few of those, a handful of those in your company.
+
+131
+00:11:03.480 --> 00:11:11.400
+<v Shauli Rozen>You must have them, but you can't build on thinking that this is the only type of people that you will bring to the company.
+
+132
+00:11:11.720 --> 00:11:23.440
+<v Shauli Rozen>So eventually we started to hire subject matter experts around a product, around management of R&amp;D, sales, customer success.
+
+133
+00:11:24.170 --> 00:11:27.480
+<v Shauli Rozen>And I think that is proving very well.
+
+134
+00:11:27.480 --> 00:11:33.440
+<v Shauli Rozen>Well, I do try to hire people from relatively the same industry.
+
+135
+00:11:33.560 --> 00:11:42.720
+<v Shauli Rozen>So people who work for DevOps tools companies, security companies, because you can't have them completely out of the know of the industry.
+
+136
+00:11:45.500 --> 00:11:50.060
+<v Noah Labhart>This will be interesting given the product you're supporting and know and love.
+
+137
+00:11:50.180 --> 00:11:51.540
+<v Noah Labhart>Tell me about scalability.
+
+138
+00:11:51.820 --> 00:11:56.580
+<v Noah Labhart>Was this built to scale efficiently from day one or with scale in mind?
+
+139
+00:11:57.480 --> 00:12:00.340
+<v Noah Labhart>Has there been anywhere you've had to fight this as you've grown?
+
+140
+00:12:01.580 --> 00:12:05.380
+<v Shauli Rozen>You never build without scale in mind, okay?
+
+141
+00:12:06.620 --> 00:12:11.660
+<v Shauli Rozen>We did not make decisions of, hey, we know it's not going to scale,
+
+142
+00:12:11.800 --> 00:12:14.720
+<v Shauli Rozen>but we're going to do it anyway because it's quicker.
+
+143
+00:12:14.880 --> 00:12:17.560
+<v Shauli Rozen>We didn't make any type of decisions like that.
+
+144
+00:12:18.460 --> 00:12:23.140
+<v Shauli Rozen>But did we make decisions that we took relatively quick decisions,
+
+145
+00:12:23.300 --> 00:12:26.720
+<v Shauli Rozen>thinking that the way we do it is going to scale,
+
+146
+00:12:27.480 --> 00:12:30.160
+<v Shauli Rozen>they needed to redo some of the things later on.
+
+147
+00:12:30.240 --> 00:12:31.680
+<v Shauli Rozen>Yeah, that happened.
+
+148
+00:12:32.380 --> 00:12:35.140
+<v Shauli Rozen>We always knew that we are a security company,
+
+149
+00:12:35.260 --> 00:12:37.820
+<v Shauli Rozen>we are an enterprise security company.
+
+150
+00:12:37.920 --> 00:12:40.600
+<v Shauli Rozen>Our customers, they are usually larger companies.
+
+151
+00:12:40.660 --> 00:12:44.080
+<v Shauli Rozen>If you're very small and you don't have a lot at stakes
+
+152
+00:12:44.080 --> 00:12:45.660
+<v Shauli Rozen>and you don't have a big environment,
+
+153
+00:12:45.880 --> 00:12:48.520
+<v Shauli Rozen>then usually you are not that concerned about security.
+
+154
+00:12:49.120 --> 00:12:52.080
+<v Shauli Rozen>So because we are aiming at relatively large organizations,
+
+155
+00:12:52.480 --> 00:12:55.580
+<v Shauli Rozen>we needed to have scale really from the get-go.
+
+156
+00:12:58.680 --> 00:13:03.300
+<v Noah Labhart>So, as you step out on the balcony, you look across all that you've built with Armo, what
+
+157
+00:13:03.300 --> 00:13:04.160
+<v Noah Labhart>are you most proud of?
+
+158
+00:13:05.240 --> 00:13:08.840
+<v Shauli Rozen>The team is definitely what I am most proud of.
+
+159
+00:13:09.020 --> 00:13:12.080
+<v Shauli Rozen>It's a very strong, resilient team.
+
+160
+00:13:12.240 --> 00:13:17.280
+<v Shauli Rozen>They do whatever it takes to win a deal and to get things done.
+
+161
+00:13:17.900 --> 00:13:19.660
+<v Shauli Rozen>The company is based in Israel.
+
+162
+00:13:19.740 --> 00:13:25.800
+<v Shauli Rozen>This team has gone through a war, has gone through terrible experiences on October 7th
+
+163
+00:13:27.480 --> 00:13:34.920
+<v Shauli Rozen>and still performed and worked and made things happen in really difficult times.
+
+164
+00:13:35.140 --> 00:13:37.420
+<v Shauli Rozen>Also, the guys abroad supported.
+
+165
+00:13:38.500 --> 00:13:43.820
+<v Shauli Rozen>I remember Slack notes from team members abroad saying,
+
+166
+00:13:43.920 --> 00:13:46.120
+<v Shauli Rozen>hey, we know what you're going through.
+
+167
+00:13:46.420 --> 00:13:53.600
+<v Shauli Rozen>We're going to take whatever we need to do in order to help the company at this point.
+
+168
+00:13:53.600 --> 00:13:58.580
+<v Shauli Rozen>If we need to take some load on ourselves instead of our Israeli colleagues, we are here for you.
+
+169
+00:13:59.320 --> 00:14:01.320
+<v Shauli Rozen>So it's an unusual circumstances.
+
+170
+00:14:02.240 --> 00:14:08.360
+<v Shauli Rozen>I think the team and the collaboration and the togetherness that we have managed to create,
+
+171
+00:14:08.580 --> 00:14:12.080
+<v Shauli Rozen>in my mind, if I'm sitting on that balcony, that's what I'm seeing.
+
+172
+00:14:12.240 --> 00:14:13.920
+<v Shauli Rozen>And actually, I had that experience.
+
+173
+00:14:14.660 --> 00:14:18.980
+<v Shauli Rozen>We gathered for, there was a PR, I remember,
+
+174
+00:14:18.980 --> 00:14:26.660
+<v Shauli Rozen>member and we wanted to do a company picture for that PR. Everybody is dressed with the ARMO t-shirt
+
+175
+00:14:26.660 --> 00:14:32.520
+<v Shauli Rozen>right and we have this location in Jerusalem where we are everybody's getting organized and
+
+176
+00:14:32.520 --> 00:14:39.480
+<v Shauli Rozen>the photographer say hey guys come in come here come there. In that scene there was a point where
+
+177
+00:14:39.480 --> 00:14:45.160
+<v Shauli Rozen>I was like on the side I was sitting with my coffee like looking at that scene of those people
+
+178
+00:14:45.160 --> 00:14:50.280
+<v Shauli Rozen>Most of them are pretty young, 25 to 35, gathering for that picture.
+
+179
+00:14:50.320 --> 00:14:53.100
+<v Shauli Rozen>And I said, wow, this is truly the salt of the earth.
+
+180
+00:14:54.720 --> 00:14:57.340
+<v Noah Labhart>Okay, Shauli, let's flip the script a little bit.
+
+181
+00:14:57.440 --> 00:15:01.240
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+182
+00:15:02.620 --> 00:15:11.000
+<v Shauli Rozen>The time it took us to understand Kubernetes is really a DevOps, a platform engineering,
+
+183
+00:15:11.000 --> 00:15:14.340
+<v Shauli Rozen>is really security, is platform engineering focused,
+
+184
+00:15:15.120 --> 00:15:20.280
+<v Shauli Rozen>and that we need to find the right way to get to the hearts of those stakeholders.
+
+185
+00:15:20.680 --> 00:15:26.900
+<v Shauli Rozen>And then once we knew that, it took us a lot of time to get comfortable with open source.
+
+186
+00:15:27.680 --> 00:15:31.360
+<v Shauli Rozen>Today, Kubescape and us being part of the open source community,
+
+187
+00:15:32.080 --> 00:15:37.160
+<v Shauli Rozen>and we are feeling very native in the CNCF, the Linux Foundation,
+
+188
+00:15:37.960 --> 00:15:44.240
+<v Shauli Rozen>foundation. It took us too long in my mind, and it's on me, to flip the switch from a completely
+
+189
+00:15:44.240 --> 00:15:51.160
+<v Shauli Rozen>security company to an open source driven company. It's a cultural change. I think the team was
+
+190
+00:15:51.160 --> 00:15:58.500
+<v Shauli Rozen>amazing in embracing it, but it took us a little bit too long to actually put our actions where our
+
+191
+00:15:58.500 --> 00:16:03.820
+<v Shauli Rozen>mouth is. We would always say we're an open source company, we're going to open source everything.
+
+192
+00:16:03.820 --> 00:16:08.000
+<v Shauli Rozen>Everything in the cluster is going to be open source, and then a new functionality will come in.
+
+193
+00:16:08.100 --> 00:16:09.260
+<v Shauli Rozen>Are you really going to open it?
+
+194
+00:16:09.820 --> 00:16:11.620
+<v Shauli Rozen>And in the beginning, we were very hesitant.
+
+195
+00:16:12.180 --> 00:16:16.980
+<v Shauli Rozen>Now I think we, as a company, embraced it, and it took us a little bit too long.
+
+196
+00:16:17.360 --> 00:16:19.420
+<v Shauli Rozen>But I think now we are fully behind it.
+
+197
+00:16:21.860 --> 00:16:23.420
+<v Noah Labhart>This will be fun to hear.
+
+198
+00:16:23.640 --> 00:16:26.500
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+199
+00:16:28.620 --> 00:16:30.100
+<v Shauli Rozen>I see growth ahead.
+
+200
+00:16:30.100 --> 00:16:37.580
+<v Shauli Rozen>head. I always say I'd love to grow in income while not growing too much in expenses, right?
+
+201
+00:16:37.740 --> 00:16:44.880
+<v Shauli Rozen>And I think I have the right team that will take me to a very sizable revenue position. And we
+
+202
+00:16:44.880 --> 00:16:48.880
+<v Shauli Rozen>don't need to grow the team exponentially in order to do that. I think we have the right processes
+
+203
+00:16:48.880 --> 00:16:57.600
+<v Shauli Rozen>and the right teams in place. I do see us going more and more into enterprise accounts and
+
+204
+00:16:57.600 --> 00:17:04.300
+<v Shauli Rozen>enterprise organizations. We are already in many of those and I just see that growing. I see DevOps
+
+205
+00:17:04.300 --> 00:17:11.340
+<v Shauli Rozen>and DevSecOps and security engineering and security architects all merging together and getting shared
+
+206
+00:17:11.340 --> 00:17:17.720
+<v Shauli Rozen>responsibility around Kubernetes security. And I think one of the challenges that we already had
+
+207
+00:17:17.720 --> 00:17:24.320
+<v Shauli Rozen>and that we're going to continue to try to solve in the future is how can our product create joint
+
+208
+00:17:24.320 --> 00:17:28.800
+<v Shauli Rozen>joint discussions and shared language between those stakeholders.
+
+209
+00:17:28.980 --> 00:17:31.780
+<v Shauli Rozen>Because security, they talk the risk language,
+
+210
+00:17:32.040 --> 00:17:34.960
+<v Shauli Rozen>and sometimes DevOps, they don't speak the risk language.
+
+211
+00:17:35.140 --> 00:17:39.840
+<v Shauli Rozen>And we see a lot of tension between platform engineering teams and security teams.
+
+212
+00:17:40.100 --> 00:17:43.820
+<v Shauli Rozen>and I think bridging that gap is going to be the future of ARMO
+
+213
+00:17:43.820 --> 00:17:46.160
+<v Shauli Rozen>and the future of Kubernetes security in general.
+
+214
+00:17:47.340 --> 00:17:48.520
+<v Noah Labhart>Let's switch to you, Shauli.
+
+215
+00:17:48.580 --> 00:17:50.240
+<v Noah Labhart>Who influences the way that you work?
+
+216
+00:17:50.420 --> 00:17:52.440
+<v Noah Labhart>Name a person or many persons or something.
+
+217
+00:17:52.560 --> 00:17:53.420
+<v Noah Labhart>You look up to and why.
+
+218
+00:17:54.760 --> 00:18:13.340
+<v Shauli Rozen>I have many mentors. One of the things that I am not afraid to do is to consult with many people around me. I have very, I would say, talented and knowledgeable board members. I'm lucky to have them in my board and I consult with them quite a bit.
+
+219
+00:18:13.340 --> 00:18:18.780
+<v Shauli Rozen>some might say too much right there is always a balance between how much you want to share
+
+220
+00:18:18.780 --> 00:18:26.300
+<v Shauli Rozen>with your board and many people I've heard the recommendation not once in my life which is
+
+221
+00:18:26.300 --> 00:18:32.720
+<v Shauli Rozen>manage what you share with the board manage the board I have to say I'm probably not doing that
+
+222
+00:18:32.720 --> 00:18:39.640
+<v Shauli Rozen>very well I'm probably I don't know if too open but very open with my board and as of now in my
+
+223
+00:18:39.640 --> 00:18:43.920
+<v Shauli Rozen>mind it proves valuable and I think I am doing that because I feel I have the right people
+
+224
+00:18:43.920 --> 00:18:47.520
+<v Shauli Rozen>in my board that I can listen to and will give me the right advice.
+
+225
+00:18:47.820 --> 00:18:52.320
+<v Shauli Rozen>They come from the right places in the industry, they've seen things, they've been where I
+
+226
+00:18:52.320 --> 00:18:58.520
+<v Shauli Rozen>am, they've been entrepreneurs in the past, so I feel like I can trust them and I feel
+
+227
+00:18:58.520 --> 00:18:59.440
+<v Shauli Rozen>we have a shared interest.
+
+228
+00:18:59.760 --> 00:19:05.300
+<v Shauli Rozen>So a lot of people in my board, I have many mentors from my army time around leadership
+
+229
+00:19:05.300 --> 00:19:09.660
+<v Shauli Rozen>that have, I would say, sculptured the way I lead my team.
+
+230
+00:19:09.800 --> 00:19:13.020
+<v Shauli Rozen>Many times I get this feedback, for example, here in the company,
+
+231
+00:19:13.060 --> 00:19:15.480
+<v Shauli Rozen>that, hey, you are too close to the employees.
+
+232
+00:19:16.320 --> 00:19:18.920
+<v Shauli Rozen>Like I said before, it's a brotherhood, right?
+
+233
+00:19:19.000 --> 00:19:21.100
+<v Shauli Rozen>It's a very close community of employees,
+
+234
+00:19:21.200 --> 00:19:25.640
+<v Shauli Rozen>and I think it's because that is how my unit worked in the army.
+
+235
+00:19:26.740 --> 00:19:30.080
+<v Shauli Rozen>And I'm still learning and changing all the time
+
+236
+00:19:30.080 --> 00:19:34.920
+<v Shauli Rozen>because every step that we get to as a company,
+
+237
+00:19:35.300 --> 00:19:38.860
+<v Shauli Rozen>is the first time that I'm experiencing that as a leader.
+
+238
+00:19:39.060 --> 00:19:42.500
+<v Shauli Rozen>I've been in startups before, as in executive positions.
+
+239
+00:19:42.880 --> 00:19:47.020
+<v Shauli Rozen>There is a quote from a guy who is also, if you're talking about mentors,
+
+240
+00:19:47.620 --> 00:19:51.080
+<v Shauli Rozen>Pini Yacouel, who was the CEO of my previous company.
+
+241
+00:19:51.700 --> 00:19:53.140
+<v Shauli Rozen>He was always saying to me,
+
+242
+00:19:53.280 --> 00:19:57.320
+<v Shauli Rozen>we grew the company from 20 people to 200 people when I left.
+
+243
+00:19:57.460 --> 00:19:59.880
+<v Shauli Rozen>And he said, when we were 20, he said,
+
+244
+00:19:59.940 --> 00:20:02.740
+<v Shauli Rozen>surely I've never been a CEO of a 20-people company.
+
+245
+00:20:02.740 --> 00:20:21.020
+<v Shauli Rozen>And then we were 50. I've never been a CEO of a 50-people company. So every experience also for me is new and I need to adjust and I need to change my leadership style. So I think the people that you put around you are super important to help you adjust to each one of those phases.
+
+246
+00:20:23.140 --> 00:20:24.400
+<v Noah Labhart>Okay, Shauli, last question.
+
+247
+00:20:24.620 --> 00:20:29.360
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+248
+00:20:29.840 --> 00:20:30.960
+<v Noah Labhart>They're jazzed about it.
+
+249
+00:20:31.000 --> 00:20:33.880
+<v Noah Labhart>They can't wait to show it off to the world and can't wait to show it off to you right there on the plane.
+
+250
+00:20:34.240 --> 00:20:37.020
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+251
+00:20:38.520 --> 00:20:40.380
+<v Shauli Rozen>Ask for money early.
+
+252
+00:20:40.380 --> 00:20:52.740
+<v Shauli Rozen>I think one of the biggest things that many entrepreneurs fall in is they get design partners and they give them the product for free because they want to build the product.
+
+253
+00:20:53.000 --> 00:21:03.700
+<v Shauli Rozen>But I don't want to take credit for the quote, but I've read somewhere a quote which says, when you ask people for their opinions, you get lies.
+
+254
+00:21:04.280 --> 00:21:08.620
+<v Shauli Rozen>When you ask for their money, that's when you get the real feedback.
+
+255
+00:21:10.420 --> 00:21:12.180
+<v Shauli Rozen>That's one very practical advice.
+
+256
+00:21:12.320 --> 00:21:13.860
+<v Shauli Rozen>Start selling quickly.
+
+257
+00:21:14.140 --> 00:21:18.260
+<v Shauli Rozen>Start to try selling quickly to get the no very quickly
+
+258
+00:21:18.260 --> 00:21:20.160
+<v Shauli Rozen>because it will always start with a no.
+
+259
+00:21:20.800 --> 00:21:22.640
+<v Noah Labhart>That's fantastic advice.
+
+260
+00:21:23.260 --> 00:21:25.560
+<v Noah Labhart>Well, Shauli, thank you for being on the show today.
+
+261
+00:21:25.640 --> 00:21:27.720
+<v Noah Labhart>Thank you for telling the creation story of ARMO.
+
+262
+00:21:28.180 --> 00:21:28.680
+<v Noah Labhart>Thank
+
+263
+00:21:28.660 --> 00:21:29.300
+<v Shauli Rozen>you for having me.
+
+264
+00:21:31.880 --> 00:21:34.620
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+265
+00:21:38.800 --> 00:21:41.860
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+266
+00:21:41.980 --> 00:21:46.780
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+267
+00:21:47.380 --> 00:21:49.600
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+268
+00:21:49.900 --> 00:21:51.920
+<v Noah Labhart>Both things help us out tremendously.
+
+269
+00:21:54.720 --> 00:21:56.220
+<v Noah Labhart>And thanks again for listening.

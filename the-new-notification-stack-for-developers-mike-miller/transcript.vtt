@@ -1,0 +1,607 @@
+WEBVTT
+
+NOTE The New Notification Stack for Developers - Mike Miller
+
+1
+00:00:02.220 --> 00:00:27.420
+<v Noah Labhart>Howdy, listeners. Today we are kicking off a new series of interviews entitled The New Notification Stack for Developers, brought to you by our long-time friends and sponsors of the Code Story podcast, Courier. As a reminder, Courier is developer infrastructure for product notifications, making it easier to deliver the notification experience that your customers expect. Check out their product to learn more at courier.com.
+
+2
+00:00:28.360 --> 00:00:35.480
+<v Noah Labhart>Well, today I have a special guest on the Code Story podcast, Mike Miller, the lead mobile SDK engineer at Courier.
+
+3
+00:00:35.580 --> 00:00:41.220
+<v Noah Labhart>He has many years of experience in product management, UI, UX, design, and mobile engineering.
+
+4
+00:00:41.420 --> 00:00:43.200
+<v Noah Labhart>Mike, thank you for being on the show today.
+
+5
+00:00:43.420 --> 00:00:45.200
+<v Mike Miller>Hey, thank you for having me. Excited to be here.
+
+6
+00:00:45.480 --> 00:00:52.200
+<v Noah Labhart>Before we go too far into our topic for today, tell me and my audience a little bit more about you.
+
+7
+00:00:52.200 --> 00:01:06.600
+<v Mike Miller>Yeah, been doing a lot of startup-y things for about 10 years and worked at a bunch of different startup companies, built a bunch of different products from scratch on not only the design side, but the mobile engineering side.
+
+8
+00:01:06.600 --> 00:01:24.580
+<v Mike Miller>So along the way, I got a bunch of experience building notification systems out from scratch, experienced a lot of issues there. And now I lead the mobile engineering team at Courier, building the ideal way to make push notifications happen in your app.
+
+9
+00:01:24.580 --> 00:01:25.080
+<v Noah Labhart>I
+
+10
+00:01:25.000 --> 00:01:33.860
+<v Noah Labhart>would imagine given your track record of the things you've worked on a lot of the mobile space, you've had to rebuild and rebuild and rebuild this a ton of times.
+
+11
+00:01:34.000 --> 00:01:36.200
+<v Noah Labhart>And now you're setting it up the right way.
+
+12
+00:01:36.300 --> 00:01:37.600
+<v Noah Labhart>Am I understanding you correctly?
+
+13
+00:01:38.600 --> 00:01:39.900
+<v Mike Miller>That's a good way to put it.
+
+14
+00:01:39.920 --> 00:01:42.640
+<v Mike Miller>I've definitely learned the wrong way many times.
+
+15
+00:01:43.160 --> 00:01:46.880
+<v Mike Miller>Now I get to definitely stay on the right side of things.
+
+16
+00:01:47.140 --> 00:01:47.640
+<v Mike Miller>That's
+
+17
+00:01:47.620 --> 00:01:48.120
+<v Noah Labhart>awesome.
+
+18
+00:01:48.000 --> 00:01:48.620
+<v Noah Labhart>Well, cool.
+
+19
+00:01:48.680 --> 00:01:49.960
+<v Noah Labhart>Let's dive into that then.
+
+20
+00:01:49.960 --> 00:01:58.400
+<v Noah Labhart>So the happy path for building push notifications as a mobile engineer, as someone who's setting up mobile apps, what is that happy path?
+
+21
+00:01:58.600 --> 00:02:02.020
+<v Noah Labhart>What is the happy path for building push notifications in an app?
+
+22
+00:02:02.500 --> 00:02:11.160
+<v Mike Miller>So typically, you're going to get some sort of design piece that you need to solve for your users.
+
+23
+00:02:11.340 --> 00:02:16.880
+<v Mike Miller>So that's like, hey, we're going to send a message out and we need users to come back into the app.
+
+24
+00:02:17.000 --> 00:02:18.340
+<v Mike Miller>That's like the user experience.
+
+25
+00:02:20.120 --> 00:02:26.120
+<v Mike Miller>seen pushes before. You like somebody's post on Instagram. They get a push notification saying,
+
+26
+00:02:26.320 --> 00:02:32.680
+<v Mike Miller>hey, somebody liked your post. Your DoorDash delivery is on the way. Maybe there's a sale
+
+27
+00:02:32.680 --> 00:02:39.720
+<v Mike Miller>in some sort of store type app that you need to hear about. So they're trying to re-engage you.
+
+28
+00:02:40.280 --> 00:02:46.380
+<v Mike Miller>As a developer, then what you have to do is you have to figure out, okay, how are we going to
+
+29
+00:02:46.380 --> 00:02:53.140
+<v Mike Miller>to send these messages? When the user receives this message on the device, what are we going to
+
+30
+00:02:53.140 --> 00:02:59.600
+<v Mike Miller>do? How do we make them go into the app and navigate to the right page? So this usually
+
+31
+00:02:59.600 --> 00:03:05.820
+<v Mike Miller>starts with Googling how to push notifications work. And you figure out that, okay, I need this
+
+32
+00:03:05.820 --> 00:03:13.580
+<v Mike Miller>thing called a push notification device token. Then you figure out you have to store these device
+
+33
+00:03:13.580 --> 00:03:20.160
+<v Mike Miller>tokens in your database. Then you have to figure out how to get those tokens out of your database
+
+34
+00:03:20.160 --> 00:03:26.620
+<v Mike Miller>and send a message to the token. Then if everything goes well there, which usually it doesn't,
+
+35
+00:03:26.620 --> 00:03:32.280
+<v Mike Miller>if you're lucky enough, you get to now make the notification actionable in your app, which
+
+36
+00:03:32.280 --> 00:03:39.480
+<v Mike Miller>requires a whole nother set of things to understand. And then you can finally start to
+
+37
+00:03:39.480 --> 00:03:42.540
+<v Mike Miller>make your app do something when someone receives the notification.
+
+38
+00:03:43.020 --> 00:03:45.220
+<v Noah Labhart>So you're using notifications
+
+39
+00:03:45.220 --> 00:03:51.540
+<v Noah Labhart>to re-engage users or to hook people into the application again. And throughout the way,
+
+40
+00:03:51.560 --> 00:03:57.540
+<v Noah Labhart>there are different things you have to do to register a device and to receive that information
+
+41
+00:03:57.540 --> 00:04:03.160
+<v Noah Labhart>and do something with it, right? What are some of the most common problems that mobile engineers
+
+42
+00:04:03.160 --> 00:04:08.560
+<v Noah Labhart>face when building push notifications? Because, you know, being a mobile engineer myself, I could
+
+43
+00:04:09.480 --> 00:04:13.380
+<v Noah Labhart>you're going to go with some of these things. But I'm curious what you have to say there. And
+
+44
+00:04:13.380 --> 00:04:20.140
+<v Noah Labhart>in how you're describing that path, there's lots of different pitfalls, I would say, and probably
+
+45
+00:04:20.140 --> 00:04:24.900
+<v Noah Labhart>complexities that are hidden in your description. So tell me about that.
+
+46
+00:04:25.520 --> 00:04:27.000
+<v Mike Miller>The first thing is
+
+47
+00:04:27.940 --> 00:04:32.800
+<v Mike Miller>developers go through and they start Googling a bunch of different things about push notifications.
+
+48
+00:04:32.800 --> 00:04:51.420
+<v Mike Miller>Push notifications have changed a lot over the years. The original ones that came out on iOS are not the same exact way they are now and same for Android. So there's a lot of questions and answers on your Googling path that are old.
+
+49
+00:04:51.420 --> 00:05:02.740
+<v Mike Miller>So one of the common pitfalls is people will put the request push notification permission prompt in a weird part of their app.
+
+50
+00:05:02.920 --> 00:05:12.360
+<v Mike Miller>I think we've all installed an app before and had it say before you've even used it, you just open it up and it says, do you agree to push notifications?
+
+51
+00:05:12.560 --> 00:05:14.120
+<v Mike Miller>And you're like, wait, what?
+
+52
+00:05:14.280 --> 00:05:16.200
+<v Mike Miller>Like, I've never even used this app.
+
+53
+00:05:16.360 --> 00:05:17.220
+<v Mike Miller>What are you going to send me?
+
+54
+00:05:17.220 --> 00:05:29.480
+<v Mike Miller>And I think that the root of that is from old answers on the internet and people just kind of quickly adding the code snippets into their app in places that aren't ideal for the user experience.
+
+55
+00:05:29.480 --> 00:05:44.420
+<v Mike Miller>Another common problem is when you go to send a message to a push notification token, the data that you send to that token has to be perfectly structured.
+
+56
+00:05:44.700 --> 00:05:52.160
+<v Mike Miller>And if it's not structured perfectly, it's either very difficult to debug or it's not possible to debug.
+
+57
+00:05:52.400 --> 00:05:58.540
+<v Mike Miller>You can send the message and have the message go through successfully, but you won't receive it.
+
+58
+00:05:59.480 --> 00:06:05.320
+<v Mike Miller>structured in a really particular way in order to receive that message on the device.
+
+59
+00:06:06.160 --> 00:06:14.280
+<v Mike Miller>Another thing is, as you build these out, you typically have to bring in more engineers or
+
+60
+00:06:14.280 --> 00:06:19.860
+<v Mike Miller>just different parts of your stack into understanding what it takes to receive these
+
+61
+00:06:19.860 --> 00:06:25.560
+<v Mike Miller>messages and send these messages. So it's very common to be like, okay, I'm going to add pushes
+
+62
+00:06:25.560 --> 00:06:32.800
+<v Mike Miller>without realizing, oh, I need to work with the backend team to store these tokens and send these
+
+63
+00:06:32.800 --> 00:06:39.600
+<v Mike Miller>messages out at the right time. And that can create just more collaboration that you maybe
+
+64
+00:06:39.600 --> 00:06:41.080
+<v Mike Miller>didn't plan for early on.
+
+65
+00:06:41.260 --> 00:06:45.860
+<v Noah Labhart>Okay, so then let's jump into Courier then. So how does Courier's
+
+66
+00:06:45.860 --> 00:06:48.480
+<v Noah Labhart>mobile SDK solve these types of problems?
+
+67
+00:06:49.340 --> 00:06:53.740
+<v Mike Miller>Courier is building a super awesome notification
+
+68
+00:06:55.560 --> 00:07:01.620
+<v Mike Miller>as a service. So a lot of the rails that you would normally have to build into your app,
+
+69
+00:07:01.840 --> 00:07:07.720
+<v Mike Miller>Courier is building and they're already in place. You don't have to rebuild a lot of these systems
+
+70
+00:07:07.720 --> 00:07:14.960
+<v Mike Miller>from scratch like you used to have to. And what the Courier mobile SDK has done to integrate with
+
+71
+00:07:14.960 --> 00:07:22.920
+<v Mike Miller>Courier is we automatically do much of the heavy lifting. So if you use the mobile SDK,
+
+72
+00:07:22.920 --> 00:07:26.880
+<v Mike Miller>you don't have to manually sync push notification tokens.
+
+73
+00:07:27.180 --> 00:07:29.420
+<v Mike Miller>They're automatically synced to Courier.
+
+74
+00:07:29.600 --> 00:07:33.360
+<v Mike Miller>All you do is just use the SDK, how it's documented,
+
+75
+00:07:33.700 --> 00:07:36.340
+<v Mike Miller>integrate it into your user experience you're building,
+
+76
+00:07:36.540 --> 00:07:40.480
+<v Mike Miller>and you never have to deal with a push notification token ever again.
+
+77
+00:07:40.940 --> 00:07:45.780
+<v Mike Miller>So you don't have to worry about it being valid or invalid or anything like that.
+
+78
+00:07:45.940 --> 00:07:52.080
+<v Mike Miller>We've also automatically structured the data you send via a push notification.
+
+79
+00:07:52.920 --> 00:07:59.420
+<v Mike Miller>in a way that gives you good insight if there are errors, but most errors are completely gone.
+
+80
+00:07:59.580 --> 00:08:05.680
+<v Mike Miller>So you can get up and running sending messages to the device very quickly. We have quite a few
+
+81
+00:08:05.680 --> 00:08:11.040
+<v Mike Miller>convenient functions in there. So you can request push notification permissions when makes sense for
+
+82
+00:08:11.040 --> 00:08:18.400
+<v Mike Miller>you and not have to deal with Googling how to ask for that. It simplifies quite a bit down there in
+
+83
+00:08:18.400 --> 00:08:21.260
+<v Mike Miller>in terms of managing getting the pushes up and running
+
+84
+00:08:21.260 --> 00:08:23.560
+<v Mike Miller>or getting the pushes to where you can receive them nicely.
+
+85
+00:08:23.900 --> 00:08:25.380
+<v Mike Miller>And then we have a nice function
+
+86
+00:08:25.380 --> 00:08:28.320
+<v Mike Miller>that allows you to send a test message out to yourself.
+
+87
+00:08:28.500 --> 00:08:31.280
+<v Mike Miller>So you don't even need to set up like a backend
+
+88
+00:08:31.280 --> 00:08:35.380
+<v Mike Miller>or work with a backend engineer or do raw HTTP calls.
+
+89
+00:08:35.600 --> 00:08:39.200
+<v Mike Miller>Like all of it can be done from right inside the SDK
+
+90
+00:08:39.870 --> 00:08:43.060
+<v Mike Miller>and one engineer can get up and running with all of it.
+
+91
+00:08:43.800 --> 00:08:44.600
+<v Noah Labhart>Nice, okay.
+
+92
+00:08:44.680 --> 00:08:48.220
+<v Noah Labhart>So that leads me into my next question really, really well.
+
+93
+00:08:48.400 --> 00:08:53.060
+<v Noah Labhart>So how does this affect the collaboration process for a mobile engineering team?
+
+94
+00:08:53.160 --> 00:08:55.100
+<v Noah Labhart>Because it simplifies the process.
+
+95
+00:08:55.280 --> 00:09:01.580
+<v Noah Labhart>It simplifies how a back-end engineer has to sort of create the innards for a messaging system.
+
+96
+00:09:01.900 --> 00:09:06.040
+<v Noah Labhart>But for the mobile engineering team themselves, how does that affect the collaboration process?
+
+97
+00:09:06.820 --> 00:09:09.300
+<v Mike Miller>A lot of this is designed in a way.
+
+98
+00:09:09.320 --> 00:09:14.540
+<v Mike Miller>A lot of how we design the implementation of the code is designed in a way where one engineer can get up and running.
+
+99
+00:09:15.320 --> 00:09:17.260
+<v Mike Miller>So I can create a Courier account.
+
+100
+00:09:18.400 --> 00:09:25.160
+<v Mike Miller>grab my key out of there. I can implement the SDK. I can use that key through our simple
+
+101
+00:09:25.160 --> 00:09:31.760
+<v Mike Miller>authentication function flow and start sending messages to myself. Once that's all good to go,
+
+102
+00:09:31.980 --> 00:09:39.280
+<v Mike Miller>you can then start to integrate the more complicated parts into your backend and expect
+
+103
+00:09:39.280 --> 00:09:44.740
+<v Mike Miller>the same exact result. So I could get up and running, getting pushes onto my device as one
+
+104
+00:09:44.740 --> 00:09:51.040
+<v Mike Miller>one engineer. Then I can pass over to the backend engineer, use this specific send request to
+
+105
+00:09:51.040 --> 00:09:56.840
+<v Mike Miller>Courier. And then I expect to receive those pushes in the same exact way that I had been testing with.
+
+106
+00:09:56.960 --> 00:10:03.080
+<v Mike Miller>So no longer having to build the infrastructure to manage things from scratch, just work with
+
+107
+00:10:03.080 --> 00:10:04.800
+<v Mike Miller>your backend to send the right messages.
+
+108
+00:10:05.360 --> 00:10:08.800
+<v Noah Labhart>Okay. So I'm sold, right? I want to get up and running.
+
+109
+00:10:08.800 --> 00:10:13.660
+<v Noah Labhart>How do I set this up? How do I get the mobile SDK integrated into my app?
+
+110
+00:10:13.920 --> 00:10:19.340
+<v Mike Miller>So first, you can go to docs.courier.com. Underneath the client library section,
+
+111
+00:10:19.600 --> 00:10:26.500
+<v Mike Miller>there are four SDKs. We have an iOS, Android, React Native, and Flutter SDK. They all support
+
+112
+00:10:27.400 --> 00:10:32.880
+<v Mike Miller>APNS, Apple Push Notification Service, and Firebase Cloud Messaging. You can follow each
+
+113
+00:10:32.880 --> 00:10:37.080
+<v Mike Miller>repo. If you just go to GitHub, you can see the repo, and you can follow a nice
+
+114
+00:10:38.800 --> 00:10:44.620
+<v Mike Miller>up and running. We really try to minimize the amount of code that somebody has to write. So
+
+115
+00:10:44.620 --> 00:10:50.740
+<v Mike Miller>it's definitely consolidated down to as few lines of code as we can try to get to at this point.
+
+116
+00:10:50.780 --> 00:10:56.260
+<v Mike Miller>And maybe we can remove some more steps as time goes on. But yeah, it keeps it really,
+
+117
+00:10:56.320 --> 00:10:59.120
+<v Mike Miller>really simple that way. So you can just follow
+
+118
+00:10:59.120 --> 00:10:59.620
+<v Mike Miller>the docs.
+
+119
+00:11:00.100 --> 00:11:05.580
+<v Noah Labhart>Spoken like a true developer, follow the docs, right? Okay, Mike, this all makes sense to me.
+
+120
+00:11:05.580 --> 00:11:11.620
+<v Noah Labhart>and being a mobile engineer, I'm connecting with what you're telling me. But let's quantify it a
+
+121
+00:11:11.620 --> 00:11:17.600
+<v Noah Labhart>little bit. So in building my mobile application, my mobile experience, how many lines of code am
+
+122
+00:11:17.600 --> 00:11:23.880
+<v Noah Labhart>I saving by going and using Courier? Or how much time am I saving by going and using Courier?
+
+123
+00:11:24.020 --> 00:11:25.000
+<v Noah Labhart>Tell me a little bit there.
+
+124
+00:11:25.940 --> 00:11:32.180
+<v Mike Miller>So the mobile SDKs save a considerable amount of code,
+
+125
+00:11:32.180 --> 00:11:39.540
+<v Mike Miller>not only on your mobile app, but on your backend. And most of this was crazy is most of the mobile
+
+126
+00:11:39.540 --> 00:11:47.720
+<v Mike Miller>SDKs are kind of just integration more so than actually like code. So once you sign a user in
+
+127
+00:11:47.720 --> 00:11:55.960
+<v Mike Miller>and you request push notification tokens, there's basically one other function that is what you want
+
+128
+00:11:55.960 --> 00:12:00.980
+<v Mike Miller>to do when the notification arrives on the device or when a user clicks it. And that's about it.
+
+129
+00:12:02.180 --> 00:12:09.080
+<v Mike Miller>would be many, many days of hunting through potentially outdated documentation from Apple
+
+130
+00:12:09.080 --> 00:12:14.560
+<v Mike Miller>and Google, working with your backend engineer. So we really consolidate probably things down into
+
+131
+00:12:14.560 --> 00:12:21.840
+<v Mike Miller>less than 50 lines of code or around there and saving many, many days. You can get up and running
+
+132
+00:12:21.840 --> 00:12:25.700
+<v Mike Miller>with the mobile SDKs within a couple hours.
+
+133
+00:12:26.180 --> 00:12:28.760
+<v Noah Labhart>Okay, I got to ask Mike, as an engineer myself,
+
+134
+00:12:28.760 --> 00:12:33.800
+<v Noah Labhart>and as someone who's built stuff, how does it feel to be building something that truly helps
+
+135
+00:12:33.800 --> 00:12:39.560
+<v Noah Labhart>developers save time? It simplifies the process. And this is something that, you know, in the past
+
+136
+00:12:39.560 --> 00:12:44.360
+<v Noah Labhart>would have made your job easier. How does it feel to be building that for other devs?
+
+137
+00:12:44.880 --> 00:12:52.840
+<v Mike Miller>It's awesome. When I joined Courier, I had been very familiar with this problem for many years.
+
+138
+00:12:52.840 --> 00:13:17.900
+<v Mike Miller>And my mentality is, as we continue to build this, it's if we're building this once and for all, for like a million developers, like how would we structure this? How can we remove as much complexity out as possible and just make it to where developers get to focus on creating a great user experience rather than building notification infrastructure?
+
+139
+00:13:17.900 --> 00:13:18.400
+<v Mike Miller>infrastructure.
+
+140
+00:13:19.040 --> 00:13:23.020
+<v Noah Labhart>Well, Mike, thank you for being on the show today. I think this has been an
+
+141
+00:13:23.020 --> 00:13:28.360
+<v Noah Labhart>excellent overview on the mobile SDK, the problems for mobile engineers, and why Courier's mobile
+
+142
+00:13:28.360 --> 00:13:35.640
+<v Noah Labhart>SDK and approach to integrating notification infrastructure into a mobile app is super
+
+143
+00:13:35.640 --> 00:13:38.880
+<v Noah Labhart>simple and easy to use. I really appreciate you being on the show today.
+
+144
+00:13:39.100 --> 00:13:40.360
+<v Mike Miller>Yeah, thank you so much.
+
+145
+00:13:43.500 --> 00:13:47.760
+<v Noah Labhart>This was an awesome conversation and a bit nostalgic for me to recall some of the mobile
+
+146
+00:13:47.900 --> 00:13:51.400
+<v Noah Labhart>engineering pain that accompanies setting up push notifications within an app.
+
+147
+00:13:51.580 --> 00:13:55.940
+<v Noah Labhart>Mike did a fantastic job illustrating how Courier is simplifying this process,
+
+148
+00:13:56.120 --> 00:14:00.000
+<v Noah Labhart>not only for mobile engineers, but for the entire engineering team involved.
+
+149
+00:14:01.560 --> 00:14:06.820
+<v Noah Labhart>As a reminder, Courier makes it easier for you to deliver a world-class notification experience
+
+150
+00:14:06.820 --> 00:14:11.680
+<v Noah Labhart>that your customers expect. To learn more about their product and get started today,
+
+151
+00:14:11.900 --> 00:14:16.340
+<v Noah Labhart>check out courier.com. And thanks again for listening.

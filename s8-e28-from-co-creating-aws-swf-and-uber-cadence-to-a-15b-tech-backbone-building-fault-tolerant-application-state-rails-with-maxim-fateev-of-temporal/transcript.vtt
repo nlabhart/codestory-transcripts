@@ -1,0 +1,1263 @@
+WEBVTT
+
+NOTE S8 E28: From Co-Creating AWS SWF and Uber Cadence to a $1.5B Tech Backbone: Building Fault-Tolerant Application State Rails with Maxim Fateev of Temporal
+
+1
+00:00:00.000 --> 00:00:04.060
+<v Maxim Fateev>In reality, the whole thing is just one big set of compromises.
+
+2
+00:00:05.480 --> 00:00:09.480
+<v Maxim Fateev>For example, when we started the project, we didn't get official funding.
+
+3
+00:00:09.640 --> 00:00:14.560
+<v Maxim Fateev>It was a bottoms-up project, which was really cool at Uber at the time, that you could start
+
+4
+00:00:14.560 --> 00:00:18.600
+<v Maxim Fateev>a project like that and still get support from your management and then get official
+
+5
+00:00:18.600 --> 00:00:19.680
+<v Maxim Fateev>funding if it's successful.
+
+6
+00:00:20.420 --> 00:00:24.140
+<v Maxim Fateev>When we started the project, I told Samar, I don't like simple workflow design, even
+
+7
+00:00:24.140 --> 00:00:24.720
+<v Maxim Fateev>conceptually.
+
+8
+00:00:24.760 --> 00:00:25.800
+<v Maxim Fateev>I want to redo all of that.
+
+9
+00:00:25.980 --> 00:00:28.000
+<v Maxim Fateev>His answer was, and he's a very practical guy.
+
+10
+00:00:30.000 --> 00:00:31.860
+<v Maxim Fateev>I mean, he said, there is no way, right?
+
+11
+00:00:31.880 --> 00:00:32.580
+<v Maxim Fateev>We have zero funding.
+
+12
+00:00:32.680 --> 00:00:33.360
+<v Maxim Fateev>We have no time.
+
+13
+00:00:33.400 --> 00:00:34.280
+<v Maxim Fateev>We need to launch something.
+
+14
+00:00:34.480 --> 00:00:38.020
+<v Maxim Fateev>Let's just make something which looks like a simple workflow, at least on the high level.
+
+15
+00:00:39.080 --> 00:00:40.540
+<v Maxim Fateev>My name is Maxim Fateev.
+
+16
+00:00:40.820 --> 00:00:43.080
+<v Maxim Fateev>I'm CEO and co-founder of Temporal.
+
+17
+00:00:46.740 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+18
+00:00:52.340 --> 00:00:53.680
+<v Clip>It's six months moonlighting.
+
+19
+00:00:53.720 --> 00:00:55.200
+<v Clip>There's nothing like the bedcams.
+
+20
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+21
+00:00:58.280 --> 00:00:59.640
+<v Clip>I don't exactly know what to do.
+
+22
+00:01:00.000 --> 00:01:00.500
+<v Clip>Who
+
+23
+00:01:00.480 --> 00:01:04.560
+<v Noah Labhart>built the teams that have their back.
+
+24
+00:01:08.680 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+25
+00:01:15.180 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+26
+00:01:18.240 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+27
+00:01:22.240 --> 00:01:25.840
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+28
+00:01:26.960 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+29
+00:01:30.000 --> 00:01:37.260
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today how Maxim Fateev is giving you
+
+30
+00:01:37.260 --> 00:01:42.520
+<v Noah Labhart>code for more reliable systems, helping you deliver your features faster.
+
+31
+00:01:47.340 --> 00:01:53.100
+<v Noah Labhart>Maxim Fateev grew up in the Soviet Union and witnessed its collapse. He left in 1995 and
+
+32
+00:01:53.100 --> 00:01:57.960
+<v Noah Labhart>moved to Brazil, where he got his master's in computer science. In the late 90s, he moved to
+
+33
+00:01:57.960 --> 00:02:03.600
+<v Noah Labhart>the US, eventually landing in Seattle, which he loves. He's been married for 27 years with three
+
+34
+00:02:03.600 --> 00:02:08.760
+<v Noah Labhart>boys and loves to hike, play ice hockey, and snowboard. He mentioned there were a number of
+
+35
+00:02:08.760 --> 00:02:12.960
+<v Noah Labhart>mountain choices, but he prefers Whistler in Canada when he can make the five-hour drive.
+
+36
+00:02:14.620 --> 00:02:20.620
+<v Noah Labhart>During the development of open-source services at Amazon, Maxim came across the idea of durable
+
+37
+00:02:20.620 --> 00:02:26.480
+<v Noah Labhart>execution. Eventually, at Uber, he launched an open-source library that eventually would become
+
+38
+00:02:30.660 --> 00:02:34.060
+<v Noah Labhart>venture. This is the creation story of Temporal.
+
+39
+00:02:39.000 --> 00:02:43.400
+<v Maxim Fateev>We started as an open source project. Obviously, we have a company now to monetize that,
+
+40
+00:02:43.600 --> 00:02:48.660
+<v Maxim Fateev>and the company is the main contributor to the core project. But again, it's mostly the
+
+41
+00:02:48.660 --> 00:02:54.000
+<v Maxim Fateev>most important thing about it. It's an open source project. Imagine you can write code,
+
+42
+00:02:54.000 --> 00:02:59.320
+<v Maxim Fateev>and there is runtime which will preserve the full state of execution of that code all the time, durably.
+
+43
+00:03:00.020 --> 00:03:01.340
+<v Maxim Fateev>We call it durable execution.
+
+44
+00:03:01.960 --> 00:03:06.480
+<v Maxim Fateev>So, for example, if you have a function which calls three APIs, A, B, and C,
+
+45
+00:03:06.600 --> 00:03:11.300
+<v Maxim Fateev>and this function is blocked on API B, and then process which hosts this function crashes,
+
+46
+00:03:12.180 --> 00:03:16.700
+<v Maxim Fateev>Temporal will resurrect that function in a different machine in exactly the same state.
+
+47
+00:03:16.760 --> 00:03:20.400
+<v Maxim Fateev>It still will be blocked on B, all the local variables, everything will be preserved.
+
+48
+00:03:20.400 --> 00:03:23.680
+<v Maxim Fateev>From the programmer point of view, nothing happened.
+
+49
+00:03:23.900 --> 00:03:28.480
+<v Maxim Fateev>This process just keeps running as nothing happened and beacon unblocked two days later
+
+50
+00:03:28.480 --> 00:03:29.000
+<v Maxim Fateev>and continue.
+
+51
+00:03:30.300 --> 00:03:34.460
+<v Maxim Fateev>It eliminates so much code which deals with failures, persistence.
+
+52
+00:03:35.400 --> 00:03:36.920
+<v Maxim Fateev>Temporal makes it seamless.
+
+53
+00:03:37.260 --> 00:03:40.220
+<v Maxim Fateev>You just write code and this code keeps running in presence of any failure.
+
+54
+00:03:41.220 --> 00:03:46.380
+<v Maxim Fateev>I joined Amazon first time in 2002 and back then I worked in a platform team.
+
+55
+00:03:46.380 --> 00:03:52.120
+<v Maxim Fateev>team. We owned quite a few technologies, but one of them was practically PubSub, like publish,
+
+56
+00:03:52.180 --> 00:03:56.200
+<v Maxim Fateev>subscribe, message, and queueing. And I was tech lead. I became tech lead of that team.
+
+57
+00:03:56.320 --> 00:04:03.860
+<v Maxim Fateev>I helped to design the distributed storage for queuing systems. As somebody who was overseeing
+
+58
+00:04:03.860 --> 00:04:09.020
+<v Maxim Fateev>the whole PubSub ecosystem of Amazon and talking to a lot of teams doing designs, it became pretty
+
+59
+00:04:09.020 --> 00:04:14.820
+<v Maxim Fateev>clear that event-driven systems are not the right abstraction to build such services. So we started
+
+60
+00:04:16.380 --> 00:04:17.900
+<v Maxim Fateev>So we iterated multiple times.
+
+61
+00:04:18.040 --> 00:04:20.040
+<v Maxim Fateev>And the third version became public.
+
+62
+00:04:20.140 --> 00:04:25.160
+<v Maxim Fateev>And it's still a public AWS service called AWS Simple Workflow, SWF.
+
+63
+00:04:25.740 --> 00:04:30.160
+<v Maxim Fateev>During developing that service, this idea of durable execution came to my mind.
+
+64
+00:04:30.540 --> 00:04:34.300
+<v Maxim Fateev>And then what happened is that we still didn't nail the developer experience.
+
+65
+00:04:34.580 --> 00:04:36.900
+<v Maxim Fateev>So idea was there, but it wasn't very well executed.
+
+66
+00:04:37.620 --> 00:04:43.680
+<v Maxim Fateev>After some time, me and my co-founder, who worked with me on Simple Workflow, ended up in Uber.
+
+67
+00:04:43.680 --> 00:04:48.620
+<v Maxim Fateev>At Uber, we initially built a pub/sub system because this is what we did all our lives.
+
+68
+00:04:48.800 --> 00:04:52.740
+<v Maxim Fateev>But then we actually decided to build a similar thing to a simple workflow.
+
+69
+00:04:52.960 --> 00:04:55.940
+<v Maxim Fateev>We called it Cadence, and we started as an open-source project.
+
+70
+00:04:56.240 --> 00:05:01.200
+<v Maxim Fateev>So this project organically grew from zero to over 100 use cases in three years at Uber.
+
+71
+00:05:01.360 --> 00:05:04.980
+<v Maxim Fateev>And it was built as an open-source from the beginning, so it started to get external adoption.
+
+72
+00:05:05.360 --> 00:05:07.560
+<v Maxim Fateev>And we started the company four years ago.
+
+73
+00:05:09.940 --> 00:05:12.680
+<v Noah Labhart>Let's dive into the MVP of Temporal then.
+
+74
+00:05:13.680 --> 00:05:17.040
+<v Noah Labhart>version of the product you built how long did it take to build and what sort of tools were you
+
+75
+00:05:17.040 --> 00:05:20.460
+<v Noah Labhart>using to bring it to life first
+
+76
+00:05:20.460 --> 00:05:24.140
+<v Maxim Fateev>version was at amazon it was three iterations but if you talk
+
+77
+00:05:24.140 --> 00:05:29.980
+<v Maxim Fateev>about the actual project which we built a tuber it took us probably half a year to put it in
+
+78
+00:05:29.980 --> 00:05:35.060
+<v Maxim Fateev>production and we already knew what we are doing because we had previous experience building such
+
+79
+00:05:35.060 --> 00:05:40.960
+<v Maxim Fateev>systems we built it from the beginning as a highly scalable system but it took quite a while to make
+
+80
+00:05:40.960 --> 00:05:44.080
+<v Maxim Fateev>make it robust and scalable and like production worthy.
+
+81
+00:05:45.020 --> 00:05:45.520
+<v Noah Labhart>Okay.
+
+82
+00:05:45.520 --> 00:05:48.360
+<v Noah Labhart>So with that first version and really with any sort of first version,
+
+83
+00:05:48.420 --> 00:05:50.440
+<v Noah Labhart>you got to make certain decisions and trade-offs, right?
+
+84
+00:05:50.600 --> 00:05:52.960
+<v Noah Labhart>You probably had some of the more,
+
+85
+00:05:53.000 --> 00:05:55.420
+<v Noah Labhart>more powerful ones already worked out because you've been doing this for a
+
+86
+00:05:55.420 --> 00:05:58.760
+<v Noah Labhart>long time, but I'm curious if there were any with temporal,
+
+87
+00:05:58.960 --> 00:06:02.440
+<v Noah Labhart>what that first version that you launched in six months that you had to work
+
+88
+00:06:02.440 --> 00:06:04.080
+<v Noah Labhart>through and how you cope with those decisions.
+
+89
+00:06:05.800 --> 00:06:09.460
+<v Maxim Fateev>Reality, the whole thing is just one big set of compromises.
+
+90
+00:06:10.960 --> 00:06:14.840
+<v Maxim Fateev>For example, when we started the project, we didn't get official funding.
+
+91
+00:06:14.960 --> 00:06:19.100
+<v Maxim Fateev>It was a bottoms-up project, which was really cool at Uber at the time,
+
+92
+00:06:19.120 --> 00:06:22.900
+<v Maxim Fateev>that you could start a project like that and still get support from your management
+
+93
+00:06:22.900 --> 00:06:25.040
+<v Maxim Fateev>and then get official funding if it's successful.
+
+94
+00:06:25.620 --> 00:06:31.800
+<v Maxim Fateev>But we had practically zero funding, and just me, co-founder Samar, and an engineer to start on that.
+
+95
+00:06:31.960 --> 00:06:33.500
+<v Maxim Fateev>So we had to do a lot of compromises.
+
+96
+00:06:33.680 --> 00:06:37.540
+<v Maxim Fateev>The first compromise was that when we started the project, I told Samar,
+
+97
+00:06:37.540 --> 00:06:39.920
+<v Maxim Fateev>I don't like simple workflow design, even conceptually.
+
+98
+00:06:39.920 --> 00:06:40.980
+<v Maxim Fateev>I want to redo all of that.
+
+99
+00:06:41.100 --> 00:06:43.240
+<v Maxim Fateev>And I have a lot of ideas how to improve on that.
+
+100
+00:06:43.920 --> 00:06:46.020
+<v Maxim Fateev>His answer was, and he's a very practical guy.
+
+101
+00:06:46.140 --> 00:06:48.980
+<v Maxim Fateev>He's like more practical than I am in our relationship.
+
+102
+00:06:49.580 --> 00:06:51.500
+<v Maxim Fateev>And he said, there is no way, right?
+
+103
+00:06:51.540 --> 00:06:52.220
+<v Maxim Fateev>We have zero funding.
+
+104
+00:06:52.320 --> 00:06:53.000
+<v Maxim Fateev>We have no time.
+
+105
+00:06:53.040 --> 00:06:53.920
+<v Maxim Fateev>We need to launch something.
+
+106
+00:06:54.180 --> 00:06:57.680
+<v Maxim Fateev>Let's just make something which looks like a simple workflow, at least on the high level.
+
+107
+00:06:58.220 --> 00:06:59.720
+<v Maxim Fateev>And it worked out very nicely.
+
+108
+00:07:00.000 --> 00:07:04.120
+<v Maxim Fateev>And there were obviously a lot of like smaller design decisions we had to make during that.
+
+109
+00:07:04.120 --> 00:07:11.020
+<v Maxim Fateev>But the main one was that we just decided to don't do it right from the beginning because it could take like a few months just of the design time.
+
+110
+00:07:11.420 --> 00:07:13.540
+<v Maxim Fateev>We decided not to build our storage layer.
+
+111
+00:07:13.640 --> 00:07:15.520
+<v Maxim Fateev>We decided to use an existing database.
+
+112
+00:07:15.820 --> 00:07:20.140
+<v Maxim Fateev>And back then, the only highly scalable database that Uber had was Cassandra.
+
+113
+00:07:20.540 --> 00:07:26.620
+<v Maxim Fateev>So we had to build it on top of Cassandra, which actually wasn't easy because Cassandra, especially we are fully transactional service.
+
+114
+00:07:26.900 --> 00:07:29.620
+<v Maxim Fateev>So we had to use transactions everywhere.
+
+115
+00:07:30.360 --> 00:07:34.900
+<v Maxim Fateev>Cassandra wasn't a database which was built for high-scale throughput on transactions.
+
+116
+00:07:35.280 --> 00:07:37.580
+<v Maxim Fateev>So we had to spend a lot of time to make it work.
+
+117
+00:07:39.120 --> 00:07:39.640
+<v Maxim Fateev>You've
+
+118
+00:07:39.640 --> 00:07:41.280
+<v Noah Labhart>got the first version built.
+
+119
+00:07:41.360 --> 00:07:42.300
+<v Noah Labhart>You've got it out there.
+
+120
+00:07:42.380 --> 00:07:44.100
+<v Noah Labhart>How did you progress the product from there?
+
+121
+00:07:44.280 --> 00:07:46.180
+<v Noah Labhart>And I'm curious about roadmap.
+
+122
+00:07:46.460 --> 00:07:47.900
+<v Noah Labhart>How do you go about building your roadmap?
+
+123
+00:07:48.080 --> 00:07:51.340
+<v Noah Labhart>What process or criteria did you use to decide,
+
+124
+00:07:51.540 --> 00:07:55.560
+<v Noah Labhart>okay, this is the next most important thing to address or build with Temporal?
+
+125
+00:07:57.000 --> 00:07:59.120
+<v Maxim Fateev>We are super developer-focused.
+
+126
+00:07:59.620 --> 00:08:03.720
+<v Maxim Fateev>From the first days of the project, it was about developers because we are a developer tool.
+
+127
+00:08:03.800 --> 00:08:06.060
+<v Maxim Fateev>We practically help developers to build their applications.
+
+128
+00:08:06.660 --> 00:08:10.060
+<v Maxim Fateev>So most of the new feature ideas come from talking to developers.
+
+129
+00:08:10.280 --> 00:08:12.380
+<v Maxim Fateev>And I still talk to developers all the time.
+
+130
+00:08:12.400 --> 00:08:15.780
+<v Maxim Fateev>I still even do support tickets and answer questions in the Slack.
+
+131
+00:08:16.100 --> 00:08:20.200
+<v Maxim Fateev>And one of the main reasons I do that is because I want to understand developers and what they're going through.
+
+132
+00:08:21.080 --> 00:08:22.840
+<v Maxim Fateev>Back then, it was just constant.
+
+133
+00:08:23.040 --> 00:08:26.260
+<v Maxim Fateev>Every new use case, every new problem, we were looking and saying,
+
+134
+00:08:26.320 --> 00:08:28.200
+<v Maxim Fateev>OK, we are missing this abstraction, we are missing that.
+
+135
+00:08:29.620 --> 00:08:34.600
+<v Maxim Fateev>this loop of constant improvements and sometimes you get big features which you
+
+136
+00:08:34.600 --> 00:08:39.880
+<v Maxim Fateev>have to have. For example at Uber you cannot run any important
+
+137
+00:08:39.880 --> 00:08:43.840
+<v Maxim Fateev>application if you cannot sustain regional outage. So we had to build
+
+138
+00:08:43.840 --> 00:08:47.480
+<v Maxim Fateev>multi-region replication stack which is super non-trivial but that was
+
+139
+00:08:47.480 --> 00:08:52.260
+<v Maxim Fateev>practically a requirement to be able to use by most important services at
+
+140
+00:08:52.260 --> 00:08:59.100
+<v Maxim Fateev>Uber. So that was the largest investment after we made initial project. And then
+
+141
+00:08:59.620 --> 00:09:04.160
+<v Maxim Fateev>things like, for example, new language support. At Uber, we initially supported only Go as an
+
+142
+00:09:04.160 --> 00:09:08.960
+<v Maxim Fateev>SDK, but then we added Java. And now as a company, we decided that we want to support as many
+
+143
+00:09:08.960 --> 00:09:15.360
+<v Maxim Fateev>languages as we can. We support six languages right now, like C Sharp, Python, Go, Java,
+
+144
+00:09:17.060 --> 00:09:23.220
+<v Maxim Fateev>TypeScript, PHP, and recently we added .NET. So we want to meet developers wherever they are.
+
+145
+00:09:23.440 --> 00:09:27.300
+<v Maxim Fateev>It's very expensive to create new SDKs, but we believe that it's worth it.
+
+146
+00:09:28.160 --> 00:09:29.700
+<v Noah Labhart>So let's switch to team then.
+
+147
+00:09:29.760 --> 00:09:31.620
+<v Noah Labhart>So how did you go about building your team?
+
+148
+00:09:31.800 --> 00:09:35.960
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+149
+00:09:36.680 --> 00:09:41.200
+<v Maxim Fateev>We actually discussed recently with my co-founder what was the hardest in starting the company.
+
+150
+00:09:41.360 --> 00:09:45.100
+<v Maxim Fateev>And we agreed that hiring first 15 people was probably the hardest.
+
+151
+00:09:45.680 --> 00:09:50.500
+<v Maxim Fateev>We were lucky because we started the company already having product market fit
+
+152
+00:09:50.500 --> 00:09:54.160
+<v Maxim Fateev>because our open source was already getting pretty reasonable adoption
+
+153
+00:09:54.160 --> 00:10:00.980
+<v Maxim Fateev>option and had some users which were big fans of ours. But hiring first few people, especially in
+
+154
+00:10:00.980 --> 00:10:07.600
+<v Maxim Fateev>Seattle, was very hard because people in Seattle are not as versed about startups, how equity works,
+
+155
+00:10:07.800 --> 00:10:12.760
+<v Maxim Fateev>and they all worked for large companies mostly, and type of engineers we needed. They usually can
+
+156
+00:10:12.760 --> 00:10:19.780
+<v Maxim Fateev>get a job in any fun company, no problem. And that was very hard. What we are looking for, I think,
+
+157
+00:10:19.780 --> 00:10:25.480
+<v Maxim Fateev>A few things. First, caring about customers, which are developers in our case, a lot, right?
+
+158
+00:10:25.560 --> 00:10:29.820
+<v Maxim Fateev>So you just don't build cool solutions, you build cool solutions for the customers, for users.
+
+159
+00:10:30.280 --> 00:10:32.260
+<v Maxim Fateev>And then attention to detail.
+
+160
+00:10:32.540 --> 00:10:34.920
+<v Maxim Fateev>We are in the business of selling practical reliability
+
+161
+00:10:35.440 --> 00:10:40.040
+<v Maxim Fateev>because our service runs the most demanding and important workloads for every company.
+
+162
+00:10:40.260 --> 00:10:44.460
+<v Maxim Fateev>So we put a lot of effort to make sure that this is as reliable as possible.
+
+163
+00:10:44.700 --> 00:10:47.340
+<v Maxim Fateev>And also ability to work independently, right?
+
+164
+00:10:47.340 --> 00:10:51.000
+<v Maxim Fateev>You want somebody who's able to produce and work independently.
+
+165
+00:10:54.060 --> 00:10:55.340
+<v Noah Labhart>This will be really interesting.
+
+166
+00:10:55.480 --> 00:10:56.860
+<v Noah Labhart>I'm curious about scalability.
+
+167
+00:10:57.340 --> 00:11:02.400
+<v Noah Labhart>Given the history of what you've built, the product that you built itself,
+
+168
+00:11:02.700 --> 00:11:05.820
+<v Noah Labhart>I hear you talking about Cassandra and the difficulties there.
+
+169
+00:11:05.900 --> 00:11:10.880
+<v Noah Labhart>I'm curious about was this built to scale efficiently from day one or with scale in mind?
+
+170
+00:11:10.960 --> 00:11:15.500
+<v Noah Labhart>Or have you been fighting this as you grow in any sort of capacity in anywhere?
+
+171
+00:11:17.420 --> 00:11:24.240
+<v Maxim Fateev>We are super lucky here because, again, we had experience with Amazon and we built a public AWS service.
+
+172
+00:11:24.460 --> 00:11:30.840
+<v Maxim Fateev>And then later, my co-founder worked at Azure and he was also overseeing public Azure service.
+
+173
+00:11:31.120 --> 00:11:33.720
+<v Maxim Fateev>We had a lot of experience building large-scale systems.
+
+174
+00:11:34.040 --> 00:11:42.200
+<v Maxim Fateev>So we built Temporal from the beginning as a large-scale multi-tenant service, which is usually opposite to what people do, right?
+
+175
+00:11:42.240 --> 00:11:46.180
+<v Maxim Fateev>They think about developer experience and then they think about backend as an afterthought.
+
+176
+00:11:47.340 --> 00:11:49.060
+<v Maxim Fateev>we cared about developer experience,
+
+177
+00:11:49.220 --> 00:11:50.940
+<v Maxim Fateev>but backend was actually fought through
+
+178
+00:11:50.940 --> 00:11:53.400
+<v Maxim Fateev>from the beginning to be practically infinitely scalable.
+
+179
+00:11:54.620 --> 00:11:56.880
+<v Maxim Fateev>And so far, we actually achieved that
+
+180
+00:11:56.880 --> 00:11:59.860
+<v Maxim Fateev>because we were able to saturate any database we throw at it.
+
+181
+00:12:00.080 --> 00:12:03.480
+<v Maxim Fateev>We ran this over 100 nodes, Cassandra clusters,
+
+182
+00:12:03.640 --> 00:12:05.960
+<v Maxim Fateev>and right now we built our own persistence layer
+
+183
+00:12:05.960 --> 00:12:08.600
+<v Maxim Fateev>just for our internal kind of cloud offering,
+
+184
+00:12:09.300 --> 00:12:11.780
+<v Maxim Fateev>which our company provides for the hosted version.
+
+185
+00:12:12.460 --> 00:12:14.360
+<v Maxim Fateev>And we were able to do, for example,
+
+186
+00:12:14.360 --> 00:12:16.700
+<v Maxim Fateev>a million updates per second in a single database.
+
+187
+00:12:17.340 --> 00:12:17.980
+<v Maxim Fateev>called namespace.
+
+188
+00:12:18.140 --> 00:12:19.160
+<v Maxim Fateev>And we could go higher.
+
+189
+00:12:19.260 --> 00:12:23.720
+<v Maxim Fateev>It's just we didn't want to pay that large AWS bill for the infrastructure.
+
+190
+00:12:24.740 --> 00:12:28.220
+<v Maxim Fateev>At the same time, as we hit the scalability of any database,
+
+191
+00:12:28.340 --> 00:12:32.900
+<v Maxim Fateev>we always found workloads which would exceed any database scalability,
+
+192
+00:12:33.100 --> 00:12:34.160
+<v Maxim Fateev>even Cassandra one.
+
+193
+00:12:34.360 --> 00:12:37.140
+<v Maxim Fateev>That's why we had to build our custom persistence layer
+
+194
+00:12:37.140 --> 00:12:39.460
+<v Maxim Fateev>because we wanted to be able to scale practically infinitely.
+
+195
+00:12:41.220 --> 00:12:45.860
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built,
+
+196
+00:12:45.900 --> 00:12:46.880
+<v Noah Labhart>what are you most proud of?
+
+197
+00:12:47.940 --> 00:12:52.920
+<v Maxim Fateev>At this point, I think the most I'm proud of is actually our developer community, because
+
+198
+00:12:53.980 --> 00:12:59.500
+<v Maxim Fateev>you build something and you can be super proud of the technical details of that thing or
+
+199
+00:12:59.500 --> 00:13:00.280
+<v Maxim Fateev>how cool it is.
+
+200
+00:13:00.580 --> 00:13:03.600
+<v Maxim Fateev>But if people don't care, that it's different.
+
+201
+00:13:04.660 --> 00:13:06.740
+<v Maxim Fateev>We created something which people care about.
+
+202
+00:13:06.860 --> 00:13:08.880
+<v Maxim Fateev>We have a very active community.
+
+203
+00:13:09.040 --> 00:13:13.320
+<v Maxim Fateev>We have a lot of champions who are bringing temporal to their companies.
+
+204
+00:13:13.760 --> 00:13:16.280
+<v Maxim Fateev>We just had our conference two weeks ago.
+
+205
+00:13:17.340 --> 00:13:20.060
+<v Maxim Fateev>and we had over 500 people there
+
+206
+00:13:20.060 --> 00:13:23.820
+<v Maxim Fateev>and just energy of all these people being there
+
+207
+00:13:23.820 --> 00:13:26.900
+<v Maxim Fateev>and really liking the product and talking about that.
+
+208
+00:13:27.400 --> 00:13:29.000
+<v Maxim Fateev>That was really amazing.
+
+209
+00:13:30.400 --> 00:13:33.380
+<v Maxim Fateev>Other thing which I'm super proud of is just our team.
+
+210
+00:13:33.520 --> 00:13:34.880
+<v Maxim Fateev>I think temporal team is amazing.
+
+211
+00:13:35.240 --> 00:13:36.960
+<v Maxim Fateev>Like I've heard it from multiple people
+
+212
+00:13:36.960 --> 00:13:39.620
+<v Maxim Fateev>and multiple employees that this is the strongest team,
+
+213
+00:13:39.720 --> 00:13:40.420
+<v Maxim Fateev>not only engineering,
+
+214
+00:13:40.620 --> 00:13:42.180
+<v Maxim Fateev>but in general team they have worked with.
+
+215
+00:13:43.580 --> 00:13:45.520
+<v Noah Labhart>Okay, let's flip the script a little bit.
+
+216
+00:13:45.640 --> 00:13:47.180
+<v Noah Labhart>Tell me about a mistake you made
+
+217
+00:13:47.340 --> 00:13:49.060
+<v Noah Labhart>and how you and your team responded to it.
+
+218
+00:13:50.020 --> 00:13:52.500
+<v Maxim Fateev>I don't think we made any kind of big strategic mistakes,
+
+219
+00:13:53.320 --> 00:13:57.240
+<v Maxim Fateev>mostly because we had product market fit before we started the company.
+
+220
+00:13:57.860 --> 00:14:01.400
+<v Maxim Fateev>There were quite a few tactical ones around hiring sometimes,
+
+221
+00:14:01.620 --> 00:14:04.680
+<v Maxim Fateev>around defining roles or just defining certain functions.
+
+222
+00:14:05.160 --> 00:14:08.660
+<v Maxim Fateev>As both me and some of our technical co-founders,
+
+223
+00:14:08.800 --> 00:14:14.380
+<v Maxim Fateev>we didn't understand the value of what all other functions of the company should be.
+
+224
+00:14:14.520 --> 00:14:17.120
+<v Maxim Fateev>So it took us quite a while to just even understand what we need.
+
+225
+00:14:17.340 --> 00:14:23.500
+<v Maxim Fateev>to build. Initially, one of the big, I wouldn't say mistakes, but what happened is that we started
+
+226
+00:14:23.500 --> 00:14:28.820
+<v Maxim Fateev>the company, we always worked in offices. So we wanted to create a normal company which works
+
+227
+00:14:28.820 --> 00:14:35.520
+<v Maxim Fateev>from an office. And we started in Seattle, in Bellevue. What happened? COVID happened.
+
+228
+00:14:36.000 --> 00:14:42.880
+<v Maxim Fateev>And for a year, we were resisting everybody's urge to hire people outside of Seattle. We were
+
+229
+00:14:42.880 --> 00:14:46.320
+<v Maxim Fateev>We're working from homes and we said, no, we will only hire people in the Seattle area.
+
+230
+00:14:46.700 --> 00:14:50.140
+<v Maxim Fateev>And at some point we couldn't hire anyone for over two months.
+
+231
+00:14:50.240 --> 00:14:52.240
+<v Maxim Fateev>And we kind of, okay, we need to go remote.
+
+232
+00:14:52.700 --> 00:14:54.240
+<v Maxim Fateev>And we became fully remote company.
+
+233
+00:14:54.420 --> 00:14:58.800
+<v Maxim Fateev>And I think it was a very good decision because type of talent we are able to get right now,
+
+234
+00:14:58.940 --> 00:15:03.020
+<v Maxim Fateev>especially in leadership positions and like just engineers, is amazing.
+
+235
+00:15:03.820 --> 00:15:09.460
+<v Maxim Fateev>Creates a lot of challenges, obviously, especially for me who never worked for a remote company, it's a challenge.
+
+236
+00:15:09.600 --> 00:15:11.660
+<v Maxim Fateev>But I think at the end, everybody won.
+
+237
+00:15:14.580 --> 00:15:15.640
+<v Noah Labhart>So this will be fun.
+
+238
+00:15:16.040 --> 00:15:20.460
+<v Noah Labhart>With Temporal, what does the future look like for the product and for your team?
+
+239
+00:15:21.660 --> 00:15:25.140
+<v Maxim Fateev>I think the most important part for us as a product is just awareness.
+
+240
+00:15:25.420 --> 00:15:30.640
+<v Maxim Fateev>Because this new way to write distributed systems for durable execution is amazing.
+
+241
+00:15:30.840 --> 00:15:31.800
+<v Maxim Fateev>People love it.
+
+242
+00:15:31.940 --> 00:15:34.820
+<v Maxim Fateev>But the problem is that most developers never heard about it.
+
+243
+00:15:35.200 --> 00:15:39.080
+<v Maxim Fateev>So that is the most important thing for us, is just become ubiquitous.
+
+244
+00:15:39.080 --> 00:15:43.720
+<v Maxim Fateev>I want every developer to use durable execution when they think about their next backend system.
+
+245
+00:15:44.260 --> 00:15:50.580
+<v Maxim Fateev>We as a business and as open source projects, we want to become as ubiquitous as something like Kubernetes, for example, or even more.
+
+246
+00:15:50.820 --> 00:15:55.020
+<v Maxim Fateev>But at the same time, as a business, I think we have a very good way to monetize that.
+
+247
+00:15:55.140 --> 00:15:57.940
+<v Maxim Fateev>We have a cloud service, which is SaaS offering.
+
+248
+00:15:58.800 --> 00:16:03.400
+<v Maxim Fateev>We believe that we would be able to scale that service to the needs of every business.
+
+249
+00:16:04.640 --> 00:16:07.700
+<v Maxim Fateev>Longer term, I think we will have an amazing cloud business.
+
+250
+00:16:09.080 --> 00:16:15.460
+<v Maxim Fateev>very significant revenue. Our goal is that most businesses out there use Temporal for their
+
+251
+00:16:15.460 --> 00:16:20.060
+<v Maxim Fateev>business-critical applications. And we already have a lot of examples. When I drive from, for
+
+252
+00:16:20.060 --> 00:16:25.720
+<v Maxim Fateev>example, from San Francisco airport to San Francisco on a business trip, probably more than
+
+253
+00:16:25.720 --> 00:16:30.260
+<v Maxim Fateev>half of the billboards are users or customers of Temporal, which makes me pretty proud.
+
+254
+00:16:30.880 --> 00:16:34.580
+<v Noah Labhart>Okay, let's switch to you, Maxim. Who influences the way that you work?
+
+255
+00:16:34.780 --> 00:16:37.620
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+256
+00:16:39.080 --> 00:16:40.600
+<v Maxim Fateev>I don't think there is one person.
+
+257
+00:16:40.780 --> 00:16:41.460
+<v Maxim Fateev>I don't know.
+
+258
+00:16:41.460 --> 00:16:43.360
+<v Maxim Fateev>At least, like I say, I try to copy.
+
+259
+00:16:44.180 --> 00:16:49.180
+<v Maxim Fateev>I'm certainly very influenced by Amazon in general because I worked eight and a half years at Amazon.
+
+260
+00:16:49.440 --> 00:17:00.920
+<v Maxim Fateev>And the most thing which amazed me at Amazon, how it was able to grow so large, so fast, and at the same time, maintain that ability to people feel that urgency, right?
+
+261
+00:17:01.600 --> 00:17:03.920
+<v Maxim Fateev>Amazon is probably the only large company I worked with
+
+262
+00:17:03.920 --> 00:17:06.600
+<v Maxim Fateev>Every team feels like a startup
+
+263
+00:17:06.600 --> 00:17:09.420
+<v Maxim Fateev>And every team feels understaffed
+
+264
+00:17:09.420 --> 00:17:12.240
+<v Maxim Fateev>And every team feels like they have more work to do than they can do
+
+265
+00:17:12.240 --> 00:17:15.780
+<v Maxim Fateev>And they're super excited to deliver that to the customers
+
+266
+00:17:15.780 --> 00:17:17.460
+<v Maxim Fateev>And they're very super customer-oriented
+
+267
+00:17:17.460 --> 00:17:19.440
+<v Maxim Fateev>I think this is something which I admire
+
+268
+00:17:19.440 --> 00:17:23.300
+<v Maxim Fateev>And this is something which I absolutely want to maintain in Temporal as well
+
+269
+00:17:24.200 --> 00:17:25.240
+<v Maxim Fateev>Other thing is that
+
+270
+00:17:25.240 --> 00:17:27.880
+<v Maxim Fateev>As I have physics education originally
+
+271
+00:17:27.880 --> 00:17:30.600
+<v Maxim Fateev>I think a little bit differently than most people
+
+272
+00:17:31.620 --> 00:17:37.080
+<v Maxim Fateev>I think Elon Musk mentioned it once that he tries to think from first principles because he has physics degree.
+
+273
+00:17:37.580 --> 00:17:39.840
+<v Maxim Fateev>Related to myself, I thought I cannot do the same thing.
+
+274
+00:17:39.900 --> 00:17:45.280
+<v Maxim Fateev>It's that very frequently I look at the problem very differently than most engineers because of my different education.
+
+275
+00:17:47.000 --> 00:17:48.560
+<v Noah Labhart>We talked about a mistake, right?
+
+276
+00:17:48.660 --> 00:17:50.000
+<v Noah Labhart>But this is a little bit different spin.
+
+277
+00:17:50.160 --> 00:17:52.320
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+278
+00:17:52.460 --> 00:17:54.320
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+279
+00:17:54.500 --> 00:17:56.160
+<v Noah Labhart>It doesn't have to be something that didn't work out.
+
+280
+00:17:56.200 --> 00:17:59.240
+<v Noah Labhart>It could have been something that worked and worked well, but maybe you'd tweak it a little bit.
+
+281
+00:18:00.920 --> 00:18:06.660
+<v Maxim Fateev>a few things. One is that I probably would start a company, my first company, probably 15-20 years
+
+282
+00:18:06.660 --> 00:18:12.620
+<v Maxim Fateev>earlier if I realized how these things work. Because I had quite a few ideas which would be
+
+283
+00:18:12.620 --> 00:18:17.740
+<v Maxim Fateev>absolutely monetizable and I could build large companies around them. At the same time, I'm
+
+284
+00:18:17.740 --> 00:18:22.160
+<v Maxim Fateev>probably a much better person right now than I was 20 years ago. Empathy wasn't my thing.
+
+285
+00:18:23.220 --> 00:18:27.220
+<v Maxim Fateev>So I think I'm certainly a much better CEO now than I would be 20 years ago.
+
+286
+00:18:27.980 --> 00:18:34.460
+<v Maxim Fateev>I like building things so my usual operational mode was start the project prototype the project
+
+287
+00:18:34.460 --> 00:18:38.780
+<v Maxim Fateev>put the first version out maybe second version out and then move to the next thing and I did
+
+288
+00:18:38.780 --> 00:18:44.240
+<v Maxim Fateev>it multiple times in my career the problem is that most project I started they stagnated after I left
+
+289
+00:18:44.240 --> 00:18:49.580
+<v Maxim Fateev>it's not like they died it's just they didn't move to the next level and I almost left actually the
+
+290
+00:18:49.580 --> 00:18:53.860
+<v Maxim Fateev>temporal project like Cadence project at Uber because we launched the first version it was
+
+291
+00:18:53.860 --> 00:18:58.520
+<v Maxim Fateev>was growing fast, everything was fine. I'm like, okay, I've done most of it. Let me do something
+
+292
+00:18:58.520 --> 00:19:04.120
+<v Maxim Fateev>else. For some reason, something stopped me because I just believe that this is such a huge
+
+293
+00:19:04.120 --> 00:19:09.980
+<v Maxim Fateev>opportunity in general that I just wanted to see it to the end. And I'm still seeing it to the end.
+
+294
+00:19:11.940 --> 00:19:16.120
+<v Noah Labhart>Last question. So you're getting on a plane and you're sitting next to a young entrepreneur who's
+
+295
+00:19:16.120 --> 00:19:19.640
+<v Noah Labhart>built the next big thing. They're jazzed about it. They can't wait to show it off to the world
+
+296
+00:19:19.640 --> 00:19:23.320
+<v Noah Labhart>and can't wait to show it off to you right there on the plane. What advice do you give that person
+
+297
+00:19:23.860 --> 00:19:24.920
+<v Noah Labhart>on down this road a bit.
+
+298
+00:19:26.360 --> 00:19:27.900
+<v Maxim Fateev>It's a marathon, right?
+
+299
+00:19:28.120 --> 00:19:34.300
+<v Maxim Fateev>So you need to be prepared for years, maybe tens of years, to walk on this thing, keep
+
+300
+00:19:34.300 --> 00:19:36.240
+<v Maxim Fateev>walking on that thing, and be passionate about it.
+
+301
+00:19:37.340 --> 00:19:43.300
+<v Maxim Fateev>You need to find passionate users and passionate people who understand your next big thing
+
+302
+00:19:43.300 --> 00:19:44.700
+<v Maxim Fateev>and love your next big thing.
+
+303
+00:19:45.280 --> 00:19:46.600
+<v Maxim Fateev>And it shouldn't be your friends.
+
+304
+00:19:46.700 --> 00:19:48.860
+<v Maxim Fateev>It should be people outside of your immediate circle.
+
+305
+00:19:49.300 --> 00:19:53.060
+<v Maxim Fateev>If you can do that, then it's execution, which is not easy, but it's possible.
+
+306
+00:19:54.080 --> 00:19:55.280
+<v Noah Labhart>That's fantastic advice.
+
+307
+00:19:55.480 --> 00:19:57.260
+<v Noah Labhart>Well, Maxim, thank you for being on the show today.
+
+308
+00:19:57.380 --> 00:19:59.760
+<v Noah Labhart>And thank you for telling the creation story of Temporal.
+
+309
+00:20:00.140 --> 00:20:00.700
+<v Noah Labhart>Thank you.
+
+310
+00:20:02.560 --> 00:20:05.300
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+311
+00:20:08.860 --> 00:20:11.820
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+312
+00:20:12.000 --> 00:20:16.740
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+313
+00:20:17.380 --> 00:20:19.560
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+314
+00:20:19.900 --> 00:20:21.760
+<v Noah Labhart>Both things help us out tremendously.
+
+315
+00:20:24.720 --> 00:20:26.180
+<v Noah Labhart>and thanks again for listening.

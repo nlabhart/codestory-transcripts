@@ -1,0 +1,1779 @@
+WEBVTT
+
+NOTE S11 Bonus: The Cloud Tax & The 10,000 JVM Milestone: Why Performance Optimization is the Only Way to Scale Enterprise AI Without Blowing Your Budget with Simon Ritter, Deputy CTO of Azul
+
+1
+00:00:00.660 --> 00:00:05.040
+<v Simon Ritter>It's a very sort of old adage, if you like, which is a picture is worth a thousand words.
+
+2
+00:00:05.300 --> 00:00:10.540
+<v Simon Ritter>So, if you're trying to explain something to somebody, trying to do it purely with your
+
+3
+00:00:10.540 --> 00:00:13.960
+<v Simon Ritter>voice or writing it down can be very difficult.
+
+4
+00:00:14.560 --> 00:00:19.740
+<v Simon Ritter>But if you can present a picture, then that gives something visual for people to look
+
+5
+00:00:19.740 --> 00:00:21.820
+<v Simon Ritter>at and go, okay, I can see what you're saying.
+
+6
+00:00:22.020 --> 00:00:26.000
+<v Simon Ritter>And then you explain that using words to highlight the individual parts.
+
+7
+00:00:26.000 --> 00:00:31.340
+<v Simon Ritter>that is a very powerful way of getting a message across. And especially when you're dealing with
+
+8
+00:00:31.340 --> 00:00:36.980
+<v Simon Ritter>complex concepts, being able to break it down into a diagram and be able to use pictures to
+
+9
+00:00:36.980 --> 00:00:43.000
+<v Simon Ritter>show what's actually happening. My name is Simon Ritter. I'm the Deputy CTO at Azul.
+
+10
+00:00:46.520 --> 00:00:52.200
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+11
+00:00:52.300 --> 00:00:53.700
+<v Clip>Six months moonlighting.
+
+12
+00:00:53.760 --> 00:00:55.240
+<v Clip>There's nothing on the back end.
+
+13
+00:00:56.000 --> 00:00:58.100
+<v Noah Labhart>Share what it takes to change an industry.
+
+14
+00:00:58.280 --> 00:00:59.840
+<v Clip>I don't exactly know what to do next.
+
+15
+00:00:59.840 --> 00:01:01.240
+<v Clip>It took many goes to get right.
+
+16
+00:01:01.900 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+17
+00:01:04.560 --> 00:01:06.100
+<v Clip>A company is its people.
+
+18
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+19
+00:01:07.500 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+20
+00:01:08.920 --> 00:01:11.160
+<v Noah Labhart>Keeping scalability top of mind.
+
+21
+00:01:11.460 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+22
+00:01:12.880 --> 00:01:14.320
+<v Clip>Yes, we've been fighting it as we've grown.
+
+23
+00:01:14.500 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+24
+00:01:15.580 --> 00:01:17.800
+<v Noah Labhart>The stories you don't read in the headlines.
+
+25
+00:01:18.300 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+26
+00:01:20.020 --> 00:01:22.060
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+27
+00:01:22.060 --> 00:01:25.840
+<v Noah Labhart>again to ride the ups and downs of the startup life.
+
+28
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+29
+00:01:27.580 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+30
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+31
+00:01:32.300 --> 00:01:33.860
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+32
+00:01:34.140 --> 00:01:40.640
+<v Noah Labhart>And today, how Simon Ritter is making Java secure, efficient, and affordable, i.e. the
+
+33
+00:01:40.640 --> 00:01:43.960
+<v Noah Labhart>most trusted Java platform founded on open source.
+
+34
+00:01:49.280 --> 00:01:52.620
+<v Noah Labhart>Simon Ritter has been in the IT industry for 40 years.
+
+35
+00:01:52.860 --> 00:01:56.180
+<v Noah Labhart>He went from university to work on Unix in the early days,
+
+36
+00:01:56.260 --> 00:01:59.300
+<v Noah Labhart>employed by AT&amp;T and programming in the C language.
+
+37
+00:01:59.880 --> 00:02:04.500
+<v Noah Labhart>In 1996, he switched gears to join Sun Microsystems, programming in Java.
+
+38
+00:02:04.860 --> 00:02:09.360
+<v Noah Labhart>Years later, after the Oracle transition, he started to dig into what might be next.
+
+39
+00:02:09.760 --> 00:02:12.220
+<v Noah Labhart>But outside of tech, he's married with an older son.
+
+40
+00:02:13.960 --> 00:02:20.040
+<v Noah Labhart>head, meaning he's really into cars. In fact, in the last few years, he and his son rebuilt a classic
+
+41
+00:02:20.040 --> 00:02:27.460
+<v Noah Labhart>Mini from the ground up. While Simon was at Oracle, he started to crave a different opportunity,
+
+42
+00:02:27.680 --> 00:02:33.340
+<v Noah Labhart>but still in the Java space. He stumbled upon a company digging into powering the Java platform
+
+43
+00:02:33.340 --> 00:02:37.560
+<v Noah Labhart>to make it the most secure, efficient, and trusted platform on the planet.
+
+44
+00:02:37.560 --> 00:02:45.780
+<v Noah Labhart>it. And he and the company found a great fit. This is Simon's creation story at Azul.
+
+45
+00:02:49.680 --> 00:02:55.240
+<v Simon Ritter>Because I was at Oracle, as I said, and I could see that the way that things were going internally
+
+46
+00:02:55.240 --> 00:02:59.120
+<v Simon Ritter>at Oracle in terms of my position and the team that I was working in, that things weren't really
+
+47
+00:02:59.120 --> 00:03:02.720
+<v Simon Ritter>going in the direction that I wanted to go in. So I thought to myself, okay, been at Oracle for
+
+48
+00:03:02.720 --> 00:03:08.040
+<v Simon Ritter>five years trying to look around for an alternative. I'd heard about Azul. I knew about Azul
+
+49
+00:03:08.040 --> 00:03:12.700
+<v Simon Ritter>because they were in the Java space. And I thought, I'll just randomly approach them.
+
+50
+00:03:12.960 --> 00:03:18.480
+<v Simon Ritter>And so I sent an email to their sort of careers at Azul email address. I said, here's my resume,
+
+51
+00:03:18.620 --> 00:03:22.800
+<v Simon Ritter>here's my background, just wondering if you might have anything that would be of interest to me.
+
+52
+00:03:22.920 --> 00:03:28.240
+<v Simon Ritter>It led to an offer of a job and it was like, yep, okay, great. So that's how I ended up there.
+
+53
+00:03:28.240 --> 00:03:35.900
+<v Simon Ritter>I think a lot of it was because one of the big interesting things that I had before that was the whole idea of the way that Java does automated memory management.
+
+54
+00:03:36.000 --> 00:03:37.420
+<v Simon Ritter>There's this thing called garbage collection.
+
+55
+00:03:37.760 --> 00:03:40.060
+<v Simon Ritter>So I've been heavily involved in that at Sun and Oracle.
+
+56
+00:03:40.360 --> 00:03:46.900
+<v Simon Ritter>And that was one of the things that Azul was focused on in terms of their, what used to be called Zing and is now Platform Prime.
+
+57
+00:03:47.120 --> 00:03:57.760
+<v Simon Ritter>So the high performance side of Java that they did was at that time purely focused on how do we change memory management so that we can avoid latency in the way applications work.
+
+58
+00:03:58.240 --> 00:04:04.160
+<v Simon Ritter>And that sort of made a very seamless match for us from the skills that I had and what Azul was doing at that point.
+
+59
+00:04:04.820 --> 00:04:06.200
+<v Simon Ritter>So, yeah, what does Azul do?
+
+60
+00:04:06.440 --> 00:04:09.780
+<v Simon Ritter>We are a company that is 100% focused on Java.
+
+61
+00:04:10.420 --> 00:04:12.720
+<v Simon Ritter>Realistically, you can say that we have three products.
+
+62
+00:04:13.000 --> 00:04:19.060
+<v Simon Ritter>First product is what we call Platform Core, and that's a straight build of open source Java.
+
+63
+00:04:19.280 --> 00:04:23.080
+<v Simon Ritter>The analogy I like to use there is that you've got Linux as an open source project.
+
+64
+00:04:23.080 --> 00:04:30.740
+<v Simon Ritter>But if you want to use Linux to run your application, it's very unlikely you'd go to Linux to download all the source code, build it yourself, and install it on your machine.
+
+65
+00:04:31.200 --> 00:04:38.500
+<v Simon Ritter>What you're most likely going to do is get a distribution of that, which will be Red Hat or SUSE or Ubuntu or whoever.
+
+66
+00:04:38.800 --> 00:04:40.080
+<v Simon Ritter>Same thing applies with Java.
+
+67
+00:04:40.280 --> 00:04:41.640
+<v Simon Ritter>Java is an open source project.
+
+68
+00:04:41.920 --> 00:04:44.400
+<v Simon Ritter>It was open sourced by Sun back in 2007.
+
+69
+00:04:45.220 --> 00:04:49.660
+<v Simon Ritter>And if you want to use it to run your applications, unlikely you'd build it yourself.
+
+70
+00:04:49.740 --> 00:04:51.100
+<v Simon Ritter>So you go and you find a distribution.
+
+71
+00:04:53.080 --> 00:04:56.880
+<v Simon Ritter>that have been the sort of primary distribution that most people have used up until a few years
+
+72
+00:04:56.880 --> 00:05:01.580
+<v Simon Ritter>ago. But when Oracle changed the licensing terms and the pricing that they had for Java,
+
+73
+00:05:02.100 --> 00:05:05.880
+<v Simon Ritter>suddenly people started looking around for a different distribution. And so one of the things
+
+74
+00:05:05.880 --> 00:05:11.600
+<v Simon Ritter>we do is we provide a fully supported distribution of OpenJDK, straight drop-in replacement for
+
+75
+00:05:11.600 --> 00:05:16.440
+<v Simon Ritter>Oracle. The idea of that is that for people who want support for their Java runtime, they can do
+
+76
+00:05:16.440 --> 00:05:20.400
+<v Simon Ritter>that with us in exactly the same way they would do with Oracle. They're just paying a whole lot less
+
+77
+00:05:20.400 --> 00:05:25.980
+<v Simon Ritter>than they do to Oracle. The second half of our business really is about high performance Java.
+
+78
+00:05:26.140 --> 00:05:29.800
+<v Simon Ritter>And that's what I mentioned when I joined the company, because that's what we were focused on
+
+79
+00:05:29.800 --> 00:05:36.300
+<v Simon Ritter>purely at that time. And that's Platform Prime, or as it used to be called, Zing. The idea there is
+
+80
+00:05:36.300 --> 00:05:40.320
+<v Simon Ritter>that, again, we take the open source Java, rather than just building it in the same way that
+
+81
+00:05:40.320 --> 00:05:46.440
+<v Simon Ritter>everybody else does, we change things internally to give you better performance. When I joined the
+
+82
+00:05:46.440 --> 00:05:51.040
+<v Simon Ritter>company, we only changed the way that things work in terms of the garbage collections,
+
+83
+00:05:51.080 --> 00:05:55.560
+<v Simon Ritter>the automated memory management. If you look at the way that most garbage collectors work is that
+
+84
+00:05:55.560 --> 00:06:00.440
+<v Simon Ritter>they move objects around within the memory. And in order to do that safely, you pause the
+
+85
+00:06:00.440 --> 00:06:04.240
+<v Simon Ritter>application while you do that. Application can't make changes to the data. You move it around.
+
+86
+00:06:04.360 --> 00:06:08.780
+<v Simon Ritter>It's all safe. The problem with that is that the bigger your heap, as we call it,
+
+87
+00:06:08.800 --> 00:06:13.180
+<v Simon Ritter>so the way you store your objects, the longer the pauses you're going to see associated with
+
+88
+00:06:13.180 --> 00:06:13.860
+<v Simon Ritter>with garbage collection.
+
+89
+00:06:14.240 --> 00:06:15.620
+<v Simon Ritter>Now, if you're lucky, it's, you know,
+
+90
+00:06:15.640 --> 00:06:17.900
+<v Simon Ritter>of the order of 10 or maybe 15 milliseconds,
+
+91
+00:06:18.080 --> 00:06:19.100
+<v Simon Ritter>so you don't really see it.
+
+92
+00:06:19.440 --> 00:06:20.960
+<v Simon Ritter>But you can get longer pauses.
+
+93
+00:06:20.960 --> 00:06:22.260
+<v Simon Ritter>You can get seconds, minutes.
+
+94
+00:06:22.780 --> 00:06:24.160
+<v Simon Ritter>Longest pause I ever heard of
+
+95
+00:06:24.160 --> 00:06:26.680
+<v Simon Ritter>in terms of garbage collections was one and a half days.
+
+96
+00:06:27.380 --> 00:06:29.240
+<v Simon Ritter>Very extreme, but we won't go into that.
+
+97
+00:06:29.440 --> 00:06:32.020
+<v Simon Ritter>But the idea of our garbage collector was to say,
+
+98
+00:06:32.100 --> 00:06:35.180
+<v Simon Ritter>okay, we'll allow you to continue to update objects
+
+99
+00:06:35.180 --> 00:06:36.620
+<v Simon Ritter>whilst we're moving around,
+
+100
+00:06:36.940 --> 00:06:38.480
+<v Simon Ritter>but do it completely safely.
+
+101
+00:06:38.860 --> 00:06:40.720
+<v Simon Ritter>And that way we can eliminate problems
+
+102
+00:06:40.720 --> 00:06:42.180
+<v Simon Ritter>of these seconds of pauses
+
+103
+00:06:43.180 --> 00:06:43.960
+<v Simon Ritter>Milliseconds of pauses.
+
+104
+00:06:44.560 --> 00:06:47.920
+<v Simon Ritter>And initially, that was very popular with things like financial services.
+
+105
+00:06:48.060 --> 00:06:50.260
+<v Simon Ritter>You're doing stock trading, FX trading.
+
+106
+00:06:50.420 --> 00:06:54.740
+<v Simon Ritter>Then the longer you have to pause doing a trade, the more chance you're going to lose money.
+
+107
+00:06:55.180 --> 00:06:57.080
+<v Simon Ritter>So that was the initial sort of idea.
+
+108
+00:06:57.200 --> 00:07:00.780
+<v Simon Ritter>And then we've progressed from there in terms of developing the product further.
+
+109
+00:07:03.000 --> 00:07:07.600
+<v Noah Labhart>A lot of times on the show, I talk about MVPs from founders and things like that.
+
+110
+00:07:07.680 --> 00:07:11.180
+<v Noah Labhart>I'm curious what your MVP was when you joined Azul, right?
+
+111
+00:07:11.240 --> 00:07:12.740
+<v Noah Labhart>So 10 years, lots can happen.
+
+112
+00:07:13.180 --> 00:07:17.120
+<v Noah Labhart>can change. You mentioned when you joined the company, you were focused on kind of one specific
+
+113
+00:07:17.120 --> 00:07:23.480
+<v Noah Labhart>angle. Tell me about that. What was your MVP as you joined Azul and what sort of tools were you
+
+114
+00:07:23.480 --> 00:07:24.540
+<v Noah Labhart>using to bring it to life?
+
+115
+00:07:25.420 --> 00:07:28.620
+<v Simon Ritter>When I joined the company, it was all about that automated memory
+
+116
+00:07:28.620 --> 00:07:35.300
+<v Simon Ritter>management. What we had to do was focus on how could we do that in such a way that we wouldn't
+
+117
+00:07:35.300 --> 00:07:40.500
+<v Simon Ritter>distort the way that Java performs in different ways. Because of course, there's always a cost
+
+118
+00:07:40.500 --> 00:07:46.160
+<v Simon Ritter>associated with moving work around. So if we divide the work up so that it happens with the application,
+
+119
+00:07:46.720 --> 00:07:52.480
+<v Simon Ritter>then what is better performance from a latency perspective, but then you also see a decrease
+
+120
+00:07:52.480 --> 00:07:58.300
+<v Simon Ritter>in terms of throughput. So we had to come up with ways of solving that problem. Certainly one of the
+
+121
+00:07:58.300 --> 00:08:03.680
+<v Simon Ritter>things that I also had a lot to do with was, based on my previous role at Oracle and some before that,
+
+122
+00:08:03.860 --> 00:08:09.400
+<v Simon Ritter>was helping customers understand what it was we did. Because going to a customer and saying,
+
+123
+00:08:10.800 --> 00:08:16.520
+<v Simon Ritter>with the way that Java works is, okay, but how does it actually work internally? So a lot of it
+
+124
+00:08:16.520 --> 00:08:21.040
+<v Simon Ritter>is trying to explain those kinds of things to people in a way that they can understand without
+
+125
+00:08:21.040 --> 00:08:25.960
+<v Simon Ritter>going down right into the weeds and talking about the very low level things in terms of read barriers
+
+126
+00:08:25.960 --> 00:08:30.060
+<v Simon Ritter>and your text locks and things like that. So taking it to a high enough level that people
+
+127
+00:08:30.060 --> 00:08:35.820
+<v Simon Ritter>can grasp what it is we're doing, but a low enough level that people understand the benefits of what
+
+128
+00:08:35.820 --> 00:08:36.320
+<v Simon Ritter>what we're doing.
+
+129
+00:08:37.300 --> 00:08:42.020
+<v Noah Labhart>I'm curious about in, you know, coming up with those, you know, those explanations
+
+130
+00:08:42.020 --> 00:08:48.020
+<v Noah Labhart>where you communicated the value, but it wasn't, you know, too deep, right? A decision or trade-off
+
+131
+00:08:48.020 --> 00:08:51.720
+<v Noah Labhart>you had to make and how you're going to communicate that, right? Because there's different ways you
+
+132
+00:08:51.720 --> 00:08:55.580
+<v Noah Labhart>could go about that, right? There's different ways you could, you could dig in, you could dive in,
+
+133
+00:08:55.620 --> 00:08:59.760
+<v Noah Labhart>dive out, zoom in, zoom out, that whole thing. I'm curious about a decision or a trade-off
+
+134
+00:08:59.760 --> 00:09:02.580
+<v Noah Labhart>that you and the company made and how you coped with it.
+
+135
+00:09:03.140 --> 00:09:05.460
+<v Simon Ritter>It's a very sort of old adage, if you
+
+136
+00:09:05.820 --> 00:09:10.340
+<v Simon Ritter>is that a picture is worth a thousand words. So if you're trying to explain something to somebody,
+
+137
+00:09:10.500 --> 00:09:17.040
+<v Simon Ritter>trying to do it purely with your voice or writing it down can be very difficult.
+
+138
+00:09:17.560 --> 00:09:23.220
+<v Simon Ritter>But if you can present a picture, then that gives something visual for people to look at and go,
+
+139
+00:09:23.320 --> 00:09:28.320
+<v Simon Ritter>okay, I can see what you're saying. And then you explain that using words to highlight the
+
+140
+00:09:28.320 --> 00:09:33.720
+<v Simon Ritter>individual part. That is a very powerful way of getting a message across. And especially when
+
+141
+00:09:33.720 --> 00:09:35.500
+<v Simon Ritter>when you're dealing with complex concepts,
+
+142
+00:09:36.160 --> 00:09:38.500
+<v Simon Ritter>being able to break it down into a diagram
+
+143
+00:09:38.500 --> 00:09:39.800
+<v Simon Ritter>and be able to use pictures
+
+144
+00:09:39.800 --> 00:09:41.380
+<v Simon Ritter>to show what's actually happening.
+
+145
+00:09:41.600 --> 00:09:43.660
+<v Simon Ritter>And especially when you're using things like PowerPoint,
+
+146
+00:09:43.860 --> 00:09:46.640
+<v Simon Ritter>because you can do build outs of the individual slides.
+
+147
+00:09:46.880 --> 00:09:48.760
+<v Simon Ritter>So you can say, okay, we do this bit
+
+148
+00:09:48.760 --> 00:09:50.080
+<v Simon Ritter>and then this happens
+
+149
+00:09:50.080 --> 00:09:52.400
+<v Simon Ritter>and you can show progression through that.
+
+150
+00:09:54.180 --> 00:09:55.400
+<v Noah Labhart>So let's move forward then.
+
+151
+00:09:55.480 --> 00:09:58.760
+<v Noah Labhart>And you mentioned this kind of in your overview there,
+
+152
+00:09:58.840 --> 00:10:02.320
+<v Noah Labhart>but I'm curious about how you progressed and matured,
+
+153
+00:10:03.720 --> 00:10:08.240
+<v Noah Labhart>aspect and communicating this value. Tell me about how you progressed and matured that and how
+
+154
+00:10:08.240 --> 00:10:13.120
+<v Noah Labhart>the product offerings in general progressed and matured. And I kind of liken that to, you know,
+
+155
+00:10:13.120 --> 00:10:17.540
+<v Noah Labhart>how you built your roadmap. How do you go about deciding that, okay, this is the next most
+
+156
+00:10:17.540 --> 00:10:19.440
+<v Noah Labhart>important thing to build or to address?
+
+157
+00:10:20.380 --> 00:10:22.340
+<v Simon Ritter>We basically got to a point where we decided
+
+158
+00:10:22.340 --> 00:10:27.800
+<v Simon Ritter>that we had solved the problem. And there really wasn't very much to do beyond what we had actually
+
+159
+00:10:27.800 --> 00:10:33.100
+<v Simon Ritter>done. So it's okay. Well, we've got that working as well as it's going to work. There is nothing
+
+160
+00:10:33.720 --> 00:10:37.280
+<v Simon Ritter>to improve it. There might be a few little tweaks and things, especially as hardware progresses.
+
+161
+00:10:37.600 --> 00:10:43.040
+<v Simon Ritter>But from a development perspective, there really wasn't a lot to consider where we could go in
+
+162
+00:10:43.040 --> 00:10:47.740
+<v Simon Ritter>this direction or that direction. So what we then did was think about, okay, so we've solved that
+
+163
+00:10:47.740 --> 00:10:53.360
+<v Simon Ritter>one problem in the way that we do things internally. What else could we solve in terms of
+
+164
+00:10:53.360 --> 00:10:59.040
+<v Simon Ritter>performance? And that led us to doing a couple of different things. The way that Java works internally
+
+165
+00:10:59.040 --> 00:11:03.280
+<v Simon Ritter>is that the whole concept of what was called write once, run anywhere.
+
+166
+00:11:03.440 --> 00:11:07.140
+<v Simon Ritter>So if you take the same application and you can run it on Windows on an Intel box
+
+167
+00:11:07.140 --> 00:11:11.320
+<v Simon Ritter>or you can run it on Linux on an ARM box, you don't have to recompile it.
+
+168
+00:11:11.440 --> 00:11:13.920
+<v Simon Ritter>And that relies on using what are called bytecodes.
+
+169
+00:11:14.060 --> 00:11:18.440
+<v Simon Ritter>So bytecodes are instructions for a virtual machine, hence the Java virtual machine.
+
+170
+00:11:19.180 --> 00:11:23.480
+<v Simon Ritter>And what you have to do then is you have to translate those bytecodes at runtime
+
+171
+00:11:24.000 --> 00:11:26.660
+<v Simon Ritter>into the instructions of whichever platform you're on.
+
+172
+00:11:26.660 --> 00:11:31.460
+<v Simon Ritter>The way that happens is now a little bit more complicated or sophisticated, I should say,
+
+173
+00:11:31.480 --> 00:11:35.240
+<v Simon Ritter>not complicated, sophisticated than it was in the early days. And we have this thing called
+
+174
+00:11:35.240 --> 00:11:39.780
+<v Simon Ritter>a just-in-time compiler. So you start running your application, you take your bytecodes,
+
+175
+00:11:39.860 --> 00:11:45.460
+<v Simon Ritter>you interpret them, converting them directly into instructions. But over time, what you do is you
+
+176
+00:11:45.460 --> 00:11:51.080
+<v Simon Ritter>identify where you've got frequently called pieces of code. And when you find a piece of code that's
+
+177
+00:11:51.080 --> 00:11:56.520
+<v Simon Ritter>called very frequently, you say, let's pass it to a compiler internally, compile that all into
+
+178
+00:11:56.660 --> 00:12:00.640
+<v Simon Ritter>native instructions and that will run faster. And we do that a couple of different phases
+
+179
+00:12:00.640 --> 00:12:06.500
+<v Simon Ritter>to get initially compile code and then to do heavily optimized code. So we looked at that and
+
+180
+00:12:06.500 --> 00:12:11.660
+<v Simon Ritter>we said, we could actually change the second part of that to use a different compiler, and we can use
+
+181
+00:12:11.660 --> 00:12:16.880
+<v Simon Ritter>different techniques to compile the code and optimize it, which will give us better performance.
+
+182
+00:12:16.880 --> 00:12:22.700
+<v Simon Ritter>And so that's what we did. So we changed a different part of the JVM, the JIT compiler, so
+
+183
+00:12:22.700 --> 00:12:25.160
+<v Simon Ritter>so that we could address where we were losing throughput
+
+184
+00:12:25.160 --> 00:12:27.820
+<v Simon Ritter>because of the way that we did the garbage collection
+
+185
+00:12:28.300 --> 00:12:29.920
+<v Simon Ritter>and dividing it up whilst the application
+
+186
+00:12:29.920 --> 00:12:30.820
+<v Simon Ritter>was still doing its work.
+
+187
+00:12:31.080 --> 00:12:33.440
+<v Simon Ritter>We could then address that by saying,
+
+188
+00:12:33.520 --> 00:12:35.440
+<v Simon Ritter>let's provide better performing code.
+
+189
+00:12:35.720 --> 00:12:38.740
+<v Simon Ritter>And that has really led to a lot of benefits
+
+190
+00:12:38.740 --> 00:12:40.900
+<v Simon Ritter>for our customers because we can deliver
+
+191
+00:12:40.900 --> 00:12:43.160
+<v Simon Ritter>better performing code with lower latency.
+
+192
+00:12:43.400 --> 00:12:45.880
+<v Simon Ritter>And that addresses problems that people might be having
+
+193
+00:12:45.880 --> 00:12:46.440
+<v Simon Ritter>with performance.
+
+194
+00:12:46.640 --> 00:12:48.420
+<v Simon Ritter>So if their application isn't performing
+
+195
+00:12:48.420 --> 00:12:50.740
+<v Simon Ritter>as well as they want it to, then we can say,
+
+196
+00:12:52.700 --> 00:12:57.040
+<v Simon Ritter>get better performance without changing any of the aspects of your application itself.
+
+197
+00:12:57.560 --> 00:13:02.020
+<v Simon Ritter>But that then has a sort of a flip side benefit, which is you can say everybody's now moving to
+
+198
+00:13:02.020 --> 00:13:07.100
+<v Simon Ritter>the cloud. Everybody's shifting their workloads into the cloud. And the idea behind that is that
+
+199
+00:13:07.100 --> 00:13:12.320
+<v Simon Ritter>utility-based pricing model means that you can save money on what you're provisioning. Great.
+
+200
+00:13:12.600 --> 00:13:17.020
+<v Simon Ritter>Except that what most people find is they shift their workloads to the cloud and they actually
+
+201
+00:13:17.020 --> 00:13:21.540
+<v Simon Ritter>end up spending more than they were spending in their own data center. Now there's a number of
+
+202
+00:13:22.700 --> 00:13:26.860
+<v Simon Ritter>One of the things that obviously people have to do is they have to provision certain sized
+
+203
+00:13:26.860 --> 00:13:28.980
+<v Simon Ritter>instances to run the different workloads.
+
+204
+00:13:29.280 --> 00:13:34.860
+<v Simon Ritter>What we can offer there is you say, okay, use our JVM, which has better performance
+
+205
+00:13:34.860 --> 00:13:37.040
+<v Simon Ritter>in terms of compile code, low latency.
+
+206
+00:13:37.680 --> 00:13:42.760
+<v Simon Ritter>By doing that, you can provide the same carrying capacity, the same number of transactions
+
+207
+00:13:42.760 --> 00:13:48.080
+<v Simon Ritter>per second, but because it performs better, you can use smaller instances or less instances.
+
+208
+00:13:48.080 --> 00:13:51.300
+<v Simon Ritter>is. And that way you get what we call cloud cost optimization.
+
+209
+00:13:52.800 --> 00:13:54.380
+<v Noah Labhart>As you're doing all of this,
+
+210
+00:13:54.520 --> 00:13:59.120
+<v Noah Labhart>you got to have the right people at the helm. And, you know, joining the company, I'm sure they had
+
+211
+00:13:59.120 --> 00:14:04.280
+<v Noah Labhart>an amazing team. Over 10 years, you had to grow that team and to accomplish, you know, different
+
+212
+00:14:04.280 --> 00:14:08.540
+<v Noah Labhart>things. How did you do that? And how does your company do that? And what do you look for in these
+
+213
+00:14:08.540 --> 00:14:11.080
+<v Noah Labhart>people to indicate that they're the winning horses to join you?
+
+214
+00:14:11.800 --> 00:14:13.820
+<v Simon Ritter>That is something that is a challenge
+
+215
+00:14:13.820 --> 00:14:20.440
+<v Simon Ritter>for us especially because even though we're a company that's focused purely on Java we actually
+
+216
+00:14:20.440 --> 00:14:26.100
+<v Simon Ritter>don't hire very many people who program in Java because that's not where we actually work so the
+
+217
+00:14:26.100 --> 00:14:30.620
+<v Simon Ritter>JVM itself is written in C++. So what we're really looking for is C++ programmers, not
+
+218
+00:14:30.620 --> 00:14:36.780
+<v Simon Ritter>Java programmers but even then it's a bit more involved than that in terms of the skill set that
+
+219
+00:14:36.780 --> 00:14:40.800
+<v Simon Ritter>we're looking for, because yes, you can find plenty of people who've done C++ programming, but what
+
+220
+00:14:40.800 --> 00:14:44.240
+<v Simon Ritter>What we're really looking for is people who have worked on the JVM itself.
+
+221
+00:14:44.520 --> 00:14:49.580
+<v Simon Ritter>And so understand the data structures that are used, the algorithms that are used internally.
+
+222
+00:14:50.160 --> 00:14:53.500
+<v Simon Ritter>And that is a challenge because there aren't that many people who've done that.
+
+223
+00:14:53.700 --> 00:14:57.280
+<v Simon Ritter>There were a lot of people at Sun who did it initially when Java was created.
+
+224
+00:14:57.640 --> 00:15:01.720
+<v Simon Ritter>Obviously, they hired and trained engineers over time, then Oracle, the same thing.
+
+225
+00:15:01.900 --> 00:15:09.180
+<v Simon Ritter>So we do find that where people have left Sun or left Oracle, we've certainly been approached by some people and we've hired them
+
+226
+00:15:10.600 --> 00:15:17.280
+<v Simon Ritter>us. But yes, it is definitely a challenge in terms of finding the right people. One of the areas that
+
+227
+00:15:17.280 --> 00:15:23.960
+<v Simon Ritter>is quite good in terms of looking for new talent is academia. So looking at universities, because
+
+228
+00:15:23.960 --> 00:15:28.860
+<v Simon Ritter>a lot of people do research projects and they think, oh, let's do a research project on Java,
+
+229
+00:15:29.020 --> 00:15:33.900
+<v Simon Ritter>look at the JVM, how can I improve performance in the JVM, address different aspects of that.
+
+230
+00:15:34.020 --> 00:15:39.540
+<v Simon Ritter>So if we find people who publish papers that are related to that, then they potentially are a good
+
+231
+00:15:40.800 --> 00:15:41.700
+<v Simon Ritter>terms of looking for recruitment.
+
+232
+00:15:45.180 --> 00:15:49.200
+<v Noah Labhart>I'm curious about scalability. And this will be interesting
+
+233
+00:15:49.200 --> 00:15:56.000
+<v Noah Labhart>because it could apply in all kinds of different ways. Distribution, it could be people, it could
+
+234
+00:15:56.000 --> 00:16:01.500
+<v Noah Labhart>be the actual software itself. So I'm curious where you want to take it. How have you approached
+
+235
+00:16:01.500 --> 00:16:07.240
+<v Noah Labhart>scalability? Where has scalability reared its ugly head on the ugly side of scalability? And
+
+236
+00:16:07.240 --> 00:16:09.560
+<v Noah Labhart>And has there been interesting areas we've had to fight it as you've grown?
+
+237
+00:16:10.340 --> 00:16:15.480
+<v Simon Ritter>So if I go in reverse order for that and look at the software scalability aspect first,
+
+238
+00:16:16.000 --> 00:16:19.660
+<v Simon Ritter>that's one of the things that we've focused on a lot is how do we scale our software up
+
+239
+00:16:19.660 --> 00:16:21.720
+<v Simon Ritter>to enable people to run much bigger workloads?
+
+240
+00:16:22.380 --> 00:16:25.580
+<v Simon Ritter>And that's one of the key things that Java has been very famous for.
+
+241
+00:16:25.640 --> 00:16:30.440
+<v Simon Ritter>One of the reasons why it's maintained its popularity over 30 years is because it will
+
+242
+00:16:30.440 --> 00:16:32.940
+<v Simon Ritter>scale up to internet-sized workloads.
+
+243
+00:16:32.940 --> 00:16:37.300
+<v Simon Ritter>clothes. People like Netflix, people like Salesforce use it for running their applications
+
+244
+00:16:37.300 --> 00:16:41.220
+<v Simon Ritter>because they can scale up to tens of thousands, hundreds of thousands, millions of users.
+
+245
+00:16:41.700 --> 00:16:46.120
+<v Simon Ritter>Then what we've looked at is how do we improve that further? And so that kind of leads into
+
+246
+00:16:46.120 --> 00:16:50.360
+<v Simon Ritter>another more recent development we've done in terms of product, which is the idea of, again,
+
+247
+00:16:50.400 --> 00:16:55.560
+<v Simon Ritter>because people are moving into the cloud, why don't we decouple the JIT compiler from the JVM
+
+248
+00:16:55.560 --> 00:17:01.560
+<v Simon Ritter>and make it into a centralized service? So JIT as a service. When people are using microservices,
+
+249
+00:17:02.940 --> 00:17:08.580
+<v Simon Ritter>instances of the same service, why have each of those services compiling exactly the same code
+
+250
+00:17:08.580 --> 00:17:13.460
+<v Simon Ritter>in exactly the same way within each JVM? Why not offload that into a centralized service,
+
+251
+00:17:13.660 --> 00:17:19.480
+<v Simon Ritter>have that happen remotely? That then reduces the amount of resources you need to do the compilation
+
+252
+00:17:19.480 --> 00:17:24.480
+<v Simon Ritter>locally or run the application locally. Then by centralizing it, you can also cache the results.
+
+253
+00:17:24.780 --> 00:17:29.120
+<v Simon Ritter>And when you start up new instances of the service, the code's already compiled, so we can
+
+254
+00:17:29.120 --> 00:17:34.360
+<v Simon Ritter>can just pass that back straight away. When you look at scalability on the team side and the
+
+255
+00:17:34.360 --> 00:17:40.360
+<v Simon Ritter>corporate side, that's, again, always been a challenge because, again, coming back to the
+
+256
+00:17:40.360 --> 00:17:45.260
+<v Simon Ritter>sort of the scarceness of resource that we have in terms of skilled engineers, we have to make
+
+257
+00:17:45.260 --> 00:17:51.360
+<v Simon Ritter>sure that we use the time of the ones that we do have as well as possible. And that is where you
+
+258
+00:17:51.360 --> 00:17:55.880
+<v Simon Ritter>have to be thinking very carefully about what projects do we work on and what things make sense
+
+259
+00:17:55.880 --> 00:17:58.540
+<v Simon Ritter>in terms of does it improve the product
+
+260
+00:17:58.540 --> 00:18:01.520
+<v Simon Ritter>or are we going off on a slightly, a bit of a tangent
+
+261
+00:18:01.520 --> 00:18:03.400
+<v Simon Ritter>and maybe that's not going to be quite so helpful.
+
+262
+00:18:03.720 --> 00:18:06.480
+<v Simon Ritter>So the scalability aspect of the team
+
+263
+00:18:06.480 --> 00:18:08.940
+<v Simon Ritter>does become something that we really have to be aware of
+
+264
+00:18:08.940 --> 00:18:10.280
+<v Simon Ritter>because of the scarceness of resource.
+
+265
+00:18:12.000 --> 00:18:14.300
+<v Noah Labhart>From where you are now and all that you've accomplished
+
+266
+00:18:14.300 --> 00:18:18.000
+<v Noah Labhart>over this past 10 years with Azul in particular,
+
+267
+00:18:18.180 --> 00:18:20.080
+<v Noah Labhart>as you kind of step out on the balcony
+
+268
+00:18:20.080 --> 00:18:21.600
+<v Noah Labhart>and look across all that you've built,
+
+269
+00:18:21.660 --> 00:18:22.580
+<v Noah Labhart>what are you most proud of?
+
+270
+00:18:24.120 --> 00:18:34.900
+<v Simon Ritter>I'm most proud of the fact that we have delivered on helping people to use Java to run their applications in a more efficient way.
+
+271
+00:18:35.440 --> 00:18:44.780
+<v Simon Ritter>Because, again, if I think back all the way through to when I started at Sun, I was very heavily involved at that time in trying to drive the adoption of Java.
+
+272
+00:18:44.780 --> 00:18:51.820
+<v Simon Ritter>because back in 1997, 1998, which is when I really started that, was where we were really trying to
+
+273
+00:18:51.820 --> 00:18:58.800
+<v Simon Ritter>get developers to adopt Java. And so I've seen over the last sort of 30 years how Java has
+
+274
+00:18:58.800 --> 00:19:05.160
+<v Simon Ritter>continued to grow in terms of its use, especially in terms of server-based applications. We've
+
+275
+00:19:05.160 --> 00:19:09.300
+<v Simon Ritter>moved away from the desktop, but Java is hugely popular and hugely successful on the server side.
+
+276
+00:19:09.540 --> 00:19:14.060
+<v Simon Ritter>And when you do look at companies like Netflix that run their content delivery system using
+
+277
+00:19:14.780 --> 00:19:28.700
+<v Simon Ritter>In terms of Azul, what I'm most proud of is the way that we have helped lots of customers to deliver those applications using Java and making Java successful by helping them to get better performance from it.
+
+278
+00:19:30.540 --> 00:19:36.400
+<v Noah Labhart>Okay, let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+279
+00:19:37.620 --> 00:19:43.400
+<v Simon Ritter>that's where, as I said, you need to be careful in terms of going off at a tangent where you think
+
+280
+00:19:43.400 --> 00:19:48.340
+<v Simon Ritter>something might be useful, you try it for a while, and then you decide, yeah, actually that's not going
+
+281
+00:19:48.340 --> 00:19:52.580
+<v Simon Ritter>to really help. Back in the early days when I joined Azul, we had one project that we
+
+282
+00:19:52.580 --> 00:19:59.080
+<v Simon Ritter>were working on, which was looking at how we could improve the efficiency of the way that memory was
+
+283
+00:19:59.080 --> 00:20:04.380
+<v Simon Ritter>used internally in the JVM. So not just the way that we did the garbage collection, the memory
+
+284
+00:20:04.380 --> 00:20:10.060
+<v Simon Ritter>management, but how objects were laid out in the heap. And this was because we were looking at the
+
+285
+00:20:10.060 --> 00:20:15.320
+<v Simon Ritter>way that languages like C++ worked, and C as well, because in C and C++ you have a concept
+
+286
+00:20:15.320 --> 00:20:21.220
+<v Simon Ritter>of a struct, which is where you can have different types of objects grouped together and they get
+
+287
+00:20:21.220 --> 00:20:25.860
+<v Simon Ritter>placed into memory contiguously, which is all good and it's very efficient because you get the
+
+288
+00:20:25.860 --> 00:20:30.680
+<v Simon Ritter>benefits of the locality of reference, as it's called. So you're dealing with memory that's close
+
+289
+00:20:30.680 --> 00:20:36.000
+<v Simon Ritter>together, so the cache works very effectively with that. So we thought, okay, let's apply that kind of
+
+290
+00:20:36.000 --> 00:20:42.820
+<v Simon Ritter>idea to Java. So we came up with a sort of solution to this and we created a library that would do
+
+291
+00:20:42.820 --> 00:20:48.140
+<v Simon Ritter>this, and we did some work in the JVM as well, but it was never going to fly. So it was a great idea,
+
+292
+00:20:48.140 --> 00:20:55.700
+<v Simon Ritter>but it just didn't work out in practice. And also trying to get that adopted into standard Java
+
+293
+00:20:55.700 --> 00:20:57.700
+<v Simon Ritter>is also like a big hurdle.
+
+294
+00:20:57.980 --> 00:20:59.580
+<v Simon Ritter>And we went down that road a little bit
+
+295
+00:20:59.580 --> 00:21:00.360
+<v Simon Ritter>and then we just decided,
+
+296
+00:21:00.420 --> 00:21:01.480
+<v Simon Ritter>yeah, this is not going to work.
+
+297
+00:21:01.560 --> 00:21:04.840
+<v Simon Ritter>It's not going to be beneficial enough to customers.
+
+298
+00:21:04.920 --> 00:21:06.680
+<v Simon Ritter>And we'd have to go through so much effort
+
+299
+00:21:06.680 --> 00:21:08.580
+<v Simon Ritter>to try and get it into standard Java
+
+300
+00:21:08.580 --> 00:21:10.340
+<v Simon Ritter>that we just abandoned this as a project.
+
+301
+00:21:13.540 --> 00:21:15.020
+<v Noah Labhart>This will be really interesting.
+
+302
+00:21:15.260 --> 00:21:18.000
+<v Noah Labhart>Tell me what the future looks like for Azul,
+
+303
+00:21:18.080 --> 00:21:21.620
+<v Noah Labhart>for the offerings that you have and for your team.
+
+304
+00:21:22.300 --> 00:21:24.540
+<v Simon Ritter>If I think about the individual products that we have,
+
+305
+00:21:25.700 --> 00:21:34.700
+<v Simon Ritter>I don't really see much development, if you like, in terms of the future, because what we're doing is simply delivering distribution in the same way that you get from Linux and that sort of thing.
+
+306
+00:21:34.960 --> 00:21:40.040
+<v Simon Ritter>On the Prime side, we're always looking at how can we take performance to the next level.
+
+307
+00:21:40.120 --> 00:21:48.840
+<v Simon Ritter>As I said, things like the cloud-native compiler, as we call it, so the JIT as a service, came out of the how can we improve the efficiency of Java further.
+
+308
+00:21:48.840 --> 00:21:53.380
+<v Simon Ritter>further we've got another project that we've been working on and we just recently introduced into
+
+309
+00:21:53.380 --> 00:22:00.060
+<v Simon Ritter>prime, which is Java on CRaC. Maybe needed to think about the marketing naming of that, but
+
+310
+00:22:00.060 --> 00:22:06.000
+<v Simon Ritter>essentially what this does is it allows you to think of a java application in the same way to
+
+311
+00:22:06.000 --> 00:22:10.560
+<v Simon Ritter>some extent as your laptop so when you're using your laptop you're editing a word document you've
+
+312
+00:22:10.560 --> 00:22:15.780
+<v Simon Ritter>got a browser window open or whatever and then you can close your laptop take it to another room
+
+313
+00:22:15.780 --> 00:22:19.480
+<v Simon Ritter>take it to another country, open up your laptop, and the Word document is there,
+
+314
+00:22:19.600 --> 00:22:23.000
+<v Simon Ritter>and your browser window is there, and you can continue from where you were.
+
+315
+00:22:23.160 --> 00:22:27.660
+<v Simon Ritter>So it's literally freezing your laptop in a moment in time, and then opening it later on.
+
+316
+00:22:27.880 --> 00:22:32.240
+<v Simon Ritter>So what we're looking at with this CRaC project, CRaC as it's called,
+
+317
+00:22:32.320 --> 00:22:37.840
+<v Simon Ritter>Coordinated Restore at Checkpoint, is taking the same approach for a Java application.
+
+318
+00:22:38.320 --> 00:22:42.880
+<v Simon Ritter>One of the, again, performance issues that people face with Java overall,
+
+319
+00:22:42.880 --> 00:22:48.480
+<v Simon Ritter>all because of this compilation that happens is what's called warm-up time. So how long it takes
+
+320
+00:22:48.480 --> 00:22:53.480
+<v Simon Ritter>to identify the frequently used pieces of code, compile them through the first JIT compiler,
+
+321
+00:22:53.940 --> 00:22:58.220
+<v Simon Ritter>recompile them through the second JIT compiler using more heavy optimization. Shifting that to
+
+322
+00:22:58.220 --> 00:23:02.440
+<v Simon Ritter>the cloud-native compiler helps. We also have another thing called ReadyNow, which is where
+
+323
+00:23:02.440 --> 00:23:07.940
+<v Simon Ritter>we can take a profile of a running application to reuse that information for JIT compilation when
+
+324
+00:23:07.940 --> 00:23:12.820
+<v Simon Ritter>we start it up again. But what we'd like to do and what we are now doing is simply saying okay
+
+325
+00:23:12.880 --> 00:23:14.720
+<v Simon Ritter>okay, take a snapshot of that running application
+
+326
+00:23:14.720 --> 00:23:17.980
+<v Simon Ritter>so that you can restart it from exactly the same point
+
+327
+00:23:18.560 --> 00:23:21.180
+<v Simon Ritter>and continue as if you just left off.
+
+328
+00:23:21.280 --> 00:23:22.620
+<v Simon Ritter>And you could also take that image,
+
+329
+00:23:22.820 --> 00:23:23.820
+<v Simon Ritter>move it to a different machine,
+
+330
+00:23:23.980 --> 00:23:25.040
+<v Simon Ritter>start it on a different machine,
+
+331
+00:23:25.140 --> 00:23:26.500
+<v Simon Ritter>start it on multiple machines.
+
+332
+00:23:27.340 --> 00:23:28.880
+<v Simon Ritter>But the problem with doing that
+
+333
+00:23:28.880 --> 00:23:30.740
+<v Simon Ritter>is that if you simply take a snapshot
+
+334
+00:23:30.740 --> 00:23:32.460
+<v Simon Ritter>of a running application or a state,
+
+335
+00:23:32.880 --> 00:23:34.460
+<v Simon Ritter>you run into problems of things
+
+336
+00:23:34.460 --> 00:23:36.240
+<v Simon Ritter>if you've got an open database connection
+
+337
+00:23:36.240 --> 00:23:37.360
+<v Simon Ritter>or an open file.
+
+338
+00:23:37.800 --> 00:23:39.300
+<v Simon Ritter>Try and move that to another machine,
+
+339
+00:23:39.620 --> 00:23:41.820
+<v Simon Ritter>try and do it an hour or two later,
+
+340
+00:23:42.880 --> 00:23:44.860
+<v Simon Ritter>It's not going to work because you've lost the connection.
+
+341
+00:23:45.020 --> 00:23:46.860
+<v Simon Ritter>The file may have changed, all sorts of things.
+
+342
+00:23:47.040 --> 00:23:49.060
+<v Simon Ritter>So what we do is this coordinated bit,
+
+343
+00:23:49.140 --> 00:23:51.220
+<v Simon Ritter>which is where we make the application aware
+
+344
+00:23:51.620 --> 00:23:53.440
+<v Simon Ritter>that it's going to be checkpointed
+
+345
+00:23:53.440 --> 00:23:54.880
+<v Simon Ritter>and we make it aware that it's being restored.
+
+346
+00:23:55.440 --> 00:23:56.900
+<v Simon Ritter>So when you say, I want to make a checkpoint,
+
+347
+00:23:57.120 --> 00:23:58.980
+<v Simon Ritter>it has to close all of those things
+
+348
+00:23:58.980 --> 00:24:01.320
+<v Simon Ritter>like the database connection, the files, and so on.
+
+349
+00:24:01.560 --> 00:24:04.440
+<v Simon Ritter>And then when it restarts, it says, okay, I'm restarting,
+
+350
+00:24:04.440 --> 00:24:06.460
+<v Simon Ritter>establish the connection to the database,
+
+351
+00:24:06.740 --> 00:24:09.120
+<v Simon Ritter>reopen the file, potentially using a checksum
+
+352
+00:24:09.120 --> 00:24:10.940
+<v Simon Ritter>to check if the file has changed or not,
+
+353
+00:24:10.980 --> 00:24:11.780
+<v Simon Ritter>and things like that.
+
+354
+00:24:12.880 --> 00:24:16.960
+<v Simon Ritter>us to do, and I'll give you an example from our sort of benchmarks, we did a Spring Boot application
+
+355
+00:24:17.520 --> 00:24:22.960
+<v Simon Ritter>and just running it from cold to start up to first transaction on the machine that we used it on,
+
+356
+00:24:23.080 --> 00:24:27.500
+<v Simon Ritter>it was four seconds. And that's a sort of fairly reasonable sort of time it takes to
+
+357
+00:24:27.500 --> 00:24:32.380
+<v Simon Ritter>fire up an application, get everything running. If we took a snapshot of that and we restarted
+
+358
+00:24:32.380 --> 00:24:38.400
+<v Simon Ritter>it from that snapshot, we reduced that four seconds to 40 milliseconds. So if you can start
+
+359
+00:24:38.400 --> 00:24:43.960
+<v Simon Ritter>startup services in 40 milliseconds rather than four seconds, you can have a huge impact in terms
+
+360
+00:24:43.960 --> 00:24:48.180
+<v Simon Ritter>of your microservices and you're spinning up your instances and so on. So that's one of those things
+
+361
+00:24:48.180 --> 00:24:53.120
+<v Simon Ritter>that in terms of the future is looking at things like that. The other big area that I can see that
+
+362
+00:24:53.120 --> 00:24:57.340
+<v Simon Ritter>from an Azul perspective we're focusing on is the third part of our product range, which I haven't
+
+363
+00:24:57.340 --> 00:25:01.320
+<v Simon Ritter>actually mentioned yet, which is what's called Intelligence Cloud. What we're doing there is
+
+364
+00:25:01.320 --> 00:25:06.520
+<v Simon Ritter>we're saying we build the JVM, whether it's Platform Core or Platform Prime. So how can we
+
+365
+00:25:08.400 --> 00:25:14.260
+<v Simon Ritter>in the JVM to provide value outside of that. That consists of Azul Vulnerability Detection,
+
+366
+00:25:14.560 --> 00:25:18.920
+<v Simon Ritter>which is where, because we know all of the libraries and everything that's being loaded
+
+367
+00:25:18.920 --> 00:25:24.520
+<v Simon Ritter>when an application runs, if you have a situation where a library is identified as having a
+
+368
+00:25:24.520 --> 00:25:29.500
+<v Simon Ritter>vulnerability, and I'll give you the great example, which was Log4J. Log4J, a few years ago, had a
+
+369
+00:25:29.500 --> 00:25:34.660
+<v Simon Ritter>critical vulnerability, zero-day vulnerability, that meant that you could, if somebody was using
+
+370
+00:25:34.660 --> 00:25:40.220
+<v Simon Ritter>log4j there was a potential to break into systems very easily. The problem people had was how do
+
+371
+00:25:40.220 --> 00:25:45.040
+<v Simon Ritter>they know where they're running Log4J? Now you can do various things like software bill of materials,
+
+372
+00:25:45.260 --> 00:25:49.640
+<v Simon Ritter>SBOMs is a common technique where you list all of the libraries, all of the classes and so on,
+
+373
+00:25:49.680 --> 00:25:54.760
+<v Simon Ritter>which are contained in an application. But that's a static analysis just telling you which ones
+
+374
+00:25:54.760 --> 00:26:00.620
+<v Simon Ritter>could be used. What we can do by monitoring the class loader and understanding which classes are
+
+375
+00:26:00.620 --> 00:26:05.440
+<v Simon Ritter>are actually being used at any given time. If a situation like that arose, you could go to our
+
+376
+00:26:05.440 --> 00:26:11.440
+<v Simon Ritter>JVMs and say, show me all the JVMs that currently have Log4J loaded and are using it. So you know
+
+377
+00:26:11.440 --> 00:26:16.760
+<v Simon Ritter>exactly which machines you've got to focus on to be able to address any vulnerabilities in that
+
+378
+00:26:16.760 --> 00:26:21.000
+<v Simon Ritter>sense. And because we can also see all the libraries, we can give more information in that
+
+379
+00:26:21.000 --> 00:26:25.820
+<v Simon Ritter>respect. The thing that we can then do is we can again invert that. And so we've come up with what
+
+380
+00:26:25.820 --> 00:26:31.300
+<v Simon Ritter>what we call code inventory. Code inventory says, when you run your application, we'll keep track of
+
+381
+00:26:31.300 --> 00:26:36.340
+<v Simon Ritter>all the code that you're using. If we do that, we can then identify which code is not being used.
+
+382
+00:26:36.540 --> 00:26:40.560
+<v Simon Ritter>And if you've got an application that's been developed over many years, you might find that
+
+383
+00:26:40.560 --> 00:26:45.000
+<v Simon Ritter>there are pieces of code that are no longer required. That's a maintenance burden. It's a
+
+384
+00:26:45.000 --> 00:26:51.600
+<v Simon Ritter>security potential risk. So if we can identify those pieces, you could remove those safely and
+
+385
+00:26:51.600 --> 00:26:55.700
+<v Simon Ritter>and then reduce the size of your application in terms of maintenance and security issues.
+
+386
+00:26:56.420 --> 00:26:59.240
+<v Simon Ritter>And then the third thing that we've done related to that is,
+
+387
+00:26:59.400 --> 00:27:02.040
+<v Simon Ritter>because we understand all the JVMs that are being run,
+
+388
+00:27:02.240 --> 00:27:04.100
+<v Simon Ritter>we can then keep an inventory of those,
+
+389
+00:27:04.260 --> 00:27:07.280
+<v Simon Ritter>and we can see if somebody installs a different Java version,
+
+390
+00:27:07.420 --> 00:27:09.120
+<v Simon Ritter>then we can track that as well.
+
+391
+00:27:09.520 --> 00:27:13.420
+<v Simon Ritter>So this is all very valuable information for people who are running a large estate
+
+392
+00:27:13.420 --> 00:27:15.040
+<v Simon Ritter>with lots of JVMs in it.
+
+393
+00:27:15.360 --> 00:27:17.100
+<v Simon Ritter>And I can certainly see that in the future,
+
+394
+00:27:17.140 --> 00:27:20.780
+<v Simon Ritter>we're going to look at how we extend that further with more value we can add.
+
+395
+00:27:22.320 --> 00:27:23.440
+<v Noah Labhart>Let's switch to you, Simon.
+
+396
+00:27:23.540 --> 00:27:25.840
+<v Noah Labhart>Who influences the way that you work?
+
+397
+00:27:26.000 --> 00:27:29.460
+<v Noah Labhart>Name a person or many persons or something that you look up to and why.
+
+398
+00:27:30.420 --> 00:27:33.780
+<v Simon Ritter>There aren't that many people that I think that influence the way that I work.
+
+399
+00:27:34.040 --> 00:27:37.740
+<v Simon Ritter>Although there was one person who stood out, and that was actually James Gosling.
+
+400
+00:27:37.900 --> 00:27:39.980
+<v Simon Ritter>So he was the person who created Java initially.
+
+401
+00:27:40.280 --> 00:27:43.820
+<v Simon Ritter>I was very lucky when I was at Sun because I worked with James quite a lot.
+
+402
+00:27:44.000 --> 00:27:51.180
+<v Simon Ritter>And in fact, at one point, one of the programs that they had at Sun was what they called Sun Engineering Excellence Development.
+
+403
+00:27:51.600 --> 00:27:56.320
+<v Simon Ritter>SEED. The idea behind that was that they took engineers who were in the earlier to middle part
+
+404
+00:27:56.320 --> 00:28:01.840
+<v Simon Ritter>of their career to help them develop as engineers. They would assign a mentor to work with them so
+
+405
+00:28:01.840 --> 00:28:06.260
+<v Simon Ritter>that they could help them develop as an engineer. So I applied for that and I was lucky enough to
+
+406
+00:28:06.260 --> 00:28:11.320
+<v Simon Ritter>get accepted. And then you had to suggest people that you would work with to be your mentor.
+
+407
+00:28:11.520 --> 00:28:15.080
+<v Simon Ritter>So I suggested James Gosling, thinking I'll start at the top and work my way down
+
+408
+00:28:15.080 --> 00:28:20.540
+<v Simon Ritter>because I already knew him. So he said, yeah, I'll be your mentor. So I actually worked with James
+
+409
+00:28:21.600 --> 00:28:26.620
+<v Simon Ritter>mentorship relationship. One of the things that I would say is that the way that he worked always
+
+410
+00:28:26.620 --> 00:28:31.060
+<v Simon Ritter>impressed me because it was one of those weird things where you think there's 24 hours in a day
+
+411
+00:28:31.060 --> 00:28:36.040
+<v Simon Ritter>and yet some people like James seem to get so much more done than I do. They still got the
+
+412
+00:28:36.040 --> 00:28:41.180
+<v Simon Ritter>same 24 hours that I have. How do they get so much done? So I always found that an interesting
+
+413
+00:28:41.180 --> 00:28:42.760
+<v Simon Ritter>sort of thing to look at.
+
+414
+00:28:44.680 --> 00:28:47.760
+<v Noah Labhart>Last question. So you're getting on a plane and you're sitting
+
+415
+00:28:47.760 --> 00:28:54.060
+<v Noah Labhart>next to a young builder, entrepreneur, Java head, maybe Petrohead too, who knows? Maybe they're
+
+416
+00:28:54.060 --> 00:28:58.280
+<v Noah Labhart>mixed in there as well, but they built the next big thing and they're excited about it. They're
+
+417
+00:28:58.280 --> 00:29:01.400
+<v Noah Labhart>jazzed about it. They can't wait to show it off to the world and they can't wait to show it off
+
+418
+00:29:01.400 --> 00:29:06.320
+<v Noah Labhart>to you right there on the plane. What advice do you give that person having gone down this road
+
+419
+00:29:06.320 --> 00:29:13.560
+<v Noah Labhart>of building foundational elements that we all stand upon today in our software journeys?
+
+420
+00:29:13.560 --> 00:29:15.160
+<v Noah Labhart>needs what do you tell them one
+
+421
+00:29:15.160 --> 00:29:18.280
+<v Simon Ritter>thing is don't be afraid to fail because that's clearly something
+
+422
+00:29:18.280 --> 00:29:24.520
+<v Simon Ritter>that works very well if you look at the way that a lot of people have done startups and created new
+
+423
+00:29:24.520 --> 00:29:30.100
+<v Simon Ritter>technology and so on don't be afraid don't be afraid to fail fast and come back and reiterate
+
+424
+00:29:30.100 --> 00:29:37.220
+<v Simon Ritter>and go through a number of approaches to the same problem but temper that i would say so so don't
+
+425
+00:29:37.220 --> 00:29:40.500
+<v Simon Ritter>simply go i'm just going to try everything and shotgun approach and throw everything against
+
+426
+00:29:40.500 --> 00:29:44.940
+<v Simon Ritter>against the wall and see what sticks. I think you need to have that approach where you're not afraid
+
+427
+00:29:44.940 --> 00:29:51.100
+<v Simon Ritter>to fail, but give it some thought before you go down different directions. And that kind of comes
+
+428
+00:29:51.100 --> 00:29:55.060
+<v Simon Ritter>back to what I was saying earlier about the thing that failed for us in terms of an approach.
+
+429
+00:29:55.680 --> 00:30:01.420
+<v Simon Ritter>We thought about it quite well beforehand, and we thought that had potential, because if you look at
+
+430
+00:30:01.420 --> 00:30:05.640
+<v Simon Ritter>the way other languages work and other runtimes work, that definitely had potential. But once we
+
+431
+00:30:05.640 --> 00:30:10.620
+<v Simon Ritter>started exploring it, then we realized that there were too many hurdles that we had to overcome.
+
+432
+00:30:11.100 --> 00:30:15.100
+<v Simon Ritter>So rather than just taking the approach of, well, try everything that we can possibly think of to
+
+433
+00:30:15.100 --> 00:30:19.220
+<v Simon Ritter>improve Java, we did take a more measured approach, even though some of those things
+
+434
+00:30:19.220 --> 00:30:24.520
+<v Simon Ritter>don't necessarily work out every time. But don't be afraid to fail, but think about it before you
+
+435
+00:30:24.520 --> 00:30:26.140
+<v Simon Ritter>start on that route.
+
+436
+00:30:26.440 --> 00:30:29.640
+<v Noah Labhart>I think that's fantastic advice. Well, Simon, thank you for being on the
+
+437
+00:30:29.640 --> 00:30:33.200
+<v Noah Labhart>show today. Thank you for telling your creation story at Azul.
+
+438
+00:30:33.360 --> 00:30:34.220
+<v Simon Ritter>Thank you very much.
+
+439
+00:30:36.260 --> 00:30:39.320
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+440
+00:30:46.440 --> 00:30:49.420
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+441
+00:30:49.640 --> 00:30:54.340
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+442
+00:30:55.040 --> 00:30:57.220
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+443
+00:30:57.700 --> 00:30:59.360
+<v Noah Labhart>Both things help us out tremendously.
+
+444
+00:31:02.260 --> 00:31:03.780
+<v Noah Labhart>And thanks again for listening.

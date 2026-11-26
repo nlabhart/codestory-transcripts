@@ -1,0 +1,1707 @@
+WEBVTT
+
+NOTE S13 Bonus: From Airbnb's Chronon Engine to Enterprise Real-Time Feature Compute with Varant Zanoyan, Co-Founder & CEO of Zipline AI
+
+1
+00:00:00.960 --> 00:00:07.580
+<v Varant Zanoyan>It was built over the course of, I want to say a little over a quarter, not quite a half, so like maybe four or five months.
+
+2
+00:00:08.160 --> 00:00:14.840
+<v Varant Zanoyan>But then if you look at the tools that we used to build this, a lot of the challenge here is just in data computation, data processing, right?
+
+3
+00:00:14.900 --> 00:00:22.000
+<v Varant Zanoyan>So like you got to take raw data and turn it into useful signals like features and embeddings, and then use that to backfill training data and use that to power online inference.
+
+4
+00:00:22.220 --> 00:00:24.020
+<v Varant Zanoyan>So it's like those are the best kind of the scope of things.
+
+5
+00:00:24.020 --> 00:00:31.440
+<v Varant Zanoyan>You take data, you transform it, and you need to serve it with low latency and high freshness in the online environment to power model inference in real time.
+
+6
+00:00:31.660 --> 00:00:36.540
+<v Varant Zanoyan>And then you need to do these big batches of backfills that can be slow and expensive if you don't engineer things correctly.
+
+7
+00:00:36.780 --> 00:00:38.260
+<v Varant Zanoyan>But ideally, they're fast and cheap.
+
+8
+00:00:38.840 --> 00:00:43.480
+<v Varant Zanoyan>My name is Varant Zanoyan, and I am the co-founder and CEO at Zipline AI.
+
+9
+00:00:46.680 --> 00:00:52.160
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+10
+00:00:52.200 --> 00:00:53.720
+<v Clip>Six months moonlighting.
+
+11
+00:00:54.020 --> 00:00:59.520
+<v Noah Labhart>Nothing on the back end who share what it takes to change an industry. I don't exactly know
+
+12
+00:00:59.520 --> 00:01:00.020
+<v Clip>What
+
+13
+00:00:59.740 --> 00:01:02.320
+<v Clip>to do. Many goes to get right. Who
+
+14
+00:01:02.320 --> 00:01:06.360
+<v Noah Labhart>built the teams that have their back. Company is its people. The
+
+15
+00:01:06.360 --> 00:01:06.860
+<v Noah Labhart>Teams
+
+16
+00:01:06.480 --> 00:01:07.580
+<v Clip>help each other achieve most.
+
+17
+00:01:07.580 --> 00:01:11.940
+<v Noah Labhart>Proud of our team. Keeping scalability top of mind. All that
+
+18
+00:01:11.940 --> 00:01:12.960
+<v Noah Labhart>Infrastructure was a yes.
+
+19
+00:01:12.960 --> 00:01:13.600
+<v Clip>We've been fighting
+
+20
+00:01:13.600 --> 00:01:16.640
+<v Noah Labhart>it as we grow. Total waste of time. The stories you
+
+21
+00:01:16.640 --> 00:01:18.740
+<v Noah Labhart>don't read in the headlines. It's
+
+22
+00:01:18.740 --> 00:01:20.360
+<v Clip>not an easy thing to achieve. Took off the
+
+23
+00:01:20.360 --> 00:01:21.340
+<v Noah Labhart>shelf and dusted it off
+
+24
+00:01:21.340 --> 00:01:25.840
+<v Noah Labhart>and try to begin to ride the ups and downs of the startup life.
+
+25
+00:01:26.040 --> 00:01:27.580
+<v Clip>You need to really want it.
+
+26
+00:01:27.680 --> 00:01:28.960
+<v Clip>It's not just about technology.
+
+27
+00:01:29.080 --> 00:01:31.040
+<v Noah Labhart>All this and more on Code Story.
+
+28
+00:01:32.340 --> 00:01:33.840
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+29
+00:01:34.120 --> 00:01:39.120
+<v Noah Labhart>And today, how Varant Zanoyan has built a secure way to power your AI
+
+30
+00:01:39.120 --> 00:01:43.220
+<v Noah Labhart>with fresh and fast data deployed on your cloud.
+
+31
+00:01:49.040 --> 00:01:53.980
+<v Noah Labhart>Varant Zanoyan was born in Washington, D.C. and grew up there and in Switzerland as well.
+
+32
+00:01:54.140 --> 00:01:57.120
+<v Noah Labhart>He now lives in the Bay Area, specifically San Mateo.
+
+33
+00:01:57.300 --> 00:02:02.420
+<v Noah Labhart>He spent time at Palantir Technologies as well as a stint building ML Tech at Airbnb.
+
+34
+00:02:02.980 --> 00:02:07.840
+<v Noah Labhart>But outside of tech, he loves the outdoors, tending to his garden of plants and vegetables.
+
+35
+00:02:08.140 --> 00:02:12.480
+<v Noah Labhart>After taking a good hike, he's been digging a good uni pizza for dinner.
+
+36
+00:02:15.640 --> 00:02:21.180
+<v Noah Labhart>Prior to his current venture, Varant was working at Airbnb developing Chronon, an open-source
+
+37
+00:02:21.180 --> 00:02:24.880
+<v Noah Labhart>data management engine used to power AI ML infrastructure.
+
+38
+00:02:25.500 --> 00:02:30.260
+<v Noah Labhart>It was then that he and his team realized that building and managing data pipelines
+
+39
+00:02:30.600 --> 00:02:35.480
+<v Noah Labhart>was a bottleneck for AI Dev and decided to spin into a standalone platform.
+
+40
+00:02:35.480 --> 00:02:35.980
+<v Noah Labhart>platform.
+
+41
+00:02:37.880 --> 00:02:40.820
+<v Noah Labhart>This is the creation story of Zipline AI.
+
+42
+00:02:45.520 --> 00:02:50.200
+<v Varant Zanoyan>So Zipline AI is a feature and embedding platform for machine learning.
+
+43
+00:02:50.380 --> 00:02:55.260
+<v Varant Zanoyan>So what that means is that data scientists and engineers who are building machine learning
+
+44
+00:02:55.260 --> 00:03:00.860
+<v Varant Zanoyan>models use Zipline AI to build those models better, to automate a lot of the complex,
+
+45
+00:03:01.460 --> 00:03:04.640
+<v Varant Zanoyan>difficult infrastructure challenges that are required to power those models in production
+
+46
+00:03:05.620 --> 00:03:07.960
+<v Varant Zanoyan>basically use more data, improve model performance,
+
+47
+00:03:08.240 --> 00:03:10.340
+<v Varant Zanoyan>and improve the speed at which they're able to iterate
+
+48
+00:03:10.340 --> 00:03:11.060
+<v Varant Zanoyan>on those models.
+
+49
+00:03:12.160 --> 00:03:14.040
+<v Varant Zanoyan>The story as to how we got here,
+
+50
+00:03:14.500 --> 00:03:17.540
+<v Varant Zanoyan>it started at Airbnb where kind of I was working
+
+51
+00:03:17.540 --> 00:03:18.960
+<v Varant Zanoyan>with machine learning teams.
+
+52
+00:03:19.040 --> 00:03:21.240
+<v Varant Zanoyan>So the trust team was one of the first ones
+
+53
+00:03:21.240 --> 00:03:21.820
+<v Varant Zanoyan>that we worked with,
+
+54
+00:03:21.940 --> 00:03:24.080
+<v Varant Zanoyan>and they did all sorts of fraud detection at all.
+
+55
+00:03:24.480 --> 00:03:26.280
+<v Varant Zanoyan>So there was a lot of payment sheets,
+
+56
+00:03:26.460 --> 00:03:28.100
+<v Varant Zanoyan>fraud challenges at the time.
+
+57
+00:03:28.700 --> 00:03:29.740
+<v Varant Zanoyan>Airbnb is a travel company,
+
+58
+00:03:29.940 --> 00:03:31.780
+<v Varant Zanoyan>but in many ways is also a payments company.
+
+59
+00:03:31.960 --> 00:03:34.140
+<v Varant Zanoyan>It moves money across bank accounts, across borders.
+
+60
+00:03:35.480 --> 00:03:39.460
+<v Varant Zanoyan>result, it's the target of a lot of the same sort of fraud attacks that a lot of traditional
+
+61
+00:03:39.460 --> 00:03:41.220
+<v Varant Zanoyan>payment processors are also the target of.
+
+62
+00:03:41.440 --> 00:03:45.820
+<v Varant Zanoyan>So people trying to extract money from the system fraudulently in any number of ways.
+
+63
+00:03:46.800 --> 00:03:48.440
+<v Varant Zanoyan>And they wanted to iterate faster.
+
+64
+00:03:48.640 --> 00:03:53.380
+<v Varant Zanoyan>They wanted to use more real-time data, streaming features, capture signals of changing user
+
+65
+00:03:53.380 --> 00:03:56.880
+<v Varant Zanoyan>behavior in real time and use that to attack these bad actors better.
+
+66
+00:03:57.220 --> 00:03:58.800
+<v Varant Zanoyan>And all those things were really difficult.
+
+67
+00:03:59.220 --> 00:04:01.700
+<v Varant Zanoyan>Basically, that was the first case that we supported.
+
+68
+00:04:01.700 --> 00:04:04.900
+<v Varant Zanoyan>And so I was taking a look at that and seeing like, okay, why is this so hard?
+
+69
+00:04:04.960 --> 00:04:05.680
+<v Varant Zanoyan>Or the bottlenecks?
+
+70
+00:04:05.740 --> 00:04:09.620
+<v Varant Zanoyan>And we identified that essentially the data infrastructure, the data pipelines, our views,
+
+71
+00:04:09.760 --> 00:04:14.800
+<v Varant Zanoyan>these models, both for training and serving is basically where the majority of the complexity
+
+72
+00:04:14.800 --> 00:04:16.380
+<v Varant Zanoyan>and the friction was coming in.
+
+73
+00:04:16.780 --> 00:04:20.060
+<v Varant Zanoyan>And so we started building tools and trying to see if we could take that iteration loop
+
+74
+00:04:20.060 --> 00:04:23.520
+<v Varant Zanoyan>for months to better, and we eventually got it down for months to days.
+
+75
+00:04:23.960 --> 00:04:25.240
+<v Varant Zanoyan>That was a pretty big breakthrough.
+
+76
+00:04:25.440 --> 00:04:29.940
+<v Varant Zanoyan>And after that, there's other machine learning use cases at Airbnb, like the ones that you
+
+77
+00:04:31.700 --> 00:04:36.160
+<v Varant Zanoyan>of Airbnb, which is like search and personalization and search ranking. And so that became the second
+
+78
+00:04:36.160 --> 00:04:39.840
+<v Varant Zanoyan>big use case that we worked with and that was challenging for some new reasons, mainly that
+
+79
+00:04:39.840 --> 00:04:44.780
+<v Varant Zanoyan>the scale is even greater, the latency requirements are even tighter, and sometimes you're ranking
+
+80
+00:04:44.780 --> 00:04:48.660
+<v Varant Zanoyan>thousands of listings and every time someone clicks that drag on Airbnb.com along the app
+
+81
+00:04:48.660 --> 00:04:52.980
+<v Varant Zanoyan>and drags it, that's a new search that happens in a new geobox and there's new listings that need
+
+82
+00:04:52.980 --> 00:04:56.840
+<v Varant Zanoyan>to be ranked and we want those to be personalized for each user that's searching so that they can
+
+83
+00:04:56.840 --> 00:05:01.560
+<v Varant Zanoyan>show you things that are good for you. That kind of took the scale of the challenge up, but at the
+
+84
+00:05:01.700 --> 00:05:02.820
+<v Varant Zanoyan>the day is a similar thing, right?
+
+85
+00:05:02.880 --> 00:05:05.440
+<v Varant Zanoyan>So you want the teams that are models have a goal.
+
+86
+00:05:05.700 --> 00:05:07.800
+<v Varant Zanoyan>I want to be able to move the needle on that goal.
+
+87
+00:05:07.920 --> 00:05:10.640
+<v Varant Zanoyan>It's either saving dollars, you have fraud or making dollars.
+
+88
+00:05:11.280 --> 00:05:14.680
+<v Varant Zanoyan>Then we did some more work over the next year or so to support the search team
+
+89
+00:05:14.680 --> 00:05:15.940
+<v Varant Zanoyan>better and eventually they were happy.
+
+90
+00:05:16.040 --> 00:05:20.500
+<v Varant Zanoyan>And then the snowball was rolling and as this infrastructure within Airbnb that
+
+91
+00:05:20.500 --> 00:05:23.480
+<v Varant Zanoyan>would later become known as Chronon, which is the open source when we eventually
+
+92
+00:05:23.480 --> 00:05:25.120
+<v Varant Zanoyan>opened source to was getting more adoption.
+
+93
+00:05:25.400 --> 00:05:28.600
+<v Varant Zanoyan>And then we started talking to the engineering team at Stripe, the payment
+
+94
+00:05:28.600 --> 00:05:32.760
+<v Varant Zanoyan>process of the company and they were struggling with similar challenges. And that's when the idea
+
+95
+00:05:32.760 --> 00:05:36.480
+<v Varant Zanoyan>of this open source came about. And so we collaborated with Stripe across company bounds
+
+96
+00:05:36.480 --> 00:05:41.400
+<v Varant Zanoyan>and built in for even further. And then it went fully open source and then Netflix and OpenAI
+
+97
+00:05:41.400 --> 00:05:46.060
+<v Varant Zanoyan>and a bunch of other big companies started using it. So it was the open source was in very healthy
+
+98
+00:05:46.060 --> 00:05:50.640
+<v Varant Zanoyan>state. And yeah, that's when we eventually started the company around this core challenge.
+
+99
+00:05:50.860 --> 00:05:52.080
+<v Varant Zanoyan>The vision has remained the same.
+
+100
+00:05:54.400 --> 00:05:59.160
+<v Noah Labhart>Let's move forward into the MVP then. So that first version that you built,
+
+101
+00:05:59.200 --> 00:06:02.260
+<v Noah Labhart>how long did it take to build and what sort of tools were you using to bring it to life?
+
+102
+00:06:04.220 --> 00:06:14.280
+<v Varant Zanoyan>The first version, this was Airbnb circa 2017, 2018. It was built over the course of,
+
+103
+00:06:14.300 --> 00:06:18.340
+<v Varant Zanoyan>I want to say a little over a quarter, not quite a half, so like maybe four or five months.
+
+104
+00:06:18.940 --> 00:06:23.320
+<v Varant Zanoyan>And then if you look at the tools that we used to build this, a lot of the challenge
+
+105
+00:06:23.320 --> 00:06:25.600
+<v Varant Zanoyan>here is just in data computation, data processing, right?
+
+106
+00:06:25.660 --> 00:06:28.980
+<v Varant Zanoyan>So like you got to take raw data and turn it into useful signals like features and embeddings,
+
+107
+00:06:29.100 --> 00:06:32.780
+<v Varant Zanoyan>and then use that to backfill training data and use that to power online inference.
+
+108
+00:06:32.980 --> 00:06:34.800
+<v Varant Zanoyan>So it's like those are the best kind of a scope of things.
+
+109
+00:06:34.880 --> 00:06:38.820
+<v Varant Zanoyan>You take data, you transform it, and you need to serve it with like low latency and high
+
+110
+00:06:38.820 --> 00:06:42.220
+<v Varant Zanoyan>freshness in the online environment to power model inference in real time.
+
+111
+00:06:42.480 --> 00:06:46.040
+<v Varant Zanoyan>And then you need to do these big batches of backfills that can be slow and expensive
+
+112
+00:06:46.040 --> 00:06:47.340
+<v Varant Zanoyan>if you don't engineer things correctly,
+
+113
+00:06:47.560 --> 00:06:49.060
+<v Varant Zanoyan>but ideally they're fast and cheap.
+
+114
+00:06:49.520 --> 00:06:51.780
+<v Varant Zanoyan>When I think of like the main pieces of infrastructure
+
+115
+00:06:51.780 --> 00:06:54.300
+<v Varant Zanoyan>that we use to build this platform,
+
+116
+00:06:54.580 --> 00:06:57.000
+<v Varant Zanoyan>there's the offline batch computation piece.
+
+117
+00:06:57.220 --> 00:06:58.960
+<v Varant Zanoyan>And that was initially in the first version
+
+118
+00:06:58.960 --> 00:06:59.900
+<v Varant Zanoyan>was written in PySpark.
+
+119
+00:07:00.000 --> 00:07:01.360
+<v Varant Zanoyan>And then there's the online piece,
+
+120
+00:07:01.580 --> 00:07:03.800
+<v Varant Zanoyan>which the first version was written in Spark streaming.
+
+121
+00:07:04.180 --> 00:07:06.960
+<v Varant Zanoyan>And now we're no longer on PySpark,
+
+122
+00:07:07.040 --> 00:07:08.820
+<v Varant Zanoyan>we're on just vanilla Spark.
+
+123
+00:07:09.000 --> 00:07:11.800
+<v Varant Zanoyan>And in the online path, we are on Flink for data processing.
+
+124
+00:07:12.060 --> 00:07:14.360
+<v Varant Zanoyan>So there's been a bit of an evolution there
+
+125
+00:07:16.060 --> 00:07:20.740
+<v Varant Zanoyan>reevaluated and rebuilt. But the one piece that hasn't changed is the user-facing API. That was
+
+126
+00:07:20.740 --> 00:07:24.280
+<v Varant Zanoyan>always in Python and still is in Python. That's kind of the language where data science lives.
+
+127
+00:07:24.700 --> 00:07:28.840
+<v Varant Zanoyan>And that's where a lot of that familiarity is. So we meet users where they're at on that side.
+
+128
+00:07:30.200 --> 00:07:34.200
+<v Noah Labhart>Let's stay on it for a minute. What I'd like to kind of dive into is a core decision you had to
+
+129
+00:07:34.200 --> 00:07:38.340
+<v Noah Labhart>make in building that. And that could be around technology selection, could be around approach,
+
+130
+00:07:38.580 --> 00:07:42.380
+<v Noah Labhart>could be around something that maybe is not obvious from the outside. But I'm curious about
+
+131
+00:07:42.380 --> 00:07:45.060
+<v Noah Labhart>one of those core decisions you had to make and how you coped with it.
+
+132
+00:07:46.480 --> 00:07:49.020
+<v Varant Zanoyan>I think the biggest one was right at the start.
+
+133
+00:07:49.120 --> 00:07:54.280
+<v Varant Zanoyan>And I think this is one thing that differentiates us from other pieces of infrastructure in
+
+134
+00:07:54.280 --> 00:07:57.760
+<v Varant Zanoyan>this space, which is that we are going to tackle the computation problem.
+
+135
+00:07:58.460 --> 00:08:01.820
+<v Varant Zanoyan>If you look at the features in our space, there's kind of different architectures.
+
+136
+00:08:01.940 --> 00:08:05.480
+<v Varant Zanoyan>One that I, one is I like to call bring your own compute, where it's like, hey, you handle
+
+137
+00:08:05.480 --> 00:08:06.220
+<v Varant Zanoyan>computing your features.
+
+138
+00:08:06.340 --> 00:08:09.440
+<v Varant Zanoyan>This is a KV store, plus maybe some metadata around it.
+
+139
+00:08:09.560 --> 00:08:11.100
+<v Varant Zanoyan>We decided that was not the right.
+
+140
+00:08:11.180 --> 00:08:14.900
+<v Varant Zanoyan>And we decided that based off of really looking at the use cases that we were supporting at
+
+141
+00:08:22.220 --> 00:08:25.920
+<v Varant Zanoyan>The downside is that it's a much more difficult scope to tackle, right?
+
+142
+00:08:25.980 --> 00:08:27.460
+<v Varant Zanoyan>And saying, okay, this is the user's utility.
+
+143
+00:08:27.680 --> 00:08:30.140
+<v Varant Zanoyan>You guys handle your features and we do the rest of it.
+
+144
+00:08:30.780 --> 00:08:35.540
+<v Varant Zanoyan>It's tempting because it's far simpler, but it really doesn't solve the core of the user
+
+145
+00:08:35.540 --> 00:08:36.040
+<v Varant Zanoyan>challenge.
+
+146
+00:08:36.140 --> 00:08:40.520
+<v Varant Zanoyan>And I think we saw that because we were very close to users and we effectively were building
+
+147
+00:08:40.520 --> 00:08:44.400
+<v Varant Zanoyan>a platform that we wanted to have as we were supporting these various teams within Airbnb.
+
+148
+00:08:46.040 --> 00:08:49.360
+<v Varant Zanoyan>There's a whole set of headache from an infrastructure point of view, but the nice thing is that
+
+149
+00:08:49.360 --> 00:08:52.200
+<v Varant Zanoyan>that headache that you're taking on yourself, you're essentially solving it.
+
+150
+00:08:52.780 --> 00:08:56.680
+<v Varant Zanoyan>And the reason why it's hard is because if you look at the way data infrastructure has
+
+151
+00:08:56.680 --> 00:09:00.260
+<v Varant Zanoyan>evolved, I'm sorry with things like first there was Hive and then before we had Spark,
+
+152
+00:09:00.340 --> 00:09:02.320
+<v Varant Zanoyan>we had Hive even at Airbnb when I was there.
+
+153
+00:09:02.620 --> 00:09:04.440
+<v Varant Zanoyan>And then there was Spark and Snowflake.
+
+154
+00:09:04.540 --> 00:09:08.580
+<v Varant Zanoyan>Then there were things like Kafka message buses where you could ingest streaming data
+
+155
+00:09:08.580 --> 00:09:09.080
+<v Varant Zanoyan>from.
+
+156
+00:09:09.340 --> 00:09:10.980
+<v Varant Zanoyan>And all these things were very separate.
+
+157
+00:09:11.220 --> 00:09:15.240
+<v Varant Zanoyan>They spanned, like the workflow that users had to take spanned these various tools.
+
+158
+00:09:16.040 --> 00:09:20.360
+<v Varant Zanoyan>hard that it came from. Nobody had an end. There was no end to end sort of platform.
+
+159
+00:09:20.620 --> 00:09:25.380
+<v Varant Zanoyan>You saw this real-time data engineering for an ML. And so that's what we saw as the gap.
+
+160
+00:09:25.500 --> 00:09:28.860
+<v Varant Zanoyan>That's what we saw as the right scale for the product. And that was one decision that
+
+161
+00:09:28.860 --> 00:09:29.580
+<v Varant Zanoyan>we made early on.
+
+162
+00:09:31.160 --> 00:09:34.740
+<v Noah Labhart>Okay, let's move forward then. So you've got the MVP done. You've made the hard decisions.
+
+163
+00:09:34.920 --> 00:09:39.260
+<v Noah Labhart>You're getting some traction and you're validating your assumptions. How did you progress and
+
+164
+00:09:39.260 --> 00:09:43.980
+<v Noah Labhart>mature from that point? And I think that to wrap in a box, I'm curious about how you build
+
+165
+00:09:43.980 --> 00:09:48.960
+<v Noah Labhart>roadmap. How do you go about deciding that, okay, this is the next most important thing to build or
+
+166
+00:09:48.960 --> 00:09:50.200
+<v Noah Labhart>to address with Zipline?
+
+167
+00:09:50.960 --> 00:09:53.680
+<v Varant Zanoyan>So the company is two years old, right? But like I said, the project
+
+168
+00:09:53.680 --> 00:09:59.520
+<v Varant Zanoyan>has been underway for five, six years, right? And so first it was all internal, right? Internal
+
+169
+00:09:59.520 --> 00:10:04.060
+<v Varant Zanoyan>at Airbnb, building it. And it's really nice to be able to do those inside of one company
+
+170
+00:10:04.060 --> 00:10:08.580
+<v Varant Zanoyan>and to get a few things wrong. And so like, and even just the architecture of a lot of our
+
+171
+00:10:08.580 --> 00:10:11.600
+<v Varant Zanoyan>batch processing jobs, like how we do that,
+
+172
+00:10:11.620 --> 00:10:14.780
+<v Varant Zanoyan>the algorithms behind getting these point-in-time correct features
+
+173
+00:10:14.780 --> 00:10:16.060
+<v Varant Zanoyan>over large backfills.
+
+174
+00:10:16.380 --> 00:10:19.460
+<v Varant Zanoyan>There's a lot of decisions that we made there that we had to check and redo,
+
+175
+00:10:19.620 --> 00:10:22.940
+<v Varant Zanoyan>and each of those decisions resulted in essentially having to completely change
+
+176
+00:10:22.940 --> 00:10:24.840
+<v Varant Zanoyan>sometimes the way out of the data that we stored
+
+177
+00:10:24.840 --> 00:10:26.820
+<v Varant Zanoyan>and do these big data migrations and things.
+
+178
+00:10:27.160 --> 00:10:30.680
+<v Varant Zanoyan>And those were difficult things to do inside one company,
+
+179
+00:10:30.800 --> 00:10:32.780
+<v Varant Zanoyan>but they would have been nearly impossible to do
+
+180
+00:10:32.780 --> 00:10:34.800
+<v Varant Zanoyan>if we were doing this whole thing as a client.
+
+181
+00:10:34.800 --> 00:10:39.920
+<v Varant Zanoyan>So it was really nice to be able to have Airbnb as an incubating ground for this thing, to have
+
+182
+00:10:39.920 --> 00:10:44.300
+<v Varant Zanoyan>real use cases at scale instead of making mistakes. That wasn't simple either, by the way,
+
+183
+00:10:44.300 --> 00:10:46.740
+<v Varant Zanoyan>right? Every time we made a big change like that, we had to think about how to migrate
+
+184
+00:10:46.740 --> 00:10:51.660
+<v Varant Zanoyan>these teams that were relying on us. Still, it's far easier to do it there than it is to do it now
+
+185
+00:10:51.660 --> 00:10:54.720
+<v Varant Zanoyan>where we have multiple customers, and to make a big change like that would be close to impossible.
+
+186
+00:10:56.160 --> 00:10:59.920
+<v Varant Zanoyan>Early on, the roadmap was driven by, okay, what's on fire, what's working, what's not,
+
+187
+00:11:00.080 --> 00:11:03.860
+<v Varant Zanoyan>and a lot of that came down to, okay, how do we scale this computation engine that we built?
+
+188
+00:11:04.800 --> 00:11:08.700
+<v Varant Zanoyan>For a company, the roadmap is very different, where the core engine, which is what's open
+
+189
+00:11:08.700 --> 00:11:11.360
+<v Varant Zanoyan>source, has grown on Zipline.ai.
+
+190
+00:11:11.760 --> 00:11:13.500
+<v Varant Zanoyan>It's been super battle tested.
+
+191
+00:11:13.720 --> 00:11:14.680
+<v Varant Zanoyan>It's the only written file.
+
+192
+00:11:14.960 --> 00:11:19.600
+<v Varant Zanoyan>And now a lot of our roadmap is thinking about what does the enterprise platform that we're
+
+193
+00:11:19.600 --> 00:11:23.860
+<v Varant Zanoyan>building around this open source engine need to look like to work really seamlessly and
+
+194
+00:11:23.860 --> 00:11:25.460
+<v Varant Zanoyan>really well at more companies.
+
+195
+00:11:25.720 --> 00:11:31.120
+<v Varant Zanoyan>And so that looks a lot more like integrations, enterprise features around access controls
+
+196
+00:11:31.120 --> 00:11:37.120
+<v Varant Zanoyan>and observability and governance and things that you need to do to fit in easily with
+
+197
+00:11:37.120 --> 00:11:40.260
+<v Varant Zanoyan>companies' existing infrastructure and with their security standards.
+
+198
+00:11:40.680 --> 00:11:43.580
+<v Varant Zanoyan>So it's a very different can of worms now than it was in the early days.
+
+199
+00:11:46.700 --> 00:11:48.820
+<v Noah Labhart>So how did you build your team?
+
+200
+00:11:48.980 --> 00:11:53.120
+<v Noah Labhart>What did you look for in those people to help you decide that they were the winning horses
+
+201
+00:11:53.120 --> 00:11:53.800
+<v Noah Labhart>to join you?
+
+202
+00:11:57.120 --> 00:12:01.880
+<v Varant Zanoyan>We did pull in a lot of people that we had worked with both at Airbnb and from Stripe.
+
+203
+00:12:01.900 --> 00:12:03.100
+<v Varant Zanoyan>We did the collaboration.
+
+204
+00:12:03.760 --> 00:12:07.300
+<v Varant Zanoyan>We had the chance to work with a lot of really great people in data infrastructure.
+
+205
+00:12:07.560 --> 00:12:12.760
+<v Varant Zanoyan>So people that were true experts in the technologies that we use, our batches, reprocessing, and
+
+206
+00:12:12.760 --> 00:12:14.280
+<v Varant Zanoyan>really deeply understood the space.
+
+207
+00:12:14.780 --> 00:12:18.000
+<v Varant Zanoyan>And people that we've worked with personally and that we liked the way they work.
+
+208
+00:12:18.680 --> 00:12:23.780
+<v Varant Zanoyan>Basically, the founding team was from a pretty tight network of folks who all worked together
+
+209
+00:12:23.800 --> 00:12:25.220
+<v Varant Zanoyan>already, which is the best, right?
+
+210
+00:12:25.300 --> 00:12:27.040
+<v Varant Zanoyan>It's like, you know who they are, you know how they work.
+
+211
+00:12:27.380 --> 00:12:28.460
+<v Varant Zanoyan>That formed the core team.
+
+212
+00:12:28.560 --> 00:12:31.600
+<v Varant Zanoyan>And when you have a core team like that, I think there's kind of a center of mass and
+
+213
+00:12:31.600 --> 00:12:33.880
+<v Varant Zanoyan>a gravity that pulls in more good people.
+
+214
+00:12:34.040 --> 00:12:35.440
+<v Varant Zanoyan>And yeah, I don't know.
+
+215
+00:12:35.480 --> 00:12:38.460
+<v Varant Zanoyan>I don't know how you can't obviously grow that way to a thousand people, but we're at
+
+216
+00:12:38.460 --> 00:12:39.400
+<v Varant Zanoyan>about 10 people out.
+
+217
+00:12:39.980 --> 00:12:43.460
+<v Varant Zanoyan>So if you want to, if we want to go 10x bigger with the same quality, that'll probably be
+
+218
+00:12:43.460 --> 00:12:45.320
+<v Varant Zanoyan>a new challenge, but we're not there yet.
+
+219
+00:12:49.400 --> 00:12:50.820
+<v Noah Labhart>Let's move into scalability.
+
+220
+00:12:51.040 --> 00:12:51.600
+<v Noah Labhart>This will be interesting.
+
+221
+00:12:51.600 --> 00:12:55.520
+<v Noah Labhart>This is baked into your bread and butter and the way you think, but I'm curious about how
+
+222
+00:12:55.520 --> 00:13:00.200
+<v Noah Labhart>you approached scale from the beginning in the early days. And then I'm also interested
+
+223
+00:13:00.200 --> 00:13:02.700
+<v Noah Labhart>in stories where you've had to fight scale as you've grown.
+
+224
+00:13:03.620 --> 00:13:08.100
+<v Varant Zanoyan>Yeah, when we talk about scale, we usually just talk about data scale for the use case.
+
+225
+00:13:08.480 --> 00:13:13.880
+<v Varant Zanoyan>So I think like I alluded to, Airbnb search was the highest scale use case, meaning that there
+
+226
+00:13:13.880 --> 00:13:17.160
+<v Varant Zanoyan>is like the most advanced fire and it was data that needs to be trained on and the highest
+
+227
+00:13:17.160 --> 00:13:18.980
+<v Varant Zanoyan>just the data that makes it easier to production.
+
+228
+00:13:19.600 --> 00:13:21.600
+<v Varant Zanoyan>In this data processing engine world,
+
+229
+00:13:21.840 --> 00:13:24.540
+<v Varant Zanoyan>there's like a, I think one big challenge
+
+230
+00:13:24.540 --> 00:13:26.020
+<v Varant Zanoyan>in terms of scale is often skew.
+
+231
+00:13:26.340 --> 00:13:28.820
+<v Varant Zanoyan>But what skew means is that some keys that you're aggregating
+
+232
+00:13:28.820 --> 00:13:30.500
+<v Varant Zanoyan>by have way more data than others.
+
+233
+00:13:30.720 --> 00:13:32.220
+<v Varant Zanoyan>That could be something like, you know,
+
+234
+00:13:32.280 --> 00:13:34.600
+<v Varant Zanoyan>a fraudulent IP address that's sending a bunch of traffic
+
+235
+00:13:34.600 --> 00:13:36.400
+<v Varant Zanoyan>to your site and so they try to compute features
+
+236
+00:13:36.400 --> 00:13:37.260
+<v Varant Zanoyan>per IP address.
+
+237
+00:13:37.420 --> 00:13:39.980
+<v Varant Zanoyan>That one IP address becomes a bottleneck for computation.
+
+238
+00:13:40.980 --> 00:13:43.000
+<v Varant Zanoyan>Basically, if you don't architect things carefully,
+
+239
+00:13:43.160 --> 00:13:44.600
+<v Varant Zanoyan>then as you're doing this distributed computation,
+
+240
+00:13:44.960 --> 00:13:46.060
+<v Varant Zanoyan>which is basically taking data
+
+241
+00:13:47.160 --> 00:13:51.700
+<v Varant Zanoyan>machines to ban out a copy to get it done faster for parallelism, you can end up in
+
+242
+00:13:51.700 --> 00:13:55.560
+<v Varant Zanoyan>a world where a lot of data gets sent to a small number of executors or a small number
+
+243
+00:13:55.560 --> 00:13:57.540
+<v Varant Zanoyan>of machine-reverting machines for processing.
+
+244
+00:13:57.800 --> 00:14:00.680
+<v Varant Zanoyan>And so it doesn't really matter how hard you're banning it out, you still have these like
+
+245
+00:14:00.680 --> 00:14:03.680
+<v Varant Zanoyan>hotkeys that are effectively clumping bottlenecks in your system.
+
+246
+00:14:04.740 --> 00:14:08.360
+<v Varant Zanoyan>So one of the early things that we did when we were supporting the fraud team was architected
+
+247
+00:14:08.360 --> 00:14:11.420
+<v Varant Zanoyan>in such a way that we could handle skewed data, which was great.
+
+248
+00:14:11.540 --> 00:14:14.720
+<v Varant Zanoyan>But the funny thing is actually then later on, and this was an advance that we made in
+
+249
+00:14:14.720 --> 00:14:19.000
+<v Varant Zanoyan>in the last couple of years, because we had that skew assumption baked in from the start,
+
+250
+00:14:19.060 --> 00:14:23.020
+<v Varant Zanoyan>we actually realized that for unskewed cases, we can actually get much better performance
+
+251
+00:14:23.020 --> 00:14:25.900
+<v Varant Zanoyan>by having this different computation time to work.
+
+252
+00:14:26.180 --> 00:14:29.780
+<v Varant Zanoyan>And so that was like a further optimization that we made recently, which was called the
+
+253
+00:14:29.780 --> 00:14:33.300
+<v Varant Zanoyan>non-skewed mode or unskewed mode in the computation engine.
+
+254
+00:14:33.480 --> 00:14:37.420
+<v Varant Zanoyan>So now we fork how we compute data in batch, so whether it's skewed or not, and whether
+
+255
+00:14:37.420 --> 00:14:38.720
+<v Varant Zanoyan>we need to do that additional work.
+
+256
+00:14:39.040 --> 00:14:41.940
+<v Varant Zanoyan>Anyway, this is just like a little peek into kind of what that process has been.
+
+257
+00:14:41.940 --> 00:14:44.520
+<v Varant Zanoyan>then is like a lot of, okay, here's this use case, it's not working.
+
+258
+00:14:44.680 --> 00:14:45.840
+<v Varant Zanoyan>Let's we'll fix it this way.
+
+259
+00:14:46.140 --> 00:14:49.260
+<v Varant Zanoyan>But then over time, iterating and further fine-tuning and further
+
+260
+00:14:49.260 --> 00:14:52.200
+<v Varant Zanoyan>out the engine, and this is why it's great to have open source, right?
+
+261
+00:14:52.240 --> 00:14:54.080
+<v Varant Zanoyan>Because that's a lot of work for one team to do.
+
+262
+00:14:54.160 --> 00:14:57.820
+<v Varant Zanoyan>Because that's a lot of work for one team to do. But when you have Netflix doing it and OpenAI doing it, and Zipline doing it
+
+263
+00:14:57.820 --> 00:15:00.080
+<v Varant Zanoyan>and Airbnb doing it and Stripe doing it, you have all these people that are
+
+264
+00:15:00.080 --> 00:15:03.660
+<v Varant Zanoyan>contributing to this engine, making it better, making it faster, making it work
+
+265
+00:15:03.660 --> 00:15:05.820
+<v Varant Zanoyan>for more cases and more data profiles.
+
+266
+00:15:06.560 --> 00:15:07.360
+<v Varant Zanoyan>Everybody's also done it.
+
+267
+00:15:08.000 --> 00:15:10.220
+<v Varant Zanoyan>Obviously like it's also, that's another reason why it was nice to start
+
+268
+00:15:10.220 --> 00:15:11.720
+<v Varant Zanoyan>this thing off at Airbnb and Stripe.
+
+269
+00:15:12.940 --> 00:15:16.860
+<v Varant Zanoyan>point and then it was nice to go open source so that more and more people could contribute to it.
+
+270
+00:15:18.860 --> 00:15:23.100
+<v Noah Labhart>Okay, as you step out on the balcony and you look across all that you've built thus far with
+
+271
+00:15:23.100 --> 00:15:25.420
+<v Noah Labhart>Zipline AI, what are you most proud of?
+
+272
+00:15:26.480 --> 00:15:28.920
+<v Varant Zanoyan>I would just say the feedback that we've
+
+273
+00:15:28.920 --> 00:15:32.440
+<v Varant Zanoyan>gotten from users. Having people say, okay, the previous thing that we were using here
+
+274
+00:15:32.440 --> 00:15:38.020
+<v Varant Zanoyan>was really tough and now I have. I used to try to avoid using it and now with you guys,
+
+275
+00:15:38.100 --> 00:15:42.440
+<v Varant Zanoyan>it's like I'm actually excited to use it and so I could get my projects done the way I have always
+
+276
+00:15:42.940 --> 00:15:44.440
+<v Varant Zanoyan>done and hearing stuff like that.
+
+277
+00:15:44.820 --> 00:15:49.000
+<v Varant Zanoyan>It's great to hear it internally from users at Airbnb, but to do it, to hear it
+
+278
+00:15:49.000 --> 00:15:51.000
+<v Varant Zanoyan>from customers at Zipline is like very satisfying.
+
+279
+00:15:53.540 --> 00:15:55.020
+<v Noah Labhart>Let's flip the script a little bit.
+
+280
+00:15:55.080 --> 00:15:58.640
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+281
+00:15:59.620 --> 00:16:04.620
+<v Varant Zanoyan>Early on, we made a mistake that I think is common for startups to make, which is
+
+282
+00:16:04.620 --> 00:16:09.480
+<v Varant Zanoyan>to over-index on the first, maybe sometimes it's the first company or the first set of
+
+283
+00:16:09.480 --> 00:16:15.100
+<v Varant Zanoyan>companies that are talking to you as potential customers and to drop everything and do what
+
+284
+00:16:15.100 --> 00:16:18.700
+<v Varant Zanoyan>they are indicating, whether or not you think it fundamentally makes sense.
+
+285
+00:16:18.780 --> 00:16:20.480
+<v Varant Zanoyan>That's the highest priority thing that you can be building.
+
+286
+00:16:20.820 --> 00:16:21.840
+<v Varant Zanoyan>And it's tempting, right?
+
+287
+00:16:21.900 --> 00:16:25.160
+<v Varant Zanoyan>Because you're just getting going, you don't have any customers yet, and they're asking
+
+288
+00:16:25.160 --> 00:16:25.700
+<v Varant Zanoyan>for this thing.
+
+289
+00:16:25.860 --> 00:16:29.300
+<v Varant Zanoyan>It's tough because it's obvious why a lot of teams make that mistake.
+
+290
+00:16:29.580 --> 00:16:32.960
+<v Varant Zanoyan>But yeah, we certainly made that mistake right out in the gate, I think, where we started.
+
+291
+00:16:33.100 --> 00:16:37.760
+<v Varant Zanoyan>We built a part of the stack that honestly is not bad to have, and now we have it, it
+
+292
+00:16:37.760 --> 00:16:38.460
+<v Varant Zanoyan>does add value.
+
+293
+00:16:39.480 --> 00:16:43.900
+<v Varant Zanoyan>far too much into it far early on where we had done other things it would have unblocked way
+
+294
+00:16:43.900 --> 00:16:48.780
+<v Varant Zanoyan>more growth for us early on but we thought we kind of started down and started off down that
+
+295
+00:16:48.780 --> 00:16:53.920
+<v Varant Zanoyan>had invested four or five months into going deep on this one area that probably wasn't the right
+
+296
+00:16:53.920 --> 00:16:58.900
+<v Varant Zanoyan>thing to do we learned from it we when we realized what was happening and realized that we were
+
+297
+00:16:58.900 --> 00:17:03.540
+<v Varant Zanoyan>getting dragged around in not the right direction and it's hard to know when you first start off on
+
+298
+00:17:03.540 --> 00:17:06.800
+<v Varant Zanoyan>it because you're like okay we'll invest a month in this but then one month turns two turns to
+
+299
+00:17:06.800 --> 00:17:12.020
+<v Varant Zanoyan>three and then we brought our heads up for air. We had to figure out what are the things that are
+
+300
+00:17:12.020 --> 00:17:16.160
+<v Varant Zanoyan>going to generalize to the most users and unblock the most early customers to actually getting value
+
+301
+00:17:16.160 --> 00:17:20.080
+<v Varant Zanoyan>and actually being a question. And at that point, you also have more people who you're talking to
+
+302
+00:17:20.080 --> 00:17:24.280
+<v Varant Zanoyan>and you have a better view on that. It's tough to say no, but you learn to say no a little bit
+
+303
+00:17:24.280 --> 00:17:28.580
+<v Varant Zanoyan>to things that people are asking for early on and to pick your roadmap as opposed to
+
+304
+00:17:29.100 --> 00:17:33.700
+<v Varant Zanoyan>let it be dictated by customers who are sometimes much larger enterprises than you are.
+
+305
+00:17:36.800 --> 00:17:47.680
+<v Noah Labhart>Let's look into the future. What does the future look like for Zipline AI, for the product, for where the industry is going, all the things with ML, AI and the changes every day? What does the future look like?
+
+306
+00:17:48.620 --> 00:17:55.260
+<v Varant Zanoyan>AI ML is changing rapidly. I think the space that we're in, I've always focused on these
+
+307
+00:17:55.260 --> 00:17:58.880
+<v Varant Zanoyan>use cases. It's like risk positioning more broadly, which includes payment fraud and
+
+308
+00:17:58.880 --> 00:18:03.600
+<v Varant Zanoyan>includes like underwriting decisioning, buy now, pay later type use cases. And then there's
+
+309
+00:18:03.600 --> 00:18:07.640
+<v Varant Zanoyan>personalization includes search ranking, content ranking, content personalization,
+
+310
+00:18:07.900 --> 00:18:12.420
+<v Varant Zanoyan>listing personalizations. Those two use cases at the end of the day, certain things are not
+
+311
+00:18:12.420 --> 00:18:16.280
+<v Varant Zanoyan>going to change about them, which is that their requirements, they are high QPS, they are low
+
+312
+00:18:17.680 --> 00:18:19.560
+<v Varant Zanoyan>And that is the way they work.
+
+313
+00:18:19.720 --> 00:18:22.740
+<v Varant Zanoyan>And so as a result, they are their porphyrs or language models.
+
+314
+00:18:23.280 --> 00:18:27.220
+<v Varant Zanoyan>Basically, where the industry is changing there is twofold.
+
+315
+00:18:27.380 --> 00:18:29.900
+<v Varant Zanoyan>One is more broadly generative architecture.
+
+316
+00:18:30.220 --> 00:18:33.080
+<v Varant Zanoyan>So things like generative recommendations have been coming around there.
+
+317
+00:18:33.320 --> 00:18:37.580
+<v Varant Zanoyan>So not language models, but things like semantic IDs, which are really interesting.
+
+318
+00:18:37.760 --> 00:18:42.020
+<v Varant Zanoyan>And that's where a lot of our finding value in their models and the performance of their systems.
+
+319
+00:18:42.020 --> 00:18:46.680
+<v Varant Zanoyan>systems. And so we are, our infrastructure is built to support the reduced cases and
+
+320
+00:18:46.680 --> 00:18:49.760
+<v Varant Zanoyan>to make building those into one build with the production easier. But then yeah, more
+
+321
+00:18:49.760 --> 00:18:53.960
+<v Varant Zanoyan>broadly it's like the other thing that we've seen is the same way that AI and LLMs have
+
+322
+00:18:53.960 --> 00:18:58.380
+<v Varant Zanoyan>accelerated coding, they're also accelerating building and iterating on these models. So
+
+323
+00:18:58.380 --> 00:19:02.460
+<v Varant Zanoyan>it's not like the language models aren't replacing fraud detection models or search models, but
+
+324
+00:19:02.460 --> 00:19:06.300
+<v Varant Zanoyan>they can be hugely impactful for helping people iterate on these models to run experiments,
+
+325
+00:19:06.380 --> 00:19:11.460
+<v Varant Zanoyan>to engineer better models and engineer better pipelines. And so our infrastructure is also
+
+326
+00:19:12.020 --> 00:19:17.260
+<v Varant Zanoyan>very coding agent first, meaning that right now you don't need much. You can use Claude Code to
+
+327
+00:19:17.260 --> 00:19:23.600
+<v Varant Zanoyan>write code and to develop features on applications. To do this kind of ML engineering, ML engineering,
+
+328
+00:19:23.700 --> 00:19:28.460
+<v Varant Zanoyan>the coding agent needs a set of tools to work with data and to build those data pipelines and to do
+
+329
+00:19:28.460 --> 00:19:32.780
+<v Varant Zanoyan>model training and essentially run experiments that will reproduce in production. What you want
+
+330
+00:19:32.780 --> 00:19:36.960
+<v Varant Zanoyan>to do is you want it to have an API. It can run experiments. You can tell it, okay, run this sort
+
+331
+00:19:36.960 --> 00:19:41.320
+<v Varant Zanoyan>of experiment. The human can guide it along what sorts of things it wants to try or what sorts of
+
+332
+00:19:42.020 --> 00:19:46.380
+<v Varant Zanoyan>tried. And if the coding agent has the right tools, it can be a very powerful assistant for people
+
+333
+00:19:46.380 --> 00:19:52.180
+<v Varant Zanoyan>to iterate on these models to make them better and to improve the performance of these personalization
+
+334
+00:19:52.180 --> 00:19:57.160
+<v Varant Zanoyan>and fraud detection systems. And so that's where our infrastructure fits in to this feature, basically.
+
+335
+00:19:58.700 --> 00:20:03.820
+<v Noah Labhart>Let's switch to you. Who influences the way that you work? Name a person or many persons or
+
+336
+00:20:03.820 --> 00:20:05.200
+<v Noah Labhart>something you look up to and why.
+
+337
+00:20:06.380 --> 00:20:12.000
+<v Varant Zanoyan>The funny thing here is that there's no one really famous. Like
+
+338
+00:20:12.020 --> 00:20:14.160
+<v Varant Zanoyan>and the way I work, I don't think of
+
+339
+00:20:14.600 --> 00:20:15.960
+<v Varant Zanoyan>sort of the celebrity people
+
+340
+00:20:15.960 --> 00:20:17.520
+<v Varant Zanoyan>in technology. It's more just
+
+341
+00:20:17.520 --> 00:20:20.160
+<v Varant Zanoyan>folks who I worked with at Airbnb
+
+342
+00:20:20.160 --> 00:20:21.980
+<v Varant Zanoyan>and I was at Palantir before that.
+
+343
+00:20:22.200 --> 00:20:24.020
+<v Varant Zanoyan>And there's a handful of people there, and they're not
+
+344
+00:20:24.020 --> 00:20:25.780
+<v Varant Zanoyan>even necessarily the highest rungs
+
+345
+00:20:25.780 --> 00:20:28.040
+<v Varant Zanoyan>of the corporate ladder or anyone that the public would have
+
+346
+00:20:28.040 --> 00:20:30.080
+<v Varant Zanoyan>heard of, but just people who I've
+
+347
+00:20:30.080 --> 00:20:32.000
+<v Varant Zanoyan>worked with. And when I think about why I
+
+348
+00:20:32.000 --> 00:20:33.540
+<v Varant Zanoyan>look up to them and why I learned from them,
+
+349
+00:20:33.660 --> 00:20:36.020
+<v Varant Zanoyan>and sometimes they, like I said, sometimes they were not even
+
+350
+00:20:36.020 --> 00:20:38.040
+<v Varant Zanoyan>like, they were not necessarily the CTOs or whatever.
+
+351
+00:20:38.200 --> 00:20:40.180
+<v Varant Zanoyan>Sometimes they were literally my peers in terms of
+
+352
+00:20:42.020 --> 00:20:44.520
+<v Varant Zanoyan>If folks ultimately did the right thing,
+
+353
+00:20:44.560 --> 00:20:46.780
+<v Varant Zanoyan>didn't get caught up in corporate politics,
+
+354
+00:20:46.920 --> 00:20:49.060
+<v Varant Zanoyan>kept an eye on what the right solution should be,
+
+355
+00:20:49.180 --> 00:20:50.920
+<v Varant Zanoyan>thought about what's right for the company,
+
+356
+00:20:51.060 --> 00:20:51.900
+<v Varant Zanoyan>what's right for the user,
+
+357
+00:20:52.520 --> 00:20:53.580
+<v Varant Zanoyan>and kept it simple.
+
+358
+00:20:53.700 --> 00:20:54.520
+<v Varant Zanoyan>And what I mean by that is
+
+359
+00:20:54.520 --> 00:20:56.320
+<v Varant Zanoyan>it's easy to lose sight of what matters.
+
+360
+00:20:56.500 --> 00:20:58.240
+<v Varant Zanoyan>But it's if you really prioritize
+
+361
+00:20:58.240 --> 00:21:00.020
+<v Varant Zanoyan>what's going to be valuable for the company,
+
+362
+00:21:00.080 --> 00:21:01.200
+<v Varant Zanoyan>what's going to be valuable for the user,
+
+363
+00:21:01.360 --> 00:21:04.300
+<v Varant Zanoyan>and do the simplest thing to land that value
+
+364
+00:21:04.300 --> 00:21:06.360
+<v Varant Zanoyan>and not to get caught up in the politics
+
+365
+00:21:06.360 --> 00:21:08.440
+<v Varant Zanoyan>and the scope war and the this and the that.
+
+366
+00:21:08.520 --> 00:21:09.620
+<v Varant Zanoyan>And as companies get bigger,
+
+367
+00:21:09.660 --> 00:21:11.260
+<v Varant Zanoyan>it's really easy to get caught up in those things.
+
+368
+00:21:12.360 --> 00:21:18.160
+<v Varant Zanoyan>So folks who are able to do that, to take a principled approach to their work, I always
+
+369
+00:21:18.160 --> 00:21:19.520
+<v Varant Zanoyan>admired those folks a lot.
+
+370
+00:21:19.780 --> 00:21:24.020
+<v Varant Zanoyan>And yeah, I think as I worked, I tried to always focus on that.
+
+371
+00:21:24.340 --> 00:21:25.000
+<v Varant Zanoyan>And it's easy.
+
+372
+00:21:25.060 --> 00:21:29.040
+<v Varant Zanoyan>I think it translates a bit to as you're running your own company is now you don't have, sure
+
+373
+00:21:29.040 --> 00:21:32.740
+<v Varant Zanoyan>you don't have politics to play anymore, but there are always things that you could optimize
+
+374
+00:21:32.740 --> 00:21:34.300
+<v Varant Zanoyan>for that are not the right thing.
+
+375
+00:21:34.480 --> 00:21:37.880
+<v Varant Zanoyan>Even things that are important for the business, like fundraising or whatever, it's like you,
+
+376
+00:21:37.900 --> 00:21:41.640
+<v Varant Zanoyan>you still have things to prioritize and it's like, okay, what do you choose to prioritize?
+
+377
+00:21:42.020 --> 00:21:45.860
+<v Varant Zanoyan>And I think that we built valuable technology by prioritizing the right
+
+378
+00:21:45.860 --> 00:21:49.780
+<v Varant Zanoyan>things, by prioritizing what moves the needle on the business, like what will
+
+379
+00:21:49.780 --> 00:21:54.580
+<v Varant Zanoyan>ultimately drive dollars either via saving money from fraud, bottom line, or
+
+380
+00:21:54.580 --> 00:21:58.920
+<v Varant Zanoyan>by improving bookings and improving search results at the top line and by
+
+381
+00:21:58.920 --> 00:22:01.840
+<v Varant Zanoyan>making people more productive, like what tools do people need to build these
+
+382
+00:22:01.840 --> 00:22:03.060
+<v Varant Zanoyan>models better and to do it better?
+
+383
+00:22:03.120 --> 00:22:05.680
+<v Varant Zanoyan>Like what will actually make them kind of more productive?
+
+384
+00:22:05.920 --> 00:22:06.740
+<v Varant Zanoyan>And it's really easy.
+
+385
+00:22:06.840 --> 00:22:09.300
+<v Varant Zanoyan>It seems obvious, but it's really easy to lose sight of those things as
+
+386
+00:22:09.300 --> 00:22:10.680
+<v Varant Zanoyan>in the chaos of the day to day.
+
+387
+00:22:12.020 --> 00:22:14.620
+<v Varant Zanoyan>I admire. I think we're really good at keeping an eye on it all.
+
+388
+00:22:15.840 --> 00:22:19.340
+<v Noah Labhart>Okay, last question. So you're getting on a plane and you're sitting next to a young
+
+389
+00:22:19.340 --> 00:22:22.880
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+390
+00:22:22.880 --> 00:22:25.380
+<v Noah Labhart>show it off to the world and can't wait to show it off to you right there on the plane.
+
+391
+00:22:25.800 --> 00:22:28.820
+<v Noah Labhart>What advice to give that person having gone down this road a bit?
+
+392
+00:22:30.040 --> 00:22:35.000
+<v Varant Zanoyan>I think if they're already at that point where they have something and they're super excited
+
+393
+00:22:35.000 --> 00:22:40.240
+<v Varant Zanoyan>about it, they're already 90% okay there. And what I mean by that is to get to that point,
+
+394
+00:22:42.260 --> 00:22:44.960
+<v Varant Zanoyan>that they're like, okay, we simply can't let this be the way it is.
+
+395
+00:22:45.020 --> 00:22:46.580
+<v Varant Zanoyan>There needs to be a better way to do this.
+
+396
+00:22:46.580 --> 00:22:48.320
+<v Varant Zanoyan>There needs to be a better solution for this thing,
+
+397
+00:22:48.360 --> 00:22:51.220
+<v Varant Zanoyan>or we can't let this sort of wrong in the world continue.
+
+398
+00:22:51.600 --> 00:22:53.440
+<v Varant Zanoyan>And this is my vision for the solution for it.
+
+399
+00:22:53.720 --> 00:22:55.660
+<v Varant Zanoyan>If they're at that point, then I would say, yeah,
+
+400
+00:22:55.720 --> 00:22:58.200
+<v Varant Zanoyan>all they got to do is keep their eye on the ball in that way.
+
+401
+00:22:58.300 --> 00:23:01.040
+<v Varant Zanoyan>It's like, don't lose sight of the thing that's driving them to get to this point.
+
+402
+00:23:01.100 --> 00:23:02.980
+<v Varant Zanoyan>And there's clearly something that's driven them to get to that point.
+
+403
+00:23:03.280 --> 00:23:05.740
+<v Varant Zanoyan>And as long as they stay focused on that, I think it'll all be fine.
+
+404
+00:23:06.140 --> 00:23:07.560
+<v Varant Zanoyan>If I saw someone like that, I'd be like,
+
+405
+00:23:07.620 --> 00:23:09.240
+<v Varant Zanoyan>if you're really their system that's driving you,
+
+406
+00:23:09.240 --> 00:23:13.940
+<v Varant Zanoyan>And so you just wake up every day and do what you think is the right thing to do to solve
+
+407
+00:23:13.940 --> 00:23:16.580
+<v Varant Zanoyan>that problem or make things better for people in that particular way.
+
+408
+00:23:16.680 --> 00:23:18.000
+<v Varant Zanoyan>And that's really their calling.
+
+409
+00:23:18.180 --> 00:23:19.340
+<v Varant Zanoyan>And so I think they're already there.
+
+410
+00:23:19.440 --> 00:23:21.280
+<v Varant Zanoyan>I think I wouldn't say, all I would say is you're already there.
+
+411
+00:23:21.340 --> 00:23:22.040
+<v Varant Zanoyan>You're already doing it.
+
+412
+00:23:22.100 --> 00:23:23.020
+<v Varant Zanoyan>Just don't lose sight of it.
+
+413
+00:23:23.440 --> 00:23:23.980
+<v Varant Zanoyan>That's all you
+
+414
+00:23:23.980 --> 00:23:24.480
+<v Noah Labhart>got to do.
+
+415
+00:23:24.580 --> 00:23:26.460
+<v Noah Labhart>That's awesome advice and super encouraging.
+
+416
+00:23:26.740 --> 00:23:28.960
+<v Noah Labhart>Well, Varant, thank you for being on the show today.
+
+417
+00:23:29.080 --> 00:23:31.920
+<v Noah Labhart>Thank you for telling the creation story of Zipline AI.
+
+418
+00:23:32.340 --> 00:23:32.960
+<v Varant Zanoyan>Thank you.
+
+419
+00:23:32.960 --> 00:23:33.680
+<v Varant Zanoyan>Thanks for having me.
+
+420
+00:23:33.740 --> 00:23:34.260
+<v Varant Zanoyan>It's a lot of fun.
+
+421
+00:23:35.800 --> 00:23:38.400
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+422
+00:23:49.480 --> 00:23:55.820
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or
+
+423
+00:23:55.820 --> 00:24:01.720
+<v Noah Labhart>the podcasting app of your choice. And when you get a chance, leave us a review. Both things help
+
+424
+00:24:01.720 --> 00:24:02.580
+<v Noah Labhart>us out tremendously
+
+425
+00:24:02.580 --> 00:24:05.660
+<v Noah Labhart>and
+
+426
+00:24:05.660 --> 00:24:07.000
+<v Noah Labhart>thanks again for listening.

@@ -1,0 +1,1027 @@
+WEBVTT
+
+NOTE S11 E13: From Frictionless SaaS Auth to Eliminating the 1:1 Drone Pilot Bottleneck at the Tactical Edge with Matt Hamann, Co-Founder & CTO of Rownd
+
+1
+00:00:00.000 --> 00:00:18.020
+<v Matt Hamann>We were trying to use some serverless technology to power some of our main business logic and APIs. And one of the things that caused is it was hard to observe exactly how the workload was taking advantage of the compute underneath or was hitting bottlenecks in that compute.
+
+2
+00:00:18.020 --> 00:00:27.000
+<v Matt Hamann>And so there was one particular occasion where the service basically was down and we were scrambling to figure out what was going on.
+
+3
+00:00:27.080 --> 00:00:30.780
+<v Matt Hamann>We thought, hey, maybe it's the database provider, but they were saying everything is fine.
+
+4
+00:00:30.940 --> 00:00:39.640
+<v Matt Hamann>And eventually throughout triaging that problem and really trying to dig into it, we realized that our foundation was shaky and what we were actually running our workloads on.
+
+5
+00:00:39.980 --> 00:00:43.640
+<v Matt Hamann>I'm Matt Hamann, and I'm a co-founder and the CTO at Rownd.
+
+6
+00:00:46.500 --> 00:00:52.240
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+7
+00:00:52.340 --> 00:00:53.700
+<v Clip>Six months moonlighting.
+
+8
+00:00:53.720 --> 00:00:55.240
+<v Clip>There's nothing on the back end.
+
+9
+00:00:55.460 --> 00:00:58.080
+<v Noah Labhart>Who share what it takes to change an industry.
+
+10
+00:00:58.260 --> 00:00:59.840
+<v Clip>I don't exactly know what to do next.
+
+11
+00:00:59.840 --> 00:01:01.240
+<v Clip>It took many guys to get right.
+
+12
+00:01:01.820 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:01:04.560 --> 00:01:06.120
+<v Clip>A company is its people.
+
+14
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+15
+00:01:07.500 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+16
+00:01:08.840 --> 00:01:11.160
+<v Noah Labhart>Keeping scalability top of mind.
+
+17
+00:01:11.480 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+18
+00:01:13.640 --> 00:01:17.840
+<v Noah Labhart>it as we grow. Total waste of time. The stories you don't read in the headlines.
+
+19
+00:01:18.280 --> 00:01:19.140
+<v Matt Hamann>It's not an easy
+
+20
+00:01:19.140 --> 00:01:24.060
+<v Clip>thing to achieve. Took it off the shelf and dusted it off and tried it again. To ride the ups and
+
+21
+00:01:24.060 --> 00:01:26.540
+<v Noah Labhart>downs of the startup life. You need to
+
+22
+00:01:26.540 --> 00:01:28.940
+<v Matt Hamann>really want it. It's not just about technology.
+
+23
+00:01:29.060 --> 00:01:29.560
+<v Noah Labhart>All this and
+
+24
+00:01:29.480 --> 00:01:38.320
+<v Noah Labhart>more on Code Story. I'm your host, Noah Labhart, and today, how Matt Hamann is powering your app's
+
+25
+00:01:38.320 --> 00:01:42.780
+<v Noah Labhart>core services, all the way from sign-in to scale.
+
+26
+00:01:49.820 --> 00:01:53.820
+<v Noah Labhart>Matt Hamann knew he was going to be in tech way back in his younger days.
+
+27
+00:01:54.040 --> 00:01:57.980
+<v Noah Labhart>His dad worked for IBM, so there were always fun things to talk about and play with.
+
+28
+00:01:58.220 --> 00:02:02.480
+<v Noah Labhart>He got his first family computer when he was four years old and started programming BASIC
+
+29
+00:02:02.480 --> 00:02:03.080
+<v Noah Labhart>when he was eight.
+
+30
+00:02:03.740 --> 00:02:08.960
+<v Noah Labhart>Eventually, they got dial-up through AOL, and he took off building websites with PHP and MySQL.
+
+31
+00:02:09.520 --> 00:02:11.560
+<v Noah Labhart>But outside of tech, he's married with three kids.
+
+32
+00:02:11.680 --> 00:02:14.040
+<v Noah Labhart>He loves to travel and spend time with his family.
+
+33
+00:02:14.200 --> 00:02:19.960
+<v Noah Labhart>He also plays several instruments, including the piano and pipe organ, and enjoys tinkering with smart home devices.
+
+34
+00:02:22.420 --> 00:02:29.560
+<v Noah Labhart>Right around the time of the pandemic, Matt and his co-founders were pitching a new company idea in Y Combinator around data privacy.
+
+35
+00:02:29.560 --> 00:02:42.080
+<v Noah Labhart>After receiving the feedback that there wasn't a big market for the original idea, they started to jam on other ideas on how to pivot and quickly landed on how cool it would be to have passwordless authentication.
+
+36
+00:02:44.180 --> 00:02:46.820
+<v Noah Labhart>This is the creation story of Rownd.
+
+37
+00:02:51.160 --> 00:02:55.680
+<v Matt Hamann>So Rownd is a next-gen, frictionless authentication platform.
+
+38
+00:02:56.640 --> 00:02:58.640
+<v Matt Hamann>It really grew out of a pivot.
+
+39
+00:02:59.560 --> 00:03:07.900
+<v Matt Hamann>It started right around the time that COVID was hitting the world and shutting things down and changing the face of just about everything.
+
+40
+00:03:08.320 --> 00:03:12.660
+<v Matt Hamann>That was obviously a bad thing, but it also created a lot of opportunity.
+
+41
+00:03:13.420 --> 00:03:18.340
+<v Matt Hamann>We actually had the opportunity to bring the company through Y Combinator.
+
+42
+00:03:18.520 --> 00:03:19.840
+<v Matt Hamann>And we did that in 2022.
+
+43
+00:03:20.200 --> 00:03:25.440
+<v Matt Hamann>And when we got into Y Combinator, we were actually pitching the company as a data privacy product.
+
+44
+00:03:25.440 --> 00:03:37.720
+<v Matt Hamann>And what we quickly realized after reading a lot of the material that YC has to offer and getting some advice is that there probably wasn't a market for exactly what we were looking for.
+
+45
+00:03:38.080 --> 00:03:47.800
+<v Matt Hamann>So we started brainstorming about ways to shift the company in directions that maybe weren't totally out of the data privacy space because we definitely cared about that a lot.
+
+46
+00:03:47.800 --> 00:04:15.060
+<v Matt Hamann>But we started tossing around ideas. And one of the things that really hit home is how much we all hated passwords. It just seemed every time you went to use a new product or a new app online, the first thing you have to do is you have to create an account, you have to enter your email address and then put in a password. And then you have to remember that password or save it in your password manager or do the horrible thing of just using the same password everywhere. So that makes it easy to remember.
+
+47
+00:04:15.060 --> 00:04:18.400
+<v Matt Hamann>And so we said, what if there was a world that did not have passwords?
+
+48
+00:04:18.600 --> 00:04:25.740
+<v Matt Hamann>And so we decided really to build a product that was passwordless first, that didn't even support passwords.
+
+49
+00:04:25.960 --> 00:04:28.920
+<v Matt Hamann>If you don't support passwords, your password can't get hacked.
+
+50
+00:04:29.080 --> 00:04:34.720
+<v Matt Hamann>So we really, we pivoted the company and started building this auth product instead.
+
+51
+00:04:35.080 --> 00:04:44.080
+<v Matt Hamann>And ironically, I've always been fascinated by security and access control and making sure the right people have the right access to what they should have access to.
+
+52
+00:04:45.060 --> 00:04:48.800
+<v Matt Hamann>I was a kid, probably an early teenager, actually developed a program.
+
+53
+00:04:48.860 --> 00:04:51.880
+<v Matt Hamann>It was not very secure, but it was called boot disk security.
+
+54
+00:04:52.040 --> 00:04:59.640
+<v Matt Hamann>And it basically made sure when your computer started up that you had a specific floppy disk in the disk drive and the computer wouldn't boot without that.
+
+55
+00:04:59.720 --> 00:05:03.480
+<v Matt Hamann>Now it was easily hackable and you could work around it and find your way in if you were determined.
+
+56
+00:05:03.640 --> 00:05:06.440
+<v Matt Hamann>But it was just one of those, huh, I think there's a pattern here.
+
+57
+00:05:09.480 --> 00:05:11.560
+<v Noah Labhart>So let's dive into the MVP.
+
+58
+00:05:11.560 --> 00:05:23.580
+<v Noah Labhart>So that first version of Rownd that you built, that first passwordless authentication piece that you stepped up to build and to pivot towards, how long did it take to build and what sort of tools were you using to bring it to life?
+
+59
+00:05:24.200 --> 00:05:35.460
+<v Matt Hamann>We really wanted to not start from scratch and we felt like we had a good kind of platform foundation with what we'd already built in the data privacy space in terms of prototypes and existing code.
+
+60
+00:05:35.460 --> 00:05:39.280
+<v Matt Hamann>So we started with that as our platform, which gave us a lot of tools already.
+
+61
+00:05:39.360 --> 00:05:42.080
+<v Matt Hamann>It was built in TypeScript and React and Node.js.
+
+62
+00:05:42.640 --> 00:05:46.240
+<v Matt Hamann>We were able to use that to get ourselves off the ground faster.
+
+63
+00:05:46.680 --> 00:05:55.440
+<v Matt Hamann>But when we set out to build the MVP, we set a goal of what can we do in two weeks or maybe three weeks just to get this off the ground.
+
+64
+00:05:55.760 --> 00:05:57.920
+<v Matt Hamann>We'll manually onboard customers.
+
+65
+00:05:59.000 --> 00:06:01.940
+<v Matt Hamann>It'll require a lot of work, a lot of hands-on work.
+
+66
+00:06:01.940 --> 00:06:06.780
+<v Matt Hamann>It's not going to be something that's just self-service tool that any developer can pick up at first.
+
+67
+00:06:06.960 --> 00:06:09.220
+<v Matt Hamann>And that's really how we set out to build it.
+
+68
+00:06:09.260 --> 00:06:20.920
+<v Matt Hamann>We actually started looking for customers and talking to early stage customers or potential customers to try to understand what their needs were, how they were building auth and things like that.
+
+69
+00:06:21.100 --> 00:06:25.400
+<v Matt Hamann>And so we built a very minimum viable product.
+
+70
+00:06:25.600 --> 00:06:29.480
+<v Matt Hamann>And all that it could do was email magic link authentication.
+
+71
+00:06:29.480 --> 00:06:44.140
+<v Matt Hamann>So you would get to an app, it would pop up a dialogue saying enter your email address and you click continue. It would send you an email, you click the link in the email, and that would authenticate that tab so that you could access the product that you were trying to access.
+
+72
+00:06:44.140 --> 00:07:07.100
+<v Matt Hamann>And we just started working to onboard customers that were interested and actually do a lot of the integration work for them. And what that did is that also helped us learn what the challenges would be that our customers would face in terms of doing integration and use that to create an iteration loop of making the onboarding experience better, improving the SDKs and so on and so forth.
+
+73
+00:07:08.560 --> 00:07:26.300
+<v Noah Labhart>That's a good segue into my next question. I'm curious about how you progressed and matured the product from that point and moved forward. And to wrap in a box a little bit, what I'm looking for is how you built your roadmap, how you went about deciding that, okay, this is the next most important thing to build or to address with Rownd.
+
+74
+00:07:26.300 --> 00:07:26.800
+<v Noah Labhart>out.
+
+75
+00:07:27.460 --> 00:07:31.140
+<v Matt Hamann>When you're building a startup, one of the worst things you could do is actually create a
+
+76
+00:07:31.140 --> 00:07:35.320
+<v Matt Hamann>roadmap. You might have some ideas of where you think the product should go and where you want
+
+77
+00:07:35.320 --> 00:07:39.620
+<v Matt Hamann>it to go and some things that you want to see realized in the product eventually. But the most
+
+78
+00:07:39.620 --> 00:07:44.820
+<v Matt Hamann>important thing early on, or one could argue throughout the entire lifetime of a product is
+
+79
+00:07:44.820 --> 00:07:49.500
+<v Matt Hamann>to listen to your customers, because they're going to be your biggest champions if you make them
+
+80
+00:07:49.500 --> 00:07:54.900
+<v Matt Hamann>happy and if you solve real problems for them. So from the beginning, we were talking to customers
+
+81
+00:07:56.300 --> 00:08:00.880
+<v Matt Hamann>of our early customers, essentially design partners that help shape the product over time.
+
+82
+00:08:01.120 --> 00:08:08.520
+<v Matt Hamann>So we avoided creating a three-month roadmap or a six-month roadmap and early on actually focused
+
+83
+00:08:08.520 --> 00:08:14.220
+<v Matt Hamann>on doing one-week iterations. What can we build over the next week that meets a customer ask,
+
+84
+00:08:14.340 --> 00:08:20.800
+<v Matt Hamann>a customer need? And actually for quite a while, I would say the first couple years of doing this,
+
+85
+00:08:20.800 --> 00:08:28.000
+<v Matt Hamann>we kept that cadence of looking at the product backlog or looking at what's next every week.
+
+86
+00:08:28.020 --> 00:08:31.940
+<v Matt Hamann>So basically every Friday, just looking at that. And more recently, we've gotten into more
+
+87
+00:08:31.940 --> 00:08:38.840
+<v Matt Hamann>two-week iterations because we've seen that as we build more complex features or as the product
+
+88
+00:08:38.840 --> 00:08:45.240
+<v Matt Hamann>gets bigger, we need more time to adequately test things and to ensure that we're designing things
+
+89
+00:08:45.240 --> 00:08:50.140
+<v Matt Hamann>correctly and writing the code and testing things correctly. But we've really tried to keep that
+
+90
+00:08:50.800 --> 00:08:57.000
+<v Matt Hamann>feedback loop in that tight iteration cycle in the context of having bigger blocks that we know
+
+91
+00:08:57.000 --> 00:09:03.360
+<v Matt Hamann>are maybe out in the future or that we know we need to get to. For example, passkeys are a fairly
+
+92
+00:09:03.360 --> 00:09:08.740
+<v Matt Hamann>new concept in authentication where you don't need a password and you don't need a two-factor
+
+93
+00:09:08.740 --> 00:09:14.280
+<v Matt Hamann>authentication code. You can use a passkey, which essentially gives you both factors wrapped in one
+
+94
+00:09:14.280 --> 00:09:19.500
+<v Matt Hamann>thing, and it can use biometrics that are attached to your laptop or your phone, your fingerprint or
+
+95
+00:09:20.820 --> 00:09:24.900
+<v Matt Hamann>and we knew that this was going to be an important part of an authentication story.
+
+96
+00:09:25.060 --> 00:09:26.900
+<v Matt Hamann>So it's something that was out in the distance that we said,
+
+97
+00:09:26.980 --> 00:09:28.360
+<v Matt Hamann>okay, we need to support this eventually.
+
+98
+00:09:28.920 --> 00:09:34.340
+<v Matt Hamann>But we were also waiting for the right customer to need that particular feature.
+
+99
+00:09:34.640 --> 00:09:38.480
+<v Matt Hamann>One way that we addressed kind of the tension there of,
+
+100
+00:09:38.540 --> 00:09:39.640
+<v Matt Hamann>we know we need to build this,
+
+101
+00:09:39.780 --> 00:09:43.920
+<v Matt Hamann>and we maybe want to have some of that ready to go by the time the customer asks for it,
+
+102
+00:09:43.980 --> 00:09:46.120
+<v Matt Hamann>even though a customer hasn't necessarily demanded it today,
+
+103
+00:09:46.300 --> 00:09:49.080
+<v Matt Hamann>is we occasionally do what we call a jam,
+
+104
+00:09:50.800 --> 00:09:57.320
+<v Matt Hamann>together and we focused them on one particular feature, one particular area. One of our jams
+
+105
+00:09:57.320 --> 00:10:03.680
+<v Matt Hamann>was on PassKeys where we essentially built PassKey support over about a week and kind of knocked out
+
+106
+00:10:03.680 --> 00:10:10.720
+<v Matt Hamann>that block of functionality that we knew we needed and wanted to build over time. And so we used both
+
+107
+00:10:10.720 --> 00:10:14.380
+<v Matt Hamann>of those things to mature the product into where it is currently.
+
+108
+00:10:14.940 --> 00:10:17.000
+<v Noah Labhart>I hear you saying we a lot. Tell
+
+109
+00:10:17.000 --> 00:10:18.480
+<v Noah Labhart>Tell me about how you built your team.
+
+110
+00:10:18.560 --> 00:10:22.200
+<v Noah Labhart>And what do you look for in those people to indicate that they're the winning horses to join you?
+
+111
+00:10:23.540 --> 00:10:26.540
+<v Matt Hamann>First off, I have to say that the founding team is really important.
+
+112
+00:10:26.860 --> 00:10:29.480
+<v Matt Hamann>I have two really great co-founders.
+
+113
+00:10:29.700 --> 00:10:37.360
+<v Matt Hamann>One who comes from a deep product management background and one who comes from a deep design background, Rob, Rachel.
+
+114
+00:10:38.160 --> 00:10:46.020
+<v Matt Hamann>We met at IBM and did some work together at IBM and really saw the meshing of personalities and how we looked at the world.
+
+115
+00:10:47.000 --> 00:10:54.260
+<v Matt Hamann>we could work together. The way we've built the team and how we've just looked for the humility
+
+116
+00:10:54.900 --> 00:11:00.520
+<v Matt Hamann>and the desire to learn and to grow and to work together to build something that's bigger than
+
+117
+00:11:00.520 --> 00:11:05.100
+<v Matt Hamann>the sum of its parts, if I can say it that way, has really just knit the team together.
+
+118
+00:11:06.020 --> 00:11:12.340
+<v Matt Hamann>And we've just got a lot of synergy in terms of personalities and just how well things mesh.
+
+119
+00:11:12.600 --> 00:11:15.480
+<v Matt Hamann>And so that's when we're hiring people, that's really what we're looking for is
+
+120
+00:11:17.640 --> 00:11:22.480
+<v Matt Hamann>into the existing team construct that will bring new ideas and hopefully we'll look at things from
+
+121
+00:11:22.480 --> 00:11:26.620
+<v Matt Hamann>different angles and maybe angles we haven't considered before because that diversity of
+
+122
+00:11:26.620 --> 00:11:31.740
+<v Matt Hamann>thought is always important. The people that are really just easy to work with and desire to just
+
+123
+00:11:31.740 --> 00:11:36.140
+<v Matt Hamann>make to build everyone up and to have the rising tide that lifts all boats, so to speak.
+
+124
+00:11:39.140 --> 00:11:45.100
+<v Noah Labhart>Let's flip to scalability then. I'm curious how you approach this from even the early days,
+
+125
+00:11:47.000 --> 00:11:49.800
+<v Noah Labhart>Scalability, obviously, it's important and authentication.
+
+126
+00:11:50.420 --> 00:11:54.100
+<v Noah Labhart>But I'm curious if there have been interesting areas where you've had to fight it as you've grown.
+
+127
+00:11:55.380 --> 00:11:57.040
+<v Matt Hamann>Scale is an interesting thing.
+
+128
+00:11:57.420 --> 00:12:08.860
+<v Matt Hamann>It's hard, especially early on, to test for scale to make sure that you can actually achieve scale of your product until you really actually are there.
+
+129
+00:12:08.980 --> 00:12:13.760
+<v Matt Hamann>And you're starting to see the cracks in your foundation or the pieces that just aren't working well.
+
+130
+00:12:13.760 --> 00:12:21.160
+<v Matt Hamann>and so we've had a number of customers that we've grown with who have needed us to scale with them
+
+131
+00:12:21.160 --> 00:12:26.400
+<v Matt Hamann>and that's honestly just a really great way to do it there there's no one better to test your
+
+132
+00:12:26.400 --> 00:12:30.520
+<v Matt Hamann>product than your customers and obviously you should do your own testing but just the number
+
+133
+00:12:30.520 --> 00:12:35.140
+<v Matt Hamann>of things that you'll find because the customer is using it and you can see so much data flowing
+
+134
+00:12:35.140 --> 00:12:40.540
+<v Matt Hamann>through it at bigger and bigger scales really just helps squash those bugs and so one of the
+
+135
+00:12:40.540 --> 00:12:49.220
+<v Matt Hamann>One of the challenges that we faced in scaling it is just the combination of raw compute and then like database capacity.
+
+136
+00:12:49.660 --> 00:12:57.900
+<v Matt Hamann>And just seeing like more and more queries hitting the database and looking at that from the perspective of, okay, how can we improve the experience here?
+
+137
+00:12:58.000 --> 00:13:02.260
+<v Matt Hamann>How do we prevent the database from being a bottleneck in the overall authentication flow?
+
+138
+00:13:02.500 --> 00:13:04.560
+<v Matt Hamann>And you can look at that from a variety of perspectives.
+
+139
+00:13:04.680 --> 00:13:07.240
+<v Matt Hamann>One being just put more raw compute against the database.
+
+140
+00:13:07.460 --> 00:13:09.140
+<v Matt Hamann>And of course, that increase your cost.
+
+141
+00:13:10.540 --> 00:13:14.960
+<v Matt Hamann>at it is how can we make the product more efficient? How can we make queries more efficient?
+
+142
+00:13:15.100 --> 00:13:20.860
+<v Matt Hamann>And so we've tried to balance those things as we've scaled. But really, I have to just say
+
+143
+00:13:20.860 --> 00:13:29.860
+<v Matt Hamann>getting critical mass with customers is critical in just helping you find the right buttons to push
+
+144
+00:13:29.860 --> 00:13:35.940
+<v Matt Hamann>and really working some of those scale kinks out of the product. One of the issues we had to deal
+
+145
+00:13:35.940 --> 00:13:40.920
+<v Matt Hamann>with even recently is we had used a particular database provider from the beginning of the
+
+146
+00:13:40.920 --> 00:13:48.220
+<v Matt Hamann>product and we were seeing some scaling issues with that particular provider and to keep things
+
+147
+00:13:48.220 --> 00:13:54.020
+<v Matt Hamann>on top of that the database provider essentially went out of business and gave us two months to
+
+148
+00:13:54.020 --> 00:14:00.480
+<v Matt Hamann>move all of our data off so we had to quickly scramble to complete a database migration from
+
+149
+00:14:00.480 --> 00:14:06.420
+<v Matt Hamann>from that provider to another one, while also continuing to scale with our customers and meeting those demands.
+
+150
+00:14:06.760 --> 00:14:11.480
+<v Matt Hamann>And so just watching the team come together and work to just keep the customers happy
+
+151
+00:14:11.480 --> 00:14:18.440
+<v Matt Hamann>and to solve the technical problems of essentially rebuilding part of the airplane while it's flying
+
+152
+00:14:18.440 --> 00:14:20.780
+<v Matt Hamann>was just a really cool thing to see.
+
+153
+00:14:20.860 --> 00:14:23.860
+<v Matt Hamann>And it's just a testament to, I think, the team that we've put together.
+
+154
+00:14:24.960 --> 00:14:29.800
+<v Noah Labhart>As you step out on the balcony, you look across all that you've built thus far with Rownd.
+
+155
+00:14:30.480 --> 00:14:30.980
+<v Noah Labhart>proud of.
+
+156
+00:14:32.780 --> 00:14:39.540
+<v Matt Hamann>One of the coolest things that we've done is just how we focused on making authentication
+
+157
+00:14:39.540 --> 00:14:46.420
+<v Matt Hamann>a benefit to the product team. A lot of times authentication is, it's maybe one of the first
+
+158
+00:14:46.420 --> 00:14:49.760
+<v Matt Hamann>things you put in your product, but it's still a little bit of an afterthought. We just need to
+
+159
+00:14:49.760 --> 00:14:53.280
+<v Matt Hamann>get people on the door, then they'll work with the real product. And that's the important piece.
+
+160
+00:14:53.480 --> 00:14:59.660
+<v Matt Hamann>But with every customer that we've ever brought on board, we focused on authentication as part
+
+161
+00:15:00.480 --> 00:15:03.320
+<v Matt Hamann>as a value add to the product and not a detractor.
+
+162
+00:15:03.440 --> 00:15:05.440
+<v Matt Hamann>And so I'm just really proud of the way
+
+163
+00:15:05.440 --> 00:15:07.500
+<v Matt Hamann>that the product has come together
+
+164
+00:15:07.500 --> 00:15:10.620
+<v Matt Hamann>and has created an experience
+
+165
+00:15:10.620 --> 00:15:14.440
+<v Matt Hamann>that is both easy for developers to integrate,
+
+166
+00:15:14.680 --> 00:15:18.840
+<v Matt Hamann>but also is a net add to the product management team
+
+167
+00:15:18.840 --> 00:15:21.920
+<v Matt Hamann>as they work to reduce churn
+
+168
+00:15:21.920 --> 00:15:23.640
+<v Matt Hamann>or reduce drop-off in their funnels
+
+169
+00:15:23.640 --> 00:15:27.320
+<v Matt Hamann>and just really improve the onboarding into their product.
+
+170
+00:15:27.400 --> 00:15:29.660
+<v Matt Hamann>That's one of the things that we see a lot of our customers
+
+171
+00:15:30.940 --> 00:15:35.160
+<v Matt Hamann>around, wanting to do is just really reduce that friction point at the beginning of the
+
+172
+00:15:35.160 --> 00:15:35.660
+<v Matt Hamann>product.
+
+173
+00:15:35.460 --> 00:15:39.260
+<v Matt Hamann>And I think we've done a really great job meeting them where they are and really helping
+
+174
+00:15:39.260 --> 00:15:42.100
+<v Matt Hamann>those product teams get better through authentication.
+
+175
+00:15:44.100 --> 00:15:45.640
+<v Noah Labhart>Let's flip the script a little bit.
+
+176
+00:15:45.720 --> 00:15:49.100
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+177
+00:15:50.620 --> 00:15:55.760
+<v Matt Hamann>It's really easy to not want to face your mistakes or to bury them.
+
+178
+00:15:55.760 --> 00:16:08.640
+<v Matt Hamann>And one of the things that happened earlier on in the company is we were trying to use some serverless technology to power some of our main business logic and APIs.
+
+179
+00:16:09.020 --> 00:16:20.920
+<v Matt Hamann>And one of the things that caused is it was hard to observe exactly how the workload was taking advantage of the compute underneath or was hitting bottlenecks in that compute.
+
+180
+00:16:20.920 --> 00:16:32.220
+<v Matt Hamann>And so there was one particular occasion where the service basically was down or at least heavily degraded for an extended period of time.
+
+181
+00:16:32.240 --> 00:16:38.660
+<v Matt Hamann>I think it was the better part of a day that we were just like flat on our backs and we were scrambling to figure out what was going on.
+
+182
+00:16:38.740 --> 00:16:42.540
+<v Matt Hamann>We thought, hey, maybe it's the database provider, but they were saying everything is fine.
+
+183
+00:16:43.220 --> 00:16:50.340
+<v Matt Hamann>And we're looking at the observability that we had in the platform and we just weren't seeing problems from that perspective.
+
+184
+00:16:50.920 --> 00:16:59.180
+<v Matt Hamann>Eventually, throughout triaging that problem and really trying to dig into it, we realized that our foundation was shaky and what we were actually running our workloads on.
+
+185
+00:16:59.860 --> 00:17:09.100
+<v Matt Hamann>And in addition to that, we didn't have the data that we needed to actually make the right decisions of how to scale up or scale down based on what was happening at the time.
+
+186
+00:17:09.100 --> 00:17:24.460
+<v Matt Hamann>And so I think realizing that was really important and then coming up with a solid plan to improve that foundation and move on to a more stable compute structure and ensure that we had the right visibility in place.
+
+187
+00:17:24.460 --> 00:17:30.100
+<v Matt Hamann>and of course the hardest part of that was going to our customers and saying hey we messed up and
+
+188
+00:17:30.780 --> 00:17:36.040
+<v Matt Hamann>people have been struggling to use your product as a result of our mistake and we're sorry about
+
+189
+00:17:36.040 --> 00:17:41.660
+<v Matt Hamann>that and we're doing better and here's the steps that we're taking and it was just amazing how
+
+190
+00:17:41.660 --> 00:17:47.060
+<v Matt Hamann>i don't think we lost a single customer through that i think they all were very under understanding
+
+191
+00:17:47.060 --> 00:17:53.640
+<v Matt Hamann>and gracious through the mistakes that we had made and it's also that type of thing that type of
+
+192
+00:17:54.520 --> 00:17:59.700
+<v Matt Hamann>fire, walking through the fire, so to speak, that just helps build the team closer together
+
+193
+00:18:00.480 --> 00:18:05.780
+<v Matt Hamann>and just give you a deeper set of knowledge of, okay, if I have to do this in the future,
+
+194
+00:18:05.840 --> 00:18:11.260
+<v Matt Hamann>if I face a similar situation or architecture decision, I can make better decisions because
+
+195
+00:18:11.260 --> 00:18:13.600
+<v Matt Hamann>of the things I've learned through these mistakes.
+
+196
+00:18:16.360 --> 00:18:18.420
+<v Noah Labhart>Let's move forward then. So tell me what the
+
+197
+00:18:18.420 --> 00:18:22.700
+<v Noah Labhart>future looks like for Rownd, for the product and for what you offer and for your team.
+
+198
+00:18:24.460 --> 00:18:30.920
+<v Matt Hamann>the future is always changing. Since we started Rownd and have been on this authentication
+
+199
+00:18:30.920 --> 00:18:36.240
+<v Matt Hamann>journey, one of the biggest change agents in the world, especially the world of computing,
+
+200
+00:18:36.480 --> 00:18:40.660
+<v Matt Hamann>of course, has been the two letters that's on the tip of everyone's tongue these days,
+
+201
+00:18:40.860 --> 00:18:49.740
+<v Matt Hamann>AI. AI is changing everything. It's changing the market for SaaS. It's changing the market for
+
+202
+00:18:49.740 --> 00:18:55.880
+<v Matt Hamann>for various products and services that used to be slam dunks. And I think we're definitely seeing
+
+203
+00:18:55.880 --> 00:19:01.320
+<v Matt Hamann>more businesses and app developers and folks like that that are looking at auth and going,
+
+204
+00:19:01.500 --> 00:19:07.560
+<v Matt Hamann>I can maybe build this with AI. We're evaluating how that impacts the product and what that means
+
+205
+00:19:07.560 --> 00:19:14.000
+<v Matt Hamann>for the future around. I think we're proud of how our team has been able to adjust and change over
+
+206
+00:19:14.000 --> 00:19:19.420
+<v Matt Hamann>time. And I think the whole team is very excited about AI in general and what's possible with
+
+207
+00:19:19.740 --> 00:19:24.400
+<v Matt Hamann>today's large language models and the advances that are being made in that space. And so we're
+
+208
+00:19:24.400 --> 00:19:29.260
+<v Matt Hamann>confident that we can face the challenges head on and meet them where they are and build a product
+
+209
+00:19:29.260 --> 00:19:36.020
+<v Matt Hamann>that's useful and beneficial to our customers, even in the age of AI. Things are changing so
+
+210
+00:19:36.020 --> 00:19:42.580
+<v Matt Hamann>rapidly. It's really hard to predict exactly what all that looks like in a month or three months,
+
+211
+00:19:42.600 --> 00:19:47.220
+<v Matt Hamann>or especially six months down the road. But it's exciting. It's nerve wracking and it's exciting.
+
+212
+00:19:47.220 --> 00:19:50.720
+<v Matt Hamann>and just very interesting all around.
+
+213
+00:19:51.620 --> 00:19:52.940
+<v Noah Labhart>Okay, Matt, let's switch to you.
+
+214
+00:19:53.020 --> 00:19:54.880
+<v Noah Labhart>Who influences the way that you work?
+
+215
+00:19:55.080 --> 00:19:58.820
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+216
+00:19:59.540 --> 00:20:02.340
+<v Matt Hamann>There's so many people I can talk about.
+
+217
+00:20:02.560 --> 00:20:06.220
+<v Matt Hamann>Certainly my parents and my dad being a computer scientist
+
+218
+00:20:06.220 --> 00:20:09.100
+<v Matt Hamann>or computer programmer has had a great influence on me.
+
+219
+00:20:09.720 --> 00:20:11.700
+<v Matt Hamann>I'm a believer and a follower of Christ,
+
+220
+00:20:11.780 --> 00:20:15.620
+<v Matt Hamann>and so church has always been an important part of my life.
+
+221
+00:20:17.220 --> 00:20:22.920
+<v Matt Hamann>I'm doing aligns with what God wants me to do and the decisions I'm making day in and day out
+
+222
+00:20:22.920 --> 00:20:28.220
+<v Matt Hamann>align with the principles that he's and commands that he's outlined in scripture. Those are,
+
+223
+00:20:28.240 --> 00:20:33.020
+<v Matt Hamann>those things are very important at a very like core foundational level. Just thinking more
+
+224
+00:20:33.500 --> 00:20:40.700
+<v Matt Hamann>practical day to day in terms of influences and how like Rownd runs our business and things like
+
+225
+00:20:40.700 --> 00:20:45.920
+<v Matt Hamann>that. I would definitely say one of the, one of my most favorite books and favorite authors is a guy
+
+226
+00:20:47.220 --> 00:20:52.580
+<v Matt Hamann>wrote a book. He's written several books, but one of my favorites that he wrote is called Start With
+
+227
+00:20:52.580 --> 00:20:58.920
+<v Matt Hamann>Why. And the whole premise of it is that you need to know why you're doing what you're doing before
+
+228
+00:20:58.920 --> 00:21:03.380
+<v Matt Hamann>you even decide what you're doing and how you're doing it. When it comes to authentication,
+
+229
+00:21:04.320 --> 00:21:09.180
+<v Matt Hamann>we need to know and understand why authentication is important, why we need authentication,
+
+230
+00:21:09.600 --> 00:21:14.940
+<v Matt Hamann>why we're approaching authentication the way that we're approaching it before we decide exactly
+
+231
+00:21:14.940 --> 00:21:19.240
+<v Matt Hamann>like how that's happening and what that looks like. So that I think that's one of the biggest
+
+232
+00:21:19.240 --> 00:21:21.340
+<v Matt Hamann>influences from that perspective.
+
+233
+00:21:22.780 --> 00:21:25.200
+<v Noah Labhart>Well, Matt, last question. So you're getting on a plane
+
+234
+00:21:25.200 --> 00:21:29.780
+<v Noah Labhart>and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed
+
+235
+00:21:29.780 --> 00:21:33.000
+<v Noah Labhart>about it. They can't wait to show it off to the world. And can we show it off to you right there
+
+236
+00:21:33.000 --> 00:21:36.760
+<v Noah Labhart>on the plane? What advice do you give that person having gone down this road a bit?
+
+237
+00:21:37.900 --> 00:21:43.200
+<v Matt Hamann>I think the number one piece of advice is listen to your customers. So if you're selling to someone,
+
+238
+00:21:44.940 --> 00:21:51.000
+<v Matt Hamann>opinion on what you've built and their input can be really helpful in how in shaping the future
+
+239
+00:21:51.000 --> 00:21:55.540
+<v Matt Hamann>and the direction of that thing that you're building. And I think the other piece of advice
+
+240
+00:21:55.540 --> 00:22:00.020
+<v Matt Hamann>that I would give them is there's going to be ups and downs. And so right now you're riding high,
+
+241
+00:22:00.180 --> 00:22:05.500
+<v Matt Hamann>literally, and you're really excited about this, but there's going to come a day sometime soon
+
+242
+00:22:05.500 --> 00:22:12.960
+<v Matt Hamann>where things feel bleak and you're maybe not excited about it or, and maybe that's temporary,
+
+243
+00:22:14.940 --> 00:22:20.260
+<v Matt Hamann>give up and to just keep going and keep iterating and keep working on your craft and get better at
+
+244
+00:22:20.260 --> 00:22:26.860
+<v Matt Hamann>what you're doing. And it's okay to fail. You're going to fail sometimes and you can learn so much
+
+245
+00:22:26.860 --> 00:22:32.900
+<v Matt Hamann>from those failures. And that's how you get ultimately to some of those successes. So just
+
+246
+00:22:32.900 --> 00:22:37.520
+<v Matt Hamann>keep on going and don't let the bad times get you down because the good times are coming.
+
+247
+00:22:37.680 --> 00:22:41.660
+<v Noah Labhart>That's fantastic advice. Well, Matt, thank you for being on the show today. And thank you for
+
+248
+00:22:41.660 --> 00:22:43.400
+<v Noah Labhart>for telling the creation story of Rownd.
+
+249
+00:22:44.180 --> 00:22:45.480
+<v Matt Hamann>Absolutely. It's been my pleasure.
+
+250
+00:22:47.060 --> 00:22:49.780
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+251
+00:22:57.740 --> 00:23:00.820
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+252
+00:23:00.940 --> 00:23:03.600
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+253
+00:23:03.780 --> 00:23:05.740
+<v Noah Labhart>or the podcasting app of your choice.
+
+254
+00:23:06.320 --> 00:23:08.540
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+255
+00:23:08.840 --> 00:23:10.740
+<v Noah Labhart>Both things help us out tremendously.
+
+256
+00:23:13.700 --> 00:23:15.160
+<v Noah Labhart>and thanks again for listening.

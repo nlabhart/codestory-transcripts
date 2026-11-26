@@ -1,0 +1,2159 @@
+WEBVTT
+
+NOTE S6 Bonus: When Systems Crash: Engineering Facebook-Scale Incident Management & Exiting to PagerDuty with John Egan
+
+1
+00:00:00.000 --> 00:00:07.880
+<v John Egan>What's actually more important is having that longer-term vision for what you want your company to be and applying that backwards to the customer feedback.
+
+2
+00:00:08.240 --> 00:00:17.280
+<v John Egan>So you have to translate those things over and say, okay, what's the answer? What would satisfy this thing the customer is asking for while meeting that longer-term vision?
+
+3
+00:00:17.480 --> 00:00:25.660
+<v John Egan>Early on, you're really kind of looking at it like, what's happening this month and what's happening in six years? Right? There's like huge separation of distance, right? Anything in between that's fuzzy.
+
+4
+00:00:25.660 --> 00:00:33.560
+<v John Egan>And if you make the mistake of working on things that will take you a month or two months to do, you're going to lose that attention from your customers.
+
+5
+00:00:33.720 --> 00:00:38.140
+<v John Egan>You're going to lose that beginning of excitement, and you're going to miss the mark.
+
+6
+00:00:38.480 --> 00:00:42.520
+<v John Egan>My name's John Egan. I'm a co-founder and CEO at Kintaba.
+
+7
+00:00:47.400 --> 00:01:00.800
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+8
+00:01:02.180 --> 00:01:11.520
+<v Noah Labhart>I'm your host, Noah Labhart, and today how John Egan set out to create the platform to bring order to the chaos of incident response.
+
+9
+00:01:13.500 --> 00:01:15.740
+<v Noah Labhart>All this and more on Code Story.
+
+10
+00:01:20.880 --> 00:01:24.300
+<v Noah Labhart>John Egan is a computer and electrical engineer by training.
+
+11
+00:01:24.900 --> 00:01:29.900
+<v Noah Labhart>Early on, he got disillusioned by the idea of building robots because it was too slow for him.
+
+12
+00:01:29.980 --> 00:01:34.220
+<v Noah Labhart>While he was working at Harvard, he was watching the early days of Y Combinator
+
+13
+00:01:34.220 --> 00:01:37.800
+<v Noah Labhart>and told his wife that there was a movement going on and they should move to be a part of it.
+
+14
+00:01:38.320 --> 00:01:40.660
+<v Noah Labhart>Startups weren't common then, so it was a risky move.
+
+15
+00:01:42.520 --> 00:01:47.040
+<v Noah Labhart>excited about being a part of it. Eventually, they did make the move, created a file transfer
+
+16
+00:01:47.040 --> 00:01:51.480
+<v Noah Labhart>company, and ended up getting acquired by Facebook. Outside of tech, he's married with a
+
+17
+00:01:51.480 --> 00:01:57.080
+<v Noah Labhart>four-year-old son. And for fun, he builds tools for himself, since he's not writing much code at
+
+18
+00:01:57.080 --> 00:02:02.640
+<v Noah Labhart>his current venture. One of them is Postmortem.io, in addition to launching IRConf for incident
+
+19
+00:02:02.640 --> 00:02:09.240
+<v Noah Labhart>responders. Post-Facebook, John set out to ask the question to his prior colleagues that had left
+
+20
+00:02:09.240 --> 00:02:11.620
+<v Noah Labhart>about the tools that they missed the most.
+
+21
+00:02:12.260 --> 00:02:16.580
+<v Noah Labhart>The tool that kept coming up in conversation was a tool to manage incidents.
+
+22
+00:02:17.680 --> 00:02:23.100
+<v Noah Labhart>So he decided to build this platform, named after an ancient Japanese philosophy.
+
+23
+00:02:25.540 --> 00:02:28.300
+<v Noah Labhart>This is the creation story of Kintaba.
+
+24
+00:02:32.420 --> 00:02:36.460
+<v John Egan>So Kintaba is an incident management and response platform.
+
+25
+00:02:36.460 --> 00:02:44.720
+<v John Egan>So there's a trend that's kind of taken hold back around like 2016 when Google published the SRE handbook.
+
+26
+00:02:44.820 --> 00:02:45.820
+<v John Egan>They published this for free.
+
+27
+00:02:45.900 --> 00:02:53.300
+<v John Egan>And they, for the first time, really outlined what their approach was internally to dealing with critical emergencies at the company.
+
+28
+00:02:53.780 --> 00:02:57.500
+<v John Egan>And this was really impactful because every company is always on fire.
+
+29
+00:02:57.600 --> 00:02:58.500
+<v John Egan>I'm sure you do these interviews.
+
+30
+00:02:58.640 --> 00:03:02.340
+<v John Egan>You must hear from people every day talking about troubles, not just their successes.
+
+31
+00:03:02.340 --> 00:03:11.480
+<v John Egan>But it's only recent history that companies have really started to adopt a set of best practices for what to do when things go badly.
+
+32
+00:03:11.740 --> 00:03:20.720
+<v John Egan>The old world really looked like saying, well, our goal is not to have incidents or there won't be incidents or we're trying to knock them down to as low as little as possible.
+
+33
+00:03:21.480 --> 00:03:33.000
+<v John Egan>That moment in 2016 was really powerful because it made everyone look at one of the most successful companies in the world, Google, and say, oh, they actually are expecting these things to continue to happen forever.
+
+34
+00:03:33.260 --> 00:03:35.420
+<v John Egan>They're not planning for incident zero.
+
+35
+00:03:35.760 --> 00:03:39.180
+<v John Egan>And this was something that I saw firsthand at Facebook as well.
+
+36
+00:03:39.220 --> 00:03:42.160
+<v John Egan>Facebook also adopted incident management really aggressively internally.
+
+37
+00:03:42.520 --> 00:03:45.680
+<v John Egan>And it actually sort of made me think that that was the standard.
+
+38
+00:03:45.680 --> 00:03:50.380
+<v John Egan>They kind of, you know, working at Facebook out of a startup, you think, okay, at the startup, we were on fire.
+
+39
+00:03:50.480 --> 00:03:52.180
+<v John Egan>And Facebook's more like everyone else.
+
+40
+00:03:52.320 --> 00:03:53.920
+<v John Egan>You know, they have a plan for these things.
+
+41
+00:03:53.980 --> 00:03:55.200
+<v John Egan>They have a whole process in place.
+
+42
+00:03:55.540 --> 00:04:08.000
+<v John Egan>And they've learned these processes from, you know, places like fire departments, from like the DOD, from like places that are really dealing with fires all the time, from the airline industry where a fire means loss of life.
+
+43
+00:04:08.000 --> 00:04:20.440
+<v John Egan>And so when I left Facebook back in about 2017, 2018, we went to all of our friends who had also left, you know, over the years and had gone to other unicorn startups and other companies.
+
+44
+00:04:20.700 --> 00:04:24.300
+<v John Egan>And we talked to them a lot about what were the tools that they missed.
+
+45
+00:04:24.460 --> 00:04:29.320
+<v John Egan>And the one that kept coming up was an internal tool at Facebook that managed incidents.
+
+46
+00:04:29.680 --> 00:04:37.720
+<v John Egan>And this was really an orchestration tool that was all about giving you access to the administrative overhead and process for dealing with an incident.
+
+47
+00:04:38.000 --> 00:04:42.760
+<v John Egan>across the company. And critically, it was available to the entire organization. This
+
+48
+00:04:42.760 --> 00:04:48.060
+<v John Egan>wasn't an SRE tool. This wasn't an engineering tool. This was something that anyone in the company
+
+49
+00:04:48.060 --> 00:04:53.600
+<v John Egan>at any moment could say, well, what's on fire? And if there was something on fire, either be a
+
+50
+00:04:53.600 --> 00:04:59.160
+<v John Egan>responder and help and know where the conversation was happening for that resolution, be an observer
+
+51
+00:04:59.160 --> 00:05:03.460
+<v John Egan>and learn without having to send a bunch of emails out to everyone's managers saying,
+
+52
+00:05:03.460 --> 00:05:08.600
+<v John Egan>what's going on, why are things bad, and then learn the output of when an incident is resolved,
+
+53
+00:05:09.040 --> 00:05:13.720
+<v John Egan>what are the changes we're making systemically, day to day, week to week, as we learn from these
+
+54
+00:05:13.720 --> 00:05:18.900
+<v John Egan>outages to make sure they don't happen again, to become more powerful. And that's what Kintaba
+
+55
+00:05:18.900 --> 00:05:25.240
+<v John Egan>is really meant to be and where it's born from. It's actually derived from the word Kintsugi,
+
+56
+00:05:25.480 --> 00:05:30.660
+<v John Egan>which is a Japanese art form where you take broken pottery and you put it back together
+
+57
+00:05:30.660 --> 00:05:35.100
+<v John Egan>with gold and inlay. And then it becomes more valuable because of it. It's an entire art form.
+
+58
+00:05:35.140 --> 00:05:39.580
+<v John Egan>You can actually go buy Kintsugi art, you know, online. And it was this beautiful imagery to me,
+
+59
+00:05:39.640 --> 00:05:44.460
+<v John Egan>right? Which is this idea that you're actually stronger for your scars. And that's what tools
+
+60
+00:05:44.460 --> 00:05:49.760
+<v John Egan>and processes that care about incident management are. They take into account the idea that each one
+
+61
+00:05:49.760 --> 00:05:55.460
+<v John Egan>of these major incidents is an opportunity for your company to become stronger and more resilient.
+
+62
+00:05:55.460 --> 00:05:57.460
+<v John Egan>and you're going to be better than your competition.
+
+63
+00:05:58.400 --> 00:06:03.620
+<v John Egan>What Kintaba really is, is it's a dashboard for all of your major fires
+
+64
+00:06:03.620 --> 00:06:06.380
+<v John Egan>that are happening and have happened in the past.
+
+65
+00:06:06.480 --> 00:06:09.540
+<v John Egan>And then it's a process orchestrator for making sure
+
+66
+00:06:09.540 --> 00:06:13.240
+<v John Egan>that the way you respond to these outages is consistent.
+
+67
+00:06:13.480 --> 00:06:15.120
+<v John Egan>Where do you go to have the conversation?
+
+68
+00:06:15.480 --> 00:06:16.860
+<v John Egan>Who are the people responding?
+
+69
+00:06:17.120 --> 00:06:17.980
+<v John Egan>What are their roles?
+
+70
+00:06:18.180 --> 00:06:19.660
+<v John Egan>How are those roles being assigned?
+
+71
+00:06:20.180 --> 00:06:21.940
+<v John Egan>Like where are the postmortems getting written?
+
+72
+00:06:22.060 --> 00:06:23.200
+<v John Egan>How do we make sure they get written?
+
+73
+00:06:23.200 --> 00:06:25.860
+<v John Egan>All of that lives inside of Kintaba.
+
+74
+00:06:26.120 --> 00:06:39.960
+<v John Egan>And the goal was, let's just provide this as an off-the-shelf solution so that every company, three people, 3,000 people, 30,000 people, can get the same kind of tooling value that these big FAANG companies are getting by building it for themselves.
+
+75
+00:06:40.420 --> 00:06:41.520
+<v John Egan>And that was really the genesis.
+
+76
+00:06:41.600 --> 00:06:43.320
+<v John Egan>And it sort of took off from there.
+
+77
+00:06:45.260 --> 00:06:46.660
+<v Noah Labhart>Well, tell me about the MVP.
+
+78
+00:06:46.980 --> 00:06:50.440
+<v Noah Labhart>So that first product you built, how long did it take you to build?
+
+79
+00:06:50.560 --> 00:06:53.000
+<v Noah Labhart>And what sort of tools did you use to bring it to life?
+
+80
+00:06:54.660 --> 00:07:00.660
+<v John Egan>so the initial thought was that the core of the product was going to be the dashboard
+
+81
+00:07:01.080 --> 00:07:06.240
+<v John Egan>and a collaboration space where do you go when the incident happens um and so those were the
+
+82
+00:07:06.240 --> 00:07:10.260
+<v John Egan>first two things we built which looking back maybe that's a bit a bit difficult to go and say okay
+
+83
+00:07:10.260 --> 00:07:14.840
+<v John Egan>great let's go build a full chat interface that's the mvp you know i sometimes i look back and i
+
+84
+00:07:14.840 --> 00:07:19.040
+<v John Egan>think wow that was that was a bit of a high bar just to get out of the gate but it was actually
+
+85
+00:07:19.040 --> 00:07:23.480
+<v John Egan>pretty important you know that that was the bar coming out of the gate because we really wanted
+
+86
+00:07:23.480 --> 00:07:29.080
+<v John Egan>Kintaba to be a little bit different from just a record-keeping solution we wanted it to be
+
+87
+00:07:29.600 --> 00:07:35.220
+<v John Egan>a real-time solution it's the place you go and the place you work the problem not just the place you
+
+88
+00:07:35.220 --> 00:07:39.040
+<v John Egan>go after the fact and so it's pretty important for us that we come up with some approach to the
+
+89
+00:07:39.040 --> 00:07:43.140
+<v John Egan>collaborative interface we just come off of another project we were working on that was more
+
+90
+00:07:43.140 --> 00:07:48.560
+<v John Egan>in the blockchain space and learned a lot about how we were going to do you know resilient and
+
+91
+00:07:49.040 --> 00:07:54.760
+<v John Egan>coding going forward. And I think Kintaba is primarily based on Node and Next.js and then
+
+92
+00:07:54.760 --> 00:07:59.640
+<v John Egan>backed by Kubernetes. So really the infrastructure for us gets to be very hands-off, right? It's a
+
+93
+00:07:59.640 --> 00:08:05.660
+<v John Egan>very self-sufficient, inherently resilient product from the bottom up. And a lot of the MVP had to do
+
+94
+00:08:05.660 --> 00:08:09.660
+<v John Egan>with that, had to do with how do we do this as three people in a way that can make the company
+
+95
+00:08:09.660 --> 00:08:13.360
+<v John Egan>look like it's a hundred. And as soon as that started to work, we really started to shop it
+
+96
+00:08:13.360 --> 00:08:17.580
+<v John Egan>around aggressively. In the past, I'd built products and, you know, we always said, we'll
+
+97
+00:08:19.040 --> 00:08:23.340
+<v John Egan>to and work with people. And with Kintaba, we really said that we need to charge on day one.
+
+98
+00:08:23.400 --> 00:08:29.040
+<v John Egan>The MVP has to be valuable on day one or else this space isn't real. Because it's one of those spaces
+
+99
+00:08:29.040 --> 00:08:34.000
+<v John Egan>where people will never disagree with you when you talk to them about it. You'll never go up to
+
+100
+00:08:34.000 --> 00:08:37.980
+<v John Egan>someone who builds a company or works in a company and say, wouldn't it be great if it was easy to
+
+101
+00:08:37.980 --> 00:08:42.760
+<v John Egan>put your fires out? The real test there, right, this is kind of a standard with SaaS products.
+
+102
+00:08:42.860 --> 00:08:46.900
+<v John Egan>The real test is, well, will you write me a check of any amount of money, even a dollar,
+
+103
+00:08:46.900 --> 00:08:51.980
+<v John Egan>$5, $10, you know, to come and use this product. And so the MVP was really those two things. It
+
+104
+00:08:51.980 --> 00:08:57.000
+<v John Egan>was just the dashboard, an ability to create a new incident, and then a place to come in
+
+105
+00:08:57.000 --> 00:09:01.060
+<v John Egan>and collaborate. So you can imagine where it grew from there, right? We immediately had to go
+
+106
+00:09:01.060 --> 00:09:05.840
+<v John Egan>connect it to Slack, because that's where people actually collaborate, etc, etc. But the MVP was
+
+107
+00:09:05.840 --> 00:09:10.820
+<v John Egan>that it was very much those two pieces, web only, I think we had some integrations with Twilio to do
+
+108
+00:09:10.820 --> 00:09:15.720
+<v John Egan>notifications out over email, and SMS to make sure we could attract responders, you know, at the
+
+109
+00:09:16.900 --> 00:09:17.640
+<v John Egan>searching for customers.
+
+110
+00:09:18.180 --> 00:09:22.260
+<v Noah Labhart>With any MVP, you got to make certain decisions and trade-offs. Tell me
+
+111
+00:09:22.260 --> 00:09:27.920
+<v Noah Labhart>about those decisions and trade-offs you had to make and how you built it and what features you
+
+112
+00:09:27.920 --> 00:09:32.540
+<v Noah Labhart>were going to start with or cut, technical debt, anything like that, and how you coped with those
+
+113
+00:09:32.540 --> 00:09:33.040
+<v Noah Labhart>decisions.
+
+114
+00:09:33.380 --> 00:09:38.600
+<v John Egan>There was so much we wanted in the MVP, which we're really just getting to the point of
+
+115
+00:09:38.600 --> 00:09:43.820
+<v John Egan>having. Incident response, being an effective, what I keep calling it an orchestration system,
+
+116
+00:09:43.820 --> 00:09:50.160
+<v John Egan>system really means automations, it means on-call roles and handoffs, it means post-mortem
+
+117
+00:09:50.160 --> 00:09:54.080
+<v John Egan>documents and notifications and emails going out with calendars.
+
+118
+00:09:54.080 --> 00:09:55.360
+<v John Egan>It means all of these things.
+
+119
+00:09:55.640 --> 00:10:00.480
+<v John Egan>And so, yeah, when we came out of the gate, we wanted all of these features and burning
+
+120
+00:10:00.960 --> 00:10:06.840
+<v John Egan>it down to just a couple of items really looked like trying to stack rank them both from a
+
+121
+00:10:06.840 --> 00:10:12.760
+<v John Egan>standpoint of difficulty as well as a standpoint of critical insight that it would give us.
+
+122
+00:10:13.840 --> 00:10:15.540
+<v John Egan>by building each of these features.
+
+123
+00:10:15.680 --> 00:10:17.580
+<v John Egan>And we had to be careful not to build features
+
+124
+00:10:17.580 --> 00:10:19.580
+<v John Egan>that were reliant on other features, right?
+
+125
+00:10:19.680 --> 00:10:22.400
+<v John Egan>Because that's meaningless when you're building an MVP.
+
+126
+00:10:22.620 --> 00:10:24.960
+<v John Egan>You need to know if the first level features work.
+
+127
+00:10:26.280 --> 00:10:27.920
+<v John Egan>Very much you're zero to one.
+
+128
+00:10:28.180 --> 00:10:31.560
+<v John Egan>And so the decision around the dashboard was obvious
+
+129
+00:10:31.560 --> 00:10:34.540
+<v John Egan>because we wanted Kintaba to be a whole company product
+
+130
+00:10:34.820 --> 00:10:36.920
+<v John Egan>And the thing that makes something a whole company product
+
+131
+00:10:36.920 --> 00:10:37.820
+<v John Egan>really is that dashboard.
+
+132
+00:10:38.040 --> 00:10:39.720
+<v John Egan>So that even if you're not a participant
+
+133
+00:10:39.720 --> 00:10:41.060
+<v John Egan>in incident response,
+
+134
+00:10:41.340 --> 00:10:43.600
+<v John Egan>we wanted to make sure that frontline salesperson
+
+135
+00:10:43.820 --> 00:10:49.220
+<v John Egan>PR, marketing, CEO, everyone could go in and see what was happening. That was priority number one.
+
+136
+00:10:49.340 --> 00:10:55.380
+<v John Egan>So that easily made the cut. The chat interface was a tougher decision. It was really weighing
+
+137
+00:10:55.380 --> 00:11:00.580
+<v John Egan>that versus having sort of a structured data input space, right? Where we just say, oh,
+
+138
+00:11:00.600 --> 00:11:04.380
+<v John Egan>maybe we'll just capture the data, right? We'll just give you a bunch of form fields to fill out,
+
+139
+00:11:04.820 --> 00:11:08.200
+<v John Egan>which is actually what a lot of other products kind of looked like that were coming into this
+
+140
+00:11:08.200 --> 00:11:13.780
+<v John Egan>space at the time. And we ultimately decided against it because of that point I made earlier,
+
+141
+00:11:14.140 --> 00:11:20.960
+<v John Egan>which was we really wanted the space to be alive. We wanted it to be the space that people go and
+
+142
+00:11:20.960 --> 00:11:25.140
+<v John Egan>interact, not just the space you go after the fact. And secondarily, we kind of walked through
+
+143
+00:11:25.140 --> 00:11:30.060
+<v John Egan>our values. And one of the really important ones was we wanted the barrier to filing incidents to
+
+144
+00:11:30.060 --> 00:11:35.200
+<v John Egan>be as low as possible, right? In the current world, if you have in the non-tooled world,
+
+145
+00:11:35.200 --> 00:11:38.020
+<v John Egan>If you have an incident response process, it probably looks like a wiki page.
+
+146
+00:11:38.180 --> 00:11:41.240
+<v John Egan>And it's probably a really scary wiki page, right?
+
+147
+00:11:41.340 --> 00:11:43.220
+<v John Egan>It's like, or a Notion doc.
+
+148
+00:11:43.420 --> 00:11:47.800
+<v John Egan>You know, it's like, here's the 500 steps we follow when we have a major incident, right?
+
+149
+00:11:48.100 --> 00:11:48.860
+<v John Egan>Terrifying stuff.
+
+150
+00:11:50.380 --> 00:11:55.520
+<v John Egan>And when your incident response product looks like a bunch of structured data, it's very
+
+151
+00:11:55.520 --> 00:11:56.220
+<v John Egan>similar to that.
+
+152
+00:11:56.320 --> 00:12:00.140
+<v John Egan>It's like, here's all the things you're going to fill out if you file an incident.
+
+153
+00:12:00.460 --> 00:12:03.900
+<v John Egan>And the natural reaction to that is, I don't want to file an incident, right?
+
+154
+00:12:05.200 --> 00:12:08.680
+<v John Egan>in here. But the reality of the space and what we've learned, you know, at Facebook and what
+
+155
+00:12:08.680 --> 00:12:12.980
+<v John Egan>Google knows and Netflix knows is that you actually want as many of these things as possible
+
+156
+00:12:12.980 --> 00:12:17.120
+<v John Egan>getting filed because then you'll catch them sooner because your barrier is lower. You'll
+
+157
+00:12:17.120 --> 00:12:21.940
+<v John Egan>catch them at the SEV3 and the SEV2 level instead of waiting until your entire site's gone down and
+
+158
+00:12:21.940 --> 00:12:27.560
+<v John Egan>your whole business is at risk. And so we sort of made that decision straight out of the gate
+
+159
+00:12:27.560 --> 00:12:30.740
+<v John Egan>on the MVP. We said, okay, we're just going to do it. We're going to go build a collaborative space.
+
+160
+00:12:31.000 --> 00:12:34.300
+<v John Egan>We're going to make sure all the conversation information is logged. And then we're going to
+
+161
+00:12:35.200 --> 00:12:38.840
+<v John Egan>that farther down the road in terms of capturing important moments and making sure they're
+
+162
+00:12:38.840 --> 00:12:39.900
+<v John Egan>pushing into the postmortem.
+
+163
+00:12:39.980 --> 00:12:45.320
+<v John Egan>And we're going to benefit from that by giving people an easier to use, more familiar experience.
+
+164
+00:12:46.220 --> 00:12:51.320
+<v John Egan>In fact, when we launched the MVP and TechCrunch picked it up, the first piece of sort of backhanded
+
+165
+00:12:51.320 --> 00:12:55.980
+<v John Egan>compliment we got on Hacker News was, wow, this visually kind of looks like Facebook
+
+166
+00:12:55.980 --> 00:12:56.560
+<v John Egan>or something.
+
+167
+00:12:56.760 --> 00:12:58.600
+<v John Egan>And we took that as a compliment.
+
+168
+00:12:58.700 --> 00:13:02.240
+<v John Egan>We were like, good, it should feel like something that isn't scary.
+
+169
+00:13:02.240 --> 00:13:06.740
+<v John Egan>It shouldn't feel like, you know, the tool you roll out to three or four SREs.
+
+170
+00:13:08.920 --> 00:13:11.160
+<v Noah Labhart>So, okay, you've got your MVP, right?
+
+171
+00:13:11.340 --> 00:13:15.680
+<v Noah Labhart>And how did you progress the product from there and how did you mature it?
+
+172
+00:13:15.720 --> 00:13:19.500
+<v Noah Labhart>And you kind of mentioned it earlier with the, okay, now you've got to integrate it with Slack, right?
+
+173
+00:13:19.580 --> 00:13:24.500
+<v Noah Labhart>But even further and to give it a little more context, how did you build your roadmap?
+
+174
+00:13:24.700 --> 00:13:28.940
+<v Noah Labhart>And how did you decide, okay, this is the next most important thing to build?
+
+175
+00:13:30.020 --> 00:13:45.820
+<v John Egan>When you've got that first bit of product market fit and you've got your first customers and they start telling you what they want, right, which they'll do if you have any any degree of product market fit, you're going to get this just avalanche of feedback from from your customers.
+
+176
+00:13:45.820 --> 00:13:59.340
+<v John Egan>What's actually more important, I think, than having that short-term roadmap built in stone is having that longer-term vision for what you want your company to be and applying that backwards to the customer feedback.
+
+177
+00:14:00.300 --> 00:14:04.920
+<v John Egan>It's actually a pretty difficult thing to do because customers will ask you for really specific things.
+
+178
+00:14:05.220 --> 00:14:09.920
+<v John Egan>They'll come in and they'll say, there's no way for me to put this piece of structured data in.
+
+179
+00:14:10.040 --> 00:14:11.500
+<v John Egan>I want this piece of structured data.
+
+180
+00:14:11.540 --> 00:14:12.220
+<v John Egan>Can you add a field?
+
+181
+00:14:12.640 --> 00:14:14.360
+<v John Egan>And then you look at your long-term vision.
+
+182
+00:14:15.820 --> 00:14:19.840
+<v John Egan>term vision being we want entire organizations to be using Kintaba.
+
+183
+00:14:19.920 --> 00:14:23.900
+<v John Egan>We want everyone in the company to feel like it's an easy to use, comfortable experience.
+
+184
+00:14:24.280 --> 00:14:27.540
+<v John Egan>And we really don't like structured data because of that, right?
+
+185
+00:14:27.620 --> 00:14:31.760
+<v John Egan>We don't want to say, here are things that make it scarier, here are more input fields.
+
+186
+00:14:31.920 --> 00:14:35.100
+<v John Egan>So you have to translate those things over and say, okay, what's the answer?
+
+187
+00:14:35.260 --> 00:14:40.580
+<v John Egan>What would satisfy this thing the customer is asking for while meeting that longer term
+
+188
+00:14:40.580 --> 00:14:42.320
+<v John Egan>vision for what we want the company to become?
+
+189
+00:14:42.320 --> 00:14:46.560
+<v John Egan>come. And I think that really builds your short-term roadmap. You can actually kind of
+
+190
+00:14:46.560 --> 00:14:52.200
+<v John Egan>just put together lists of customer requests, map them to long-term company vision, and then like
+
+191
+00:14:52.200 --> 00:14:56.400
+<v John Egan>equals short-term roadmap because you're going to be resource constrained early on, right? You're
+
+192
+00:14:56.400 --> 00:15:00.780
+<v John Egan>going to have more of a problem of like, what do you have to cut out than anything else? And so
+
+193
+00:15:00.780 --> 00:15:04.640
+<v John Egan>you've got to be really careful with those decisions. And early on, you're really kind
+
+194
+00:15:04.640 --> 00:15:07.760
+<v John Egan>of looking at it like what's happening this month and what's happening in six years,
+
+195
+00:15:07.840 --> 00:15:11.900
+<v John Egan>right? There's like huge separation of distance, right? Anything in between that's fuzzy.
+
+196
+00:15:12.320 --> 00:15:14.780
+<v John Egan>Because you're going to learn a lot over that period.
+
+197
+00:15:14.880 --> 00:15:19.960
+<v John Egan>And if you make the mistake of working on things that will take you a month or two months to do,
+
+198
+00:15:20.100 --> 00:15:22.400
+<v John Egan>you're going to lose that attention from your customers.
+
+199
+00:15:22.480 --> 00:15:25.240
+<v John Egan>You're going to lose that beginning of excitement.
+
+200
+00:15:26.060 --> 00:15:27.160
+<v John Egan>And you're going to miss the mark.
+
+201
+00:15:28.700 --> 00:15:30.140
+<v Noah Labhart>Well, let's switch to team then.
+
+202
+00:15:30.260 --> 00:15:32.780
+<v Noah Labhart>So how did you go about building your team?
+
+203
+00:15:32.900 --> 00:15:37.700
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+204
+00:15:38.820 --> 00:15:45.440
+<v John Egan>so we started very small and and and we've stayed quite small um very purposefully uh i believe
+
+205
+00:15:45.440 --> 00:15:51.880
+<v John Egan>really strongly in hiring people and uh and and working with people who punch way above their
+
+206
+00:15:51.880 --> 00:15:58.640
+<v John Egan>weight from a standpoint of the amount of product and and and and effort they can put out uh day to
+
+207
+00:15:58.640 --> 00:16:02.740
+<v John Egan>day um and we do this without burnout you know we're not a 24-hour working company we're actually
+
+208
+00:16:02.740 --> 00:16:07.740
+<v John Egan>actually pretty strict around, you know, around around normal working hours. But, you know, when
+
+209
+00:16:07.740 --> 00:16:11.680
+<v John Egan>you're picking things like co founders, which is the first step to this, you're generally, you know,
+
+210
+00:16:11.680 --> 00:16:17.760
+<v John Egan>looking for folks who are willing to really just roll with the changes that are going to happen.
+
+211
+00:16:18.320 --> 00:16:22.540
+<v John Egan>In a large organization, it's easy to get feedback, you know, when you're when you're
+
+212
+00:16:22.540 --> 00:16:25.880
+<v John Egan>trying to find your footing. And it's one of the reasons big companies have trouble kind of doing
+
+213
+00:16:25.880 --> 00:16:30.720
+<v John Egan>major pivots is the organization thinks it's pointed one way and gets really hooked on that.
+
+214
+00:16:30.720 --> 00:16:48.980
+<v John Egan>And then like, if you need to pivot inside of that because of new information, it's tough. It's a, it's kind of a hit against everyone who's on the team and who's working. Whereas in, um, in startups, that's just day to day. You're going to say, wow, this thing we've been putting the entire say week into is like completely wrong. Burn the code. Let's go a different direction.
+
+215
+00:16:48.980 --> 00:16:54.100
+<v John Egan>So initially, that's kind of step one is folks who are really flexible.
+
+216
+00:16:54.260 --> 00:16:57.420
+<v John Egan>And Zach and Cole, my two co-founders, fit this bill perfectly.
+
+217
+00:16:57.580 --> 00:17:02.040
+<v John Egan>Zach and I ran a company together before, so we knew each other for a long time.
+
+218
+00:17:02.340 --> 00:17:04.940
+<v John Egan>Cole, we'd worked really closely with at Facebook.
+
+219
+00:17:05.440 --> 00:17:18.040
+<v John Egan>It was just a fantastic architect and really, really capable in terms of building, like I mentioned earlier, infrastructure that punches above its weight class that doesn't fall, even though it has a limited number of people behind it.
+
+220
+00:17:18.980 --> 00:17:20.080
+<v John Egan>I think that's like step one.
+
+221
+00:17:20.220 --> 00:17:21.900
+<v John Egan>Step two then is hiring.
+
+222
+00:17:21.980 --> 00:17:23.720
+<v John Egan>And hiring is really hard.
+
+223
+00:17:24.600 --> 00:17:30.500
+<v John Egan>You know, hiring, you talk to most founders and they'll generally kind of give you the
+
+224
+00:17:30.500 --> 00:17:31.800
+<v John Egan>current state of their team.
+
+225
+00:17:31.900 --> 00:17:33.460
+<v John Egan>And they'll say, yeah, we've hired the best.
+
+226
+00:17:33.620 --> 00:17:37.140
+<v John Egan>And they won't often talk about all the trouble they had getting to the best.
+
+227
+00:17:37.200 --> 00:17:44.380
+<v John Egan>Most founders I talk to go through a series of hires and then attrition immediately afterwards.
+
+228
+00:17:44.380 --> 00:17:48.640
+<v John Egan>afterwards. And we've gone through similar, you know, when we've tried to hire people in
+
+229
+00:17:48.640 --> 00:17:52.140
+<v John Egan>and fit them into the team and found that there's not a perfect fit or otherwise,
+
+230
+00:17:52.300 --> 00:17:57.260
+<v John Egan>getting to where we are now, we're really just starting to find our footing. And we still work
+
+231
+00:17:57.260 --> 00:18:03.460
+<v John Egan>really heavily with contractors because of how much we value the flexibility of the folks who
+
+232
+00:18:03.460 --> 00:18:08.740
+<v John Egan>we work with in terms of, you know, let's make sure this works really well. Let's make sure
+
+233
+00:18:08.740 --> 00:18:12.080
+<v John Egan>you're really on board. Let's make sure it's going to be the right fit before we'll kind of bring
+
+234
+00:18:12.080 --> 00:18:16.160
+<v John Egan>anyone on full time. So, you know, that that's really high level. It's kind of wishy-washy
+
+235
+00:18:16.160 --> 00:18:22.080
+<v John Egan>answer, but hiring in the early days is sort of wishy-washy. You're like 50% human relationship
+
+236
+00:18:22.080 --> 00:18:25.780
+<v John Egan>because you're going to have a very human relationship with these people. It's not going
+
+237
+00:18:25.780 --> 00:18:32.100
+<v John Egan>to be a manager employee relationship. Um, and then 50%, you know, technical capability, uh,
+
+238
+00:18:32.220 --> 00:18:38.300
+<v John Egan>and drive and alignment with vision. Um, and so testing for all of that is not a perfect science,
+
+239
+00:18:38.300 --> 00:18:44.980
+<v John Egan>science unfortunately and oftentimes you you need to get the person in before you learn whether or
+
+240
+00:18:44.980 --> 00:18:49.920
+<v John Egan>not it's going to be the right person um and there are a bunch of old blog posts from from startups
+
+241
+00:18:49.920 --> 00:18:53.880
+<v John Egan>where they had like hacky ways to do that and and a lot of those have kind of disappeared because
+
+242
+00:18:53.880 --> 00:18:58.640
+<v John Egan>it's you know it's questionable labor practices sometimes come in do a bunch of work and then you
+
+243
+00:18:58.640 --> 00:19:03.200
+<v John Egan>know we don't hire you we try not to do that um but but yeah that's sort of the approach we've
+
+244
+00:19:03.200 --> 00:19:07.780
+<v John Egan>generally taken is we we look for you know we really look for friends at this point i think
+
+245
+00:19:08.300 --> 00:19:12.040
+<v John Egan>to describe it. You want to work with your friends. I think I'd mentioned to you off camera
+
+246
+00:19:12.040 --> 00:19:16.840
+<v John Egan>before this a little bit that running a startup during the pandemic is a much more isolating
+
+247
+00:19:16.840 --> 00:19:22.200
+<v John Egan>experience than historically running a startup has been. Historically running a startup has been,
+
+248
+00:19:22.280 --> 00:19:28.660
+<v John Egan>we're all in a room together. Y Combinator used to be, you'd rent a room in Mountain View
+
+249
+00:19:28.660 --> 00:19:32.240
+<v John Egan>somewhere and that was your office, that was your home. Those were the people you lived with,
+
+250
+00:19:32.380 --> 00:19:36.340
+<v John Egan>they were the people you cooked with. It was a little boiler room of these things.
+
+251
+00:19:38.300 --> 00:19:38.900
+<v John Egan>Nowadays, it's not.
+
+252
+00:19:38.960 --> 00:19:41.740
+<v John Egan>Nowadays, it's a Slack room of these individuals.
+
+253
+00:19:42.020 --> 00:19:45.200
+<v John Egan>And I actually think the way you hire is starting to change because of that as well.
+
+254
+00:19:48.160 --> 00:19:49.780
+<v Noah Labhart>Let's switch to scalability.
+
+255
+00:19:50.000 --> 00:19:53.580
+<v Noah Labhart>And you answered this in your MVP answer.
+
+256
+00:19:53.840 --> 00:19:58.800
+<v Noah Labhart>But I want to give it full space because I want to understand your approach.
+
+257
+00:19:59.060 --> 00:20:02.460
+<v Noah Labhart>So did you build this to scale efficiently from day one?
+
+258
+00:20:02.560 --> 00:20:06.100
+<v Noah Labhart>Or are you fighting this as you grow and gain traction?
+
+259
+00:20:07.560 --> 00:20:13.180
+<v John Egan>direction. Kintaba has really been built for scale from day one. It was one of the things we did
+
+260
+00:20:13.180 --> 00:20:18.360
+<v John Egan>better with this startup than I think any other product or startup space I've worked in before.
+
+261
+00:20:19.120 --> 00:20:24.140
+<v John Egan>And it's really us standing on the shoulders of giants more than us being brilliant, right? The
+
+262
+00:20:24.140 --> 00:20:31.000
+<v John Egan>infrastructure that you build on, it's really become, you know, almost consistent across
+
+263
+00:20:31.000 --> 00:20:35.280
+<v John Egan>companies, like everyone's sort of building on the same stuff now. I remember when we built the
+
+264
+00:20:36.100 --> 00:20:41.000
+<v John Egan>you know, it was all a hodgepodge. I think Heroku had sort of just recently been acquired by
+
+265
+00:20:41.000 --> 00:20:45.260
+<v John Egan>Salesforce, if you want to do like timing, this was back in like 2013. And that was about the
+
+266
+00:20:45.260 --> 00:20:51.720
+<v John Egan>closest there was to sort of auto scalability. You were still kind of manually provisioning on AWS,
+
+267
+00:20:51.900 --> 00:20:55.340
+<v John Egan>and you were sort of managing your web servers, you were certainly managing your own security.
+
+268
+00:20:56.300 --> 00:21:00.940
+<v John Egan>These things are pretty scary. Whereas today, you know, if you want to go and build a pretty
+
+269
+00:21:00.940 --> 00:21:05.580
+<v John Egan>reliable and resilient stack, I'm not going to say it's easy, but it's reasonably well
+
+270
+00:21:06.480 --> 00:21:09.220
+<v John Egan>in terms of what you ought to go and build on.
+
+271
+00:21:09.380 --> 00:21:11.640
+<v John Egan>And we built, I think we chose some winners
+
+272
+00:21:11.640 --> 00:21:14.040
+<v John Egan>partially because of our experience with them,
+
+273
+00:21:14.100 --> 00:21:15.900
+<v John Egan>but also partially because that was
+
+274
+00:21:15.900 --> 00:21:17.960
+<v John Egan>kind of what you could read online.
+
+275
+00:21:18.200 --> 00:21:22.340
+<v John Egan>But Node and Next are just fantastic front-end experiences.
+
+276
+00:21:22.720 --> 00:21:25.800
+<v John Egan>And on the back-end, Kubernetes has a huge community behind it.
+
+277
+00:21:25.820 --> 00:21:26.600
+<v John Egan>It's well-supported.
+
+278
+00:21:26.740 --> 00:21:28.400
+<v John Egan>It was becoming even better supported
+
+279
+00:21:28.400 --> 00:21:30.680
+<v John Egan>at the time that we came onto it.
+
+280
+00:21:30.740 --> 00:21:34.240
+<v John Egan>I think Azure had just really started doing AKS successfully,
+
+281
+00:21:36.100 --> 00:21:44.020
+<v John Egan>top of. And these things really just kind of give us auto scaling out of the box. And so, you know,
+
+282
+00:21:44.020 --> 00:21:49.640
+<v John Egan>our outages very rarely look like scaling problems, which I think is in the old days,
+
+283
+00:21:49.700 --> 00:21:53.320
+<v John Egan>a lot of what our outages used to look like. The servers are falling over. We need to provision
+
+284
+00:21:53.320 --> 00:21:57.520
+<v John Egan>more servers. We need to get auto scaling working better. We need to get, you know, the load
+
+285
+00:21:57.520 --> 00:22:02.540
+<v John Egan>balancers back in shape. Like that's pretty rare to be our issues these days. These days, our issues
+
+286
+00:22:02.540 --> 00:22:08.580
+<v John Egan>are more around database migrations, which is a world that I think is still in its infancy.
+
+287
+00:22:09.140 --> 00:22:15.580
+<v John Egan>Scale from an infrastructure standpoint has not been as challenging with this company as I thought.
+
+288
+00:22:15.720 --> 00:22:21.060
+<v John Egan>Scaling the rest of the company, scaling the non-engineering side, has been incredibly
+
+289
+00:22:21.060 --> 00:22:30.540
+<v John Egan>challenging because that looks more like marketing and PR and sales and is it founder-led sales?
+
+290
+00:22:32.540 --> 00:22:33.440
+<v John Egan>Is it marketing-led sales?
+
+291
+00:22:33.620 --> 00:22:34.640
+<v John Egan>Is it product-led sales?
+
+292
+00:22:34.780 --> 00:22:36.460
+<v John Egan>When you're young, it's all of those things.
+
+293
+00:22:36.560 --> 00:22:39.540
+<v John Egan>That stuff's been pretty challenging for us.
+
+294
+00:22:40.560 --> 00:22:44.860
+<v John Egan>And maybe I'm just standing on Cole's shoulders here actually a little bit in that he's just
+
+295
+00:22:44.860 --> 00:22:50.460
+<v John Egan>done such a great job helping to do the architecture that I don't worry as much about the technical
+
+296
+00:22:50.460 --> 00:22:51.760
+<v John Egan>scaling as I used to.
+
+297
+00:22:52.120 --> 00:22:57.860
+<v John Egan>But I actually think one of the great things that's happened for startups is that we've
+
+298
+00:22:57.860 --> 00:23:02.280
+<v John Egan>gotten a lot of that initial architecture challenge off the table.
+
+299
+00:23:02.540 --> 00:23:07.160
+<v John Egan>that used to really keep people out, you know, used to cause the kinds of catastrophic outages
+
+300
+00:23:07.160 --> 00:23:13.920
+<v John Egan>that would kill companies early on. And now those happen later. I think, you know, you have to grow
+
+301
+00:23:13.920 --> 00:23:18.460
+<v John Egan>pretty significantly before you hit the point where that scale starts to really get in your way.
+
+302
+00:23:18.660 --> 00:23:23.360
+<v John Egan>And some SaaS companies, I think, will actually never hit it. You know, user numbers aren't in
+
+303
+00:23:23.360 --> 00:23:29.020
+<v John Egan>the billions generally with a B2B SaaS organization. And you've got to get pretty big before
+
+304
+00:23:29.020 --> 00:23:34.160
+<v John Egan>you hit the edges of what built-in infrastructure can handle. Or you're trying to do something like
+
+305
+00:23:34.800 --> 00:23:40.860
+<v John Egan>mitigate, manage your cost. Then you get in all kinds of challenging scale worlds. We're
+
+306
+00:23:40.860 --> 00:23:42.060
+<v John Egan>luckily not in that state.
+
+307
+00:23:43.480 --> 00:23:47.560
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've
+
+308
+00:23:47.560 --> 00:23:49.280
+<v Noah Labhart>built, what are you most proud of?
+
+309
+00:23:50.000 --> 00:23:53.960
+<v John Egan>This will sound sort of silly and self-serving. I'm really proud
+
+310
+00:23:53.960 --> 00:23:59.140
+<v John Egan>proud of the retention rate of this product. That's such a, that's such a like, like product
+
+311
+00:23:59.140 --> 00:24:04.120
+<v John Egan>manager kind of an answer. I'm like, I'm like, I'm getting a performance cycle review and I'm
+
+312
+00:24:04.120 --> 00:24:10.580
+<v John Egan>proud of it. But I, I really am. I think my, when you're a tools builder, you're really close to
+
+313
+00:24:10.580 --> 00:24:16.020
+<v John Egan>your customers. Um, especially, you know, working, working at like Facebook on internal tools,
+
+314
+00:24:16.180 --> 00:24:21.460
+<v John Egan>you, you see these people in person every day using your tools. And if they don't like it,
+
+315
+00:24:21.460 --> 00:24:25.940
+<v John Egan>you know, you get to see the frowns and the frustration and people are very open about
+
+316
+00:24:25.940 --> 00:24:30.360
+<v John Egan>the things that they dislike. I think, you know, I've done some work in the consumer space as well.
+
+317
+00:24:30.440 --> 00:24:35.340
+<v John Egan>And the consumer space, you don't actually get to get to see a lot of the reaction. There's,
+
+318
+00:24:35.340 --> 00:24:38.420
+<v John Egan>it's sort of all over the place. It's a little disconnected from you. You're kind of going,
+
+319
+00:24:38.500 --> 00:24:42.320
+<v John Egan>you know, world scale and you're not hearing emails back when things go badly,
+
+320
+00:24:42.420 --> 00:24:46.720
+<v John Egan>they're just churning. It's kind of a data point, but in SaaS, it's very personal,
+
+321
+00:24:46.720 --> 00:24:51.640
+<v John Egan>especially tooling. It's just a very personal relationship with customers. And they tell you
+
+322
+00:24:51.640 --> 00:24:58.900
+<v John Egan>every time they're unhappy. And so when I look at Kintaba, what I'm really happy with is just
+
+323
+00:24:58.900 --> 00:25:06.160
+<v John Egan>how successful it's been at getting companies engaged in the process of incident management
+
+324
+00:25:06.160 --> 00:25:11.580
+<v John Egan>and keeping them there. Because I think so many companies have tried to do incident management
+
+325
+00:25:11.580 --> 00:25:16.840
+<v John Egan>management and been unsuccessful. They've gone in, tried to roll it out. A couple people
+
+326
+00:25:16.840 --> 00:25:21.400
+<v John Egan>have adopted it. The culture didn't really take hold. The CTO didn't really get in. But
+
+327
+00:25:21.400 --> 00:25:26.320
+<v John Egan>I feel like this tool is really doing what we wanted it to do. It's propagating this
+
+328
+00:25:26.320 --> 00:25:31.800
+<v John Egan>culture of incident management, not just the tooling. And because of that, I think we're
+
+329
+00:25:31.800 --> 00:25:36.480
+<v John Egan>just seeing really interesting growth inside of our customers, like sort of growth across
+
+330
+00:25:36.480 --> 00:25:42.620
+<v John Egan>across the organization, as well as retention in terms of continuous use of this process that was,
+
+331
+00:25:42.680 --> 00:25:47.440
+<v John Egan>you know, pretty new to a lot of customers who brought it on. So I'm, you know, I'm really proud
+
+332
+00:25:47.440 --> 00:25:52.880
+<v John Egan>of that. And I think there's a big interesting future for incident management. And it only
+
+333
+00:25:52.880 --> 00:26:03.860
+<v John Egan>happens if people can not only adopt it, but like maintain that day-to-day practice of it.
+
+334
+00:26:03.860 --> 00:26:06.900
+<v John Egan>And so I'm really excited to see that happen with this product.
+
+335
+00:26:08.640 --> 00:26:10.180
+<v Noah Labhart>Let's flip the script a little bit.
+
+336
+00:26:10.320 --> 00:26:14.400
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+337
+00:26:15.940 --> 00:26:22.440
+<v John Egan>Things that we brought with us from our kind of earlier days of running companies and earlier
+
+338
+00:26:22.440 --> 00:26:30.120
+<v John Egan>days of working at unicorns like Facebook was sort of a penchant to ship really quickly,
+
+339
+00:26:30.710 --> 00:26:31.210
+<v John Egan>right?
+
+340
+00:26:31.000 --> 00:26:37.700
+<v John Egan>There's sort of this idea of move fast and break things that's existed in the startup world for an awfully long time.
+
+341
+00:26:37.900 --> 00:26:44.560
+<v John Egan>And it really served the lean startup world well, especially back in the early 2010s.
+
+342
+00:26:45.380 --> 00:26:52.600
+<v John Egan>And in the early days of Kentaba, we brought that with us in a way that I don't think was super great for the company.
+
+343
+00:26:52.600 --> 00:27:00.900
+<v John Egan>company. It let us get features out really fast, but our likelihood to cause breakage
+
+344
+00:27:00.900 --> 00:27:05.080
+<v John Egan>in other parts of the product due to rapid shipping were significantly higher than I
+
+345
+00:27:05.080 --> 00:27:08.500
+<v John Egan>would have liked them to be. We talk about our own incidents internally, right? Like
+
+346
+00:27:08.500 --> 00:27:13.280
+<v John Egan>how many SEV1s are we having? We use Kintaba internally. In the early days, they really
+
+347
+00:27:13.920 --> 00:27:20.400
+<v John Egan>spiked. And it took us a while to get comfortable with the fact that we needed to move just
+
+348
+00:27:20.400 --> 00:27:24.580
+<v John Egan>just a little bit slower when we were building and shipping in the early days.
+
+349
+00:27:25.640 --> 00:27:29.960
+<v John Egan>Because again, mapping back to what I'd said earlier, where I said, you know, we wanted people
+
+350
+00:27:29.960 --> 00:27:33.560
+<v John Egan>to pay us straight out of the gate. We wanted to see that growth inside of the company straight
+
+351
+00:27:33.560 --> 00:27:39.220
+<v John Egan>out of the gate. Like those two boxes were checked. They aren't super compatible with,
+
+352
+00:27:39.280 --> 00:27:44.500
+<v John Egan>and the product becomes fragile, you know, at moments that the customer isn't expecting.
+
+353
+00:27:44.800 --> 00:27:48.060
+<v John Egan>And I think our early customers, you know, suffered a little bit with us,
+
+354
+00:27:48.060 --> 00:27:56.340
+<v John Egan>more than they probably needed to before we realized that there's safer ways to ship.
+
+355
+00:27:56.620 --> 00:27:58.460
+<v John Egan>We needed to get our unit tests in order.
+
+356
+00:27:58.560 --> 00:28:01.940
+<v John Egan>We needed to get our staging environments in order and properly testing.
+
+357
+00:28:02.060 --> 00:28:05.840
+<v John Egan>We needed to get more fallback and resiliency into our code.
+
+358
+00:28:06.080 --> 00:28:13.260
+<v John Egan>And I think that it took us a little bit longer than I would have liked to admit that that
+
+359
+00:28:13.260 --> 00:28:16.240
+<v John Egan>was a problem, not a feature of the company.
+
+360
+00:28:18.060 --> 00:28:31.460
+<v John Egan>And I think figuring that out was hugely valuable for us and getting us into sort of a more resilient state, not just from a base code competency standpoint, but also from like a cross feature stability standpoint.
+
+361
+00:28:32.300 --> 00:28:39.140
+<v John Egan>Which is a tough thing to measure when you're rolling out a tool that has a lot of sub features and a lot of capabilities, which we were shipping quickly.
+
+362
+00:28:39.140 --> 00:28:43.260
+<v John Egan>quickly, like measuring stability across the product.
+
+363
+00:28:43.520 --> 00:28:47.520
+<v John Egan>You know, we had luckily like a little intercom widget in the corner where if things went
+
+364
+00:28:47.520 --> 00:28:50.180
+<v John Egan>badly, you could really yell directly at the team.
+
+365
+00:28:50.240 --> 00:28:51.080
+<v John Egan>You could say, this isn't working.
+
+366
+00:28:51.280 --> 00:28:54.620
+<v John Egan>And we were all on the intercom threads, you know, managing it.
+
+367
+00:28:54.900 --> 00:28:58.880
+<v John Egan>But, you know, if I look back and I were doing it again, I think I would have put a little
+
+368
+00:28:58.880 --> 00:29:06.240
+<v John Egan>bit more attention towards, you know, making sure that the shipping process, the sort of
+
+369
+00:29:06.240 --> 00:29:13.640
+<v John Egan>release process was better managed from day one. You know, how often do we ship? Is it predictable?
+
+370
+00:29:13.880 --> 00:29:18.540
+<v John Egan>When do we do the cut? You know, even things like that, I think were, could have been pretty
+
+371
+00:29:18.540 --> 00:29:23.720
+<v John Egan>easily put together early, but we were really wired to like, you know, old school lean startup,
+
+372
+00:29:23.800 --> 00:29:28.820
+<v John Egan>like ship it, just ship it, just push the button. And it took us a little bit, I think, to get our
+
+373
+00:29:28.820 --> 00:29:34.540
+<v John Egan>heads back in the right spot there to make sure that, you know, we were shipping safely
+
+374
+00:29:36.240 --> 00:29:39.540
+<v John Egan>each week, which is about, you know, we sometimes ship more than each week,
+
+375
+00:29:39.580 --> 00:29:42.420
+<v John Egan>but these days we ship about once a week, which is where we found the sweet spot.
+
+376
+00:29:46.020 --> 00:29:48.920
+<v Noah Labhart>Well, what does the future look like for the product and for your team?
+
+377
+00:29:50.840 --> 00:29:56.640
+<v John Egan>I think you can look at incident management as a spectrum that could go one of two ways.
+
+378
+00:29:56.960 --> 00:30:01.180
+<v John Egan>To the right, you move deeper and deeper into the technical side of things,
+
+379
+00:30:01.180 --> 00:30:17.080
+<v John Egan>You get closer and closer to SRE, you start to become a more expansive reporting platform and technical platform for a smaller group of people in the company.
+
+380
+00:30:17.320 --> 00:30:19.280
+<v John Egan>I think that's one direction it could go.
+
+381
+00:30:19.880 --> 00:30:22.760
+<v John Egan>And I actually have seen some competitors move in that space.
+
+382
+00:30:22.980 --> 00:30:24.260
+<v John Egan>I won't name names.
+
+383
+00:30:24.480 --> 00:30:28.660
+<v John Egan>But I think that's one version of what incident management becomes.
+
+384
+00:30:28.660 --> 00:30:40.540
+<v John Egan>We are wholly involved in the idea that there's a shift left opportunity for incident management, which is moving closer to the customer and the customer being our customer's customer.
+
+385
+00:30:40.540 --> 00:31:01.720
+<v John Egan>Right. How do you pull incidents closer and closer to the reporting source, which is oftentimes the customer who tells you when something's going wrong in a way that it's never gone wrong before? And how do you involve more of the organization in the incident process so that they can benefit from it, not just the technical organization?
+
+386
+00:31:01.720 --> 00:31:12.360
+<v John Egan>So I get really happy when I see here have customers come to me and tell me, oh, you know, we used incident management the other week for, you know, for a power outage at an office.
+
+387
+00:31:12.680 --> 00:31:17.140
+<v John Egan>You know, not because it took the site down, but because our employees were at risk and we wanted to make sure they were comfortable.
+
+388
+00:31:17.240 --> 00:31:19.040
+<v John Egan>But we're not sure if we can use Kintaba that way.
+
+389
+00:31:19.240 --> 00:31:22.860
+<v John Egan>And we'd come back and we'd say, of course, that's the way you need to use it.
+
+390
+00:31:22.900 --> 00:31:26.760
+<v John Egan>This is incident management isn't actually a technical practice.
+
+391
+00:31:27.440 --> 00:31:28.980
+<v John Egan>It's a human practice.
+
+392
+00:31:28.980 --> 00:31:43.920
+<v John Egan>And I think where Kintaba is most successful long term is it becomes a natural tool for the entire organization to use that lives somewhere close to your sort of task and project management space.
+
+393
+00:31:44.200 --> 00:31:55.580
+<v John Egan>And just over the line where you say these aren't planned things, these are unplanned, high importance tasks and actions we need to take to deal with a measurable critical situation.
+
+394
+00:31:55.580 --> 00:32:04.860
+<v John Egan>And if you describe it that way, suddenly it's relevant to sales, marketing, PR, legal, C-suite, and engineering.
+
+395
+00:32:05.200 --> 00:32:10.540
+<v John Egan>And this is something we saw at Facebook work really well and that I really want to bring to the rest of the world.
+
+396
+00:32:10.700 --> 00:32:12.760
+<v John Egan>And the future for Kintaba looks like that to me.
+
+397
+00:32:12.800 --> 00:32:24.720
+<v John Egan>It looks like a company-wide tool that's valuable to everyone in the organization, where incidents are being caught earlier and earlier for various types of practices.
+
+398
+00:32:25.580 --> 00:32:28.940
+<v John Egan>bringing resilience to everyone, not just resilience to your technical organization,
+
+399
+00:32:29.160 --> 00:32:32.540
+<v John Egan>but resilience to your PR organization, resilience to your sales organization.
+
+400
+00:32:33.540 --> 00:32:40.240
+<v John Egan>I don't think that the process steps in incident management are unique to technical folks. And I
+
+401
+00:32:40.240 --> 00:32:44.920
+<v John Egan>think that that's pretty, that's the really interesting future that kind of got me into
+
+402
+00:32:44.920 --> 00:32:47.680
+<v John Egan>the space in the first place and that I think remains our North Star.
+
+403
+00:32:48.840 --> 00:32:54.360
+<v Noah Labhart>So, John, it sounds like you're doing really interesting and different things. You're taking
+
+404
+00:32:55.780 --> 00:33:00.540
+<v Noah Labhart>into the sort of industry of incident management, so to speak.
+
+405
+00:33:00.760 --> 00:33:04.740
+<v Noah Labhart>I'm curious, what is the community like in that world?
+
+406
+00:33:05.140 --> 00:33:09.100
+<v Noah Labhart>How does the community take shape, form, and what does that look like?
+
+407
+00:33:10.320 --> 00:33:14.080
+<v John Egan>So it's a very young and just-forming community.
+
+408
+00:33:14.860 --> 00:33:19.040
+<v John Egan>In fact, if you stand in front of a room of folks from a company and you say,
+
+409
+00:33:19.120 --> 00:33:20.620
+<v John Egan>who here is involved in incident management?
+
+410
+00:33:20.920 --> 00:33:23.440
+<v John Egan>I don't think you'll see too many hands go up, right?
+
+411
+00:33:23.500 --> 00:33:24.500
+<v John Egan>It's sort of a strange question.
+
+412
+00:33:25.580 --> 00:33:30.120
+<v John Egan>though, if you ask that same room, who here has ever been a responder to an incident? Who here
+
+413
+00:33:30.120 --> 00:33:35.720
+<v John Egan>has ever had to deal with a major outage or a fire? Suddenly all the hands go up. And so we
+
+414
+00:33:35.720 --> 00:33:39.640
+<v John Egan>actually noticed there wasn't really a way for these folks to come together. And we've been
+
+415
+00:33:39.640 --> 00:33:45.040
+<v John Egan>looking for ways to build this community and connect these people more successfully. And so
+
+416
+00:33:45.040 --> 00:33:49.780
+<v John Egan>we're actually putting a conference together. It's called IRConf. And it's really the first
+
+417
+00:33:49.780 --> 00:33:55.080
+<v John Egan>first incident responder focused conference. And it's really cool. We're bringing folks in from,
+
+418
+00:33:55.120 --> 00:34:00.700
+<v John Egan>from, from industry, uh, you know, from companies like Honeycomb, like 1Password, um, to come in
+
+419
+00:34:00.700 --> 00:34:05.900
+<v John Egan>and just talk about, you know, what do you do when things go badly? How do you manage it at your
+
+420
+00:34:05.900 --> 00:34:10.620
+<v John Egan>company? Um, we've got talks about it at scale. We've got talks about it from a cultural standpoint.
+
+421
+00:34:11.060 --> 00:34:17.980
+<v John Egan>Um, and it's really exciting. It's incident, uh, it's irconf.io. Um, and, uh, and it's April 1st.
+
+422
+00:34:19.780 --> 00:34:24.560
+<v John Egan>April Fool's Day joke actually happening. But yeah, we're really still looking for ways to
+
+423
+00:34:24.560 --> 00:34:29.100
+<v John Egan>bring that community together and get them connected. Because when a space like this is
+
+424
+00:34:29.100 --> 00:34:34.260
+<v John Egan>in its infancy, like finding the community and helping people feel like others are going through
+
+425
+00:34:34.260 --> 00:34:40.580
+<v John Egan>the same challenges they are, is really just critical, right? You want this idea of every
+
+426
+00:34:40.580 --> 00:34:45.620
+<v John Egan>company is on fire, not just mine. The more that propagates, I think the more successful we'll all
+
+427
+00:34:45.620 --> 00:34:46.820
+<v John Egan>be at dealing with those fires.
+
+428
+00:34:47.740 --> 00:34:51.460
+<v Noah Labhart>Well, let's switch to you, John. Who influences the way that you work?
+
+429
+00:34:51.580 --> 00:34:55.980
+<v Noah Labhart>I mean, a CEO, a CTO, an architect, really any person that you look up to and why?
+
+430
+00:34:57.560 --> 00:35:01.580
+<v John Egan>I've got some sort of traditional influencers. I mean, going through Y Combinator, folks like
+
+431
+00:35:01.580 --> 00:35:07.520
+<v John Egan>Paul Graham, and really the entire Y Combinator founder family, who I stay very connected to,
+
+432
+00:35:07.520 --> 00:35:11.480
+<v John Egan>has always been kind of a group of powerful influencers.
+
+433
+00:35:11.820 --> 00:35:15.440
+<v John Egan>I think, you know, as it ages,
+
+434
+00:35:15.660 --> 00:35:18.960
+<v John Egan>people look at Y Combinator in a different light than they used to.
+
+435
+00:35:19.160 --> 00:35:22.920
+<v John Egan>But for a long time, it was very much a disruption.
+
+436
+00:35:23.100 --> 00:35:24.640
+<v John Egan>It was very much a different attitude.
+
+437
+00:35:24.900 --> 00:35:30.440
+<v John Egan>It was the attitude that really anyone can figure out how to build companies
+
+438
+00:35:30.440 --> 00:35:34.680
+<v John Egan>and anyone can come into any space to apply their capabilities
+
+439
+00:35:34.680 --> 00:35:39.120
+<v John Egan>capabilities as long as they're intelligent, driven, and have technical capabilities. That
+
+440
+00:35:39.120 --> 00:35:42.520
+<v John Egan>was sort of the base, right? You need an engineer, everything else you can learn.
+
+441
+00:35:43.160 --> 00:35:48.340
+<v John Egan>I still really believe that. You know, coming into incident management, you know, building a B2B SaaS
+
+442
+00:35:49.120 --> 00:35:53.400
+<v John Egan>startup like this, to me, felt like a bit of a reach as we started to plan it, and then felt
+
+443
+00:35:53.400 --> 00:35:56.660
+<v John Egan>natural afterwards. We said, well, we'll figure it out. You know, we'll meet the right people,
+
+444
+00:35:56.740 --> 00:36:02.680
+<v John Egan>we'll build, we'll learn, and hopefully we'll be better for that. CEOs who really influenced me,
+
+445
+00:36:04.680 --> 00:36:11.520
+<v John Egan>like actually like Devin Finzer over at OpenSea, which is which is a crypto startup, has always
+
+446
+00:36:11.520 --> 00:36:17.800
+<v John Egan>been a good friend and pretty influential on me. You know, he ran people think of crypto and NFTs
+
+447
+00:36:17.800 --> 00:36:21.900
+<v John Egan>now as this big, you know, massive, successful space, billions of dollars. OpenSea has raised
+
+448
+00:36:21.900 --> 00:36:26.660
+<v John Egan>all this money. But, you know, we knew them really well back when it was something that no one cared
+
+449
+00:36:26.660 --> 00:36:31.160
+<v John Egan>about, you know, where you would shop the idea of NFTs up and down Sand Hill Road for investment
+
+450
+00:36:31.160 --> 00:36:32.520
+<v John Egan>and everyone would laugh you out the door.
+
+451
+00:36:33.400 --> 00:36:36.040
+<v John Egan>But they held on, you know, and they held on really hard.
+
+452
+00:36:36.260 --> 00:36:38.360
+<v John Egan>And then they're now getting the spoils of that.
+
+453
+00:36:38.540 --> 00:36:43.440
+<v John Egan>And I think that that's incredible to be a CEO in a space that's unproven
+
+454
+00:36:43.960 --> 00:36:49.080
+<v John Egan>and to just, you know, grip that thing tightly and say this vision is going to come true.
+
+455
+00:36:49.980 --> 00:36:50.880
+<v John Egan>Really, really amazing.
+
+456
+00:36:51.200 --> 00:36:54.200
+<v John Egan>And then the third CEO is Guillermo over at Vercel,
+
+457
+00:36:54.720 --> 00:36:59.860
+<v John Egan>who's just done a fantastic job of being a community practitioner in a way that I wish I could be.
+
+458
+00:37:01.160 --> 00:37:04.840
+<v John Egan>that he interacts with his community and has helped to build and grow next.
+
+459
+00:37:05.600 --> 00:37:07.920
+<v John Egan>And ultimately ZEIT, which became Vercel.
+
+460
+00:37:08.320 --> 00:37:14.080
+<v John Egan>It's just incredible to me as a founder and has always been a powerful influencer.
+
+461
+00:37:14.340 --> 00:37:20.000
+<v John Egan>So those three folks have been sort of influential in my day-to-day over the last decade of my life.
+
+462
+00:37:21.920 --> 00:37:24.940
+<v Noah Labhart>We talked about a mistake earlier, but a little bit different spin.
+
+463
+00:37:25.220 --> 00:37:28.240
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+464
+00:37:28.240 --> 00:37:31.180
+<v Noah Labhart>or where would you consider taking a different approach?
+
+465
+00:37:32.020 --> 00:37:34.580
+<v John Egan>I think if I could give advice to myself,
+
+466
+00:37:34.800 --> 00:37:37.640
+<v John Egan>I guess is sort of what that question is, right?
+
+467
+00:37:37.780 --> 00:37:39.520
+<v John Egan>Like back in the early days.
+
+468
+00:37:41.660 --> 00:37:46.140
+<v John Egan>I would continue to push really hard
+
+469
+00:37:46.140 --> 00:37:48.860
+<v John Egan>on the idea of like avoiding fear.
+
+470
+00:37:49.700 --> 00:37:53.580
+<v John Egan>It's really scary running a company.
+
+471
+00:37:54.480 --> 00:37:56.200
+<v John Egan>Founders don't get to talk about it much
+
+472
+00:37:56.200 --> 00:38:01.760
+<v John Egan>because there's a survivorship bias where no matter how scary it gets,
+
+473
+00:38:02.280 --> 00:38:05.660
+<v John Egan>if you're ultimately successful, you forget all the scary stuff, right?
+
+474
+00:38:06.020 --> 00:38:10.500
+<v John Egan>Someone told me when we were having a child, there's a biological imprint on parents
+
+475
+00:38:10.500 --> 00:38:14.440
+<v John Egan>where after like the first year, their minds start to erase everything that happened
+
+476
+00:38:14.440 --> 00:38:17.860
+<v John Egan>because if it didn't do that, people would never have more kids, right?
+
+477
+00:38:17.920 --> 00:38:20.040
+<v John Egan>If you didn't forget about all the really hard and the hard stuff.
+
+478
+00:38:20.660 --> 00:38:23.720
+<v John Egan>But startups, especially if you're new to the space,
+
+479
+00:38:23.720 --> 00:38:30.080
+<v John Egan>You know, I don't come from a line of high-tech startup founders, right?
+
+480
+00:38:30.160 --> 00:38:31.980
+<v John Egan>I mean, this was a very new space to me.
+
+481
+00:38:32.080 --> 00:38:37.820
+<v John Egan>And the idea of bringing on money from other people, potentially losing it, you know, really kept me up at night.
+
+482
+00:38:38.020 --> 00:38:39.380
+<v John Egan>Still does keep me up at night.
+
+483
+00:38:39.380 --> 00:38:53.640
+<v John Egan>But the really great founders, the really great companies are able to focus on the fact that your goals for what you're building are far more valuable and interesting than the money.
+
+484
+00:38:53.720 --> 00:39:00.740
+<v John Egan>And being afraid of the money or being afraid of spending it or being afraid of losing can really paralyze you.
+
+485
+00:39:00.940 --> 00:39:08.340
+<v John Egan>I mean, I've seen it in other founders. I've seen it myself, especially in my first company in terms of like fear of loss and fear of failure.
+
+486
+00:39:09.380 --> 00:39:13.700
+<v John Egan>And so I'd take bigger bets in all cases and everything I've ever done.
+
+487
+00:39:13.880 --> 00:39:16.480
+<v John Egan>I would take the bet that I was making and I would 10x it.
+
+488
+00:39:16.800 --> 00:39:29.940
+<v John Egan>I would say, you know, in the early days of building out Caffeinated Mind, which did the high speed data transport, you know, when we were trying to build into the media industry, I'd say, well, what would it have taken to go and build and become high speed data transport for five industries?
+
+489
+00:39:30.120 --> 00:39:31.900
+<v John Egan>Not like one and a half.
+
+490
+00:39:33.040 --> 00:39:38.560
+<v John Egan>And I try to do that today in terms of incident management, which is, you know, how do we not just be for SRE?
+
+491
+00:39:39.460 --> 00:39:47.640
+<v John Egan>everyone. And so I would pull that back as far as I could to as early state, as early days as I could
+
+492
+00:39:48.220 --> 00:39:54.320
+<v John Egan>and, and make, make more and more aggressive actions. Because if it, if it doesn't work,
+
+493
+00:39:54.420 --> 00:39:58.740
+<v John Egan>you're better off not working when you're shooting for the highest moon you can find,
+
+494
+00:39:58.820 --> 00:40:04.260
+<v John Egan>you know, then you are, you know, falling apart when you never really even took the biggest stab
+
+495
+00:40:04.260 --> 00:40:05.000
+<v John Egan>have you could have had it.
+
+496
+00:40:06.280 --> 00:40:09.780
+<v Noah Labhart>Well, last question, John. So you're getting on a plane and you're
+
+497
+00:40:09.780 --> 00:40:14.600
+<v Noah Labhart>sitting next to a young entrepreneur who's built the next big thing. They're jazzed about it. They
+
+498
+00:40:14.600 --> 00:40:17.540
+<v Noah Labhart>can't wait to show it off to the world. They can't wait to show it off to you right there on the
+
+499
+00:40:17.540 --> 00:40:21.480
+<v Noah Labhart>plane. What advice do you give that person having gone down this road a bit?
+
+500
+00:40:24.120 --> 00:40:25.260
+<v John Egan>As you come into this
+
+501
+00:40:25.260 --> 00:40:30.700
+<v John Egan>space, as you're like entering into it in terms of the thing you've built, bringing it to the world,
+
+502
+00:40:30.700 --> 00:40:39.500
+<v John Egan>you need to take it as a given that the way you're going to learn as a builder is by being wrong.
+
+503
+00:40:40.960 --> 00:40:47.060
+<v John Egan>And it means that you're going to have to be wrong a lot. And it's okay that the things you're
+
+504
+00:40:47.060 --> 00:40:52.400
+<v John Egan>building right now might not hit the way you want them to. What's critical is that you learn
+
+505
+00:40:52.400 --> 00:40:59.680
+<v John Egan>from the bits of success inside of that, and then you find ways to aggressively leverage it.
+
+506
+00:41:00.700 --> 00:41:01.840
+<v John Egan>That's what you want to do.
+
+507
+00:41:02.120 --> 00:41:04.820
+<v John Egan>We talk about how VCs operate, right?
+
+508
+00:41:04.880 --> 00:41:09.480
+<v John Egan>They operate in this idea that they make 40 investments and only one needs to work, right?
+
+509
+00:41:09.520 --> 00:41:13.780
+<v John Egan>Because if the one works, that outsized success takes everything else down.
+
+510
+00:41:13.840 --> 00:41:15.700
+<v John Egan>Founders need to kind of operate the same way.
+
+511
+00:41:16.040 --> 00:41:22.880
+<v John Egan>You need to be able to make large numbers of small bets inside of your large vision.
+
+512
+00:41:22.880 --> 00:41:33.020
+<v John Egan>And when you find the one that kind of sticks, leverage it to get that thousand X return on it so that your bigger vision actually reaches the goals that you're trying to reach.
+
+513
+00:41:33.720 --> 00:41:43.980
+<v John Egan>You know, I meet a lot of founders early on who are overly subscribed to a very discrete part of a larger vision.
+
+514
+00:41:44.460 --> 00:41:47.820
+<v John Egan>And because of it, they disappear very quickly.
+
+515
+00:41:47.820 --> 00:41:55.340
+<v John Egan>They come in, that discrete test doesn't really hit the way they wanted it to, and they say, okay, this large vision is impossible, and they move on and do something else.
+
+516
+00:41:55.340 --> 00:41:56.300
+<v John Egan>They get a job somewhere else.
+
+517
+00:41:57.420 --> 00:42:01.560
+<v John Egan>I think that's critical feedback that founders don't often get in the early days.
+
+518
+00:42:01.620 --> 00:42:09.220
+<v John Egan>We often get the kind of fail fast idea, but it's very rarely put in the context of you want to fail fast on small things as aggressively as possible.
+
+519
+00:42:09.220 --> 00:42:13.340
+<v John Egan>just make sure you really believe in the big vision that you're trying to work towards
+
+520
+00:42:13.340 --> 00:42:20.980
+<v John Egan>so that you can get that um you know that outsized benefit from when you make it successful it's kind
+
+521
+00:42:20.980 --> 00:42:24.540
+<v John Egan>of a weird way to phrase it but i think that that's that's that's sort of the the advice i'd
+
+522
+00:42:24.540 --> 00:42:28.680
+<v John Egan>want to be given um i think that's what i'd sort of i'd tell another founder as well
+
+523
+00:42:28.680 --> 00:42:29.620
+<v Noah Labhart>that's great
+
+524
+00:42:29.620 --> 00:42:34.860
+<v Noah Labhart>advice well john thank you for being on the show today thank you for telling the creation story of
+
+525
+00:42:34.860 --> 00:42:35.360
+<v Noah Labhart>Kintaba.
+
+526
+00:42:36.860 --> 00:42:37.700
+<v John Egan>Great, thanks.
+
+527
+00:42:39.020 --> 00:42:40.940
+<v Noah Labhart>And this concludes another chapter
+
+528
+00:42:40.940 --> 00:42:42.020
+<v Noah Labhart>of Code Story.
+
+529
+00:42:45.840 --> 00:42:47.000
+<v Noah Labhart>Code Story is
+
+530
+00:42:47.000 --> 00:42:48.900
+<v Noah Labhart>hosted and produced by Noah Labhart.
+
+531
+00:42:49.020 --> 00:42:51.400
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts,
+
+532
+00:42:51.400 --> 00:42:53.120
+<v Noah Labhart>Spotify, or the podcasting app
+
+533
+00:42:53.120 --> 00:42:55.140
+<v Noah Labhart>of your choice. Support the show
+
+534
+00:42:55.140 --> 00:42:56.860
+<v Noah Labhart>on Patreon.com slash
+
+535
+00:42:56.860 --> 00:42:59.280
+<v Noah Labhart>Code Story for just $5 to $10 a month.
+
+536
+00:42:59.620 --> 00:43:01.080
+<v Noah Labhart>And when you get a chance,
+
+537
+00:43:01.120 --> 00:43:02.960
+<v Noah Labhart>leave us a review. Both things
+
+538
+00:43:02.960 --> 00:43:04.080
+<v Noah Labhart>help us out tremendously.
+
+539
+00:43:06.520 --> 00:43:08.000
+<v Noah Labhart>and thanks again for listening.

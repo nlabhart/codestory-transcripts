@@ -1,0 +1,1071 @@
+WEBVTT
+
+NOTE S10 E8: From Cisco Meraki and Splunk to Fixing Privilege Sprawl: Why Treating Identity as a Static One-Time Login Invites Cloud Catastrophe with Shashwat Sehgal, Co-Founder & CEO of P0 Security
+
+1
+00:00:00.000 --> 00:00:11.620
+<v Shashwat Sehgal>Our very first deployable version of a product which we put in the hands of an actual customer was probably within three months of when we started.
+
+2
+00:00:11.880 --> 00:00:25.080
+<v Shashwat Sehgal>By February of 2023, we had our first customer deployment. It worked, thankfully, and we were able to close that customer contract by March or April of 2023.
+
+3
+00:00:25.080 --> 00:00:38.160
+<v Shashwat Sehgal>And ever since then, it's been a stream of, okay, let's find another customer that looks like the last customer we closed and make sure the MVP works for their specific environment.
+
+4
+00:00:39.120 --> 00:00:43.640
+<v Shashwat Sehgal>I'm Shashwat Sehgal. I'm the co-founder and CEO at P0 Security.
+
+5
+00:00:46.540 --> 00:00:52.200
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+6
+00:00:52.320 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+7
+00:00:55.300 --> 00:00:58.080
+<v Noah Labhart>who share what it takes to change an industry.
+
+8
+00:00:58.260 --> 00:01:01.220
+<v Clip>It took many goes to get right.
+
+9
+00:01:01.820 --> 00:01:04.540
+<v Noah Labhart>Who built the teams that have their back.
+
+10
+00:01:04.880 --> 00:01:06.120
+<v Clip>The company is its people.
+
+11
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+12
+00:01:07.440 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+13
+00:01:08.900 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+14
+00:01:11.460 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+15
+00:01:12.860 --> 00:01:14.200
+<v Clip>Yes, we've been fighting it as a group.
+
+16
+00:01:14.440 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+17
+00:01:15.500 --> 00:01:17.800
+<v Noah Labhart>The stories you don't read in the headlines.
+
+18
+00:01:18.240 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+19
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+20
+00:01:22.100 --> 00:01:22.700
+<v Clip>to
+
+21
+00:01:22.700 --> 00:01:25.860
+<v Noah Labhart>ride the ups and downs of the startup life.
+
+22
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+23
+00:01:27.640 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+24
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+25
+00:01:32.240 --> 00:01:33.840
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+26
+00:01:33.980 --> 00:01:39.380
+<v Noah Labhart>And today, how Shashwat Sehgal is helping you secure cloud access in minutes
+
+27
+00:01:39.380 --> 00:01:43.880
+<v Noah Labhart>by securing and governing all forms of cloud identity.
+
+28
+00:01:49.480 --> 00:01:53.760
+<v Noah Labhart>Shashwat Sehgal has been in the tech industry broadly for 15 years.
+
+29
+00:01:54.080 --> 00:01:58.860
+<v Noah Labhart>He started out as an engineer, but eventually worked his way towards product and the business side.
+
+30
+00:01:59.260 --> 00:02:01.880
+<v Noah Labhart>Outside of tech, he enjoys spending time with his family.
+
+31
+00:02:02.000 --> 00:02:07.400
+<v Noah Labhart>He's into sports, loves to play tennis, but admits he hasn't played pickleball yet because the courts are always booked.
+
+32
+00:02:07.640 --> 00:02:12.080
+<v Noah Labhart>He always enjoys reading, in particular, historical narratives and autobiographies.
+
+33
+00:02:13.880 --> 00:02:18.320
+<v Noah Labhart>In his prior years, Shashwat noticed that developers spend a large amount of time securing
+
+34
+00:02:18.320 --> 00:02:20.000
+<v Noah Labhart>business assets in the cloud.
+
+35
+00:02:20.340 --> 00:02:25.620
+<v Noah Labhart>He dreamt of a world where this was just an abstraction layer on top of the cloud, making
+
+36
+00:02:25.620 --> 00:02:28.280
+<v Noah Labhart>it easier for developers to complete the task.
+
+37
+00:02:30.700 --> 00:02:33.960
+<v Noah Labhart>This is the creation story of P0 Security.
+
+38
+00:02:36.900 --> 00:02:42.820
+<v Shashwat Sehgal>Our mission as a company is to abstract away security for developers.
+
+39
+00:02:43.160 --> 00:02:57.480
+<v Shashwat Sehgal>In our prior lives, we have seen and experienced the fact that developers spent an inordinate amount of time securing the company's most prized assets, which is the cloud.
+
+40
+00:02:57.480 --> 00:03:03.460
+<v Shashwat Sehgal>and we believe that security should just be an abstract layer which developers do not have to
+
+41
+00:03:03.460 --> 00:03:07.880
+<v Shashwat Sehgal>worry about. That is our mission. Where do we stand as a product? What do we actually do?
+
+42
+00:03:08.000 --> 00:03:15.560
+<v Shashwat Sehgal>Our goal is to secure access in the cloud. We've observed over time that the number of identities
+
+43
+00:03:15.560 --> 00:03:22.880
+<v Shashwat Sehgal>or the number of entities that can take any sort of action in the cloud has just exploded over the
+
+44
+00:03:22.880 --> 00:03:30.120
+<v Shashwat Sehgal>the last few years. It's not just human users or groups of employees that can take action or access
+
+45
+00:03:30.120 --> 00:03:35.500
+<v Shashwat Sehgal>the cloud, but increasingly it's also workloads, service accounts, quote-unquote non-human identities.
+
+46
+00:03:36.760 --> 00:03:43.380
+<v Shashwat Sehgal>And we believe that there needs to be a product, a company that can secure access for all of these
+
+47
+00:03:43.380 --> 00:03:49.580
+<v Shashwat Sehgal>entities, right? Be it an engineer, be it a contractor, be it a sales engineer, or be it a
+
+48
+00:03:49.580 --> 00:03:53.600
+<v Shashwat Sehgal>a workload or a service account, they can secure the access for all of these entities
+
+49
+00:03:53.600 --> 00:03:55.260
+<v Shashwat Sehgal>across the lifecycle.
+
+50
+00:03:55.900 --> 00:04:02.860
+<v Shashwat Sehgal>The three co-founders in the company are myself, the co-founder and CEO, and Greg, who's the
+
+51
+00:04:02.860 --> 00:04:05.140
+<v Shashwat Sehgal>CTO, and Nathan, who's the VP of engineering.
+
+52
+00:04:05.860 --> 00:04:12.020
+<v Shashwat Sehgal>Nathan and I used to be peers at Meraki, Cisco Meraki, where we built and led the SD-WAN
+
+53
+00:04:12.020 --> 00:04:12.760
+<v Shashwat Sehgal>business unit.
+
+54
+00:04:12.760 --> 00:04:20.780
+<v Shashwat Sehgal>it. And then Greg and myself both worked at Splunk for a while, where we were building out the
+
+55
+00:04:20.780 --> 00:04:26.640
+<v Shashwat Sehgal>observability platform. And in each of these spaces, what we realized was that the cloud-native
+
+56
+00:04:26.640 --> 00:04:31.940
+<v Shashwat Sehgal>way of application development is extremely powerful. It gives a lot of very sophisticated
+
+57
+00:04:31.940 --> 00:04:38.200
+<v Shashwat Sehgal>primitives in the hands of developers to build things quickly like never before. But it's also
+
+58
+00:04:38.200 --> 00:04:44.860
+<v Shashwat Sehgal>got its own pitfalls which is that it can make application development very complicated and this
+
+59
+00:04:44.860 --> 00:04:51.800
+<v Shashwat Sehgal>gives security teams a very hard time securing access securing access as a use case has been
+
+60
+00:04:51.800 --> 00:04:57.560
+<v Shashwat Sehgal>around for the longest time right the only thing that's evolved over the last 20 30 years is what
+
+61
+00:04:57.560 --> 00:05:04.040
+<v Shashwat Sehgal>it is that organizations are interested in securing before internet securing access mostly just meant
+
+62
+00:05:04.040 --> 00:05:09.440
+<v Shashwat Sehgal>you have your physical buildings and you need to secure access to the physical workspaces.
+
+63
+00:05:09.740 --> 00:05:13.760
+<v Shashwat Sehgal>In the early days of computers, the early days of the internet,
+
+64
+00:05:13.940 --> 00:05:19.000
+<v Shashwat Sehgal>when the most prized possession of a company used to be a data center
+
+65
+00:05:19.000 --> 00:05:24.080
+<v Shashwat Sehgal>and specifically data and applications hosted within a data center.
+
+66
+00:05:24.980 --> 00:05:32.700
+<v Shashwat Sehgal>In that world, securing access really just meant securing access to the network perimeter of the data center.
+
+67
+00:05:34.060 --> 00:05:42.120
+<v Shashwat Sehgal>As the world has become more cloud native, the prized jewels of a company are increasingly in SaaS and in the cloud.
+
+68
+00:05:42.260 --> 00:05:46.420
+<v Shashwat Sehgal>We are firmly tackling the problem of securing cloud access.
+
+69
+00:05:46.700 --> 00:05:56.720
+<v Shashwat Sehgal>That is what we do, help secure access to a company's crown jewels in the cloud, no matter who's trying to access that infrastructure or that data.
+
+70
+00:05:58.480 --> 00:06:03.380
+<v Noah Labhart>So let's dive into the MVP, that first version of the product you built.
+
+71
+00:06:04.040 --> 00:06:06.920
+<v Noah Labhart>to build and what sort of tools were you using to bring it to life?
+
+72
+00:06:07.320 --> 00:06:08.980
+<v Shashwat Sehgal>It's a never-ending process, really.
+
+73
+00:06:09.140 --> 00:06:14.000
+<v Shashwat Sehgal>I wish I could say that there was a point in time when we knew we had nailed down the
+
+74
+00:06:14.000 --> 00:06:14.500
+<v Shashwat Sehgal>MVP.
+
+75
+00:06:14.880 --> 00:06:22.820
+<v Shashwat Sehgal>Our very first deployable version of a product which we put in the hands of an actual customer
+
+76
+00:06:22.820 --> 00:06:26.220
+<v Shashwat Sehgal>was probably within three months of when we started.
+
+77
+00:06:26.440 --> 00:06:28.680
+<v Shashwat Sehgal>We started the company in late 2022.
+
+78
+00:06:28.680 --> 00:06:38.000
+<v Shashwat Sehgal>we started building and by February of 2023 we had our first customer deployment it worked
+
+79
+00:06:38.000 --> 00:06:45.460
+<v Shashwat Sehgal>thankfully and we were able to close that customer contract by by March or April of 2023 and ever
+
+80
+00:06:45.460 --> 00:06:52.200
+<v Shashwat Sehgal>since then it's been a stream of okay let's find another customer that looks like the last customer
+
+81
+00:06:52.200 --> 00:06:59.660
+<v Shashwat Sehgal>when we closed and make sure the MVP works for their specific environment. That has been our
+
+82
+00:06:59.660 --> 00:07:06.740
+<v Shashwat Sehgal>philosophy ever since then. Always keep shipping, keep building whatever is necessary, have very
+
+83
+00:07:06.740 --> 00:07:13.320
+<v Shashwat Sehgal>tight feedback loops between customers and between our engineering team so that we can iterate, get
+
+84
+00:07:13.320 --> 00:07:18.780
+<v Shashwat Sehgal>their feedback and if necessary build the next feature that would help them gain even more value
+
+85
+00:07:18.780 --> 00:07:27.200
+<v Shashwat Sehgal>out of the product. In terms of what we used, I think we've been very nimble in using all kinds
+
+86
+00:07:27.200 --> 00:07:35.280
+<v Shashwat Sehgal>of tooling. Like our stack for the most part is in TypeScript. We run on both GCP and AWS. We are
+
+87
+00:07:35.280 --> 00:07:40.560
+<v Shashwat Sehgal>heavy users of Terraform, of Kubernetes, and we've been experimenting very heavily with GenAI
+
+88
+00:07:40.560 --> 00:07:47.160
+<v Shashwat Sehgal>and Copilot as well. So in short, I think our design and our product development philosophy
+
+89
+00:07:48.780 --> 00:07:50.040
+<v Shashwat Sehgal>the best of breed solutions,
+
+90
+00:07:50.360 --> 00:07:52.240
+<v Shashwat Sehgal>all the latest and greatest
+
+91
+00:07:52.240 --> 00:07:53.660
+<v Shashwat Sehgal>cloud native development
+
+92
+00:07:53.660 --> 00:07:55.880
+<v Shashwat Sehgal>in Gen AI usage,
+
+93
+00:07:56.220 --> 00:07:57.220
+<v Shashwat Sehgal>just keep shipping.
+
+94
+00:07:58.820 --> 00:08:02.240
+<v Noah Labhart>So tell me about how you mature
+
+95
+00:08:02.240 --> 00:08:03.860
+<v Noah Labhart>and progress the product.
+
+96
+00:08:03.940 --> 00:08:05.000
+<v Noah Labhart>How have you done that?
+
+97
+00:08:05.100 --> 00:08:05.880
+<v Noah Labhart>And I'm curious about
+
+98
+00:08:05.880 --> 00:08:08.140
+<v Noah Labhart>how you go about building your roadmap.
+
+99
+00:08:08.340 --> 00:08:09.340
+<v Noah Labhart>How do you go about deciding
+
+100
+00:08:09.340 --> 00:08:11.380
+<v Noah Labhart>this is the next most important thing
+
+101
+00:08:11.380 --> 00:08:13.400
+<v Noah Labhart>to build or to address with P0?
+
+102
+00:08:14.460 --> 00:08:16.220
+<v Shashwat Sehgal>Any decisions like these
+
+103
+00:08:16.220 --> 00:08:17.940
+<v Shashwat Sehgal>are never made in a vacuum.
+
+104
+00:08:18.780 --> 00:08:27.780
+<v Shashwat Sehgal>almost always have customers drive our roadmap, which means that any week we are probably speaking
+
+105
+00:08:27.780 --> 00:08:35.440
+<v Shashwat Sehgal>to at least five, if not more customers across existing customers, new prospects, ongoing POCs,
+
+106
+00:08:35.700 --> 00:08:41.720
+<v Shashwat Sehgal>probably closer to 10, I'd say. And we let our customers define our road. We are very open in
+
+107
+00:08:41.720 --> 00:08:49.760
+<v Shashwat Sehgal>aggressive and soliciting feedback from all kinds of customers and from there on we try to triangulate
+
+108
+00:08:49.760 --> 00:08:56.680
+<v Shashwat Sehgal>all the feedback that we are receiving and we try to have an opinionated view on okay what are the
+
+109
+00:08:56.680 --> 00:09:03.080
+<v Shashwat Sehgal>kinds of customers that are good fit for us right now and let's say that's a particular segment
+
+110
+00:09:03.080 --> 00:09:09.700
+<v Shashwat Sehgal>let's call it segment one and eventually we want to go from there to all kinds of segments
+
+111
+00:09:09.700 --> 00:09:15.700
+<v Shashwat Sehgal>segments across customers, big and small, across verticals, across geographies, right?
+
+112
+00:09:15.820 --> 00:09:20.360
+<v Shashwat Sehgal>So then we always try to have opinionated views on, okay, how do we go from segment
+
+113
+00:09:20.360 --> 00:09:22.920
+<v Shashwat Sehgal>one to segment four, for example, right?
+
+114
+00:09:22.980 --> 00:09:26.960
+<v Shashwat Sehgal>Where segment four could be representative of the vast majority of the market.
+
+115
+00:09:27.160 --> 00:09:32.840
+<v Shashwat Sehgal>And then we always try to sequence out the steps that we would need to take from segment
+
+116
+00:09:32.840 --> 00:09:35.460
+<v Shashwat Sehgal>one to segment two, three, and eventually four.
+
+117
+00:09:35.460 --> 00:09:42.920
+<v Shashwat Sehgal>and we always we try to map what are the gaps that we have in our current product and what would it
+
+118
+00:09:42.920 --> 00:09:48.140
+<v Shashwat Sehgal>take to start selling to customers in segments two three and four on a consistent basis and we
+
+119
+00:09:48.140 --> 00:09:53.020
+<v Shashwat Sehgal>take all of that feedback into account for building our roadmap and but most importantly
+
+120
+00:09:53.020 --> 00:09:59.820
+<v Shashwat Sehgal>we ensure that this roadmap is never set in stone and we try to be as nimble and flexible on
+
+121
+00:09:59.820 --> 00:10:02.480
+<v Shashwat Sehgal>revisiting this on some kind of an ongoing cadence.
+
+122
+00:10:03.220 --> 00:10:04.420
+<v Noah Labhart>So I hear you saying we.
+
+123
+00:10:04.520 --> 00:10:06.980
+<v Noah Labhart>Tell me about how you went about building your team.
+
+124
+00:10:07.120 --> 00:10:08.560
+<v Noah Labhart>And what do you look for in those people
+
+125
+00:10:08.560 --> 00:10:11.000
+<v Noah Labhart>to indicate that they're the winning horses to join you?
+
+126
+00:10:11.700 --> 00:10:17.680
+<v Shashwat Sehgal>So there are three attributes that I look for in a team.
+
+127
+00:10:18.720 --> 00:10:22.460
+<v Shashwat Sehgal>First, almost always, they have to be intellectually curious.
+
+128
+00:10:22.840 --> 00:10:26.900
+<v Shashwat Sehgal>It's almost a cliche that you hire smart people, right?
+
+129
+00:10:26.900 --> 00:10:33.360
+<v Shashwat Sehgal>But I'd say you have to go one step beyond and hire not just smart, but also curious or flexible people.
+
+130
+00:10:33.600 --> 00:10:40.320
+<v Shashwat Sehgal>Because smart people sometimes can be very opinionated on, hey, this is my way or the highway.
+
+131
+00:10:40.440 --> 00:10:42.200
+<v Shashwat Sehgal>This is the right way of doing things.
+
+132
+00:10:42.660 --> 00:10:47.040
+<v Shashwat Sehgal>And sometimes that may or may not be the best way of building a company.
+
+133
+00:10:47.160 --> 00:10:54.260
+<v Shashwat Sehgal>So for me, the number one attribute almost always is, hey, is this person that I'm hiring, are they intellectually curious or not?
+
+134
+00:10:54.260 --> 00:10:57.500
+<v Shashwat Sehgal>Secondly, they have to be super high integrity.
+
+135
+00:10:57.940 --> 00:11:01.960
+<v Shashwat Sehgal>That goes without saying, if you hire a bad apple,
+
+136
+00:11:02.100 --> 00:11:07.020
+<v Shashwat Sehgal>and very soon the disease could spread to the rest of the very small company.
+
+137
+00:11:07.520 --> 00:11:11.200
+<v Shashwat Sehgal>Having high integrity people is an absolute must-have.
+
+138
+00:11:11.380 --> 00:11:14.120
+<v Shashwat Sehgal>And last but not the least, so after intellectually curious,
+
+139
+00:11:14.340 --> 00:11:16.940
+<v Shashwat Sehgal>after high integrity people,
+
+140
+00:11:16.940 --> 00:11:24.260
+<v Shashwat Sehgal>you almost have to look for people who are looking for a platform to excel in, right?
+
+141
+00:11:24.360 --> 00:11:29.540
+<v Shashwat Sehgal>In other words, they have some kind of a chip on their shoulder or willingness to go above and beyond, right?
+
+142
+00:11:29.640 --> 00:11:31.460
+<v Shashwat Sehgal>Different people call this different things.
+
+143
+00:11:31.520 --> 00:11:33.160
+<v Shashwat Sehgal>Some call it extreme ownership.
+
+144
+00:11:33.520 --> 00:11:36.100
+<v Shashwat Sehgal>Some call it having a chip on their shoulder.
+
+145
+00:11:36.200 --> 00:11:44.100
+<v Shashwat Sehgal>For me, this third attribute is, okay, is this person going to come in and just take the bull by the horns or not?
+
+146
+00:11:44.420 --> 00:11:46.740
+<v Shashwat Sehgal>Are they willing to take extreme ownership or not?
+
+147
+00:11:49.260 --> 00:11:54.640
+<v Noah Labhart>so let's flip to scalability and this will be interesting given you know what you've built and
+
+148
+00:11:54.640 --> 00:11:59.300
+<v Noah Labhart>who you're building it for how did you approach scalability was it built to scale from day one
+
+149
+00:11:59.300 --> 00:12:03.900
+<v Noah Labhart>or were there areas where you had to fight it as you grew if
+
+150
+00:12:03.900 --> 00:12:05.360
+<v Shashwat Sehgal>this company were to be super
+
+151
+00:12:05.360 --> 00:12:11.540
+<v Shashwat Sehgal>successful then i would want to say the largest organizations of the world let's call it for
+
+152
+00:12:11.540 --> 00:12:16.060
+<v Shashwat Sehgal>For example, the largest banks in the world, as an example, JP Morgan Chase, right?
+
+153
+00:12:16.180 --> 00:12:19.320
+<v Shashwat Sehgal>They would be using us to govern access to their cloud.
+
+154
+00:12:20.220 --> 00:12:27.660
+<v Shashwat Sehgal>As you can imagine, at that scale, the cloud, it increases in complexity with the total number of employees,
+
+155
+00:12:27.800 --> 00:12:32.960
+<v Shashwat Sehgal>as well as the total number of workloads within any particular organization, right?
+
+156
+00:12:33.060 --> 00:12:39.020
+<v Shashwat Sehgal>Which means that if we, for example, have to provide visibility into AWS,
+
+157
+00:12:39.020 --> 00:12:42.080
+<v Shashwat Sehgal>or we have to provide control over GCP,
+
+158
+00:12:42.260 --> 00:12:45.020
+<v Shashwat Sehgal>then we'll have to eventually build a product
+
+159
+00:12:45.020 --> 00:12:47.880
+<v Shashwat Sehgal>that scales with the total number of identities
+
+160
+00:12:47.880 --> 00:12:50.460
+<v Shashwat Sehgal>within that particular cloud.
+
+161
+00:12:51.180 --> 00:12:54.440
+<v Shashwat Sehgal>What this means is that we are always building
+
+162
+00:12:54.440 --> 00:12:58.620
+<v Shashwat Sehgal>an architecture that we eventually want to scale
+
+163
+00:12:58.620 --> 00:13:01.420
+<v Shashwat Sehgal>to tens of thousands of employees
+
+164
+00:13:01.420 --> 00:13:04.940
+<v Shashwat Sehgal>and hundreds of thousands, if not more,
+
+165
+00:13:05.540 --> 00:13:07.200
+<v Shashwat Sehgal>of workloads and machine identities.
+
+166
+00:13:09.020 --> 00:13:16.740
+<v Shashwat Sehgal>we are looking to land and the foundations of that architecture when we laid down, we always
+
+167
+00:13:16.740 --> 00:13:23.020
+<v Shashwat Sehgal>wanted to make sure that, hey, we don't have to re-architect large parts of our product as and
+
+168
+00:13:23.020 --> 00:13:28.940
+<v Shashwat Sehgal>when we hit that scale. But at the same time, it's also important to not boil the ocean when you only
+
+169
+00:13:28.940 --> 00:13:36.040
+<v Shashwat Sehgal>have like 200, 300 employee companies as your customers in the early days. So I would answer
+
+170
+00:13:36.040 --> 00:13:41.200
+<v Shashwat Sehgal>that question as by saying that we laid down some foundational elements of an architecture which
+
+171
+00:13:41.200 --> 00:13:47.620
+<v Shashwat Sehgal>will allow us to scale seamlessly to hundreds of thousands of identities over time. But at the same
+
+172
+00:13:47.620 --> 00:13:55.420
+<v Shashwat Sehgal>time, we also did not go overboard in making sure our architecture was performant at scale,
+
+173
+00:13:55.560 --> 00:14:00.820
+<v Shashwat Sehgal>especially when we were servicing early customers, which were not more than 100, 200, 300 engineers
+
+174
+00:14:00.820 --> 00:14:01.980
+<v Shashwat Sehgal>as a company.
+
+175
+00:14:03.080 --> 00:14:05.880
+<v Noah Labhart>So as you step out on the balcony,
+
+176
+00:14:06.000 --> 00:14:08.340
+<v Noah Labhart>you look across all that you've built with P0,
+
+177
+00:14:08.440 --> 00:14:09.780
+<v Noah Labhart>what are you most proud of?
+
+178
+00:14:10.720 --> 00:14:11.440
+<v Shashwat Sehgal>I'm proud
+
+179
+00:14:11.440 --> 00:14:12.660
+<v Shashwat Sehgal>of how far we have come.
+
+180
+00:14:12.760 --> 00:14:15.140
+<v Shashwat Sehgal>I'm proud of how many customers we have serviced,
+
+181
+00:14:15.240 --> 00:14:16.580
+<v Shashwat Sehgal>especially at scale.
+
+182
+00:14:17.000 --> 00:14:18.740
+<v Shashwat Sehgal>And more than anything,
+
+183
+00:14:18.900 --> 00:14:21.540
+<v Shashwat Sehgal>I'm proud of the culture of ownership
+
+184
+00:14:21.540 --> 00:14:24.020
+<v Shashwat Sehgal>in the team that we've been able to establish
+
+185
+00:14:24.560 --> 00:14:26.200
+<v Shashwat Sehgal>where people are stepping up
+
+186
+00:14:26.200 --> 00:14:30.520
+<v Shashwat Sehgal>to solve extremely difficult problems day in, day out.
+
+187
+00:14:30.820 --> 00:14:35.380
+<v Shashwat Sehgal>At the end of the day, what we are building is not something that has ever been attempted before.
+
+188
+00:14:36.140 --> 00:14:45.940
+<v Shashwat Sehgal>And what I mean by that is if you look at identity as a space, there are various companies that are trying to solve small problems within the overall identity domain.
+
+189
+00:14:46.480 --> 00:15:00.520
+<v Shashwat Sehgal>And ultimately, we believe that the winner in the entire identity space will be someone who can build a performant platform as quickly as possible and get it to the market as quickly as possible.
+
+190
+00:15:00.820 --> 00:15:06.100
+<v Shashwat Sehgal>But building a platform required is a challenge all by itself because you have to keep building.
+
+191
+00:15:06.260 --> 00:15:16.000
+<v Shashwat Sehgal>There's so many things to build and you're almost always prioritizing what needs to be built to get to your next milestone, your next landmark, your next bunch of customers.
+
+192
+00:15:16.720 --> 00:15:24.280
+<v Shashwat Sehgal>It almost always becomes a race to make sure you have what you need to be able to get to where you want to be.
+
+193
+00:15:24.280 --> 00:15:35.900
+<v Shashwat Sehgal>And I've been extremely proud of the way our team, our small and extremely mighty team, has stepped up to the plate to be able to deliver all those challenges.
+
+194
+00:15:37.460 --> 00:15:42.740
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+195
+00:15:43.880 --> 00:15:47.240
+<v Shashwat Sehgal>I'd be very scared if we were not making a mistake.
+
+196
+00:15:47.240 --> 00:15:52.340
+<v Shashwat Sehgal>take. In fact, I won't even say it's almost impossible. I'd say it's absolutely impossible
+
+197
+00:15:52.340 --> 00:15:59.240
+<v Shashwat Sehgal>to have impeccable execution on your way to building a billion dollar company. It's just
+
+198
+00:15:59.240 --> 00:16:05.260
+<v Shashwat Sehgal>not possible, right? Just because there are so many unknowns, there are so many ways things could
+
+199
+00:16:05.260 --> 00:16:11.060
+<v Shashwat Sehgal>go wrong. If anything, what's most important is to just make sure you're making the best decision
+
+200
+00:16:11.060 --> 00:16:13.380
+<v Shashwat Sehgal>in any point in time,
+
+201
+00:16:13.460 --> 00:16:14.960
+<v Shashwat Sehgal>even though you may have
+
+202
+00:16:14.960 --> 00:16:16.480
+<v Shashwat Sehgal>little to no information,
+
+203
+00:16:16.720 --> 00:16:17.860
+<v Shashwat Sehgal>little to no data points
+
+204
+00:16:17.860 --> 00:16:18.700
+<v Shashwat Sehgal>to make that decision.
+
+205
+00:16:19.220 --> 00:16:20.900
+<v Shashwat Sehgal>What's even more important
+
+206
+00:16:20.900 --> 00:16:23.280
+<v Shashwat Sehgal>is not to just rest and sit back,
+
+207
+00:16:23.420 --> 00:16:25.320
+<v Shashwat Sehgal>but it's super, super critical
+
+208
+00:16:25.320 --> 00:16:26.180
+<v Shashwat Sehgal>to make sure
+
+209
+00:16:26.180 --> 00:16:28.540
+<v Shashwat Sehgal>if the decision turns out to be wrong,
+
+210
+00:16:28.680 --> 00:16:31.040
+<v Shashwat Sehgal>you course correct as soon as possible.
+
+211
+00:16:31.900 --> 00:16:34.040
+<v Shashwat Sehgal>Sometimes only 60 to 70%
+
+212
+00:16:34.040 --> 00:16:36.560
+<v Shashwat Sehgal>of the people you hire work out, right?
+
+213
+00:16:36.640 --> 00:16:37.680
+<v Shashwat Sehgal>And when they don't,
+
+214
+00:16:37.680 --> 00:16:38.680
+<v Shashwat Sehgal>you have to be absolutely
+
+215
+00:16:39.200 --> 00:16:40.240
+<v Shashwat Sehgal>ruthless and quick
+
+216
+00:16:41.060 --> 00:16:45.240
+<v Shashwat Sehgal>that you rectify your mistakes for the benefit of both the individual and the company.
+
+217
+00:16:46.000 --> 00:16:54.240
+<v Shashwat Sehgal>And similarly, on the customer front, you might think that a customer wants feature XYZ. But what
+
+218
+00:16:54.240 --> 00:17:01.420
+<v Shashwat Sehgal>is often left unsaid is they might be articulating a feature just because they haven't thought of
+
+219
+00:17:01.420 --> 00:17:08.800
+<v Shashwat Sehgal>alternative ways to solve the actual underlying problem, right? And so many times, it turns out
+
+220
+00:17:08.800 --> 00:17:13.960
+<v Shashwat Sehgal>that you have misdiagnosed the problem and you are going too far out building a feature missing
+
+221
+00:17:13.960 --> 00:17:21.460
+<v Shashwat Sehgal>the forest for the trees and again in instances like this it is absolutely imperative to to take
+
+222
+00:17:21.460 --> 00:17:27.520
+<v Shashwat Sehgal>the MVP approach just keep iterating keep shipping creating a very tight feedback loop between the
+
+223
+00:17:27.520 --> 00:17:32.980
+<v Shashwat Sehgal>customer and the R&amp;D team so that you can rectify or you can catch the mistakes as soon as possible
+
+224
+00:17:32.980 --> 00:17:37.700
+<v Shashwat Sehgal>and more importantly, rectify them before too much time has been lost.
+
+225
+00:17:38.160 --> 00:17:39.240
+<v Shashwat Sehgal>That's what I'd say, right?
+
+226
+00:17:39.420 --> 00:17:43.520
+<v Shashwat Sehgal>There's no one big example that comes to mind,
+
+227
+00:17:43.600 --> 00:17:47.080
+<v Shashwat Sehgal>but I'd say lots of small mistakes that we have made over the last two years.
+
+228
+00:17:47.220 --> 00:17:50.620
+<v Shashwat Sehgal>And thankfully, we've been able to rectify quite a few of them.
+
+229
+00:17:53.060 --> 00:17:57.880
+<v Noah Labhart>What does the future look like for P0 security, the product and for your team?
+
+230
+00:17:58.540 --> 00:18:01.780
+<v Shashwat Sehgal>So we recently raised our series A&amp;L funding.
+
+231
+00:18:02.980 --> 00:18:09.200
+<v Shashwat Sehgal>Sin Ventures with participation from our existing investors, Lightspeed and Zscaler also came in as
+
+232
+00:18:09.200 --> 00:18:17.120
+<v Shashwat Sehgal>a strategic investor. So now having raised some cash, the focus in the short to medium term
+
+233
+00:18:17.120 --> 00:18:22.560
+<v Shashwat Sehgal>will be to start investing in our team. In particular, we want to double our engineering
+
+234
+00:18:22.560 --> 00:18:28.000
+<v Shashwat Sehgal>team over the next six to nine months and commensurate with that. We also want to start
+
+235
+00:18:28.000 --> 00:18:33.820
+<v Shashwat Sehgal>start investing in our go-to-market team by bringing in the right sales leader who can
+
+236
+00:18:33.820 --> 00:18:39.540
+<v Shashwat Sehgal>take us to the next level. We found some product market fit in a couple of customer segments.
+
+237
+00:18:39.780 --> 00:18:45.720
+<v Shashwat Sehgal>So tactically, it will mean that how do we front the market in those customer segments? How do we
+
+238
+00:18:45.720 --> 00:18:50.300
+<v Shashwat Sehgal>gain more traction and also start building a product for the next customer segments that we
+
+239
+00:18:50.300 --> 00:18:58.060
+<v Shashwat Sehgal>you want to address. All this while, the overall vision is to build a platform that can solve for
+
+240
+00:18:58.060 --> 00:19:03.120
+<v Shashwat Sehgal>cloud access governance for all kinds of identities, right? At the end of the day, we want to be known
+
+241
+00:19:03.120 --> 00:19:10.320
+<v Shashwat Sehgal>as the company that helps secure cloud access for customers, small and large, no matter where
+
+242
+00:19:10.320 --> 00:19:11.880
+<v Shashwat Sehgal>that access is coming from.
+
+243
+00:19:12.620 --> 00:19:16.960
+<v Noah Labhart>Let's switch to you, Shashwat. Who influences the way that you work?
+
+244
+00:19:16.960 --> 00:19:19.940
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+245
+00:19:21.300 --> 00:19:27.900
+<v Shashwat Sehgal>The biggest influence has probably been my mother in many ways, large and small.
+
+246
+00:19:28.920 --> 00:19:40.940
+<v Shashwat Sehgal>That's probably someone I look up to in terms of their work ethic, as well as integrity when it comes to their professionalism.
+
+247
+00:19:40.960 --> 00:19:44.380
+<v Shashwat Sehgal>And again, she's worked as an educator for most of her life.
+
+248
+00:19:44.380 --> 00:19:51.620
+<v Shashwat Sehgal>life. Within the tech industry, I'd say the one role model I have is probably Paul Graham. His
+
+249
+00:19:52.060 --> 00:19:57.320
+<v Shashwat Sehgal>essays around, you know, the culture of building and startups in general, I've been through,
+
+250
+00:19:57.380 --> 00:20:01.280
+<v Shashwat Sehgal>I've gone through them all, and they've definitely influenced me a lot in the early part of my life.
+
+251
+00:20:02.760 --> 00:20:06.880
+<v Noah Labhart>Last question. So you're getting on a plane, you're sitting next to a young entrepreneur
+
+252
+00:20:06.880 --> 00:20:10.160
+<v Noah Labhart>who's built the next big thing. They're jazzed about it. They can't wait to show it off to the
+
+253
+00:20:10.160 --> 00:20:13.560
+<v Noah Labhart>world. Can't wait to show it off to you right there on the plane. What advice do you give that
+
+254
+00:20:14.380 --> 00:20:15.100
+<v Noah Labhart>down this road a bit?
+
+255
+00:20:16.260 --> 00:20:23.000
+<v Shashwat Sehgal>Go for it and don't stop. Just keep pushing. There'll be a lot of obstacles.
+
+256
+00:20:23.600 --> 00:20:30.940
+<v Shashwat Sehgal>Just don't give up. Keep pushing until eventually the rock will gather an escape velocity of its
+
+257
+00:20:30.940 --> 00:20:31.440
+<v Shashwat Sehgal>own.
+
+258
+00:20:31.600 --> 00:20:35.500
+<v Noah Labhart>That's fantastic advice. Well, Shashwat, thank you for being on the show today. Thank you for
+
+259
+00:20:35.500 --> 00:20:37.840
+<v Noah Labhart>telling the creation story of P0 Security.
+
+260
+00:20:38.320 --> 00:20:40.100
+<v Shashwat Sehgal>Thank you. The pleasure was all mine.
+
+261
+00:20:41.240 --> 00:20:44.540
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+262
+00:20:49.260 --> 00:20:52.460
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart
+
+263
+00:20:52.460 --> 00:20:55.220
+<v Noah Labhart>be sure to subscribe on Apple Podcasts, Spotify
+
+264
+00:20:55.220 --> 00:20:57.360
+<v Noah Labhart>or the podcasting app of your choice
+
+265
+00:20:57.360 --> 00:21:00.200
+<v Noah Labhart>and when you get a chance, leave us a review
+
+266
+00:21:00.200 --> 00:21:02.380
+<v Noah Labhart>both things help us out tremendously
+
+267
+00:21:04.840 --> 00:21:06.820
+<v Noah Labhart>and thanks again for listening

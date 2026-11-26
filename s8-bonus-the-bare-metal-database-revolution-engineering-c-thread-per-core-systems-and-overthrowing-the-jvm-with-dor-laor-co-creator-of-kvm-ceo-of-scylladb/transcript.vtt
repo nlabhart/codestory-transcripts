@@ -1,0 +1,1007 @@
+WEBVTT
+
+NOTE S8 Bonus: The Bare-Metal Database Revolution: Engineering C++ Thread-Per-Core Systems and Overthrowing the JVM with Dor Laor, Co-Creator of KVM & CEO of ScyllaDB
+
+1
+00:00:00.000 --> 00:00:01.320
+<v Noah Labhart>We
+
+2
+00:00:01.320 --> 00:00:13.720
+<v Dor Laor>stumbled across several databases, and specifically also Cassandra, when we wanted to demonstrate how those general applications and databases included run faster on the OS that we created.
+
+3
+00:00:14.020 --> 00:00:20.000
+<v Dor Laor>We discovered that Cassandra isn't running faster on our system, unlike many other applications.
+
+4
+00:00:20.000 --> 00:00:33.320
+<v Dor Laor>The reason was that it was written in Java and while the Cassandra design and architecture are highly scalable, the per unit economic of the implementation weren't as good.
+
+5
+00:00:34.040 --> 00:00:39.100
+<v Dor Laor>So we realized there is an opportunity here and we had to pivot away.
+
+6
+00:00:39.820 --> 00:00:43.480
+<v Dor Laor>I'm Dor Laor, I'm the co-founder and CEO of ScyllaDB.
+
+7
+00:00:46.460 --> 00:00:52.900
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries. Six months
+
+8
+00:00:52.900 --> 00:00:53.920
+<v Noah Labhart>moonlighting. There's
+
+9
+00:00:53.920 --> 00:00:54.820
+<v Dor Laor>nothing like the
+
+10
+00:00:54.820 --> 00:00:58.080
+<v Noah Labhart>backhands. Who share what it takes to change an industry.
+
+11
+00:00:58.280 --> 00:00:59.860
+<v Noah Labhart>I don't exactly know what to do next. It took
+
+12
+00:00:59.860 --> 00:01:01.220
+<v Dor Laor>many goes to get right.
+
+13
+00:01:01.760 --> 00:01:03.800
+<v Noah Labhart>Who built the teams that have
+
+14
+00:01:03.800 --> 00:01:08.580
+<v Clip>their back. The company is its people. The teams help each other achieve. Most proud of our team.
+
+15
+00:01:08.580 --> 00:01:11.240
+<v Noah Labhart>Keeping scalability top of mind.
+
+16
+00:01:11.420 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+17
+00:01:12.860 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+18
+00:01:14.440 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+19
+00:01:15.560 --> 00:01:17.800
+<v Noah Labhart>The stories you don't read in the headlines.
+
+20
+00:01:18.280 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+21
+00:01:20.020 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+22
+00:01:22.920 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+23
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+24
+00:01:27.660 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+25
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+26
+00:01:32.680 --> 00:01:34.140
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+27
+00:01:34.140 --> 00:01:41.940
+<v Noah Labhart>And today, how Dor Laor is building the world's fastest distributed database, enabling you to break the barriers of scale.
+
+28
+00:01:47.580 --> 00:01:53.100
+<v Noah Labhart>Dor Laor lives north of Tel Aviv, Israel, but travels four times out of the year to the States.
+
+29
+00:01:53.340 --> 00:01:56.220
+<v Noah Labhart>He loves tech, which drives 200% of his day.
+
+30
+00:01:56.320 --> 00:02:00.840
+<v Noah Labhart>But outside of tech, he's married with two teenage kids and enjoys extreme sports.
+
+31
+00:02:00.840 --> 00:02:07.180
+<v Noah Labhart>At the time, he does snowboarding and mountain biking, mentioning that the best place to mountain bike was a ski resort in France.
+
+32
+00:02:08.060 --> 00:02:12.260
+<v Noah Labhart>He would also love to do surfing, but hasn't found the time to hit the waves around Israel.
+
+33
+00:02:14.180 --> 00:02:17.320
+<v Noah Labhart>Dor and his co-founder met long ago at another startup.
+
+34
+00:02:18.120 --> 00:02:21.680
+<v Noah Labhart>Post-acquisition, they listed ideas of what they wanted to start building next.
+
+35
+00:02:22.020 --> 00:02:28.600
+<v Noah Labhart>They decided to build an operating system like Linux, and noticed that databases still didn't run faster within this system.
+
+36
+00:02:28.600 --> 00:02:33.080
+<v Noah Labhart>They decided to tackle distributed NoSQL databases instead.
+
+37
+00:02:34.440 --> 00:02:37.440
+<v Noah Labhart>This is the creation story of ScyllaDB.
+
+38
+00:02:40.320 --> 00:02:43.360
+<v Dor Laor>ScyllaDB is a database company. It's a NoSQL database.
+
+39
+00:02:43.760 --> 00:02:49.400
+<v Dor Laor>We have open source offering, which pretty much that's the basis for our product.
+
+40
+00:02:49.600 --> 00:02:55.840
+<v Dor Laor>An enterprise offering and as a service, we excel in scalability and high throughput environments.
+
+41
+00:02:55.840 --> 00:03:04.540
+<v Dor Laor>environments. My co-founder and I, we met back in 2005 at another startup. That startup happened
+
+42
+00:03:04.540 --> 00:03:10.520
+<v Dor Laor>to pivot three times. And eventually, Avi, my co-founder, brought a brilliant idea to that
+
+43
+00:03:10.520 --> 00:03:16.200
+<v Dor Laor>previous startup. And he invented the KVM hypervisor, which I managed. And we had lots
+
+44
+00:03:16.200 --> 00:03:22.300
+<v Dor Laor>of mileage together. And the company was acquired by Red Hat. We wanted to start our own thing.
+
+45
+00:03:22.300 --> 00:03:24.880
+<v Dor Laor>and we listed lots of ideas on a paper.
+
+46
+00:03:25.340 --> 00:03:27.140
+<v Dor Laor>One of them was actually a database,
+
+47
+00:03:27.240 --> 00:03:29.220
+<v Dor Laor>but it was the end of 2012.
+
+48
+00:03:29.520 --> 00:03:33.960
+<v Dor Laor>And we thought, nah, most databases were already built.
+
+49
+00:03:34.080 --> 00:03:36.500
+<v Dor Laor>There's nothing unique to come up with.
+
+50
+00:03:36.660 --> 00:03:38.760
+<v Dor Laor>So we decided to do something else.
+
+51
+00:03:38.880 --> 00:03:40.620
+<v Dor Laor>A new operating system from scratch
+
+52
+00:03:40.620 --> 00:03:42.820
+<v Dor Laor>that was supposed to compete with Linux
+
+53
+00:03:42.820 --> 00:03:44.420
+<v Dor Laor>for virtualization workloads.
+
+54
+00:03:44.760 --> 00:03:47.020
+<v Dor Laor>Usually when we say a project,
+
+55
+00:03:47.080 --> 00:03:49.080
+<v Dor Laor>it's everything from scratch.
+
+56
+00:03:49.080 --> 00:03:54.820
+<v Dor Laor>So we started the company with writing a new operating system, like a crazy endeavor.
+
+57
+00:03:55.120 --> 00:03:58.960
+<v Dor Laor>And this project was technically successful.
+
+58
+00:03:59.320 --> 00:04:02.900
+<v Dor Laor>It still exists today, but we didn't get the traction we wanted.
+
+59
+00:04:03.080 --> 00:04:17.580
+<v Dor Laor>We stumbled across several databases and specifically also Cassandra when we wanted to demonstrate how those general applications and databases included run faster on the OS that we created compared to Linux.
+
+60
+00:04:19.080 --> 00:04:22.240
+<v Dor Laor>that Cassandra isn't running faster on our system,
+
+61
+00:04:22.340 --> 00:04:23.940
+<v Dor Laor>unlike many other applications.
+
+62
+00:04:24.400 --> 00:04:26.820
+<v Dor Laor>And when we realized why,
+
+63
+00:04:27.040 --> 00:04:29.680
+<v Dor Laor>the reason was that it was written in Java.
+
+64
+00:04:29.900 --> 00:04:33.740
+<v Dor Laor>And while the Cassandra design and architecture
+
+65
+00:04:33.740 --> 00:04:37.340
+<v Dor Laor>are highly scalable distributed database,
+
+66
+00:04:37.760 --> 00:04:40.200
+<v Dor Laor>the per unit economic of the implementation
+
+67
+00:04:40.200 --> 00:04:41.240
+<v Dor Laor>weren't as good.
+
+68
+00:04:41.400 --> 00:04:44.360
+<v Dor Laor>And Java is a great language for management application,
+
+69
+00:04:44.640 --> 00:04:46.020
+<v Dor Laor>but not for infrastructure.
+
+70
+00:04:46.020 --> 00:04:53.140
+<v Dor Laor>structure. So we realized there is an opportunity here and we had to pivot away. So this plus
+
+71
+00:04:53.140 --> 00:04:59.760
+<v Dor Laor>additional research led us to pivot into the database space and we decided let's write a new
+
+72
+00:04:59.760 --> 00:05:06.260
+<v Dor Laor>database. Usually when you do that the second question is why write a new database? So we
+
+73
+00:05:06.260 --> 00:05:11.640
+<v Dor Laor>decided to combine the two and write a new database with an existing familiar interface like a
+
+74
+00:05:11.640 --> 00:05:33.800
+<v Dor Laor>So this is what we've done with the pivot. And this is how we came up to the database world. And it's today, after years of years of working on databases, I know how much I do not know. So it was a crazy thing that only a young startup desperate to find an angle can do.
+
+75
+00:05:33.800 --> 00:05:34.300
+<v Dor Laor>it.
+
+76
+00:05:36.220 --> 00:05:41.540
+<v Noah Labhart>Let's dive into the MVP then. So that first version of Scylla that you built, how long did
+
+77
+00:05:41.540 --> 00:05:44.680
+<v Noah Labhart>it take to build and what sort of tools did you use to bring it to life?
+
+78
+00:05:46.280 --> 00:05:47.560
+<v Dor Laor>Cassandra is written in
+
+79
+00:05:47.560 --> 00:05:56.460
+<v Dor Laor>Java and we wanted to use C++, especially modern C++. Back in the days, it was C++, I think it was
+
+80
+00:05:56.460 --> 00:06:03.880
+<v Dor Laor>was 12 or so. And nowadays there is C++ 23, very different than the C++ I learned in university,
+
+81
+00:06:04.000 --> 00:06:08.980
+<v Dor Laor>much more advanced with Lambda functions and all. So highly recommended. Though now we have
+
+82
+00:06:08.980 --> 00:06:16.560
+<v Dor Laor>newer languages like Rust. So we use advanced C++ and we basically cloned all of the goodies
+
+83
+00:06:16.560 --> 00:06:24.220
+<v Dor Laor>of Cassandra while we had our own unique design with a shard per core approach. So that's the
+
+84
+00:06:24.220 --> 00:06:31.960
+<v Dor Laor>the idea. The shard per core is a notion where you run one thread on one processor. And if you
+
+85
+00:06:31.960 --> 00:06:39.120
+<v Dor Laor>have a server with 20 processors, then you run 20 threads and all do the same work with a shared
+
+86
+00:06:39.120 --> 00:06:45.960
+<v Dor Laor>nothing across the board. And the first step wasn't to create a full database because it's
+
+87
+00:06:45.960 --> 00:06:53.560
+<v Dor Laor>complicated. The first step was where we created a library. We called that library Seastar.
+
+88
+00:06:54.220 --> 00:07:01.080
+<v Dor Laor>was a name play on Cassandra because shorthand for Cassandra is the letter C and the letter star.
+
+89
+00:07:01.540 --> 00:07:06.100
+<v Dor Laor>So it was a library to do distributed simple apps.
+
+90
+00:07:06.340 --> 00:07:11.000
+<v Dor Laor>And the first one we wrote was an HTTP daemon that was very basic,
+
+91
+00:07:11.060 --> 00:07:14.480
+<v Dor Laor>but could handle millions of requests per second on a single machine.
+
+92
+00:07:14.800 --> 00:07:20.480
+<v Dor Laor>And the next step towards an MVP was to come up with the database itself with Scylla
+
+93
+00:07:20.480 --> 00:07:22.680
+<v Dor Laor>that can do a million operations per second,
+
+94
+00:07:23.420 --> 00:07:24.280
+<v Dor Laor>still be distributed,
+
+95
+00:07:24.460 --> 00:07:27.540
+<v Dor Laor>and we didn't have all of the more complicated indexing.
+
+96
+00:07:28.220 --> 00:07:31.260
+<v Dor Laor>As an anecdote, we had an investor who said,
+
+97
+00:07:31.420 --> 00:07:34.440
+<v Dor Laor>why are you insisting to write the database
+
+98
+00:07:34.440 --> 00:07:36.260
+<v Dor Laor>as distributed on many machines?
+
+99
+00:07:36.380 --> 00:07:36.880
+<v Dor Laor>That's harder.
+
+100
+00:07:37.000 --> 00:07:38.840
+<v Dor Laor>Just can you release a version
+
+101
+00:07:38.840 --> 00:07:40.780
+<v Dor Laor>that just runs on a single machine?
+
+102
+00:07:41.340 --> 00:07:43.740
+<v Dor Laor>But that was not every MVP.
+
+103
+00:07:44.140 --> 00:07:45.600
+<v Dor Laor>Sometimes it's too minimal.
+
+104
+00:07:45.800 --> 00:07:47.760
+<v Dor Laor>One of the basic things that you expect
+
+105
+00:07:47.760 --> 00:07:49.900
+<v Dor Laor>from a distributed database is to be distributed.
+
+106
+00:07:50.480 --> 00:07:53.080
+<v Dor Laor>So it was a kind offer, but not relevant.
+
+107
+00:07:54.860 --> 00:07:56.420
+<v Noah Labhart>So you've got your MVP.
+
+108
+00:07:56.840 --> 00:07:57.840
+<v Noah Labhart>It's working.
+
+109
+00:07:58.020 --> 00:08:00.860
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+110
+00:08:00.860 --> 00:08:10.320
+<v Noah Labhart>I think what I'm looking for there is how you went about building your roadmap and how you decided, okay, this is the next most important thing to build or to address with Scylla.
+
+111
+00:08:12.060 --> 00:08:16.500
+<v Dor Laor>So like all startups, it's difficult to build a roadmap.
+
+112
+00:08:16.500 --> 00:08:28.860
+<v Dor Laor>One of the easier jobs that we had was that because we're API compatible or we strive to be in the early years, we strive to be API compatible.
+
+113
+00:08:29.180 --> 00:08:38.580
+<v Dor Laor>We just needed to implement the API and in a much better way than the origin, because otherwise, why use us at all?
+
+114
+00:08:39.280 --> 00:08:52.360
+<v Dor Laor>So the roadmap in the early days was just to implement and to have a full complete API where we'll be able to migrate people to the new database without code changes on the client side.
+
+115
+00:08:52.640 --> 00:09:01.240
+<v Dor Laor>And the first MVP we used as a beta was more of an alpha, but we didn't even know that it's not that applicable as a beta back then.
+
+116
+00:09:02.040 --> 00:09:04.620
+<v Dor Laor>A year later, we started to have customers.
+
+117
+00:09:04.960 --> 00:09:09.840
+<v Dor Laor>So overall for a database product, the development was relatively fast.
+
+118
+00:09:10.460 --> 00:09:14.900
+<v Dor Laor>There was the beta, then we went to a stage where we were full API
+
+119
+00:09:14.900 --> 00:09:16.380
+<v Dor Laor>compatible with Cassandra.
+
+120
+00:09:16.600 --> 00:09:22.280
+<v Dor Laor>Afterwards, we started to add some of our unique features on top of it.
+
+121
+00:09:22.380 --> 00:09:26.720
+<v Dor Laor>So eventually we had time to develop our own features, and
+
+122
+00:09:26.720 --> 00:09:33.380
+<v Dor Laor>And we also added compatibility with AWS DynamoDB, which is from the same family of databases.
+
+123
+00:09:33.580 --> 00:09:36.000
+<v Dor Laor>So that was another big development.
+
+124
+00:09:37.840 --> 00:09:40.320
+<v Noah Labhart>So how did you go about building your team?
+
+125
+00:09:40.480 --> 00:09:45.420
+<v Noah Labhart>And what do you look for in those people to indicate that they're the winning horses to join you?
+
+126
+00:09:46.980 --> 00:09:52.360
+<v Dor Laor>The team was very heavy on engineering and especially infrastructure.
+
+127
+00:09:52.360 --> 00:10:00.120
+<v Dor Laor>structure. And lots of the team members got to us through the KVM hypervisor project and from Linux.
+
+128
+00:10:00.460 --> 00:10:08.380
+<v Dor Laor>And I was searching through my network, through Red Hat, my previous employer, and other open
+
+129
+00:10:08.380 --> 00:10:15.780
+<v Dor Laor>source, like we had the name for innovative group is very capable. So that attracted more and more
+
+130
+00:10:15.780 --> 00:10:22.600
+<v Dor Laor>people and really good people that joined us attracted their own communities. So it was a
+
+131
+00:10:22.600 --> 00:10:32.780
+<v Dor Laor>good small snowball of excellency. So that was for the core technical team. Nowadays we're about 160
+
+132
+00:10:32.780 --> 00:10:40.560
+<v Dor Laor>people overall worldwide and engineering is half of the team and what we're trying to do is to
+
+133
+00:10:40.560 --> 00:10:48.880
+<v Dor Laor>to trying to make sure that other teams are as good and as quality as the core engineering team we've got.
+
+134
+00:10:49.920 --> 00:10:54.180
+<v Dor Laor>You get, especially as a co-founder and CEO, you get to uncharted territories
+
+135
+00:10:54.180 --> 00:11:02.020
+<v Dor Laor>where sometimes you may not know the definition of good in areas like sales and marketing and partnerships and all that.
+
+136
+00:11:02.020 --> 00:11:11.600
+<v Dor Laor>that. But nowadays, we have a really strong, imbalanced leadership beyond the technological
+
+137
+00:11:11.600 --> 00:11:12.300
+<v Dor Laor>team.
+
+138
+00:11:15.860 --> 00:11:20.200
+<v Noah Labhart>This next question will be interesting, given what you're building and how you're going
+
+139
+00:11:20.200 --> 00:11:25.960
+<v Noah Labhart>about building it. And I've heard the stories thus far, MVP and progression. But I want to talk
+
+140
+00:11:25.960 --> 00:11:31.560
+<v Noah Labhart>about scalability. And I want to give space for an answer of how you approach that. Was it built
+
+141
+00:11:32.020 --> 00:11:37.340
+<v Noah Labhart>scale efficiently from day one? Or is there anything you had to fight as you grew and gained
+
+142
+00:11:37.340 --> 00:11:37.840
+<v Noah Labhart>traction?
+
+143
+00:11:40.080 --> 00:11:46.700
+<v Dor Laor>There's different types of scalability problems. Some of them in tech, some of them
+
+144
+00:11:46.700 --> 00:11:54.340
+<v Dor Laor>aren't in tech. But it was obvious for us that the core product is supposed to be highly scalable.
+
+145
+00:11:54.640 --> 00:12:00.820
+<v Dor Laor>Sometimes even try to build it even more scalable than what it really needs to do. So
+
+146
+00:12:02.020 --> 00:12:04.420
+<v Dor Laor>we did a billion operations per second benchmark.
+
+147
+00:12:04.800 --> 00:12:06.900
+<v Dor Laor>Not a million operations, but a billion,
+
+148
+00:12:07.000 --> 00:12:08.260
+<v Dor Laor>and no one needs a billion.
+
+149
+00:12:08.500 --> 00:12:10.960
+<v Dor Laor>So sometimes you overshoot,
+
+150
+00:12:11.020 --> 00:12:15.860
+<v Dor Laor>and we had our fair share of premature optimizations.
+
+151
+00:12:15.880 --> 00:12:19.000
+<v Dor Laor>One of them was TCP kernel bypass
+
+152
+00:12:19.000 --> 00:12:22.560
+<v Dor Laor>that we did to bypass and accelerate networking,
+
+153
+00:12:22.780 --> 00:12:25.140
+<v Dor Laor>and it wasn't really needed, required.
+
+154
+00:12:25.620 --> 00:12:28.520
+<v Dor Laor>We realized that, and we never used it in production.
+
+155
+00:12:28.520 --> 00:12:44.100
+<v Dor Laor>There are other areas outside of the core product where you need scalability and many times we didn't do the right decision with the shift towards the cloud and managed product.
+
+156
+00:12:44.100 --> 00:12:52.900
+<v Dor Laor>Database as a Service, I think that we started with too small team to accomplish the goal we wanted to have.
+
+157
+00:12:53.140 --> 00:13:00.460
+<v Dor Laor>And it took us a time until we added more enough resources to make it as good as it's supposed to be.
+
+158
+00:13:00.720 --> 00:13:03.000
+<v Dor Laor>And we're still growing it now.
+
+159
+00:13:03.140 --> 00:13:06.740
+<v Dor Laor>And there's more demand and infinite amount of things to do there.
+
+160
+00:13:07.740 --> 00:13:13.400
+<v Noah Labhart>Okay, Dor, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+161
+00:13:14.260 --> 00:13:29.720
+<v Dor Laor>I think that I'm mostly proud of the team. We've been out there for a long period of time and we have core team members who've been with us for 10 years. So I'm really proud that we managed to exist for 10 years.
+
+162
+00:13:30.200 --> 00:13:42.900
+<v Dor Laor>Nowadays, we're just one notch to be a cash positive. So I'm pretty sure that we'll be able to live another 10 years. Very pleased with the trust in the team we managed to combine.
+
+163
+00:13:44.100 --> 00:13:45.720
+<v Noah Labhart>Let's flip the script a little bit.
+
+164
+00:13:45.820 --> 00:13:50.140
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+165
+00:13:51.360 --> 00:13:58.220
+<v Dor Laor>The whole original project was a mistake and it was relatively hard to recover from it.
+
+166
+00:13:58.300 --> 00:14:04.340
+<v Dor Laor>And I think that it took us too long to realize that the first path is a mistake.
+
+167
+00:14:04.460 --> 00:14:13.460
+<v Dor Laor>To compare with in the previous startup where Avi and I were the first employees and my existing chairman was back then.
+
+168
+00:14:14.100 --> 00:14:21.860
+<v Dor Laor>the CEO, they managed to do three pivots and not one. So we were slow to identify a mistake as a
+
+169
+00:14:21.860 --> 00:14:32.520
+<v Dor Laor>mistake. So that was mistake number one. We didn't do huge mistakes afterwards. We always do mistakes,
+
+170
+00:14:32.620 --> 00:14:38.120
+<v Dor Laor>but I think that we're trying to minimize the time. I think it's good to have a culture where
+
+171
+00:14:38.120 --> 00:14:44.040
+<v Dor Laor>where mistakes are fine as long as you do it in a careful way.
+
+172
+00:14:44.240 --> 00:14:48.340
+<v Dor Laor>And as long as you know, OK, let's take this project.
+
+173
+00:14:48.420 --> 00:14:55.140
+<v Dor Laor>It has risk, but we can capture the risk and the risk is capped.
+
+174
+00:14:55.260 --> 00:15:04.840
+<v Dor Laor>And if we have reasonable KPIs, we'll be able to revert and change course without it being too much demanding.
+
+175
+00:15:07.560 --> 00:15:11.480
+<v Noah Labhart>Okay, this will be fun to ask and hear from the founder's perspective.
+
+176
+00:15:12.060 --> 00:15:15.980
+<v Noah Labhart>What's the future look like for the product and for your team?
+
+177
+00:15:17.260 --> 00:15:22.840
+<v Dor Laor>From the very beginning, we wanted to be the number one NoSQL company.
+
+178
+00:15:23.200 --> 00:15:33.180
+<v Dor Laor>Even sometimes go beyond NoSQL, not necessarily either to relational or to other frameworks and to do more.
+
+179
+00:15:34.840 --> 00:15:47.820
+<v Dor Laor>Every week we say no to more initiatives and sometimes, or even over years, we stayed on the same rails that we originally started to create the best NoSQL.
+
+180
+00:15:48.120 --> 00:15:50.380
+<v Dor Laor>So this is still our journey.
+
+181
+00:15:50.900 --> 00:15:57.080
+<v Dor Laor>In the past, we used to say that Scylla can provide you the power of Cassandra at the speed of Redis.
+
+182
+00:15:57.240 --> 00:15:58.920
+<v Dor Laor>Redis is super fast cache.
+
+183
+00:15:58.920 --> 00:16:01.180
+<v Dor Laor>So I think that we achieved that part.
+
+184
+00:16:01.440 --> 00:16:07.540
+<v Dor Laor>And now we're trying to go after DynamoDB, which leads the industry in terms of usability.
+
+185
+00:16:08.780 --> 00:16:11.920
+<v Dor Laor>It's the most mature SaaS database.
+
+186
+00:16:12.180 --> 00:16:15.900
+<v Dor Laor>And we're trying to make Scylla as usable as DynamoDB.
+
+187
+00:16:16.650 --> 00:16:22.220
+<v Dor Laor>We've almost accomplished the infrastructure needed to be very elastic, have the ability
+
+188
+00:16:22.220 --> 00:16:26.800
+<v Dor Laor>to send data across many machines as fast as possible.
+
+189
+00:16:26.800 --> 00:16:30.400
+<v Dor Laor>So if you have a workload which is very dynamic,
+
+190
+00:16:30.540 --> 00:16:34.980
+<v Dor Laor>let's say you have users that may arrive at any given point in time,
+
+191
+00:16:35.180 --> 00:16:38.000
+<v Dor Laor>social network type of vendor that needs a database,
+
+192
+00:16:38.260 --> 00:16:41.180
+<v Dor Laor>and every minute you can have a gigantic spike,
+
+193
+00:16:41.280 --> 00:16:45.100
+<v Dor Laor>but you do not want to pay for all of the infrastructure all of the time,
+
+194
+00:16:45.260 --> 00:16:48.440
+<v Dor Laor>then this elasticity assists you the most.
+
+195
+00:16:48.520 --> 00:16:51.160
+<v Dor Laor>And we now have it in the core product,
+
+196
+00:16:51.220 --> 00:16:52.860
+<v Dor Laor>and we're going to deliver it next year.
+
+197
+00:16:52.980 --> 00:16:55.220
+<v Dor Laor>So this is very promising for us.
+
+198
+00:16:56.800 --> 00:17:00.040
+<v Dor Laor>it will help many users in their workloads.
+
+199
+00:17:01.100 --> 00:17:02.400
+<v Noah Labhart>Let's switch to you, Dor.
+
+200
+00:17:02.500 --> 00:17:05.360
+<v Noah Labhart>Who influences the way that you work?
+
+201
+00:17:05.560 --> 00:17:08.340
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+202
+00:17:09.700 --> 00:17:12.420
+<v Dor Laor>Obviously, there's plenty of people within the company,
+
+203
+00:17:12.960 --> 00:17:16.100
+<v Dor Laor>either individual contributors or executives.
+
+204
+00:17:16.580 --> 00:17:21.320
+<v Dor Laor>And we had several really great executives who joined us recently
+
+205
+00:17:21.320 --> 00:17:26.460
+<v Dor Laor>who improve the way the organization and the way I see things.
+
+206
+00:17:26.800 --> 00:17:39.020
+<v Dor Laor>But someone that really helped me along all of those years, and if it's helpful for other entrepreneurs in their early journey, is I personally enjoyed from Benny Schneider.
+
+207
+00:17:39.200 --> 00:17:46.460
+<v Dor Laor>He was the CEO of the previous startup I worked for and invested in us initially as an investor.
+
+208
+00:17:46.940 --> 00:17:49.200
+<v Dor Laor>And he's also our active chairman.
+
+209
+00:17:50.240 --> 00:17:55.640
+<v Dor Laor>Now, he has this role as an active chairman, as an investor, but basically is a friend.
+
+210
+00:17:56.800 --> 00:17:58.400
+<v Dor Laor>Trust his judgment 100%.
+
+211
+00:17:58.400 --> 00:18:08.620
+<v Dor Laor>And it's really great for an entrepreneur and a founder to have someone to consult with who was in that scenario.
+
+212
+00:18:08.900 --> 00:18:19.900
+<v Dor Laor>And also, it's not just an advice where you get an advice from someone who you just met and you tell them your story for an hour and the output is an advice.
+
+213
+00:18:20.740 --> 00:18:27.100
+<v Dor Laor>It's someone who companies use for a long time and is familiar with the company.
+
+214
+00:18:27.460 --> 00:18:33.700
+<v Dor Laor>So he helped me a lot and helped the company a lot just by being next to me and making
+
+215
+00:18:33.700 --> 00:18:41.500
+<v Dor Laor>sure I won't do silly mistakes here and there or just sometimes to reflect all of the complexity
+
+216
+00:18:41.500 --> 00:18:45.180
+<v Dor Laor>and the decision-making issues I have to make.
+
+217
+00:18:45.180 --> 00:18:49.240
+<v Dor Laor>So I recommend everybody to have someone like that.
+
+218
+00:18:50.680 --> 00:18:54.040
+<v Noah Labhart>Okay, we talked about a mistake earlier, but this is a little different spin.
+
+219
+00:18:54.300 --> 00:18:57.320
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+220
+00:18:57.400 --> 00:18:59.200
+<v Noah Labhart>Where would you consider taking a different approach?
+
+221
+00:18:59.380 --> 00:19:00.820
+<v Noah Labhart>It doesn't even have to be a mistake.
+
+222
+00:19:00.960 --> 00:19:05.000
+<v Noah Labhart>It could have been something that worked and worked well, but maybe you'd tweak it a little bit.
+
+223
+00:19:06.100 --> 00:19:11.320
+<v Dor Laor>It's not easy because sometimes if you go back in time with the knowledge you have,
+
+224
+00:19:11.320 --> 00:19:16.240
+<v Dor Laor>then you may do things differently but it's a knowledge that you currently have
+
+225
+00:19:16.240 --> 00:19:22.280
+<v Dor Laor>one thing that it would have helped a lot is back when we started and in the
+
+226
+00:19:22.280 --> 00:19:28.620
+<v Dor Laor>early days SAS wasn't that much of a thing and we built the product as a
+
+227
+00:19:28.620 --> 00:19:33.300
+<v Dor Laor>standard open source plus an enter matching enterprise offering that can
+
+228
+00:19:33.300 --> 00:19:39.980
+<v Dor Laor>run everywhere but if some companies like snowflake early on figured out that
+
+229
+00:19:41.320 --> 00:19:42.880
+<v Dor Laor>And obviously, AWS.
+
+230
+00:19:43.540 --> 00:19:58.040
+<v Dor Laor>If we would manage to do that shift very early in the process, then we would have been in a much, much better place just by spending more years on a cloud-native solution with as-a-service approach.
+
+231
+00:19:58.040 --> 00:20:11.700
+<v Dor Laor>And if someone here and there, when I speak with people who work at newer companies, people contemplate between enterprise and as a service, and mostly the answer is supposed to be as a service.
+
+232
+00:20:11.900 --> 00:20:20.180
+<v Dor Laor>Just abandon the other option and focus on as a service because it's impossible to do everything good and better just have focus.
+
+233
+00:20:22.160 --> 00:20:36.820
+<v Noah Labhart>Dor, last question. So you're sitting on a plane and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show it off to the world. Can't wait to show it off to you right there on the plane. What advice do you give that person having gone down this road a bit several times?
+
+234
+00:20:38.280 --> 00:20:50.280
+<v Dor Laor>Just to find someone that you can 100% trust and share everything without any reservation and without being afraid of bias and just have pure consultation with.
+
+235
+00:20:50.340 --> 00:20:58.280
+<v Dor Laor>It can be an official role or a friend or other founder from another company where you just sit and share the problems together.
+
+236
+00:20:58.460 --> 00:20:59.440
+<v Dor Laor>So that's number one.
+
+237
+00:20:59.540 --> 00:21:04.520
+<v Dor Laor>Number two is as an entrepreneur, you're going to meet amazing people.
+
+238
+00:21:04.520 --> 00:21:08.740
+<v Dor Laor>And it's always good to hear their advices and also to ask for advices.
+
+239
+00:21:08.900 --> 00:21:22.620
+<v Dor Laor>However, it doesn't necessarily mean that any advice that a fantastic person, very successful and accomplished, gives you may not be applicable to your business or to you personally as you have your own character.
+
+240
+00:21:22.920 --> 00:21:25.840
+<v Dor Laor>So it may be the wrong advice or the wrong timing.
+
+241
+00:21:25.840 --> 00:21:42.360
+<v Dor Laor>So the best is to, if you hear a good advice and you really contemplate to adopt it, try to receive another advice, a counter advice that have an opposite outcome, and then decide between the two.
+
+242
+00:21:42.720 --> 00:21:43.560
+<v Noah Labhart>That's great advice.
+
+243
+00:21:43.880 --> 00:21:45.940
+<v Noah Labhart>Well, Dor, thank you for being on the show today.
+
+244
+00:21:46.080 --> 00:21:48.640
+<v Noah Labhart>And thank you for telling the creation story of ScyllaDB.
+
+245
+00:21:48.780 --> 00:21:49.280
+<v Noah Labhart>Thanks
+
+246
+00:21:49.220 --> 00:21:49.720
+<v Dor Laor>a lot.
+
+247
+00:21:49.540 --> 00:21:50.460
+<v Dor Laor>It was a pleasure to be here.
+
+248
+00:21:53.300 --> 00:21:56.320
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+249
+00:21:59.780 --> 00:22:06.180
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart be sure to subscribe on apple podcast spotify or
+
+250
+00:22:06.180 --> 00:22:12.080
+<v Noah Labhart>the podcasting app of your choice and when you get a chance leave us a review both things help
+
+251
+00:22:12.080 --> 00:22:17.340
+<v Noah Labhart>us out tremendously and thanks again for listening

@@ -1,0 +1,2003 @@
+WEBVTT
+
+NOTE S3 E18: Defining Modern Observability: How Honeycomb Redefined Systems Engineering with Charity Majors
+
+1
+00:00:02.120 --> 00:00:21.360
+<v Charity Majors>I'm a little embarrassed to admit now, I had this vehemently anti-product manager sort of stance. I didn't want any of them to touch my product. It felt to me like giving up control. It felt to me like giving up the vision. Like I've never wanted to build a team where engineers just take orders. That's what it represented to me.
+
+2
+00:00:22.400 --> 00:00:26.960
+<v Charity Majors>I'm from ops. Every single year I've been like, like, every year I've been like, well, this is
+
+3
+00:00:26.960 --> 00:00:31.760
+<v Charity Majors>definitely the year we're going to fail, and this is the first year that I'm like,
+
+4
+00:00:31.760 --> 00:00:35.020
+<v Charity Majors>we might not fail, which might mean that we're doomed.
+
+5
+00:00:37.260 --> 00:00:41.880
+<v Charity Majors>My name is Charity Majors. I'm the CTO and co-founder of Honeycomb.io.
+
+6
+00:00:47.500 --> 00:00:52.780
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+7
+00:00:52.780 --> 00:00:57.020
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+8
+00:00:57.020 --> 00:01:00.760
+<v Noah Labhart>and build and lead a team that has your back.
+
+9
+00:01:02.280 --> 00:01:07.820
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Charity Majors coined the term observability
+
+10
+00:01:07.820 --> 00:01:12.900
+<v Noah Labhart>and built a tool to surface the relevant infrastructure bits.
+
+11
+00:01:13.500 --> 00:01:15.920
+<v Noah Labhart>All this and more on Code Story.
+
+12
+00:01:19.260 --> 00:01:22.300
+<v Noah Labhart>Charity Majors didn't touch a computer until she was in college.
+
+13
+00:01:22.860 --> 00:01:27.180
+<v Noah Labhart>In fact, she was raised in a religious fundamentalist compound in rural Idaho,
+
+14
+00:01:27.800 --> 00:01:29.920
+<v Noah Labhart>homeschooled and cultivating all of her own food.
+
+15
+00:01:30.580 --> 00:01:33.820
+<v Noah Labhart>She went to college to study classical performance in piano.
+
+16
+00:01:33.820 --> 00:01:37.800
+<v Noah Labhart>And though she loved piano, she decided to switch keyboards, so to speak, and pursue
+
+17
+00:01:37.800 --> 00:01:39.080
+<v Noah Labhart>something in computers.
+
+18
+00:01:39.560 --> 00:01:43.180
+<v Noah Labhart>She's been in San Francisco since she was 19 and never wants to leave.
+
+19
+00:01:44.000 --> 00:01:49.060
+<v Noah Labhart>She's firmly motivated by using code to get stuff done, i.e. she doesn't do tech for fun.
+
+20
+00:01:49.940 --> 00:01:53.020
+<v Noah Labhart>Several years ago, she was the first infrastructure hire at Parse.
+
+21
+00:01:53.280 --> 00:01:57.960
+<v Noah Labhart>While supporting the mobile backend as a service before and after the Facebook acquisition,
+
+22
+00:01:58.300 --> 00:02:03.300
+<v Noah Labhart>she had access to a tool where she could slice and dice her infrastructure to gain visibility
+
+23
+00:02:03.820 --> 00:02:06.600
+<v Noah Labhart>to a particular section of services and answer questions.
+
+24
+00:02:06.900 --> 00:02:09.980
+<v Noah Labhart>When she left, she realized that a tool of that nature
+
+25
+00:02:09.980 --> 00:02:11.760
+<v Noah Labhart>was paramount to doing her job well.
+
+26
+00:02:12.500 --> 00:02:14.600
+<v Noah Labhart>So she set out to build it again
+
+27
+00:02:14.600 --> 00:02:17.660
+<v Noah Labhart>and figure out how to coin the term observability.
+
+28
+00:02:18.880 --> 00:02:21.940
+<v Noah Labhart>This is the creation story of Honeycomb.io.
+
+29
+00:02:24.920 --> 00:02:28.220
+<v Charity Majors>Five years ago or so, seven years ago or so,
+
+30
+00:02:28.980 --> 00:02:32.000
+<v Charity Majors>I was doing my thing, engineer at Parse.
+
+31
+00:02:34.120 --> 00:02:36.860
+<v Charity Majors>I came on board when, you know, pre-beta.
+
+32
+00:02:37.180 --> 00:02:39.260
+<v Charity Majors>And that first year was insane, right?
+
+33
+00:02:39.400 --> 00:02:41.980
+<v Charity Majors>Between when I came on board and when we got acquired by Facebook,
+
+34
+00:02:42.020 --> 00:02:44.340
+<v Charity Majors>we brought online over 60,000 mobile apps.
+
+35
+00:02:44.600 --> 00:02:49.940
+<v Charity Majors>The technical problems were astoundingly hard and fun and hard.
+
+36
+00:02:50.500 --> 00:02:54.720
+<v Charity Majors>Every other day, like, a different app was hitting the iTunes top five or whatever.
+
+37
+00:02:55.200 --> 00:02:58.100
+<v Charity Majors>We'd be scrambling to figure out why Parse was down
+
+38
+00:02:58.100 --> 00:02:59.980
+<v Charity Majors>because Parse was going down all the time.
+
+39
+00:03:00.220 --> 00:03:01.640
+<v Charity Majors>It was a really hard set of problems.
+
+40
+00:03:01.640 --> 00:03:05.120
+<v Charity Majors>We were doing microservices before microservices were the thing.
+
+41
+00:03:05.260 --> 00:03:07.900
+<v Charity Majors>We were kind of ahead of the curve in a lot of ways.
+
+42
+00:03:08.500 --> 00:03:15.540
+<v Charity Majors>But the core root of the problem was for our API server, we had a fixed pool of HTTP workers,
+
+43
+00:03:15.760 --> 00:03:17.060
+<v Charity Majors>unicorn workers, right?
+
+44
+00:03:17.180 --> 00:03:20.120
+<v Charity Majors>And backing it, we'd have multiple databases.
+
+45
+00:03:20.860 --> 00:03:27.520
+<v Charity Majors>And any time any of those backing databases or other services got slow, within seconds,
+
+46
+00:03:27.520 --> 00:03:34.380
+<v Charity Majors>Second, all of those workers would fill up with requests that were in flight to that slower back end and the app would go down for everyone else.
+
+47
+00:03:34.680 --> 00:03:38.820
+<v Charity Majors>And I tried everything. I tried every tool that was available.
+
+48
+00:03:39.160 --> 00:03:45.620
+<v Charity Majors>You know, monitoring tools, metrics tools were great because it would tell you that something was wrong, but they wouldn't tell you what was wrong.
+
+49
+00:03:45.800 --> 00:03:49.020
+<v Charity Majors>You couldn't slice and dice your way down to figure out what exactly was wrong.
+
+50
+00:03:49.180 --> 00:03:55.040
+<v Charity Majors>And logging tools were great if you knew what you were looking for and you had remembered to log it in the first place.
+
+51
+00:03:55.040 --> 00:03:59.900
+<v Charity Majors>But if it was a new problem, if it was an unknown unknown, you were screwed because
+
+52
+00:03:59.900 --> 00:04:00.960
+<v Charity Majors>you didn't know what to look for.
+
+53
+00:04:01.620 --> 00:04:04.900
+<v Charity Majors>The first insight we got into this problem was at Facebook.
+
+54
+00:04:05.080 --> 00:04:10.780
+<v Charity Majors>There was this tool called Scuba that was butt ugly, like aggressively hostile to users.
+
+55
+00:04:10.860 --> 00:04:11.820
+<v Charity Majors>It was not fun.
+
+56
+00:04:12.320 --> 00:04:14.940
+<v Charity Majors>But it let us slice and dice in near real time.
+
+57
+00:04:15.160 --> 00:04:19.000
+<v Charity Majors>And all of a sudden, I could follow it like a trail of breadcrumbs, right?
+
+58
+00:04:19.120 --> 00:04:21.260
+<v Charity Majors>I could start from something's wrong.
+
+59
+00:04:21.520 --> 00:04:22.140
+<v Charity Majors>What's wrong?
+
+60
+00:04:22.260 --> 00:04:23.680
+<v Charity Majors>Oh, there's a bunch of errors.
+
+61
+00:04:25.040 --> 00:04:26.820
+<v Charity Majors>It seems like they're going to the right endpoints.
+
+62
+00:04:27.060 --> 00:04:28.420
+<v Charity Majors>Okay, right on the endpoints.
+
+63
+00:04:28.660 --> 00:04:30.060
+<v Charity Majors>Well, is it all of them?
+
+64
+00:04:30.520 --> 00:04:31.940
+<v Charity Majors>Well, no, it's not all of them.
+
+65
+00:04:31.980 --> 00:04:34.800
+<v Charity Majors>It's just the ones that are backed by MongoDB, let's say.
+
+66
+00:04:34.840 --> 00:04:36.160
+<v Charity Majors>Well, is it all of them?
+
+67
+00:04:36.380 --> 00:04:40.440
+<v Charity Majors>Well, no, it's just the ones that are for this replica set or for this cluster.
+
+68
+00:04:40.620 --> 00:04:42.180
+<v Charity Majors>Well, is it all of them?
+
+69
+00:04:42.320 --> 00:04:46.180
+<v Charity Majors>You know, and I could just like, I could follow that step after step to the end.
+
+70
+00:04:46.400 --> 00:04:52.820
+<v Charity Majors>And the amount of time it took us to diagnose these previously intractable problems dropped like a rock.
+
+71
+00:04:52.820 --> 00:05:00.360
+<v Charity Majors>Like from open-ended days to like maybe minutes. But it wasn't even an engineering problem,
+
+72
+00:05:00.360 --> 00:05:05.280
+<v Charity Majors>it was a support problem, right? You could always find the path to the problem. This made
+
+73
+00:05:05.280 --> 00:05:09.620
+<v Charity Majors>a big impact on me. Like, it changed my life in a very real way. I started sleeping again.
+
+74
+00:05:09.620 --> 00:05:15.640
+<v Charity Majors>And then when I was leaving Facebook a couple years later, I kind of went, oh crap, I don't know
+
+75
+00:05:15.640 --> 00:05:19.880
+<v Charity Majors>how to engineer anymore without this tooling that we've built. Like, this is not just how I get
+
+76
+00:05:19.880 --> 00:05:25.180
+<v Charity Majors>the site back up when the site's down. This is, these are my five senses for production. This is how I
+
+77
+00:05:25.180 --> 00:05:31.460
+<v Charity Majors>know that what I built is doing what I wanted it to, you know? And so Christine, Christine, my co-founder,
+
+78
+00:05:31.460 --> 00:05:36.800
+<v Charity Majors>start building this. And like, we had to start by writing a store from scratch, which was non-trivial,
+
+79
+00:05:38.040 --> 00:05:43.740
+<v Charity Majors>but it was actually the easier problem compared to trying to figure out how to talk about this.
+
+80
+00:05:43.740 --> 00:05:48.100
+<v Charity Majors>We knew that we weren't building a monitoring solution, but trying to figure out how to talk
+
+81
+00:05:49.880 --> 00:05:52.140
+<v Charity Majors>was the hardest problem that I've ever had in my entire career.
+
+82
+00:05:52.440 --> 00:05:54.420
+<v Charity Majors>It was half of the way through the first year that I first,
+
+83
+00:05:54.480 --> 00:05:55.980
+<v Charity Majors>I Googled the term observability,
+
+84
+00:05:56.200 --> 00:05:59.340
+<v Charity Majors>which was not a term that was widely used at the time.
+
+85
+00:05:59.460 --> 00:06:02.080
+<v Charity Majors>But like I Googled it and the definition,
+
+86
+00:06:02.340 --> 00:06:05.420
+<v Charity Majors>like it had this really rich history in mechanical engineering,
+
+87
+00:06:05.680 --> 00:06:06.920
+<v Charity Majors>control system theory,
+
+88
+00:06:07.180 --> 00:06:08.140
+<v Charity Majors>and it was all about,
+
+89
+00:06:08.220 --> 00:06:11.800
+<v Charity Majors>can you look at the outside and understand what's going on inside?
+
+90
+00:06:12.440 --> 00:06:12.940
+<v Charity Majors>Right?
+
+91
+00:06:12.980 --> 00:06:16.220
+<v Charity Majors>Can you understand any system state that it's ever gotten itself into
+
+92
+00:06:16.220 --> 00:06:19.360
+<v Charity Majors>without being able to predict that you would see that system state before
+
+93
+00:06:19.880 --> 00:06:24.220
+<v Charity Majors>Right. And like I just had like light bulbs going off my brain like, oh, my God, this is what we're building.
+
+94
+00:06:24.400 --> 00:06:29.240
+<v Charity Majors>This is so great. Fast forward a year or so and the entire industry has adopted all of our language.
+
+95
+00:06:30.700 --> 00:06:36.500
+<v Charity Majors>Most of the people who are out there building, quote unquote, observability tools or observability teams, they're just building monitoring tools.
+
+96
+00:06:36.740 --> 00:06:46.100
+<v Charity Majors>They're just building monitoring teams. They're not actually making a leap from the known unknowns to the unknown unknowns and all of the technical ramifications of that choice.
+
+97
+00:06:46.820 --> 00:06:59.440
+<v Noah Labhart>That's interesting. So it is observability, but it's not monitoring. How do you describe that? And that's what you're saying. That was a really hard thing to be able to describe that. How have you landed on describing the difference there? Because that's a key.
+
+98
+00:06:59.440 --> 00:06:59.940
+<v Noah Labhart>key
+
+99
+00:06:59.600 --> 00:07:05.020
+<v Charity Majors>Yeah, well, it kind of depends on the audience, right? Like, there are a lot of technical ramifications
+
+100
+00:07:05.020 --> 00:07:09.740
+<v Charity Majors>that fall if you accept the definition that, you know, observability means being able to
+
+101
+00:07:09.740 --> 00:07:14.860
+<v Charity Majors>just ask questions from the outside to understand any systems in the inside. There's actually a lot
+
+102
+00:07:14.860 --> 00:07:20.420
+<v Charity Majors>of things that fall from that. It needs to support high cardinality, high dimensionality. It needs to,
+
+103
+00:07:20.420 --> 00:07:25.020
+<v Charity Majors>you know, pack a bunch of really rich context. You need to be gathering up all this information, the
+
+104
+00:07:25.020 --> 00:07:30.860
+<v Charity Majors>the right level of abstraction such that you can ask any question without needing to ship custom
+
+105
+00:07:30.860 --> 00:07:36.180
+<v Charity Majors>code to describe that system state. The way to solve this problem, it comes down to the data
+
+106
+00:07:36.180 --> 00:07:41.440
+<v Charity Majors>format. You can't gather metrics. A metric is a single number where you've appended some tags to
+
+107
+00:07:41.440 --> 00:07:46.480
+<v Charity Majors>it. It doesn't support high cardinality. It doesn't support high dimensionality. I believe that the
+
+108
+00:07:46.480 --> 00:07:51.340
+<v Charity Majors>source of truth for this needs to be these arbitrarily wide structured data blobs where
+
+109
+00:07:51.340 --> 00:07:53.520
+<v Charity Majors>where you can just pack in all of the context,
+
+110
+00:07:53.760 --> 00:07:55.000
+<v Charity Majors>everything that's interesting.
+
+111
+00:07:55.580 --> 00:07:57.060
+<v Charity Majors>Another way to think of this is that
+
+112
+00:07:57.380 --> 00:07:59.600
+<v Charity Majors>this became necessary when we blew up the monolith,
+
+113
+00:07:59.760 --> 00:08:01.540
+<v Charity Majors>because when you had a monolith,
+
+114
+00:08:01.720 --> 00:08:02.960
+<v Charity Majors>you could attach a debugger
+
+115
+00:08:02.960 --> 00:08:04.380
+<v Charity Majors>and you could just step through the code.
+
+116
+00:08:04.680 --> 00:08:06.860
+<v Charity Majors>Now, when you got rid of the monolith,
+
+117
+00:08:07.020 --> 00:08:09.540
+<v Charity Majors>now your code is in all of these different services,
+
+118
+00:08:09.600 --> 00:08:11.140
+<v Charity Majors>so it has to hop the network.
+
+119
+00:08:11.380 --> 00:08:12.600
+<v Charity Majors>So you kind of need to bundle
+
+120
+00:08:12.600 --> 00:08:15.560
+<v Charity Majors>and attach all that context along with it.
+
+121
+00:08:15.780 --> 00:08:18.140
+<v Charity Majors>You seed it with everything that we know about the request,
+
+122
+00:08:18.760 --> 00:08:20.340
+<v Charity Majors>any parameters that were shipped in,
+
+123
+00:08:21.340 --> 00:08:28.240
+<v Charity Majors>stuff about the environment, say the container, the EC2 instance, the language internals,
+
+124
+00:08:28.340 --> 00:08:30.540
+<v Charity Majors>anything we know, we just stuff it in there.
+
+125
+00:08:31.100 --> 00:08:35.720
+<v Charity Majors>As your code is executing, you can also stuff in, be like, oh, shopping credit, this will
+
+126
+00:08:35.720 --> 00:08:36.880
+<v Charity Majors>be useful, stuff it in.
+
+127
+00:08:37.000 --> 00:08:39.380
+<v Charity Majors>Oh, user ID, this will be useful, stuff it in.
+
+128
+00:08:39.840 --> 00:08:44.180
+<v Charity Majors>You know, when your request is ready to exit or error, you ship that single arbitrarily
+
+129
+00:08:44.180 --> 00:08:46.920
+<v Charity Majors>wide data blob off to a service like Honeycomb.
+
+130
+00:08:46.920 --> 00:08:52.560
+<v Charity Majors>In the future, when you're trying to figure out what's going on, when you've structured
+
+131
+00:08:52.560 --> 00:08:56.760
+<v Charity Majors>it this way, you're able to go, oh, what all of these errors have in common is they're all
+
+132
+00:08:56.760 --> 00:09:03.360
+<v Charity Majors>in US East 1A, they're all on this type of instance type, they all have this large packet
+
+133
+00:09:03.360 --> 00:09:05.060
+<v Charity Majors>size, whatever the hell it is.
+
+134
+00:09:05.160 --> 00:09:08.900
+<v Charity Majors>If you didn't structure it that way, then you couldn't do that post hoc correlation.
+
+135
+00:09:10.320 --> 00:09:15.240
+<v Charity Majors>If you're more of a client-side person or user experience person or whatever, I would
+
+136
+00:09:16.920 --> 00:09:22.120
+<v Charity Majors>that you're able to ask. Questions like, what went wrong? What did these errors have in common?
+
+137
+00:09:22.420 --> 00:09:25.640
+<v Charity Majors>It's like right now, like people are used to having these metrics tools where you can see
+
+138
+00:09:25.640 --> 00:09:30.040
+<v Charity Majors>that something went wrong. And then the logging tools where they can see what went wrong. And
+
+139
+00:09:30.040 --> 00:09:33.980
+<v Charity Majors>then maybe the tracing tools where they can see how it went wrong. And observability means you
+
+140
+00:09:33.980 --> 00:09:38.260
+<v Charity Majors>can ask all of those questions together because it's just the same data, right? It's two sides
+
+141
+00:09:38.260 --> 00:09:42.840
+<v Charity Majors>of the same coin. You're just flipping back and forth between visualizing it as a waterfall in
+
+142
+00:09:42.840 --> 00:09:47.940
+<v Charity Majors>in your tracing tool or like slicing and dicing it in your logging tool, right? You should be
+
+143
+00:09:47.940 --> 00:09:48.940
+<v Charity Majors>able to do all that at once.
+
+144
+00:09:51.460 --> 00:09:55.160
+<v Noah Labhart>That's a perfect segue. So tell me about the MVP. Tell me about
+
+145
+00:09:55.160 --> 00:10:00.480
+<v Noah Labhart>that first product you built, how you went about building it. And I would even say when you
+
+146
+00:10:00.480 --> 00:10:05.280
+<v Noah Labhart>recreated it or, you know, recreated your five senses, as you were saying, tell me about that
+
+147
+00:10:05.280 --> 00:10:07.700
+<v Noah Labhart>MVP and what sort of tools you use to bring it to life.
+
+148
+00:10:08.360 --> 00:10:10.400
+<v Charity Majors>Well, I would preface this by saying that
+
+149
+00:10:10.400 --> 00:10:11.240
+<v Charity Majors>we did it all wrong.
+
+150
+00:10:12.560 --> 00:10:14.700
+<v Charity Majors>And our investors were telling us from the very beginning,
+
+151
+00:10:14.820 --> 00:10:15.400
+<v Charity Majors>they were just like,
+
+152
+00:10:15.500 --> 00:10:17.100
+<v Charity Majors>shouldn't you find product market fit
+
+153
+00:10:17.100 --> 00:10:18.460
+<v Charity Majors>before you write a storage engine?
+
+154
+00:10:19.560 --> 00:10:20.760
+<v Charity Majors>No, definitely not.
+
+155
+00:10:20.980 --> 00:10:23.260
+<v Charity Majors>We'll just look and feel like every other tool out there,
+
+156
+00:10:23.320 --> 00:10:24.500
+<v Charity Majors>like it needed to be different.
+
+157
+00:10:25.060 --> 00:10:27.360
+<v Charity Majors>We're really, really lucky that we managed to survive
+
+158
+00:10:28.700 --> 00:10:30.820
+<v Charity Majors>because we built for like a year and a half
+
+159
+00:10:30.820 --> 00:10:32.160
+<v Charity Majors>before we even went out there.
+
+160
+00:10:32.480 --> 00:10:34.340
+<v Charity Majors>But the MVP was basically just
+
+161
+00:10:34.340 --> 00:10:35.940
+<v Charity Majors>this arbitrarily wide structured data blob
+
+162
+00:10:35.940 --> 00:10:36.760
+<v Charity Majors>so you can slice and dice.
+
+163
+00:10:36.980 --> 00:10:39.760
+<v Charity Majors>I would say that we started to find product market fit.
+
+164
+00:10:40.400 --> 00:10:45.780
+<v Charity Majors>We added the integration where you could just like install a library and we do all of the,
+
+165
+00:10:45.780 --> 00:10:50.120
+<v Charity Majors>you know, bundling up and, you know, wrapping up of the information and ship it off to Honeycomb,
+
+166
+00:10:50.120 --> 00:10:55.060
+<v Charity Majors>right? Like, we did that like two, three years in. The other thing that was really helpful was we built
+
+167
+00:10:55.060 --> 00:11:00.220
+<v Charity Majors>sort of the APM home. People get their data in and then they'd be faced with this query
+
+168
+00:11:00.220 --> 00:11:05.520
+<v Charity Majors>builder, which is hostile. A query builder, no matter how easy you make them, are never easy.
+
+169
+00:11:05.520 --> 00:11:10.060
+<v Charity Majors>And so instead of facing them with that, we would show them like the same three graphs together.
+
+170
+00:11:10.400 --> 00:11:12.680
+<v Charity Majors>Your request rate, your error rate, and your latency.
+
+171
+00:11:13.000 --> 00:11:14.640
+<v Charity Majors>And that made it much friendlier.
+
+172
+00:11:14.880 --> 00:11:20.780
+<v Charity Majors>But in the beginning, the MVP, the very basic thing, was basically just a slightly better logs tool.
+
+173
+00:11:21.560 --> 00:11:25.580
+<v Noah Labhart>So when you're building that, you had to decide.
+
+174
+00:11:25.840 --> 00:11:28.660
+<v Noah Labhart>I had this amazing thing when I was at Parse and Facebook.
+
+175
+00:11:29.040 --> 00:11:30.840
+<v Noah Labhart>And now I've got to rebuild it.
+
+176
+00:11:30.960 --> 00:11:33.240
+<v Noah Labhart>And I know you said you rebuilt it all wrong.
+
+177
+00:11:33.540 --> 00:11:40.220
+<v Noah Labhart>But even in building that first version, you had to make some decisions and trade-offs about what you were going to do.
+
+178
+00:11:40.400 --> 00:11:45.480
+<v Noah Labhart>what you weren't going to do. Talk to me about those and how did you cope with those decisions?
+
+179
+00:11:46.960 --> 00:11:52.360
+<v Charity Majors>To be clear, like we didn't have a great thing at Facebook. It was a thing that was necessary
+
+180
+00:11:52.360 --> 00:11:57.920
+<v Charity Majors>and also horrible to use. We wanted to make something that was delightful to you. You know,
+
+181
+00:11:57.960 --> 00:12:01.860
+<v Charity Majors>at Facebook, they could just cram it down our throats. You use this, you use nothing, right?
+
+182
+00:12:02.100 --> 00:12:07.940
+<v Charity Majors>And this is a mistake that many ex-Google, ex-Facebook, etc. teams make, which is they're
+
+183
+00:12:07.940 --> 00:12:10.340
+<v Charity Majors>They're just like, oh, we were forced to use this thing.
+
+184
+00:12:10.480 --> 00:12:11.620
+<v Charity Majors>It was life-changing for us.
+
+185
+00:12:11.680 --> 00:12:15.940
+<v Charity Majors>We're just going to build it and we're going to force everyone else to use it, which just doesn't work.
+
+186
+00:12:16.420 --> 00:12:19.780
+<v Charity Majors>From the very beginning, we were talking a lot about, you know, how do we make this friendly?
+
+187
+00:12:20.180 --> 00:12:25.480
+<v Charity Majors>Ultimately, what we're trying to do is revolutionize the way engineers think about production systems.
+
+188
+00:12:25.900 --> 00:12:27.720
+<v Charity Majors>We want to invite them in.
+
+189
+00:12:27.940 --> 00:12:31.780
+<v Charity Majors>Instead of it being this terrible thing that they have to be responsible for,
+
+190
+00:12:31.980 --> 00:12:36.560
+<v Charity Majors>we want it to be something where they understand that it makes them a better engineer.
+
+191
+00:12:37.940 --> 00:12:42.240
+<v Charity Majors>lot about, you know, bringing everyone up to the level of the best debugger in every area of your
+
+192
+00:12:42.240 --> 00:12:46.460
+<v Charity Majors>system, because when you're working on a system, you know, you're working on your service, you know it
+
+193
+00:12:46.460 --> 00:12:51.420
+<v Charity Majors>intimately, you know all the ins and outs of it, you know how to interact with it like an expert,
+
+194
+00:12:51.420 --> 00:12:56.140
+<v Charity Majors>and you should wear grooves in the system by interacting with it. But when you're debugging it,
+
+195
+00:12:56.140 --> 00:13:00.540
+<v Charity Majors>you're not just debugging your corner of the system. You have to be able to understand, debug
+
+196
+00:13:00.540 --> 00:13:07.580
+<v Charity Majors>like the full request. So like, what if we could just give you access to your team's brain, right?
+
+197
+00:13:07.940 --> 00:13:11.440
+<v Charity Majors>Everyone on your team is responsible for a different part of the system. Every one of you
+
+198
+00:13:11.440 --> 00:13:16.020
+<v Charity Majors>interacts with it in this X level way, and, you know, five months from now when you've moved on
+
+199
+00:13:16.020 --> 00:13:20.360
+<v Charity Majors>to a different part of the system, you're going to have forgotten how you interact with this part of
+
+200
+00:13:20.360 --> 00:13:25.240
+<v Charity Majors>the system that you were once responsible for. Like, what could we do to just make it so that,
+
+201
+00:13:25.240 --> 00:13:30.380
+<v Charity Majors>you know, you can go, oh, okay, I'm on call for this thing, whatever, I don't know how to use it, I get
+
+202
+00:13:30.380 --> 00:13:36.020
+<v Charity Majors>paged, but like I know that my team's expert is Ben or Emily, so I'm just going to go look at how.
+
+203
+00:13:37.940 --> 00:13:42.480
+<v Charity Majors>Or like the last time we had a problem that felt like this, you know, I think like Allison's on call.
+
+204
+00:13:42.660 --> 00:13:44.460
+<v Charity Majors>So I'm going to go see how she did it.
+
+205
+00:13:44.460 --> 00:13:47.340
+<v Charity Majors>And I want to just like retrace her steps through the system.
+
+206
+00:13:47.660 --> 00:13:49.440
+<v Charity Majors>History may not repeat, but it rhymes.
+
+207
+00:13:49.740 --> 00:13:53.440
+<v Charity Majors>And that should like take me within shouting distance of the answer.
+
+208
+00:13:54.760 --> 00:13:58.640
+<v Noah Labhart>So from that point, you've got your MVP built.
+
+209
+00:13:58.860 --> 00:14:00.800
+<v Noah Labhart>You've considered how to build it.
+
+210
+00:14:00.880 --> 00:14:03.840
+<v Noah Labhart>You have a good point of view on how you're going to build it.
+
+211
+00:14:03.900 --> 00:14:05.320
+<v Noah Labhart>And you get the tool out there.
+
+212
+00:14:05.420 --> 00:14:07.600
+<v Noah Labhart>How did you progress the product from there?
+
+213
+00:14:07.940 --> 00:14:14.360
+<v Noah Labhart>And kind of what I'm looking for is, how did you figure out what was the next most important thing to build and how you built your roadmap?
+
+214
+00:14:15.520 --> 00:14:23.800
+<v Charity Majors>So in the beginning, I had this, I'm a little embarrassed to admit it now, I had this vehemently anti-product manager sort of stance.
+
+215
+00:14:24.100 --> 00:14:27.460
+<v Charity Majors>I didn't want any of them to touch my product.
+
+216
+00:14:28.140 --> 00:14:32.620
+<v Charity Majors>It's hard for me to even project myself into the way I was thinking about it then.
+
+217
+00:14:32.820 --> 00:14:34.600
+<v Charity Majors>It felt to me like giving up control.
+
+218
+00:14:34.880 --> 00:14:36.780
+<v Charity Majors>It felt to me like giving up the vision.
+
+219
+00:14:37.940 --> 00:14:42.340
+<v Charity Majors>like sacrificing, like I've never wanted to build a team where engineers just take orders.
+
+220
+00:14:42.800 --> 00:14:46.420
+<v Charity Majors>That's what it represented to me. Like all the other years I would just be taking,
+
+221
+00:14:46.440 --> 00:14:51.340
+<v Charity Majors>taking orders if I hired new product people. And that was dumb.
+
+222
+00:14:53.280 --> 00:14:58.520
+<v Charity Majors>I have an amazing product manager now who I rely on very much. I think also in the,
+
+223
+00:14:58.540 --> 00:15:02.480
+<v Charity Majors>in the early days, I think that I was telling the team not to listen to our customers because
+
+224
+00:15:02.480 --> 00:15:06.180
+<v Charity Majors>I knew that our customers were just asking for faster horses.
+
+225
+00:15:06.620 --> 00:15:12.620
+<v Charity Majors>They had come from the metrics world, and I knew that we were building something dramatically
+
+226
+00:15:12.620 --> 00:15:13.240
+<v Charity Majors>different.
+
+227
+00:15:13.560 --> 00:15:16.940
+<v Charity Majors>So I was reluctant to listen to our customers very much.
+
+228
+00:15:17.100 --> 00:15:22.480
+<v Charity Majors>And now, it's like 30% we have built what we wanted to build, we've gotten farther,
+
+229
+00:15:22.660 --> 00:15:26.080
+<v Charity Majors>and it's 70% I actually feel like the world has come around to us.
+
+230
+00:15:26.400 --> 00:15:30.300
+<v Charity Majors>When I started talking about observability on this stuff, literally I had so many people
+
+231
+00:15:30.300 --> 00:15:31.900
+<v Charity Majors>just tell me, you're too late.
+
+232
+00:15:32.480 --> 00:15:36.600
+<v Charity Majors>done. Datadog is going public. There's nothing left to be done in this space. Just give up and
+
+233
+00:15:36.600 --> 00:15:41.620
+<v Charity Majors>go home. And I think that over the past few years, a lot of space has opened up there,
+
+234
+00:15:41.800 --> 00:15:45.100
+<v Charity Majors>partly as a result of the observability stuff that we've been talking about,
+
+235
+00:15:45.260 --> 00:15:51.920
+<v Charity Majors>partly as a result of you've now got logging, APM, metrics, time series database. There's like
+
+236
+00:15:51.920 --> 00:15:56.940
+<v Charity Majors>five or six different market segments. They've changed their product roadmap and they're like,
+
+237
+00:15:56.960 --> 00:16:01.080
+<v Charity Majors>we do observability now too. I think that customers have been educated a lot. They're
+
+238
+00:16:02.480 --> 00:16:07.540
+<v Charity Majors>this is all great. Now we can listen to our users because they're asking for the right things.
+
+239
+00:16:08.340 --> 00:16:12.140
+<v Charity Majors>We've been operating with like nine people writing code for the past two years,
+
+240
+00:16:12.320 --> 00:16:16.800
+<v Charity Majors>which is insane. It's like an order of magnitude or two orders of magnitude,
+
+241
+00:16:16.900 --> 00:16:21.160
+<v Charity Majors>less than any of our competitors. And the reason for that was because when we last raised,
+
+242
+00:16:21.660 --> 00:16:26.420
+<v Charity Majors>you know, our VCs were like, we believe that you can build product. We aren't sure that we
+
+243
+00:16:26.420 --> 00:16:30.920
+<v Charity Majors>believe that you can sell it. So, you know, we went heads down, like Christine focusing on sales,
+
+244
+00:16:32.480 --> 00:16:36.380
+<v Charity Majors>trying to figure out we're trying to get our house in order over the past two years and as of this
+
+245
+00:16:36.380 --> 00:16:42.180
+<v Charity Majors>last summer we've shown that we can our sales are great marketing great so now like we're doubling
+
+246
+00:16:42.180 --> 00:16:46.360
+<v Charity Majors>the size of our engineering team like there was there was a long time there where it was just like
+
+247
+00:16:46.360 --> 00:16:51.280
+<v Charity Majors>we just have to keep the wheels on the bus while we figure out our business side and now that's
+
+248
+00:16:51.280 --> 00:16:56.240
+<v Charity Majors>opening up a little bit more so now you know we've gone through the exercise of like what is our
+
+249
+00:16:56.240 --> 00:17:01.340
+<v Charity Majors>product vision and and really that what our product vision is is to fulfill the promise
+
+250
+00:17:02.480 --> 00:17:06.920
+<v Charity Majors>I think that Honeycomb is really the only legit observability tool out there at this point.
+
+251
+00:17:06.980 --> 00:17:09.960
+<v Charity Majors>And yet it doesn't fully fulfill the promise of observability.
+
+252
+00:17:09.960 --> 00:17:12.940
+<v Charity Majors>There are still questions that you can't ask using Honeycomb.
+
+253
+00:17:13.260 --> 00:17:19.920
+<v Charity Majors>And in order to be able to understand any internal system state, you need to be able to ask any question given the data that you have.
+
+254
+00:17:20.140 --> 00:17:22.040
+<v Charity Majors>So that's really what's driving us right now.
+
+255
+00:17:23.080 --> 00:17:29.420
+<v Noah Labhart>Doubling back a little bit, when you built the tool, what sort of tools are you using to build an observability tool?
+
+256
+00:17:29.420 --> 00:17:33.000
+<v Noah Labhart>I mean, what are you writing this platform in, you know, things like that?
+
+257
+00:17:34.140 --> 00:17:35.600
+<v Charity Majors>On the back end, it's Golang.
+
+258
+00:17:35.940 --> 00:17:39.380
+<v Charity Majors>On the front end, it is React, for the most part.
+
+259
+00:17:39.940 --> 00:17:46.020
+<v Noah Labhart>Gotcha. So Golang and React and then microservices type architecture, I assume.
+
+260
+00:17:47.520 --> 00:17:49.140
+<v Charity Majors>Yeah, microservices-ish.
+
+261
+00:17:49.240 --> 00:17:53.420
+<v Charity Majors>You know, the API is just one service, but we've spun off other services too.
+
+262
+00:17:53.640 --> 00:17:56.540
+<v Charity Majors>We also have this one thing, Secure Proxy.
+
+263
+00:17:56.540 --> 00:18:04.300
+<v Charity Majors>For customers who aren't able to fully use the cloud, they can run the service inside their secure network and proxy all their events through it.
+
+264
+00:18:04.360 --> 00:18:19.220
+<v Charity Majors>It either stores the hashed value of the events or representation of the events themselves and just forwards on the encrypted version to us so that people who have really high data security needs or HIPAA or whatever, they can still use this.
+
+265
+00:18:20.360 --> 00:18:23.180
+<v Noah Labhart>Okay, fast forward a little bit back to where we were.
+
+266
+00:18:23.300 --> 00:18:25.400
+<v Noah Labhart>So you're about to expand the team.
+
+267
+00:18:26.540 --> 00:18:31.020
+<v Noah Labhart>nine people and now you're gonna you're gonna double it how do you go about building your team
+
+268
+00:18:31.020 --> 00:18:36.380
+<v Noah Labhart>and what I'm specifically looking for is what do you look for in those people to indicate that
+
+269
+00:18:36.380 --> 00:18:38.460
+<v Noah Labhart>they're the winning horses to join you?
+
+270
+00:18:38.460 --> 00:18:42.700
+<v Charity Majors>We've been in the Bay Area for a long time, but we have a lot
+
+271
+00:18:42.700 --> 00:18:48.100
+<v Charity Majors>of amazing friends, right? And this is something where we could have just hired all of our ex
+
+272
+00:18:48.100 --> 00:18:52.640
+<v Charity Majors>Google, ex Facebook friends, right? From the very beginning, we were like, we're building a tool for
+
+273
+00:18:52.640 --> 00:18:55.540
+<v Charity Majors>for everyone, we need to have a very diverse group.
+
+274
+00:18:55.740 --> 00:18:59.100
+<v Charity Majors>And I don't just mean diverse in terms of like gender and race,
+
+275
+00:18:59.240 --> 00:19:01.380
+<v Charity Majors>but like diverse in terms of where they come from.
+
+276
+00:19:01.540 --> 00:19:05.580
+<v Charity Majors>You know, we very intentionally went out and hired a bunch of HAC Academy grads
+
+277
+00:19:05.580 --> 00:19:08.580
+<v Charity Majors>because we're like, this is really the most representative of, you know,
+
+278
+00:19:08.580 --> 00:19:09.780
+<v Charity Majors>the up and coming developers.
+
+279
+00:19:10.260 --> 00:19:13.920
+<v Charity Majors>The first two people we hired, I will admit, were people that we knew well
+
+280
+00:19:13.920 --> 00:19:17.780
+<v Charity Majors>because it was like the five of us for the first two and a half years or so.
+
+281
+00:19:18.220 --> 00:19:20.580
+<v Charity Majors>But even there, like we were very conscious of,
+
+282
+00:19:20.640 --> 00:19:22.020
+<v Charity Majors>because Christine and I are both workaholics,
+
+283
+00:19:22.640 --> 00:19:28.960
+<v Charity Majors>hired two young dads with young girls who were always home by 4 or 5 p.m. like every night.
+
+284
+00:19:29.080 --> 00:19:33.220
+<v Charity Majors>So we were like, well, if we can't set a good role model for future employees, at least we can hire
+
+285
+00:19:33.220 --> 00:19:38.120
+<v Charity Majors>some people who will do that for us. Something that we've always done in terms of our interviewing is
+
+286
+00:19:38.120 --> 00:19:43.180
+<v Charity Majors>we do have a coding interview, but like the code is not the interview. We send them like a piece
+
+287
+00:19:43.180 --> 00:19:48.000
+<v Charity Majors>of code the night before. We ask them to extend or modify it in some way because Greenfield code is
+
+288
+00:19:48.000 --> 00:19:50.040
+<v Charity Majors>It's just not most of what we care about, right?
+
+289
+00:19:50.220 --> 00:19:55.280
+<v Charity Majors>We ask them to spend an hour or two, like, extending it or, like, adding a feature or something like that, but not more than that.
+
+290
+00:19:55.440 --> 00:19:56.480
+<v Charity Majors>But that's not the interview.
+
+291
+00:19:56.620 --> 00:20:01.780
+<v Charity Majors>The interview is the next day when they have a code review with, you know, a couple people from our team.
+
+292
+00:20:01.920 --> 00:20:05.380
+<v Charity Majors>And the interview is just, you know, we walk through, why did you make these choices?
+
+293
+00:20:05.840 --> 00:20:07.100
+<v Charity Majors>What else did you have in mind?
+
+294
+00:20:07.300 --> 00:20:08.800
+<v Charity Majors>What would you have done if you had more time?
+
+295
+00:20:09.120 --> 00:20:10.640
+<v Charity Majors>Talk me through the tradeoffs here.
+
+296
+00:20:11.360 --> 00:20:12.120
+<v Charity Majors>That's the interview.
+
+297
+00:20:12.380 --> 00:20:17.380
+<v Charity Majors>And we have found that selecting for communication skills is a great predictor of success at Honeycomb.
+
+298
+00:20:18.000 --> 00:20:20.000
+<v Charity Majors>Tech skills, you know, they come and go.
+
+299
+00:20:20.120 --> 00:20:23.020
+<v Charity Majors>If you can learn one, you can learn another, you know?
+
+300
+00:20:23.040 --> 00:20:25.900
+<v Charity Majors>Like, what we care about is, do they think clearly?
+
+301
+00:20:26.040 --> 00:20:28.280
+<v Charity Majors>And can they communicate about what they're doing?
+
+302
+00:20:28.360 --> 00:20:31.100
+<v Charity Majors>And do they not have an ego wrapped up in their code?
+
+303
+00:20:31.440 --> 00:20:37.240
+<v Noah Labhart>I've hired, I think, nine to ten now graduates from DevMountain here in Dallas.
+
+304
+00:20:37.360 --> 00:20:41.280
+<v Noah Labhart>And great success working with them and great folks.
+
+305
+00:20:41.420 --> 00:20:46.480
+<v Noah Labhart>I really love how you said that's representative of tech folks today and moving forward.
+
+306
+00:20:46.600 --> 00:20:47.820
+<v Noah Labhart>I totally agree with that.
+
+307
+00:20:48.000 --> 00:20:54.360
+<v Noah Labhart>And it's this combination of practical skills and view of the world actually as an end user, which is really interesting.
+
+308
+00:20:54.640 --> 00:20:58.040
+<v Charity Majors>A bunch of them are like sort of mid-career transfer folks, too.
+
+309
+00:20:58.280 --> 00:21:00.200
+<v Charity Majors>One of them was trained as a biologist.
+
+310
+00:21:00.280 --> 00:21:03.080
+<v Charity Majors>One of them was Canadian border security guard.
+
+311
+00:21:03.240 --> 00:21:04.560
+<v Charity Majors>But they change careers.
+
+312
+00:21:04.740 --> 00:21:09.020
+<v Charity Majors>And they're some of the most driven and motivated folks that I've ever gotten to work with, which is fantastic.
+
+313
+00:21:09.740 --> 00:21:10.240
+<v Noah Labhart>Absolutely.
+
+314
+00:21:10.340 --> 00:21:11.180
+<v Noah Labhart>Gritty and hungry.
+
+315
+00:21:11.660 --> 00:21:12.320
+<v Charity Majors>Yeah, they are.
+
+316
+00:21:12.440 --> 00:21:13.780
+<v Noah Labhart>Well, this is going to be interesting.
+
+317
+00:21:13.780 --> 00:21:20.320
+<v Noah Labhart>Interesting. Did you build this in the beginning to scale efficiently or were you fighting this as you grew?
+
+318
+00:21:20.840 --> 00:21:29.580
+<v Charity Majors>Oh, yeah. No, no, no. We like this is kind of the benefit that you get from having an ops co-founder is like scale was baked in from the very beginning.
+
+319
+00:21:29.820 --> 00:21:34.420
+<v Charity Majors>It's all it's a distributed data store. It scales horizontally. It's not even a problem.
+
+320
+00:21:34.560 --> 00:21:39.140
+<v Noah Labhart>Sort of what you knew and what you walked in with. So it's how you're going to do it from the beginning.
+
+321
+00:21:39.140 --> 00:21:39.640
+<v Noah Labhart>The
+
+322
+00:21:39.540 --> 00:21:44.120
+<v Charity Majors>infrastructure is still largely what I built almost five years ago. It just, it works.
+
+323
+00:21:45.160 --> 00:21:49.980
+<v Charity Majors>I think the more people should really have ops co-founders. They're incredibly rare and that's
+
+324
+00:21:49.980 --> 00:21:55.140
+<v Charity Majors>really too bad because so many of the classic, you know, scaling horror stories, problems that
+
+325
+00:21:55.140 --> 00:21:59.460
+<v Charity Majors>we hear about are just the result of people not knowing what they were doing and starting wrong.
+
+326
+00:21:59.720 --> 00:22:04.680
+<v Charity Majors>These things are not hard. It's so much harder to dig yourself out of a hole than not fall into
+
+327
+00:22:04.680 --> 00:22:05.640
+<v Charity Majors>to the hole in the first place.
+
+328
+00:22:06.140 --> 00:22:08.660
+<v Noah Labhart>Do you have this template that you're able to replicate?
+
+329
+00:22:08.840 --> 00:22:14.320
+<v Noah Labhart>Essentially say, this is how I'm going to build out a system. Or is it something that you have to
+
+330
+00:22:14.320 --> 00:22:19.420
+<v Noah Labhart>decide how you're going to build it moving? Like for Honeycomb, or say you started something new,
+
+331
+00:22:19.600 --> 00:22:24.840
+<v Noah Labhart>you would do it a different way for that company? Or is it, this is the charity template?
+
+332
+00:22:25.580 --> 00:22:30.060
+<v Charity Majors>You know, I think that there's a set of reasonable defaults at any given time.
+
+333
+00:22:30.060 --> 00:22:35.960
+<v Charity Majors>Time, the set of defaults that I used five years ago, I think they would shift a little bit. Like,
+
+334
+00:22:35.960 --> 00:22:41.760
+<v Charity Majors>for example, I didn't use containers, I used EC2 instances, because like Docker, Kubernetes were
+
+335
+00:22:41.760 --> 00:22:47.440
+<v Charity Majors>kind of on the verge of maybe being the winner at that point, and at this point I think I would
+
+336
+00:22:47.440 --> 00:22:50.940
+<v Charity Majors>go all in on those, but at that point they weren't ready yet, so I didn't choose them.
+
+337
+00:22:50.940 --> 00:22:54.540
+<v Charity Majors>But otherwise, I don't know what I would do differently. Well,
+
+338
+00:22:54.540 --> 00:22:56.360
+<v Noah Labhart>as you step out on the balcony
+
+339
+00:22:56.360 --> 00:22:59.620
+<v Noah Labhart>and you look across what you've built with Honeycomb,
+
+340
+00:22:59.800 --> 00:23:00.900
+<v Noah Labhart>what are you most proud of?
+
+341
+00:23:01.320 --> 00:23:04.120
+<v Charity Majors>I am most proud of the fact that we have built a team
+
+342
+00:23:04.120 --> 00:23:06.380
+<v Charity Majors>where you do not have to be the loudest person in the room
+
+343
+00:23:06.380 --> 00:23:11.680
+<v Charity Majors>to be heard, to be noticed, to be listened to,
+
+344
+00:23:11.740 --> 00:23:12.320
+<v Charity Majors>to be promoted.
+
+345
+00:23:13.580 --> 00:23:14.920
+<v Charity Majors>I'm really proud of that.
+
+346
+00:23:15.500 --> 00:23:16.000
+<v Noah Labhart>Absolutely.
+
+347
+00:23:16.020 --> 00:23:18.200
+<v Noah Labhart>What did you do to cultivate that culture?
+
+348
+00:23:18.660 --> 00:23:21.280
+<v Charity Majors>I would give most of the credit to the person
+
+349
+00:23:21.280 --> 00:23:23.220
+<v Charity Majors>who's now our VP of Engineering, Emily Nakashima.
+
+350
+00:23:23.380 --> 00:23:24.740
+<v Charity Majors>We hired her early on.
+
+351
+00:23:26.360 --> 00:23:34.020
+<v Charity Majors>I knew that I needed her because she comes from a front end background and she was really sharp and really good at her job.
+
+352
+00:23:34.160 --> 00:23:39.480
+<v Charity Majors>But I also feel like she's someone who's been kind of consistently looked over across her career because she is very quiet.
+
+353
+00:23:39.600 --> 00:23:41.920
+<v Charity Majors>You have to prod her to speak up or you did.
+
+354
+00:23:41.980 --> 00:23:43.480
+<v Charity Majors>You don't so much anymore, but you did.
+
+355
+00:23:43.560 --> 00:23:47.300
+<v Charity Majors>And you can tell she's been shut down a lot of times by the time she came to us.
+
+356
+00:23:47.380 --> 00:23:54.000
+<v Charity Majors>But I needed her because I am not someone with any front end experience or design experience or product experience.
+
+357
+00:23:54.000 --> 00:23:58.200
+<v Charity Majors>experience and the fact that I leaned on her so much. I was traveling half the time for the first
+
+358
+00:23:58.200 --> 00:24:02.580
+<v Charity Majors>three or four years while I was CEO. I leaned on her so much and I think that she really built
+
+359
+00:24:02.580 --> 00:24:05.760
+<v Charity Majors>this culture where quiet people are celebrated.
+
+360
+00:24:06.860 --> 00:24:08.980
+<v Noah Labhart>Well, let's flip the script a little bit. Tell
+
+361
+00:24:08.980 --> 00:24:12.600
+<v Noah Labhart>me about a mistake you made and how you and your team responded to it.
+
+362
+00:24:12.960 --> 00:24:13.720
+<v Charity Majors>You know, honestly,
+
+363
+00:24:13.860 --> 00:24:19.960
+<v Charity Majors>I think that the original mistake was me being CEO. We had originally had three founders. Third
+
+364
+00:24:19.960 --> 00:24:25.780
+<v Charity Majors>one didn't work out and I kind of was left holding the bag as CEO, but I didn't want to do it.
+
+365
+00:24:25.780 --> 00:24:31.500
+<v Charity Majors>and I had nightmares for like two years I had nightmares almost every night about being basically
+
+366
+00:24:31.500 --> 00:24:36.760
+<v Charity Majors>unemployable for the rest of my career because I had to take a big sideways step and like learn
+
+367
+00:24:36.760 --> 00:24:41.080
+<v Charity Majors>all this stuff about sales and marketing and my heart wasn't in it I didn't love it and and
+
+368
+00:24:41.080 --> 00:24:46.700
+<v Charity Majors>fundamentally just like my personality type is not I am not a very structured person so there's
+
+369
+00:24:46.700 --> 00:24:53.480
+<v Charity Majors>There's this great book called The Four Tendencies where she talks about what motivates you internally and externally, right?
+
+370
+00:24:53.540 --> 00:24:55.560
+<v Charity Majors>You can have your internal goals you set for yourself.
+
+371
+00:24:55.720 --> 00:24:57.460
+<v Charity Majors>Do you find it easy or hard to meet them?
+
+372
+00:24:57.560 --> 00:25:01.620
+<v Charity Majors>And the expectations that other people have of you, do you find it easy or hard to make them?
+
+373
+00:25:01.940 --> 00:25:04.460
+<v Charity Majors>And there's basically four possible combinations here, right?
+
+374
+00:25:04.600 --> 00:25:09.040
+<v Charity Majors>Either you find it easy to uphold others' expectations of you and your expectations of yourself.
+
+375
+00:25:09.560 --> 00:25:12.620
+<v Charity Majors>Or you're the kind of person who needs a gym buddy, right?
+
+376
+00:25:12.620 --> 00:25:16.980
+<v Charity Majors>You can't set the structure for yourself, but you can follow someone else's external structure.
+
+377
+00:25:17.200 --> 00:25:22.960
+<v Charity Majors>Or you're the kind of person who finds it easy to meet your own expectations for yourself, but can't meet others' expectations.
+
+378
+00:25:23.140 --> 00:25:27.380
+<v Charity Majors>Or you're the type who basically is a rebel and just burns it all down.
+
+379
+00:25:27.460 --> 00:25:28.740
+<v Charity Majors>Can't meet anyone's expectations.
+
+380
+00:25:29.160 --> 00:25:30.080
+<v Charity Majors>And that's me.
+
+381
+00:25:31.260 --> 00:25:33.500
+<v Charity Majors>I am a bomb thrower.
+
+382
+00:25:33.740 --> 00:25:35.780
+<v Charity Majors>I'm not someone who provides structure.
+
+383
+00:25:36.160 --> 00:25:40.560
+<v Charity Majors>So three, three and a half years in, my co-founder and I switched places.
+
+384
+00:25:41.100 --> 00:25:42.340
+<v Charity Majors>Christine is now the CEO.
+
+385
+00:25:42.620 --> 00:25:49.060
+<v Charity Majors>and I like sort of instinctively dominate and she instinctively doesn't and so having us in
+
+386
+00:25:49.060 --> 00:25:56.260
+<v Charity Majors>this configuration is just a much better equal partnership yeah a CEO like I have never been
+
+387
+00:25:56.260 --> 00:26:01.940
+<v Charity Majors>so miserable it's when I would wake up in the morning roll out of bed the first thing that I
+
+388
+00:26:01.940 --> 00:26:05.940
+<v Charity Majors>would think about was the weight of the responsibility you know like all these people
+
+389
+00:26:05.940 --> 00:26:13.700
+<v Charity Majors>would follow me off this cliff and I didn't know if we were going to land anywhere and it it it was
+
+390
+00:26:13.700 --> 00:26:15.400
+<v Charity Majors>kind of slowly killing me
+
+391
+00:26:15.400 --> 00:26:20.220
+<v Noah Labhart>so what's the future look like for the product and for your team
+
+392
+00:26:21.100 --> 00:26:26.660
+<v Charity Majors>I should preface this with, I'm from ops. Every single year I've been like, I was sure we were
+
+393
+00:26:26.660 --> 00:26:30.340
+<v Charity Majors>going to fail from the start. Like, every year I've been like, well, this is definitely the year we're
+
+394
+00:26:30.340 --> 00:26:37.220
+<v Charity Majors>going to fail, and this is the first year that I'm like, we might not fail, which might mean that
+
+395
+00:26:37.220 --> 00:26:44.880
+<v Charity Majors>we're doomed. Things are looking up. Like, it's kind of crazy. The entire world has kind of come around
+
+396
+00:26:44.880 --> 00:26:51.060
+<v Charity Majors>to our way of thinking over the past four years and it's a little wild it's really crazy to hear
+
+397
+00:26:51.060 --> 00:26:55.320
+<v Charity Majors>you know the stuff that I labored over like trying to figure out how to explain this stuff
+
+398
+00:26:55.320 --> 00:27:00.380
+<v Charity Majors>Now just seeing it like every conference I go to, it's being echoed.
+
+399
+00:27:00.380 --> 00:27:09.900
+<v Charity Majors>Like every other day, it feels like there's a product release from some tech company who's like, you know, using my words and talking about things the way I talked about them.
+
+400
+00:27:10.520 --> 00:27:18.560
+<v Charity Majors>From a business perspective, like we've gotten some amazing executives at Honeycomb and, you know, who know how to do the things that Christine and I don't, right?
+
+401
+00:27:18.620 --> 00:27:19.720
+<v Charity Majors>Sales and marketing and stuff.
+
+402
+00:27:20.020 --> 00:27:21.740
+<v Charity Majors>We have some amazing customers.
+
+403
+00:27:21.740 --> 00:27:27.020
+<v Charity Majors>customers. Right now, we're bouncing people every day who come to Honeycomb who want to use us,
+
+404
+00:27:27.100 --> 00:27:31.200
+<v Charity Majors>but we haven't made it easy enough. We haven't armed them with the right information. We haven't
+
+405
+00:27:31.200 --> 00:27:34.520
+<v Charity Majors>made it easy enough for them to get their data in. We haven't made it clear enough with their
+
+406
+00:27:34.520 --> 00:27:38.680
+<v Charity Majors>choices. And so I think there's some sharpening that we need to do. It's like we've built this
+
+407
+00:27:38.680 --> 00:27:45.960
+<v Charity Majors>great superhighway and the on-ramp is 10 miles from everyone's front door. So we need to build
+
+408
+00:27:45.960 --> 00:27:47.740
+<v Charity Majors>build some driveways, right?
+
+409
+00:27:47.880 --> 00:27:50.600
+<v Charity Majors>To some communities to make it easier for them to get on.
+
+410
+00:27:50.760 --> 00:27:52.800
+<v Charity Majors>But the product does what it says it does,
+
+411
+00:27:52.920 --> 00:27:54.320
+<v Charity Majors>which is a kind of amazing thing.
+
+412
+00:27:54.780 --> 00:27:57.020
+<v Charity Majors>Ultimately, I mean, this is about helping teams
+
+413
+00:27:57.020 --> 00:27:59.120
+<v Charity Majors>build software in a better way.
+
+414
+00:27:59.340 --> 00:28:01.820
+<v Charity Majors>Like I come from ops where we're notorious
+
+415
+00:28:01.820 --> 00:28:05.980
+<v Charity Majors>for our masochism and I'm over 30 now
+
+416
+00:28:05.980 --> 00:28:08.600
+<v Charity Majors>and I don't want to get woken up anymore either, right?
+
+417
+00:28:08.680 --> 00:28:11.360
+<v Charity Majors>Like the goal is not to invite software engineers
+
+418
+00:28:11.360 --> 00:28:13.500
+<v Charity Majors>to invite us here in this hellhole.
+
+419
+00:28:13.500 --> 00:28:15.840
+<v Charity Majors>it's to make it better
+
+420
+00:28:15.840 --> 00:28:17.740
+<v Charity Majors>and it turns out that ownership
+
+421
+00:28:17.740 --> 00:28:19.840
+<v Charity Majors>is really key to that, making these
+
+422
+00:28:19.840 --> 00:28:21.900
+<v Charity Majors>tight, virtuous feedback loops
+
+423
+00:28:21.900 --> 00:28:23.520
+<v Charity Majors>so that the person who's making the change
+
+424
+00:28:23.520 --> 00:28:25.960
+<v Charity Majors>who's empowered to change it, who knows what the
+
+425
+00:28:25.960 --> 00:28:27.980
+<v Charity Majors>context is, is getting the alerts
+
+426
+00:28:27.980 --> 00:28:29.220
+<v Charity Majors>in a timely manner
+
+427
+00:28:29.220 --> 00:28:31.920
+<v Charity Majors>and I feel like it's not just
+
+428
+00:28:31.920 --> 00:28:34.120
+<v Charity Majors>us, there's also like LaunchDarkly
+
+429
+00:28:34.120 --> 00:28:36.000
+<v Charity Majors>with feature flags, there's
+
+430
+00:28:36.000 --> 00:28:37.420
+<v Charity Majors>the people doing
+
+431
+00:28:37.420 --> 00:28:39.880
+<v Charity Majors>chaos engineering, it's all about swinging the
+
+432
+00:28:39.880 --> 00:28:41.400
+<v Charity Majors>center of gravity away from
+
+433
+00:28:41.400 --> 00:28:45.340
+<v Charity Majors>from pre-production environments to production, right?
+
+434
+00:28:45.500 --> 00:28:47.580
+<v Charity Majors>And making that the first class citizen,
+
+435
+00:28:47.660 --> 00:28:49.020
+<v Charity Majors>the thing that we think about first,
+
+436
+00:28:49.080 --> 00:28:50.240
+<v Charity Majors>the thing we build for first,
+
+437
+00:28:50.260 --> 00:28:51.260
+<v Charity Majors>the thing we test for first.
+
+438
+00:28:52.360 --> 00:28:54.960
+<v Charity Majors>I finally think that we might not fail.
+
+439
+00:28:56.400 --> 00:28:59.380
+<v Charity Majors>It's just a question of the scale of our success.
+
+440
+00:29:00.200 --> 00:29:04.160
+<v Charity Majors>And so that really boils down, I think, honestly,
+
+441
+00:29:05.100 --> 00:29:07.400
+<v Charity Majors>we're making some really big investments in design,
+
+442
+00:29:07.480 --> 00:29:08.500
+<v Charity Majors>design and product.
+
+443
+00:29:08.760 --> 00:29:11.180
+<v Charity Majors>I think that our success over the next one to three years
+
+444
+00:29:11.400 --> 00:29:17.740
+<v Charity Majors>really going to be governed by how well we can shift from, you know, a great ops tool to a great
+
+445
+00:29:18.380 --> 00:29:23.980
+<v Charity Majors>consumer quality designed tool. I think the design is how we're going to make sure that our engineering
+
+446
+00:29:24.780 --> 00:29:28.740
+<v Charity Majors>isn't wasted anymore. Like we've built a lot of things that people don't, they can't find,
+
+447
+00:29:28.740 --> 00:29:31.980
+<v Charity Majors>or they don't see, or they don't know how to use, or the vision isn't getting transmitted to them
+
+448
+00:29:31.980 --> 00:29:36.900
+<v Charity Majors>somehow. And design is my hope for how we bridge that gap.
+
+449
+00:29:37.600 --> 00:29:39.100
+<v Noah Labhart>We'll switch to you, Charity.
+
+450
+00:29:39.140 --> 00:29:41.220
+<v Noah Labhart>Who influences the way that you work?
+
+451
+00:29:41.360 --> 00:29:45.500
+<v Noah Labhart>You know, a CEO or CTO or an architect, really any person.
+
+452
+00:29:45.760 --> 00:29:48.180
+<v Noah Labhart>Name a person that you look up to and why.
+
+453
+00:29:49.340 --> 00:29:51.340
+<v Charity Majors>Oh, I look up to Adam Jacob a lot.
+
+454
+00:29:51.460 --> 00:29:53.320
+<v Charity Majors>Adam Jacob, former CTO of Chef.
+
+455
+00:29:53.560 --> 00:29:58.160
+<v Charity Majors>In fact, the best compliment I ever received in my life was after we finished pitching
+
+456
+00:29:58.160 --> 00:30:03.700
+<v Charity Majors>to, I think it was Storm this last round, round before last, as I was leaving, they
+
+457
+00:30:03.700 --> 00:30:05.600
+<v Charity Majors>were like, you're just like a female Adam Jacob.
+
+458
+00:30:06.900 --> 00:30:14.820
+<v Charity Majors>blown away so flattered I really admire him I think that he's made the leap from engineer to
+
+459
+00:30:14.820 --> 00:30:19.560
+<v Charity Majors>executive in a way that has impacted so many people's lives for the better he's just a warm
+
+460
+00:30:19.560 --> 00:30:24.820
+<v Charity Majors>and wonderful human being and and I also feel like the honeycomb is kind of carrying the torch
+
+461
+00:30:24.820 --> 00:30:31.100
+<v Charity Majors>you know just the the story of how to build software better I was impacted a lot by Chef
+
+462
+00:30:31.100 --> 00:30:34.300
+<v Charity Majors>five, six, seven, eight years ago or whatever,
+
+463
+00:30:34.460 --> 00:30:36.260
+<v Charity Majors>it made a big impact on my career.
+
+464
+00:30:36.420 --> 00:30:40.160
+<v Charity Majors>And I hope that Honeycomb can make the same kind of impact on people's careers.
+
+465
+00:30:40.860 --> 00:30:42.740
+<v Noah Labhart>Well, if you could go back to the beginning,
+
+466
+00:30:42.980 --> 00:30:44.300
+<v Noah Labhart>what would you do differently?
+
+467
+00:30:44.360 --> 00:30:47.020
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+468
+00:30:48.200 --> 00:30:49.980
+<v Charity Majors>I would start talking to users sooner.
+
+469
+00:30:50.200 --> 00:30:53.940
+<v Charity Majors>You know, because I made all the mistakes that I said I was going to make,
+
+470
+00:30:54.040 --> 00:30:55.760
+<v Charity Majors>even though I thought that I was not making them.
+
+471
+00:30:55.900 --> 00:30:57.540
+<v Charity Majors>I was like, ah, people like me,
+
+472
+00:30:57.540 --> 00:31:03.180
+<v Charity Majors>we often start companies and leave design for an afterthought, we run in stuff for an afterthought,
+
+473
+00:31:03.180 --> 00:31:08.060
+<v Charity Majors>and I thought I wasn't making those mistakes, and I totally made those mistakes. I wish that we'd
+
+474
+00:31:08.060 --> 00:31:13.640
+<v Charity Majors>been working as hard on the user experience as we were on you know the back end the storage engine
+
+475
+00:31:13.640 --> 00:31:18.520
+<v Charity Majors>the making the queries run that's what that's one thing i would do differently i would also
+
+476
+00:31:18.520 --> 00:31:26.300
+<v Charity Majors>I think that I would quit sooner as CEO. I think that I'm a very stubborn person, very stubborn, and
+
+477
+00:31:27.540 --> 00:31:31.840
+<v Charity Majors>fastest way to motivate me is to tell me that I can't do something. I've gotten a lot of mileage
+
+478
+00:31:31.840 --> 00:31:39.440
+<v Charity Majors>out of that trait, but it's not all great. You know, I think that I could have saved myself a
+
+479
+00:31:39.440 --> 00:31:44.020
+<v Charity Majors>lot of suffering if I had just been willing to give it a little bit sooner and go, yeah,
+
+480
+00:31:44.060 --> 00:31:45.900
+<v Charity Majors>this is not me. Someone else should do this job.
+
+481
+00:31:47.100 --> 00:31:49.280
+<v Noah Labhart>So you're getting on a plane and you're sitting
+
+482
+00:31:49.280 --> 00:31:55.320
+<v Noah Labhart>next to a young entrepreneur builder who has created the next big thing. They're jazzed about
+
+483
+00:31:55.320 --> 00:31:59.560
+<v Noah Labhart>it they can't wait to show it off to the world they can't wait to show it off to you what advice
+
+484
+00:31:59.560 --> 00:32:02.620
+<v Noah Labhart>do you give that person having gone down this road a bit
+
+485
+00:32:02.620 --> 00:32:07.240
+<v Charity Majors>first of all i really hate founders
+
+486
+00:32:07.240 --> 00:32:14.980
+<v Charity Majors>Like, I just hate them. The cult of the founder in Silicon Valley is grotesque. I find it loathsome.
+
+487
+00:32:15.520 --> 00:32:19.780
+<v Charity Majors>50% chance that I just shut down, just sit down, shut up and go away.
+
+488
+00:32:19.780 --> 00:32:27.840
+<v Charity Majors>way. Maybe valid, maybe not. But if it was genuinely great, I think that first I would ask,
+
+489
+00:32:27.860 --> 00:32:32.800
+<v Charity Majors>do you have a co-founder? Because going through this without a partner, I just can't even imagine.
+
+490
+00:32:32.980 --> 00:32:37.580
+<v Charity Majors>I just can't even imagine it. And I think that you really do need a partner to get through it.
+
+491
+00:32:38.380 --> 00:32:42.960
+<v Noah Labhart>That's great advice. Well, Charity, thank you for being on the show today. Thank you for telling
+
+492
+00:32:42.960 --> 00:32:44.680
+<v Noah Labhart>the creation story of Honeycomb.
+
+493
+00:32:45.980 --> 00:32:48.320
+<v Charity Majors>Absolutely. My pleasure. Thank you so much for having me.
+
+494
+00:32:49.780 --> 00:32:52.780
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+495
+00:32:53.920 --> 00:32:56.960
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+496
+00:32:57.300 --> 00:33:02.120
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+497
+00:33:02.540 --> 00:33:07.620
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+498
+00:33:07.960 --> 00:33:10.200
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+499
+00:33:10.460 --> 00:33:12.420
+<v Noah Labhart>Both things help us out tremendously.
+
+500
+00:33:15.040 --> 00:33:16.560
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1463 @@
+WEBVTT
+
+NOTE S6 E25: Why Webhooks are Broken: Building the Twilio for Webhooks with Tom Hacohen of Svix
+
+1
+00:00:00.660 --> 00:00:29.760
+<v Tom Hacohen>And then I realized that all she wanted was an easy way to send webhooks from the former service. And I'm like, well, you know, my current company, we've been asked to send webhooks all the time. And every time we said no, for the same reasons, like, oh, my God, you know, upfront cost is going to be terrible. Maintenance is going to be terrible. And then we have this like, beautiful product and beautiful API. And then we're gonna have to offer like a terrible webhook experience, because we don't have time to focus on that. Because like, it's a it's a whole product on its own. So I'm like, okay, that makes sense.
+
+2
+00:00:30.000 --> 00:00:32.800
+<v Tom Hacohen>And I just told her like, hey, if I build it for you, will you pay me?
+
+3
+00:00:33.100 --> 00:00:34.260
+<v Tom Hacohen>And she's like, yeah.
+
+4
+00:00:34.360 --> 00:00:36.720
+<v Tom Hacohen>And then it was like in a group chat.
+
+5
+00:00:36.820 --> 00:00:38.660
+<v Tom Hacohen>And someone else said like, yeah, I'll pay you as well.
+
+6
+00:00:39.620 --> 00:00:41.960
+<v Tom Hacohen>I'm Tom, founder and CEO of Svix.
+
+7
+00:00:47.800 --> 00:00:49.300
+<v Noah Labhart>This is Code Story.
+
+8
+00:00:49.820 --> 00:00:52.960
+<v Noah Labhart>A podcast bringing you interviews with tech visionaries.
+
+9
+00:00:53.620 --> 00:00:57.120
+<v Noah Labhart>Who share in the critical moments of what it takes to change an industry.
+
+10
+00:00:57.360 --> 00:00:58.960
+<v Noah Labhart>And build and lead.
+
+11
+00:01:00.000 --> 00:01:07.300
+<v Noah Labhart>that has your back. I'm your host, Noah Labhart, and today how Tom Hacohen built the open source
+
+12
+00:01:07.300 --> 00:01:15.760
+<v Noah Labhart>and enterprise ready webhooks as a service. All this and more on Code Story.
+
+13
+00:01:20.600 --> 00:01:26.500
+<v Noah Labhart>For Tom Hacohen, coding started when he was nine years old. He took after school robotics classes,
+
+14
+00:01:26.500 --> 00:01:30.920
+<v Noah Labhart>which required coding. But once he stepped into the programming aspect, he realized he didn't
+
+15
+00:01:30.920 --> 00:01:36.160
+<v Noah Labhart>really care about robots anymore. Outside of tech, he surfs, cycles, and longboards,
+
+16
+00:01:36.320 --> 00:01:41.060
+<v Noah Labhart>when the conditions are right. When asked where he likes to longboard, he prefers the roads on
+
+17
+00:01:41.060 --> 00:01:47.780
+<v Noah Labhart>a sunny day for a long-distance longboarding in Tel Aviv. When a friend asked Tom a question
+
+18
+00:01:47.780 --> 00:01:52.820
+<v Noah Labhart>about webhooks, he dug deeper into the problem and realized that for her solution, she just
+
+19
+00:01:52.820 --> 00:01:58.100
+<v Noah Labhart>wanted an easy way to send hooks from her service. After she agreed to pay him to build it, along
+
+20
+00:01:58.100 --> 00:02:05.160
+<v Noah Labhart>with several others, he found the validation to step into building the platform. This is the
+
+21
+00:02:05.160 --> 00:02:06.980
+<v Noah Labhart>creation story of Svix.
+
+22
+00:02:09.540 --> 00:02:13.380
+<v Tom Hacohen>We do webhook sending as a service. So essentially, we help companies
+
+23
+00:02:13.380 --> 00:02:17.820
+<v Tom Hacohen>add webhook sending capabilities to the service. We help companies large and small, including
+
+24
+00:02:17.820 --> 00:02:20.100
+<v Tom Hacohen>including Brex, Lob, long-term stock exchange.
+
+25
+00:02:20.760 --> 00:02:23.020
+<v Tom Hacohen>You can think of it as like SendGrid or Twilio,
+
+26
+00:02:23.160 --> 00:02:24.540
+<v Tom Hacohen>but for webhooks.
+
+27
+00:02:24.540 --> 00:02:26.620
+<v Tom Hacohen>And for those who don't know what webhooks are,
+
+28
+00:02:26.820 --> 00:02:29.980
+<v Tom Hacohen>webhooks are essentially how services notify each other of events.
+
+29
+00:02:30.120 --> 00:02:32.420
+<v Tom Hacohen>So they're kind of like a server-to-server push notification.
+
+30
+00:02:32.920 --> 00:02:35.760
+<v Tom Hacohen>Most services you know use them already and offer them already,
+
+31
+00:02:35.920 --> 00:02:38.520
+<v Tom Hacohen>you know, to build integrations or to trigger,
+
+32
+00:02:38.600 --> 00:02:40.440
+<v Tom Hacohen>you know, workflows using no code,
+
+33
+00:02:40.940 --> 00:02:43.420
+<v Tom Hacohen>tools like Zapier or just code integrations.
+
+34
+00:02:43.520 --> 00:02:44.940
+<v Tom Hacohen>So one example would be Stripe.
+
+35
+00:02:44.940 --> 00:02:50.940
+<v Tom Hacohen>GitHub sends them, Shopify sends them, really any, any company you can think of, and we just make it
+
+36
+00:02:50.940 --> 00:02:56.480
+<v Tom Hacohen>easier for companies to send them. As for how we started, you know, I wish I could tell you I had
+
+37
+00:02:56.480 --> 00:03:00.660
+<v Tom Hacohen>this like, you know, I woke up one day or like an apple fell of my head, on my head, and I realized
+
+38
+00:03:00.660 --> 00:03:06.940
+<v Tom Hacohen>that this needs to be done. But it was, it just, like, a friend of mine asked a silly question, or
+
+39
+00:03:06.940 --> 00:03:11.940
+<v Tom Hacohen>a question that seemed silly at the time, about webhooks, and I'm just like, okay, this doesn't
+
+40
+00:03:11.940 --> 00:03:16.860
+<v Tom Hacohen>make sense, let's, you know, dig deeper. And then I realized that all she wanted was an easy way to
+
+41
+00:03:16.860 --> 00:03:21.480
+<v Tom Hacohen>send webhooks from the, from her service. And I'm like, well, you know, my current company, we've been
+
+42
+00:03:21.480 --> 00:03:27.200
+<v Tom Hacohen>asked to send webhooks, all like, to offer webhooks all the time. And every time we said no for the
+
+43
+00:03:27.200 --> 00:03:31.840
+<v Tom Hacohen>same reasons, like, oh my God, you know, upfront cost is going to be terrible, maintenance is going to
+
+44
+00:03:31.840 --> 00:03:36.540
+<v Tom Hacohen>be terrible, and then we have this like beautiful product and beautiful API, and then we're going to
+
+45
+00:03:36.540 --> 00:03:39.980
+<v Tom Hacohen>have to offer like a terrible webhook experience because we don't have time to focus on that
+
+46
+00:03:41.720 --> 00:03:46.680
+<v Tom Hacohen>own. So I'm like, okay, that makes sense. And I just told her like, hey, if I build it for you,
+
+47
+00:03:46.740 --> 00:03:51.320
+<v Tom Hacohen>will you pay me? And she's like, yeah. And then it was like in a, you know, in a group chat, and
+
+48
+00:03:51.320 --> 00:03:55.400
+<v Tom Hacohen>someone else said like, yeah, I'll pay you as well. And another one jumped in and said, we actually
+
+49
+00:03:55.400 --> 00:03:59.720
+<v Tom Hacohen>don't send webhooks, my current company, but the previous one we did, and I would be more than
+
+50
+00:03:59.720 --> 00:04:03.940
+<v Tom Hacohen>happy to introduce you to the team. So kind of like that gave me the initial validation to realize
+
+51
+00:04:03.940 --> 00:04:05.760
+<v Tom Hacohen>that's probably something there. I
+
+52
+00:04:05.760 --> 00:04:10.100
+<v Noah Labhart>love it. If I build it, will you pay me? That's a great question.
+
+53
+00:04:11.940 --> 00:04:17.680
+<v Tom Hacohen>believing them, but, you know, there's only so much you can do. Well,
+
+54
+00:04:17.680 --> 00:04:19.740
+<v Noah Labhart>Tell me about the MVP, so that
+
+55
+00:04:19.740 --> 00:04:23.720
+<v Noah Labhart>first product you built, how long did it take you to build, and what sort of tools did you use to
+
+56
+00:04:23.720 --> 00:04:24.400
+<v Noah Labhart>bring it to life?
+
+57
+00:04:24.400 --> 00:04:29.560
+<v Tom Hacohen>Common wisdom is to do like market research and more validation before you
+
+58
+00:04:29.560 --> 00:04:34.100
+<v Tom Hacohen>do that. I just realized that, you know, my quote, quote, founder superpower is building, so I just
+
+59
+00:04:34.100 --> 00:04:35.180
+<v Tom Hacohen>just like went on and built it.
+
+60
+00:04:36.480 --> 00:04:38.120
+<v Tom Hacohen>V1 was raw.
+
+61
+00:04:38.340 --> 00:04:41.380
+<v Tom Hacohen>It took, I think it took two days to build it.
+
+62
+00:04:41.540 --> 00:04:42.900
+<v Tom Hacohen>But you know, like as you send the emails
+
+63
+00:04:42.900 --> 00:04:44.280
+<v Tom Hacohen>and like let people know that it's ready,
+
+64
+00:04:44.420 --> 00:04:45.680
+<v Tom Hacohen>you keep like hacking, you know,
+
+65
+00:04:45.680 --> 00:04:46.780
+<v Tom Hacohen>in the meanwhile before they respond.
+
+66
+00:04:47.140 --> 00:04:51.840
+<v Tom Hacohen>We used FastAPI, Postgres, Docker, TypeScript and React.
+
+67
+00:04:52.300 --> 00:04:54.220
+<v Tom Hacohen>As I said, it took us like two days.
+
+68
+00:04:54.300 --> 00:04:56.040
+<v Tom Hacohen>I mean, it took me, I'm a sole founder.
+
+69
+00:04:56.280 --> 00:04:57.920
+<v Tom Hacohen>Yeah, that was like the hacky V1.
+
+70
+00:04:58.180 --> 00:04:59.600
+<v Tom Hacohen>It was fairly quick to get out.
+
+71
+00:05:00.840 --> 00:05:03.420
+<v Noah Labhart>Okay, so then with the hacky V1, right?
+
+72
+00:05:04.100 --> 00:05:05.840
+<v Noah Labhart>any MVP V1, right?
+
+73
+00:05:06.120 --> 00:05:10.300
+<v Noah Labhart>You have to make certain decisions and trade-offs about, you know, technical debt you're going
+
+74
+00:05:10.300 --> 00:05:14.420
+<v Noah Labhart>to accept and, you know, trade-offs on features you're not going to build in the beginning.
+
+75
+00:05:14.620 --> 00:05:18.660
+<v Noah Labhart>Walk me through some of those that you had to make in that V1 and how you coped with
+
+76
+00:05:18.660 --> 00:05:19.200
+<v Noah Labhart>those decisions.
+
+77
+00:05:20.100 --> 00:05:24.340
+<v Tom Hacohen>I guess like the first thing is like, as you alluded to, is about cutting down scope.
+
+78
+00:05:24.580 --> 00:05:28.820
+<v Tom Hacohen>And so just like realizing what is the absolute core of the product that people would need.
+
+79
+00:05:28.820 --> 00:05:34.460
+<v Tom Hacohen>And for us, since we're an API product, that meant no UI, also meant no signup.
+
+80
+00:05:34.500 --> 00:05:35.840
+<v Tom Hacohen>Like why would people need to sign up?
+
+81
+00:05:35.900 --> 00:05:38.280
+<v Tom Hacohen>I know all the people that are using the product.
+
+82
+00:05:38.660 --> 00:05:42.160
+<v Tom Hacohen>So I had to send them an encrypted API key so that they can use.
+
+83
+00:05:42.740 --> 00:05:47.800
+<v Tom Hacohen>And it just like really, you know, removing all of that and just, you know, cutting down to the core.
+
+84
+00:05:48.440 --> 00:05:52.380
+<v Tom Hacohen>Again, as an API product, one thing we couldn't do, we couldn't break API.
+
+85
+00:05:52.580 --> 00:05:58.440
+<v Tom Hacohen>I mean, we could, and I think we may have briefly like in the beginning, but the aim was
+
+86
+00:05:58.820 --> 00:06:00.840
+<v Tom Hacohen>to accumulate technical debt everywhere else.
+
+87
+00:06:00.940 --> 00:06:02.280
+<v Tom Hacohen>Like we couldn't care, you know,
+
+88
+00:06:02.280 --> 00:06:03.320
+<v Tom Hacohen>that doesn't matter at all.
+
+89
+00:06:03.380 --> 00:06:05.380
+<v Tom Hacohen>Like the product could have been dead within the week.
+
+90
+00:06:05.480 --> 00:06:06.860
+<v Tom Hacohen>So like technical debt meant nothing.
+
+91
+00:06:07.320 --> 00:06:10.160
+<v Tom Hacohen>But technical API debt, I guess that's a term
+
+92
+00:06:10.160 --> 00:06:11.840
+<v Tom Hacohen>that we couldn't have accumulated.
+
+93
+00:06:11.960 --> 00:06:14.440
+<v Tom Hacohen>So that we made sure to, you know, to keep the same.
+
+94
+00:06:14.600 --> 00:06:16.420
+<v Tom Hacohen>But yeah, sign up, nothing.
+
+95
+00:06:16.580 --> 00:06:17.920
+<v Tom Hacohen>We had nothing, really nothing.
+
+96
+00:06:17.960 --> 00:06:19.540
+<v Tom Hacohen>Just like a basic API that you could use
+
+97
+00:06:19.540 --> 00:06:20.780
+<v Tom Hacohen>to create messages.
+
+98
+00:06:22.880 --> 00:06:25.560
+<v Noah Labhart>So, okay, you've got your MVP, right?
+
+99
+00:06:25.700 --> 00:06:27.940
+<v Noah Labhart>How did you progress the product from there?
+
+100
+00:06:28.820 --> 00:06:34.140
+<v Noah Labhart>Chirrut, and I think to kind of put that in a box a little bit, how did you go about building your
+
+101
+00:06:34.140 --> 00:06:38.800
+<v Noah Labhart>roadmap and figuring out, okay, this is the next most important thing to build?
+
+102
+00:06:39.560 --> 00:06:40.700
+<v Tom Hacohen>Yeah, like, you
+
+103
+00:06:40.700 --> 00:06:45.240
+<v Tom Hacohen>know, like asking how the product progressed since the MVP. I mean, just literally in every single
+
+104
+00:06:45.240 --> 00:06:50.900
+<v Tom Hacohen>way. You know, we have like SDKs for a variety of languages. Now we have, you know, a stable API
+
+105
+00:06:50.900 --> 00:06:55.440
+<v Tom Hacohen>that scales with our customers. And, you know, we have a lot more customers than we did at,
+
+106
+00:06:55.440 --> 00:07:00.760
+<v Tom Hacohen>you know at point zero yeah just like everything changed and everything improved as for like how
+
+107
+00:07:00.760 --> 00:07:05.020
+<v Tom Hacohen>we build the roadmap it's almost like a cliche but like we realize that we only exist to serve
+
+108
+00:07:05.020 --> 00:07:10.560
+<v Tom Hacohen>our customers everything we do is based on what they need or what we think they would need and
+
+109
+00:07:10.560 --> 00:07:14.680
+<v Tom Hacohen>we've gotten like pretty good at anticipating what they'll need well that what they'll ask for
+
+110
+00:07:14.680 --> 00:07:19.900
+<v Tom Hacohen>before they do but even so we're like we wait for some signal from them so we like we may just start
+
+111
+00:07:19.900 --> 00:07:23.860
+<v Tom Hacohen>working on a feature but we just like wait for real signal from like a few customers before we
+
+112
+00:07:25.440 --> 00:07:30.960
+<v Tom Hacohen>do it. One other thing is that we're in like a bit of a unique situation there is that we're
+
+113
+00:07:30.960 --> 00:07:34.900
+<v Tom Hacohen>building something new and like essentially inventing a niche. So we didn't really have
+
+114
+00:07:34.900 --> 00:07:38.860
+<v Tom Hacohen>like any established competitors to learn from, which is like a double-edged sword. You know,
+
+115
+00:07:38.860 --> 00:07:43.380
+<v Tom Hacohen>in the beginning, I didn't have anything to benchmark us against. So like, okay, just a
+
+116
+00:07:43.380 --> 00:07:48.080
+<v Tom Hacohen>simple API is like more than enough. Like no one could just go back and say like, oh, company X has
+
+117
+00:07:48.080 --> 00:07:51.480
+<v Tom Hacohen>like way more. I'm not going to use you. No, we're just like, we are your only option essentially.
+
+118
+00:07:51.480 --> 00:07:55.540
+<v Tom Hacohen>So it was both good and bad, I guess, not having anyone to get inspiration from.
+
+119
+00:07:57.060 --> 00:07:59.000
+<v Noah Labhart>So let's switch to team then.
+
+120
+00:07:59.100 --> 00:08:01.160
+<v Noah Labhart>So how did you go about building your team?
+
+121
+00:08:01.300 --> 00:08:06.160
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+122
+00:08:07.520 --> 00:08:11.200
+<v Tom Hacohen>Obviously tapped my network, like literally pinged anyone.
+
+123
+00:08:11.600 --> 00:08:15.580
+<v Tom Hacohen>Almost, not my grandma, but almost to that extent, you know, with the job description.
+
+124
+00:08:15.960 --> 00:08:17.540
+<v Tom Hacohen>I just asked them like if they knew anyone.
+
+125
+00:08:18.080 --> 00:08:19.320
+<v Tom Hacohen>That worked quite well.
+
+126
+00:08:19.320 --> 00:08:22.820
+<v Tom Hacohen>Well, another thing was work at a startup, which is the YC job board.
+
+127
+00:08:22.960 --> 00:08:24.040
+<v Tom Hacohen>And that was pretty good.
+
+128
+00:08:24.120 --> 00:08:26.340
+<v Tom Hacohen>Reached out, called to people on GitHub, LinkedIn.
+
+129
+00:08:26.640 --> 00:08:27.860
+<v Tom Hacohen>All of those worked.
+
+130
+00:08:28.360 --> 00:08:31.640
+<v Tom Hacohen>But one of the things I like the most, and I don't remember where I heard it from, but
+
+131
+00:08:31.640 --> 00:08:37.640
+<v Tom Hacohen>I think it's actually from YC, is whenever a candidate rejected us or we decided to reject
+
+132
+00:08:37.640 --> 00:08:40.440
+<v Tom Hacohen>a candidate for whatever reason, it's just not a mutual fit.
+
+133
+00:08:40.640 --> 00:08:44.700
+<v Tom Hacohen>We asked them to introduce us to someone else like, hey, you know, this doesn't work.
+
+134
+00:08:44.820 --> 00:08:47.420
+<v Tom Hacohen>But do you know someone that actually may work?
+
+135
+00:08:49.320 --> 00:08:53.100
+<v Tom Hacohen>You know, to get great people on board. And actually, one of our best hires we got from that
+
+136
+00:08:53.100 --> 00:08:57.780
+<v Tom Hacohen>And as for, like, what am I looking, what do I look for in the team, you know, I'm a strong believer
+
+137
+00:08:57.780 --> 00:09:04.260
+<v Tom Hacohen>in company values, and so alignment with our values is essential. And the two big one that comes to
+
+138
+00:09:04.260 --> 00:09:08.980
+<v Tom Hacohen>mind is, like, always learning, and which essentially, like, don't have an ego. Like, okay, you were wrong,
+
+139
+00:09:08.980 --> 00:09:13.980
+<v Tom Hacohen>it's fine, let's move on, no need to like strice and defect it and just like dwell on it for a week.
+
+140
+00:09:13.980 --> 00:09:20.080
+<v Tom Hacohen>It's okay, move on, learn from it. And the other part is like good and concise communicators. You
+
+141
+00:09:20.080 --> 00:09:24.760
+<v Tom Hacohen>know, we work in distributed team, and I think one of the most exhausting things is going on a Zoom
+
+142
+00:09:24.760 --> 00:09:30.060
+<v Tom Hacohen>call with a team member, just goes on and on and on for like an hour, and just everyone is like, just
+
+143
+00:09:30.060 --> 00:09:35.920
+<v Tom Hacohen>like losing focus. And yes, I think those are very important to me. And like one thing that really
+
+144
+00:09:35.920 --> 00:09:42.000
+<v Tom Hacohen>grabs my interest is people that are passionate about coding, that's obviously a bias, but like
+
+145
+00:09:43.980 --> 00:09:46.960
+<v Tom Hacohen>from a young age or people that have been lucky are usually great hires,
+
+146
+00:09:47.080 --> 00:09:49.780
+<v Tom Hacohen>but obviously you can be like an amazing hire and start coding later on.
+
+147
+00:09:49.860 --> 00:09:53.400
+<v Tom Hacohen>So it's not, it's not a requirement, but just like a good first signal.
+
+148
+00:09:53.900 --> 00:09:57.600
+<v Tom Hacohen>We build tool for tools for developers. So if you're not passionate about coding,
+
+149
+00:09:57.720 --> 00:10:01.100
+<v Tom Hacohen>I don't think you can really empathize with our user base,
+
+150
+00:10:01.200 --> 00:10:03.040
+<v Tom Hacohen>with our customer base. So that's,
+
+151
+00:10:03.040 --> 00:10:04.740
+<v Tom Hacohen>that's another thing that's like very important to us.
+
+152
+00:10:05.340 --> 00:10:08.100
+<v Tom Hacohen>So this is not my first company, but in my previous one,
+
+153
+00:10:08.160 --> 00:10:11.480
+<v Tom Hacohen>I was a sole founder, sole employee, fully bootstrapped.
+
+154
+00:10:11.480 --> 00:10:14.180
+<v Tom Hacohen>I didn't have to deal with hiring and managing a team.
+
+155
+00:10:14.300 --> 00:10:16.020
+<v Tom Hacohen>And that was much easier, to be honest.
+
+156
+00:10:16.280 --> 00:10:20.580
+<v Tom Hacohen>It's just like maintaining culture takes a lot of direct effort and conscious effort.
+
+157
+00:10:20.960 --> 00:10:23.500
+<v Tom Hacohen>I try to refer to the values all the time.
+
+158
+00:10:23.520 --> 00:10:24.420
+<v Tom Hacohen>I lead by example.
+
+159
+00:10:24.600 --> 00:10:27.100
+<v Tom Hacohen>You know, I'm not above any of the values.
+
+160
+00:10:27.360 --> 00:10:28.960
+<v Tom Hacohen>I ask people to call me out.
+
+161
+00:10:29.160 --> 00:10:31.280
+<v Tom Hacohen>I am the first one to admit when I'm wrong.
+
+162
+00:10:31.420 --> 00:10:33.140
+<v Tom Hacohen>Always take every opportunity to learn.
+
+163
+00:10:33.280 --> 00:10:37.300
+<v Tom Hacohen>And just like if we live by the values, I think everything just like goes from there.
+
+164
+00:10:37.300 --> 00:10:45.420
+<v Tom Hacohen>And we also go on like offsites to make sure that, you know, like people are together in the same room and build that, you know, face to face aspect of the culture.
+
+165
+00:10:49.200 --> 00:10:50.780
+<v Noah Labhart>Well, let's flip to scalability.
+
+166
+00:10:51.100 --> 00:10:56.580
+<v Noah Labhart>So did you build this to scale efficiently from day one in that V1 version you built?
+
+167
+00:10:56.660 --> 00:11:00.000
+<v Noah Labhart>Or have you been fighting this as you've grown and gained traction?
+
+168
+00:11:01.120 --> 00:11:05.740
+<v Tom Hacohen>So I think V1 was fairly scalable because it was simple.
+
+169
+00:11:07.300 --> 00:11:13.280
+<v Tom Hacohen>If you have like a fiberglass race car body, it's like fairly easy to get it, you know, running fast, even without like a massive engine.
+
+170
+00:11:13.720 --> 00:11:18.680
+<v Tom Hacohen>As we added like more complexity and had like more customers, it kind of started.
+
+171
+00:11:19.040 --> 00:11:24.580
+<v Tom Hacohen>Actually, you know, it never showed it age, but it's kind of like started showing that we may need to like start thinking about scaling.
+
+172
+00:11:25.160 --> 00:11:26.640
+<v Tom Hacohen>And I gave a talk about it recently.
+
+173
+00:11:26.840 --> 00:11:31.320
+<v Tom Hacohen>One thing that I think we did, which was a mistake, we prematurely scaled things.
+
+174
+00:11:31.480 --> 00:11:34.220
+<v Tom Hacohen>So we realized, oh my God, we're growing at a certain rate.
+
+175
+00:11:34.220 --> 00:11:39.900
+<v Tom Hacohen>you know let's now go 100x that size already and just like not worry about scaling and that really
+
+176
+00:11:39.900 --> 00:11:43.880
+<v Tom Hacohen>slowed us down it was like really a foolish mistake you know like you just need to i think
+
+177
+00:11:43.880 --> 00:11:48.160
+<v Tom Hacohen>like scaling as the business scales is like much better than just like trying to re-architect
+
+178
+00:11:48.160 --> 00:11:53.520
+<v Tom Hacohen>things in advance which i really regret that mistake and also like because of the nature of
+
+179
+00:11:53.520 --> 00:11:58.060
+<v Tom Hacohen>our business we add a new cut company and all of a sudden we have all of the weight of that company
+
+180
+00:11:58.060 --> 00:12:03.780
+<v Tom Hacohen>so we add like you know lob all of a sudden we need to handle lobs full traffic which is
+
+181
+00:12:04.220 --> 00:12:05.120
+<v Tom Hacohen>They're like a large company.
+
+182
+00:12:05.340 --> 00:12:12.240
+<v Tom Hacohen>And so it's always been like a challenge to make sure that we can keep our standards as we add more and more large customers.
+
+183
+00:12:13.600 --> 00:12:19.360
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+184
+00:12:20.120 --> 00:12:20.780
+<v Tom Hacohen>Oh, wow.
+
+185
+00:12:20.940 --> 00:12:22.920
+<v Tom Hacohen>So, you know, I wear multiple hats.
+
+186
+00:12:23.080 --> 00:12:27.000
+<v Tom Hacohen>So as an engineer, I'm very proud of our uptime and the work we've done to get there.
+
+187
+00:12:27.160 --> 00:12:33.060
+<v Tom Hacohen>I know that if anyone from the team makes a mistake, it's going to be caught by one of the automatic testing.
+
+188
+00:12:34.220 --> 00:12:38.180
+<v Tom Hacohen>all of our testing and just like the scalability and all of our redundancy and just to know that
+
+189
+00:12:38.180 --> 00:12:43.060
+<v Tom Hacohen>we can sleep at night and everything would be fine and that like if the test week passes we're
+
+190
+00:12:43.060 --> 00:12:48.820
+<v Tom Hacohen>going to be good like you know a bug is not going to hit production but as a non-engineer i guess as
+
+191
+00:12:48.820 --> 00:12:53.940
+<v Tom Hacohen>the ceo hat on i'm like extremely proud of the value we create for our users and our customers
+
+192
+00:12:53.940 --> 00:12:59.900
+<v Tom Hacohen>and it just it's still mind-blowing to me that this mvp that i built in two days as we talked
+
+193
+00:12:59.900 --> 00:13:04.640
+<v Tom Hacohen>talked about earlier, literally hacked together is now used by amazing companies, you know, that
+
+194
+00:13:04.640 --> 00:13:08.840
+<v Tom Hacohen>are household names and companies that I've always looked up to. I mean, obviously, we're not,
+
+195
+00:13:08.860 --> 00:13:14.000
+<v Tom Hacohen>we're no longer serving them that like hacky MVP. But it's still, you know, seeing that evolution
+
+196
+00:13:14.000 --> 00:13:16.280
+<v Tom Hacohen>is just mind blowing to me. And I'm really proud of that.
+
+197
+00:13:17.200 --> 00:13:18.920
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+198
+00:13:18.960 --> 00:13:23.800
+<v Noah Labhart>And you mentioned a mistake earlier, but I'm going to ask again, tell me about the mistake
+
+199
+00:13:23.800 --> 00:13:27.620
+<v Noah Labhart>you made, whether it be that one or another one you want to mention and how you and your team
+
+200
+00:13:27.620 --> 00:13:28.440
+<v Noah Labhart>responded to it.
+
+201
+00:13:28.440 --> 00:13:34.260
+<v Tom Hacohen>Yeah, I mean, I think the previous mistake that I mentioned, I don't think there's like a lot
+
+202
+00:13:34.260 --> 00:13:38.520
+<v Tom Hacohen>more to add. We just suffered for it. And you know, it was just like a lot of pain. And we had to,
+
+203
+00:13:38.520 --> 00:13:43.480
+<v Tom Hacohen>you know, change the architecture again, just to support everything just to support our team.
+
+204
+00:13:44.000 --> 00:13:46.680
+<v Tom Hacohen>It's always a bit uncomfortable to talk about. But there's like,
+
+205
+00:13:47.480 --> 00:13:53.700
+<v Tom Hacohen>it just I think this is very useful for like new CEOs, essentially. And you know,
+
+206
+00:13:53.700 --> 00:13:57.620
+<v Tom Hacohen>there was like an employee that was underperforming and was dragging the team down and damaging our
+
+207
+00:13:57.620 --> 00:13:59.460
+<v Tom Hacohen>damaging our culture, you know, which we talked about.
+
+208
+00:13:59.500 --> 00:14:01.440
+<v Tom Hacohen>It was like very important for the team.
+
+209
+00:14:01.560 --> 00:14:03.940
+<v Tom Hacohen>And, you know, it's always hard to let letting someone go,
+
+210
+00:14:04.080 --> 00:14:06.200
+<v Tom Hacohen>especially someone I've known from before.
+
+211
+00:14:06.860 --> 00:14:09.480
+<v Tom Hacohen>The mistake was I just took too long to let him go.
+
+212
+00:14:09.620 --> 00:14:11.820
+<v Tom Hacohen>And just like, you know, it wasn't a good fit for him.
+
+213
+00:14:11.920 --> 00:14:13.060
+<v Tom Hacohen>It wasn't a good fit for us.
+
+214
+00:14:13.140 --> 00:14:14.440
+<v Tom Hacohen>It was just like causing a lot of conflict.
+
+215
+00:14:15.540 --> 00:14:19.220
+<v Tom Hacohen>And yeah, I was pleasantly surprised by how the team responded, though.
+
+216
+00:14:19.240 --> 00:14:22.020
+<v Tom Hacohen>I thought like, oh, my God, you know, like a core member of the team,
+
+217
+00:14:22.180 --> 00:14:24.940
+<v Tom Hacohen>not being part of the company is going to like destroy everything.
+
+218
+00:14:25.000 --> 00:14:26.280
+<v Tom Hacohen>Everyone is going to want to leave.
+
+219
+00:14:27.620 --> 00:14:30.920
+<v Tom Hacohen>actually know, like people told me that they were wondering the same. You know, they felt that wasn't
+
+220
+00:14:30.920 --> 00:14:35.640
+<v Tom Hacohen>a fit and, like, was wondering why I wasn't making the call. So I guess, yeah, the important thing is
+
+221
+00:14:35.640 --> 00:14:39.040
+<v Tom Hacohen>Yeah, just do what you think, you know, what your gut tells you, even if it's the hard decision
+
+222
+00:14:39.040 --> 00:14:44.260
+<v Tom Hacohen>and don't like try to second guess your team because they probably are on it anyway. So
+
+223
+00:14:46.960 --> 00:14:51.580
+<v Noah Labhart>Well, what does the future look like for Svix, the product, and for your team?
+
+224
+00:14:52.640 --> 00:14:54.040
+<v Tom Hacohen>I'm a long time Linux user
+
+225
+00:14:55.160 --> 00:14:56.500
+<v Tom Hacohen>I've been using Linux for
+
+226
+00:14:56.500 --> 00:14:58.500
+<v Tom Hacohen>I don't know how long but many many many
+
+227
+00:14:58.500 --> 00:15:00.680
+<v Tom Hacohen>years. In the Linux
+
+228
+00:15:00.680 --> 00:15:02.660
+<v Tom Hacohen>world, in the Unix world, you have a lot of
+
+229
+00:15:02.660 --> 00:15:04.100
+<v Tom Hacohen>different services that interact
+
+230
+00:15:04.100 --> 00:15:06.040
+<v Tom Hacohen>in the Unix world again like it's a
+
+231
+00:15:06.040 --> 00:15:08.120
+<v Tom Hacohen>small binary so you output
+
+232
+00:15:08.120 --> 00:15:10.340
+<v Tom Hacohen>some command that has some output
+
+233
+00:15:10.340 --> 00:15:12.460
+<v Tom Hacohen>and then you pipe it to another command that filters
+
+234
+00:15:12.460 --> 00:15:14.560
+<v Tom Hacohen>it and then to another command that does something
+
+235
+00:15:14.560 --> 00:15:16.200
+<v Tom Hacohen>else. I think we're
+
+236
+00:15:16.200 --> 00:15:18.380
+<v Tom Hacohen>nearing that or we're already maybe
+
+237
+00:15:18.380 --> 00:15:20.340
+<v Tom Hacohen>in this future in the web
+
+238
+00:15:21.580 --> 00:15:27.420
+<v Tom Hacohen>for authentication and Stripe for billing and SendGrid for emails and Twilio for SMS and Svix
+
+239
+00:15:27.420 --> 00:15:33.400
+<v Tom Hacohen>for webhooks and Mux for video. And like the list goes on and on. And I think we're missing this,
+
+240
+00:15:33.420 --> 00:15:39.500
+<v Tom Hacohen>this layer of helping these services interact and interact reliably. So webhooks actually fill that
+
+241
+00:15:39.500 --> 00:15:44.680
+<v Tom Hacohen>gap, but you know, it's always been a pain to build them and most people get them wrong. So I
+
+242
+00:15:44.680 --> 00:15:48.860
+<v Tom Hacohen>think this is, you know, this is like the long-term, this is what we want. Like this is our place in
+
+243
+00:15:48.860 --> 00:15:54.020
+<v Tom Hacohen>world. This is who we are. Short term, yeah, a lot of really cool things. I don't want to, like, spoil too
+
+244
+00:15:54.020 --> 00:15:58.920
+<v Tom Hacohen>much or like, or commit to anything, like, be releasing immediately, but I can tell you what
+
+245
+00:15:58.920 --> 00:16:03.300
+<v Tom Hacohen>we just released recently. So we have automatic docs generation. You know, we already know what
+
+246
+00:16:03.300 --> 00:16:07.100
+<v Tom Hacohen>webhooks you send, we might as well, like, generate the docs for you. I mean, obviously, like a barebone
+
+247
+00:16:07.100 --> 00:16:11.120
+<v Tom Hacohen>version that you can annotate further, but that's, you know, that's something we do. We have an
+
+248
+00:16:11.120 --> 00:16:16.540
+<v Tom Hacohen>automatic Zapier integration builder. You know, Zapier relies on webhooks to operate, to trigger
+
+249
+00:16:16.540 --> 00:16:19.120
+<v Tom Hacohen>look at this apps, and we already know what webhooks you sent,
+
+250
+00:16:19.340 --> 00:16:21.380
+<v Tom Hacohen>we might as well build integration for you.
+
+251
+00:16:21.460 --> 00:16:22.300
+<v Tom Hacohen>So that's what we did.
+
+252
+00:16:22.780 --> 00:16:26.820
+<v Tom Hacohen>And we had like a community member contribute to our C-sharp library.
+
+253
+00:16:27.080 --> 00:16:29.240
+<v Tom Hacohen>We have a Rust SDK as well.
+
+254
+00:16:29.300 --> 00:16:30.720
+<v Tom Hacohen>Just like a lot of things.
+
+255
+00:16:31.380 --> 00:16:34.060
+<v Tom Hacohen>It's just like the list, the list goes on and on.
+
+256
+00:16:34.180 --> 00:16:36.040
+<v Tom Hacohen>And I guess like to segue from that,
+
+257
+00:16:36.140 --> 00:16:41.100
+<v Tom Hacohen>we are hiring for like strong Rust backend or just like full stack.
+
+258
+00:16:41.140 --> 00:16:42.960
+<v Tom Hacohen>So like Rust and React for TypeScript engineers.
+
+259
+00:16:42.960 --> 00:16:47.820
+<v Tom Hacohen>engineers. So if you want to help us reduce the backlog and help us get through the roadmap,
+
+260
+00:16:47.820 --> 00:16:50.120
+<v Tom Hacohen>we're hiring. Well,
+
+261
+00:16:50.120 --> 00:16:53.960
+<v Noah Labhart>Let's switch to you. Who influences the way that you work, you know, name a
+
+262
+00:16:54.520 --> 00:16:59.040
+<v Noah Labhart>CEO, CTO, an architect, really any person you look up to, and why? I, I
+
+263
+00:16:59.040 --> 00:17:00.060
+<v Tom Hacohen>really, I look up, and I learn
+
+264
+00:17:00.060 --> 00:17:04.680
+<v Tom Hacohen>from so many people all the time. When you just look at other founders, right, and the founder that
+
+265
+00:17:04.680 --> 00:17:08.360
+<v Tom Hacohen>just finds a creative solution at the face of adversity, like, you know, the company's gonna
+
+266
+00:17:08.360 --> 00:17:12.700
+<v Tom Hacohen>gonna die and they find a solution, and the one that's like bold and decisive, and the one that's
+
+267
+00:17:12.700 --> 00:17:17.460
+<v Tom Hacohen>like a great public speaker, like kind of like Steve Jobs type, and, you know, the one that just
+
+268
+00:17:17.460 --> 00:17:22.640
+<v Tom Hacohen>like grinds, you know, in silence in the corner, just like gets more and more sales. There's just so many
+
+269
+00:17:22.640 --> 00:17:27.160
+<v Tom Hacohen>people even like around me that do amazing things, and I just try to learn, you know, the best from
+
+270
+00:17:27.160 --> 00:17:32.520
+<v Tom Hacohen>each of them. One thing that YC loves to say is, you know, average companies fail. So if you do
+
+271
+00:17:32.520 --> 00:17:37.200
+<v Tom Hacohen>something average, you know, if you're gonna be average, you're gonna fail as well. And I think
+
+272
+00:17:38.360 --> 00:17:42.660
+<v Tom Hacohen>to always, you know, look at the companies around me and see who does best at something and just
+
+273
+00:17:42.660 --> 00:17:45.340
+<v Tom Hacohen>like try to mimic that and learn from that and like get their advice.
+
+274
+00:17:47.020 --> 00:17:48.920
+<v Noah Labhart>Well, we talked about a
+
+275
+00:17:48.920 --> 00:17:53.640
+<v Noah Labhart>mistake earlier, but a little different spin. If you could go back to the beginning, what would
+
+276
+00:17:53.640 --> 00:17:56.160
+<v Noah Labhart>you do different? Or where would you consider taking a different approach?
+
+277
+00:17:57.380 --> 00:17:58.180
+<v Tom Hacohen>So I mean, first
+
+278
+00:17:58.180 --> 00:18:04.940
+<v Tom Hacohen>of all, the scaling thing that I mentioned, God, I wish we went like a different way there. And I
+
+279
+00:18:04.940 --> 00:18:20.040
+<v Tom Hacohen>So just to recap, we prematurely scaled for like 100x our current traffic rather than just, or try to scale to that, aim to that, instead of just saying, okay, we're here, we're growing at a certain pace, let's just do 10x and that should be fine for the next like, whatever long.
+
+280
+00:18:21.220 --> 00:18:24.320
+<v Tom Hacohen>That one, I wish, I wish we could have done differently.
+
+281
+00:18:25.000 --> 00:18:31.780
+<v Tom Hacohen>But other than that, I think, you know, like startup, or at least like for me, nevermind even the start of the company, like I learned so much from the mistakes.
+
+282
+00:18:31.780 --> 00:18:35.200
+<v Tom Hacohen>and just that made me more resilient and more,
+
+283
+00:18:35.900 --> 00:18:37.440
+<v Tom Hacohen>I mean, I'm better suited, I think,
+
+284
+00:18:37.460 --> 00:18:38.600
+<v Tom Hacohen>to continue running this company.
+
+285
+00:18:39.260 --> 00:18:40.540
+<v Tom Hacohen>So I can think like, you know,
+
+286
+00:18:40.540 --> 00:18:42.320
+<v Tom Hacohen>I've made a lot of mistakes, like really a lot.
+
+287
+00:18:42.580 --> 00:18:44.820
+<v Tom Hacohen>But now I know, you know,
+
+288
+00:18:44.820 --> 00:18:47.040
+<v Tom Hacohen>and the scars show it that, you know,
+
+289
+00:18:47.040 --> 00:18:48.160
+<v Tom Hacohen>I know not to repeat them.
+
+290
+00:18:48.220 --> 00:18:49.480
+<v Tom Hacohen>And it's kind of like almost, you know,
+
+291
+00:18:49.480 --> 00:18:50.460
+<v Tom Hacohen>like the butterfly effect.
+
+292
+00:18:50.600 --> 00:18:53.040
+<v Tom Hacohen>You know, if I go back and I change that mistake
+
+293
+00:18:53.040 --> 00:18:55.540
+<v Tom Hacohen>and I fix it and I just avoid it,
+
+294
+00:18:55.600 --> 00:18:57.620
+<v Tom Hacohen>like, will I have the scars to show it for it?
+
+295
+00:18:57.640 --> 00:18:59.140
+<v Tom Hacohen>And like, will I know to not repeat it
+
+296
+00:18:59.140 --> 00:18:59.960
+<v Tom Hacohen>when it really matters?
+
+297
+00:19:00.520 --> 00:19:01.140
+<v Tom Hacohen>I don't know.
+
+298
+00:19:01.780 --> 00:19:06.680
+<v Tom Hacohen>Try not to, you know, try not to time travel and not to change anything as much as I can.
+
+299
+00:19:08.420 --> 00:19:09.780
+<v Noah Labhart>Well, last question, Tom.
+
+300
+00:19:09.940 --> 00:19:14.840
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+301
+00:19:15.060 --> 00:19:16.180
+<v Noah Labhart>They're jazzed about it.
+
+302
+00:19:16.220 --> 00:19:17.480
+<v Noah Labhart>They can't wait to show it off to the world.
+
+303
+00:19:17.580 --> 00:19:19.200
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+304
+00:19:19.560 --> 00:19:22.780
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+305
+00:19:23.680 --> 00:19:27.120
+<v Tom Hacohen>I hope it's transatlantic because I really have like a lot to say.
+
+306
+00:19:27.880 --> 00:19:29.420
+<v Tom Hacohen>Let me give you the gist of it.
+
+307
+00:19:29.420 --> 00:19:35.720
+<v Tom Hacohen>it. Okay, first of all, I guess setbacks all the time, like just, it's part of being a founder, just don't
+
+308
+00:19:35.720 --> 00:19:40.000
+<v Tom Hacohen>worry about them, just solve them if they're even worth solving, and just move on. You know, it's very
+
+309
+00:19:40.000 --> 00:19:45.160
+<v Tom Hacohen>easy to just like dwell on them for a few days. Yeah, just go on and just, and also remember like
+
+310
+00:19:45.160 --> 00:19:49.720
+<v Tom Hacohen>you're the rock that everyone depends on and gets cues from. So if you're stressed, everyone is stressed,
+
+311
+00:19:49.720 --> 00:19:54.280
+<v Tom Hacohen>if you stay cool, everyone is cool. You're gonna hit something like, you know, potentially company
+
+312
+00:19:54.280 --> 00:19:59.200
+<v Tom Hacohen>company destroying, like, every day. So just like get used to it, I guess. You know, in the beginning
+
+313
+00:19:59.200 --> 00:20:03.940
+<v Tom Hacohen>I used to think that there were like silver bullets. I thought I would just get this one hire,
+
+314
+00:20:03.940 --> 00:20:10.720
+<v Tom Hacohen>just sign this one deal, just do X, just, I don't know, and just after that everything will just be
+
+315
+00:20:10.720 --> 00:20:14.900
+<v Tom Hacohen>fine. And I guess it connects, actually, it's related to the previous point. They're just like, there are
+
+316
+00:20:14.900 --> 00:20:19.700
+<v Tom Hacohen>no silver bullets. They're gonna be like another thing like the day after, and once the, the highs
+
+317
+00:20:19.700 --> 00:20:22.600
+<v Tom Hacohen>is gone from after raising a big round
+
+318
+00:20:23.140 --> 00:20:24.840
+<v Tom Hacohen>or from doing a big sale
+
+319
+00:20:24.840 --> 00:20:26.600
+<v Tom Hacohen>and getting an amazing customer on board.
+
+320
+00:20:26.940 --> 00:20:28.280
+<v Tom Hacohen>It's back to company building.
+
+321
+00:20:28.400 --> 00:20:30.800
+<v Tom Hacohen>It's company to day-to-day roller coaster.
+
+322
+00:20:31.600 --> 00:20:32.860
+<v Tom Hacohen>One last one, I guess.
+
+323
+00:20:33.020 --> 00:20:33.680
+<v Tom Hacohen>And then, you know.
+
+324
+00:20:34.080 --> 00:20:36.080
+<v Tom Hacohen>So one of our partners, again,
+
+325
+00:20:36.180 --> 00:20:37.020
+<v Tom Hacohen>I go back to YC.
+
+326
+00:20:37.460 --> 00:20:39.480
+<v Tom Hacohen>It's really been formative for us as a company.
+
+327
+00:20:39.680 --> 00:20:41.360
+<v Tom Hacohen>So one of the advice that one of our partners
+
+328
+00:20:41.360 --> 00:20:44.300
+<v Tom Hacohen>gave the batch is that I still carry to this day.
+
+329
+00:20:44.340 --> 00:20:45.240
+<v Tom Hacohen>It's like, don't make excuses.
+
+330
+00:20:45.700 --> 00:20:47.660
+<v Tom Hacohen>So he was referring to investor updates
+
+331
+00:20:47.660 --> 00:20:48.840
+<v Tom Hacohen>when he gave this advice.
+
+332
+00:20:49.700 --> 00:20:54.880
+<v Tom Hacohen>Just like, you know, like, you know, investors don't like it when they just get like a long list of like why you didn't hit your targets.
+
+333
+00:20:54.880 --> 00:20:57.400
+<v Tom Hacohen>Just like hit your targets or, you know, stay quiet about it.
+
+334
+00:20:57.780 --> 00:21:00.720
+<v Tom Hacohen>But I actually took it a bit more, you know, widely.
+
+335
+00:21:01.000 --> 00:21:04.820
+<v Tom Hacohen>So I think most people fail at something and explain why they failed.
+
+336
+00:21:04.900 --> 00:21:06.240
+<v Tom Hacohen>And then they think they got a pass, right?
+
+337
+00:21:06.280 --> 00:21:07.620
+<v Tom Hacohen>I mean, you know, it's not my fault.
+
+338
+00:21:07.660 --> 00:21:12.720
+<v Tom Hacohen>I failed because, you know, the floor was crooked or because the wind, I had headwind or whatever.
+
+339
+00:21:13.460 --> 00:21:14.940
+<v Tom Hacohen>And they think that they're okay.
+
+340
+00:21:15.040 --> 00:21:18.640
+<v Tom Hacohen>And then that kind of like gives you almost a pass to yourself to fail.
+
+341
+00:21:19.700 --> 00:21:25.600
+<v Tom Hacohen>just like take excuses off the table and you just tell yourself okay i need either to execute and
+
+342
+00:21:25.600 --> 00:21:32.640
+<v Tom Hacohen>get the results that i want to get or just like outright say i failed and i'm sorry and i'm gonna
+
+343
+00:21:32.640 --> 00:21:37.860
+<v Tom Hacohen>learn and but you know we failed just that at least for me like just makes you the master of
+
+344
+00:21:37.860 --> 00:21:41.960
+<v Tom Hacohen>your own destiny and makes you much more resourceful because you now know that you're gonna hit the
+
+345
+00:21:41.960 --> 00:21:46.820
+<v Tom Hacohen>road back and you have to solve it some way and if you don't that's fine you failed it and maybe
+
+346
+00:21:46.820 --> 00:21:49.580
+<v Tom Hacohen>And maybe, you know, sometimes there's nothing you could have done, right?
+
+347
+00:21:49.680 --> 00:21:53.680
+<v Tom Hacohen>I mean, it's not, I'm not saying like hit yourself, you know, like blame yourself for
+
+348
+00:21:53.680 --> 00:21:58.020
+<v Tom Hacohen>everything, but just don't cop out with like a, you know, an easy excuse.
+
+349
+00:21:58.280 --> 00:21:59.420
+<v Tom Hacohen>Like you didn't hit your targets.
+
+350
+00:21:59.500 --> 00:22:00.000
+<v Tom Hacohen>That's fine.
+
+351
+00:22:00.060 --> 00:22:01.340
+<v Tom Hacohen>Maybe the targets were too ambitious.
+
+352
+00:22:01.440 --> 00:22:01.940
+<v Tom Hacohen>Maybe that.
+
+353
+00:22:01.960 --> 00:22:05.200
+<v Tom Hacohen>But the fact is you set those targets and those were not hit.
+
+354
+00:22:05.420 --> 00:22:08.080
+<v Tom Hacohen>And I think this, yeah, that was, it's just liberating for me.
+
+355
+00:22:08.680 --> 00:22:09.560
+<v Noah Labhart>That's great advice.
+
+356
+00:22:09.980 --> 00:22:12.180
+<v Noah Labhart>Well, Tom, thank you for being on the show today.
+
+357
+00:22:12.280 --> 00:22:15.020
+<v Noah Labhart>Thank you for telling the creation story of Svix.
+
+358
+00:22:15.220 --> 00:22:16.400
+<v Tom Hacohen>No, thank you very much for having me.
+
+359
+00:22:18.220 --> 00:22:21.300
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+360
+00:22:25.760 --> 00:22:28.400
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+361
+00:22:28.520 --> 00:22:33.320
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+362
+00:22:33.720 --> 00:22:38.760
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just $5 to $10 a month.
+
+363
+00:22:39.160 --> 00:22:41.380
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+364
+00:22:41.640 --> 00:22:43.700
+<v Noah Labhart>Both things help us out tremendously.
+
+365
+00:22:45.980 --> 00:22:47.480
+<v Noah Labhart>And thanks again for listening.

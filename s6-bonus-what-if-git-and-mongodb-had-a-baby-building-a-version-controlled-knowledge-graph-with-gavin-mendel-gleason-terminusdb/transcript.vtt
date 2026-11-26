@@ -1,0 +1,1163 @@
+WEBVTT
+
+NOTE S6 Bonus: What If Git and MongoDB Had a Baby? Building a Version-Controlled Knowledge Graph with Gavin Mendel-Gleason, TerminusDB
+
+1
+00:00:00.620 --> 00:00:08.820
+<v Gavin Mendel-Gleason>The sort of roadmap in our minds was way too big to actually realize in practice with the kind of resources that we had.
+
+2
+00:00:09.100 --> 00:00:13.260
+<v Gavin Mendel-Gleason>We got seed funding, we got a little over a million in seed funding.
+
+3
+00:00:13.460 --> 00:00:19.040
+<v Gavin Mendel-Gleason>Then it was a little bit more practicable, like a lot of the kinds of ideas we could start to put into practice.
+
+4
+00:00:19.960 --> 00:00:25.980
+<v Gavin Mendel-Gleason>But there was so much, right? So we were trying to be a bit driven by customer needs as well.
+
+5
+00:00:25.980 --> 00:00:34.060
+<v Gavin Mendel-Gleason>So we had one early customer that drove like us trying to get very big graphs and less on the sort of incremental.
+
+6
+00:00:34.280 --> 00:00:37.440
+<v Gavin Mendel-Gleason>Like, how do you how do you actually create those graphs in the first place?
+
+7
+00:00:38.860 --> 00:00:42.300
+<v Gavin Mendel-Gleason>I'm Gavin Mendel-Gleason. I'm the CTO of TerminusDB.
+
+8
+00:00:47.440 --> 00:00:52.940
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+9
+00:00:52.940 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+10
+00:00:57.100 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+11
+00:01:02.260 --> 00:01:06.180
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Gavin Mendel-Gleason
+
+12
+00:01:06.180 --> 00:01:11.480
+<v Noah Labhart>built a world-class tool with Git-like collaboration centered around data workflows.
+
+13
+00:01:13.340 --> 00:01:15.840
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:20.560 --> 00:01:24.980
+<v Noah Labhart>When asked what he does for fun, Gavin Mendel-Gleason likes to program for fun.
+
+15
+00:01:25.180 --> 00:01:30.200
+<v Noah Labhart>He builds stuff in his spare time as tech dominates his life. But outside of tech,
+
+16
+00:01:30.360 --> 00:01:34.800
+<v Noah Labhart>he has two daughters and his family enjoys spending time outdoors, specifically in the Alps.
+
+17
+00:01:36.100 --> 00:01:40.140
+<v Noah Labhart>At Trinity College in Dublin, Gavin and his teammates were working on a project
+
+18
+00:01:40.140 --> 00:01:44.460
+<v Noah Labhart>that required the storage and relation between loads of complex datasets.
+
+19
+00:01:45.840 --> 00:01:51.360
+<v Noah Labhart>During this project, they decided to create a better kind of database to help solve these sorts of problems.
+
+20
+00:01:53.800 --> 00:01:56.640
+<v Noah Labhart>This is the creation story of TerminusDB.
+
+21
+00:02:02.920 --> 00:02:08.580
+<v Gavin Mendel-Gleason>TerminusDB actually got started at Trinity College Dublin some number of years back.
+
+22
+00:02:08.640 --> 00:02:10.500
+<v Gavin Mendel-Gleason>I think it's like six years ago now.
+
+23
+00:02:10.500 --> 00:02:18.360
+<v Gavin Mendel-Gleason>and we were working on a project about long-scale historical research trying to look at patterns in
+
+24
+00:02:18.360 --> 00:02:25.540
+<v Gavin Mendel-Gleason>history and look at the pattern of civilizations civilizational collapse disasters and the
+
+25
+00:02:25.540 --> 00:02:31.820
+<v Gavin Mendel-Gleason>responses to those and what it takes to keep a society around so terminus was actually just a
+
+26
+00:02:31.820 --> 00:02:38.380
+<v Gavin Mendel-Gleason>its genesis comes in us trying to figure out how to store all of the really complicated data that
+
+27
+00:02:38.380 --> 00:02:40.320
+<v Gavin Mendel-Gleason>It would have to be time-scoped data.
+
+28
+00:02:40.580 --> 00:02:43.020
+<v Gavin Mendel-Gleason>It would have to be geographically scoped.
+
+29
+00:02:43.180 --> 00:02:45.740
+<v Gavin Mendel-Gleason>It had loads of different variables.
+
+30
+00:02:46.250 --> 00:02:50.200
+<v Gavin Mendel-Gleason>All the variables had people who would vouch for them.
+
+31
+00:02:50.320 --> 00:02:52.640
+<v Gavin Mendel-Gleason>So you'd take it from some source.
+
+32
+00:02:52.780 --> 00:02:58.520
+<v Gavin Mendel-Gleason>You'd have some variables saying the human height in Britain during the late 1800s,
+
+33
+00:02:58.970 --> 00:03:03.480
+<v Gavin Mendel-Gleason>according to military inductions, was this high.
+
+34
+00:03:03.720 --> 00:03:06.220
+<v Gavin Mendel-Gleason>And that we found in this source.
+
+35
+00:03:06.420 --> 00:03:08.160
+<v Gavin Mendel-Gleason>And he used this other source.
+
+36
+00:03:08.380 --> 00:03:14.680
+<v Gavin Mendel-Gleason>So you have this really complicated sort of chain of provenance that you need to keep around, and you have very complicated information.
+
+37
+00:03:15.560 --> 00:03:25.500
+<v Gavin Mendel-Gleason>And that problem really sort of drove us to try to create a different kind of database that would make it easier to do these sort of large-scale data management projects.
+
+38
+00:03:27.760 --> 00:03:30.680
+<v Noah Labhart>Well, tell me about the MVP for TerminusDB.
+
+39
+00:03:30.840 --> 00:03:32.920
+<v Noah Labhart>Tell me about that first product you built.
+
+40
+00:03:32.980 --> 00:03:36.200
+<v Noah Labhart>How long did it take you to build, and what sort of tools did you use to bring it to life?
+
+41
+00:03:37.500 --> 00:03:42.060
+<v Gavin Mendel-Gleason>It went through a lot of iterations actually. So the first thing we did was we were trying to
+
+42
+00:03:42.060 --> 00:03:48.020
+<v Gavin Mendel-Gleason>figure out how to store this complicated data and we were looking at linked data solutions,
+
+43
+00:03:48.200 --> 00:03:54.160
+<v Gavin Mendel-Gleason>like ways of trying to use RDF and OWL to try to structure this because it was such a complicated,
+
+44
+00:03:55.060 --> 00:04:01.840
+<v Gavin Mendel-Gleason>interwoven sort of graph database-y type problem. My first prototype I guess was just in Prolog.
+
+45
+00:04:01.840 --> 00:04:07.620
+<v Gavin Mendel-Gleason>So I just wrote a Prolog graph and I looked around to see if I could do it that way.
+
+46
+00:04:07.800 --> 00:04:13.360
+<v Gavin Mendel-Gleason>And SWI-Prolog, I guess, there's this SWI-Prolog, has some really good tools for linked data.
+
+47
+00:04:14.060 --> 00:04:17.860
+<v Gavin Mendel-Gleason>Pretty quickly, it became apparent that it wouldn't scale up very well.
+
+48
+00:04:17.980 --> 00:04:22.640
+<v Gavin Mendel-Gleason>So once you got past like 20 million triples, then it started to fall over.
+
+49
+00:04:22.840 --> 00:04:26.540
+<v Gavin Mendel-Gleason>So then we started trying to find out ways to get around that.
+
+50
+00:04:26.540 --> 00:04:36.080
+<v Gavin Mendel-Gleason>that and I guess then I integrated HDT which is a headers dictionary triple library that's written
+
+51
+00:04:36.080 --> 00:04:41.540
+<v Gavin Mendel-Gleason>in C++ with Prolog and then I kind of started playing around with that and that scaled really
+
+52
+00:04:41.540 --> 00:04:47.900
+<v Gavin Mendel-Gleason>well in fact like that could scale up to really huge graphs like really just enormous graphs
+
+53
+00:04:47.900 --> 00:04:53.780
+<v Gavin Mendel-Gleason>bigger than you could get in most other graph databases you'd have a hard time like loading
+
+54
+00:04:53.780 --> 00:04:59.200
+<v Gavin Mendel-Gleason>that into Neo4j database for instance because you would just end up swapping to disk all the time.
+
+55
+00:04:59.420 --> 00:05:04.120
+<v Gavin Mendel-Gleason>They were using these really unusual data structures, these succinct data structures,
+
+56
+00:05:04.320 --> 00:05:07.780
+<v Gavin Mendel-Gleason>so then that got me really interested in succinct data structures.
+
+57
+00:05:08.800 --> 00:05:12.700
+<v Gavin Mendel-Gleason>It didn't have a lot of the features that TerminusDB has in that it didn't have
+
+58
+00:05:13.260 --> 00:05:19.380
+<v Gavin Mendel-Gleason>version control but it started me thinking about these sorts of things like actually you know how
+
+59
+00:05:19.380 --> 00:05:20.200
+<v Gavin Mendel-Gleason>how do we do updates?
+
+60
+00:05:20.500 --> 00:05:22.580
+<v Gavin Mendel-Gleason>And then I was thinking, okay, well, we could do updates
+
+61
+00:05:23.060 --> 00:05:25.160
+<v Gavin Mendel-Gleason>where we actually create a new one of these,
+
+62
+00:05:25.320 --> 00:05:28.440
+<v Gavin Mendel-Gleason>or we create intermediate layers that are also structured
+
+63
+00:05:28.440 --> 00:05:31.740
+<v Gavin Mendel-Gleason>using these HDT-like data structures.
+
+64
+00:05:31.920 --> 00:05:35.140
+<v Gavin Mendel-Gleason>And then, you know, from there, it was like very obvious,
+
+65
+00:05:35.200 --> 00:05:38.180
+<v Gavin Mendel-Gleason>actually, that looks a bit like the way that Git does
+
+66
+00:05:38.760 --> 00:05:41.980
+<v Gavin Mendel-Gleason>its storage where you store snapshots of things,
+
+67
+00:05:42.060 --> 00:05:43.720
+<v Gavin Mendel-Gleason>but we wouldn't store snapshots
+
+68
+00:05:43.720 --> 00:05:45.040
+<v Gavin Mendel-Gleason>because with data would be too large,
+
+69
+00:05:45.080 --> 00:05:47.220
+<v Gavin Mendel-Gleason>but we'd store the diff between them.
+
+70
+00:05:47.220 --> 00:05:49.960
+<v Gavin Mendel-Gleason>That sort of was the genesis of the first MVP.
+
+71
+00:05:52.180 --> 00:05:58.900
+<v Noah Labhart>From that point, from the genesis point, like you mentioned, how did you progress the product from there and how did you mature it?
+
+72
+00:05:58.940 --> 00:06:10.560
+<v Noah Labhart>I think to wrap that in a box a little bit, I'm curious how you built your roadmap and how you decided, okay, this is the next most important thing to build or address or enhance with TerminusDB.
+
+73
+00:06:12.020 --> 00:06:13.820
+<v Gavin Mendel-Gleason>It's really been a process.
+
+74
+00:06:13.860 --> 00:06:15.560
+<v Gavin Mendel-Gleason>It hasn't been one direction.
+
+75
+00:06:17.220 --> 00:06:23.340
+<v Gavin Mendel-Gleason>vision. So myself and Kevin Feeney, we talked about this stuff constantly and how we would like
+
+76
+00:06:23.340 --> 00:06:30.380
+<v Gavin Mendel-Gleason>the product to look. But that sort of roadmap in our minds was way too big to actually realize
+
+77
+00:06:30.380 --> 00:06:37.340
+<v Gavin Mendel-Gleason>and practice with the kind of resources that we had. We got seed funding. We got a little over
+
+78
+00:06:37.340 --> 00:06:42.260
+<v Gavin Mendel-Gleason>a million in seed funding. Then it was a little bit more practicable, like a lot of the kinds of
+
+79
+00:06:42.260 --> 00:06:48.740
+<v Gavin Mendel-Gleason>of ideas we could start to put into practice but there was so much right so we were trying to be a
+
+80
+00:06:48.740 --> 00:06:55.720
+<v Gavin Mendel-Gleason>bit driven by customer needs as well so we had one early customer they were essentially doing a
+
+81
+00:06:56.360 --> 00:07:01.640
+<v Gavin Mendel-Gleason>corporate intelligence application and they had they had big graphs with complicated data
+
+82
+00:07:01.640 --> 00:07:07.100
+<v Gavin Mendel-Gleason>that was time scoped and they needed to have that kind of information so that you could traverse
+
+83
+00:07:07.100 --> 00:07:13.100
+<v Gavin Mendel-Gleason>edges in a time-scoped way. So for instance, like you'd have a company, the company has shareholders,
+
+84
+00:07:13.360 --> 00:07:17.480
+<v Gavin Mendel-Gleason>but the company doesn't just have shareholders, right? The company has shareholders that hold
+
+85
+00:07:17.480 --> 00:07:23.100
+<v Gavin Mendel-Gleason>shares at a particular time window, right? So you buy shares and then at some point you might sell
+
+86
+00:07:23.100 --> 00:07:26.700
+<v Gavin Mendel-Gleason>them. So if you want to look at control of the company, the control of the company is a very
+
+87
+00:07:26.700 --> 00:07:31.180
+<v Gavin Mendel-Gleason>dynamic thing that changes over time. So you want to be able to have this sort of graph where
+
+88
+00:07:31.180 --> 00:07:33.880
+<v Gavin Mendel-Gleason>where everything's scoped by the time that it's in.
+
+89
+00:07:34.020 --> 00:07:37.580
+<v Gavin Mendel-Gleason>And you can ask questions about time slices through that.
+
+90
+00:07:38.020 --> 00:07:41.720
+<v Gavin Mendel-Gleason>That drove us trying to get very big graphs
+
+91
+00:07:41.720 --> 00:07:44.080
+<v Gavin Mendel-Gleason>and going in that direction,
+
+92
+00:07:44.660 --> 00:07:46.920
+<v Gavin Mendel-Gleason>and less on the sort of incremental,
+
+93
+00:07:47.140 --> 00:07:50.220
+<v Gavin Mendel-Gleason>like how do you actually create those graphs in the first place?
+
+94
+00:07:50.480 --> 00:07:52.940
+<v Gavin Mendel-Gleason>So then subsequently, we had another customer
+
+95
+00:07:52.940 --> 00:07:55.120
+<v Gavin Mendel-Gleason>who was trying to do supply chain stuff,
+
+96
+00:07:55.280 --> 00:07:57.420
+<v Gavin Mendel-Gleason>and their stuff was coming in very incrementally.
+
+97
+00:07:57.420 --> 00:08:00.800
+<v Gavin Mendel-Gleason>So there wasn't like a big load process that you could do.
+
+98
+00:08:01.180 --> 00:08:06.200
+<v Gavin Mendel-Gleason>just do the analytics, you had to keep something that was a little bit more like a transactional
+
+99
+00:08:06.200 --> 00:08:14.140
+<v Gavin Mendel-Gleason>database. Then we started developing features on that basis to really make it more Git-like
+
+100
+00:08:14.140 --> 00:08:19.940
+<v Gavin Mendel-Gleason>at that point. There was a lot of discussion, I guess, in the company. All of the employees
+
+101
+00:08:19.940 --> 00:08:25.420
+<v Gavin Mendel-Gleason>actually were involved pretty heavily in the decision-making processes around these things
+
+102
+00:08:25.420 --> 00:08:29.540
+<v Gavin Mendel-Gleason>about like what are we trying to build how are we going to bring this to life
+
+103
+00:08:30.380 --> 00:08:37.080
+<v Gavin Mendel-Gleason>like databases are big things they're not like us i've i've um you know worked on quite complicated
+
+104
+00:08:37.080 --> 00:08:43.120
+<v Gavin Mendel-Gleason>software in the past for chem informatics and stuff like that but in a lot of ways those it's
+
+105
+00:08:43.120 --> 00:08:49.900
+<v Gavin Mendel-Gleason>often the case that your sort of mvp uh has lower barrier to entry than a database like a database
+
+106
+00:08:49.900 --> 00:08:55.460
+<v Gavin Mendel-Gleason>base, people want it to be absolutely solid. They want it to be super fast. And the things that they
+
+107
+00:08:55.460 --> 00:09:01.220
+<v Gavin Mendel-Gleason>have in mind have really like Postgres is an amazing, you know, piece of kit. So if you're
+
+108
+00:09:01.220 --> 00:09:07.220
+<v Gavin Mendel-Gleason>trying to compare yourself to Postgres as the sort of baseline, you really have, you have a long way
+
+109
+00:09:07.220 --> 00:09:10.020
+<v Gavin Mendel-Gleason>to run, you know, it's, it's, it's not an easy road.
+
+110
+00:09:11.160 --> 00:09:14.360
+<v Noah Labhart>So then my next question is probably even
+
+111
+00:09:14.360 --> 00:09:18.760
+<v Noah Labhart>more important than normal. How did you go about building your team? And what did you look for in
+
+112
+00:09:19.900 --> 00:09:23.860
+<v Noah Labhart>that they were the winning horses to join you and go tackle this hard problem.
+
+113
+00:09:24.980 --> 00:09:28.080
+<v Gavin Mendel-Gleason>It is very hard to get a good team together.
+
+114
+00:09:28.140 --> 00:09:29.980
+<v Gavin Mendel-Gleason>We have an incredible group of people,
+
+115
+00:09:30.080 --> 00:09:32.580
+<v Gavin Mendel-Gleason>but we didn't always make the right decisions on that.
+
+116
+00:09:32.760 --> 00:09:35.160
+<v Gavin Mendel-Gleason>And that's, it is tricky to do.
+
+117
+00:09:35.360 --> 00:09:37.360
+<v Gavin Mendel-Gleason>And I've learned over time,
+
+118
+00:09:37.560 --> 00:09:40.500
+<v Gavin Mendel-Gleason>I was involved, very heavily involved in the hiring process,
+
+119
+00:09:41.000 --> 00:09:43.600
+<v Gavin Mendel-Gleason>and I've learned I'm not very good at hiring.
+
+120
+00:09:44.880 --> 00:09:48.520
+<v Gavin Mendel-Gleason>So, and you know, the bad side of this is like they say,
+
+121
+00:09:49.900 --> 00:09:55.980
+<v Gavin Mendel-Gleason>good at hiring or good at firing. And that's really a disaster, right? When you have to fire
+
+122
+00:09:55.980 --> 00:10:01.540
+<v Gavin Mendel-Gleason>people, it's not great. It's bad for morale. It's bad for everybody. And oftentimes, it's
+
+123
+00:10:01.540 --> 00:10:07.640
+<v Gavin Mendel-Gleason>generally the fault of the person who hires them. There's a number of things you have to go after,
+
+124
+00:10:07.740 --> 00:10:13.320
+<v Gavin Mendel-Gleason>and they're hard to get right, right? So you need somebody who can do the skill set that you're
+
+125
+00:10:13.320 --> 00:10:18.020
+<v Gavin Mendel-Gleason>looking for. And that's already hard to find, especially if you're looking for database
+
+126
+00:10:19.900 --> 00:10:25.360
+<v Gavin Mendel-Gleason>or people who are very adept at dealing with complicated modeling, hard to come by.
+
+127
+00:10:25.980 --> 00:10:30.420
+<v Gavin Mendel-Gleason>In addition to that, you also need somebody who loves the thing, right?
+
+128
+00:10:30.580 --> 00:10:34.020
+<v Gavin Mendel-Gleason>So because we're an open source product, that's a little bit easier.
+
+129
+00:10:34.140 --> 00:10:35.820
+<v Gavin Mendel-Gleason>And I think that has helped a lot.
+
+130
+00:10:36.560 --> 00:10:40.940
+<v Gavin Mendel-Gleason>If you're an open source product, one, you can get people working with it potentially
+
+131
+00:10:40.940 --> 00:10:42.860
+<v Gavin Mendel-Gleason>before they're employed.
+
+132
+00:10:43.100 --> 00:10:48.740
+<v Gavin Mendel-Gleason>And two, there's a feeling of contribution that you just can't quite get unless you're
+
+133
+00:10:48.740 --> 00:10:49.240
+<v Gavin Mendel-Gleason>open source.
+
+134
+00:10:49.900 --> 00:10:53.820
+<v Gavin Mendel-Gleason>the contributions that people put into it are in some way remembered.
+
+135
+00:10:54.140 --> 00:10:55.060
+<v Gavin Mendel-Gleason>It's in GitHub.
+
+136
+00:10:55.220 --> 00:10:58.700
+<v Gavin Mendel-Gleason>You know, you have put your piece out there in the world.
+
+137
+00:10:58.940 --> 00:11:01.300
+<v Gavin Mendel-Gleason>So it's a little bit like artistry in a way.
+
+138
+00:11:01.360 --> 00:11:04.000
+<v Gavin Mendel-Gleason>And, you know, being able to sign your art, I don't know.
+
+139
+00:11:04.440 --> 00:11:10.380
+<v Gavin Mendel-Gleason>But I think, you know, people who are really interested in writing difficult code
+
+140
+00:11:10.380 --> 00:11:13.780
+<v Gavin Mendel-Gleason>and beautiful code can be quite invested in that.
+
+141
+00:11:13.940 --> 00:11:14.920
+<v Gavin Mendel-Gleason>And I know I am.
+
+142
+00:11:14.940 --> 00:11:16.560
+<v Gavin Mendel-Gleason>I mean, it really drives me.
+
+143
+00:11:16.620 --> 00:11:18.720
+<v Gavin Mendel-Gleason>I want to create something beautiful.
+
+144
+00:11:20.120 --> 00:11:24.160
+<v Gavin Mendel-Gleason>that's what you have to also look for is the people who are not just there for the job,
+
+145
+00:11:24.280 --> 00:11:27.080
+<v Gavin Mendel-Gleason>but trying to create something beautiful.
+
+146
+00:11:30.160 --> 00:11:35.180
+<v Noah Labhart>Given, you know, you got to get a database right out of the gate, right? I'm curious where you'll
+
+147
+00:11:35.180 --> 00:11:40.480
+<v Noah Labhart>take this question, but let's talk about scale. So did you build this to scale efficiently from
+
+148
+00:11:40.480 --> 00:11:44.460
+<v Noah Labhart>day one or have you been fighting this as you've grown and gained traction?
+
+149
+00:11:45.580 --> 00:11:51.240
+<v Gavin Mendel-Gleason>oddly like we were very scalable on day one and then we got unscalable by adding features
+
+150
+00:11:53.700 --> 00:11:58.320
+<v Gavin Mendel-Gleason>and now we're really regaining that scalability that we had on day one
+
+151
+00:11:58.320 --> 00:12:05.320
+<v Gavin Mendel-Gleason>so the the simplest um example you know without all of the features we could scale it i don't
+
+152
+00:12:05.320 --> 00:12:12.820
+<v Gavin Mendel-Gleason>know i had we were ingesting data on it up to about a billion triples on and we're running 48
+
+153
+00:12:14.460 --> 00:12:19.980
+<v Gavin Mendel-Gleason>and then we had this giant memory image and everything's really great there but you couldn't
+
+154
+00:12:19.980 --> 00:12:25.040
+<v Gavin Mendel-Gleason>update it and every time you wanted to change something you had to do a full upload so in some
+
+155
+00:12:25.040 --> 00:12:30.900
+<v Gavin Mendel-Gleason>ways like it was very scalable in other ways it it it wasn't a like a transactional database so
+
+156
+00:12:30.900 --> 00:12:35.560
+<v Gavin Mendel-Gleason>making it more like a transactional database and then having the sort of git like features
+
+157
+00:12:35.560 --> 00:12:41.180
+<v Gavin Mendel-Gleason>slowed us down a bit and we're still in the process of recovering that so but two of the
+
+158
+00:12:41.180 --> 00:12:48.400
+<v Gavin Mendel-Gleason>things like the first iteration we were using HDT which is like this C++ library and one of
+
+159
+00:12:48.400 --> 00:12:55.540
+<v Gavin Mendel-Gleason>our engineers matthias he's a dutch engineer he wrote a rust proof of concept for this library
+
+160
+00:12:56.000 --> 00:13:02.680
+<v Gavin Mendel-Gleason>and we were immediately very interested because we had had some seg faults in the hdt library and
+
+161
+00:13:02.680 --> 00:13:08.900
+<v Gavin Mendel-Gleason>like parts of it were supposed to be re-entrant but actually weren't it was very very difficult
+
+162
+00:13:08.900 --> 00:13:14.000
+<v Gavin Mendel-Gleason>to track them down. Like we put locks in places and you'd be dancing around trying to find out
+
+163
+00:13:14.000 --> 00:13:20.160
+<v Gavin Mendel-Gleason>what's going wrong. And we have had much better experience with Rust being able to multi-thread,
+
+164
+00:13:20.280 --> 00:13:26.240
+<v Gavin Mendel-Gleason>being able to really scale up, getting high speed, similar speeds to what we had in C++,
+
+165
+00:13:26.440 --> 00:13:33.240
+<v Gavin Mendel-Gleason>but also much greater safety. So that helped us in that sort of transition.
+
+166
+00:13:34.020 --> 00:13:37.940
+<v Gavin Mendel-Gleason>transition. At the moment, we're still in the process of really trying to get it up to
+
+167
+00:13:37.940 --> 00:13:45.200
+<v Gavin Mendel-Gleason>Ferrari speed, which is where we want it to be. But that process has been pushing things down
+
+168
+00:13:45.200 --> 00:13:51.020
+<v Gavin Mendel-Gleason>into Rust. So we have an orchestration layer that's done in Prolog. And a lot of the things
+
+169
+00:13:51.020 --> 00:13:56.160
+<v Gavin Mendel-Gleason>that slow us down, we find out where the greatest time is spent and then push it down into Rust
+
+170
+00:13:56.160 --> 00:14:01.720
+<v Gavin Mendel-Gleason>and then try to optimize that. So that's been the forever process. And I think it'll be the process
+
+171
+00:14:03.240 --> 00:14:08.520
+<v Gavin Mendel-Gleason>is really going to be looking to really get this up to analytics scale where people can seriously
+
+172
+00:14:08.520 --> 00:14:16.940
+<v Gavin Mendel-Gleason>use it for gigantic graphs but then also get like get like features on top of that you
+
+173
+00:14:16.940 --> 00:14:17.440
+<v Noah Labhart>know
+
+174
+00:14:17.080 --> 00:14:23.400
+<v Noah Labhart>that's a powerful statement as someone who cut his teeth on c and c plus plus that rust is as
+
+175
+00:14:23.400 --> 00:14:28.220
+<v Noah Labhart>powerful or get you were getting up to the the place that is as powerful as c plus plus that's a
+
+176
+00:14:28.220 --> 00:14:29.100
+<v Noah Labhart>a that's a big deal
+
+177
+00:14:29.100 --> 00:14:33.620
+<v Gavin Mendel-Gleason>yeah no it's huge and i i was really impressed like i mean the ideas that go
+
+178
+00:14:33.620 --> 00:14:38.140
+<v Gavin Mendel-Gleason>into rust are very interesting and so i was always interested from a sort of computer science
+
+179
+00:14:38.140 --> 00:14:44.880
+<v Gavin Mendel-Gleason>theoretical view but i didn't think about actually adopting it until matthias had written that
+
+180
+00:14:44.880 --> 00:14:51.680
+<v Gavin Mendel-Gleason>prototype implementation and you know i had just been fighting with this hdt library chasing down
+
+181
+00:14:51.680 --> 00:14:58.240
+<v Gavin Mendel-Gleason>out bugs day and night for weeks. At some point, like when I saw this, I was like, okay, yeah,
+
+182
+00:14:58.300 --> 00:15:04.100
+<v Gavin Mendel-Gleason>let's do this. Let's do this. Try it out. See if we can make it work. And, you know, I've never
+
+183
+00:15:04.100 --> 00:15:05.720
+<v Gavin Mendel-Gleason>looked back. That was a great decision.
+
+184
+00:15:06.760 --> 00:15:09.820
+<v Noah Labhart>Okay. So then as you step out on the balcony and you
+
+185
+00:15:09.820 --> 00:15:12.440
+<v Noah Labhart>look across all that you've built, what are you most proud of?
+
+186
+00:15:14.160 --> 00:15:15.640
+<v Gavin Mendel-Gleason>At the present moment, I guess
+
+187
+00:15:15.640 --> 00:15:21.320
+<v Gavin Mendel-Gleason>that we can use the database. We have a project that we're working with called CAMS, which is the
+
+188
+00:15:21.680 --> 00:15:28.160
+<v Gavin Mendel-Gleason>critical assets management system that we've been doing with ARISE US, which is the UN disaster
+
+189
+00:15:28.160 --> 00:15:34.740
+<v Gavin Mendel-Gleason>response projects affiliate. It's trying to help Caribbean nations and other small developing
+
+190
+00:15:34.740 --> 00:15:40.740
+<v Gavin Mendel-Gleason>nations deal with the impacts of climate change. They have some very graph-like problems where
+
+191
+00:15:40.740 --> 00:15:45.160
+<v Gavin Mendel-Gleason>they're trying to look at the way that their assets relate to each other, which ones depend
+
+192
+00:15:45.160 --> 00:15:51.460
+<v Gavin Mendel-Gleason>on which other ones. So there's a dependency chain problem. We participated in this project
+
+193
+00:15:51.680 --> 00:16:00.120
+<v Gavin Mendel-Gleason>And we helped a lot to try to get them a working project in Dominica, which is a Caribbean country.
+
+194
+00:16:00.320 --> 00:16:04.760
+<v Gavin Mendel-Gleason>And we're going to have another pilot project, I believe, in Costa Rica.
+
+195
+00:16:05.000 --> 00:16:17.360
+<v Gavin Mendel-Gleason>And I'm quite proud that we were able to get the database to a point where we could really feel comfortable deploying it for real use cases like this that can help people.
+
+196
+00:16:18.400 --> 00:16:19.900
+<v Noah Labhart>Let's flip the script a little bit.
+
+197
+00:16:21.680 --> 00:16:23.760
+<v Noah Labhart>and how you and your team responded to it?
+
+198
+00:16:24.680 --> 00:16:26.660
+<v Gavin Mendel-Gleason>We got an early customer.
+
+199
+00:16:26.940 --> 00:16:30.220
+<v Gavin Mendel-Gleason>We had an early customer and we offered them a deployment
+
+200
+00:16:30.220 --> 00:16:32.120
+<v Gavin Mendel-Gleason>and we just weren't ready.
+
+201
+00:16:32.280 --> 00:16:35.540
+<v Gavin Mendel-Gleason>The database wasn't at a point where we could scale up to their needs.
+
+202
+00:16:35.980 --> 00:16:38.300
+<v Gavin Mendel-Gleason>So we were trying to backfill like crazy.
+
+203
+00:16:38.480 --> 00:16:40.840
+<v Gavin Mendel-Gleason>And then sort of halfway through that process,
+
+204
+00:16:41.120 --> 00:16:44.800
+<v Gavin Mendel-Gleason>I think there was a sense, you know, we should just give up.
+
+205
+00:16:44.960 --> 00:16:47.500
+<v Gavin Mendel-Gleason>And we kind of like only halfway,
+
+206
+00:16:48.160 --> 00:16:50.640
+<v Gavin Mendel-Gleason>we had like one foot in continuing the project
+
+207
+00:16:51.680 --> 00:16:58.180
+<v Gavin Mendel-Gleason>foot in like continuing development on the roadmap i think that was a mistake i think we should have
+
+208
+00:16:58.180 --> 00:17:04.160
+<v Gavin Mendel-Gleason>gone two feet in and just made that customer uh the absolute happiest customer it would have we
+
+209
+00:17:04.160 --> 00:17:08.040
+<v Gavin Mendel-Gleason>would have had to lay it a little bit in terms of like we it would have been a little bit of a
+
+210
+00:17:08.040 --> 00:17:15.200
+<v Gavin Mendel-Gleason>diplomatic mission as well to to keep them uh okay with it keep them sweet but uh it would have helped
+
+211
+00:17:15.200 --> 00:17:22.780
+<v Gavin Mendel-Gleason>because it would have sped up our attention to the problems that we face in industrial deployment.
+
+212
+00:17:23.200 --> 00:17:27.560
+<v Gavin Mendel-Gleason>And we've really worked out a lot of those issues at this point.
+
+213
+00:17:27.960 --> 00:17:29.640
+<v Gavin Mendel-Gleason>Many of them are still there, though.
+
+214
+00:17:29.720 --> 00:17:35.720
+<v Gavin Mendel-Gleason>Some of them are still there, but we would have done it quicker if we just tried to go in with two feet.
+
+215
+00:17:35.880 --> 00:17:42.720
+<v Gavin Mendel-Gleason>So I'm really of the opinion that you have to use these things in anger on real scenarios
+
+216
+00:17:42.720 --> 00:17:46.220
+<v Gavin Mendel-Gleason>to really get a feeling for where the pain points are.
+
+217
+00:17:48.000 --> 00:17:49.740
+<v Noah Labhart>So, okay, let's switch to you, Gavin.
+
+218
+00:17:49.820 --> 00:17:51.880
+<v Noah Labhart>Who influences the way that you work?
+
+219
+00:17:52.040 --> 00:17:56.520
+<v Noah Labhart>You know, CEO, CTO, architect, person, any person you look up to and why?
+
+220
+00:17:57.920 --> 00:17:59.480
+<v Gavin Mendel-Gleason>My head engineer, I guess.
+
+221
+00:18:01.040 --> 00:18:02.840
+<v Gavin Mendel-Gleason>I look up to him a lot.
+
+222
+00:18:02.900 --> 00:18:04.400
+<v Gavin Mendel-Gleason>Like, he's an amazing programmer.
+
+223
+00:18:04.680 --> 00:18:05.700
+<v Gavin Mendel-Gleason>Really insightful.
+
+224
+00:18:05.940 --> 00:18:09.200
+<v Gavin Mendel-Gleason>Like, really big vision kind of guy, which is rare.
+
+225
+00:18:09.320 --> 00:18:10.740
+<v Gavin Mendel-Gleason>So I like that.
+
+226
+00:18:12.720 --> 00:18:21.100
+<v Gavin Mendel-Gleason>CEO that helped found the company. I really admired his vision as well. I guess in terms of
+
+227
+00:18:21.100 --> 00:18:27.200
+<v Gavin Mendel-Gleason>like what my influences are, like if this was, if we were talking about records, like which bands
+
+228
+00:18:27.200 --> 00:18:34.080
+<v Gavin Mendel-Gleason>I listen to, I think, you know, I'm really influenced by type theory. I like type theory a
+
+229
+00:18:34.080 --> 00:18:39.600
+<v Gavin Mendel-Gleason>lot. And then I would say my single biggest sort of from computer science, my single biggest
+
+230
+00:18:39.600 --> 00:18:46.220
+<v Gavin Mendel-Gleason>biggest influences, Saul Kripke. His ideas of Kripke structures, I think, influences how I
+
+231
+00:18:46.220 --> 00:18:54.000
+<v Gavin Mendel-Gleason>think about databases and logic and query languages. So if anybody hasn't read Saul Kripke,
+
+232
+00:18:54.140 --> 00:19:00.160
+<v Gavin Mendel-Gleason>like he was like 17, I think, when he published his first paper. And it was like a seminal paper
+
+233
+00:19:00.160 --> 00:19:02.720
+<v Gavin Mendel-Gleason>in computer science. So it's well worth a read.
+
+234
+00:19:04.560 --> 00:19:07.140
+<v Noah Labhart>Okay, so we we talked about a mistake earlier,
+
+235
+00:19:07.140 --> 00:19:08.220
+<v Noah Labhart>but a little bit different spin.
+
+236
+00:19:08.460 --> 00:19:10.360
+<v Noah Labhart>If you could go back to the beginning,
+
+237
+00:19:10.640 --> 00:19:11.780
+<v Noah Labhart>what would you do different?
+
+238
+00:19:11.860 --> 00:19:13.940
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+239
+00:19:14.500 --> 00:19:16.720
+<v Gavin Mendel-Gleason>At some points, I would have grown slower,
+
+240
+00:19:16.820 --> 00:19:19.140
+<v Gavin Mendel-Gleason>been a bit more careful about growth.
+
+241
+00:19:19.680 --> 00:19:24.260
+<v Gavin Mendel-Gleason>I would have probably tried to take on capital
+
+242
+00:19:24.260 --> 00:19:25.400
+<v Gavin Mendel-Gleason>more slowly as well,
+
+243
+00:19:25.440 --> 00:19:26.820
+<v Gavin Mendel-Gleason>take on capital more slowly
+
+244
+00:19:26.820 --> 00:19:29.860
+<v Gavin Mendel-Gleason>and focus on consultancies
+
+245
+00:19:29.860 --> 00:19:33.580
+<v Gavin Mendel-Gleason>that are building the product more.
+
+246
+00:19:34.540 --> 00:19:36.440
+<v Gavin Mendel-Gleason>And I think that that's a good way
+
+247
+00:19:37.140 --> 00:19:40.760
+<v Gavin Mendel-Gleason>you honest about the features that you're building, that the features you're building,
+
+248
+00:19:40.840 --> 00:19:45.900
+<v Gavin Mendel-Gleason>because there's this problem, like if you have capital, you can try to guess, and then you try
+
+249
+00:19:45.900 --> 00:19:53.420
+<v Gavin Mendel-Gleason>to get feedback from the consumer. But it's often best just to be your own consumer. It's easier to
+
+250
+00:19:53.420 --> 00:19:59.160
+<v Gavin Mendel-Gleason>feel where the pain points are going to be that way, than if you're just like sort of guessing
+
+251
+00:20:00.040 --> 00:20:01.440
+<v Gavin Mendel-Gleason>with your finger in the wind.
+
+252
+00:20:01.620 --> 00:20:05.320
+<v Noah Labhart>I like how you said that a lot with the being your own consumer,
+
+253
+00:20:07.140 --> 00:20:12.860
+<v Noah Labhart>like eating your own dog food, building it, you know, yes, for this vision, yes, for the
+
+254
+00:20:12.860 --> 00:20:14.740
+<v Noah Labhart>customer, but you're also building it for yourself.
+
+255
+00:20:15.540 --> 00:20:17.780
+<v Noah Labhart>And that's a, that's a big, I don't know.
+
+256
+00:20:17.780 --> 00:20:18.860
+<v Noah Labhart>I really like how you said that.
+
+257
+00:20:19.980 --> 00:20:21.440
+<v Noah Labhart>Well, last question, Gavin.
+
+258
+00:20:21.580 --> 00:20:25.440
+<v Noah Labhart>So, so you're getting on a plane and you're sitting next to a young entrepreneur who's
+
+259
+00:20:25.440 --> 00:20:26.480
+<v Noah Labhart>built the next big thing.
+
+260
+00:20:26.840 --> 00:20:27.860
+<v Noah Labhart>They're jazzed about it.
+
+261
+00:20:27.880 --> 00:20:29.340
+<v Noah Labhart>They can't wait to show it off to the world.
+
+262
+00:20:29.440 --> 00:20:31.020
+<v Noah Labhart>Can we show it off to you right there on the plane?
+
+263
+00:20:31.280 --> 00:20:34.620
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+264
+00:20:35.920 --> 00:20:36.600
+<v Gavin Mendel-Gleason>I don't know.
+
+265
+00:20:37.140 --> 00:20:43.360
+<v Gavin Mendel-Gleason>give them a lot of advice probably about the whole process of taking on capital and how to go about
+
+266
+00:20:43.360 --> 00:20:51.100
+<v Gavin Mendel-Gleason>it i think that's the hard it's a hard road and it changes all the time and at every stage it's
+
+267
+00:20:51.100 --> 00:20:56.620
+<v Gavin Mendel-Gleason>different so you know every time you get bigger it changes again so i haven't done it yet so it's
+
+268
+00:20:56.620 --> 00:21:02.380
+<v Gavin Mendel-Gleason>this crazy situation where you're always a novice at the same time i don't know how to give a general
+
+269
+00:21:02.380 --> 00:21:08.840
+<v Gavin Mendel-Gleason>advice about that because it really depends a lot on the individual product and how the technology
+
+270
+00:21:08.840 --> 00:21:14.340
+<v Gavin Mendel-Gleason>works, what the business plan is. Definitely, if you're going to do it, you're going to have to
+
+271
+00:21:14.340 --> 00:21:20.100
+<v Gavin Mendel-Gleason>love the journey because maybe I would tell them that. If you don't love the journey, there's no
+
+272
+00:21:20.100 --> 00:21:27.880
+<v Gavin Mendel-Gleason>point because there's going to be a lot of ups and downs. So you have to be there for the dream.
+
+273
+00:21:27.880 --> 00:21:28.560
+<v Gavin Mendel-Gleason>I
+
+274
+00:21:28.560 --> 00:21:30.780
+<v Noah Labhart>think all of those are great bits
+
+275
+00:21:30.780 --> 00:21:32.880
+<v Noah Labhart>well Gavin thank you for being on the show
+
+276
+00:21:32.880 --> 00:21:34.580
+<v Noah Labhart>today thank you for telling the creation
+
+277
+00:21:34.580 --> 00:21:35.920
+<v Noah Labhart>story of TerminusDB
+
+278
+00:21:35.920 --> 00:21:36.880
+<v Noah Labhart>thank
+
+279
+00:21:36.880 --> 00:21:38.060
+<v Gavin Mendel-Gleason>you very much for having me
+
+280
+00:21:39.680 --> 00:21:40.680
+<v Noah Labhart>and this concludes
+
+281
+00:21:40.680 --> 00:21:42.580
+<v Noah Labhart>another chapter of Code Story
+
+282
+00:21:47.020 --> 00:21:48.760
+<v Noah Labhart>Code Story is hosted and
+
+283
+00:21:48.760 --> 00:21:50.140
+<v Noah Labhart>produced by Noah Labhart
+
+284
+00:21:50.140 --> 00:21:52.640
+<v Noah Labhart>be sure to subscribe on Apple Podcasts
+
+285
+00:21:52.640 --> 00:21:55.060
+<v Noah Labhart>Spotify or the podcasting app of your choice
+
+286
+00:21:55.060 --> 00:21:56.700
+<v Noah Labhart>support the show on
+
+287
+00:21:57.880 --> 00:22:00.520
+<v Noah Labhart>slash Code Story for just $5 to $10 a month.
+
+288
+00:22:00.940 --> 00:22:03.120
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+289
+00:22:03.420 --> 00:22:05.340
+<v Noah Labhart>Both things help us out tremendously.
+
+290
+00:22:07.760 --> 00:22:09.240
+<v Noah Labhart>And thanks again for listening.

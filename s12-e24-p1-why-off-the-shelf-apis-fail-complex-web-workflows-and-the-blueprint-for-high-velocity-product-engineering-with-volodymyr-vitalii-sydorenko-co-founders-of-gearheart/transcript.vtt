@@ -1,0 +1,1351 @@
+WEBVTT
+
+NOTE S12 E24: Why Off-the-Shelf APIs Fail Complex Web Workflows and the Blueprint for High-Velocity Product Engineering with Volodymyr & Vitalii Sydorenko, Co-Founders of Gearheart (Part 1)
+
+1
+00:00:00.520 --> 00:00:21.120
+<v Guest>One of our first projects we were building that was about pretty high volume of data processing. And I made an architecture for that and we developed it. And the first version that we did, like it didn't really scale. I realized that I made this design essentially based on things like I read in books. And that was the moment I realized, okay, I cannot make guesses like that anymore.
+
+2
+00:00:21.120 --> 00:00:27.580
+<v Guest>We were so focused on doing great work for our clients that we completely neglected building
+
+3
+00:00:27.580 --> 00:00:28.460
+<v Guest>the business itself.
+
+4
+00:00:28.800 --> 00:00:32.780
+<v Guest>No pipeline, no positioning, no structure on growth.
+
+5
+00:00:33.180 --> 00:00:40.500
+<v Guest>When the market turned in 2022, we felt it immediately because there was nothing underneath
+
+6
+00:00:40.500 --> 00:00:41.000
+<v Guest>us.
+
+7
+00:00:41.320 --> 00:00:43.480
+<v Guest>My name is Volodymyr Sydorenko.
+
+8
+00:00:43.660 --> 00:00:46.260
+<v Guest>And my name is Vitalii Sydorenko.
+
+9
+00:00:46.500 --> 00:00:48.400
+<v Guest>And we are running the team at Gearheart.
+
+10
+00:00:51.340 --> 00:00:56.940
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+11
+00:00:57.040 --> 00:00:58.380
+<v Clip>Six months moonlighting.
+
+12
+00:00:58.420 --> 00:00:59.940
+<v Clip>There's nothing on the back end.
+
+13
+00:01:00.160 --> 00:01:02.780
+<v Noah Labhart>Who share what it takes to change an industry.
+
+14
+00:01:02.960 --> 00:01:04.540
+<v Clip>I don't exactly know what to do next.
+
+15
+00:01:04.540 --> 00:01:05.920
+<v Clip>It took many guys to get right.
+
+16
+00:01:06.560 --> 00:01:09.160
+<v Noah Labhart>Who built the teams that have their back.
+
+17
+00:01:09.200 --> 00:01:10.800
+<v Clip>A company is its people.
+
+18
+00:01:10.820 --> 00:01:12.180
+<v Clip>The teams help each other achieve more.
+
+19
+00:01:12.180 --> 00:01:13.260
+<v Clip>Most proud of our team.
+
+20
+00:01:13.600 --> 00:01:15.860
+<v Noah Labhart>Keeping scalability top of mind.
+
+21
+00:01:16.180 --> 00:01:17.580
+<v Clip>All that infrastructure was a pain.
+
+22
+00:01:17.580 --> 00:01:18.960
+<v Clip>Yes, we've been fighting it as we grow.
+
+23
+00:01:19.140 --> 00:01:20.000
+<v Clip>Total waste of time.
+
+24
+00:01:21.120 --> 00:01:22.520
+<v Noah Labhart>you don't read in the headlines.
+
+25
+00:01:22.940 --> 00:01:24.720
+<v Clip>It's not an easy thing to achieve, mind you.
+
+26
+00:01:24.740 --> 00:01:26.820
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+27
+00:01:27.140 --> 00:01:30.520
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+28
+00:01:30.700 --> 00:01:32.220
+<v Clip>You need to really want it.
+
+29
+00:01:32.320 --> 00:01:33.640
+<v Clip>It's not just about technology.
+
+30
+00:01:33.740 --> 00:01:35.700
+<v Noah Labhart>All this and more on Code Story.
+
+31
+00:01:37.060 --> 00:01:38.500
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+32
+00:01:38.660 --> 00:01:41.580
+<v Noah Labhart>And today, how Vitalii and Volodymyr Sydorenko
+
+33
+00:01:41.580 --> 00:01:44.600
+<v Noah Labhart>built the world's best AI-powered product studio
+
+34
+00:01:44.600 --> 00:01:48.520
+<v Noah Labhart>so you can build the best solution even at your early stage.
+
+35
+00:01:54.120 --> 00:01:59.800
+<v Noah Labhart>Volodymyr Sydorenko lives in London and collects mechanical keyboards. His most unusual hobby is
+
+36
+00:01:59.800 --> 00:02:05.440
+<v Noah Labhart>that he does clay sculptures of characters or random people at times. He has two cats and likes
+
+37
+00:02:05.440 --> 00:02:10.040
+<v Noah Labhart>to spend time outdoors. In fact, in three weeks time from this recording, he will be traveling
+
+38
+00:02:10.040 --> 00:02:15.240
+<v Noah Labhart>to Switzerland to do the Via Ferrata. To add to all of this, he has started to write children's
+
+39
+00:02:15.240 --> 00:02:21.140
+<v Noah Labhart>books and hopes to publish them someday. Vitalii Sydorenko currently lives in Lisbon,
+
+40
+00:02:21.340 --> 00:02:26.080
+<v Noah Labhart>Portugal. He is into sports and loves to hit the gym and regularly tracks his calories.
+
+41
+00:02:26.400 --> 00:02:30.640
+<v Noah Labhart>Last year, he started playing tennis and finds that he can't stop. He enjoys hiking,
+
+42
+00:02:30.780 --> 00:02:35.120
+<v Noah Labhart>which is great in Lisbon. And in the past, he spent many years building startups, exiting,
+
+43
+00:02:35.280 --> 00:02:41.400
+<v Noah Labhart>and also in venture capital. You may have noticed that Volodymyr and Vitalii have the same last name.
+
+44
+00:02:41.400 --> 00:02:45.580
+<v Noah Labhart>That is because they are brothers. As kids growing up they did a lot of boxing
+
+45
+00:02:45.580 --> 00:02:49.460
+<v Noah Labhart>together as well as clinging to classic films like Back to the Future.
+
+46
+00:02:51.060 --> 00:02:55.680
+<v Noah Labhart>14 years ago Volodymyr got interested in building solutions and realized he could
+
+47
+00:02:55.680 --> 00:03:00.360
+<v Noah Labhart>only get so far by himself. So he decided to build a team to deliver these
+
+48
+00:03:00.360 --> 00:03:05.400
+<v Noah Labhart>solutions. Two years ago Vitalii and Volodymyr started to consider all of the
+
+49
+00:03:05.400 --> 00:03:10.420
+<v Noah Labhart>shifts in the SDLC and what that meant for the current business. Vitalii decided
+
+50
+00:03:11.400 --> 00:03:14.700
+<v Noah Labhart>prior startup and VC experience and join the team.
+
+51
+00:03:16.700 --> 00:03:19.340
+<v Noah Labhart>This is the creation story of Gearheart.
+
+52
+00:03:22.460 --> 00:03:27.280
+<v Guest>Officially, Gearheart is a product development studio, and we are building enterprise SaaS
+
+53
+00:03:27.280 --> 00:03:27.780
+<v Guest>products.
+
+54
+00:03:28.200 --> 00:03:29.740
+<v Guest>We have 40 people on the team.
+
+55
+00:03:29.880 --> 00:03:34.400
+<v Guest>All of us are Ukrainians, and right now we're just scattered all over the world, but still
+
+56
+00:03:34.400 --> 00:03:37.860
+<v Guest>all are Ukrainians, and we have people in all time zones, I think.
+
+57
+00:03:38.480 --> 00:03:45.000
+<v Guest>So the products that we usually build are about workflows, automations, data processing, stuff about working.
+
+58
+00:03:45.280 --> 00:03:50.460
+<v Guest>Which is a bit funny because I got into development in the first place because I wanted to make games.
+
+59
+00:03:50.660 --> 00:03:53.760
+<v Guest>I started playing games as a kid and then I learned development to do that.
+
+60
+00:03:54.140 --> 00:03:59.520
+<v Guest>And it turns out I'm far better at making tools for efficient work than to do stuff for fun.
+
+61
+00:03:59.840 --> 00:04:03.280
+<v Guest>So there are a couple of projects we are particularly proud about.
+
+62
+00:04:03.420 --> 00:04:05.160
+<v Guest>So there is SmartSuite and Globally.
+
+63
+00:04:05.160 --> 00:04:07.020
+<v Guest>And SmartSuite, I hope it sounds familiar.
+
+64
+00:04:07.180 --> 00:04:10.980
+<v Guest>It sounds familiar because it was featured on this podcast a few years ago.
+
+65
+00:04:11.500 --> 00:04:13.760
+<v Guest>Also, we are now launching a separate brand.
+
+66
+00:04:13.900 --> 00:04:14.860
+<v Guest>It's called Beyond the Wow.
+
+67
+00:04:15.020 --> 00:04:16.940
+<v Guest>It's an AI-native MVP studio.
+
+68
+00:04:17.520 --> 00:04:22.280
+<v Guest>And we are helping early-stage founders build their first products using AI.
+
+69
+00:04:22.920 --> 00:04:27.200
+<v Guest>The way it all started, I was just doing freelancing work myself.
+
+70
+00:04:27.400 --> 00:04:28.460
+<v Guest>I just did development.
+
+71
+00:04:28.760 --> 00:04:32.500
+<v Guest>And then I started assembling a team gradually.
+
+72
+00:04:32.500 --> 00:04:35.500
+<v Guest>I realized that there's a bottleneck to what I can do myself.
+
+73
+00:04:35.740 --> 00:04:38.160
+<v Guest>And I just started, okay, I'll need some people.
+
+74
+00:04:38.380 --> 00:04:40.380
+<v Guest>And it evolved naturally for a while.
+
+75
+00:04:40.680 --> 00:04:43.740
+<v Guest>Then after some time, Vitalii joined me.
+
+76
+00:04:43.840 --> 00:04:48.740
+<v Guest>We actually had to grow up a little bit in terms of processes and what we're doing and what's our proposition.
+
+77
+00:04:49.220 --> 00:04:50.920
+<v Guest>But that's how we started.
+
+78
+00:04:51.300 --> 00:04:56.220
+<v Guest>I would say that 2022 year hit and the market shifted.
+
+79
+00:04:56.680 --> 00:04:57.680
+<v Guest>AI arrived.
+
+80
+00:04:57.680 --> 00:05:05.220
+<v Guest>And before that, this market of software development and outsourced software development was growing really fast.
+
+81
+00:05:05.460 --> 00:05:10.960
+<v Guest>And especially in Ukraine, we have lots of IT development companies.
+
+82
+00:05:11.710 --> 00:05:15.660
+<v Guest>Before this year, that year, it was really easy to grow.
+
+83
+00:05:15.860 --> 00:05:24.140
+<v Guest>And you didn't need much of specific value proposition or market focus or something like that.
+
+84
+00:05:24.140 --> 00:05:28.640
+<v Guest>that it was enough to just do the development work fine
+
+85
+00:05:29.000 --> 00:05:31.660
+<v Guest>and customers were finding you.
+
+86
+00:05:32.160 --> 00:05:37.400
+<v Guest>But after 2022, war started, also market shifted,
+
+87
+00:05:37.780 --> 00:05:41.860
+<v Guest>AI arrived, and we had to ask ourselves a third question.
+
+88
+00:05:42.060 --> 00:05:44.820
+<v Guest>If building software keeps getting cheaper,
+
+89
+00:05:45.000 --> 00:05:46.700
+<v Guest>what are we actually here for?
+
+90
+00:05:47.280 --> 00:05:49.880
+<v Guest>And another thing is that we still have
+
+91
+00:05:49.880 --> 00:05:52.320
+<v Guest>this one of the biggest customer, SmartSuite.
+
+92
+00:05:54.140 --> 00:06:01.020
+<v Guest>And for, I would say, five years or so, the whole team was focused on building this product
+
+93
+00:06:01.020 --> 00:06:05.200
+<v Guest>and I didn't spend much time on business development.
+
+94
+00:06:05.640 --> 00:06:09.120
+<v Guest>So all these things together, it was time to change.
+
+95
+00:06:09.740 --> 00:06:12.600
+<v Guest>Before Gearheart, I built my startups before.
+
+96
+00:06:12.880 --> 00:06:18.760
+<v Guest>I founded two of them, exited one of them, and worked in venture capital for a while.
+
+97
+00:06:18.900 --> 00:06:22.840
+<v Guest>So I was like this business development and product person.
+
+98
+00:06:24.140 --> 00:06:30.520
+<v Guest>Volodymyr invited me to Gearheart to help to build business and to make this shift, to
+
+99
+00:06:30.520 --> 00:06:36.960
+<v Guest>come up with something, okay, what now we do with AI and how it will change our work.
+
+100
+00:06:37.560 --> 00:06:43.360
+<v Guest>After that, we realized that the value we can bring is not just writing code.
+
+101
+00:06:43.600 --> 00:06:49.700
+<v Guest>It is knowing what's worth building because we've built more than 80 different projects
+
+102
+00:06:49.700 --> 00:06:55.320
+<v Guest>projects so far and me personally have my experience of building my own companies before.
+
+103
+00:06:55.580 --> 00:07:02.160
+<v Guest>We realized that we can help founders not only to build but also to validate and to
+
+104
+00:07:02.160 --> 00:07:05.960
+<v Guest>save money by doing right choices at the beginning.
+
+105
+00:07:06.220 --> 00:07:10.240
+<v Guest>So the poor execution is a commodity and product judgment isn't.
+
+106
+00:07:10.380 --> 00:07:12.940
+<v Guest>So that's what we started to do.
+
+107
+00:07:13.460 --> 00:07:18.260
+<v Guest>That's really what led us to where we are now, where we have Gearheart for complex
+
+108
+00:07:19.700 --> 00:07:25.860
+<v Guest>And the new brand, Beyond the Wow, for founders who want to build their first products with AI.
+
+109
+00:07:26.140 --> 00:07:29.760
+<v Guest>Same team, same standards, but two different choices.
+
+110
+00:07:31.940 --> 00:07:38.700
+<v Noah Labhart>So I'm curious about what you would consider the catalyst for Gearheart.
+
+111
+00:07:38.780 --> 00:07:41.740
+<v Noah Labhart>And this was probably for Vladimir as you started the company.
+
+112
+00:07:42.060 --> 00:07:49.040
+<v Noah Labhart>Tell me about how a bit it started and what would you consider the quote unquote MVP of Gearheart?
+
+113
+00:07:49.700 --> 00:07:54.380
+<v Noah Labhart>What sort of tools or methodologies were you using to bring it to life as you really formed the company?
+
+114
+00:07:55.560 --> 00:08:00.320
+<v Guest>As I told, I started learning programming to make games back in my school years.
+
+115
+00:08:01.080 --> 00:08:06.940
+<v Guest>And then my early 20s, I made two more or less serious attempts to run my own projects.
+
+116
+00:08:07.000 --> 00:08:10.140
+<v Guest>One of them was game and another one was just a web application.
+
+117
+00:08:10.640 --> 00:08:16.480
+<v Guest>I quit my job and I worked on one thing for a while and another thing for a while.
+
+118
+00:08:16.480 --> 00:08:26.020
+<v Guest>And so with both of them, I made the most common mistake I think founders make, like technical founders make, is that they build it first and then they realize that nobody is buying it unless they sell it actually.
+
+119
+00:08:26.340 --> 00:08:29.960
+<v Guest>So I had the product running and I tried selling it.
+
+120
+00:08:30.560 --> 00:08:33.880
+<v Guest>There was some very limited success, but eventually didn't take off.
+
+121
+00:08:34.040 --> 00:08:36.980
+<v Guest>And then I went to do some freelancing work again.
+
+122
+00:08:37.040 --> 00:08:42.760
+<v Guest>And then I built another product with the same exact story, by the way, as if I didn't learn any lessons from the first one.
+
+123
+00:08:42.760 --> 00:08:46.940
+<v Guest>like I first build something because this time it's a great idea, everybody will love it and I
+
+124
+00:08:46.940 --> 00:08:53.920
+<v Guest>won't have to sell anything. And I still have to make calls, make meetings and do sales. And I
+
+125
+00:08:53.920 --> 00:08:58.500
+<v Guest>realized just I hate it. I hate it so much and I'm not very good at it. And so I thought, okay,
+
+126
+00:08:58.580 --> 00:09:03.240
+<v Guest>let's maybe then I should really focus on building stuff because I think after all of those months
+
+127
+00:09:03.240 --> 00:09:07.400
+<v Guest>of building these products, I got pretty good at that. And I already was working professional
+
+128
+00:09:07.400 --> 00:09:11.780
+<v Guest>developer before that for a while. Essentially those two products, I made the first landing
+
+129
+00:09:12.760 --> 00:09:18.280
+<v Guest>I put those my failed startups as my portfolio like this is what I've built and I started looking
+
+130
+00:09:18.280 --> 00:09:24.380
+<v Guest>for clients and my idea was that okay I want to work with my clients as sort of partners like I
+
+131
+00:09:24.380 --> 00:09:30.640
+<v Guest>expect of them to be experts in their domain I expect them to know how to sell and I'm willing
+
+132
+00:09:30.640 --> 00:09:36.940
+<v Guest>to build bring the technical expertise and be a technical partner for them found my first clients
+
+133
+00:09:36.940 --> 00:09:41.880
+<v Guest>essentially through network and Upwork by the way back then it was called oDesk. I'm not sure how
+
+134
+00:09:42.760 --> 00:09:48.480
+<v Guest>remember those times. In terms of methodologies, I'm not sure if it was the best way, but that was
+
+135
+00:09:48.480 --> 00:09:54.260
+<v Guest>the way I did it. That I just really wanted to focus on building stuff and I really didn't want
+
+136
+00:09:54.260 --> 00:10:02.060
+<v Guest>to learn about how to actually run business. And I think leftovers of that ethos and that approach
+
+137
+00:10:02.060 --> 00:10:08.200
+<v Guest>are still alive in the company to this day in a way that we really focus on making products
+
+138
+00:10:08.200 --> 00:10:12.140
+<v Guest>as good as we can and technical expertise as good as we can.
+
+139
+00:10:12.240 --> 00:10:15.080
+<v Guest>And then the rest of it, we're just trying to make it as simple as possible
+
+140
+00:10:15.080 --> 00:10:19.500
+<v Guest>with very little bureaucracy and very little barriers
+
+141
+00:10:19.500 --> 00:10:23.740
+<v Guest>between developers and the team in general and the customers and clients.
+
+142
+00:10:24.360 --> 00:10:28.820
+<v Guest>For a while, we were just trying to, okay, we will find smart people.
+
+143
+00:10:28.980 --> 00:10:30.520
+<v Guest>We will build cool stuff.
+
+144
+00:10:30.800 --> 00:10:35.520
+<v Guest>And if people are smart enough and good enough, they will figure it out.
+
+145
+00:10:35.940 --> 00:10:37.600
+<v Guest>And so we started working like that.
+
+146
+00:10:38.200 --> 00:10:45.780
+<v Guest>It worked for so long without even kind of official hierarchy or very well-defined processes.
+
+147
+00:10:46.220 --> 00:10:50.660
+<v Guest>I guess MVP was, okay, me and two failed startups as portfolio.
+
+148
+00:10:51.100 --> 00:10:52.180
+<v Guest>That's how it started.
+
+149
+00:10:52.400 --> 00:10:54.060
+<v Guest>And then I started hiring some people.
+
+150
+00:10:55.380 --> 00:10:57.940
+<v Noah Labhart>From that point, Gearheart is formed.
+
+151
+00:10:58.080 --> 00:11:03.260
+<v Noah Labhart>You're having success and you're providing your customers their world-class solutions.
+
+152
+00:11:03.500 --> 00:11:06.480
+<v Noah Labhart>And then let's say Vitalii's joining, right?
+
+153
+00:11:08.200 --> 00:11:09.680
+<v Noah Labhart>the software development process.
+
+154
+00:11:10.140 --> 00:11:13.260
+<v Noah Labhart>How have you progressed and matured Gearheart?
+
+155
+00:11:13.520 --> 00:11:15.580
+<v Noah Labhart>Again, I kind of liken that to product lifecycle.
+
+156
+00:11:15.880 --> 00:11:17.060
+<v Noah Labhart>How do you go about deciding
+
+157
+00:11:17.560 --> 00:11:19.800
+<v Noah Labhart>what is the next most important thing to build
+
+158
+00:11:19.800 --> 00:11:21.760
+<v Noah Labhart>or to address or create with Gearheart?
+
+159
+00:11:22.320 --> 00:11:25.360
+<v Guest>So in terms of building Gearheart as business,
+
+160
+00:11:25.640 --> 00:11:29.080
+<v Guest>I am not as good businessman as Vitalii, that's for sure.
+
+161
+00:11:29.240 --> 00:11:33.080
+<v Guest>And most of my business decisions were pretty much reactive.
+
+162
+00:11:33.200 --> 00:11:35.240
+<v Guest>Okay, like how, let's figure out this bottleneck
+
+163
+00:11:35.240 --> 00:11:36.680
+<v Guest>so that we could get back to development.
+
+164
+00:11:38.200 --> 00:11:44.200
+<v Guest>a few decisions that shaped Gearheart. I think the interesting part was we worked remotely from the
+
+165
+00:11:44.200 --> 00:11:49.240
+<v Guest>beginning and actually the main reason I just didn't want to spend time managing a real office
+
+166
+00:11:49.240 --> 00:11:54.840
+<v Guest>and I was like why do I need it? So we just started working remotely and that was 2012. It wasn't as
+
+167
+00:11:54.840 --> 00:12:00.460
+<v Guest>popular as these days. By then it was pretty unusual, especially in Ukraine. But that turned
+
+168
+00:12:00.460 --> 00:12:07.020
+<v Guest>out to be a nice filter for people because it attracts specific types of people who are self-organized.
+
+169
+00:12:08.200 --> 00:12:10.180
+<v Guest>like and don't need a lot of management.
+
+170
+00:12:10.480 --> 00:12:14.660
+<v Guest>And also with remote work, if somebody can not get themselves together to
+
+171
+00:12:14.660 --> 00:12:18.720
+<v Guest>actually do what they sign up for, that's also very visible very quickly.
+
+172
+00:12:18.920 --> 00:12:23.520
+<v Guest>That part, I think it allowed me to build a really reliable team from early on.
+
+173
+00:12:23.980 --> 00:12:25.860
+<v Guest>And I said, that's one thing.
+
+174
+00:12:26.380 --> 00:12:29.520
+<v Guest>Another thing is I really wanted to keep the company small.
+
+175
+00:12:29.720 --> 00:12:33.800
+<v Guest>That was not the goal specifically, but I had the limits that we are
+
+176
+00:12:33.800 --> 00:12:36.000
+<v Guest>not growing past specific limits.
+
+177
+00:12:36.000 --> 00:12:42.440
+<v Guest>And I was afraid that if I were to build a company of 100 even people or 200 people or something like that,
+
+178
+00:12:42.560 --> 00:12:46.600
+<v Guest>then my day-to-day work would not be building products anymore.
+
+179
+00:12:46.820 --> 00:12:48.040
+<v Guest>It will be running business.
+
+180
+00:12:48.320 --> 00:12:54.060
+<v Guest>I will have clients that I don't know personally, and I will have team members that I don't even know at all.
+
+181
+00:12:54.580 --> 00:13:02.060
+<v Guest>So I really wanted to keep company small and focus more on how do we build more interesting projects, essentially.
+
+182
+00:13:02.120 --> 00:13:04.200
+<v Guest>How do you find more interesting projects to work on?
+
+183
+00:13:06.000 --> 00:13:11.700
+<v Guest>that happened that really gave a boost to our progress was work on SmartSuite.
+
+184
+00:13:12.260 --> 00:13:16.920
+<v Guest>It's a really flexible and complicated no-code platform and we've built a lot
+
+185
+00:13:16.920 --> 00:13:20.820
+<v Guest>of products for different domains before. We built a tool to manage
+
+186
+00:13:20.820 --> 00:13:25.680
+<v Guest>photo studios or to manage medical lab with its specific workflows and stuff
+
+187
+00:13:25.680 --> 00:13:29.040
+<v Guest>and other things like that but all of them were for specific domain, for
+
+188
+00:13:29.040 --> 00:13:32.780
+<v Guest>specific company, specific direction, stuff like that. And SmartSuite idea
+
+189
+00:13:32.780 --> 00:13:36.960
+<v Guest>idea that it has to be flexible enough that it should cover all of those use cases.
+
+190
+00:13:37.120 --> 00:13:39.700
+<v Guest>We can replace entire category of applications.
+
+191
+00:13:40.200 --> 00:13:46.180
+<v Guest>And so working on it, it brought our understanding of all of these workflows and the processes
+
+192
+00:13:46.180 --> 00:13:48.980
+<v Guest>in business and the technical part of elect the next level.
+
+193
+00:13:49.080 --> 00:13:50.380
+<v Guest>It was really interesting and challenging.
+
+194
+00:13:50.880 --> 00:13:53.340
+<v Guest>And also it's just larger than what we built before.
+
+195
+00:13:53.560 --> 00:13:59.120
+<v Guest>So it was the largest team that we had working on a single project that also led to some
+
+196
+00:13:59.120 --> 00:14:00.300
+<v Guest>changes on how we organize work.
+
+197
+00:14:00.300 --> 00:14:07.760
+<v Guest>work. And then I started burning out a little bit because all of these things that I was hoping, again, that if
+
+198
+00:14:07.760 --> 00:14:13.220
+<v Guest>you're staying small, that they won't have to think about how do we build business properly and how do we build
+
+199
+00:14:13.220 --> 00:14:15.400
+<v Guest>workflows properly inside of our team?
+
+200
+00:14:15.480 --> 00:14:20.180
+<v Guest>We'll just figure it out. It turned out that even with 40 people, when we have multiple parallel projects, it
+
+201
+00:14:20.180 --> 00:14:21.320
+<v Guest>doesn't easily work that way.
+
+202
+00:14:21.640 --> 00:14:29.580
+<v Guest>And it seems that, you know, if I want to have a team of just 40 people, it's better to build business to support a
+
+203
+00:14:30.300 --> 00:14:32.520
+<v Guest>80 people and then you just choose to stay at 40.
+
+204
+00:14:32.700 --> 00:14:36.000
+<v Guest>But when I started realizing that, okay, I need to change something, I knew that
+
+205
+00:14:36.000 --> 00:14:39.280
+<v Guest>first of all, I don't know how, but another thing is that I don't really want to do
+
+206
+00:14:39.280 --> 00:14:39.780
+<v Guest>that.
+
+207
+00:14:39.600 --> 00:14:40.680
+<v Guest>I'm still a technical person.
+
+208
+00:14:40.980 --> 00:14:44.640
+<v Guest>And around the time, essentially I invited Vitalii to join us and help
+
+209
+00:14:44.640 --> 00:14:45.980
+<v Guest>me with all the following changes.
+
+210
+00:14:46.640 --> 00:14:50.400
+<v Guest>And now we separated two different directions.
+
+211
+00:14:50.620 --> 00:14:56.300
+<v Guest>So we keep Gearheart for complex enterprise grade solutions that you
+
+212
+00:14:56.300 --> 00:14:58.680
+<v Guest>definitely can't automate somehow.
+
+213
+00:15:00.300 --> 00:15:06.560
+<v Guest>At the same time, we still want to work with founders who have domain expertise,
+
+214
+00:15:07.040 --> 00:15:11.320
+<v Guest>but don't have product expertise and never built products before.
+
+215
+00:15:11.640 --> 00:15:14.500
+<v Guest>That's why we created this brand Beyond the WOW.
+
+216
+00:15:14.660 --> 00:15:17.020
+<v Guest>By the way, I didn't explain the name.
+
+217
+00:15:17.260 --> 00:15:22.340
+<v Guest>Now, when you build something with AI, anything actually, if you do anything with AI,
+
+218
+00:15:22.640 --> 00:15:26.300
+<v Guest>you have this wow moment really fast.
+
+219
+00:15:26.300 --> 00:15:31.040
+<v Guest>So you just put some prompt, first prompt to get first result.
+
+220
+00:15:32.060 --> 00:15:35.300
+<v Guest>And you're like, wow, I did it like in 10 seconds.
+
+221
+00:15:35.540 --> 00:15:40.300
+<v Guest>Now what I can do if I spent, I don't know, a day for that.
+
+222
+00:15:40.640 --> 00:15:44.880
+<v Guest>But here is the catch that after this first wow,
+
+223
+00:15:45.220 --> 00:15:49.480
+<v Guest>you need to spend a lot of time to tweak this last 10%.
+
+224
+00:15:49.480 --> 00:15:54.080
+<v Guest>And sometimes it takes so much time, you start being nervous about it.
+
+225
+00:15:54.080 --> 00:16:00.660
+<v Guest>So that's why we call this brand Beyond the Wow, because we help founders to go beyond
+
+226
+00:16:00.660 --> 00:16:02.620
+<v Guest>the wall building products with AI.
+
+227
+00:16:02.960 --> 00:16:11.740
+<v Guest>And we started to build our processes around it to deliver MVP sales, ready MVP in two
+
+228
+00:16:11.740 --> 00:16:12.240
+<v Guest>weeks.
+
+229
+00:16:12.420 --> 00:16:15.160
+<v Guest>If we're talking about prototypes, it's a couple of hours.
+
+230
+00:16:15.780 --> 00:16:18.640
+<v Guest>That's what we are doing now in terms of Beyond the Wow.
+
+231
+00:16:18.640 --> 00:16:24.740
+<v Guest>Another thing that I realized doing it that actually it sometimes surprised me.
+
+232
+00:16:24.880 --> 00:16:29.780
+<v Guest>I always assumed that people in tech were naturally curious about new stuff.
+
+233
+00:16:30.060 --> 00:16:35.860
+<v Guest>I always thought that if the person is a developer, when something new comes up,
+
+234
+00:16:36.320 --> 00:16:40.120
+<v Guest>the first people to catch it are technical people.
+
+235
+00:16:40.440 --> 00:16:45.720
+<v Guest>But when AI came out, even really strong developers didn't automatically pick this up.
+
+236
+00:16:45.720 --> 00:16:51.300
+<v Guest>And we faced with, okay, how can we change that inside of our team?
+
+237
+00:16:51.460 --> 00:16:59.540
+<v Guest>And how can we engage great people who embrace this new technology and also build processes around that?
+
+238
+00:17:01.980 --> 00:17:05.500
+<v Noah Labhart>What is the process you go through to
+
+239
+00:17:05.500 --> 00:17:06.500
+<v Guest>identify
+
+240
+00:17:06.500 --> 00:17:10.340
+<v Noah Labhart>that someone's the right person to come work at Gearheart, right?
+
+241
+00:17:10.400 --> 00:17:11.500
+<v Noah Labhart>How do you build that team?
+
+242
+00:17:11.500 --> 00:17:15.760
+<v Noah Labhart>and I'm curious about what you look for in those people specifically to indicate that they are the
+
+243
+00:17:15.760 --> 00:17:16.980
+<v Noah Labhart>winning horses to join you.
+
+244
+00:17:17.980 --> 00:17:21.720
+<v Guest>In general, we are trying to minimize the distance between the client
+
+245
+00:17:21.720 --> 00:17:28.100
+<v Guest>and the customer and the team, right? And we build processes around this. So we have a developer
+
+246
+00:17:28.100 --> 00:17:34.280
+<v Guest>stop to the client to figure out requirements of the features. We let our QAs and our developers
+
+247
+00:17:34.280 --> 00:17:39.620
+<v Guest>to give demos to the clients. And we're just trying to always organize this, a lot of communication
+
+248
+00:17:41.500 --> 00:17:47.060
+<v Guest>them necessary but without any artificial barriers there. And it also, this part always
+
+249
+00:17:47.060 --> 00:17:53.140
+<v Guest>what was driving me most. Not just programming thing but then see how people actually use
+
+250
+00:17:53.140 --> 00:17:58.800
+<v Guest>it. One thing I'm looking for with technical team is I'm looking for people to be interested
+
+251
+00:17:58.800 --> 00:18:03.340
+<v Guest>in that and how the product works and how people are using that. Not only the technical
+
+252
+00:18:03.340 --> 00:18:08.160
+<v Guest>part of how fun it is to build it, even though it's really fun to build stuff. So that's
+
+253
+00:18:08.160 --> 00:18:08.880
+<v Guest>That's one thing.
+
+254
+00:18:08.980 --> 00:18:13.660
+<v Guest>And I try to find people who are not afraid of talking to clients and customers who are
+
+255
+00:18:13.660 --> 00:18:14.640
+<v Guest>actually interested in that.
+
+256
+00:18:14.840 --> 00:18:20.200
+<v Guest>And it's so much fun also that some people do really hate it with their guts.
+
+257
+00:18:20.320 --> 00:18:21.520
+<v Guest>They won't talk to anybody.
+
+258
+00:18:21.700 --> 00:18:22.940
+<v Guest>They just want to program stuff.
+
+259
+00:18:23.240 --> 00:18:27.600
+<v Guest>And others, they truly yearn for, okay, give me some people to talk to.
+
+260
+00:18:27.640 --> 00:18:29.260
+<v Guest>I want to see how this is used in the wild.
+
+261
+00:18:29.400 --> 00:18:30.680
+<v Guest>So that's one thing.
+
+262
+00:18:30.800 --> 00:18:34.200
+<v Guest>I'm just looking for people who are embracing this approach and actually like this.
+
+263
+00:18:34.200 --> 00:18:38.980
+<v Guest>Another part is just people have to be nice and pleasant to work with.
+
+264
+00:18:39.500 --> 00:18:42.720
+<v Guest>And I can, it might sound funny, but I cannot understand this.
+
+265
+00:18:42.860 --> 00:18:50.660
+<v Guest>So we, a few times we tried hiring people who are like extremely competent in what they do, but a bit hard to talk to or something like that.
+
+266
+00:18:50.740 --> 00:18:51.520
+<v Guest>And it never worked.
+
+267
+00:18:51.860 --> 00:18:58.900
+<v Guest>And so at some point I realized the case that that has to be one of the focuses, like official criteria that we are paying attention to.
+
+268
+00:18:58.900 --> 00:19:04.400
+<v Guest>do. And I really like how that works because when I ask clients about, okay, so how do
+
+269
+00:19:04.400 --> 00:19:05.320
+<v Guest>you like working with the team?
+
+270
+00:19:05.400 --> 00:19:06.820
+<v Guest>Is there anything to improve and whatnot?
+
+271
+00:19:07.680 --> 00:19:10.920
+<v Guest>They constantly tell me, okay, so the team is really pleasant to work with.
+
+272
+00:19:11.120 --> 00:19:14.680
+<v Guest>I can really like how they communicate and how friendly they are.
+
+273
+00:19:14.820 --> 00:19:15.920
+<v Guest>So there's that.
+
+274
+00:19:16.100 --> 00:19:21.560
+<v Guest>And in terms of developers specifically, I prefer working with full stack developers and
+
+275
+00:19:21.560 --> 00:19:28.160
+<v Guest>I try to check always that they have all the fundamental principles right and they're not
+
+276
+00:19:28.900 --> 00:19:31.460
+<v Guest>of learning new tools, switching language,
+
+277
+00:19:31.780 --> 00:19:32.740
+<v Guest>and stuff like this.
+
+278
+00:19:32.980 --> 00:19:36.380
+<v Guest>So I understand that eventually everybody
+
+279
+00:19:36.380 --> 00:19:37.320
+<v Guest>has their preferences.
+
+280
+00:19:37.560 --> 00:19:39.840
+<v Guest>Somebody tends to work more on the back end.
+
+281
+00:19:39.960 --> 00:19:41.380
+<v Guest>Somebody likes databases more.
+
+282
+00:19:41.480 --> 00:19:42.220
+<v Guest>So there are preferences.
+
+283
+00:19:42.440 --> 00:19:44.040
+<v Guest>Obviously, everybody has them.
+
+284
+00:19:44.380 --> 00:19:47.820
+<v Guest>But I think it's really important to not be afraid
+
+285
+00:19:47.820 --> 00:19:49.940
+<v Guest>to learn new stuff, to pick a tool for the job.
+
+286
+00:19:50.420 --> 00:19:52.560
+<v Guest>And the best developers I've worked with,
+
+287
+00:19:53.180 --> 00:19:54.140
+<v Guest>they're never afraid.
+
+288
+00:19:54.240 --> 00:19:56.200
+<v Guest>If a task requires, like, for example,
+
+289
+00:19:56.200 --> 00:20:01.660
+<v Guest>they spent years writing Python and then new project requires Go, for example. It's not an
+
+290
+00:20:01.660 --> 00:20:05.980
+<v Guest>issue for them because they have the fundamentals, they have the right mindset. It's easy and it's
+
+291
+00:20:05.980 --> 00:20:11.360
+<v Guest>interesting for them to switch and learn new things and eventually experience working different
+
+292
+00:20:11.360 --> 00:20:17.460
+<v Guest>frameworks and languages. It makes everybody like a better developer. So I think those are the most
+
+293
+00:20:17.460 --> 00:20:22.400
+<v Guest>important things I'm looking for. Oh wow, and another one is like ownership. I try to verify
+
+294
+00:20:22.400 --> 00:20:26.100
+<v Guest>if people like doing that, take ownership of what they're doing.
+
+295
+00:20:26.360 --> 00:20:29.020
+<v Guest>And it's also so interesting how different people are.
+
+296
+00:20:29.260 --> 00:20:32.920
+<v Guest>Some just want to make their part and be in the middle of a pipeline,
+
+297
+00:20:33.120 --> 00:20:36.940
+<v Guest>and then there's some other people who just really want to be in charge of something,
+
+298
+00:20:37.120 --> 00:20:39.600
+<v Guest>and they really like those guys and girls.
+
+299
+00:20:40.120 --> 00:20:43.220
+<v Guest>That they want to take a feature, they want to figure out how it works,
+
+300
+00:20:43.400 --> 00:20:46.680
+<v Guest>they want to build it, and then they want to take credit for this.
+
+301
+00:20:47.000 --> 00:20:50.760
+<v Guest>That's the best, I think, approach to building these things.
+
+302
+00:20:52.400 --> 00:20:54.900
+<v Guest>they're really self-organized, self-motivated,
+
+303
+00:20:55.040 --> 00:20:56.460
+<v Guest>they're not afraid to ask questions,
+
+304
+00:20:56.600 --> 00:20:57.340
+<v Guest>they will figure it out.
+
+305
+00:20:57.460 --> 00:20:59.100
+<v Guest>You just give it to them and they'll figure it out.
+
+306
+00:20:59.260 --> 00:21:02.320
+<v Guest>And if all of a sudden it requires some additional
+
+307
+00:21:02.900 --> 00:21:05.680
+<v Guest>bit of even design work, they will do it.
+
+308
+00:21:05.780 --> 00:21:06.900
+<v Guest>They will figure it out and do it
+
+309
+00:21:06.900 --> 00:21:09.740
+<v Guest>because they're interested in building the end feature,
+
+310
+00:21:09.860 --> 00:21:11.840
+<v Guest>the end product, and presenting it to the client
+
+311
+00:21:11.840 --> 00:21:13.600
+<v Guest>and show that this is what I've done.
+
+312
+00:21:14.100 --> 00:21:17.040
+<v Guest>The only thing I wanted to add is looking for people
+
+313
+00:21:17.040 --> 00:21:19.060
+<v Guest>with this early adopters mindset,
+
+314
+00:21:19.060 --> 00:21:22.300
+<v Guest>because we work with startups, we work with founders,
+
+315
+00:21:22.500 --> 00:21:25.720
+<v Guest>and it's super important for people
+
+316
+00:21:25.720 --> 00:21:27.920
+<v Guest>to naturally embrace something new
+
+317
+00:21:27.920 --> 00:21:31.740
+<v Guest>because it is something we are guiding our customers for,
+
+318
+00:21:31.840 --> 00:21:33.380
+<v Guest>right, when building new stuff.
+
+319
+00:21:33.700 --> 00:21:35.560
+<v Guest>And of course, it depends on the position,
+
+320
+00:21:35.740 --> 00:21:39.020
+<v Guest>but of course, we, if we're talking about developers
+
+321
+00:21:39.020 --> 00:21:40.900
+<v Guest>or product managers, product leads,
+
+322
+00:21:41.120 --> 00:21:42.880
+<v Guest>we are trying to find people
+
+323
+00:21:42.880 --> 00:21:45.560
+<v Guest>who tried to build their startups before.
+
+324
+00:21:45.960 --> 00:21:48.720
+<v Guest>Even, like, any tries are fine.
+
+325
+00:21:49.060 --> 00:21:52.960
+<v Guest>It just shows that people are naturally curious about it.
+
+326
+00:21:53.060 --> 00:21:57.620
+<v Guest>It's just an experience that helps a lot in our work,
+
+327
+00:21:57.700 --> 00:22:00.140
+<v Guest>in our work to work with our customers
+
+328
+00:22:00.140 --> 00:22:02.740
+<v Guest>and to help them to make right moves
+
+329
+00:22:02.740 --> 00:22:07.820
+<v Guest>based on our mistakes that we did with our previous startups.
+
+330
+00:22:09.060 --> 00:22:12.620
+<v Noah Labhart>We hope you've enjoyed part one of this creation story
+
+331
+00:22:12.620 --> 00:22:15.300
+<v Noah Labhart>of Gearheart with Volodymyr and Vitalii.
+
+332
+00:22:15.820 --> 00:22:17.360
+<v Noah Labhart>Stay tuned for part two.
+
+333
+00:22:19.240 --> 00:22:22.260
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+334
+00:22:22.380 --> 00:22:27.160
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+335
+00:22:27.780 --> 00:22:29.980
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+336
+00:22:30.280 --> 00:22:32.300
+<v Noah Labhart>Both things help us out tremendously.
+
+337
+00:22:35.120 --> 00:22:36.600
+<v Noah Labhart>And thanks again for listening.

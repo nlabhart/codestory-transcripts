@@ -1,0 +1,1527 @@
+WEBVTT
+
+NOTE S9 Bonus: The Scale-Stage Architecture Blueprint: Overthrowing Devops Debt and Scaling High-Velocity Engineering Organizations with Zach Goldberg, Author of The Startup CTO's Handbook
+
+1
+00:00:01.720 --> 00:00:05.380
+<v Zach Goldberg>knows I actually have an entire chapter in my book, The Startup CTO's Handbook, on exactly this
+
+2
+00:00:05.380 --> 00:00:12.080
+<v Zach Goldberg>topic. Coming into a team or an organization as a leader, what is your agenda? What's your
+
+3
+00:00:12.080 --> 00:00:17.020
+<v Zach Goldberg>checklist? What are your priorities, early days? And the framework that I offer, the way I think
+
+4
+00:00:17.020 --> 00:00:21.180
+<v Zach Goldberg>about it, is if you're promoted into a leadership position, you likely already have the context.
+
+5
+00:00:21.380 --> 00:00:27.340
+<v Zach Goldberg>And so your focus is on picking up all those leadership elements, trying to put the pieces
+
+6
+00:00:27.340 --> 00:00:31.660
+<v Zach Goldberg>together, so to speak, and not rock the boat. My ideas are not necessarily the right ideas.
+
+7
+00:00:31.760 --> 00:00:37.640
+<v Zach Goldberg>It's about building an organization where the collective whole can be fantastic.
+
+8
+00:00:38.040 --> 00:00:43.520
+<v Zach Goldberg>My name is Zach Goldberg. I'm the CTO of Gruntwork and the author of the Startup CTO's Handbook.
+
+9
+00:00:46.400 --> 00:00:52.140
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+10
+00:00:52.140 --> 00:00:53.700
+<v Clip>six months moonlighting,
+
+11
+00:00:53.700 --> 00:00:57.140
+<v Clip>who share what it takes to
+
+12
+00:00:57.840 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+13
+00:01:02.980 --> 00:01:06.100
+<v Noah Labhart>What company is its people?
+
+14
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+15
+00:01:07.440 --> 00:01:08.600
+<v Clip>Most proud of our team.
+
+16
+00:01:08.880 --> 00:01:11.240
+<v Noah Labhart>Keeping scalability top of mind.
+
+17
+00:01:11.480 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+18
+00:01:12.880 --> 00:01:14.200
+<v Clip>Yes, we've been fighting it as a group.
+
+19
+00:01:14.440 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+20
+00:01:15.520 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+21
+00:01:18.300 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+22
+00:01:20.020 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+23
+00:01:22.880 --> 00:01:25.860
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+24
+00:01:27.340 --> 00:01:28.940
+<v Clip>Not just about technology.
+
+25
+00:01:29.060 --> 00:01:30.940
+<v Noah Labhart>All this and more on Code Story.
+
+26
+00:01:32.420 --> 00:01:33.900
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+27
+00:01:34.040 --> 00:01:38.620
+<v Noah Labhart>And today, how Zach Goldberg is joining the world-class team at Gruntwork
+
+28
+00:01:38.620 --> 00:01:42.940
+<v Noah Labhart>to help you define your infrastructure with code in about a day.
+
+29
+00:01:49.420 --> 00:01:52.980
+<v Noah Labhart>Zach Goldberg was sent to computer camp when he was 12 years old.
+
+30
+00:01:53.340 --> 00:01:58.720
+<v Noah Labhart>An interesting part of the story is that the prior year, he went to sports camp, and it didn't go so well.
+
+31
+00:01:59.140 --> 00:02:02.680
+<v Noah Labhart>At the computer camp, he fell in love with tech and eventually became a counselor.
+
+32
+00:02:02.840 --> 00:02:07.320
+<v Noah Labhart>He finds the most joy and impact at the intersection of business and technology.
+
+33
+00:02:07.720 --> 00:02:11.380
+<v Noah Labhart>But outside of tech, he's married and a private pilot in California.
+
+34
+00:02:11.820 --> 00:02:17.240
+<v Noah Labhart>He also admits to being a total geek, getting very excited about installing a solar panel on his roof.
+
+35
+00:02:17.380 --> 00:02:20.060
+<v Noah Labhart>Up to code, of course, and with the permission of his wife.
+
+36
+00:02:21.640 --> 00:02:28.160
+<v Noah Labhart>A few months ago, Zach was introduced to the founders of his current company through the executive coaching and consulting he does.
+
+37
+00:02:28.340 --> 00:02:38.520
+<v Noah Labhart>They all had great conversations around approaches to DevOps and what the future of the industry is, so much so that he decided to join the team and lead the conversation.
+
+38
+00:02:40.600 --> 00:02:43.480
+<v Noah Labhart>This is Zach's creation story at Gruntwork.
+
+39
+00:02:43.480 --> 00:02:52.140
+<v Zach Goldberg>Is a DevOps and infrastructure company.
+
+40
+00:02:52.500 --> 00:02:57.100
+<v Zach Goldberg>If you're not familiar with the phrase, DevOps is really all things cloud
+
+41
+00:02:57.100 --> 00:03:02.520
+<v Zach Goldberg>infrastructure. So your continuous integration, continuous deployment pipelines, managing your
+
+42
+00:03:02.520 --> 00:03:09.140
+<v Zach Goldberg>cloud compute, your cloud storage. It's a B2B company, so we help other companies with their
+
+43
+00:03:09.140 --> 00:03:15.200
+<v Zach Goldberg>DevOps postures. Gruntwork's most recent product is called DevOps Foundations, and it's for
+
+44
+00:03:15.200 --> 00:03:19.140
+<v Zach Goldberg>enterprises that are looking to level up their standard operating procedures, their security
+
+45
+00:03:19.140 --> 00:03:25.160
+<v Zach Goldberg>posture, their compliance posture related to cloud infrastructure. I imagine a lot of the audience
+
+46
+00:03:27.140 --> 00:03:32.820
+<v Zach Goldberg>about is my infrastructure really as secure as it should be? Would we pass all
+
+47
+00:03:32.820 --> 00:03:36.600
+<v Zach Goldberg>the audits we might be asked to pass in the near future? It's a lot to manage and
+
+48
+00:03:36.600 --> 00:03:40.860
+<v Zach Goldberg>so Gruntwork provides tools, processes, and a bit of professional services to
+
+49
+00:03:40.860 --> 00:03:46.560
+<v Zach Goldberg>help organizations get on top of those problems. I was introduced to Josh Patnik,
+
+50
+00:03:46.680 --> 00:03:51.860
+<v Zach Goldberg>the CEO of Gruntwork, a few months ago as part of the coaching work I do. He was
+
+51
+00:03:51.860 --> 00:03:54.920
+<v Zach Goldberg>interested in having a conversation around some changes to the organization
+
+52
+00:03:54.920 --> 00:03:57.200
+<v Zach Goldberg>and building out the technical team.
+
+53
+00:03:57.520 --> 00:03:59.340
+<v Zach Goldberg>And I've always had a passion for DevOps.
+
+54
+00:03:59.560 --> 00:04:02.120
+<v Zach Goldberg>Even though none of the companies I've been a leader at
+
+55
+00:04:02.120 --> 00:04:04.040
+<v Zach Goldberg>were in the DevOps space itself,
+
+56
+00:04:04.260 --> 00:04:06.040
+<v Zach Goldberg>it's always something I've been following
+
+57
+00:04:06.040 --> 00:04:08.980
+<v Zach Goldberg>as an early Terraform user and early Kubernetes user.
+
+58
+00:04:10.100 --> 00:04:11.320
+<v Zach Goldberg>So I was talking to Josh.
+
+59
+00:04:11.460 --> 00:04:13.800
+<v Zach Goldberg>The challenges he was facing from a leadership perspective
+
+60
+00:04:13.800 --> 00:04:16.740
+<v Zach Goldberg>were very interesting, but also I just love the space.
+
+61
+00:04:16.920 --> 00:04:18.200
+<v Zach Goldberg>I've always been passionate about it.
+
+62
+00:04:18.280 --> 00:04:20.340
+<v Zach Goldberg>And we've had really good conversations around
+
+63
+00:04:20.340 --> 00:04:22.740
+<v Zach Goldberg>what is the cutting edge of DevOps?
+
+64
+00:04:22.740 --> 00:04:28.340
+<v Zach Goldberg>DevOps, what should best practices be? Gruntwork is known for Terragrunt, of course, as well as
+
+65
+00:04:28.340 --> 00:04:33.100
+<v Zach Goldberg>Terratest, two very common tools in the space. And what is the future going to look like,
+
+66
+00:04:33.160 --> 00:04:39.140
+<v Zach Goldberg>especially given the Terraform OpenTofu split as a result of the HashiCorp license changes a few
+
+67
+00:04:39.140 --> 00:04:43.900
+<v Zach Goldberg>months ago? It's a very interesting time in DevOps, and I'm very excited and honestly honored
+
+68
+00:04:43.900 --> 00:04:49.740
+<v Zach Goldberg>and privileged to be a part of that conversation and to help move the industry forward in a way
+
+69
+00:04:49.740 --> 00:04:54.220
+<v Zach Goldberg>that enables developers, enables companies to manage their infrastructure in a reasonable way
+
+70
+00:04:54.220 --> 00:04:56.460
+<v Zach Goldberg>that gives them the confidence that they need.
+
+71
+00:04:58.640 --> 00:05:05.140
+<v Noah Labhart>So let's dive into what would be your MVP at Gruntwork, right? Normally I ask around like
+
+72
+00:05:05.140 --> 00:05:10.280
+<v Noah Labhart>minimum viable product of that first version of Gruntwork, but this is a little bit further down
+
+73
+00:05:10.280 --> 00:05:15.220
+<v Noah Labhart>the road. What is going to be your first initiative? What are you going to build as your
+
+74
+00:05:15.220 --> 00:05:15.940
+<v Noah Labhart>your first MVP.
+
+75
+00:05:17.280 --> 00:05:22.520
+<v Zach Goldberg>This product, DevOps Foundations that Gruntwork sells, is really, it's a suite
+
+76
+00:05:22.520 --> 00:05:28.400
+<v Zach Goldberg>of tools that work together to provide the security, compliance, and operational posture
+
+77
+00:05:28.400 --> 00:05:34.280
+<v Zach Goldberg>that IT executives and technology executives are looking for at enterprise scale. So there's a lot
+
+78
+00:05:34.280 --> 00:05:38.800
+<v Zach Goldberg>of pieces there. And Gruntwork is a small company. We are, Andy, perhaps fortunate or
+
+79
+00:05:38.800 --> 00:05:42.100
+<v Zach Goldberg>unfortunate, depending on your perspective, position of having more projects than we have
+
+80
+00:05:42.100 --> 00:05:47.200
+<v Zach Goldberg>have people. And so a lot of my challenge is really working with the team to understand
+
+81
+00:05:47.200 --> 00:05:51.840
+<v Zach Goldberg>what are our gaps? What are the main features that we need to offer that we don't offer today?
+
+82
+00:05:51.960 --> 00:05:56.840
+<v Zach Goldberg>What are our customers need? What's really going to move the needle in terms of our ability to
+
+83
+00:05:56.840 --> 00:06:01.580
+<v Zach Goldberg>deploy these tools for our customers to operationalize the tools themselves, and also
+
+84
+00:06:01.580 --> 00:06:06.500
+<v Zach Goldberg>the state of the art of the industry. I think everybody probably agrees that it's possible to
+
+85
+00:06:06.500 --> 00:06:09.940
+<v Zach Goldberg>have a pretty high quality DevOps setup nowadays. There's a lot of tools, a lot of vendors,
+
+86
+00:06:09.940 --> 00:06:15.800
+<v Zach Goldberg>but it's rapidly evolving. I think everybody agrees five years from now, the tools we use,
+
+87
+00:06:15.820 --> 00:06:19.780
+<v Zach Goldberg>the best practices will be different from what they are today. And so a lot of my work with
+
+88
+00:06:19.780 --> 00:06:24.380
+<v Zach Goldberg>DevOps Foundations is of course, prioritizing what our customers need now, but also putting
+
+89
+00:06:24.380 --> 00:06:30.020
+<v Zach Goldberg>together a roadmap of what's the industry or what can Gruntwork do to move the industry forward
+
+90
+00:06:30.020 --> 00:06:35.480
+<v Zach Goldberg>over the coming years. I think we've got a lot of good stuff that's cooking in the kitchen and
+
+91
+00:06:35.480 --> 00:06:36.940
+<v Zach Goldberg>And can't wait to deploy it to the
+
+92
+00:06:36.940 --> 00:06:37.440
+<v Noah Labhart>world.
+
+93
+00:06:37.980 --> 00:06:56.420
+<v Noah Labhart>Even in early days of when you're taking on a new role, a new initiative, and maybe in some of those conversations you were having with the founders of Gruntwork, you got to make certain decisions and trade-offs or there are learnings and findings or things that really craft the approach, right?
+
+94
+00:06:56.540 --> 00:07:02.580
+<v Noah Labhart>So tell me about some of those that you've gone through, that you're processing through, and how you're coping with those decisions.
+
+95
+00:07:04.260 --> 00:07:32.560
+<v Zach Goldberg>Yeah, I really do appreciate this question. And it's actually, it's on the nose, I actually have an entire chapter in my book, The Startup CTO's Handbook, on exactly this topic, you know, coming into a team or an organization as a leader, what is your agenda? What's your checklist? What are your priorities, early days, and the framework that I offer, the way I think about it, is if you're promoted into a leadership position, you likely already have the context. And so your focus is on picking up all those leadership elements that have now been handed to you.
+
+96
+00:07:32.580 --> 00:07:37.220
+<v Zach Goldberg>to you that are now part of your job description. If you're coming into an organization as a leader,
+
+97
+00:07:37.320 --> 00:07:41.620
+<v Zach Goldberg>I'm being hired because I have a background as a technical leader, but I'm lacking all of that
+
+98
+00:07:41.620 --> 00:07:46.580
+<v Zach Goldberg>organizational context, the context around people. And so my early days at Gruntwork are all about
+
+99
+00:07:46.580 --> 00:07:51.980
+<v Zach Goldberg>building a map of where we are today and a roadmap of where we go forwards. So it's a lot of
+
+100
+00:07:51.980 --> 00:07:57.420
+<v Zach Goldberg>listening, trying to put the pieces together, so to speak, and not rock the boat. My ideas are not
+
+101
+00:07:57.420 --> 00:08:02.200
+<v Zach Goldberg>necessarily the right ideas, right? It's about building an organization where the collective
+
+102
+00:08:02.200 --> 00:08:08.240
+<v Zach Goldberg>whole can be fantastic and is incredibly productive. It's not about my productivity per se.
+
+103
+00:08:08.480 --> 00:08:13.400
+<v Zach Goldberg>It's about my ability to build an organization that delivers productivity, velocity, innovation,
+
+104
+00:08:13.620 --> 00:08:19.360
+<v Zach Goldberg>and insight. So that means not coming in on day one and blowing everything up. It means working
+
+105
+00:08:19.360 --> 00:08:23.720
+<v Zach Goldberg>with the team in those first couple months to understand where things are at and collaboratively
+
+106
+00:08:23.720 --> 00:08:28.060
+<v Zach Goldberg>make the changes that everybody agrees, point the direction, point the ship in the direction
+
+107
+00:08:28.060 --> 00:08:29.640
+<v Zach Goldberg>that we all feel it needs to go.
+
+108
+00:08:31.280 --> 00:08:34.660
+<v Noah Labhart>You've joined the company, you're jumping into your first
+
+109
+00:08:34.660 --> 00:08:39.580
+<v Noah Labhart>initiative. I'm curious about either how the company is doing this or how you are going to do
+
+110
+00:08:39.580 --> 00:08:43.780
+<v Noah Labhart>it. Build your, you know, what would be the roadmap? Like what would be the plan of how you're
+
+111
+00:08:43.780 --> 00:08:50.020
+<v Noah Labhart>going to execute? And I'm curious about how you do that and, you know, what sort of criteria you're
+
+112
+00:08:50.020 --> 00:08:54.180
+<v Noah Labhart>are using to decide this is the next most important thing to build or to address?
+
+113
+00:08:55.900 --> 00:09:00.320
+<v Zach Goldberg>I think of technical planning in terms of three different, I call them horizons,
+
+114
+00:09:00.320 --> 00:09:05.300
+<v Zach Goldberg>horizon one, horizon two, and horizon three. Horizon one is exactly the question you just
+
+115
+00:09:05.300 --> 00:09:10.700
+<v Zach Goldberg>asked. What do we need to do next? My next sprint, my next set of tickets, whatever cadence the
+
+116
+00:09:10.700 --> 00:09:15.060
+<v Zach Goldberg>company is using. What are my short-term priorities? Horizon two is my near-term,
+
+117
+00:09:15.060 --> 00:09:18.580
+<v Zach Goldberg>So maybe that's this quarter or even the remainder of this year.
+
+118
+00:09:18.820 --> 00:09:24.200
+<v Zach Goldberg>And that's usually I have contracts with customers or there's features that we know we want to build.
+
+119
+00:09:24.720 --> 00:09:27.440
+<v Zach Goldberg>And then Horizon 3 is really my strategic roadmap.
+
+120
+00:09:27.680 --> 00:09:30.320
+<v Zach Goldberg>So that's one to three or one to five years.
+
+121
+00:09:30.880 --> 00:09:32.860
+<v Zach Goldberg>What direction do we want to move the organization?
+
+122
+00:09:33.120 --> 00:09:35.300
+<v Zach Goldberg>What direction do we want to move our technology?
+
+123
+00:09:35.720 --> 00:09:43.040
+<v Zach Goldberg>What are our innovations that we can start laying the groundwork for now, which might bear fruit two or three years down the line?
+
+124
+00:09:43.040 --> 00:09:46.560
+<v Zach Goldberg>And so specifically to answer your near-term question,
+
+125
+00:09:46.840 --> 00:09:49.400
+<v Zach Goldberg>it's a balance of being customer-focused.
+
+126
+00:09:49.560 --> 00:09:51.900
+<v Zach Goldberg>What do our customers need that our product doesn't do?
+
+127
+00:09:51.980 --> 00:09:55.060
+<v Zach Goldberg>And also being mindful of what does our company need?
+
+128
+00:09:55.100 --> 00:09:56.700
+<v Zach Goldberg>What does our developer team need?
+
+129
+00:09:57.100 --> 00:10:00.760
+<v Zach Goldberg>And so it's maybe even 50, 60, 70% customer-focused.
+
+130
+00:10:01.060 --> 00:10:03.920
+<v Zach Goldberg>But I'm a huge believer in investing in the team itself.
+
+131
+00:10:04.480 --> 00:10:06.460
+<v Zach Goldberg>I think the way you build a high-performance team
+
+132
+00:10:06.460 --> 00:10:08.040
+<v Zach Goldberg>is by continually putting effort
+
+133
+00:10:08.040 --> 00:10:10.580
+<v Zach Goldberg>into moving towards a high-performance team.
+
+134
+00:10:10.580 --> 00:10:16.200
+<v Zach Goldberg>And so that means investments in developer experience, investments in debt, investments in tooling.
+
+135
+00:10:16.800 --> 00:10:22.000
+<v Zach Goldberg>As a company, we hire engineers because we think they're smart, creative, brilliant, and we think they can solve problems.
+
+136
+00:10:22.260 --> 00:10:26.920
+<v Zach Goldberg>And I want to enable them and give them all of the right foundations to do their best work.
+
+137
+00:10:27.060 --> 00:10:28.860
+<v Zach Goldberg>That means they're not fighting their tools.
+
+138
+00:10:29.140 --> 00:10:30.800
+<v Zach Goldberg>They're not fighting build systems.
+
+139
+00:10:31.220 --> 00:10:37.180
+<v Zach Goldberg>They're not unable to use whatever the best in class SaaS service is for testing or solving whatever the problem.
+
+140
+00:10:37.180 --> 00:10:53.220
+<v Zach Goldberg>I want them all to have the best pickaxes, best jackhammers, best IDEs possible so they can exercise those creative muscles and actually spend their time delivering the creative work that is customer value and thinking through the right way to do that.
+
+141
+00:10:53.560 --> 00:10:59.880
+<v Zach Goldberg>So the short-term roadmap is a balance, again, just to summarize, of customer needs and what our team needs.
+
+142
+00:11:00.740 --> 00:11:10.760
+<v Noah Labhart>Okay, so I hear you referencing team, and I'm curious about if you have to expand your team, how you're going to do that, or if you're having to organize a team or lead a team.
+
+143
+00:11:10.800 --> 00:11:17.660
+<v Noah Labhart>I'm curious about that, and I'm curious about what you look for in people to indicate that they are the winning horses to join you.
+
+144
+00:11:18.640 --> 00:11:24.960
+<v Zach Goldberg>Gruntwork as an organization firmly believes that talent is distributed globally, but opportunity is not.
+
+145
+00:11:25.720 --> 00:11:33.380
+<v Zach Goldberg>We are a remote organization. We strongly believe that we should be hiring the best people and the best fit for the role, regardless of where they are.
+
+146
+00:11:33.440 --> 00:11:37.340
+<v Zach Goldberg>There are, of course, logistical limitations. So we do have a preference for time zones.
+
+147
+00:11:37.500 --> 00:11:39.900
+<v Zach Goldberg>Gruntwork is a North American time zone focused organization.
+
+148
+00:11:40.480 --> 00:11:45.000
+<v Zach Goldberg>But as far as what country you live in, what state you live in, that's not relevant, right?
+
+149
+00:11:45.080 --> 00:11:53.260
+<v Zach Goldberg>What matters to our organization is what experiences do you have, what talents and knowledge have you invested in, and do you bring to the table?
+
+150
+00:11:54.960 --> 00:11:59.940
+<v Zach Goldberg>hours about hiring. Again, this is a subject covered in many chapters in my book. I have a
+
+151
+00:11:59.940 --> 00:12:06.020
+<v Zach Goldberg>lot of thoughts on engineering hiring process and how do we correlate hiring process success with
+
+152
+00:12:06.020 --> 00:12:09.900
+<v Zach Goldberg>on-the-job success. The long and short of it is you're looking for somebody who has the right
+
+153
+00:12:09.900 --> 00:12:14.460
+<v Zach Goldberg>skills match. So if you're, for example, hiring a backend engineer, you probably want somebody
+
+154
+00:12:14.460 --> 00:12:19.820
+<v Zach Goldberg>who has some experience in backend engineering and has experience thinking about the kinds of
+
+155
+00:12:19.820 --> 00:12:26.380
+<v Zach Goldberg>problems that you're interested in. And also a human fit, right? It's often called a culture fit.
+
+156
+00:12:26.480 --> 00:12:30.480
+<v Zach Goldberg>For example, comfortable working in a remote organization, that would be important to Gruntwork,
+
+157
+00:12:30.480 --> 00:12:37.760
+<v Zach Goldberg>work, but also somebody who has the right natural tendencies. There are a lot of personality surveys
+
+158
+00:12:37.760 --> 00:12:44.020
+<v Zach Goldberg>you might be familiar with, for example, Myers-Briggs as a way of labeling or identifying
+
+159
+00:12:44.020 --> 00:12:49.740
+<v Zach Goldberg>personality traits. These things do matter. There are some roles within the organization where I
+
+160
+00:12:49.820 --> 00:12:53.700
+<v Zach Goldberg>do need somebody who is or the organization needs somebody who is very detail oriented.
+
+161
+00:12:54.080 --> 00:12:57.620
+<v Zach Goldberg>They're going to take their time, they're going to follow the checklist, they're never going to
+
+162
+00:12:57.620 --> 00:13:01.020
+<v Zach Goldberg>deviate from the checklist. And they're comfortable with that. That's where they're comfortable
+
+163
+00:13:01.020 --> 00:13:04.500
+<v Zach Goldberg>working. And there's other times when I want to hire somebody who's going to look at the checklist
+
+164
+00:13:04.500 --> 00:13:08.360
+<v Zach Goldberg>and say, this is crazy. I think we could do this better. And they're going to blow it up. And
+
+165
+00:13:08.360 --> 00:13:11.800
+<v Zach Goldberg>they're going to come up with a brand new checklist every week. And they're going to never be content
+
+166
+00:13:11.800 --> 00:13:16.320
+<v Zach Goldberg>until it's 100% perfect. In different scenarios, either of those people could be your superhero.
+
+167
+00:13:16.320 --> 00:13:27.860
+<v Zach Goldberg>An effective part of hiring is understanding which of those two or which of the many different personality types would be most successful in that role, combined with what skills and experiences this person need.
+
+168
+00:13:28.000 --> 00:13:32.040
+<v Zach Goldberg>And those are some of the raw ingredients necessary, for example, to get
+
+169
+00:13:32.040 --> 00:13:32.540
+<v Noah Labhart>a great hire.
+
+170
+00:13:35.180 --> 00:13:38.580
+<v Noah Labhart>This will be interesting, and I'm curious where this is going to apply.
+
+171
+00:13:38.580 --> 00:13:46.740
+<v Noah Labhart>apply. Gruntwork has products and they are deeply embedded into the DevOps, into scalability and the
+
+172
+00:13:46.740 --> 00:13:51.440
+<v Noah Labhart>process there. And I guess my question is less about that, given you're just joining the team,
+
+173
+00:13:51.460 --> 00:13:57.520
+<v Noah Labhart>and more about like, where does scalability fit into what you're going to accomplish at Gruntwork,
+
+174
+00:13:57.580 --> 00:14:02.560
+<v Noah Labhart>pushing the industry forward? Tell me about that. Tell me about where your mind goes. If there are
+
+175
+00:14:02.560 --> 00:14:07.200
+<v Noah Labhart>any areas where you're like, yep, I'm going to have to fight scalability in some capacity,
+
+176
+00:14:08.580 --> 00:14:09.880
+<v Noah Labhart>or people-wise as I grow.
+
+177
+00:14:11.340 --> 00:14:15.360
+<v Zach Goldberg>Gruntwork is in a position where our scale challenges, we don't
+
+178
+00:14:15.360 --> 00:14:19.820
+<v Zach Goldberg>ourselves, for example, host tens of thousands of machines and have terabytes of bandwidth.
+
+179
+00:14:20.040 --> 00:14:27.900
+<v Zach Goldberg>We don't have big data problems as an organization. We help other companies solve human and process
+
+180
+00:14:27.900 --> 00:14:34.360
+<v Zach Goldberg>logistic scale problems. There's an enormous push, as there really should be, for securing
+
+181
+00:14:34.360 --> 00:14:40.000
+<v Zach Goldberg>enterprise architecture across the planet. The rate of data breaches and data exfiltrations
+
+182
+00:14:40.000 --> 00:14:46.780
+<v Zach Goldberg>is astounding. It's scary. Literally every week, some big brand name Fortune 500 company
+
+183
+00:14:46.780 --> 00:14:53.040
+<v Zach Goldberg>leaks my data again. And so rightfully so, we're seeing major investments across the board
+
+184
+00:14:53.040 --> 00:14:58.060
+<v Zach Goldberg>in building processes, building technology to make these kinds of things harder to happen,
+
+185
+00:14:58.060 --> 00:15:05.040
+<v Zach Goldberg>to make it impossible for an innocent human mistake or human error to lead to the opportunity
+
+186
+00:15:05.040 --> 00:15:09.680
+<v Zach Goldberg>for data exfiltration. And so what Gruntwork's business and what our products are all about
+
+187
+00:15:09.680 --> 00:15:16.060
+<v Zach Goldberg>is helping organizations at scale, put processes in place that solve these kinds of problems,
+
+188
+00:15:16.260 --> 00:15:23.360
+<v Zach Goldberg>make it such that it's not possible for a developer to create, for example, a new storage
+
+189
+00:15:23.360 --> 00:15:27.880
+<v Zach Goldberg>bucket that has permissions to be open to the world unless they have certain approvals or that
+
+190
+00:15:28.060 --> 00:15:30.920
+<v Zach Goldberg>Only certain IAM roles are allowed to do X, Y, Z.
+
+191
+00:15:31.180 --> 00:15:37.140
+<v Zach Goldberg>And that's a very difficult thing to manage when you have, for example, 25 different development
+
+192
+00:15:37.140 --> 00:15:41.780
+<v Zach Goldberg>teams who each need their own infrastructure and who each have different products as part
+
+193
+00:15:41.780 --> 00:15:42.920
+<v Zach Goldberg>of a medium or large enterprise.
+
+194
+00:15:43.180 --> 00:15:48.700
+<v Zach Goldberg>How do you create a sense of consistency and standards that enforce compliance and security
+
+195
+00:15:48.700 --> 00:15:53.060
+<v Zach Goldberg>best practices when your 25 different product teams all have different needs?
+
+196
+00:15:53.320 --> 00:15:55.080
+<v Zach Goldberg>And they may have different cadences.
+
+197
+00:15:55.100 --> 00:15:57.720
+<v Zach Goldberg>They may have teams in different places with different cultures.
+
+198
+00:15:58.060 --> 00:16:11.220
+<v Zach Goldberg>And so it's a real challenge as the CTO of some or CIO of some midsize or large enterprise to create security confidence and security, a standardized security posture across a diverse team or heterogeneous team.
+
+199
+00:16:11.440 --> 00:16:22.100
+<v Zach Goldberg>That's part of the challenge that we want to solve and that we are actively working on solving with our customers to make universal solutions or even custom tailored solutions to give everybody that confidence.
+
+200
+00:16:24.020 --> 00:16:28.440
+<v Noah Labhart>So as you step out on the balcony, you look across all that you've built.
+
+201
+00:16:28.500 --> 00:16:29.660
+<v Noah Labhart>What are you most proud of?
+
+202
+00:16:31.120 --> 00:16:35.900
+<v Zach Goldberg>I was the CTO of a company called GrowFlow for about three years.
+
+203
+00:16:36.120 --> 00:16:41.780
+<v Zach Goldberg>The company's business was selling compliance software for retail and wholesale businesses in the cannabis space.
+
+204
+00:16:42.120 --> 00:16:48.880
+<v Zach Goldberg>GrowFlow as a business, their problem that they were solving was making it easier to be compliant with those regulations.
+
+205
+00:16:49.720 --> 00:16:51.940
+<v Zach Goldberg>I joined, I was a hired in CTO.
+
+206
+00:16:52.080 --> 00:16:56.860
+<v Zach Goldberg>The co-founder, CTO Tom, was really passionate about software engineering and was very humble
+
+207
+00:16:56.860 --> 00:17:00.280
+<v Zach Goldberg>in hiring an external people leader to lead the technical organization.
+
+208
+00:17:00.860 --> 00:17:05.340
+<v Zach Goldberg>During that three years, we grew the team by a factor of probably four or five in terms
+
+209
+00:17:05.340 --> 00:17:07.440
+<v Zach Goldberg>of people, by a factor of eight to 10 in revenue.
+
+210
+00:17:07.820 --> 00:17:13.040
+<v Zach Goldberg>And we did that in this very human-focused, people-first mindset.
+
+211
+00:17:13.340 --> 00:17:18.280
+<v Zach Goldberg>We really cared deeply, myself and the other executives, about GrowFlow being a great place
+
+212
+00:17:18.880 --> 00:17:21.740
+<v Zach Goldberg>Our company's mission was to be the most helpful company in cannabis, and that
+
+213
+00:17:21.740 --> 00:17:25.640
+<v Zach Goldberg>lended itself to building an employee culture of being helpful to one another.
+
+214
+00:17:26.660 --> 00:17:30.720
+<v Zach Goldberg>I've just never been in an organization where core values and mission were so
+
+215
+00:17:30.720 --> 00:17:34.700
+<v Zach Goldberg>impactful in how we treated each other on a day-to-day basis.
+
+216
+00:17:35.580 --> 00:17:38.680
+<v Zach Goldberg>We had phenomenal employee retention at that company.
+
+217
+00:17:38.780 --> 00:17:43.580
+<v Zach Goldberg>The number of employees that years later are still friends and still look back
+
+218
+00:17:43.580 --> 00:17:46.600
+<v Zach Goldberg>at working at GrowFlow as one of the best times in their career,
+
+219
+00:17:46.600 --> 00:17:53.940
+<v Zach Goldberg>It just brings me tremendous satisfaction and tremendous joy to have been part of creating a workplace that people just loved working at.
+
+220
+00:17:54.140 --> 00:17:57.340
+<v Zach Goldberg>And I want every company I work at to feel like that going forwards.
+
+221
+00:17:57.680 --> 00:18:05.420
+<v Zach Goldberg>I want everybody to have that opportunity to work at a company where you go home every day, you talk to your spouse over dinner, and you're not complaining about your coworkers.
+
+222
+00:18:05.600 --> 00:18:07.600
+<v Zach Goldberg>You're not complaining about the politics.
+
+223
+00:18:07.880 --> 00:18:12.900
+<v Zach Goldberg>You're instead saying, wow, I can't believe so-and-so was so – they went out of their way to help me be successful.
+
+224
+00:18:12.900 --> 00:18:30.720
+<v Zach Goldberg>And I love my boss because they enable me to do my best work and they're so supportive and they communicate really well. I think that is that's the future of work. Everybody deserves to have that kind of workplace environment. I'm really passionate about being the kind of leader and helping other leaders be the kind of leader that can create that workplace environment.
+
+225
+00:18:32.060 --> 00:18:38.700
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it throughout your tenure.
+
+226
+00:18:38.700 --> 00:18:39.480
+<v Noah Labhart>year.
+
+227
+00:18:40.200 --> 00:18:46.400
+<v Zach Goldberg>Can I give you 10 mistakes? We've been talking about GrowFlow. GrowFlow, like many
+
+228
+00:18:46.400 --> 00:18:52.100
+<v Zach Goldberg>companies, had tech debt. We had a particular code base that was running an older version of .NET,
+
+229
+00:18:52.220 --> 00:18:56.920
+<v Zach Goldberg>and anybody who's familiar with that ecosystem knows that going from, for example, .NET 4
+
+230
+00:18:56.920 --> 00:19:02.260
+<v Zach Goldberg>to a .NET 5 or .NET Core ecosystem, it's a meaningful transition. That's not something
+
+231
+00:19:02.260 --> 00:19:05.840
+<v Zach Goldberg>you do in a day. There's a lot of code that needs to change, APIs that have changed.
+
+232
+00:19:05.840 --> 00:19:08.220
+<v Zach Goldberg>And so we had an older .NET codebase.
+
+233
+00:19:08.380 --> 00:19:12.820
+<v Zach Goldberg>The developers were not happy being in the legacy environment.
+
+234
+00:19:13.260 --> 00:19:21.560
+<v Zach Goldberg>And so we wanted a solution and an architecture that would enable everybody to feel like they could use more modern tools and to have a better developer experience.
+
+235
+00:19:21.760 --> 00:19:28.140
+<v Zach Goldberg>And that aligns with my belief that really focusing on developer experience is a key part of delivering high-performance teams.
+
+236
+00:19:28.720 --> 00:19:33.720
+<v Zach Goldberg>We came up with a strangler pattern approach to deprecate this older codebase.
+
+237
+00:19:33.720 --> 00:19:40.820
+<v Zach Goldberg>But the mistake we made was we didn't focus enough on making the new services independently deployable.
+
+238
+00:19:41.200 --> 00:19:45.200
+<v Zach Goldberg>And so we made the mistake of accidentally creating a distributed monolith.
+
+239
+00:19:45.820 --> 00:19:50.780
+<v Zach Goldberg>It took us a little while, a few months, to be like, wait, this isn't delivering the benefits we thought it would.
+
+240
+00:19:51.320 --> 00:19:54.640
+<v Zach Goldberg>And we sat down and we looked at what were our challenges.
+
+241
+00:19:54.800 --> 00:20:01.240
+<v Zach Goldberg>In particular, there was one service in particular we were creating and investing in that was tightly coupled to the original monolith.
+
+242
+00:20:01.240 --> 00:20:04.360
+<v Zach Goldberg>in ways that we didn't want it to be in retrospect.
+
+243
+00:20:04.660 --> 00:20:06.160
+<v Zach Goldberg>And so we sort of backpedaled.
+
+244
+00:20:06.240 --> 00:20:07.620
+<v Zach Goldberg>We owned the mistake.
+
+245
+00:20:07.840 --> 00:20:09.500
+<v Zach Goldberg>We said, hey, we've created coupling here
+
+246
+00:20:09.500 --> 00:20:10.420
+<v Zach Goldberg>that we didn't want to.
+
+247
+00:20:10.620 --> 00:20:12.560
+<v Zach Goldberg>And we simply stopped investing in that service.
+
+248
+00:20:12.660 --> 00:20:16.160
+<v Zach Goldberg>We decided that it was better to face the pain
+
+249
+00:20:16.160 --> 00:20:18.560
+<v Zach Goldberg>of making those upgrades in the monolith itself
+
+250
+00:20:19.060 --> 00:20:20.980
+<v Zach Goldberg>than to be creating the distributed monolith.
+
+251
+00:20:21.260 --> 00:20:23.620
+<v Zach Goldberg>The distributed monolith is the worst of both worlds
+
+252
+00:20:23.620 --> 00:20:25.780
+<v Zach Goldberg>where you have multiple services,
+
+253
+00:20:25.920 --> 00:20:27.740
+<v Zach Goldberg>but they're not independently deployable.
+
+254
+00:20:27.920 --> 00:20:30.300
+<v Zach Goldberg>There's tight coupling of contracts between them.
+
+255
+00:20:31.240 --> 00:20:33.980
+<v Zach Goldberg>Now you have to deploy it all at once, but it's multiple services.
+
+256
+00:20:34.180 --> 00:20:39.020
+<v Zach Goldberg>And so you don't get the benefits of the independent deployability and having more limited scope working on each service.
+
+257
+00:20:39.500 --> 00:20:41.020
+<v Zach Goldberg>And so that was painful.
+
+258
+00:20:41.320 --> 00:20:43.180
+<v Zach Goldberg>It was a mistake we made.
+
+259
+00:20:43.240 --> 00:20:46.400
+<v Zach Goldberg>We didn't think through the architecture of that service thoroughly enough.
+
+260
+00:20:46.520 --> 00:20:47.760
+<v Zach Goldberg>And yeah, it cost us some time.
+
+261
+00:20:48.440 --> 00:20:51.900
+<v Zach Goldberg>I think in the long arc of time, it works out.
+
+262
+00:20:52.260 --> 00:20:54.780
+<v Zach Goldberg>It did cost time and velocity.
+
+263
+00:20:55.280 --> 00:20:57.560
+<v Zach Goldberg>But we recovered and things move on.
+
+264
+00:20:57.560 --> 00:20:58.340
+<v Zach Goldberg>on.
+
+265
+00:20:59.040 --> 00:21:03.700
+<v Noah Labhart>Zach, what's the future look like for Gruntwork, for the product and for your team?
+
+266
+00:21:05.440 --> 00:21:08.940
+<v Zach Goldberg>Myself and Josh and the entire leadership team at Gruntwork, we really do believe
+
+267
+00:21:08.940 --> 00:21:15.680
+<v Zach Goldberg>in being a human focused company, where we value prioritizing our customers. We want our employees
+
+268
+00:21:15.680 --> 00:21:19.860
+<v Zach Goldberg>and customers to both feel like they love the company and that the company provides a lot of
+
+269
+00:21:19.860 --> 00:21:25.240
+<v Zach Goldberg>value. We're working on building that organization internally. We're rolling out this DevOps
+
+270
+00:21:25.240 --> 00:21:27.580
+<v Zach Goldberg>DevOps Foundation product more broadly.
+
+271
+00:21:27.720 --> 00:21:29.760
+<v Zach Goldberg>Depending on the date this podcast is released,
+
+272
+00:21:29.900 --> 00:21:31.380
+<v Zach Goldberg>there will be a new Gruntwork website
+
+273
+00:21:31.380 --> 00:21:33.280
+<v Zach Goldberg>that talks all about DevOps Foundations
+
+274
+00:21:33.280 --> 00:21:34.880
+<v Zach Goldberg>and the different ways it can be used
+
+275
+00:21:34.880 --> 00:21:36.740
+<v Zach Goldberg>and what kinds of companies would be a good fit.
+
+276
+00:21:37.520 --> 00:21:40.980
+<v Zach Goldberg>That really rolls into this idea of innovating
+
+277
+00:21:40.980 --> 00:21:44.480
+<v Zach Goldberg>on how companies protect their data
+
+278
+00:21:44.480 --> 00:21:46.820
+<v Zach Goldberg>and how companies ultimately protect their user data
+
+279
+00:21:46.820 --> 00:21:49.220
+<v Zach Goldberg>via these consistent security postures,
+
+280
+00:21:49.720 --> 00:21:50.860
+<v Zach Goldberg>consistent compliance posture.
+
+281
+00:21:51.200 --> 00:21:52.500
+<v Zach Goldberg>And we want to be innovators.
+
+282
+00:21:52.560 --> 00:21:54.400
+<v Zach Goldberg>We want to make it easy for developers
+
+283
+00:21:55.240 --> 00:22:01.120
+<v Zach Goldberg>do the right thing and to be creating resources and infrastructure that they feel confident in.
+
+284
+00:22:01.220 --> 00:22:05.660
+<v Zach Goldberg>And that's easy for them to work with, most importantly. It shouldn't take a PhD in
+
+285
+00:22:05.660 --> 00:22:10.300
+<v Zach Goldberg>infrastructure to learn how to effectively deploy a cloud network with some compute inside.
+
+286
+00:22:10.560 --> 00:22:14.720
+<v Zach Goldberg>That should be something that is fairly standardized, your organization has an opinion on,
+
+287
+00:22:14.840 --> 00:22:19.080
+<v Zach Goldberg>that is secure and compliant. And I don't think we're there today. I don't think anybody,
+
+288
+00:22:19.340 --> 00:22:24.040
+<v Zach Goldberg>Gruntwork or any other company, has really solved the problem and made that bulletproof.
+
+289
+00:22:25.520 --> 00:22:30.820
+<v Zach Goldberg>to what we've got coming out there and to the future where I think Gruntwork and other companies
+
+290
+00:22:30.820 --> 00:22:36.040
+<v Zach Goldberg>in the space that are pushing for this kind of stuff can create open standards, open tools that
+
+291
+00:22:36.040 --> 00:22:41.200
+<v Zach Goldberg>any company can use to create a fantastic developer experience that gives organizations
+
+292
+00:22:41.200 --> 00:22:43.720
+<v Zach Goldberg>confidence in their security and compliance postures.
+
+293
+00:22:44.760 --> 00:22:46.380
+<v Noah Labhart>Let's switch to you, Zach. Who
+
+294
+00:22:46.380 --> 00:22:50.920
+<v Noah Labhart>influences the way that you work? Name a person or many persons or something you look up to and why.
+
+295
+00:22:51.960 --> 00:23:14.340
+<v Zach Goldberg>So Sam Corcos is the CEO of Levels Health. And Sam, he's got lots of writing and he's done many podcasts. If you haven't heard of him, a quick Google search will give you some of that content. Just an incredibly disciplined individual. I really admire in particular his focus on asynchronous culture. I've learned a lot about remote management and asynchronous teams from Sam.
+
+296
+00:23:14.340 --> 00:23:17.980
+<v Zach Goldberg>His implementation is very disciplined, very uncompromising.
+
+297
+00:23:18.040 --> 00:23:26.700
+<v Zach Goldberg>Even from that sort of uncompromising position or that disciplined position, there's a lot to learn that can be applied in other situations that are less disciplined.
+
+298
+00:23:27.380 --> 00:23:34.520
+<v Zach Goldberg>And I think that really focus on giving everybody the opportunity to be thoughtful about hard problems.
+
+299
+00:23:34.520 --> 00:23:38.640
+<v Zach Goldberg>problems. It's very challenging, of course, in a group conversation with seven people,
+
+300
+00:23:38.700 --> 00:23:45.000
+<v Zach Goldberg>for everybody to really deeply engage their brains on the problem and to communicate and
+
+301
+00:23:45.000 --> 00:23:50.800
+<v Zach Goldberg>help move the conversation forward. Amazon, of course, has the six-page memo. They don't do
+
+302
+00:23:50.800 --> 00:23:54.240
+<v Zach Goldberg>PowerPoint. They do everything as a written narrative. You give everybody the opportunity
+
+303
+00:23:54.240 --> 00:23:58.580
+<v Zach Goldberg>to read the narrative in advance. So this is all in service of what I call working together
+
+304
+00:23:58.580 --> 00:24:04.180
+<v Zach Goldberg>separately. The ability for everybody to perhaps be in the same room or be working on the same
+
+305
+00:24:04.520 --> 00:24:07.260
+<v Zach Goldberg>but to engage their minds independently.
+
+306
+00:24:07.740 --> 00:24:09.560
+<v Zach Goldberg>I've taken a lot of inspiration from Sam
+
+307
+00:24:09.560 --> 00:24:10.860
+<v Zach Goldberg>on how I run meetings,
+
+308
+00:24:11.000 --> 00:24:12.920
+<v Zach Goldberg>on the expectations I set for teams,
+
+309
+00:24:13.720 --> 00:24:15.480
+<v Zach Goldberg>for writing in particular,
+
+310
+00:24:15.680 --> 00:24:17.980
+<v Zach Goldberg>for writing specs, writing user stories,
+
+311
+00:24:18.160 --> 00:24:20.780
+<v Zach Goldberg>just documenting thought processes
+
+312
+00:24:20.780 --> 00:24:23.120
+<v Zach Goldberg>on problems the organization's facing.
+
+313
+00:24:23.340 --> 00:24:25.000
+<v Zach Goldberg>And I think holding a really high bar
+
+314
+00:24:25.000 --> 00:24:28.200
+<v Zach Goldberg>to encourage everybody to think these things through
+
+315
+00:24:28.200 --> 00:24:29.340
+<v Zach Goldberg>and really write them out
+
+316
+00:24:29.340 --> 00:24:32.380
+<v Zach Goldberg>and do that deep thinking is very powerful
+
+317
+00:24:32.380 --> 00:24:34.060
+<v Zach Goldberg>and saves a lot of time, honestly.
+
+318
+00:24:34.520 --> 00:24:45.240
+<v Zach Goldberg>If somebody has a problem and your response is, well, all right, really write down that problem, the circumstances around that problem, what solutions have you considered, really advances and accelerates the conversation.
+
+319
+00:24:45.500 --> 00:24:52.280
+<v Zach Goldberg>It gets everybody up to speed on the context way faster and enables you to have deeper, more productive conversations and have more well thought out solutions.
+
+320
+00:24:52.920 --> 00:24:56.280
+<v Zach Goldberg>And I really do credit Sam a lot for helping my thinking there.
+
+321
+00:24:56.400 --> 00:24:57.540
+<v Zach Goldberg>I've read a lot of his stuff.
+
+322
+00:24:57.740 --> 00:25:01.940
+<v Zach Goldberg>And I'm really fortunate that him and others like him continue to blog about this kind of thing.
+
+323
+00:25:01.940 --> 00:25:07.960
+<v Zach Goldberg>and I think slowly move the culture at large in this sort of productive direction.
+
+324
+00:25:09.480 --> 00:25:10.420
+<v Noah Labhart>Last question, Zach.
+
+325
+00:25:10.600 --> 00:25:14.900
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+326
+00:25:15.140 --> 00:25:16.260
+<v Noah Labhart>They're jazzed about it.
+
+327
+00:25:16.280 --> 00:25:17.360
+<v Noah Labhart>They can't wait to show it off to the world.
+
+328
+00:25:17.440 --> 00:25:19.200
+<v Noah Labhart>Can't wait to show it off to you right there on a plane.
+
+329
+00:25:19.560 --> 00:25:24.660
+<v Noah Labhart>What advice do you give that person having gone down this road a bit and also having written a book around all this?
+
+330
+00:25:25.600 --> 00:25:26.100
+<v Zach Goldberg>Wow.
+
+331
+00:25:26.040 --> 00:25:27.520
+<v Zach Goldberg>I love talking to these kinds of folks.
+
+332
+00:25:27.520 --> 00:25:32.600
+<v Zach Goldberg>folks. As an entrepreneur, unless your name is Elon Musk, which apparently he can do things that
+
+333
+00:25:32.600 --> 00:25:36.780
+<v Zach Goldberg>nobody else can do, you really can only focus on one company at a time. You can only change the
+
+334
+00:25:36.780 --> 00:25:41.100
+<v Zach Goldberg>world with your efforts. You've only got so many hours in the day. And so to work with other
+
+335
+00:25:41.100 --> 00:25:46.540
+<v Zach Goldberg>entrepreneurs and help other entrepreneurs and hear their stories is very uplifting around the
+
+336
+00:25:46.540 --> 00:25:51.020
+<v Zach Goldberg>pace of innovation on the planet. And to be able to help other innovations along the way is really
+
+337
+00:25:51.020 --> 00:25:56.400
+<v Zach Goldberg>a privilege and something I really enjoy. So I love talking to that person. I think, first and
+
+338
+00:25:57.520 --> 00:26:01.880
+<v Zach Goldberg>is the reward. 80, 90, whatever statistic you want to quote, percentage of startups fail,
+
+339
+00:26:02.000 --> 00:26:06.200
+<v Zach Goldberg>right? Whether that's because the idea wasn't good, or the execution wasn't good, or the timing
+
+340
+00:26:06.200 --> 00:26:10.400
+<v Zach Goldberg>was wrong. There's all sorts of, there's a lot of headwinds facing every startup. So the most
+
+341
+00:26:10.400 --> 00:26:15.120
+<v Zach Goldberg>important thing is enjoy the journey along the way, give it your best, and treasure in the
+
+342
+00:26:15.120 --> 00:26:21.420
+<v Zach Goldberg>privilege that we all have to be able to try and change the world in these ways. And then second is
+
+343
+00:26:21.420 --> 00:26:25.800
+<v Zach Goldberg>at the end of the day, culture eats strategy for breakfast. I'm not sure who I'm quoting there,
+
+344
+00:26:27.520 --> 00:26:32.360
+<v Zach Goldberg>statement. And it's just so true. Your job as the entrepreneur is not to solve every problem. It's
+
+345
+00:26:32.360 --> 00:26:37.020
+<v Zach Goldberg>to build the organization that can solve the problems. There's so many books on this subject.
+
+346
+00:26:37.140 --> 00:26:40.980
+<v Zach Goldberg>The most recent one I've been reading is multipliers versus diminishers is a great
+
+347
+00:26:40.980 --> 00:26:45.800
+<v Zach Goldberg>example. Your job is to be a multiplier. You want to multiply the skills of everybody on your team
+
+348
+00:26:45.800 --> 00:26:52.800
+<v Zach Goldberg>and have them sum up, or I guess multiply together to create a capability as an organization that
+
+349
+00:26:52.800 --> 00:26:55.120
+<v Zach Goldberg>That far exceeds what you as the entrepreneur can do.
+
+350
+00:26:55.260 --> 00:26:57.800
+<v Zach Goldberg>An entrepreneur that micromanages and can't delegate,
+
+351
+00:26:58.020 --> 00:27:01.300
+<v Zach Goldberg>the organization is never going to be able to do more than just what that one person can do.
+
+352
+00:27:01.660 --> 00:27:05.460
+<v Zach Goldberg>And so building a healthy culture where people are collaborative, they're supportive,
+
+353
+00:27:05.580 --> 00:27:07.960
+<v Zach Goldberg>you're solving problems, thinking through things deeply,
+
+354
+00:27:08.120 --> 00:27:12.760
+<v Zach Goldberg>you're being thoughtful, customer focused, that is ultimately how execution works.
+
+355
+00:27:13.160 --> 00:27:15.060
+<v Zach Goldberg>That's what it is to be a strong operator.
+
+356
+00:27:15.960 --> 00:27:19.280
+<v Zach Goldberg>And somebody comes to you with a billion dollar idea, that's amazing.
+
+357
+00:27:19.480 --> 00:27:20.720
+<v Zach Goldberg>There's a lot of billion dollar ideas.
+
+358
+00:27:20.720 --> 00:27:26.340
+<v Zach Goldberg>is the gap between the billion dollar idea and the billion dollar valuation is a really tall
+
+359
+00:27:26.340 --> 00:27:32.240
+<v Zach Goldberg>mountain of execution. And so focusing your skills as an entrepreneur, like skill number one is okay,
+
+360
+00:27:32.280 --> 00:27:36.980
+<v Zach Goldberg>have the idea and have the being in the position to be able to execute that idea and to take the
+
+361
+00:27:36.980 --> 00:27:41.300
+<v Zach Goldberg>time to start the company and hopefully have the resources to start hiring people. You're then
+
+362
+00:27:41.300 --> 00:27:48.260
+<v Zach Goldberg>going to spend on average 5, 10, 15 years building a company. And building a company is a totally
+
+363
+00:27:48.260 --> 00:27:52.580
+<v Zach Goldberg>totally different set of muscles and it's different set of skills than what got you to your idea.
+
+364
+00:27:53.000 --> 00:27:56.920
+<v Zach Goldberg>Right. And so recognizing and having the humility that building companies is really hard.
+
+365
+00:27:57.080 --> 00:28:00.980
+<v Zach Goldberg>There's a lot of skills to learn, a lot of mistakes you're going to make. Fortunately,
+
+366
+00:28:01.080 --> 00:28:05.060
+<v Zach Goldberg>you'll be able to recover from most of them and try and short circuit and not make as many
+
+367
+00:28:05.060 --> 00:28:09.640
+<v Zach Goldberg>mistakes as you can and enjoy that process and get really good at it. And if you're lucky,
+
+368
+00:28:09.740 --> 00:28:10.360
+<v Zach Goldberg>change
+
+369
+00:28:10.360 --> 00:28:13.960
+<v Noah Labhart>the world. Couldn't agree more. It's fantastic advice. Well, Zach, thank you for
+
+370
+00:28:13.960 --> 00:28:15.060
+<v Noah Labhart>for being on the show today.
+
+371
+00:28:15.260 --> 00:28:17.840
+<v Noah Labhart>Thank you for telling the creation story of Gruntwork
+
+372
+00:28:17.840 --> 00:28:19.600
+<v Noah Labhart>and referring us to your book.
+
+373
+00:28:19.860 --> 00:28:20.960
+<v Zach Goldberg>Thank you so much, Noah.
+
+374
+00:28:21.060 --> 00:28:22.220
+<v Zach Goldberg>It's been an absolute pleasure.
+
+375
+00:28:24.140 --> 00:28:26.780
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+376
+00:28:30.380 --> 00:28:33.400
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+377
+00:28:33.520 --> 00:28:36.180
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+378
+00:28:36.360 --> 00:28:38.320
+<v Noah Labhart>or the podcasting app of your choice.
+
+379
+00:28:38.940 --> 00:28:41.120
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+380
+00:28:41.460 --> 00:28:43.320
+<v Noah Labhart>Both things help us out tremendously.
+
+381
+00:28:46.280 --> 00:28:47.740
+<v Noah Labhart>and thanks again for listening

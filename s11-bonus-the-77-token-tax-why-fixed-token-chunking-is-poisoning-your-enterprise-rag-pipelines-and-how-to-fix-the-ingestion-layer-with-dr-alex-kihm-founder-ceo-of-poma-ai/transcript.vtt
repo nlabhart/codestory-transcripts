@@ -1,0 +1,1447 @@
+WEBVTT
+
+NOTE S11 Bonus: The 77% Token Tax: Why Fixed-Token Chunking is Poisoning Your Enterprise RAG Pipelines and How to Fix the Ingestion Layer with Dr. Alex Kihm, Founder & CEO of POMA AI
+
+1
+00:00:00.000 --> 00:00:09.520
+<v Dr. Alex Kihm>We built this testing pipeline and there was external services involved and I think it was even a typo or something on the level of a typo in the code.
+
+2
+00:00:09.660 --> 00:00:18.760
+<v Dr. Alex Kihm>And we still ran the pipeline with the whole data set. We had this 200,000 legal tax parsed back then. So instead of sampling, we just put everything to it.
+
+3
+00:00:18.860 --> 00:00:25.980
+<v Dr. Alex Kihm>We had spent a lot of money for running this pipeline with everything. I don't even remember why we were so stupid.
+
+4
+00:00:25.980 --> 00:00:33.700
+<v Dr. Alex Kihm>Bit, but it was a good test of, okay, also do I go nuts? Do I go nuts? Because for me it was the, okay,
+
+5
+00:00:33.700 --> 00:00:38.940
+<v Dr. Alex Kihm>Should I blame people now? Should I have known better? My name is Alex Kihm. I'm the founder and
+
+6
+00:00:38.940 --> 00:00:51.080
+<v Clip>CEO of POMA AI. This is Code Story, a podcast bringing you interviews with tech visionaries
+
+7
+00:00:51.080 --> 00:00:52.580
+<v Clip>It's been six months moonlighting.
+
+8
+00:00:52.620 --> 00:00:54.120
+<v Clip>There's nothing on the back end.
+
+9
+00:00:54.360 --> 00:00:56.960
+<v Noah Labhart>Who share what it takes to change an industry.
+
+10
+00:00:57.160 --> 00:00:58.740
+<v Clip>I don't exactly know what to do next.
+
+11
+00:00:58.740 --> 00:01:00.140
+<v Clip>It took many goes to get right.
+
+12
+00:01:00.740 --> 00:01:03.360
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:01:03.400 --> 00:01:05.000
+<v Clip>A company is its people.
+
+14
+00:01:05.000 --> 00:01:06.380
+<v Clip>The teams help each other achieve more.
+
+15
+00:01:06.380 --> 00:01:07.480
+<v Clip>Most proud of our team.
+
+16
+00:01:07.780 --> 00:01:10.060
+<v Noah Labhart>Keeping scalability top of mind.
+
+17
+00:01:10.380 --> 00:01:11.800
+<v Clip>All that infrastructure was at the gate.
+
+18
+00:01:11.800 --> 00:01:13.200
+<v Clip>Yes, we've been fighting it as we've grown.
+
+19
+00:01:13.380 --> 00:01:14.200
+<v Clip>Total waste of time.
+
+20
+00:01:14.420 --> 00:01:16.700
+<v Noah Labhart>The stories you don't read in the headlines.
+
+21
+00:01:17.200 --> 00:01:18.920
+<v Clip>It's not an easy thing to achieve, mind you.
+
+22
+00:01:18.920 --> 00:01:21.020
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+23
+00:01:21.300 --> 00:01:24.740
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+24
+00:01:24.900 --> 00:01:26.460
+<v Clip>You need to really want it.
+
+25
+00:01:26.500 --> 00:01:27.840
+<v Clip>It's not just about technology.
+
+26
+00:01:27.960 --> 00:01:29.860
+<v Noah Labhart>All this and more on Code Story.
+
+27
+00:01:31.240 --> 00:01:32.820
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+28
+00:01:33.000 --> 00:01:38.080
+<v Noah Labhart>And today, how Alex Kihm is solving the chunking problem you didn't know you had
+
+29
+00:01:38.080 --> 00:01:42.480
+<v Noah Labhart>to solve AI hallucinations and overconsumption of resources.
+
+30
+00:01:42.480 --> 00:01:42.980
+<v Noah Labhart>sources.
+
+31
+00:01:48.100 --> 00:01:52.140
+<v Noah Labhart>Alex Kihm just turned 40 and has been into computers for 36 years.
+
+32
+00:01:52.520 --> 00:01:56.560
+<v Noah Labhart>He was given his first hand-me-down computer at the age of 4 by his parents and also grew
+
+33
+00:01:56.560 --> 00:01:58.180
+<v Noah Labhart>up with Lego bricks and building things.
+
+34
+00:01:58.560 --> 00:02:03.300
+<v Noah Labhart>He's an engineer by training but eventually switched to econometrics on the big data side.
+
+35
+00:02:03.660 --> 00:02:08.040
+<v Noah Labhart>But outside of his professional life, he's married and describes himself as water affectionate.
+
+36
+00:02:08.160 --> 00:02:10.520
+<v Noah Labhart>He enjoys swimming, diving, and freediving.
+
+37
+00:02:12.480 --> 00:02:16.900
+<v Noah Labhart>semester abroad. His freediving is mainly a hobby but he has deep respect for the
+
+38
+00:02:16.900 --> 00:02:22.980
+<v Noah Labhart>professional freedivers of the world. At his original startup Alex started to
+
+39
+00:02:22.980 --> 00:02:28.960
+<v Noah Labhart>dive into LLMs and immediately ran into RAG which stands for Retrieval Augmented
+
+40
+00:02:28.960 --> 00:02:33.080
+<v Noah Labhart>Generation. When he observed the wrong information being returned along with a
+
+41
+00:02:33.080 --> 00:02:37.380
+<v Noah Labhart>ton of resource consumption in the process i.e. cost, he set out to solve
+
+42
+00:02:37.380 --> 00:02:40.940
+<v Noah Labhart>that problem and figured out the solution was in the chunks.
+
+43
+00:02:42.800 --> 00:02:45.640
+<v Noah Labhart>This is the creation story of POMA AI.
+
+44
+00:02:49.400 --> 00:02:53.700
+<v Dr. Alex Kihm>When I wrote my PhD, which is more than 10 years ago, to be fair, I actually finished
+
+45
+00:02:53.700 --> 00:02:56.280
+<v Dr. Alex Kihm>it 12 years ago, I dabbled a bit with neural networks.
+
+46
+00:02:56.560 --> 00:03:00.320
+<v Dr. Alex Kihm>Obviously, you might remember these times that we had a lot of pattern matching, OCR
+
+47
+00:03:00.320 --> 00:03:04.200
+<v Dr. Alex Kihm>worked well, and you could do stuff with neural networks and machine learning.
+
+48
+00:03:04.200 --> 00:03:11.640
+<v Dr. Alex Kihm>But what wouldn't really work is like large scale, I would say actual intelligence, more like pattern matching and not actual intelligence.
+
+49
+00:03:11.980 --> 00:03:20.680
+<v Dr. Alex Kihm>Funny enough, we dropped this avenue and I did the forecasting model very traditionally, 85 predictors, classic hypotheses, but very huge, 6 billion observations.
+
+50
+00:03:20.820 --> 00:03:23.640
+<v Dr. Alex Kihm>And it outperformed the machine learning approaches there.
+
+51
+00:03:23.760 --> 00:03:27.660
+<v Dr. Alex Kihm>So that was for me like the start of a big break with this discipline.
+
+52
+00:03:27.820 --> 00:03:33.220
+<v Dr. Alex Kihm>And later, when LLMs became a thing where you realize there is some sort of intelligence coming up,
+
+53
+00:03:34.200 --> 00:03:39.240
+<v Dr. Alex Kihm>curious, okay, what we could we do with it. And back then, which is, let's say, three years ago, two and a
+
+54
+00:03:39.240 --> 00:03:43.980
+<v Dr. Alex Kihm>half, something like this, like just before ChatGPT. Like you remember the times, like GPT-2 impressive,
+
+55
+00:03:43.980 --> 00:03:48.840
+<v Dr. Alex Kihm>GPT-3 coming up, and then some people were like, there might be something to it. And I dabbled
+
+56
+00:03:48.840 --> 00:03:54.680
+<v Dr. Alex Kihm>with it because I have another startup. I found it already 22 years ago, I think. It was the first
+
+57
+00:03:54.680 --> 00:03:59.340
+<v Dr. Alex Kihm>German legal tech. It's still running. It's still a very nice platform. We have 10,000 law firms
+
+58
+00:03:59.340 --> 00:04:02.940
+<v Dr. Alex Kihm>When ChatGPT came up, can we do something for them?
+
+59
+00:04:03.020 --> 00:04:06.660
+<v Dr. Alex Kihm>Like in a domain specific chatbot, we said.
+
+60
+00:04:06.900 --> 00:04:10.400
+<v Dr. Alex Kihm>So we said, okay, obviously professionals try to use ChatGPT
+
+61
+00:04:10.400 --> 00:04:13.420
+<v Dr. Alex Kihm>on autopilot mode and it just comes up with citing cases
+
+62
+00:04:13.420 --> 00:04:14.900
+<v Dr. Alex Kihm>that were never there and so on.
+
+63
+00:04:15.000 --> 00:04:17.540
+<v Dr. Alex Kihm>So we said for the lawyers, we need something
+
+64
+00:04:17.540 --> 00:04:20.700
+<v Dr. Alex Kihm>that is a bit more accurate and more domain specific
+
+65
+00:04:20.700 --> 00:04:21.800
+<v Dr. Alex Kihm>and fed with real information.
+
+66
+00:04:22.180 --> 00:04:25.060
+<v Dr. Alex Kihm>We quickly ran into RAG, retrieval augmented generation,
+
+67
+00:04:25.320 --> 00:04:27.440
+<v Dr. Alex Kihm>where you realize that you cannot make the model
+
+68
+00:04:29.340 --> 00:04:34.760
+<v Dr. Alex Kihm>and more. You cannot fine-tune it to knowledge. That's what some people misunderstood. We always
+
+69
+00:04:34.760 --> 00:04:39.580
+<v Dr. Alex Kihm>say training is for intelligence, fine-tuning is for style, and then the knowledge has to come from
+
+70
+00:04:39.580 --> 00:04:43.880
+<v Dr. Alex Kihm>RAG. And we actually made it quite far. And then we had the demo night, like the private demo,
+
+71
+00:04:43.980 --> 00:04:48.000
+<v Dr. Alex Kihm>just with some friends and interested parties. And then in the end, one question would cost $1
+
+72
+00:04:48.000 --> 00:04:52.520
+<v Dr. Alex Kihm>because you had to put so much into the context to really have the whole truth. And then also
+
+73
+00:04:52.520 --> 00:04:57.460
+<v Dr. Alex Kihm>with the full context, it became convoluted and garbled. And we realized it's actually about the
+
+74
+00:04:59.340 --> 00:05:01.000
+<v Dr. Alex Kihm>like in a very coarse way.
+
+75
+00:05:01.180 --> 00:05:05.020
+<v Dr. Alex Kihm>And it's impressive how few people actually thought so much about chunking.
+
+76
+00:05:05.120 --> 00:05:07.640
+<v Dr. Alex Kihm>Everyone just says, okay, there's the text and I just chunk it.
+
+77
+00:05:07.660 --> 00:05:08.540
+<v Dr. Alex Kihm>I chop it up basically.
+
+78
+00:05:08.780 --> 00:05:11.980
+<v Dr. Alex Kihm>At some point you go through the text from the beginning to the end.
+
+79
+00:05:12.020 --> 00:05:13.700
+<v Dr. Alex Kihm>And at some point you need to set cutoffs,
+
+80
+00:05:13.820 --> 00:05:17.660
+<v Dr. Alex Kihm>which means the text in itself, it loses its spatiality.
+
+81
+00:05:17.860 --> 00:05:21.100
+<v Dr. Alex Kihm>The only way to find it again, and this is what classic chunking does,
+
+82
+00:05:21.240 --> 00:05:24.580
+<v Dr. Alex Kihm>is having huge overlaps, including all the neighbors and so on.
+
+83
+00:05:25.080 --> 00:05:29.160
+<v Dr. Alex Kihm>So we said, let's not dive into this domain-specific GPT building anymore
+
+84
+00:05:29.160 --> 00:05:33.640
+<v Dr. Alex Kihm>because we really found something where we can put some serious effort
+
+85
+00:05:33.640 --> 00:05:35.800
+<v Dr. Alex Kihm>into a more deep tech kind of approach.
+
+86
+00:05:36.000 --> 00:05:39.780
+<v Dr. Alex Kihm>Like less agency and less selling systems to customers,
+
+87
+00:05:39.840 --> 00:05:40.860
+<v Dr. Alex Kihm>but really let's go tech.
+
+88
+00:05:41.020 --> 00:05:42.000
+<v Dr. Alex Kihm>We always dreamt of it.
+
+89
+00:05:42.600 --> 00:05:44.700
+<v Dr. Alex Kihm>Then there was really this moment.
+
+90
+00:05:44.860 --> 00:05:47.780
+<v Dr. Alex Kihm>I don't remember it exactly, but it was literally something like
+
+91
+00:05:47.780 --> 00:05:51.140
+<v Dr. Alex Kihm>I was stumbling in the bathtub and whacking my head on the wall.
+
+92
+00:05:51.140 --> 00:05:54.520
+<v Dr. Alex Kihm>And I told my wife, who's also a coder, hey, I got it.
+
+93
+00:05:54.580 --> 00:05:55.080
+<v Dr. Alex Kihm>I got it.
+
+94
+00:05:54.940 --> 00:05:56.220
+<v Dr. Alex Kihm>I know what we need to try.
+
+95
+00:05:56.440 --> 00:06:11.000
+<v Dr. Alex Kihm>And what we tried, which is let's put the text into an LLM and let the LLM tell us the text again, like literally verbatim and make speech breaks so we can detect the text structure.
+
+96
+00:06:11.360 --> 00:06:13.720
+<v Dr. Alex Kihm>There are more elaborate approaches to chunking, obviously.
+
+97
+00:06:13.960 --> 00:06:17.860
+<v Dr. Alex Kihm>So there are people who say, for example, for each page, give me a summary.
+
+98
+00:06:18.000 --> 00:06:20.020
+<v Dr. Alex Kihm>And then they embed the summary as well.
+
+99
+00:06:21.140 --> 00:06:27.640
+<v Dr. Alex Kihm>say you have this moving window embedding and so on. But all the LLM-based stuff, there's people who
+
+100
+00:06:27.640 --> 00:06:32.320
+<v Dr. Alex Kihm>do chunkings based on LLMs, but what they do is they always ask the LLM for, let's say, meta
+
+101
+00:06:32.320 --> 00:06:38.080
+<v Dr. Alex Kihm>information, summarize what this chapter is about. This always creates a potential bias. So you
+
+102
+00:06:38.080 --> 00:06:43.460
+<v Dr. Alex Kihm>imagine we want to have a system that avoids hallucinations, and we introduce potential
+
+103
+00:06:44.040 --> 00:06:49.900
+<v Dr. Alex Kihm>hallucinations in the process. So we said, keep the text verbatim but indent it like code. And POMA
+
+104
+00:06:51.140 --> 00:06:57.240
+<v Dr. Alex Kihm>text verbatim, but it would be structured like code. And it sounds so stupid, but it works because
+
+105
+00:06:57.240 --> 00:07:03.120
+<v Dr. Alex Kihm>LLMs think while they are speaking. We leverage this fact that the next token is predicted by
+
+106
+00:07:03.120 --> 00:07:07.880
+<v Dr. Alex Kihm>not only the token before, but all the tokens before and so on. And this means when the LLM
+
+107
+00:07:07.880 --> 00:07:13.940
+<v Dr. Alex Kihm>is repeating the text for us and it's down there deep in the tree of this text, it still knows
+
+108
+00:07:13.940 --> 00:07:19.160
+<v Dr. Alex Kihm>what the other headings were and what comes next and so on. It's just working so brilliantly.
+
+109
+00:07:21.140 --> 00:07:27.140
+<v Dr. Alex Kihm>Once we have this kind of tree, we bring back the implicit spatiality from the text.
+
+110
+00:07:27.300 --> 00:07:30.880
+<v Dr. Alex Kihm>And that means we can structure the information in a totally different way.
+
+111
+00:07:31.060 --> 00:07:36.620
+<v Dr. Alex Kihm>And this is why what our customers embed are not chunks anymore, but are what we call chunk sets.
+
+112
+00:07:36.880 --> 00:07:39.320
+<v Dr. Alex Kihm>So let's say every sentence is a chunk.
+
+113
+00:07:39.440 --> 00:07:47.280
+<v Dr. Alex Kihm>And then what we give you is through this tree, we traverse it in every potential root to leaf path.
+
+114
+00:07:47.600 --> 00:07:49.480
+<v Dr. Alex Kihm>And this is like a chunk set.
+
+115
+00:07:51.140 --> 00:07:55.560
+<v Dr. Alex Kihm>can be quite deep, can have more than 10 levels, but that still would mean like a chunk set is
+
+116
+00:07:55.560 --> 00:08:00.580
+<v Dr. Alex Kihm>like 10 sentences just crawling up or like we crawl up actually to calculate it. But obviously
+
+117
+00:08:00.580 --> 00:08:05.060
+<v Dr. Alex Kihm>when you read it, it crawls out. You start at the title of the document, then comes the heading,
+
+118
+00:08:05.160 --> 00:08:10.920
+<v Dr. Alex Kihm>subheading, subheading, and then the sentence. This is an information that is so perfectly clear.
+
+119
+00:08:11.020 --> 00:08:16.000
+<v Dr. Alex Kihm>You know what it's talking about in which subdomain and what the actual topic is, and then comes the
+
+120
+00:08:16.000 --> 00:08:22.140
+<v Dr. Alex Kihm>sentence. So it's worth quite a lot more in terms of information content than having half a sentence
+
+121
+00:08:22.140 --> 00:08:26.380
+<v Dr. Alex Kihm>that you don't know what it's talking about. And that makes for very great embeddings. And then
+
+122
+00:08:26.380 --> 00:08:31.100
+<v Dr. Alex Kihm>you get like the exact perfect retrieval. When people embed these, they are normally we go
+
+123
+00:08:31.100 --> 00:08:36.420
+<v Dr. Alex Kihm>around 500 tokens, but we never broaden it. You retrieve several of them. And then we have the
+
+124
+00:08:36.420 --> 00:08:41.900
+<v Dr. Alex Kihm>second part of our magic. Since it's all traversal paths with the document and they're perfectly
+
+125
+00:08:41.900 --> 00:08:48.140
+<v Dr. Alex Kihm>codified, we can then fuse them. So in the end, what you get when you have the RAG powered by POMA,
+
+126
+00:08:48.140 --> 00:08:53.080
+<v Dr. Alex Kihm>what you get back is, at retrieval, is one we call it a cheat sheet. Just imagine you have someone
+
+127
+00:08:53.080 --> 00:08:57.980
+<v Dr. Alex Kihm>that says, here's a book and I have this question, and what you get back as a cheat sheet is basically
+
+128
+00:08:57.980 --> 00:09:04.200
+<v Dr. Alex Kihm>having each line that is relevant perfectly text marked, and then, you know, cut together, and you only
+
+129
+00:09:04.200 --> 00:09:08.340
+<v Dr. Alex Kihm>get the text marked lines. That's basically the product, the
+
+130
+00:09:08.340 --> 00:09:09.620
+<v Noah Labhart>First one I want to dive into the
+
+131
+00:09:09.620 --> 00:09:12.240
+<v Noah Labhart>the MVP for how you approach it, right?
+
+132
+00:09:12.300 --> 00:09:13.440
+<v Noah Labhart>And you touched on it a little bit
+
+133
+00:09:13.440 --> 00:09:14.820
+<v Noah Labhart>kind of in the early part of the conversation,
+
+134
+00:09:15.020 --> 00:09:17.260
+<v Noah Labhart>but there's a progression, obviously,
+
+135
+00:09:17.440 --> 00:09:20.420
+<v Noah Labhart>in how you've built the product to date.
+
+136
+00:09:20.560 --> 00:09:22.200
+<v Noah Labhart>But I'm curious about the first version,
+
+137
+00:09:22.280 --> 00:09:24.600
+<v Noah Labhart>how long it took you to build to get to that aha point.
+
+138
+00:09:24.840 --> 00:09:26.920
+<v Noah Labhart>And then, you know, what sort of tools
+
+139
+00:09:26.920 --> 00:09:27.960
+<v Noah Labhart>you're using to bring it to life?
+
+140
+00:09:29.220 --> 00:09:32.100
+<v Dr. Alex Kihm>We obviously had so many paths at that end,
+
+141
+00:09:32.140 --> 00:09:33.080
+<v Dr. Alex Kihm>and that's part of the game.
+
+142
+00:09:33.300 --> 00:09:35.960
+<v Dr. Alex Kihm>So we used, I think, every document processing tool
+
+143
+00:09:35.960 --> 00:09:36.460
+<v Dr. Alex Kihm>there is.
+
+144
+00:09:36.380 --> 00:09:40.000
+<v Dr. Alex Kihm>Sometimes I found even some obscure new PDF converter.
+
+145
+00:09:40.260 --> 00:09:41.560
+<v Dr. Alex Kihm>And then there's several startups.
+
+146
+00:09:41.700 --> 00:09:47.560
+<v Dr. Alex Kihm>And then there's like services like unstructured, where you can always try to first ingest your data.
+
+147
+00:09:47.700 --> 00:09:48.880
+<v Dr. Alex Kihm>And we tried this a lot.
+
+148
+00:09:48.980 --> 00:09:50.340
+<v Dr. Alex Kihm>Then I tried every chunking method.
+
+149
+00:09:50.600 --> 00:09:54.280
+<v Dr. Alex Kihm>And so we had like our own little micro ecosystem.
+
+150
+00:09:54.420 --> 00:09:57.260
+<v Dr. Alex Kihm>We early on programmed, let's say, the hub ourselves.
+
+151
+00:09:57.620 --> 00:09:59.500
+<v Dr. Alex Kihm>So we have obviously Python based.
+
+152
+00:09:59.640 --> 00:10:00.440
+<v Dr. Alex Kihm>We had several microservices.
+
+153
+00:10:01.080 --> 00:10:02.440
+<v Dr. Alex Kihm>In the beginning, it was escalated.
+
+154
+00:10:02.440 --> 00:10:06.760
+<v Dr. Alex Kihm>escalated so before hadn't but worked with monolith and you say let's go microservice and
+
+155
+00:10:06.760 --> 00:10:11.660
+<v Dr. Alex Kihm>then you bitch like 20 services for a simple problem so then you reconsolidate that is this
+
+156
+00:10:11.660 --> 00:10:16.980
+<v Dr. Alex Kihm>is what we did and but for chunking to be honest like the once we had our approach let's do chunk
+
+157
+00:10:16.980 --> 00:10:22.440
+<v Dr. Alex Kihm>sets instead of chunks and let's go with the indentation and so on not much changed ever since
+
+158
+00:10:22.440 --> 00:10:27.740
+<v Dr. Alex Kihm>because it's really it's an llm call and then obviously retrieve that then you walk through
+
+159
+00:10:27.740 --> 00:10:32.800
+<v Dr. Alex Kihm>this tree. This is not many lines of Python. You could optimize it a bit. That's true. And you
+
+160
+00:10:32.800 --> 00:10:37.480
+<v Dr. Alex Kihm>build a lot around it. But that's quite straightforward. What we did is a lot of
+
+161
+00:10:37.480 --> 00:10:44.060
+<v Dr. Alex Kihm>fine tuning stuff. We had our own internal tools where, for example, this is like a constant pattern
+
+162
+00:10:44.060 --> 00:10:49.600
+<v Dr. Alex Kihm>in the company that I have like this idea, like Alex hit the wall again and had another shower.
+
+163
+00:10:49.740 --> 00:10:54.280
+<v Dr. Alex Kihm>And then I say, I try to describe with my hands, I need this tool where I can do this and that.
+
+164
+00:10:54.280 --> 00:10:59.000
+<v Dr. Alex Kihm>And then for good reasons, my beloved colleagues look at me with serious, yeah, what?
+
+165
+00:10:59.140 --> 00:11:05.600
+<v Dr. Alex Kihm>And then I hack together a little prototype that just half visually, half in code describes what I mean.
+
+166
+00:11:05.760 --> 00:11:06.940
+<v Dr. Alex Kihm>And then we build it together.
+
+167
+00:11:07.140 --> 00:11:13.540
+<v Dr. Alex Kihm>For example, I have this tool where we have a text, we let it indent, and then I can manually correct it.
+
+168
+00:11:13.600 --> 00:11:15.860
+<v Dr. Alex Kihm>And then send it straight to fine tuning, stuff like this.
+
+169
+00:11:15.940 --> 00:11:21.620
+<v Dr. Alex Kihm>Because using tools for this kind of stuff doesn't really make sense because the approach doesn't exist per se.
+
+170
+00:11:21.620 --> 00:11:26.480
+<v Dr. Alex Kihm>say, as the old, the classic labeling, data labeling software, or stuff that Scale AI does, which I deeply
+
+171
+00:11:26.480 --> 00:11:32.360
+<v Dr. Alex Kihm>respect, we couldn't use because we have this novel approach of let's indent text. And so we have a lot
+
+172
+00:11:32.360 --> 00:11:38.180
+<v Dr. Alex Kihm>of custom codes for our stuff, and this obviously evolves in quite a maddening way now. I like it, but
+
+173
+00:11:38.180 --> 00:11:42.820
+<v Dr. Alex Kihm>The good thing is, I have colleagues that work with me for a long time and they know, like, my approach
+
+174
+00:11:42.820 --> 00:11:49.020
+<v Dr. Alex Kihm>but also theirs. We agreed on, we never have this author's ego in our code. The quality should be
+
+175
+00:11:49.020 --> 00:11:54.020
+<v Dr. Alex Kihm>high, but that still means we might put it in the freezer and then it might be de-iced at one point.
+
+176
+00:11:54.480 --> 00:12:00.220
+<v Dr. Alex Kihm>We pivoted many times from one model to another, from one LLM to another. Let's try with Anthropic.
+
+177
+00:12:00.220 --> 00:12:04.280
+<v Dr. Alex Kihm>Oh, it works so well. It doesn't work with the new text. Oh damn, let's scrap it, because it has to be
+
+178
+00:12:04.280 --> 00:12:09.520
+<v Dr. Alex Kihm>robust and so on. So we went through so many different approaches, not like super pivot. We
+
+179
+00:12:09.520 --> 00:12:14.040
+<v Dr. Alex Kihm>still chunk texts because this is what we do and we know that this is very necessary and impactful
+
+180
+00:12:14.040 --> 00:12:18.480
+<v Dr. Alex Kihm>But how we do it in detail and with which models that can change any minute.
+
+181
+00:12:18.620 --> 00:12:21.720
+<v Dr. Alex Kihm>And people are ready for that because this is how we get better.
+
+182
+00:12:23.080 --> 00:12:24.780
+<v Noah Labhart>You went through all the pivots, right?
+
+183
+00:12:24.880 --> 00:12:27.880
+<v Noah Labhart>And you went through the fine tuning, the tweaking and things of that nature.
+
+184
+00:12:28.000 --> 00:12:33.740
+<v Noah Labhart>I'm curious about, you know, to kind of wrap that in a box a little bit, how you, you know, quote unquote, built your roadmap.
+
+185
+00:12:33.900 --> 00:12:40.440
+<v Noah Labhart>How did you decide what the next most important thing was to build or to tweak or optimize or address with POMA?
+
+186
+00:12:41.000 --> 00:12:45.640
+<v Dr. Alex Kihm>When we decided that we really want to crack this chunking with our novel approach,
+
+187
+00:12:45.880 --> 00:12:52.540
+<v Dr. Alex Kihm>what we actually did is first built like really non-shippable code that proves to ourselves that it works.
+
+188
+00:12:52.940 --> 00:12:55.240
+<v Dr. Alex Kihm>We wanted and did a hand in a patent.
+
+189
+00:12:55.420 --> 00:12:56.820
+<v Dr. Alex Kihm>So we submitted a patent.
+
+190
+00:12:56.900 --> 00:12:59.700
+<v Dr. Alex Kihm>We got a German one already and then we got like a utility patent.
+
+191
+00:12:59.800 --> 00:13:04.060
+<v Dr. Alex Kihm>And then we submitted also to the USPTO where we are now in the second round.
+
+192
+00:13:04.200 --> 00:13:09.700
+<v Dr. Alex Kihm>And we needed to make sure that the approach works really well because only then it makes sense to patent it.
+
+193
+00:13:10.440 --> 00:13:15.440
+<v Dr. Alex Kihm>it was more like a research lab kind of approach and then we decided to do a company with it.
+
+194
+00:13:15.840 --> 00:13:21.260
+<v Dr. Alex Kihm>The big question was like okay what are we selling? There's some so often it happens I'm very
+
+195
+00:13:21.260 --> 00:13:26.280
+<v Dr. Alex Kihm>lucky that for me it's the third company now and I learned a lot in the former companies and the
+
+196
+00:13:26.280 --> 00:13:31.460
+<v Dr. Alex Kihm>main thing was if you offer too broad a product or too much at once even though you think from
+
+197
+00:13:31.460 --> 00:13:37.360
+<v Dr. Alex Kihm>your ego yeah I can do this and that yes maybe but then you do nothing really well and also no one
+
+198
+00:13:37.360 --> 00:13:43.280
+<v Dr. Alex Kihm>knows what you're selling and this was for us maybe the most important thing we just now just
+
+199
+00:13:43.280 --> 00:13:48.900
+<v Dr. Alex Kihm>before launching i mean we're still pre pre-revenue we have a lot of design partners and the system
+
+200
+00:13:48.900 --> 00:13:54.680
+<v Dr. Alex Kihm>works but we are still taking it very carefully and white gloves and we just even reduce the
+
+201
+00:13:54.680 --> 00:14:00.740
+<v Dr. Alex Kihm>product even further for example before we would say you give us a pdf and then we do the chunks
+
+202
+00:14:00.740 --> 00:14:06.520
+<v Dr. Alex Kihm>for you but luckily because of many of the talks and calls with the design partners and startups
+
+203
+00:14:07.360 --> 00:14:10.900
+<v Dr. Alex Kihm>that are now onboarding, they said, guys, but I already have a text.
+
+204
+00:14:11.160 --> 00:14:12.840
+<v Dr. Alex Kihm>And then we said, why rock the boat?
+
+205
+00:14:13.020 --> 00:14:17.260
+<v Dr. Alex Kihm>Why enter a part of the market that is not really important for us?
+
+206
+00:14:17.320 --> 00:14:19.940
+<v Dr. Alex Kihm>If we are the chunking guys, let's really focus on chunking.
+
+207
+00:14:19.980 --> 00:14:23.720
+<v Dr. Alex Kihm>So it was more like reducing the product further and further and further.
+
+208
+00:14:24.220 --> 00:14:29.540
+<v Dr. Alex Kihm>That's maybe the most important design vector I've realized this time more than ever before.
+
+209
+00:14:30.960 --> 00:14:32.260
+<v Noah Labhart>Let's switch to team.
+
+210
+00:14:32.400 --> 00:14:34.420
+<v Noah Labhart>I'm curious about how you built your team.
+
+211
+00:14:34.420 --> 00:14:41.480
+<v Noah Labhart>Probably in the early days, you had some team members that you started out with, but you had to add folks, I'm sure.
+
+212
+00:14:41.560 --> 00:14:45.720
+<v Noah Labhart>Tell me about what you look for in those people and indicate that they're the winning horses to join you.
+
+213
+00:14:46.400 --> 00:14:50.020
+<v Dr. Alex Kihm>There's certainly several people who would say I'm the king of nepotism.
+
+214
+00:14:50.080 --> 00:14:57.260
+<v Dr. Alex Kihm>It always seems like I employ my friends, but I would counter that I also have friends who don't work for me, don't worry.
+
+215
+00:14:58.000 --> 00:15:03.460
+<v Dr. Alex Kihm>I like to surround myself by people that inspire me and that I can also respect in every sense.
+
+216
+00:15:04.420 --> 00:15:10.240
+<v Dr. Alex Kihm>fans or people that are just looking up to me or working to me, but I want people working with me,
+
+217
+00:15:10.240 --> 00:15:17.060
+<v Dr. Alex Kihm>and I have these, a lot of these people are with me for 10 years and more. So the decision was really
+
+218
+00:15:17.060 --> 00:15:22.380
+<v Dr. Alex Kihm>easy. It was more like, okay, my old friend there, he's still in my former company, do I make him
+
+219
+00:15:22.380 --> 00:15:27.400
+<v Dr. Alex Kihm>the offer of switching to the new one? I mean, our stockholder is actually my wife. She only works for
+
+220
+00:15:27.400 --> 00:15:33.920
+<v Dr. Alex Kihm>me now, like for this project, so like for two years now, but obviously before we've been mentors to
+
+221
+00:15:34.640 --> 00:15:37.540
+<v Dr. Alex Kihm>and we knew very well what our skills are.
+
+222
+00:15:37.880 --> 00:15:39.920
+<v Dr. Alex Kihm>And I have this with, I think,
+
+223
+00:15:39.980 --> 00:15:41.380
+<v Dr. Alex Kihm>six out of eight people in the team.
+
+224
+00:15:41.880 --> 00:15:44.080
+<v Dr. Alex Kihm>I like it when I know what to expect.
+
+225
+00:15:44.160 --> 00:15:46.100
+<v Dr. Alex Kihm>There's obviously always new people
+
+226
+00:15:46.100 --> 00:15:48.260
+<v Dr. Alex Kihm>and we just employed two new ones
+
+227
+00:15:48.260 --> 00:15:49.500
+<v Dr. Alex Kihm>that I also, you know,
+
+228
+00:15:49.540 --> 00:15:51.660
+<v Dr. Alex Kihm>I have high expectations in terms of,
+
+229
+00:15:51.680 --> 00:15:53.020
+<v Dr. Alex Kihm>I think it will be really good.
+
+230
+00:15:53.360 --> 00:15:55.100
+<v Dr. Alex Kihm>Also because we're not so junior.
+
+231
+00:15:55.220 --> 00:15:56.300
+<v Dr. Alex Kihm>I'm 40 years old
+
+232
+00:15:56.300 --> 00:15:57.920
+<v Dr. Alex Kihm>and I think the average age in the company
+
+233
+00:15:57.920 --> 00:15:59.120
+<v Dr. Alex Kihm>is just a bit less.
+
+234
+00:15:59.400 --> 00:16:00.340
+<v Dr. Alex Kihm>So for a startup,
+
+235
+00:16:00.400 --> 00:16:02.840
+<v Dr. Alex Kihm>we are quite mature in terms of people.
+
+236
+00:16:04.420 --> 00:16:09.540
+<v Dr. Alex Kihm>At this point you have a certain network, like for example the old, my old co-founder from my former
+
+237
+00:16:09.540 --> 00:16:15.520
+<v Dr. Alex Kihm>company where he was the CEO and I was the CTO. I just onboarded him as my head of strategy, finance,
+
+238
+00:16:15.520 --> 00:16:20.160
+<v Dr. Alex Kihm>and legal. So now we flip the deck and now he works for me. Now we have the super tech focused
+
+239
+00:16:20.160 --> 00:16:25.200
+<v Dr. Alex Kihm>company, the one before was a fintech. I have the super tech focused company and I need someone
+
+240
+00:16:25.200 --> 00:16:31.160
+<v Dr. Alex Kihm>that I can trust that covers the business side. Boom, he just signed and I love this. It's always
+
+241
+00:16:31.160 --> 00:16:34.740
+<v Dr. Alex Kihm>is very quick. I love this. Calling someone, hey, I have a new gig for you. Yeah, I love it. Let's
+
+242
+00:16:34.740 --> 00:16:37.340
+<v Dr. Alex Kihm>do it. Literally, most of the calls were like this.
+
+243
+00:16:40.780 --> 00:16:43.040
+<v Noah Labhart>So as you step out on the balcony, look
+
+244
+00:16:43.040 --> 00:16:46.720
+<v Noah Labhart>look across all that you've built thus far with POMA. What are you most proud of? There's a lot to be
+
+245
+00:16:46.720 --> 00:16:49.960
+<v Noah Labhart>proud of here, a lot of things that you're cracking, but I'm curious what you're going to say.
+
+246
+00:16:52.080 --> 00:16:57.200
+<v Dr. Alex Kihm>It's the first time that I do something so deep tech that it qualifies for a patent,
+
+247
+00:16:57.200 --> 00:17:03.760
+<v Dr. Alex Kihm>and that actually most people wouldn't say I like it that they don't understand it at first.
+
+248
+00:17:03.820 --> 00:17:08.320
+<v Dr. Alex Kihm>That sounds a bit arrogant, but I like it that apparently the depth of the value is so deep
+
+249
+00:17:08.320 --> 00:17:09.720
+<v Dr. Alex Kihm>that there must be something to it.
+
+250
+00:17:09.780 --> 00:17:11.460
+<v Dr. Alex Kihm>It's not like selling some stuff online.
+
+251
+00:17:11.560 --> 00:17:12.060
+<v Dr. Alex Kihm>Don't get me wrong.
+
+252
+00:17:12.160 --> 00:17:15.040
+<v Dr. Alex Kihm>We all need our e-commerce, but I understand this in a minute.
+
+253
+00:17:15.180 --> 00:17:21.240
+<v Dr. Alex Kihm>And if something so profoundly impactful, I mean, it saves between 50 and 80 percent of energy
+
+254
+00:17:21.240 --> 00:17:24.220
+<v Dr. Alex Kihm>for the same question at more accuracy.
+
+255
+00:17:24.220 --> 00:17:32.860
+<v Dr. Alex Kihm>And I like it that we don't do it by just cutting something short, but by something that is so elaborate that it qualifies for a patent.
+
+256
+00:17:32.980 --> 00:17:34.620
+<v Dr. Alex Kihm>I am honestly proud of that.
+
+257
+00:17:36.740 --> 00:17:41.980
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+258
+00:17:43.300 --> 00:17:47.360
+<v Dr. Alex Kihm>We built this testing pipeline and there was external services involved.
+
+259
+00:17:47.840 --> 00:17:53.900
+<v Dr. Alex Kihm>And what we did is we had, I think it was even a typo or something on the level of a typo in the code.
+
+260
+00:17:54.220 --> 00:18:00.400
+<v Dr. Alex Kihm>And we still ran the pipeline with the whole data set of, we had this 200,000 legal text parsed back then.
+
+261
+00:18:00.500 --> 00:18:02.600
+<v Dr. Alex Kihm>We ran the whole pipeline with this typo.
+
+262
+00:18:02.700 --> 00:18:05.620
+<v Dr. Alex Kihm>So instead of sampling, we just put everything to it.
+
+263
+00:18:05.960 --> 00:18:10.980
+<v Dr. Alex Kihm>We had spent a lot of money for running this pipeline with everything.
+
+264
+00:18:11.140 --> 00:18:13.200
+<v Dr. Alex Kihm>I don't even remember why we were so stupid.
+
+265
+00:18:13.780 --> 00:18:18.020
+<v Dr. Alex Kihm>But it was a good test of, okay, also do I go nuts?
+
+266
+00:18:18.120 --> 00:18:19.120
+<v Dr. Alex Kihm>Do I go nuts?
+
+267
+00:18:19.360 --> 00:18:23.480
+<v Dr. Alex Kihm>Because for me it was, okay, should I blame people now?
+
+268
+00:18:24.220 --> 00:18:29.180
+<v Dr. Alex Kihm>better, and everyone was like trembling, now we really screwed it, and will Alex kill himself or
+
+269
+00:18:29.180 --> 00:18:34.320
+<v Dr. Alex Kihm>us or what would happen. And he said, you know what, guys, this time the order of magnitude is a bit high,
+
+270
+00:18:34.320 --> 00:18:40.060
+<v Dr. Alex Kihm>but you know what, I've learned one thing: if someone blows anything up, never ever fire the guy.
+
+271
+00:18:40.060 --> 00:18:45.160
+<v Dr. Alex Kihm>Keep him, because he will never do it again. And the same holds for me, and the same holds when I
+
+272
+00:18:45.160 --> 00:18:51.240
+<v Dr. Alex Kihm>can deal with this mistake now, they will trust me that I'm not short-fused and said, okay, you know
+
+273
+00:18:51.240 --> 00:18:55.960
+<v Dr. Alex Kihm>know what, wipe the slate, get some new money, and let's do this again with a 1% sample, please.
+
+274
+00:18:56.480 --> 00:18:59.880
+<v Dr. Alex Kihm>And then we do this at 100%. So we all learned.
+
+275
+00:19:03.080 --> 00:19:08.600
+<v Noah Labhart>Let's move forward then. This is really exciting. I'm super jazzed as an engineer and as someone
+
+276
+00:19:08.600 --> 00:19:12.500
+<v Noah Labhart>who understands rag and chunking about what you've built and what you've accomplished.
+
+277
+00:19:12.700 --> 00:19:17.580
+<v Noah Labhart>What does the future look like for POMA, for what you're building and for your team?
+
+278
+00:19:17.580 --> 00:19:23.840
+<v Dr. Alex Kihm>So what we're building is currently our demonstrator, because obviously the algorithm
+
+279
+00:19:23.840 --> 00:19:28.340
+<v Dr. Alex Kihm>itself works and we're starting to onboard companies who want us to include in their
+
+280
+00:19:28.340 --> 00:19:34.660
+<v Dr. Alex Kihm>pipeline because it's quite easy. But what I, what we need for new people to get interested is some
+
+281
+00:19:34.660 --> 00:19:38.960
+<v Dr. Alex Kihm>sort of visualization, and it's really the biggest challenge I've ever had. We are by design an
+
+282
+00:19:38.960 --> 00:19:44.420
+<v Dr. Alex Kihm>invisible product. If I explain chunking to my mom, you can always do these hacking motions
+
+283
+00:19:44.420 --> 00:19:46.240
+<v Dr. Alex Kihm>like in the kitchen or something.
+
+284
+00:19:46.480 --> 00:19:49.620
+<v Dr. Alex Kihm>But otherwise, it's quite hard to visualize chunking
+
+285
+00:19:49.620 --> 00:19:52.000
+<v Dr. Alex Kihm>and especially to visualize our stuff.
+
+286
+00:19:52.120 --> 00:19:53.020
+<v Dr. Alex Kihm>We at least have the tree.
+
+287
+00:19:53.160 --> 00:19:54.000
+<v Dr. Alex Kihm>That's a nice thing.
+
+288
+00:19:54.220 --> 00:19:57.520
+<v Dr. Alex Kihm>But visualizing what we're doing to also explain
+
+289
+00:19:57.520 --> 00:19:59.740
+<v Dr. Alex Kihm>vis-a-vis what others are doing
+
+290
+00:19:59.740 --> 00:20:02.000
+<v Dr. Alex Kihm>or what the conventional approaches are, more to say.
+
+291
+00:20:02.120 --> 00:20:04.840
+<v Dr. Alex Kihm>It's not really people or companies who chunk.
+
+292
+00:20:05.280 --> 00:20:08.280
+<v Dr. Alex Kihm>So this is something I'm personally leading this project
+
+293
+00:20:08.280 --> 00:20:10.800
+<v Dr. Alex Kihm>and it takes up most of my time for now.
+
+294
+00:20:10.920 --> 00:20:12.120
+<v Dr. Alex Kihm>And also with the team now,
+
+295
+00:20:12.120 --> 00:20:19.760
+<v Dr. Alex Kihm>Now, we will build this demonstrator that really makes it sexy to think about chunking and look at chunks and say, ah, this is beautiful.
+
+296
+00:20:20.120 --> 00:20:22.140
+<v Dr. Alex Kihm>And that is a high bar to get there.
+
+297
+00:20:22.280 --> 00:20:23.900
+<v Dr. Alex Kihm>So we are totally focused on that.
+
+298
+00:20:24.020 --> 00:20:32.800
+<v Dr. Alex Kihm>For a backend company, we now have an interim frontend focus even, which is challenging because iOS developers always have this, they still have a foot in frontend.
+
+299
+00:20:32.860 --> 00:20:35.860
+<v Dr. Alex Kihm>You can imagine our Python backend guys, they don't.
+
+300
+00:20:35.860 --> 00:20:38.080
+<v Dr. Alex Kihm>Now we need to overcome this.
+
+301
+00:20:38.320 --> 00:20:41.600
+<v Dr. Alex Kihm>And there again, I have this old colleague 10 years ago.
+
+302
+00:20:42.120 --> 00:20:43.500
+<v Dr. Alex Kihm>I call him and I need you for front-end.
+
+303
+00:20:43.560 --> 00:20:44.060
+<v Dr. Alex Kihm>Yeah, okay.
+
+304
+00:20:44.160 --> 00:20:45.420
+<v Dr. Alex Kihm>He just signed on last night.
+
+305
+00:20:46.060 --> 00:20:49.320
+<v Dr. Alex Kihm>So we do this front-end stuff to visualize what we are doing.
+
+306
+00:20:49.860 --> 00:20:51.980
+<v Dr. Alex Kihm>That's like the very big thing that's coming now.
+
+307
+00:20:52.240 --> 00:20:55.100
+<v Dr. Alex Kihm>And then we can reach out and also with the team,
+
+308
+00:20:55.180 --> 00:20:57.160
+<v Dr. Alex Kihm>imagine like account executives,
+
+309
+00:20:57.420 --> 00:20:59.700
+<v Dr. Alex Kihm>they find customers, they show them the demo.
+
+310
+00:20:59.960 --> 00:21:01.960
+<v Dr. Alex Kihm>And if that works, we get into this flywheel
+
+311
+00:21:01.960 --> 00:21:03.720
+<v Dr. Alex Kihm>of going out with the demo,
+
+312
+00:21:03.820 --> 00:21:05.880
+<v Dr. Alex Kihm>showing people with their text, by the way.
+
+313
+00:21:05.920 --> 00:21:08.140
+<v Dr. Alex Kihm>So they can paste like their sample document
+
+314
+00:21:08.140 --> 00:21:10.960
+<v Dr. Alex Kihm>and see what it would change for them.
+
+315
+00:21:12.120 --> 00:21:18.080
+<v Dr. Alex Kihm>tangible, like not abstractly, oh, get my software and your ROI gets up by X. That doesn't make much
+
+316
+00:21:18.080 --> 00:21:22.940
+<v Dr. Alex Kihm>sense in most of the cases. But if you say, give me your text, I show you, this is what comes out
+
+317
+00:21:22.940 --> 00:21:28.260
+<v Dr. Alex Kihm>now. This is what comes out with us. Everyone gets it. And this is tough to visualize. But I like the
+
+318
+00:21:28.260 --> 00:21:30.040
+<v Dr. Alex Kihm>challenge. And I think we are almost there.
+
+319
+00:21:31.200 --> 00:21:34.060
+<v Noah Labhart>Alex, let's switch to you. Who influences the way that
+
+320
+00:21:34.060 --> 00:21:37.860
+<v Noah Labhart>you work? Name a person or many persons or something you look up to and why.
+
+321
+00:21:39.040 --> 00:21:40.660
+<v Dr. Alex Kihm>There is my dad, to be honest.
+
+322
+00:21:40.840 --> 00:21:47.200
+<v Dr. Alex Kihm>In many ways, people would say there was maybe a bit old school or not super, or let's say not very modern approach.
+
+323
+00:21:47.840 --> 00:21:50.740
+<v Dr. Alex Kihm>And you could frame it negatively, but I frame it positively.
+
+324
+00:21:51.320 --> 00:21:53.280
+<v Dr. Alex Kihm>He always said, you just need to do everything yourself.
+
+325
+00:21:53.740 --> 00:21:59.140
+<v Dr. Alex Kihm>But what he meant is you need to understand everything that's going on end to end.
+
+326
+00:21:59.540 --> 00:22:04.520
+<v Dr. Alex Kihm>And some people say it's wrong, but I think in a young company, I like to understand everything.
+
+327
+00:22:04.740 --> 00:22:06.160
+<v Dr. Alex Kihm>That doesn't mean I do everything.
+
+328
+00:22:07.860 --> 00:22:14.900
+<v Dr. Alex Kihm>aware of what happens in finance or in legal parts of the product or in tech, obviously, but I need to
+
+329
+00:22:14.900 --> 00:22:19.220
+<v Dr. Alex Kihm>understand it end to end, and that always helped me. So I always measure a bit, like, do I have
+
+330
+00:22:19.220 --> 00:22:25.680
+<v Dr. Alex Kihm>things under control with the, at his approach. And then in terms of work style, I have to say
+
+331
+00:22:25.680 --> 00:22:31.560
+<v Dr. Alex Kihm>the early pre-erratic Elon Musk, I have to honestly admit it. I mean, by now it's a different story,
+
+332
+00:22:32.140 --> 00:22:37.560
+<v Dr. Alex Kihm>but in the beginning, this whole work yourself there and understand it a lot, crunch it, and
+
+333
+00:22:37.860 --> 00:22:43.360
+<v Dr. Alex Kihm>also in terms of team, have rather small teams of super concentrated superstars
+
+334
+00:22:43.360 --> 00:22:48.420
+<v Dr. Alex Kihm>that also like working with you, then that's certainly a source of inspiration.
+
+335
+00:22:48.680 --> 00:22:50.700
+<v Dr. Alex Kihm>And I sometimes measure if that happens.
+
+336
+00:22:50.780 --> 00:22:55.800
+<v Dr. Alex Kihm>And also I have to say there is this anti-person, not persons, but approaches.
+
+337
+00:22:55.820 --> 00:23:00.400
+<v Dr. Alex Kihm>Like when big corporates and then you have these situations where you realize,
+
+338
+00:23:00.560 --> 00:23:04.540
+<v Dr. Alex Kihm>okay, it's not a person that is anti-inspiring me, but a setup.
+
+339
+00:23:04.540 --> 00:23:08.560
+<v Dr. Alex Kihm>up. And yeah, this combination kind of gives me the compass.
+
+340
+00:23:10.180 --> 00:23:12.160
+<v Noah Labhart>Alex, last question. So you're getting
+
+341
+00:23:12.160 --> 00:23:15.940
+<v Noah Labhart>on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+342
+00:23:16.220 --> 00:23:19.540
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world. And can we show it off to you
+
+343
+00:23:19.540 --> 00:23:23.680
+<v Noah Labhart>right there on the plane? What advice do you give that person having gone down this road a bit in a
+
+344
+00:23:23.680 --> 00:23:24.240
+<v Noah Labhart>couple of different ways?
+
+345
+00:23:24.920 --> 00:23:28.980
+<v Dr. Alex Kihm>If they already built the greatest thing, I'm not sure they would listen.
+
+346
+00:23:28.980 --> 00:23:34.880
+<v Dr. Alex Kihm>I would tell them, never fly too close to the sun. If you burn yourself, you might crash into the next
+
+347
+00:23:34.880 --> 00:23:38.860
+<v Dr. Alex Kihm>rain, and after rain comes sunshine, and when the sun is back up again, don't throw away the umbrella.
+
+348
+00:23:38.860 --> 00:23:44.000
+<v Dr. Alex Kihm>Simple as that. But I think it's very abstract, but you get it. There will be ups and downs, and always
+
+349
+00:23:44.000 --> 00:23:48.220
+<v Dr. Alex Kihm>there will be ups and downs, and it's not this old, it's not about you fall, it's about how you stand
+
+350
+00:23:48.220 --> 00:23:53.960
+<v Dr. Alex Kihm>up. But it's more, don't throw away the umbrella once things are running. Expect the next rain, but
+
+351
+00:23:53.960 --> 00:23:58.420
+<v Dr. Alex Kihm>you can also know that afterwards it will be sunshine, but next time you have the umbrella. So
+
+352
+00:23:58.980 --> 00:23:59.620
+<v Dr. Alex Kihm>You're not a wet.
+
+353
+00:23:59.820 --> 00:24:00.820
+<v Noah Labhart>I love it.
+
+354
+00:24:00.820 --> 00:24:01.940
+<v Noah Labhart>I think that's fantastic advice.
+
+355
+00:24:02.100 --> 00:24:04.200
+<v Noah Labhart>Well, Alex, thank you for being on the show today.
+
+356
+00:24:04.360 --> 00:24:06.600
+<v Noah Labhart>Thank you for telling the creation story of POMA.
+
+357
+00:24:06.860 --> 00:24:07.460
+<v Dr. Alex Kihm>Thank you.
+
+358
+00:24:09.640 --> 00:24:12.300
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+359
+00:24:19.480 --> 00:24:22.520
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+360
+00:24:22.680 --> 00:24:27.420
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+361
+00:24:28.980 --> 00:24:36.880
+<v Noah Labhart>a chance, leave us a review. Both things help us out tremendously. And thanks again for listening.

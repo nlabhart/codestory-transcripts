@@ -1,0 +1,1031 @@
+WEBVTT
+
+NOTE S11 E2: The 4x Faster Indexer: Scaling Rust-Based Search to Millions of Documents Without Infrastructure Bloat with Clément "Kero" Renault, Co-Founder & CTO of Meilisearch
+
+1
+00:00:00.000 --> 00:00:07.380
+<v Clément Renault>I think that the best decision we took was to hire people to manage a product roadmap
+
+2
+00:00:07.380 --> 00:00:13.960
+<v Clément Renault>and to organize stuff depending on who's willing to be interested in these features, who's
+
+3
+00:00:13.960 --> 00:00:20.680
+<v Clément Renault>willing to use the cloud for that. So we prioritize features for customers who want to index millions
+
+4
+00:00:21.000 --> 00:00:26.820
+<v Clément Renault>of documents, who want like low latency search requests, who are willing to pay for that.
+
+5
+00:00:26.820 --> 00:00:31.220
+<v Clément Renault>We still make the engine available and accept pull requests, obviously.
+
+6
+00:00:31.460 --> 00:00:37.320
+<v Clément Renault>But we also make sure that the most important features are the ones that follow future decisions.
+
+7
+00:00:37.800 --> 00:00:43.020
+<v Clément Renault>My name is Clément Renault, aka Kero, and I'm from Meilisearch.
+
+8
+00:00:46.440 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:52.340 --> 00:00:53.680
+<v Clip>It's been six months moonlighting.
+
+10
+00:00:53.760 --> 00:00:55.240
+<v Clip>There's nothing on the back end.
+
+11
+00:00:57.900 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+12
+00:01:04.020 --> 00:01:06.120
+<v Clip>A company is its people.
+
+13
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+14
+00:01:07.500 --> 00:01:08.600
+<v Clip>Most proud of our team.
+
+15
+00:01:12.380 --> 00:01:14.340
+<v Clip>Yes, we've been fighting it as we've grown.
+
+16
+00:01:14.500 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+17
+00:01:18.320 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+18
+00:01:20.020 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+19
+00:01:25.360 --> 00:01:26.800
+<v Noah Labhart>You need to read.
+
+20
+00:01:26.820 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+21
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+22
+00:01:32.300 --> 00:01:33.840
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+23
+00:01:34.000 --> 00:01:43.020
+<v Noah Labhart>I'm your host, Noah Labhart. And today, how Clément "Kero" Renault built a refreshingly simple search that's lightning fast and enhanced with AI.
+
+24
+00:01:49.140 --> 00:01:53.360
+<v Noah Labhart>Clément "Kero" Renault wanted to be an architect when he was younger.
+
+25
+00:01:53.740 --> 00:01:57.120
+<v Noah Labhart>During that time, he also learned about computers and built his first website.
+
+26
+00:01:57.360 --> 00:01:59.640
+<v Noah Labhart>And since then, he's never stopped building.
+
+27
+00:02:00.240 --> 00:02:03.440
+<v Noah Labhart>Funny story, he lost that first website because it wasn't on Git.
+
+28
+00:02:03.940 --> 00:02:07.620
+<v Noah Labhart>Outside of his professional life, he likes to draw, craft, and to cook.
+
+29
+00:02:07.800 --> 00:02:14.040
+<v Noah Labhart>He also enjoys video games and mentioned Hidden Reign was his favorite game of all time, alongside the likes of Cyberpunk.
+
+30
+00:02:16.040 --> 00:02:22.560
+<v Noah Labhart>Seven years ago, Kero was in school, and he wanted to build a solid search experience, but not just a general search.
+
+31
+00:02:23.360 --> 00:02:27.840
+<v Noah Labhart>one that indexed your data and allowed you to have a Google just for your info.
+
+32
+00:02:28.440 --> 00:02:33.680
+<v Noah Labhart>After winning a school hackathon, Kero and his mates wanted to take it to the next level.
+
+33
+00:02:35.840 --> 00:02:38.600
+<v Noah Labhart>This is the creation story of Meilisearch.
+
+34
+00:02:42.380 --> 00:02:47.900
+<v Clément Renault>So Meilisearch is a search engine as a search engine not like Google, not a search engine
+
+35
+00:02:47.900 --> 00:02:51.640
+<v Clément Renault>that search in public data, but more like on the data you provide it.
+
+36
+00:02:53.360 --> 00:02:57.800
+<v Clément Renault>an e-commerce website, marketplace, or any SaaS application you want to build,
+
+37
+00:02:58.060 --> 00:03:03.800
+<v Clément Renault>just plug Meilisearch and it will be able to provide a search bar on your website
+
+38
+00:03:03.800 --> 00:03:07.420
+<v Clément Renault>and search into whatever you want and it will find.
+
+39
+00:03:07.620 --> 00:03:11.060
+<v Clément Renault>You have a couple of settings to make sure that you have a good experience,
+
+40
+00:03:11.260 --> 00:03:13.380
+<v Clément Renault>search experience, and that's it.
+
+41
+00:03:13.500 --> 00:03:14.060
+<v Clément Renault>It's done.
+
+42
+00:03:14.200 --> 00:03:15.980
+<v Clément Renault>It indexes your stuff in the background.
+
+43
+00:03:16.180 --> 00:03:17.460
+<v Clément Renault>You don't have to worry about that.
+
+44
+00:03:17.700 --> 00:03:20.120
+<v Clément Renault>So Meilisearch is seven years old now.
+
+45
+00:03:20.120 --> 00:03:26.020
+<v Clément Renault>It started in November 2018, and we were trying to create a good search engine for an e-commerce
+
+46
+00:03:26.020 --> 00:03:30.160
+<v Clément Renault>website we were working at with two other co-founders, Quentin and Thomas.
+
+47
+00:03:30.360 --> 00:03:36.040
+<v Clément Renault>We found out that Algolia back then was very good actually in terms of relevancy and experience,
+
+48
+00:03:36.360 --> 00:03:37.760
+<v Clément Renault>so we built the same.
+
+49
+00:03:38.080 --> 00:03:44.700
+<v Clément Renault>We just looked at the API and the way people can use the engine and crafted something from
+
+50
+00:03:44.700 --> 00:03:45.200
+<v Clément Renault>scratch.
+
+51
+00:03:44.940 --> 00:03:53.560
+<v Clément Renault>It took us like something like two to three months, not even that, maybe less, to build something like useful.
+
+52
+00:03:53.800 --> 00:04:03.600
+<v Clément Renault>And we won a hackathon organized by Louis Vuitton back then at school because we were working at school because we haven't got a lot of money back then.
+
+53
+00:04:03.720 --> 00:04:05.520
+<v Clément Renault>This hackathon like created Meilisearch.
+
+54
+00:04:05.680 --> 00:04:07.120
+<v Clément Renault>Like we won that.
+
+55
+00:04:07.440 --> 00:04:10.000
+<v Clément Renault>We had a lot of money, a bit of money.
+
+56
+00:04:10.160 --> 00:04:14.500
+<v Clément Renault>And we crafted Meilisearch from there, working for Louis Vuitton for some time.
+
+57
+00:04:14.940 --> 00:04:17.060
+<v Clément Renault>months and from there it began.
+
+58
+00:04:19.840 --> 00:04:23.020
+<v Noah Labhart>Let's dive into that MVP that you built and maybe it's the one
+
+59
+00:04:23.020 --> 00:04:28.220
+<v Noah Labhart>where you know you built it for the hackathon or maybe it's later you tell me that I'm curious
+
+60
+00:04:28.220 --> 00:04:33.440
+<v Noah Labhart>about that portion and that initial product and what sort of tools you're using to bring it to
+
+61
+00:04:33.440 --> 00:04:33.940
+<v Noah Labhart>life.
+
+62
+00:04:34.600 --> 00:04:40.400
+<v Clément Renault>So I was working on this project back then there was another team from the e-commerce website
+
+63
+00:04:40.400 --> 00:04:43.220
+<v Clément Renault>that we were working for that was working on the same projects.
+
+64
+00:04:43.480 --> 00:04:46.500
+<v Clément Renault>And at the end, my project was a bit better,
+
+65
+00:04:46.600 --> 00:04:49.660
+<v Clément Renault>and we decided to go with that with my two mates.
+
+66
+00:04:50.040 --> 00:04:53.640
+<v Clément Renault>It was all built in Rust because I'm a big Rust fan,
+
+67
+00:04:53.780 --> 00:04:54.960
+<v Clément Renault>contributor of the Rust language,
+
+68
+00:04:55.240 --> 00:04:57.100
+<v Clément Renault>specifically the standard library.
+
+69
+00:04:57.460 --> 00:04:59.400
+<v Clément Renault>It was based on RocksDB back then
+
+70
+00:04:59.400 --> 00:05:03.200
+<v Clément Renault>and something like, not Actix, but another HTTP server.
+
+71
+00:05:03.420 --> 00:05:06.940
+<v Clément Renault>There was not a lot of stuff needed to create a good server
+
+72
+00:05:06.940 --> 00:05:10.520
+<v Clément Renault>with a good backend to store documents and index stuff.
+
+73
+00:05:10.780 --> 00:05:13.080
+<v Clément Renault>So it was built on RocksDB,
+
+74
+00:05:13.420 --> 00:05:15.280
+<v Clément Renault>Roaring Bitmaps from Daniel Lemire,
+
+75
+00:05:15.380 --> 00:05:18.060
+<v Clément Renault>and an HTTP server in Rust, I don't remember the name.
+
+76
+00:05:18.200 --> 00:05:18.820
+<v Clément Renault>And that's it.
+
+77
+00:05:18.980 --> 00:05:20.940
+<v Clément Renault>Then a couple of algorithms
+
+78
+00:05:20.940 --> 00:05:22.840
+<v Clément Renault>and a couple of time to understand
+
+79
+00:05:22.840 --> 00:05:25.280
+<v Clément Renault>how the algorithms must be like tweaks,
+
+80
+00:05:25.400 --> 00:05:27.420
+<v Clément Renault>modified, improved for performances.
+
+81
+00:05:27.680 --> 00:05:30.800
+<v Clément Renault>And you have the good first version of Meilisearch.
+
+82
+00:05:31.640 --> 00:05:33.840
+<v Noah Labhart>Let's stay on the MVP for a minute.
+
+83
+00:05:33.920 --> 00:05:36.340
+<v Noah Labhart>And I'm curious about decisions and trade-offs
+
+84
+00:05:36.940 --> 00:05:41.000
+<v Noah Labhart>make when you were building that? Maybe there's probably some decisions in how you built it
+
+85
+00:05:41.000 --> 00:05:46.100
+<v Noah Labhart>originally, but I'm real curious about how you built it after you won the hackathon and what
+
+86
+00:05:46.100 --> 00:05:49.840
+<v Noah Labhart>sort of decisions you had to make in how you went about solving the problem. It could be
+
+87
+00:05:49.840 --> 00:05:54.700
+<v Noah Labhart>technical debt acceptance. It could be choice of language, which I hear you mentioning Rust.
+
+88
+00:05:54.960 --> 00:05:58.220
+<v Noah Labhart>And I'm curious about those and how you coped with the decisions.
+
+89
+00:05:59.100 --> 00:06:05.700
+<v Clément Renault>When we were working for Louis Vuitton, we were just like following what they wanted us to build.
+
+90
+00:06:06.940 --> 00:06:12.360
+<v Clément Renault>First, we signed contracts with Louis Vuitton to build this search engine in full of open source,
+
+91
+00:06:12.500 --> 00:06:14.040
+<v Clément Renault>which is very cool, actually.
+
+92
+00:06:14.240 --> 00:06:19.360
+<v Clément Renault>So all the features we were building for Louis Vuitton were also open source and available to anyone.
+
+93
+00:06:19.700 --> 00:06:24.920
+<v Clément Renault>So we built a lot of replication systems on top of Meilisearch.
+
+94
+00:06:25.040 --> 00:06:29.280
+<v Clément Renault>So systems that duplicate the content that is sent to Meilisearch and the search queries too,
+
+95
+00:06:29.360 --> 00:06:34.700
+<v Clément Renault>so that we were capable of having three Meilisearch running for the whole Louis Vuitton website.
+
+96
+00:06:34.700 --> 00:06:40.380
+<v Clément Renault>site. Everything built from scratch. It was probably not a good idea, but back then it wasn't
+
+97
+00:06:40.380 --> 00:06:46.440
+<v Clément Renault>even decision-like. We had to do something. We were crafting it from scratch and there were a
+
+98
+00:06:46.440 --> 00:06:51.760
+<v Clément Renault>lot of bugs, but at the end we figured out how to fix that and it was working quite great.
+
+99
+00:06:54.100 --> 00:07:00.760
+<v Noah Labhart>So let's move forward then. I'm curious about how you went about building your roadmap, right? So
+
+100
+00:07:00.760 --> 00:07:02.760
+<v Noah Labhart>So how did you progress and mature your product?
+
+101
+00:07:02.860 --> 00:07:07.020
+<v Noah Labhart>And I'm curious about what sort of criteria you went through to decide,
+
+102
+00:07:07.260 --> 00:07:11.220
+<v Noah Labhart>okay, this is the next most important thing to build or to address with Meilisearch.
+
+103
+00:07:11.920 --> 00:07:18.720
+<v Clément Renault>I think that the best decision we took was to hire people to manage a product roadmap
+
+104
+00:07:18.720 --> 00:07:24.720
+<v Clément Renault>and to organize stuff depending on who's willing to be interested in these features,
+
+105
+00:07:24.900 --> 00:07:26.940
+<v Clément Renault>who's willing to use the cloud for that.
+
+106
+00:07:26.940 --> 00:07:33.060
+<v Clément Renault>So we prioritized features for customers who want to index millions of documents,
+
+107
+00:07:33.340 --> 00:07:36.560
+<v Clément Renault>who want low latency search requests.
+
+108
+00:07:36.760 --> 00:07:38.160
+<v Clément Renault>We are willing to pay for that.
+
+109
+00:07:38.340 --> 00:07:42.560
+<v Clément Renault>We still make the engine available and accept pull requests, obviously.
+
+110
+00:07:42.820 --> 00:07:48.800
+<v Clément Renault>But we also make sure that the most important features are the ones that follow future decisions
+
+111
+00:07:48.800 --> 00:07:51.460
+<v Clément Renault>or future improvements to the search engine.
+
+112
+00:07:51.460 --> 00:07:58.140
+<v Clément Renault>We decided to go with vector storage and embedding storage and semantic search.
+
+113
+00:07:58.460 --> 00:08:08.000
+<v Clément Renault>And we designed hybrid search based on the fact that people want to be able to find documents even by asking questions or just sending semantic requests.
+
+114
+00:08:08.300 --> 00:08:10.260
+<v Clément Renault>The result is very astonishing.
+
+115
+00:08:10.620 --> 00:08:14.760
+<v Clément Renault>We have an hybrid search that is very good, actually, probably one of the best.
+
+116
+00:08:14.760 --> 00:08:18.320
+<v Clément Renault>and we are planning to work on the Ask feature,
+
+117
+00:08:18.540 --> 00:08:20.760
+<v Clément Renault>like a way to talk to Meilisearch
+
+118
+00:08:20.760 --> 00:08:24.000
+<v Clément Renault>so that you can ask questions, retrieve content,
+
+119
+00:08:24.280 --> 00:08:26.780
+<v Clément Renault>and understand what's in your database
+
+120
+00:08:26.780 --> 00:08:28.820
+<v Clément Renault>and when stuff were imported,
+
+121
+00:08:29.040 --> 00:08:31.220
+<v Clément Renault>when they will be deleted, and stuff like that.
+
+122
+00:08:32.300 --> 00:08:36.140
+<v Noah Labhart>Okay, so I hear you saying we a lot in your last answer.
+
+123
+00:08:36.240 --> 00:08:37.840
+<v Noah Labhart>I'm curious about how you built your team
+
+124
+00:08:37.840 --> 00:08:39.640
+<v Noah Labhart>and what you look for in those people
+
+125
+00:08:39.640 --> 00:08:42.100
+<v Noah Labhart>to indicate that they're the winning horses to join you.
+
+126
+00:08:42.100 --> 00:08:42.880
+<v Noah Labhart>One
+
+127
+00:08:42.880 --> 00:08:47.620
+<v Clément Renault>of the things we are looking for to hire people is the passion of people.
+
+128
+00:08:47.860 --> 00:08:54.120
+<v Clément Renault>Are they willing to take time to understand the product and do they want to make Meilisearch
+
+129
+00:08:54.120 --> 00:08:59.300
+<v Clément Renault>the best search engine or AI-asked server of the world?
+
+130
+00:08:59.460 --> 00:09:04.780
+<v Clément Renault>And also, it's also the feeling of the person we are hiring, like we are working with.
+
+131
+00:09:04.920 --> 00:09:11.460
+<v Clément Renault>The way people feel with you and communicate with you, are they like your friends or are
+
+132
+00:09:12.100 --> 00:09:14.520
+<v Clément Renault>to just be paid and stuff like that.
+
+133
+00:09:14.640 --> 00:09:19.320
+<v Clément Renault>It's more about like vision and friendliness, I think.
+
+134
+00:09:21.900 --> 00:09:23.500
+<v Noah Labhart>Let's talk about scalability.
+
+135
+00:09:23.700 --> 00:09:25.700
+<v Noah Labhart>And this will be interesting, given I'm certain
+
+136
+00:09:25.700 --> 00:09:28.460
+<v Noah Labhart>that it's core to how you've built it.
+
+137
+00:09:28.580 --> 00:09:31.480
+<v Noah Labhart>Was this built with scale in mind from day one?
+
+138
+00:09:31.580 --> 00:09:33.600
+<v Noah Labhart>Or have there been interesting areas
+
+139
+00:09:33.600 --> 00:09:35.000
+<v Noah Labhart>where you've had to fight it as you've grown?
+
+140
+00:09:36.140 --> 00:09:37.980
+<v Clément Renault>We were making sure that the engine
+
+141
+00:09:37.980 --> 00:09:41.020
+<v Clément Renault>was capable of scaling vertically.
+
+142
+00:09:42.100 --> 00:09:47.980
+<v Clément Renault>For a long time, I'm making sure that the engine was capable on a single instance to index a lot of documents.
+
+143
+00:09:48.340 --> 00:09:56.120
+<v Clément Renault>When I say a lot, like back then in 2020, I would say, we were capable of handling like 2 millions and that's it.
+
+144
+00:09:56.320 --> 00:10:04.300
+<v Clément Renault>Now with a new engine, we are capable to handle like more than 500 millions without sweat.
+
+145
+00:10:04.700 --> 00:10:09.900
+<v Clément Renault>If you give the good passion, you are capable of handling that without any issue.
+
+146
+00:10:09.900 --> 00:10:18.200
+<v Clément Renault>It takes time. I wrote a lot of blog posts. We spent like probably a year on making sure that the engine is capable of handling that.
+
+147
+00:10:18.360 --> 00:10:22.820
+<v Clément Renault>But it's been like since the beginning, we are trying to make it scale as far as we can.
+
+148
+00:10:23.320 --> 00:10:33.500
+<v Clément Renault>And recently, we decided to go like one step further and scale horizontally, like being able to shard the content, not only replicate, but shard the content.
+
+149
+00:10:33.500 --> 00:10:36.720
+<v Clément Renault>because when you have 500 million documents to index,
+
+150
+00:10:37.860 --> 00:10:39.840
+<v Clément Renault>replicating is not something that you want
+
+151
+00:10:39.840 --> 00:10:41.320
+<v Clément Renault>because you will just duplicate,
+
+152
+00:10:41.980 --> 00:10:44.380
+<v Clément Renault>like multiply the number of large machines you need.
+
+153
+00:10:44.520 --> 00:10:47.440
+<v Clément Renault>So the best thing to do is to shard,
+
+154
+00:10:47.520 --> 00:10:51.040
+<v Clément Renault>split your content into three, for example,
+
+155
+00:10:51.140 --> 00:10:51.980
+<v Clément Renault>with three machines,
+
+156
+00:10:52.180 --> 00:10:55.260
+<v Clément Renault>and then you can go with smaller machines
+
+157
+00:10:55.260 --> 00:10:57.560
+<v Clément Renault>and index in one third of the time.
+
+158
+00:10:58.320 --> 00:11:00.340
+<v Noah Labhart>So as you step out on the balcony,
+
+159
+00:11:00.460 --> 00:11:01.920
+<v Noah Labhart>you look across all that you've built,
+
+160
+00:11:01.980 --> 00:11:03.020
+<v Noah Labhart>what are you most proud of?
+
+161
+00:11:03.620 --> 00:11:05.220
+<v Clément Renault>I think Meilisearch itself.
+
+162
+00:11:05.700 --> 00:11:08.600
+<v Clément Renault>Meilisearch Vector Store also, which is called Arroy.
+
+163
+00:11:08.740 --> 00:11:11.000
+<v Clément Renault>Arroy is something quite interesting.
+
+164
+00:11:11.220 --> 00:11:16.560
+<v Clément Renault>It's a vector store that has been built by Spotify around 2015, maybe.
+
+165
+00:11:16.680 --> 00:11:17.520
+<v Clément Renault>Something like that.
+
+166
+00:11:17.560 --> 00:11:18.060
+<v Clément Renault>I don't remember.
+
+167
+00:11:18.160 --> 00:11:18.760
+<v Clément Renault>It's in C++.
+
+168
+00:11:19.320 --> 00:11:24.860
+<v Clément Renault>And we decided to find a good solution for Meilisearch to store vectors on disk and not in RAM.
+
+169
+00:11:25.000 --> 00:11:26.700
+<v Clément Renault>Disk is better for durability.
+
+170
+00:11:26.960 --> 00:11:28.800
+<v Clément Renault>Not better, but it is durable.
+
+171
+00:11:29.000 --> 00:11:30.840
+<v Clément Renault>So you need to store the content on disk.
+
+172
+00:11:30.840 --> 00:11:35.540
+<v Clément Renault>So we decided to just take a look at this Annoy library from Spotify,
+
+173
+00:11:35.840 --> 00:11:37.760
+<v Clément Renault>and we created Arroy, so in Rust,
+
+174
+00:11:38.340 --> 00:11:42.860
+<v Clément Renault>which just takes, we took the C++ base and move it,
+
+175
+00:11:42.900 --> 00:11:47.560
+<v Clément Renault>just transform it to be Rust compatible, like InfoRust,
+
+176
+00:11:47.680 --> 00:11:51.720
+<v Clément Renault>and put the contents in LMDB instead of custom formats,
+
+177
+00:11:51.880 --> 00:11:53.460
+<v Clément Renault>which was justified.
+
+178
+00:11:53.840 --> 00:11:57.840
+<v Clément Renault>We needed that to be in LMDB just to make sure that it was durable,
+
+179
+00:11:57.840 --> 00:12:00.980
+<v Clément Renault>along with the document you send your Meilisearch with.
+
+180
+00:12:01.200 --> 00:12:03.840
+<v Clément Renault>It took something like two months, something like that,
+
+181
+00:12:03.940 --> 00:12:06.000
+<v Clément Renault>to have something that works well.
+
+182
+00:12:06.140 --> 00:12:08.060
+<v Clément Renault>And at the end, it's very good, actually.
+
+183
+00:12:08.200 --> 00:12:10.040
+<v Clément Renault>We are still working on that on the right
+
+184
+00:12:10.040 --> 00:12:13.260
+<v Clément Renault>to make sure that it doesn't consume too much memory and stuff like that.
+
+185
+00:12:13.380 --> 00:12:16.440
+<v Clément Renault>But at the end, we are very happy about the result we have.
+
+186
+00:12:18.420 --> 00:12:19.680
+<v Noah Labhart>Let's flip the script a little bit.
+
+187
+00:12:19.740 --> 00:12:23.860
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+188
+00:12:24.660 --> 00:12:28.160
+<v Clément Renault>There is a specific version of Meilisearch that was completely broken.
+
+189
+00:12:28.340 --> 00:12:33.480
+<v Clément Renault>We released a version which, like, one day before Christmas,
+
+190
+00:12:34.140 --> 00:12:35.680
+<v Clément Renault>nobody was at the office,
+
+191
+00:12:35.860 --> 00:12:39.460
+<v Clément Renault>and we had to fix it, like, in a rush just before Christmas.
+
+192
+00:12:39.520 --> 00:12:42.120
+<v Clément Renault>It was one of the largest mistakes we did.
+
+193
+00:12:42.300 --> 00:12:44.160
+<v Clément Renault>We fixed it, like, in a week.
+
+194
+00:12:44.240 --> 00:12:47.960
+<v Clément Renault>We decided to remove the version and to fix it just on our side after.
+
+195
+00:12:48.160 --> 00:12:51.140
+<v Clément Renault>And I think how the team reacted was cool.
+
+196
+00:12:51.140 --> 00:13:05.120
+<v Clément Renault>We decided not to punish anyone or to tell anyone that they did something bad, but more like inspect and analyze what happens and how to make sure that we don't do the same mistake again.
+
+197
+00:13:05.300 --> 00:13:08.740
+<v Clément Renault>It was more like a way to grow than a way to be sad.
+
+198
+00:13:11.840 --> 00:13:17.240
+<v Noah Labhart>Let's move forward then. What does the future look like for the product and for your team?
+
+199
+00:13:18.020 --> 00:13:22.800
+<v Clément Renault>Products, I think that it will be the 10 times you hear that, but it's probably AI.
+
+200
+00:13:23.080 --> 00:13:24.800
+<v Clément Renault>We will work on something very interesting.
+
+201
+00:13:24.880 --> 00:13:26.780
+<v Clément Renault>It's called like the Ask route.
+
+202
+00:13:27.000 --> 00:13:30.700
+<v Clément Renault>It will be a route on Meilisearch to ask Meilisearch about stuff.
+
+203
+00:13:30.920 --> 00:13:36.140
+<v Clément Renault>You will be able to put it in a single click on any website you want that you own.
+
+204
+00:13:36.220 --> 00:13:38.720
+<v Clément Renault>You will have a search bar that you can ask stuff for.
+
+205
+00:13:39.080 --> 00:13:42.840
+<v Clément Renault>And you will say, yes, it's a 10 companies that does that.
+
+206
+00:13:42.920 --> 00:13:45.660
+<v Clément Renault>But Meilisearch is more like more than the others.
+
+207
+00:13:47.240 --> 00:13:49.220
+<v Clément Renault>but we plan to be like instant.
+
+208
+00:13:49.400 --> 00:13:52.000
+<v Clément Renault>Instead of having to wait 10 minutes,
+
+209
+00:13:52.160 --> 00:13:54.800
+<v Clément Renault>not 10 minutes, 10 seconds for an answer,
+
+210
+00:13:55.000 --> 00:13:57.340
+<v Clément Renault>you will just have that instantaneously.
+
+211
+00:13:57.860 --> 00:14:00.500
+<v Clément Renault>And we will see how it behaves,
+
+212
+00:14:00.700 --> 00:14:02.200
+<v Clément Renault>but we have great plan for that.
+
+213
+00:14:02.340 --> 00:14:03.280
+<v Clément Renault>About the content,
+
+214
+00:14:03.460 --> 00:14:05.780
+<v Clément Renault>being able to correctly read through the content,
+
+215
+00:14:06.020 --> 00:14:10.480
+<v Clément Renault>the LLM understand how and what is in an index
+
+216
+00:14:10.480 --> 00:14:12.280
+<v Clément Renault>to be able to answer correctly
+
+217
+00:14:12.280 --> 00:14:15.680
+<v Clément Renault>and with the most relevant queries and answers possible.
+
+218
+00:14:17.240 --> 00:14:18.260
+<v Noah Labhart>Let's switch to you.
+
+219
+00:14:18.340 --> 00:14:21.000
+<v Noah Labhart>Kero, who influences the way that you work?
+
+220
+00:14:21.200 --> 00:14:24.080
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+221
+00:14:24.380 --> 00:14:26.160
+<v Clément Renault>I follow a lot of Rustaceans.
+
+222
+00:14:26.380 --> 00:14:31.000
+<v Clément Renault>Yes, it's like a religion for me and for a lot of people doing Rust.
+
+223
+00:14:31.180 --> 00:14:32.100
+<v Clément Renault>It's not a bad thing.
+
+224
+00:14:32.160 --> 00:14:37.200
+<v Clément Renault>It's a good thing, I think, because it makes you like think twice before doing something.
+
+225
+00:14:37.320 --> 00:14:39.680
+<v Clément Renault>Is it something that I want to do?
+
+226
+00:14:39.800 --> 00:14:41.020
+<v Clément Renault>Is it dramatic in Rust?
+
+227
+00:14:41.180 --> 00:14:45.620
+<v Clément Renault>And if it's not, is it a good way to build something that is not dramatic?
+
+228
+00:14:47.240 --> 00:14:52.380
+<v Clément Renault>probably follow Steve Klabnik and a lot of other people who are Rustaceans, Rust lovers.
+
+229
+00:14:52.660 --> 00:14:58.940
+<v Clément Renault>This person, maybe I follow Sam Altman and people in the AI space, but it's more like
+
+230
+00:14:58.940 --> 00:15:03.920
+<v Clément Renault>to be sure that I follow the trend and I understand what's happening because it's happening very
+
+231
+00:15:03.920 --> 00:15:04.420
+<v Clément Renault>fast.
+
+232
+00:15:04.520 --> 00:15:09.200
+<v Clément Renault>And also in terms of company, OpenAI is a company that is trying to make money, at least
+
+233
+00:15:09.200 --> 00:15:09.700
+<v Clément Renault>trying.
+
+234
+00:15:09.560 --> 00:15:15.140
+<v Clément Renault>And I think that at least trying to follow what they do and what they plan and how they
+
+235
+00:15:15.140 --> 00:15:19.880
+<v Clément Renault>the design, the API, and how they make people pay for stuff and other stuff
+
+236
+00:15:19.880 --> 00:15:24.520
+<v Clément Renault>is a good thing for Meilisearch to follow or at least to understand.
+
+237
+00:15:26.000 --> 00:15:27.400
+<v Noah Labhart>Okay, Kero, last question.
+
+238
+00:15:27.920 --> 00:15:31.140
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur
+
+239
+00:15:31.140 --> 00:15:32.460
+<v Noah Labhart>who's built the next big thing.
+
+240
+00:15:32.860 --> 00:15:33.920
+<v Noah Labhart>They're jazzed about it.
+
+241
+00:15:33.960 --> 00:15:35.360
+<v Noah Labhart>They can't wait to show it off to the world.
+
+242
+00:15:35.380 --> 00:15:37.100
+<v Noah Labhart>And can we show it off to you right there on the plane?
+
+243
+00:15:37.800 --> 00:15:40.660
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+244
+00:15:41.960 --> 00:15:48.840
+<v Clément Renault>always be something for someone who is willing to use stuff and not just for your own interest
+
+245
+00:15:48.840 --> 00:15:55.060
+<v Clément Renault>nobody will buy something that you are the only one to believe in don't try to enforce too much
+
+246
+00:15:55.060 --> 00:16:01.760
+<v Clément Renault>stuff and make sure that your product will be used by by probably companies or customers depends on
+
+247
+00:16:01.760 --> 00:16:07.520
+<v Clément Renault>your business and also make sure your time is very important so don't spend too much time on
+
+248
+00:16:07.520 --> 00:16:10.720
+<v Clément Renault>small stuff and I'm giving this advice to myself too.
+
+249
+00:16:10.940 --> 00:16:13.300
+<v Noah Labhart>Both fantastic pieces of advice.
+
+250
+00:16:13.520 --> 00:16:16.280
+<v Noah Labhart>Well, Kero, thank you for being on the show today
+
+251
+00:16:16.280 --> 00:16:19.020
+<v Noah Labhart>and thank you for telling the creation story of Meilisearch.
+
+252
+00:16:19.280 --> 00:16:20.880
+<v Clément Renault>Thank you, Noah. Thank you very much.
+
+253
+00:16:21.860 --> 00:16:24.660
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+254
+00:16:30.040 --> 00:16:33.120
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+255
+00:16:33.260 --> 00:16:35.920
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify
+
+256
+00:16:37.520 --> 00:16:43.060
+<v Noah Labhart>your choice. And when you get a chance, leave us a review. Both things help us out tremendously.
+
+257
+00:16:46.000 --> 00:16:47.500
+<v Noah Labhart>And thanks again for listening.

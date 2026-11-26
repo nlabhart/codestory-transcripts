@@ -1,0 +1,1811 @@
+WEBVTT
+
+NOTE S6 Bonus: Debugging Live in Production: Building Dynamic Logging and Exiting to Dynatrace with Liran Haimovitch of Rookout
+
+1
+00:00:00.000 --> 00:00:11.020
+<v Liran Haimovitch>We also had SDK engineers, people who were supposed to write those cool and fun SDKs that are supposed to go into the interpreter, into the JVM runtime, and change stuff.
+
+2
+00:00:11.640 --> 00:00:19.020
+<v Liran Haimovitch>I'm not sure about you, but I'm not familiar with many companies who have those kind of people, or with a clear job description for those.
+
+3
+00:00:19.560 --> 00:00:26.380
+<v Liran Haimovitch>So we've hired from nearby areas. We've hired a lot of cybersecurity engineers, we've hired some embedded engineers.
+
+4
+00:00:26.380 --> 00:00:31.960
+<v Liran Haimovitch>years, we've mostly hired people we felt were talented and knew enough about taking stuff
+
+5
+00:00:31.960 --> 00:00:36.880
+<v Liran Haimovitch>apart and putting it back together to help us figure out together how do you change running
+
+6
+00:00:36.880 --> 00:00:42.020
+<v Liran Haimovitch>code on the fly. I'm Liran Haimovitch. I'm a co-founder and CTO at Rookout.
+
+7
+00:00:47.540 --> 00:00:52.940
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+8
+00:00:52.940 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+9
+00:00:57.100 --> 00:01:00.800
+<v Noah Labhart>and build and lead a team that has your back.
+
+10
+00:01:02.240 --> 00:01:03.840
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+11
+00:01:04.020 --> 00:01:05.900
+<v Noah Labhart>and today I'm with Liran Haimovitch,
+
+12
+00:01:06.060 --> 00:01:08.380
+<v Noah Labhart>created a way for your development team
+
+13
+00:01:08.380 --> 00:01:11.960
+<v Noah Labhart>to get real-time data from their production systems.
+
+14
+00:01:13.400 --> 00:01:15.840
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:20.540 --> 00:01:23.620
+<v Noah Labhart>Liran Haimovitch is 34 years old and recently married.
+
+16
+00:01:23.800 --> 00:01:26.740
+<v Noah Labhart>He and his wife enjoy traveling and eating delicious foods together
+
+17
+00:01:26.740 --> 00:01:29.000
+<v Noah Labhart>and, of course, taking care of their awesome dog.
+
+18
+00:01:29.980 --> 00:01:32.920
+<v Noah Labhart>Although it's been a while, Liran loves to scuba dive
+
+19
+00:01:32.920 --> 00:01:36.340
+<v Noah Labhart>and enjoys a great whiskey, scotch, or fancy cocktail now and again.
+
+20
+00:01:36.540 --> 00:01:39.160
+<v Noah Labhart>He's recently gotten into trying to make them at home
+
+21
+00:01:39.160 --> 00:01:41.240
+<v Noah Labhart>or seeking out the latest bar to try something new.
+
+22
+00:01:42.760 --> 00:01:46.240
+<v Noah Labhart>Just over five years ago, Liran and his co-founder realized
+
+23
+00:01:46.840 --> 00:01:52.680
+<v Noah Labhart>Every time you need to change the way you observe or log your application, you have to fully release that application.
+
+24
+00:01:53.140 --> 00:02:00.180
+<v Noah Labhart>They applied their cybersecurity way of thinking and built a platform to enable the instant change to logging and observability.
+
+25
+00:02:01.860 --> 00:02:04.880
+<v Noah Labhart>This is the creation story of Rookout.
+
+26
+00:02:08.020 --> 00:02:14.180
+<v Liran Haimovitch>Rookout, at the core of it, it's a dynamic observability platform, which is a long word.
+
+27
+00:02:14.180 --> 00:02:20.180
+<v Liran Haimovitch>and you know it's very fancy sometimes marketing speak but for now let's think of Rookout as a live
+
+28
+00:02:20.180 --> 00:02:25.300
+<v Liran Haimovitch>debugger as a kind of debugger that you can use in any environment not just on your laptop as you're
+
+29
+00:02:25.300 --> 00:02:29.980
+<v Liran Haimovitch>writing code but you can use it in the cloud you can use it even for Kubernetes or serverless
+
+30
+00:02:29.980 --> 00:02:35.340
+<v Liran Haimovitch>and you can go as far as using it in production in a safe and secure manner and that's kind of
+
+31
+00:02:35.340 --> 00:02:41.960
+<v Liran Haimovitch>the magic and the concept behind Rookout. So Rookout got started about five years ago just
+
+32
+00:02:41.960 --> 00:02:47.120
+<v Liran Haimovitch>just over five years ago, when me and my co-founder tried to make a huge dent,
+
+33
+00:02:47.320 --> 00:02:51.380
+<v Liran Haimovitch>make a huge difference in how we develop code and how developer tools are built.
+
+34
+00:02:52.040 --> 00:02:56.120
+<v Liran Haimovitch>And what we've seen is that the way you monitor your applications,
+
+35
+00:02:56.260 --> 00:03:00.220
+<v Liran Haimovitch>the way we all monitor applications, is defined when we write them.
+
+36
+00:03:01.100 --> 00:03:04.520
+<v Liran Haimovitch>Everybody's talking about observability and the three pillars of observability.
+
+37
+00:03:04.800 --> 00:03:08.280
+<v Liran Haimovitch>And for the most part, you have to define your logs, metrics, and spans
+
+38
+00:03:08.280 --> 00:03:09.960
+<v Liran Haimovitch>as you write the application.
+
+39
+00:03:11.960 --> 00:03:16.300
+<v Liran Haimovitch>change them, you have to essentially write a new version of the application, you have to get it
+
+40
+00:03:16.300 --> 00:03:21.980
+<v Liran Haimovitch>tested, you have to get it deployed. This can be a bit, I know, odd, because, you know, you've written
+
+41
+00:03:21.980 --> 00:03:27.980
+<v Liran Haimovitch>a logline, and now all you want is one more variable to write, or that logline is in the
+
+42
+00:03:27.980 --> 00:03:33.240
+<v Liran Haimovitch>wrong verbosity. And all of a sudden, you're deploying an entirely new version of your
+
+43
+00:03:33.240 --> 00:03:37.240
+<v Liran Haimovitch>application. Now, whether it's a monolithic application, or a microservices application,
+
+44
+00:03:37.240 --> 00:03:44.200
+<v Liran Haimovitch>or a SaaS or not SaaS, there is a lot of risk, a lot of work, a lot of toil that goes into delivering a new version.
+
+45
+00:03:44.420 --> 00:03:50.400
+<v Liran Haimovitch>And at the end of the day, sometimes all you really want to do is flip a single bit in the application memory
+
+46
+00:03:50.400 --> 00:03:53.040
+<v Liran Haimovitch>to get that piece of information you need.
+
+47
+00:03:53.620 --> 00:04:00.780
+<v Liran Haimovitch>We've kind of taken our ex-cybersecurity mindset, skill set, approach to life and programming
+
+48
+00:04:00.780 --> 00:04:03.340
+<v Liran Haimovitch>and kind of said, we can do it differently.
+
+49
+00:04:03.340 --> 00:04:09.540
+<v Liran Haimovitch>we can build a tool, we can build a platform that will allow you to change a running application
+
+50
+00:04:09.540 --> 00:04:16.340
+<v Liran Haimovitch>so that you could instantly get new logs, new metrics, new spans. You can even get full
+
+51
+00:04:16.340 --> 00:04:21.100
+<v Liran Haimovitch>snapshots of the entire application state with a click of a button and without having to go
+
+52
+00:04:21.100 --> 00:04:25.260
+<v Liran Haimovitch>through this tedious cycle of rebuilding and redeploying.
+
+53
+00:04:27.380 --> 00:04:28.760
+<v Noah Labhart>Tell me about the MVP,
+
+54
+00:04:28.760 --> 00:04:34.580
+<v Noah Labhart>So that first product you built, how long did it take you to build and what sort of tools did you use to bring it to life?
+
+55
+00:04:35.720 --> 00:04:43.120
+<v Liran Haimovitch>I still remember that MVP, it was, you know, my co-founder and me in garage mode, just the two of us in his living room.
+
+56
+00:04:43.420 --> 00:04:47.140
+<v Liran Haimovitch>We spent somewhere between two and three months building that MVP.
+
+57
+00:04:48.120 --> 00:04:52.020
+<v Liran Haimovitch>And we actually pretty much built everything from the ground up in Python.
+
+58
+00:04:52.400 --> 00:04:55.080
+<v Liran Haimovitch>We were fairly knowledgeable with Python.
+
+59
+00:04:55.140 --> 00:04:56.940
+<v Liran Haimovitch>It felt like a good place to start.
+
+60
+00:04:58.760 --> 00:05:03.680
+<v Liran Haimovitch>about 80% of that code base at this point in the company's life, and actually very little today,
+
+61
+00:05:03.800 --> 00:05:09.600
+<v Liran Haimovitch>is still written in Python. But back then, it was good enough for us. So we started by writing an
+
+62
+00:05:09.600 --> 00:05:15.900
+<v Liran Haimovitch>SDK for Python, a Python package that we dig into the interpreter, use various black magic,
+
+63
+00:05:16.040 --> 00:05:21.360
+<v Liran Haimovitch>native extensions, unknown APIs, and kind of figure out how can we make that concept I've
+
+64
+00:05:21.360 --> 00:05:27.360
+<v Liran Haimovitch>just shared with you a reality, something that can go into the interpreter and get a snapshot,
+
+65
+00:05:28.760 --> 00:05:31.340
+<v Liran Haimovitch>of every little piece of code as it's running.
+
+66
+00:05:32.100 --> 00:05:34.580
+<v Liran Haimovitch>Back then it was an MVP, it was just the two of us,
+
+67
+00:05:34.680 --> 00:05:36.520
+<v Liran Haimovitch>so we actually focused a lot on code sharing.
+
+68
+00:05:36.860 --> 00:05:40.240
+<v Liran Haimovitch>So a lot of the code for the SDK was also used
+
+69
+00:05:40.240 --> 00:05:43.200
+<v Liran Haimovitch>for the server side components that managed it
+
+70
+00:05:43.580 --> 00:05:46.620
+<v Liran Haimovitch>and provided the backend for the orchestration
+
+71
+00:05:47.200 --> 00:05:49.040
+<v Liran Haimovitch>and that span up the UI,
+
+72
+00:05:49.260 --> 00:05:53.340
+<v Liran Haimovitch>which we've written up with JavaScript, React, web-based.
+
+73
+00:05:53.800 --> 00:05:56.660
+<v Liran Haimovitch>Now that front end component is pretty much
+
+74
+00:05:56.660 --> 00:06:00.160
+<v Liran Haimovitch>one of the biggest pieces that are still remaining.
+
+75
+00:06:00.720 --> 00:06:02.880
+<v Liran Haimovitch>Now, obviously, we've made tons of changes
+
+76
+00:06:02.880 --> 00:06:06.120
+<v Liran Haimovitch>and tons of optimizations and various stuff,
+
+77
+00:06:06.280 --> 00:06:07.860
+<v Liran Haimovitch>but still at the core of it,
+
+78
+00:06:07.940 --> 00:06:09.540
+<v Liran Haimovitch>there is tons of similarity
+
+79
+00:06:09.540 --> 00:06:12.960
+<v Liran Haimovitch>between that original React.js MVP
+
+80
+00:06:12.960 --> 00:06:14.840
+<v Liran Haimovitch>and what we currently have today
+
+81
+00:06:14.840 --> 00:06:16.700
+<v Liran Haimovitch>is the core UI for the platform.
+
+82
+00:06:18.320 --> 00:06:19.360
+<v Noah Labhart>With any MVP,
+
+83
+00:06:19.760 --> 00:06:23.100
+<v Noah Labhart>you've got to make certain decisions and trade-offs
+
+84
+00:06:23.100 --> 00:06:24.660
+<v Noah Labhart>about what you're going to start with,
+
+85
+00:06:24.760 --> 00:06:25.900
+<v Noah Labhart>what you're not going to build,
+
+86
+00:06:26.660 --> 00:06:30.600
+<v Noah Labhart>you're going to take on technically. Tell me about some of those decisions and trade-offs you had to
+
+87
+00:06:30.600 --> 00:06:32.600
+<v Noah Labhart>make and how you coped with those decisions.
+
+88
+00:06:34.100 --> 00:06:38.240
+<v Liran Haimovitch>I remember early on, we were wondering a lot about
+
+89
+00:06:38.240 --> 00:06:44.140
+<v Liran Haimovitch>the protocols. How is that SDK that has to be deployed everywhere is going to be communicating
+
+90
+00:06:44.880 --> 00:06:51.240
+<v Liran Haimovitch>with the backend that has to be managing it? Now, there are tons of restrictions that you have to
+
+91
+00:06:51.240 --> 00:06:55.380
+<v Liran Haimovitch>think about and tons of considerations. Some of them we didn't think of well ahead of time.
+
+92
+00:06:56.660 --> 00:07:02.460
+<v Liran Haimovitch>be about how do you embed that code in somebody else's application after all it's an SDK so you
+
+93
+00:07:02.460 --> 00:07:07.620
+<v Liran Haimovitch>have limited control of the environment how do you encode how do you know how much data is going to
+
+94
+00:07:07.620 --> 00:07:13.760
+<v Liran Haimovitch>end up running on those protocols how fast are they going to be what's the latency we've made
+
+95
+00:07:13.760 --> 00:07:20.500
+<v Liran Haimovitch>some good choices we've made some bad choices for instance we've opted in for using gRPC back then
+
+96
+00:07:20.500 --> 00:07:25.600
+<v Liran Haimovitch>Then, gRPC was not only less popular than it was today, but it also brought to light
+
+97
+00:07:25.600 --> 00:07:26.920
+<v Liran Haimovitch>a few challenges.
+
+98
+00:07:27.260 --> 00:07:31.960
+<v Liran Haimovitch>Some of them had to do with termination of gRPC at the edge, which is easier to do today,
+
+99
+00:07:32.080 --> 00:07:34.560
+<v Liran Haimovitch>but back then it was a real problem.
+
+100
+00:07:34.780 --> 00:07:40.440
+<v Liran Haimovitch>And second, and even more importantly, is that gRPC uses native extensions for certain
+
+101
+00:07:40.440 --> 00:07:42.440
+<v Liran Haimovitch>runtimes such as Python and Node.
+
+102
+00:07:42.640 --> 00:07:47.660
+<v Liran Haimovitch>Now those native extensions create a lot of overhead, which is not that bad if you are
+
+103
+00:07:47.660 --> 00:07:51.800
+<v Liran Haimovitch>running your own application in your own container on your own OS.
+
+104
+00:07:52.020 --> 00:07:55.760
+<v Liran Haimovitch>But if you have to build an SDK that has to run on every arbitrary OS,
+
+105
+00:07:55.960 --> 00:07:58.340
+<v Liran Haimovitch>that has to do various packaging requirements,
+
+106
+00:07:58.920 --> 00:08:01.860
+<v Liran Haimovitch>you'll often find that those native extensions are a headache
+
+107
+00:08:01.860 --> 00:08:03.800
+<v Liran Haimovitch>because it's kind of breaking the abstraction.
+
+108
+00:08:04.360 --> 00:08:08.080
+<v Liran Haimovitch>So instead of just installing your application and getting it up and running,
+
+109
+00:08:08.380 --> 00:08:09.720
+<v Liran Haimovitch>then you have to worry about,
+
+110
+00:08:09.780 --> 00:08:14.460
+<v Liran Haimovitch>am I using an operating system that's going to have those native extensions available,
+
+111
+00:08:14.460 --> 00:08:17.420
+<v Liran Haimovitch>or I'm going to have to recompile the native extensions.
+
+112
+00:08:17.840 --> 00:08:19.600
+<v Liran Haimovitch>What happens with cross compiling?
+
+113
+00:08:19.720 --> 00:08:21.780
+<v Liran Haimovitch>What happens if I'm building my Python application
+
+114
+00:08:21.780 --> 00:08:25.580
+<v Liran Haimovitch>on Windows and then I'm running it on AWS server as Lambda?
+
+115
+00:08:25.980 --> 00:08:28.120
+<v Liran Haimovitch>All of the sudden these things can get messy.
+
+116
+00:08:28.320 --> 00:08:30.100
+<v Liran Haimovitch>That was actually a kind of a decision
+
+117
+00:08:30.600 --> 00:08:32.400
+<v Liran Haimovitch>that was decent for the MVP,
+
+118
+00:08:32.640 --> 00:08:35.560
+<v Liran Haimovitch>but later on we had to spend a lot of time and effort
+
+119
+00:08:36.520 --> 00:08:38.000
+<v Liran Haimovitch>migrating all of the SDKs
+
+120
+00:08:38.000 --> 00:08:39.800
+<v Liran Haimovitch>and then having all the customers upgrade.
+
+121
+00:08:39.800 --> 00:08:46.140
+<v Liran Haimovitch>Now, other dilemmas we've been facing with were again around the protocol.
+
+122
+00:08:46.320 --> 00:08:48.780
+<v Liran Haimovitch>How do you manage control of the process?
+
+123
+00:08:49.220 --> 00:08:53.340
+<v Liran Haimovitch>Here we've opted for JSON, a combination of JSON and protobuf.
+
+124
+00:08:53.700 --> 00:08:55.200
+<v Liran Haimovitch>Early on we viewed Thrift.
+
+125
+00:08:55.660 --> 00:09:01.840
+<v Liran Haimovitch>It was pretty popular in 2017, so we've opted for Thrift at a certain point, and then we
+
+126
+00:09:01.840 --> 00:09:05.840
+<v Liran Haimovitch>had to remove that because we figured out it wasn't doing us any favors.
+
+127
+00:09:05.840 --> 00:09:14.400
+<v Liran Haimovitch>I think those are the kind of decisions in an MVP-wide that are more complex and have longer term implications.
+
+128
+00:09:15.120 --> 00:09:25.020
+<v Liran Haimovitch>Because if you're looking at other decisions that are more local, that have only one component, then those decisions are much easier to change later on.
+
+129
+00:09:25.140 --> 00:09:28.960
+<v Liran Haimovitch>Let's say I've mentioned that we aren't using Python as much as we used to.
+
+130
+00:09:29.520 --> 00:09:35.040
+<v Liran Haimovitch>We've actually rewritten about 70% of that code base into Go and a bit of Node.
+
+131
+00:09:35.840 --> 00:09:41.700
+<v Liran Haimovitch>we did each of that one component at a time, it actually wasn't such a big deal. And we could do
+
+132
+00:09:41.700 --> 00:09:44.360
+<v Liran Haimovitch>it easily along the way as we were moving forward.
+
+133
+00:09:46.380 --> 00:09:50.400
+<v Noah Labhart>So you've got your MVP, you're getting some
+
+134
+00:09:50.400 --> 00:09:55.620
+<v Noah Labhart>traction. How did you progress the product from there and mature it? And I think to give context
+
+135
+00:09:55.620 --> 00:10:00.660
+<v Noah Labhart>where I'm going with that is, you know, how did you build your roadmap and decide, okay,
+
+136
+00:10:00.660 --> 00:10:03.340
+<v Noah Labhart>okay, this is the next most important thing to build?
+
+137
+00:10:04.920 --> 00:10:08.980
+<v Liran Haimovitch>So I think that's one of the most challenging questions ever
+
+138
+00:10:08.980 --> 00:10:10.480
+<v Liran Haimovitch>because it's challenging.
+
+139
+00:10:10.880 --> 00:10:12.780
+<v Liran Haimovitch>I mean, I've been doing software engineering
+
+140
+00:10:12.780 --> 00:10:14.760
+<v Liran Haimovitch>for over 15 years now as an engineer,
+
+141
+00:10:14.940 --> 00:10:19.040
+<v Liran Haimovitch>as a team lead, product lead, tech lead, product manager.
+
+142
+00:10:19.240 --> 00:10:21.080
+<v Liran Haimovitch>It's one of the most challenging things.
+
+143
+00:10:21.420 --> 00:10:23.540
+<v Liran Haimovitch>I can say that for the most part,
+
+144
+00:10:24.180 --> 00:10:27.080
+<v Liran Haimovitch>we tried to focus as much as possible
+
+145
+00:10:27.080 --> 00:10:29.980
+<v Liran Haimovitch>on a customer feedback whenever it was available,
+
+146
+00:10:30.660 --> 00:10:33.440
+<v Liran Haimovitch>was readily capturable.
+
+147
+00:10:33.940 --> 00:10:38.420
+<v Liran Haimovitch>But there are a few screens you have to take.
+
+148
+00:10:38.500 --> 00:10:42.360
+<v Liran Haimovitch>We've taken that feedback and tried to adapt it to our needs.
+
+149
+00:10:42.940 --> 00:10:46.140
+<v Liran Haimovitch>So first is kind of how much are we going to get paid?
+
+150
+00:10:46.640 --> 00:10:49.440
+<v Liran Haimovitch>Now, it's not always, you know, foolproof.
+
+151
+00:10:49.720 --> 00:10:51.900
+<v Liran Haimovitch>But if somebody is telling you,
+
+152
+00:10:51.920 --> 00:10:55.480
+<v Liran Haimovitch>I'm going to pay $50,000 or $500,000 for that feature,
+
+153
+00:10:55.620 --> 00:10:59.000
+<v Liran Haimovitch>that's a pretty good indication that both that it's important
+
+154
+00:11:00.660 --> 00:11:04.980
+<v Liran Haimovitch>going to help you achieve your business goals. Even if it's going to end up not an important
+
+155
+00:11:04.980 --> 00:11:11.440
+<v Liran Haimovitch>part of your long-term roadmap, it might help the company achieve short-term goals. Again,
+
+156
+00:11:11.540 --> 00:11:17.460
+<v Liran Haimovitch>depending on the size of the company and your revenue goals and all of that. But if you can
+
+157
+00:11:17.460 --> 00:11:23.760
+<v Liran Haimovitch>see a customer paying you upfront or after the fact for a feature, then that's obviously a good
+
+158
+00:11:23.760 --> 00:11:29.880
+<v Liran Haimovitch>consideration. Sometimes a customer won't pay you directly for that feature, in which case you have
+
+159
+00:11:30.980 --> 00:11:33.800
+<v Liran Haimovitch>how much is this going to impact my work?
+
+160
+00:11:34.000 --> 00:11:35.700
+<v Liran Haimovitch>How much is this going to impact my deals?
+
+161
+00:11:36.080 --> 00:11:38.980
+<v Liran Haimovitch>But even more importantly, is this feature request,
+
+162
+00:11:39.320 --> 00:11:44.100
+<v Liran Haimovitch>is this complaint just about one customer saying it's a problem?
+
+163
+00:11:44.380 --> 00:11:47.760
+<v Liran Haimovitch>Or is this the third time I've had this problem this week alone?
+
+164
+00:11:48.660 --> 00:11:52.220
+<v Liran Haimovitch>Now, as things mount up, as you're meeting more customers,
+
+165
+00:11:52.380 --> 00:11:53.480
+<v Liran Haimovitch>as you're getting more feedback,
+
+166
+00:11:53.680 --> 00:11:56.580
+<v Liran Haimovitch>you should be able to pinpoint those areas
+
+167
+00:11:56.580 --> 00:11:59.260
+<v Liran Haimovitch>where you're getting more negative feedback time after time.
+
+168
+00:12:00.660 --> 00:12:05.580
+<v Liran Haimovitch>deserve a prioritization. It's important when talking to customers to separate the problems
+
+169
+00:12:05.580 --> 00:12:11.160
+<v Liran Haimovitch>for the solutions. While it's nice to get ideas for solutions from customers now, and my customers
+
+170
+00:12:11.160 --> 00:12:15.000
+<v Liran Haimovitch>are developers, so they always know how to fix everything that's broken within my application,
+
+171
+00:12:15.800 --> 00:12:21.000
+<v Liran Haimovitch>it's more important to focus on what they're trying to solve rather than how they're trying
+
+172
+00:12:21.000 --> 00:12:26.160
+<v Liran Haimovitch>to solve it. Once you've identified what customers are complaining about, what they're trying to
+
+173
+00:12:26.160 --> 00:12:31.320
+<v Liran Haimovitch>to solve, leave aside their ideas, which might be great, but think through the problem yourself
+
+174
+00:12:31.320 --> 00:12:37.360
+<v Liran Haimovitch>and kind of try to figure out how can you solve the problem? What's easiest from an engineering
+
+175
+00:12:37.360 --> 00:12:42.260
+<v Liran Haimovitch>perspective? What makes most sense for the roadmap from a product management perspective?
+
+176
+00:12:42.700 --> 00:12:48.800
+<v Liran Haimovitch>What creates great synergies with other stuff you have in mind versus what might be stopping you
+
+177
+00:12:48.800 --> 00:12:54.760
+<v Liran Haimovitch>from launching future initiatives? And then take into account also what the customer wants
+
+178
+00:12:56.360 --> 00:12:58.300
+<v Liran Haimovitch>but don't overly focus on that.
+
+179
+00:12:58.580 --> 00:13:02.140
+<v Liran Haimovitch>It's always super important to keep your vision in mind.
+
+180
+00:13:02.480 --> 00:13:04.100
+<v Liran Haimovitch>That's often the tricky part.
+
+181
+00:13:04.320 --> 00:13:06.480
+<v Liran Haimovitch>On the one hand, you do need to have a vision.
+
+182
+00:13:06.520 --> 00:13:07.880
+<v Liran Haimovitch>You do need to know where you're going.
+
+183
+00:13:08.020 --> 00:13:11.780
+<v Liran Haimovitch>You do need to think about where am I taking this
+
+184
+00:13:11.780 --> 00:13:15.380
+<v Liran Haimovitch>and how is this, how are all of those little pieces
+
+185
+00:13:16.000 --> 00:13:17.720
+<v Liran Haimovitch>combining into a bigger picture
+
+186
+00:13:18.480 --> 00:13:22.000
+<v Liran Haimovitch>and what's going to be the next big things I'm going to do
+
+187
+00:13:22.000 --> 00:13:23.100
+<v Liran Haimovitch>and not just small things.
+
+188
+00:13:23.100 --> 00:13:29.800
+<v Liran Haimovitch>But at the same time, it's important to stay reactive and keep listening to what people around you are saying.
+
+189
+00:13:30.040 --> 00:13:36.340
+<v Liran Haimovitch>You shouldn't be overly focusing on your vision to the extent of ignoring the world around you.
+
+190
+00:13:37.580 --> 00:13:40.080
+<v Noah Labhart>So let's switch to team then.
+
+191
+00:13:40.160 --> 00:13:42.060
+<v Noah Labhart>So how did you go about building your team?
+
+192
+00:13:42.220 --> 00:13:46.780
+<v Noah Labhart>And what did you look for in those people to indicate they were the winning horses to join you?
+
+193
+00:13:47.840 --> 00:13:56.520
+<v Liran Haimovitch>Early on in the days of Rookout, while my title was CTO, I was also pretty much mostly doing engineering management.
+
+194
+00:13:56.640 --> 00:13:58.740
+<v Liran Haimovitch>So I was the VP of engineering, if you will.
+
+195
+00:13:59.180 --> 00:14:03.360
+<v Liran Haimovitch>And I've started hiring the first engineers.
+
+196
+00:14:03.660 --> 00:14:11.460
+<v Liran Haimovitch>And we've grown to about 10 engineers with me managing all of them directly before I've hired the VP of engineering,
+
+197
+00:14:11.740 --> 00:14:14.060
+<v Liran Haimovitch>which is pretty much a focus question.
+
+198
+00:14:14.220 --> 00:14:16.200
+<v Liran Haimovitch>I would say I can talk plenty about that.
+
+199
+00:14:16.780 --> 00:14:22.100
+<v Liran Haimovitch>The bottom line about hiring a VP of engineering as a co-founder, as an entrepreneur, as a startup,
+
+200
+00:14:22.260 --> 00:14:28.180
+<v Liran Haimovitch>is focusing first and foremost on what you can do versus what you can hire for.
+
+201
+00:14:28.400 --> 00:14:33.360
+<v Liran Haimovitch>And what I found potentially a bit late is that I could hire for a VP of engineering,
+
+202
+00:14:33.580 --> 00:14:37.120
+<v Liran Haimovitch>potentially even hire someone who was better than me at the job.
+
+203
+00:14:37.220 --> 00:14:41.820
+<v Liran Haimovitch>And there were other stuff I couldn't hire out for, other stuff that were more important,
+
+204
+00:14:41.880 --> 00:14:43.320
+<v Liran Haimovitch>and I should have been doing them myself.
+
+205
+00:14:43.320 --> 00:15:05.840
+<v Liran Haimovitch>But back then, as I was hiring, especially for core team members, I focused a lot on initiative, experience, on people who knew enough to prove that they are talented, that they can learn, that they can execute, but not necessarily requiring everyone to know everything they need to do for the job.
+
+206
+00:15:05.840 --> 00:15:11.840
+<v Liran Haimovitch>For instance, our head of DevOps, our first DevOps engineer, actually came from backend engineering.
+
+207
+00:15:12.260 --> 00:15:15.240
+<v Liran Haimovitch>He had some knowledge, some very basic knowledge around DevOps.
+
+208
+00:15:15.340 --> 00:15:20.920
+<v Liran Haimovitch>He had seen it being done at a previous role, but he wasn't very much hands-on with it.
+
+209
+00:15:21.320 --> 00:15:26.240
+<v Liran Haimovitch>Now, it brought a set of challenges, the fact that he was more of a backend engineer,
+
+210
+00:15:26.380 --> 00:15:32.000
+<v Liran Haimovitch>but it was also a great learning opportunity for him, which both helped him develop his career,
+
+211
+00:15:32.000 --> 00:15:39.200
+<v Liran Haimovitch>but also allowed him to be much more passionate and much more push the role way beyond.
+
+212
+00:15:39.680 --> 00:15:45.840
+<v Liran Haimovitch>We also had SDK engineers, people who were supposed to write those cool and fun SDKs
+
+213
+00:15:45.840 --> 00:15:50.600
+<v Liran Haimovitch>that are supposed to go into the interpreter, into the JVM runtime and change stuff.
+
+214
+00:15:51.180 --> 00:15:55.700
+<v Liran Haimovitch>I'm not sure about you, but I'm not familiar with many companies who have those kind of people
+
+215
+00:15:55.700 --> 00:15:58.620
+<v Liran Haimovitch>or with a clear job description for those.
+
+216
+00:15:59.320 --> 00:16:02.040
+<v Liran Haimovitch>So we've hired from nearby areas.
+
+217
+00:16:02.240 --> 00:16:04.120
+<v Liran Haimovitch>We've hired a lot of cybersecurity engineers.
+
+218
+00:16:04.400 --> 00:16:05.960
+<v Liran Haimovitch>We've hired some embedded engineers.
+
+219
+00:16:06.200 --> 00:16:08.500
+<v Liran Haimovitch>We've mostly hired people we felt were talented
+
+220
+00:16:08.500 --> 00:16:11.880
+<v Liran Haimovitch>and knew enough about taking stuff apart
+
+221
+00:16:11.880 --> 00:16:13.000
+<v Liran Haimovitch>and putting it back together
+
+222
+00:16:13.000 --> 00:16:14.840
+<v Liran Haimovitch>to help us figure out together
+
+223
+00:16:14.840 --> 00:16:17.400
+<v Liran Haimovitch>how do you change running code on the fly?
+
+224
+00:16:20.220 --> 00:16:22.260
+<v Noah Labhart>Well, let's switch to scalability then.
+
+225
+00:16:22.360 --> 00:16:23.520
+<v Noah Labhart>And this will be interesting
+
+226
+00:16:23.520 --> 00:16:24.820
+<v Noah Labhart>given the nature of your product.
+
+227
+00:16:25.180 --> 00:16:28.260
+<v Noah Labhart>Did you build this to scale efficiently from day one?
+
+228
+00:16:28.620 --> 00:16:31.480
+<v Noah Labhart>Or are you fighting this as you grow and gain traction?
+
+229
+00:16:32.580 --> 00:16:39.340
+<v Liran Haimovitch>I think we planned to have it scalable from day one, and we made tons of mistakes along the way.
+
+230
+00:16:39.880 --> 00:16:47.320
+<v Liran Haimovitch>Mistakes that, for the most part, I would say, stem from differences between a theory and real world.
+
+231
+00:16:47.440 --> 00:16:52.320
+<v Liran Haimovitch>And in areas where we've had more experience, we made better judgment calls.
+
+232
+00:16:52.320 --> 00:16:57.040
+<v Liran Haimovitch>calls, but in areas where we didn't have as much experience, we actually made some pretty
+
+233
+00:16:57.040 --> 00:16:58.960
+<v Liran Haimovitch>bad judgment calls along the way.
+
+234
+00:16:59.300 --> 00:17:05.600
+<v Liran Haimovitch>Giving a few examples, we've kind of taken Python in our, as I mentioned, we've taken
+
+235
+00:17:05.600 --> 00:17:06.520
+<v Liran Haimovitch>Python for our backend.
+
+236
+00:17:06.980 --> 00:17:13.440
+<v Liran Haimovitch>And without thinking about it too much, we actually built heavily on REST APIs, tons
+
+237
+00:17:13.440 --> 00:17:17.260
+<v Liran Haimovitch>and tons and tons of calls, even at a very, very, very small scale.
+
+238
+00:17:17.260 --> 00:17:21.560
+<v Liran Haimovitch>we already got to the point where we are serving dozens of requests,
+
+239
+00:17:21.920 --> 00:17:24.160
+<v Liran Haimovitch>dozens of REST requests every second,
+
+240
+00:17:24.300 --> 00:17:27.820
+<v Liran Haimovitch>which is not that bad, you know, if you're a large scale.
+
+241
+00:17:28.020 --> 00:17:31.140
+<v Liran Haimovitch>But if you're starting to see that it's a very small scale,
+
+242
+00:17:31.300 --> 00:17:32.740
+<v Liran Haimovitch>then you're seeing that you have a problem.
+
+243
+00:17:33.300 --> 00:17:38.540
+<v Liran Haimovitch>Especially for Python, the way a concurrency is managed is not that great.
+
+244
+00:17:38.720 --> 00:17:40.740
+<v Liran Haimovitch>It's not the strength of the language.
+
+245
+00:17:40.920 --> 00:17:43.540
+<v Liran Haimovitch>And we've put it at a very tight spot,
+
+246
+00:17:43.540 --> 00:17:48.540
+<v Liran Haimovitch>thought trying to get tons of concurrency out of something that wasn't made for it.
+
+247
+00:17:48.700 --> 00:17:53.200
+<v Liran Haimovitch>Now there are various ways to squeeze some extra concurrency, whether it's a libraries
+
+248
+00:17:53.200 --> 00:17:59.480
+<v Liran Haimovitch>such as gevent or Greenlet, whether it's using web servers to manage the load, but
+
+249
+00:17:59.480 --> 00:18:04.800
+<v Liran Haimovitch>those things each have their own disadvantages and they're a bit finicky, especially when
+
+250
+00:18:04.800 --> 00:18:05.780
+<v Liran Haimovitch>you try to combine them.
+
+251
+00:18:06.040 --> 00:18:08.640
+<v Liran Haimovitch>And we actually ran into a lot of problems into that.
+
+252
+00:18:09.280 --> 00:18:12.180
+<v Liran Haimovitch>We've also shifted from rest to GraphQL.
+
+253
+00:18:13.780 --> 00:18:19.320
+<v Liran Haimovitch>GraphQL allows us to reduce the number of request we're making somewhere between an order of 10
+
+254
+00:18:19.320 --> 00:18:26.580
+<v Liran Haimovitch>to an order of 100 per client, per service, per user. And we found that it was enabling us to do
+
+255
+00:18:26.580 --> 00:18:32.300
+<v Liran Haimovitch>way, way, way more in a much simpler manner. And I honestly can't recommend it enough. GraphQL is
+
+256
+00:18:32.300 --> 00:18:40.940
+<v Liran Haimovitch>awesome. I would also mention that we ran into problems around performance of the SDKs. Early on,
+
+257
+00:18:40.940 --> 00:18:46.780
+<v Liran Haimovitch>it's very challenging to figure out how am I gonna run with in someone else's
+
+258
+00:18:46.780 --> 00:18:52.100
+<v Liran Haimovitch>code without impacting his performance how am I gonna collect data from running
+
+259
+00:18:52.100 --> 00:18:57.180
+<v Liran Haimovitch>applications at scale very high concurrency challenging thing is to
+
+260
+00:18:57.180 --> 00:19:01.860
+<v Liran Haimovitch>figure out not only the differences between runtimes but also the weak spots
+
+261
+00:19:01.860 --> 00:19:07.680
+<v Liran Haimovitch>for each runtime as well as how are different people using them if you take
+
+262
+00:19:08.900 --> 00:19:12.500
+<v Liran Haimovitch>then you can find Java servers that are very light,
+
+263
+00:19:12.600 --> 00:19:16.960
+<v Liran Haimovitch>that are running microservices-oriented architectures,
+
+264
+00:19:16.960 --> 00:19:18.120
+<v Liran Haimovitch>that are using Spring Boot,
+
+265
+00:19:18.320 --> 00:19:21.420
+<v Liran Haimovitch>that have just a handful of Java files,
+
+266
+00:19:21.560 --> 00:19:23.300
+<v Liran Haimovitch>potentially dozens of them.
+
+267
+00:19:23.760 --> 00:19:27.440
+<v Liran Haimovitch>You can also have Java enterprise application servers,
+
+268
+00:19:27.520 --> 00:19:28.760
+<v Liran Haimovitch>such as WebLogic.
+
+269
+00:19:28.820 --> 00:19:32.240
+<v Liran Haimovitch>And we've seen customers all of a sudden spin those up
+
+270
+00:19:32.240 --> 00:19:35.180
+<v Liran Haimovitch>with 50 to 100 WARs or EARs,
+
+271
+00:19:35.700 --> 00:19:38.000
+<v Liran Haimovitch>and with 5,000 threads or more.
+
+272
+00:19:38.680 --> 00:19:42.640
+<v Liran Haimovitch>Now, obviously, the edge cases you're going to face are very different.
+
+273
+00:19:42.820 --> 00:19:46.580
+<v Liran Haimovitch>For a small container, start time might be important.
+
+274
+00:19:47.040 --> 00:19:52.440
+<v Liran Haimovitch>We saw that some of those customers had start times of over 40 minutes for their servers.
+
+275
+00:19:53.140 --> 00:19:58.860
+<v Liran Haimovitch>And the way you impact small servers, medium servers, and large servers is entirely different.
+
+276
+00:19:59.580 --> 00:20:06.000
+<v Liran Haimovitch>Now, besides Java on the JVM, we also have customers using us for Clojure or Kotlin or Groovy or Scala.
+
+277
+00:20:06.000 --> 00:20:13.540
+<v Liran Haimovitch>and each of those compilers create a slightly different version of those Java class files
+
+278
+00:20:13.540 --> 00:20:17.180
+<v Liran Haimovitch>and those changes end up with different performance profiles
+
+279
+00:20:17.180 --> 00:20:20.360
+<v Liran Haimovitch>and along the way we found a lot of stuff
+
+280
+00:20:20.360 --> 00:20:23.800
+<v Liran Haimovitch>we found how to work better for different runtimes
+
+281
+00:20:23.800 --> 00:20:26.660
+<v Liran Haimovitch>how to work better for different versions of the JVM
+
+282
+00:20:26.660 --> 00:20:29.720
+<v Liran Haimovitch>how to work better for small versus large servers
+
+283
+00:20:29.720 --> 00:20:31.560
+<v Liran Haimovitch>and how to build safeties in place
+
+284
+00:20:31.560 --> 00:20:34.320
+<v Liran Haimovitch>so that if things don't work perfectly
+
+285
+00:20:36.000 --> 00:20:37.920
+<v Liran Haimovitch>creating any adverse effect anywhere.
+
+286
+00:20:39.280 --> 00:20:43.260
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built, what are you
+
+287
+00:20:43.260 --> 00:20:43.980
+<v Noah Labhart>most proud of?
+
+288
+00:20:45.140 --> 00:20:49.240
+<v Liran Haimovitch>I think I'm most proud of the team and the product we've built and the business we've
+
+289
+00:20:49.240 --> 00:20:50.120
+<v Liran Haimovitch>built around it.
+
+290
+00:20:50.240 --> 00:20:56.820
+<v Liran Haimovitch>As we're finishing 2021, we're seeing a lot of companies that raised tons of money on
+
+291
+00:20:56.820 --> 00:20:59.680
+<v Liran Haimovitch>the hype that was in the market over the past year.
+
+292
+00:20:59.680 --> 00:21:06.060
+<v Liran Haimovitch>we're seeing a lot of teams that are having something around and don't care all that much
+
+293
+00:21:06.060 --> 00:21:10.400
+<v Liran Haimovitch>and we're seeing it in corporates we're seeing it in startups i think we have something unique in
+
+294
+00:21:10.400 --> 00:21:16.340
+<v Liran Haimovitch>the fact that the team is very dedicated to the product to the to each other even more importantly
+
+295
+00:21:16.340 --> 00:21:22.800
+<v Liran Haimovitch>that they truly care about the company and our customers and that they're always focusing on
+
+296
+00:21:22.800 --> 00:21:28.880
+<v Liran Haimovitch>doing their best even sometimes it puts them in clashes with each other because for each of them
+
+297
+00:21:29.680 --> 00:21:33.960
+<v Liran Haimovitch>something different, but they're all working together and striving for something real.
+
+298
+00:21:34.560 --> 00:21:40.120
+<v Liran Haimovitch>And the fact that we've taken these technologies that used to be science fiction just five years
+
+299
+00:21:40.120 --> 00:21:46.740
+<v Liran Haimovitch>ago and have built it and are running it at scale in dozens of companies, Fortune 500 companies,
+
+300
+00:21:46.960 --> 00:21:52.600
+<v Liran Haimovitch>some of the biggest banks in the world, is a huge achievement that was made possible first
+
+301
+00:21:52.600 --> 00:21:56.220
+<v Liran Haimovitch>and foremost by the team just getting things done, whatever it takes.
+
+302
+00:21:56.220 --> 00:22:00.960
+<v Noah Labhart>I love how you put the point about five years ago, this was all science fiction.
+
+303
+00:22:01.400 --> 00:22:08.660
+<v Noah Labhart>And I think that's just a testament to how fast things move and how fast your team has moved to build it.
+
+304
+00:22:08.700 --> 00:22:09.800
+<v Noah Labhart>So kudos. That's really cool.
+
+305
+00:22:10.240 --> 00:22:18.260
+<v Liran Haimovitch>One of my favorite things about Rookout, which I've been doing a lot over the past couple of months as COVID started to subdue,
+
+306
+00:22:18.960 --> 00:22:20.080
+<v Liran Haimovitch>has been conferences.
+
+307
+00:22:20.080 --> 00:22:25.900
+<v Liran Haimovitch>conferences. Now, when I go to a conference and I walk the floor or I stand at the booth,
+
+308
+00:22:26.140 --> 00:22:31.600
+<v Liran Haimovitch>I get to meet so many people and I get to demo them and I get to show them what Rookout is about.
+
+309
+00:22:31.920 --> 00:22:39.380
+<v Liran Haimovitch>And I've seen so many jaws drop that it's amazing. It's the best experience showing people what can
+
+310
+00:22:39.380 --> 00:22:45.240
+<v Liran Haimovitch>be made. And also that seeing that week after week, month after month, the same experience
+
+311
+00:22:45.240 --> 00:22:47.980
+<v Liran Haimovitch>becomes easier to demo, easier to use.
+
+312
+00:22:48.380 --> 00:22:50.540
+<v Liran Haimovitch>And the wow effect is only growing
+
+313
+00:22:50.540 --> 00:22:52.420
+<v Liran Haimovitch>every time we meet a new customer,
+
+314
+00:22:52.940 --> 00:22:55.240
+<v Liran Haimovitch>every time we meet a new engineer
+
+315
+00:22:55.240 --> 00:22:57.120
+<v Liran Haimovitch>that's new to what we're doing.
+
+316
+00:22:58.940 --> 00:23:00.320
+<v Noah Labhart>Let's flip the script a little bit.
+
+317
+00:23:00.480 --> 00:23:02.140
+<v Noah Labhart>So tell me about a mistake you made
+
+318
+00:23:02.140 --> 00:23:04.160
+<v Noah Labhart>and how you and your team responded to it.
+
+319
+00:23:04.960 --> 00:23:06.820
+<v Liran Haimovitch>So I know it's an engineering podcast,
+
+320
+00:23:07.540 --> 00:23:09.560
+<v Liran Haimovitch>but I think we're all people.
+
+321
+00:23:09.960 --> 00:23:11.820
+<v Liran Haimovitch>And especially as managers,
+
+322
+00:23:11.820 --> 00:23:15.360
+<v Liran Haimovitch>sometimes our challenges are not so much about tech.
+
+323
+00:23:16.240 --> 00:23:19.820
+<v Liran Haimovitch>I think one of my biggest mistakes early on at Rookout,
+
+324
+00:23:20.040 --> 00:23:22.220
+<v Liran Haimovitch>and I'm wondering if the person I'm going to talk about
+
+325
+00:23:22.220 --> 00:23:23.960
+<v Liran Haimovitch>is going to hear this episode, it's going to be interesting,
+
+326
+00:23:24.120 --> 00:23:25.400
+<v Liran Haimovitch>is raises.
+
+327
+00:23:25.880 --> 00:23:29.940
+<v Liran Haimovitch>Now, as people, as engineers, as managers,
+
+328
+00:23:30.000 --> 00:23:33.320
+<v Liran Haimovitch>we often think of salary incrementally.
+
+329
+00:23:33.340 --> 00:23:37.680
+<v Liran Haimovitch>So if somebody started a company making, I don't know, 80K a year,
+
+330
+00:23:37.680 --> 00:23:42.080
+<v Liran Haimovitch>then the next year they should be making 10 or 20% above that.
+
+331
+00:23:42.380 --> 00:23:46.860
+<v Liran Haimovitch>But early on in Rookout, we had a DevOps engineer join us.
+
+332
+00:23:46.880 --> 00:23:48.900
+<v Liran Haimovitch>It was pretty much his first gig.
+
+333
+00:23:49.380 --> 00:23:51.380
+<v Liran Haimovitch>Man, he learned fast.
+
+334
+00:23:51.780 --> 00:23:54.440
+<v Liran Haimovitch>He was one of the most talented engineers I've worked with.
+
+335
+00:23:54.520 --> 00:23:55.600
+<v Liran Haimovitch>He learned super fast.
+
+336
+00:23:55.820 --> 00:24:02.540
+<v Liran Haimovitch>And at the time, we pretty much focused on the raise, you know, incrementally raise as it goes.
+
+337
+00:24:02.780 --> 00:24:05.600
+<v Liran Haimovitch>We've raised it quite often, I think three times a year.
+
+338
+00:24:05.600 --> 00:24:10.600
+<v Liran Haimovitch>they gave him some nice raises but still it's still i don't know he got from i don't know 50
+
+339
+00:24:10.600 --> 00:24:18.140
+<v Liran Haimovitch>60 percent more within a year and a half but once he kind of started getting offered from the
+
+340
+00:24:18.140 --> 00:24:24.600
+<v Liran Haimovitch>outside all of the sudden he got offers for almost double what we were paying him at the time
+
+341
+00:24:24.600 --> 00:24:30.620
+<v Liran Haimovitch>as much as we admired him and as much as we thought he was an amazing engineer and wanted
+
+342
+00:24:30.620 --> 00:24:36.240
+<v Liran Haimovitch>to pay him we were kind of fixated on we're raising him pretty high because we're giving
+
+343
+00:24:36.240 --> 00:24:42.640
+<v Liran Haimovitch>him that 10 20 every three to six months and at the end of the day it wasn't that high and
+
+344
+00:24:42.640 --> 00:24:47.780
+<v Liran Haimovitch>he kind of at some point he came to me and said he got this crazy offer and he's leaving
+
+345
+00:24:48.500 --> 00:24:55.680
+<v Liran Haimovitch>i actually got him to stay i talked to him i asked i told him he deserves it i told him we can pay him
+
+346
+00:24:55.680 --> 00:25:01.640
+<v Liran Haimovitch>he stayed for a while longer he also did great since then but i have to say our relationship
+
+347
+00:25:01.640 --> 00:25:08.760
+<v Liran Haimovitch>since then hasn't been the same since he came to me saying i took another job because you are
+
+348
+00:25:08.760 --> 00:25:13.960
+<v Liran Haimovitch>underpaying me and i've kind of taken that lesson to heart since then and i try to focus as much as
+
+349
+00:25:13.960 --> 00:25:20.320
+<v Liran Haimovitch>possible on what people should be making rather than what they are making today which also kind
+
+350
+00:25:20.320 --> 00:25:23.540
+<v Liran Haimovitch>kind of brings a different topic of compensation in general.
+
+351
+00:25:24.060 --> 00:25:26.720
+<v Liran Haimovitch>And where as a company or as an employer,
+
+352
+00:25:26.840 --> 00:25:29.100
+<v Liran Haimovitch>you want to be on the salary bench.
+
+353
+00:25:29.280 --> 00:25:30.140
+<v Liran Haimovitch>Do you want to be someone,
+
+354
+00:25:30.260 --> 00:25:33.680
+<v Liran Haimovitch>a company that's underpaying or overpaying your employees?
+
+355
+00:25:36.360 --> 00:25:38.260
+<v Noah Labhart>Well, this will be fun to ask.
+
+356
+00:25:38.400 --> 00:25:39.500
+<v Noah Labhart>What does the future look like
+
+357
+00:25:39.500 --> 00:25:42.120
+<v Noah Labhart>for Rookout the product and for your team?
+
+358
+00:25:42.940 --> 00:25:44.780
+<v Liran Haimovitch>So the future is going to be super fun.
+
+359
+00:25:45.300 --> 00:25:48.380
+<v Liran Haimovitch>We've got tons of conferences over the next few months.
+
+360
+00:25:50.320 --> 00:25:52.900
+<v Liran Haimovitch>by a conference, let us know, we might be there.
+
+361
+00:25:53.460 --> 00:25:56.420
+<v Liran Haimovitch>We're tons of cool swag and even better demos.
+
+362
+00:25:56.820 --> 00:26:01.980
+<v Liran Haimovitch>We also have a free tier that everybody can hop on and use
+
+363
+00:26:01.980 --> 00:26:04.800
+<v Liran Haimovitch>and just go to rookout.com and start using the product
+
+364
+00:26:04.800 --> 00:26:06.680
+<v Liran Haimovitch>and experimenting with it and have fun with it.
+
+365
+00:26:07.100 --> 00:26:11.160
+<v Liran Haimovitch>We've recently launched our live logging component.
+
+366
+00:26:11.780 --> 00:26:15.540
+<v Liran Haimovitch>I've mentioned that we have these things called dynamic observability,
+
+367
+00:26:15.540 --> 00:26:22.880
+<v Liran Haimovitch>which is kind of our way of saying you should be able to determine the data you get on the fly
+
+368
+00:26:24.200 --> 00:26:27.660
+<v Liran Haimovitch>without having to change the code over and over and over again.
+
+369
+00:26:28.480 --> 00:26:31.920
+<v Liran Haimovitch>We've talked mostly about how do we do that for live debugging,
+
+370
+00:26:32.080 --> 00:26:36.780
+<v Liran Haimovitch>how do we set non-breaking breakpoints on any line of code and collect data from that,
+
+371
+00:26:36.900 --> 00:26:40.820
+<v Liran Haimovitch>but our story goes beyond that, our vision goes way beyond that,
+
+372
+00:26:40.940 --> 00:26:44.080
+<v Liran Haimovitch>and we believe that all forms of data should be dynamic,
+
+373
+00:26:45.540 --> 00:26:50.400
+<v Liran Haimovitch>It can be logging, it can be metrics, it can be spans, it can be BI data.
+
+374
+00:26:51.380 --> 00:26:55.040
+<v Liran Haimovitch>With live logging, we're taking that mindset to the logging area.
+
+375
+00:26:55.220 --> 00:27:01.000
+<v Liran Haimovitch>We want engineers to be able to decide in real time what logs they want versus what logs they don't need.
+
+376
+00:27:01.460 --> 00:27:09.580
+<v Liran Haimovitch>So it can be about adding or removing or changing verbosity, but it can also be smarter and more focused.
+
+377
+00:27:09.640 --> 00:27:12.600
+<v Liran Haimovitch>So let's say you have a customer you're very interested in.
+
+378
+00:27:12.600 --> 00:27:18.780
+<v Liran Haimovitch>So why don't you get debug level logs for that customers without turning the entire system into debug?
+
+379
+00:27:19.140 --> 00:27:25.580
+<v Liran Haimovitch>Why don't you get debug level logs for specific environments you care about or for specific
+
+380
+00:27:26.360 --> 00:27:33.380
+<v Liran Haimovitch>Accounts or even just for yourself if you're just you know running a unit test or a manual test on a remote environment
+
+381
+00:27:33.380 --> 00:27:39.180
+<v Liran Haimovitch>Staging production whatever why don't you just get debug level logs just for you without
+
+382
+00:27:39.180 --> 00:27:41.260
+<v Liran Haimovitch>without impacting the environment as a whole.
+
+383
+00:27:41.480 --> 00:27:44.020
+<v Liran Haimovitch>And that's the kind of things we're working on,
+
+384
+00:27:44.100 --> 00:27:49.320
+<v Liran Haimovitch>making more and more parts of observing our applications dynamic rather than static,
+
+385
+00:27:49.480 --> 00:27:53.320
+<v Liran Haimovitch>so that we can just focus on the data we want and instantly get it,
+
+386
+00:27:53.420 --> 00:27:57.780
+<v Liran Haimovitch>instead of constantly having to walk backwards from the data we happen to have.
+
+387
+00:27:59.120 --> 00:28:00.280
+<v Noah Labhart>Let's switch to you, Liran.
+
+388
+00:28:00.500 --> 00:28:02.540
+<v Noah Labhart>Who influences the way that you work?
+
+389
+00:28:02.620 --> 00:28:06.540
+<v Noah Labhart>Name a CEO, CTO, an architect, really any person you look up to and why.
+
+390
+00:28:07.900 --> 00:28:14.180
+<v Liran Haimovitch>I would say I'm looking up to more often than anyone else to my wife.
+
+391
+00:28:15.320 --> 00:28:16.760
+<v Liran Haimovitch>She's also working in tech.
+
+392
+00:28:16.840 --> 00:28:17.760
+<v Liran Haimovitch>She's a product manager.
+
+393
+00:28:18.180 --> 00:28:19.880
+<v Liran Haimovitch>She's very not techie.
+
+394
+00:28:19.960 --> 00:28:22.920
+<v Liran Haimovitch>And yet she's extremely techie at the same time.
+
+395
+00:28:23.120 --> 00:28:28.320
+<v Liran Haimovitch>But I think I look up to her first and foremost because people love her.
+
+396
+00:28:28.400 --> 00:28:29.900
+<v Liran Haimovitch>People always love her.
+
+397
+00:28:30.120 --> 00:28:33.700
+<v Liran Haimovitch>She always knows what's going on with other people.
+
+398
+00:28:33.820 --> 00:28:35.560
+<v Liran Haimovitch>She always knows what to say.
+
+399
+00:28:36.540 --> 00:28:42.880
+<v Liran Haimovitch>how to approach things and she has this amazing capability of blacking out whatever is going on
+
+400
+00:28:42.880 --> 00:28:48.640
+<v Liran Haimovitch>with her whatever is going on inside and just step into a room be the best with the people there no
+
+401
+00:28:48.640 --> 00:28:54.920
+<v Liran Haimovitch>matter what's going on and i think this is something i often envy as i'm managing people
+
+402
+00:28:54.920 --> 00:29:03.260
+<v Liran Haimovitch>as i'm walking late nights as i'm finding myself in tons of weird and difficult situations with
+
+403
+00:29:03.260 --> 00:29:05.200
+<v Liran Haimovitch>with people I know and people I don't know,
+
+404
+00:29:05.360 --> 00:29:07.520
+<v Liran Haimovitch>it's always something I try to live up to.
+
+405
+00:29:07.960 --> 00:29:09.140
+<v Noah Labhart>That's a great answer.
+
+406
+00:29:09.320 --> 00:29:11.820
+<v Noah Labhart>I 100% love and support that answer.
+
+407
+00:29:12.460 --> 00:29:14.700
+<v Noah Labhart>Well, we talked about a mistake earlier,
+
+408
+00:29:14.880 --> 00:29:16.140
+<v Noah Labhart>but a little bit different spin.
+
+409
+00:29:16.660 --> 00:29:18.180
+<v Noah Labhart>If you could go back to the beginning,
+
+410
+00:29:18.360 --> 00:29:19.280
+<v Noah Labhart>what would you do differently?
+
+411
+00:29:19.380 --> 00:29:21.340
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+412
+00:29:22.160 --> 00:29:26.020
+<v Liran Haimovitch>The most important thing by far is to focus on impact.
+
+413
+00:29:26.400 --> 00:29:29.000
+<v Liran Haimovitch>Know what your business is doing,
+
+414
+00:29:29.640 --> 00:29:31.340
+<v Liran Haimovitch>know how it is being measured,
+
+415
+00:29:33.260 --> 00:29:39.520
+<v Liran Haimovitch>as possible on that. If whatever you're doing is going to make a big impact on that,
+
+416
+00:29:40.100 --> 00:29:46.220
+<v Liran Haimovitch>then it might be worthwhile doing. If it's not, then it's probably not worthwhile doing. And even
+
+417
+00:29:46.220 --> 00:29:51.700
+<v Liran Haimovitch>if it's going to make an impact, ask yourself and be true to yourself. Is this the thing that's
+
+418
+00:29:51.700 --> 00:29:58.040
+<v Liran Haimovitch>going to make the most impact right now? Now, this idea is something that can make me reevaluate
+
+419
+00:29:58.040 --> 00:30:04.360
+<v Liran Haimovitch>pretty much every decision I've made since founding Rookout, whether it's about hiring
+
+420
+00:30:04.360 --> 00:30:11.660
+<v Liran Haimovitch>roles, who I hired, when I hired, it can be about changing product tasks, architecture
+
+421
+00:30:11.660 --> 00:30:16.100
+<v Liran Haimovitch>tasks, but truly that's the most important thing.
+
+422
+00:30:16.420 --> 00:30:22.040
+<v Liran Haimovitch>Now, when you're doing things day to day, when the phone is ringing, when Slack is pinging
+
+423
+00:30:22.040 --> 00:30:26.780
+<v Liran Haimovitch>you when bugs are coming in, when you already have a vision in mind.
+
+424
+00:30:27.220 --> 00:30:32.360
+<v Liran Haimovitch>It's very easy to get into the nitty gritty details and just get stuff done.
+
+425
+00:30:32.580 --> 00:30:38.000
+<v Liran Haimovitch>But it's way, way more important to focus, keep focusing on the bigger picture, keep
+
+426
+00:30:38.000 --> 00:30:38.980
+<v Liran Haimovitch>focused on the impact.
+
+427
+00:30:39.160 --> 00:30:44.260
+<v Liran Haimovitch>No matter what business you're in, try to distill to yourself this one thing that matters
+
+428
+00:30:44.260 --> 00:30:49.880
+<v Liran Haimovitch>the most and do as little as possible that doesn't affect it and do as much as possible
+
+429
+00:30:49.880 --> 00:30:52.440
+<v Liran Haimovitch>possible that affects it greatly.
+
+430
+00:30:53.860 --> 00:30:55.060
+<v Noah Labhart>Well, last question, Liran.
+
+431
+00:30:55.380 --> 00:30:59.100
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the
+
+432
+00:30:59.100 --> 00:30:59.880
+<v Noah Labhart>next big thing.
+
+433
+00:31:00.180 --> 00:31:01.260
+<v Noah Labhart>They're jazzed about it.
+
+434
+00:31:01.300 --> 00:31:02.500
+<v Noah Labhart>They can't wait to show it off to the world.
+
+435
+00:31:02.660 --> 00:31:04.640
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+436
+00:31:05.060 --> 00:31:08.060
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+437
+00:31:09.860 --> 00:31:11.200
+<v Liran Haimovitch>Nobody cares what you've built.
+
+438
+00:31:12.620 --> 00:31:16.980
+<v Liran Haimovitch>Focus on the problem you're solving and the people you're solving it to.
+
+439
+00:31:18.160 --> 00:31:19.780
+<v Noah Labhart>that's fantastic advice
+
+440
+00:31:19.780 --> 00:31:22.700
+<v Noah Labhart>straightforward, direct and the right message
+
+441
+00:31:22.700 --> 00:31:25.240
+<v Noah Labhart>well Liran thank you for being on the show today
+
+442
+00:31:25.240 --> 00:31:27.940
+<v Noah Labhart>thank you for telling the creation story of Rookout
+
+443
+00:31:27.940 --> 00:31:28.620
+<v Noah Labhart>thanks
+
+444
+00:31:28.620 --> 00:31:29.580
+<v Liran Haimovitch>for having me it's been fun
+
+445
+00:31:31.980 --> 00:31:34.880
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+446
+00:31:38.120 --> 00:31:41.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart
+
+447
+00:31:41.280 --> 00:31:44.020
+<v Noah Labhart>be sure to subscribe on Apple Podcasts, Spotify
+
+448
+00:31:44.020 --> 00:31:46.200
+<v Noah Labhart>or the podcasting app of your choice
+
+449
+00:31:46.980 --> 00:31:51.680
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+450
+00:31:52.100 --> 00:31:54.260
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+451
+00:31:54.580 --> 00:31:56.460
+<v Noah Labhart>Both things help us out tremendously.
+
+452
+00:31:58.940 --> 00:32:00.360
+<v Noah Labhart>And thanks again for listening.

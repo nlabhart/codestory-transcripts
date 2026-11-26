@@ -1,0 +1,1803 @@
+WEBVTT
+
+NOTE S2 E4: Scaling High-Volume Customer Engagement & Push Notification APIs | George Deglin (OneSignal)
+
+1
+00:00:02.360 --> 00:00:13.620
+<v George Deglin>In the early days, scalability was sort of barely on our minds. The goalpost was how do we make it scalable enough for the next 30 days? This is sort of how we looked at things.
+
+2
+00:00:13.760 --> 00:00:27.440
+<v George Deglin>And even things like the architecture of the product or tests or maintainability, we definitely had accepted that we were willing to push some of that out as future technical debt.
+
+3
+00:00:27.440 --> 00:00:29.820
+<v George Deglin>in the interest of just shipping the product
+
+4
+00:00:29.820 --> 00:00:30.540
+<v George Deglin>a little bit faster.
+
+5
+00:00:32.440 --> 00:00:33.620
+<v George Deglin>I'm George Deglin,
+
+6
+00:00:33.780 --> 00:00:36.460
+<v George Deglin>co-founder and CEO of OneSignal.
+
+7
+00:00:41.820 --> 00:00:43.460
+<v Noah Labhart>This is Code Story,
+
+8
+00:00:43.660 --> 00:00:45.700
+<v Noah Labhart>a podcast bringing you interviews
+
+9
+00:00:45.700 --> 00:00:47.060
+<v Noah Labhart>with tech visionaries
+
+10
+00:00:47.060 --> 00:00:49.400
+<v Noah Labhart>who share in the critical moments
+
+11
+00:00:49.400 --> 00:00:51.100
+<v Noah Labhart>of what it takes to change an industry
+
+12
+00:00:51.100 --> 00:00:53.040
+<v Noah Labhart>and build and lead
+
+13
+00:00:53.040 --> 00:00:54.860
+<v Noah Labhart>a team that has your back.
+
+14
+00:00:57.440 --> 00:01:05.880
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how George Deglin slugged through pivot after pivot to build a company sending billions of push notifications a day.
+
+15
+00:01:06.660 --> 00:01:09.100
+<v Noah Labhart>All this and more on Code Story.
+
+16
+00:01:12.160 --> 00:01:18.140
+<v Noah Labhart>Growing up in the Bay Area, George Deglin has always been in the middle of the Silicon Valley action.
+
+17
+00:01:18.340 --> 00:01:23.780
+<v Noah Labhart>Having both parents being engineers, he was influenced to study computer science at Berkeley.
+
+18
+00:01:24.220 --> 00:01:27.700
+<v Noah Labhart>During that time, he co-founded a startup in the education space.
+
+19
+00:01:27.860 --> 00:01:32.180
+<v Noah Labhart>And after building this company up, he parted ways to start his next venture.
+
+20
+00:01:32.320 --> 00:01:37.580
+<v Noah Labhart>This next venture led to the discovery of the Vision for OneSignal,
+
+21
+00:01:37.660 --> 00:01:41.620
+<v Noah Labhart>the most widely used push notification and marketing platform,
+
+22
+00:01:42.000 --> 00:01:45.380
+<v Noah Labhart>sending over 5 billion messages a day.
+
+23
+00:01:47.640 --> 00:01:50.180
+<v George Deglin>The company's had a very interesting history,
+
+24
+00:01:50.180 --> 00:01:55.940
+<v George Deglin>And it's actually been around for quite a while in a few different versions, I guess.
+
+25
+00:01:56.100 --> 00:02:01.700
+<v George Deglin>After I had left my first startup and I was looking to do something new, I met my co-founder
+
+26
+00:02:01.700 --> 00:02:05.200
+<v George Deglin>that had previously started a company himself in the consumer space.
+
+27
+00:02:05.500 --> 00:02:08.240
+<v George Deglin>And we hit it off really well.
+
+28
+00:02:08.400 --> 00:02:09.940
+<v George Deglin>We were both looking to start something new.
+
+29
+00:02:10.180 --> 00:02:17.600
+<v George Deglin>And the initial product idea that we had was building a social network that would let people
+
+30
+00:02:17.600 --> 00:02:21.640
+<v George Deglin>share their identities across different websites, different apps and different games that they use.
+
+31
+00:02:21.740 --> 00:02:26.580
+<v George Deglin>So you can think of it similar to like Facebook login, but linked to sort of a virtual persona
+
+32
+00:02:26.580 --> 00:02:31.540
+<v George Deglin>and a virtual avatar, rather than sort of your real persona, like something like Facebook or
+
+33
+00:02:31.540 --> 00:02:35.440
+<v George Deglin>LinkedIn. And yeah, I think it's a very interesting idea. We were both very excited about it.
+
+34
+00:02:35.540 --> 00:02:42.100
+<v George Deglin>We applied to Y Combinator and we were accepted in 2011. And after working on that idea for quite
+
+35
+00:02:42.100 --> 00:02:46.860
+<v George Deglin>a while and trying to find people that would partner with us to adopt our technology,
+
+36
+00:02:47.600 --> 00:02:50.440
+<v George Deglin>decided that it was just going to be too difficult to get off the ground.
+
+37
+00:02:50.640 --> 00:02:52.660
+<v George Deglin>And we went through a long series of pivots.
+
+38
+00:02:53.060 --> 00:02:55.460
+<v George Deglin>It's funny actually to see some of the companies starting now
+
+39
+00:02:55.460 --> 00:02:58.640
+<v George Deglin>that are building on some ideas that we had back in the day.
+
+40
+00:02:58.840 --> 00:03:03.360
+<v George Deglin>So I had thought of things like maybe there's a way to do like fuel delivery to cars.
+
+41
+00:03:03.680 --> 00:03:05.520
+<v George Deglin>And of course, there's a couple startups doing that now.
+
+42
+00:03:06.000 --> 00:03:08.220
+<v George Deglin>Maybe there's a way to build a better email client.
+
+43
+00:03:08.440 --> 00:03:09.920
+<v George Deglin>And of course, you have like Superhuman now.
+
+44
+00:03:10.260 --> 00:03:14.600
+<v George Deglin>I actually think like we were not really prepared to do a good job with any of those ideas,
+
+45
+00:03:14.860 --> 00:03:16.700
+<v George Deglin>but we definitely did some research into them.
+
+46
+00:03:17.600 --> 00:03:21.860
+<v George Deglin>Ultimately, what we ended up working on for a couple years was building a mobile game studio.
+
+47
+00:03:22.140 --> 00:03:24.580
+<v George Deglin>And I would say we were very, very good at that.
+
+48
+00:03:24.720 --> 00:03:26.420
+<v George Deglin>We built a really excellent team.
+
+49
+00:03:26.540 --> 00:03:30.200
+<v George Deglin>I found myself really enjoying the technical craft of building games.
+
+50
+00:03:30.480 --> 00:03:34.800
+<v George Deglin>My co-founder is an incredibly talented illustrator, had some game design experience.
+
+51
+00:03:35.220 --> 00:03:39.840
+<v George Deglin>So the games that we built were very successful in terms of the amount of traction that they were able to get.
+
+52
+00:03:39.840 --> 00:03:48.300
+<v George Deglin>But one of the challenges that we found ourselves facing was how to get users to re-engage with our games after initially playing them for a shorter period of time.
+
+53
+00:03:48.420 --> 00:03:56.200
+<v George Deglin>And a really straightforward way to do that as a mobile developer is to use notifications as a re-engagement channel.
+
+54
+00:03:56.560 --> 00:04:01.220
+<v George Deglin>And we were astounded at how difficult it was to do that in an effective way.
+
+55
+00:04:01.440 --> 00:04:05.880
+<v George Deglin>The technology to do it and the best practices were practically non-existent.
+
+56
+00:04:05.880 --> 00:04:10.120
+<v George Deglin>And ultimately, that's actually what gave us the vision to build OneSignal.
+
+57
+00:04:12.660 --> 00:04:15.700
+<v Noah Labhart>For people that don't know what OneSignal is,
+
+58
+00:04:15.840 --> 00:04:19.260
+<v Noah Labhart>can you tell me a little bit about the company and about what you guys do now?
+
+59
+00:04:20.020 --> 00:04:24.400
+<v George Deglin>The vision of the business is to help organizations and companies of all sizes
+
+60
+00:04:24.400 --> 00:04:26.620
+<v George Deglin>send more effective messages to their users.
+
+61
+00:04:26.800 --> 00:04:30.380
+<v George Deglin>The form that that takes is when you get notifications from different apps
+
+62
+00:04:30.380 --> 00:04:31.660
+<v George Deglin>you install on your mobile device,
+
+63
+00:04:31.860 --> 00:04:34.920
+<v George Deglin>or if you subscribe to Web Push from different websites that you visit.
+
+64
+00:04:35.500 --> 00:04:40.820
+<v George Deglin>technology, analytics, A-B testing, localization, all of these different sort of marketing analytics
+
+65
+00:04:41.560 --> 00:04:48.720
+<v George Deglin>tools and APIs for these businesses to improve the personalization, the segmentation,
+
+66
+00:04:48.860 --> 00:04:51.380
+<v George Deglin>and just the general effectiveness of the messages that they're sending.
+
+67
+00:04:51.560 --> 00:04:57.720
+<v George Deglin>We're very, very successful in the push messaging space. So right now, about 15% of all new mobile
+
+68
+00:04:57.720 --> 00:05:04.800
+<v George Deglin>apps use OneSignal for push notifications. We also power notifications for about 5% of the top
+
+69
+00:05:05.880 --> 00:05:09.400
+<v George Deglin>There's a good chance that you have several apps or you visit several websites that use
+
+70
+00:05:09.400 --> 00:05:14.280
+<v George Deglin>us for notifications. We've also broadened our business now to focus not just on push
+
+71
+00:05:14.280 --> 00:05:19.380
+<v George Deglin>notifications, but also to support email as a channel. And we're continuing to improve that.
+
+72
+00:05:19.600 --> 00:05:24.520
+<v George Deglin>We support things like interstitial in-app messaging for things like in-app coupons and
+
+73
+00:05:24.520 --> 00:05:29.420
+<v George Deglin>things like that. And we're also looking at other channels like SMS and others that our
+
+74
+00:05:29.420 --> 00:05:30.680
+<v George Deglin>customers are asking us for.
+
+75
+00:05:31.460 --> 00:05:34.940
+<v Noah Labhart>So tell me about the MVP. When you started out,
+
+76
+00:05:35.880 --> 00:05:40.140
+<v Noah Labhart>how long it took to build, and what tools you used to build the initial product.
+
+77
+00:05:40.880 --> 00:05:44.880
+<v George Deglin>Our goal from the very beginning of it was to try to get an MVP out as soon as possible.
+
+78
+00:05:45.100 --> 00:05:49.760
+<v George Deglin>We were actually pretty low on money. We had some confidence that it was a good idea,
+
+79
+00:05:50.040 --> 00:05:55.180
+<v George Deglin>but we weren't 100% certain until we could actually get it out there and see people using it.
+
+80
+00:05:55.440 --> 00:05:59.780
+<v George Deglin>There was definitely a rush to get something out there. We were okay with being embarrassed
+
+81
+00:05:59.780 --> 00:06:03.060
+<v George Deglin>with the quality of it, so long as it gave us an opportunity to start getting user feedback
+
+82
+00:06:03.060 --> 00:06:07.240
+<v George Deglin>back and start identifying what customers wanted. That said, the technology that we
+
+83
+00:06:07.240 --> 00:06:09.860
+<v George Deglin>had to build, it seemed almost overwhelming.
+
+84
+00:06:12.240 --> 00:06:17.280
+<v George Deglin>We had to build SDKs that people would put in their mobile application. And it wasn't
+
+85
+00:06:17.280 --> 00:06:22.320
+<v George Deglin>just like an iOS and Android SDK. We had to build SDKs for platforms like Unity. And at
+
+86
+00:06:22.320 --> 00:06:26.180
+<v George Deglin>the time, Marmalade was popular and people were using Titanium. Of course, today, you
+
+87
+00:06:26.180 --> 00:06:28.900
+<v George Deglin>have things like React Native and Ionic and tools like that.
+
+88
+00:06:28.900 --> 00:06:35.180
+<v George Deglin>So we had to build SDKs for that. We had to build a dashboard, an API, a user login system.
+
+89
+00:06:35.760 --> 00:06:41.120
+<v George Deglin>We had to build all that analytics capabilities. So there was just actually a lot that we had
+
+90
+00:06:41.120 --> 00:06:43.680
+<v George Deglin>to do even to get a very basic MVP out.
+
+91
+00:06:43.900 --> 00:06:49.100
+<v George Deglin>And we put together a list. It was myself and one engineer on our team that were working
+
+92
+00:06:49.100 --> 00:06:53.640
+<v George Deglin>on this. And we just said, Okay, we've got to do these 12 things in order to have something
+
+93
+00:06:53.640 --> 00:06:58.280
+<v George Deglin>that is usable at all. So let's just get through them as quickly as possible. Get the product
+
+94
+00:06:58.900 --> 00:07:00.300
+<v George Deglin>and see if it's successful or not.
+
+95
+00:07:00.540 --> 00:07:02.000
+<v George Deglin>And fortunately, it really was.
+
+96
+00:07:02.180 --> 00:07:04.400
+<v George Deglin>The product in its early stages was definitely something
+
+97
+00:07:04.400 --> 00:07:06.000
+<v George Deglin>that we were really embarrassed by.
+
+98
+00:07:06.280 --> 00:07:08.660
+<v George Deglin>I'm a terrible front-end designer.
+
+99
+00:07:09.040 --> 00:07:11.440
+<v George Deglin>I can code like CSS, or I could at the time,
+
+100
+00:07:11.480 --> 00:07:13.440
+<v George Deglin>but my design skills are non-existent.
+
+101
+00:07:13.480 --> 00:07:16.060
+<v George Deglin>So I had bought a $49 template.
+
+102
+00:07:16.280 --> 00:07:17.800
+<v George Deglin>It was not beautiful.
+
+103
+00:07:18.220 --> 00:07:21.040
+<v George Deglin>It was definitely functional, barely functional.
+
+104
+00:07:21.340 --> 00:07:22.900
+<v George Deglin>A lot of things had been cobbled together
+
+105
+00:07:22.900 --> 00:07:25.240
+<v George Deglin>with different open-source solutions that we had found.
+
+106
+00:07:25.540 --> 00:07:27.220
+<v George Deglin>But it was enough, frankly.
+
+107
+00:07:28.900 --> 00:07:30.440
+<v George Deglin>did the core things that it needed to do,
+
+108
+00:07:30.560 --> 00:07:32.500
+<v George Deglin>and very quickly gave us an opportunity
+
+109
+00:07:32.500 --> 00:07:33.840
+<v George Deglin>to get a few early users
+
+110
+00:07:33.840 --> 00:07:35.640
+<v George Deglin>and to start getting feedback from them
+
+111
+00:07:35.640 --> 00:07:36.960
+<v George Deglin>and continue to improve the product.
+
+112
+00:07:38.620 --> 00:07:40.660
+<v George Deglin>We weren't sure if we'd be able to pull it off.
+
+113
+00:07:41.660 --> 00:07:43.980
+<v George Deglin>We knew that there would be so much we'd have to learn,
+
+114
+00:07:44.040 --> 00:07:44.820
+<v George Deglin>so much to build,
+
+115
+00:07:45.180 --> 00:07:47.580
+<v George Deglin>but then I think the discovery we came to is
+
+116
+00:07:47.940 --> 00:07:49.640
+<v George Deglin>when you have a really small team
+
+117
+00:07:49.640 --> 00:07:51.220
+<v George Deglin>and a very focused set of goals,
+
+118
+00:07:51.600 --> 00:07:53.040
+<v George Deglin>it's incredible how fast you can move.
+
+119
+00:07:53.200 --> 00:07:54.180
+<v George Deglin>There really was no question about
+
+120
+00:07:54.180 --> 00:07:55.500
+<v George Deglin>should we do this or should we do that?
+
+121
+00:07:55.580 --> 00:07:58.320
+<v George Deglin>We knew exactly what we had to do at every given moment,
+
+122
+00:07:58.900 --> 00:08:00.840
+<v George Deglin>was extremely streamlined.
+
+123
+00:08:01.880 --> 00:08:03.720
+<v George Deglin>We were willing to take shortcuts
+
+124
+00:08:03.720 --> 00:08:06.360
+<v George Deglin>just to get something out the door and it paid off.
+
+125
+00:08:09.000 --> 00:08:11.620
+<v Noah Labhart>Listeners, do you deal with digestion issues?
+
+126
+00:08:12.000 --> 00:08:14.580
+<v Noah Labhart>Have trouble losing weight or feeling low on energy
+
+127
+00:08:14.580 --> 00:08:15.880
+<v Noah Labhart>or have trouble focusing?
+
+128
+00:08:16.100 --> 00:08:18.220
+<v Noah Labhart>It could have something to do with your gut.
+
+129
+00:08:18.460 --> 00:08:20.020
+<v Noah Labhart>According to the latest research,
+
+130
+00:08:20.180 --> 00:08:22.380
+<v Noah Labhart>your gut microbiome health is crucial
+
+131
+00:08:22.380 --> 00:08:23.820
+<v Noah Labhart>to your overall health.
+
+132
+00:08:24.000 --> 00:08:26.380
+<v Noah Labhart>I highly recommend checking out Thryve,
+
+133
+00:08:26.380 --> 00:08:32.160
+<v Noah Labhart>the number one rated gut microbiome testing company. Thryve makes the process easy. They
+
+134
+00:08:32.160 --> 00:08:37.240
+<v Noah Labhart>send you a test kit to your home. You mail back a sample of your stool in a prepaid box. And in
+
+135
+00:08:37.240 --> 00:08:43.220
+<v Noah Labhart>two to three weeks, receive a comprehensive gut health report with dietary recommendations and
+
+136
+00:08:43.220 --> 00:08:51.220
+<v Noah Labhart>the option to receive personalized probiotics. Check them out at www.thryveinside.com and use
+
+137
+00:08:51.220 --> 00:08:57.080
+<v Noah Labhart>Use the coupon code CODE for an exclusive offer of 15% off your first purchase.
+
+138
+00:08:57.300 --> 00:09:02.060
+<v Noah Labhart>That's T-H-R-Y-V-E inside.com.
+
+139
+00:09:04.460 --> 00:09:09.600
+<v Noah Labhart>What sort of decisions and trade-offs did you have to make in the short term when you're working on the MVP?
+
+140
+00:09:10.020 --> 00:09:15.340
+<v Noah Labhart>You mentioned one, you know, going with the theme versus designing, you know, from scratch front end.
+
+141
+00:09:15.340 --> 00:09:21.660
+<v Noah Labhart>But tell me a little bit more about those kind of early decisions and how you and the team coped with them.
+
+142
+00:09:22.740 --> 00:09:26.540
+<v George Deglin>You know, I think companies at a certain point have to be very careful about how they build stuff.
+
+143
+00:09:26.840 --> 00:09:29.160
+<v George Deglin>You know, it's things like having really good tests.
+
+144
+00:09:29.360 --> 00:09:35.420
+<v George Deglin>It's things like thinking about their database schema very carefully, thinking about the design of their APIs very carefully,
+
+145
+00:09:36.080 --> 00:09:40.760
+<v George Deglin>doing user research to figure out if a feature is going to improve the product or not.
+
+146
+00:09:41.080 --> 00:09:44.540
+<v George Deglin>For us, we didn't have the luxury of really doing a lot of that.
+
+147
+00:09:45.340 --> 00:09:49.700
+<v George Deglin>When it came, for instance, to our database schema, there was no real discussion between
+
+148
+00:09:49.700 --> 00:09:56.760
+<v George Deglin>myself and Josh, our other engineer I was working with, about should we have four tables
+
+149
+00:09:56.760 --> 00:10:00.380
+<v George Deglin>or five, or should this column be named this or that?
+
+150
+00:10:00.700 --> 00:10:01.660
+<v George Deglin>We would just do it.
+
+151
+00:10:02.540 --> 00:10:07.060
+<v George Deglin>We're both experienced enough to know that these sorts of decisions were resulting in
+
+152
+00:10:07.060 --> 00:10:08.420
+<v George Deglin>massive technical debt.
+
+153
+00:10:08.600 --> 00:10:11.600
+<v George Deglin>But that was something that we were willing to accept in the interest of just getting
+
+154
+00:10:11.600 --> 00:10:13.040
+<v George Deglin>things moving faster.
+
+155
+00:10:13.040 --> 00:10:18.500
+<v George Deglin>And like, I knew like, okay, I can either just go for it and like choose these database
+
+156
+00:10:18.500 --> 00:10:22.260
+<v George Deglin>tables or we can have a, you know, a half hour discussion on it, but then, you know,
+
+157
+00:10:22.260 --> 00:10:23.800
+<v George Deglin>we'll both sort of lose half an hour.
+
+158
+00:10:24.160 --> 00:10:27.380
+<v George Deglin>Whereas why don't we sort of just invest that time into, and just plow forward.
+
+159
+00:10:27.860 --> 00:10:30.360
+<v George Deglin>I think it helped that both of us had a lot of experience.
+
+160
+00:10:30.500 --> 00:10:32.620
+<v George Deglin>So generally the decisions we made were the right ones.
+
+161
+00:10:32.780 --> 00:10:36.620
+<v George Deglin>There wasn't too much we were doing wrong, but also we, we accepted the technical debt
+
+162
+00:10:36.620 --> 00:10:37.120
+<v George Deglin>we were adding.
+
+163
+00:10:37.320 --> 00:10:38.480
+<v George Deglin>It's kind of interesting today.
+
+164
+00:10:38.660 --> 00:10:39.920
+<v George Deglin>Um, now the team is bigger.
+
+165
+00:10:39.920 --> 00:10:44.320
+<v George Deglin>some of that code is still there and I'm watching the team pull out some of that technical debt
+
+166
+00:10:44.320 --> 00:10:48.840
+<v George Deglin>and refactor things or be frustrated by it. I feel a little bit bad about it. But at the
+
+167
+00:10:48.840 --> 00:10:51.500
+<v George Deglin>same time, I don't think the business would be where it's at without it. I would take
+
+168
+00:10:51.500 --> 00:10:52.000
+<v George Deglin>that approach.
+
+169
+00:10:52.100 --> 00:10:52.600
+<v Noah Labhart>That's
+
+170
+00:10:52.440 --> 00:10:56.160
+<v Noah Labhart>right. Do you ever walk up behind someone and point at the code editor and say,
+
+171
+00:10:56.260 --> 00:10:56.760
+<v Noah Labhart>you're welcome?
+
+172
+00:10:59.260 --> 00:11:04.800
+<v George Deglin>No, I try. Yeah, I try not to take credit for all the things that are a little bit weird.
+
+173
+00:11:05.880 --> 00:11:09.320
+<v George Deglin>Yeah, it's kind of funny to sort of see people wrestle with it. Or sometimes people will
+
+174
+00:11:09.920 --> 00:11:13.120
+<v George Deglin>They'll ask me a question like, why did you design it this way?
+
+175
+00:11:13.240 --> 00:11:15.360
+<v George Deglin>Like, you want it to be this way?
+
+176
+00:11:15.480 --> 00:11:16.500
+<v George Deglin>And I'm like, no, no, no.
+
+177
+00:11:16.620 --> 00:11:19.940
+<v George Deglin>My intent was not that this was going to be the ideal architecture.
+
+178
+00:11:20.140 --> 00:11:23.960
+<v George Deglin>Like, you should just go for it and rip that out if you've got something better.
+
+179
+00:11:25.120 --> 00:11:25.820
+<v Noah Labhart>That's awesome.
+
+180
+00:11:26.520 --> 00:11:28.820
+<v Noah Labhart>So how has the product progressed?
+
+181
+00:11:29.100 --> 00:11:31.620
+<v Noah Labhart>How has it matured since that point?
+
+182
+00:11:31.720 --> 00:11:35.840
+<v Noah Labhart>Kind of walk me through some of the stages of that maturation process.
+
+183
+00:11:37.320 --> 00:11:41.820
+<v George Deglin>You know, we had this super cheap template that I had used initially.
+
+184
+00:11:42.080 --> 00:11:45.720
+<v George Deglin>There had been a couple sort of intermediate revisions or sort of improvements on the template.
+
+185
+00:11:45.880 --> 00:11:47.300
+<v George Deglin>But now like that's totally gone.
+
+186
+00:11:47.580 --> 00:11:52.540
+<v George Deglin>We have an incredible design team and really good front end engineers that have built a
+
+187
+00:11:52.540 --> 00:11:57.020
+<v George Deglin>whole new design system for us that's, you know, very consistent across all the pages,
+
+188
+00:11:57.600 --> 00:12:00.620
+<v George Deglin>has really sort of good in-line documentation for folks.
+
+189
+00:12:00.620 --> 00:12:08.900
+<v George Deglin>It's undergone some user studies and interviews to identify where there were opportunities to make things clearer or faster.
+
+190
+00:12:09.780 --> 00:12:18.360
+<v George Deglin>A lot of the code initially was sort of a mishmash of jQuery and CoffeeScript, and that's all gone at this point.
+
+191
+00:12:18.480 --> 00:12:23.620
+<v George Deglin>And we use TypeScript now and React, so there's been huge changes there.
+
+192
+00:12:23.620 --> 00:12:27.360
+<v George Deglin>Early on, the notification delivery system we used
+
+193
+00:12:27.740 --> 00:12:30.060
+<v George Deglin>was basically a fork of an open source library.
+
+194
+00:12:30.540 --> 00:12:32.020
+<v George Deglin>There weren't a lot of ones out there,
+
+195
+00:12:32.120 --> 00:12:35.000
+<v George Deglin>so we had sort of looked at a few and picked the best one.
+
+196
+00:12:35.660 --> 00:12:40.040
+<v George Deglin>But after the first year, it very clearly wasn't scaling.
+
+197
+00:12:40.320 --> 00:12:43.900
+<v George Deglin>It was written in Ruby and could only run on one thread
+
+198
+00:12:43.900 --> 00:12:46.940
+<v George Deglin>and was sort of like, after it was using 100% CPU,
+
+199
+00:12:47.180 --> 00:12:48.820
+<v George Deglin>you just couldn't get any more performance out of it.
+
+200
+00:12:49.000 --> 00:12:52.060
+<v George Deglin>And so we actually re-architected it using Rust,
+
+201
+00:12:53.620 --> 00:12:56.360
+<v George Deglin>an incredibly efficient Rust notification delivery system.
+
+202
+00:12:56.640 --> 00:12:59.500
+<v George Deglin>The early one, I think, was sort of starting to hit its limit
+
+203
+00:12:59.500 --> 00:13:03.120
+<v George Deglin>at around like 5 or 6 million notification deliveries per day.
+
+204
+00:13:03.260 --> 00:13:06.820
+<v George Deglin>And now today we send over 5 billion notifications per day
+
+205
+00:13:06.820 --> 00:13:08.660
+<v George Deglin>from our Rust backend.
+
+206
+00:13:08.880 --> 00:13:11.040
+<v Noah Labhart>That is a massive amount of notifications.
+
+207
+00:13:12.000 --> 00:13:13.100
+<v George Deglin>Yeah, it's a lot.
+
+208
+00:13:14.820 --> 00:13:16.860
+<v Noah Labhart>So how do you build your roadmap?
+
+209
+00:13:17.060 --> 00:13:19.820
+<v Noah Labhart>How do you figure out, maybe early days a little bit,
+
+210
+00:13:19.900 --> 00:13:22.240
+<v Noah Labhart>but even to now, how do you go about the process
+
+211
+00:13:23.620 --> 00:13:24.780
+<v Noah Labhart>important to build next?
+
+212
+00:13:26.080 --> 00:13:27.280
+<v George Deglin>I think different companies
+
+213
+00:13:27.280 --> 00:13:29.560
+<v George Deglin>struggle with this in different ways. The challenge
+
+214
+00:13:29.560 --> 00:13:31.380
+<v George Deglin>that we run into is that
+
+215
+00:13:31.380 --> 00:13:33.700
+<v George Deglin>there is practically
+
+216
+00:13:33.700 --> 00:13:35.660
+<v George Deglin>an unlimited number
+
+217
+00:13:35.660 --> 00:13:37.600
+<v George Deglin>of things that we could build and that
+
+218
+00:13:37.600 --> 00:13:39.360
+<v George Deglin>are going to be useful to some
+
+219
+00:13:39.360 --> 00:13:41.540
+<v George Deglin>subset of our clients. So we have to think very
+
+220
+00:13:41.540 --> 00:13:43.400
+<v George Deglin>critically about how do the product
+
+221
+00:13:43.400 --> 00:13:45.100
+<v George Deglin>decisions we make today
+
+222
+00:13:45.920 --> 00:13:47.560
+<v George Deglin>align with the vision of
+
+223
+00:13:47.560 --> 00:13:49.260
+<v George Deglin>the company? The vision being that we want to
+
+224
+00:13:49.260 --> 00:13:51.640
+<v George Deglin>help our businesses more intelligently send messages.
+
+225
+00:13:52.300 --> 00:13:53.240
+<v George Deglin>So we think about
+
+226
+00:13:53.620 --> 00:13:57.660
+<v George Deglin>what can we do in the next quarter or in the next sprint
+
+227
+00:13:57.660 --> 00:13:59.860
+<v George Deglin>that's going to help us make progress towards that?
+
+228
+00:14:00.040 --> 00:14:05.180
+<v George Deglin>And tactically, what that means is we like to get the team very involved.
+
+229
+00:14:05.440 --> 00:14:07.820
+<v George Deglin>So we actually get ideas from everyone on the team
+
+230
+00:14:07.820 --> 00:14:10.980
+<v George Deglin>all the way across from sales to operations to engineering.
+
+231
+00:14:11.680 --> 00:14:12.920
+<v George Deglin>Everyone contributes ideas.
+
+232
+00:14:13.400 --> 00:14:16.700
+<v George Deglin>And then we get together across the leadership team.
+
+233
+00:14:16.980 --> 00:14:20.580
+<v George Deglin>And we think very critically about what are the ideas
+
+234
+00:14:20.580 --> 00:14:26.060
+<v George Deglin>that are going to have the biggest impact on the business across things like our strategic vision,
+
+235
+00:14:26.780 --> 00:14:30.120
+<v George Deglin>across revenue, across system stability and performance.
+
+236
+00:14:30.880 --> 00:14:34.220
+<v George Deglin>And we whittle it down to the things that we feel we can accomplish.
+
+237
+00:14:34.680 --> 00:14:39.900
+<v George Deglin>We work very closely with the different tech leads and individuals on the team
+
+238
+00:14:39.900 --> 00:14:45.360
+<v George Deglin>to understand how the different things we're thinking about building fit into what's achievable,
+
+239
+00:14:46.140 --> 00:14:48.820
+<v George Deglin>what's aligned to unlock future product goals.
+
+240
+00:14:50.580 --> 00:14:53.680
+<v George Deglin>We present it to the team and work on it as fast as we can.
+
+241
+00:14:55.440 --> 00:14:57.200
+<v Noah Labhart>This is one of my favorite questions.
+
+242
+00:14:57.500 --> 00:14:59.980
+<v Noah Labhart>So how did you build your team?
+
+243
+00:15:00.160 --> 00:15:05.900
+<v Noah Labhart>How did you go out and find the winning horses to add to the OneSignal roster?
+
+244
+00:15:07.740 --> 00:15:10.940
+<v George Deglin>I've always been really passionate about recruiting.
+
+245
+00:15:11.140 --> 00:15:15.400
+<v George Deglin>And I think some of that comes from my past startup where I was a CTO.
+
+246
+00:15:15.400 --> 00:15:20.600
+<v George Deglin>And it was just critical for me to hire engineers and spend a lot of time trying to learn from
+
+247
+00:15:20.600 --> 00:15:25.520
+<v George Deglin>other technology leaders about what that meant, what sort of bodies I should be looking for.
+
+248
+00:15:25.780 --> 00:15:30.640
+<v George Deglin>And then when we were hiring at OneSignal, initially, it was a very similar muscle I
+
+249
+00:15:30.640 --> 00:15:34.020
+<v George Deglin>had to use because the initial team members needed to be people that were going to be
+
+250
+00:15:34.020 --> 00:15:35.260
+<v George Deglin>on the engineering product side.
+
+251
+00:15:35.440 --> 00:15:40.120
+<v George Deglin>So I looked for the same things that I felt had made me successful in my career and had
+
+252
+00:15:40.120 --> 00:15:42.760
+<v George Deglin>made different hires successful at my last company.
+
+253
+00:15:42.760 --> 00:15:51.040
+<v George Deglin>It's things like being very hardworking, being gritty, and able to be comfortable with change.
+
+254
+00:15:51.720 --> 00:15:56.660
+<v George Deglin>Being a generalist, I think, was very important for our first few hires because there wasn't...
+
+255
+00:15:56.660 --> 00:15:58.880
+<v George Deglin>You could just have one person working on one thing.
+
+256
+00:15:59.000 --> 00:16:00.600
+<v George Deglin>There were just too many things to work on.
+
+257
+00:16:00.640 --> 00:16:03.040
+<v George Deglin>And we need people that could work on four or five at least.
+
+258
+00:16:03.180 --> 00:16:07.680
+<v George Deglin>And then I think people that really aligned with the values that I personally had and
+
+259
+00:16:07.680 --> 00:16:08.620
+<v George Deglin>and the vision of the company.
+
+260
+00:16:08.920 --> 00:16:10.980
+<v George Deglin>That was a really key part
+
+261
+00:16:11.380 --> 00:16:13.460
+<v George Deglin>of making the right hires initially.
+
+262
+00:16:13.760 --> 00:16:15.200
+<v George Deglin>And also I think where I've made mistakes
+
+263
+00:16:15.200 --> 00:16:16.200
+<v George Deglin>with hiring people before,
+
+264
+00:16:16.380 --> 00:16:18.480
+<v George Deglin>is if you hire someone that fundamentally disagrees
+
+265
+00:16:18.480 --> 00:16:20.320
+<v George Deglin>with the direction that the company is going,
+
+266
+00:16:20.440 --> 00:16:22.440
+<v George Deglin>or fundamentally disagrees with some of the values
+
+267
+00:16:22.440 --> 00:16:24.020
+<v George Deglin>that I have or the company has,
+
+268
+00:16:24.880 --> 00:16:27.000
+<v George Deglin>it's very, very hard to sort of steer that person
+
+269
+00:16:27.000 --> 00:16:27.720
+<v George Deglin>in the right direction,
+
+270
+00:16:27.820 --> 00:16:30.300
+<v George Deglin>or to sort of coach them on doing the right day-to-day work.
+
+271
+00:16:30.760 --> 00:16:33.400
+<v George Deglin>Ideally, you want someone who is just on board
+
+272
+00:16:33.400 --> 00:16:34.800
+<v George Deglin>with the way that things are going,
+
+273
+00:16:34.800 --> 00:16:37.480
+<v George Deglin>and is going to be able to help them go faster
+
+274
+00:16:37.480 --> 00:16:39.160
+<v George Deglin>rather than trying to take them in a different direction.
+
+275
+00:16:39.340 --> 00:16:41.080
+<v George Deglin>And that doesn't necessarily mean that it's a bad person.
+
+276
+00:16:41.160 --> 00:16:42.780
+<v George Deglin>Sometimes people just have a different vision
+
+277
+00:16:42.780 --> 00:16:44.580
+<v George Deglin>for how their role should look
+
+278
+00:16:44.580 --> 00:16:45.700
+<v George Deglin>or how the business should operate.
+
+279
+00:16:45.880 --> 00:16:48.160
+<v George Deglin>You know, that they're just not a good fit for this company.
+
+280
+00:16:48.240 --> 00:16:49.600
+<v George Deglin>They could be a great fit for another one.
+
+281
+00:16:49.840 --> 00:16:51.520
+<v George Deglin>I would say the other part of recruiting
+
+282
+00:16:51.520 --> 00:16:52.400
+<v George Deglin>kind of at the early stages
+
+283
+00:16:52.400 --> 00:16:54.020
+<v George Deglin>is just something that you have to invest
+
+284
+00:16:54.020 --> 00:16:54.780
+<v George Deglin>a lot of time into.
+
+285
+00:16:55.080 --> 00:16:57.720
+<v George Deglin>You can't really overestimate how much time is required
+
+286
+00:16:57.720 --> 00:17:00.220
+<v George Deglin>to make sure you're bringing on a really good people.
+
+287
+00:17:01.120 --> 00:17:03.120
+<v Noah Labhart>What are the one or two qualities
+
+288
+00:17:04.860 --> 00:17:07.820
+<v Noah Labhart>days of people that you brought on?
+
+289
+00:17:07.960 --> 00:17:10.260
+<v George Deglin>Yeah. So one or two, I think one was,
+
+290
+00:17:10.500 --> 00:17:16.080
+<v George Deglin>are they a good fit for a startup? There's obviously different things that could sort of
+
+291
+00:17:16.080 --> 00:17:22.120
+<v George Deglin>play into that measure. But ultimately, that was sort of the final signal that would give me
+
+292
+00:17:22.120 --> 00:17:27.760
+<v George Deglin>confidence about whether that person is going to be a good fit. And the other one is, are they
+
+293
+00:17:27.760 --> 00:17:34.740
+<v George Deglin>going to be able to just like come in and have a very, very quick impact on the business.
+
+294
+00:17:35.000 --> 00:17:40.340
+<v George Deglin>Where obviously we had very few financial resources, very little time to sort of prove
+
+295
+00:17:40.340 --> 00:17:45.440
+<v George Deglin>the success of the product. So we had to just have incredible confidence that anyone that we
+
+296
+00:17:45.440 --> 00:17:50.100
+<v George Deglin>hired would be really successful and really impactful from day one.
+
+297
+00:17:53.840 --> 00:17:58.620
+<v Noah Labhart>Let's touch on scalability a little bit. So in the early days, you know, you have trade-offs on,
+
+298
+00:17:58.700 --> 00:18:04.080
+<v Noah Labhart>you know, how scalable do we make this to how fast can we get it out of the door? How have
+
+299
+00:18:04.080 --> 00:18:11.220
+<v Noah Labhart>you transitioned into focusing on architecting the product towards scalability throughout the
+
+300
+00:18:11.220 --> 00:18:12.380
+<v Noah Labhart>time since its inception?
+
+301
+00:18:13.040 --> 00:18:16.900
+<v George Deglin>In the early days, scalability was sort of barely on our minds.
+
+302
+00:18:16.900 --> 00:18:22.880
+<v George Deglin>The goalpost was how do we make it scalable enough for the next 30 days?
+
+303
+00:18:23.040 --> 00:18:24.740
+<v George Deglin>This is sort of how we looked at things.
+
+304
+00:18:24.860 --> 00:18:32.480
+<v George Deglin>And even things like the architecture of the product or tests or maintainability,
+
+305
+00:18:33.280 --> 00:18:40.060
+<v George Deglin>we definitely had accepted that we were willing to push some of that out as future technical debt
+
+306
+00:18:40.060 --> 00:18:43.420
+<v George Deglin>in the interest of just shipping the product a little bit faster.
+
+307
+00:18:43.420 --> 00:18:50.680
+<v George Deglin>Sure. Now, as the team has grown, as we have many paying customers, things like that, we're
+
+308
+00:18:50.680 --> 00:18:56.180
+<v George Deglin>now much more conservative. So before we build a big feature, we get user input on it, we
+
+309
+00:18:56.180 --> 00:19:01.400
+<v George Deglin>do user studies and mockups. When we architect new systems, it's no longer something where
+
+310
+00:19:01.400 --> 00:19:05.880
+<v George Deglin>someone can just come up with an idea and do it. It's something where we want all the
+
+311
+00:19:05.880 --> 00:19:11.080
+<v George Deglin>members involved in building the system or integrating with that system or maintaining
+
+312
+00:19:11.080 --> 00:19:16.060
+<v George Deglin>maintaining it to understand how it's coming together and to have input into whether we're
+
+313
+00:19:16.060 --> 00:19:17.380
+<v George Deglin>making the right technical decisions.
+
+314
+00:19:17.640 --> 00:19:24.500
+<v George Deglin>So we still will seek to move fairly quickly with things. So we're definitely not an operate-by-committee
+
+315
+00:19:24.500 --> 00:19:29.500
+<v George Deglin>company. But we do want to make sure we're getting input from all the smart people on
+
+316
+00:19:29.500 --> 00:19:34.680
+<v George Deglin>our team about the decisions that we're making, making sure that we have general buy-in and
+
+317
+00:19:34.680 --> 00:19:35.980
+<v George Deglin>understanding around them.
+
+318
+00:19:35.980 --> 00:19:44.760
+<v George Deglin>And at this point, it's okay for us to move, for individuals to move on the team to move a little bit slower because we just have many more teams now.
+
+319
+00:19:44.960 --> 00:19:47.700
+<v George Deglin>So actually, as a whole business, we can move much, much faster.
+
+320
+00:19:48.060 --> 00:19:57.640
+<v George Deglin>And then, of course, avoiding introduction of new technical debt or unnecessary complexity or things like that helps us keep our velocity high even as the team grows.
+
+321
+00:20:00.980 --> 00:20:07.720
+<v Noah Labhart>When you started out, you know, building the MVP, was it more of a monolithic kind of
+
+322
+00:20:07.720 --> 00:20:10.500
+<v Noah Labhart>structure architecture? Yeah, for
+
+323
+00:20:10.500 --> 00:20:13.180
+<v George Deglin>sure. It was, it was very, very much a monolith.
+
+324
+00:20:13.400 --> 00:20:21.040
+<v George Deglin>We were extremely avoidant of introducing new technologies or really anything that would add
+
+325
+00:20:21.040 --> 00:20:26.140
+<v George Deglin>extra overhead to like, you know, having to learn anything new, having to maintain anything new,
+
+326
+00:20:27.640 --> 00:20:29.100
+<v George Deglin>We stuck to the tools that we knew,
+
+327
+00:20:29.280 --> 00:20:31.080
+<v George Deglin>even if maybe sometimes they weren't
+
+328
+00:20:31.080 --> 00:20:32.920
+<v George Deglin>the perfect one for the job,
+
+329
+00:20:32.960 --> 00:20:35.160
+<v George Deglin>just because it was good enough for the time being.
+
+330
+00:20:35.280 --> 00:20:38.520
+<v George Deglin>Since then, I would say that we're now much better
+
+331
+00:20:38.520 --> 00:20:41.060
+<v George Deglin>about using the right tools for the right problems
+
+332
+00:20:41.060 --> 00:20:42.640
+<v George Deglin>and thinking more critically about
+
+333
+00:20:42.640 --> 00:20:44.280
+<v George Deglin>whether the decisions we're making now
+
+334
+00:20:44.280 --> 00:20:46.400
+<v George Deglin>are gonna help scale with the business
+
+335
+00:20:46.400 --> 00:20:49.580
+<v George Deglin>and when we might need to revisit a technology
+
+336
+00:20:49.580 --> 00:20:50.260
+<v George Deglin>and replace it.
+
+337
+00:20:50.440 --> 00:20:54.600
+<v George Deglin>I would still say that some of the core principles
+
+338
+00:20:55.240 --> 00:20:56.340
+<v George Deglin>towards making technical decisions
+
+339
+00:20:57.760 --> 00:20:59.160
+<v George Deglin>do still apply today.
+
+340
+00:20:59.420 --> 00:21:01.180
+<v George Deglin>And it's things like, you know,
+
+341
+00:21:01.200 --> 00:21:04.920
+<v George Deglin>not introducing a new tool or a new technology
+
+342
+00:21:04.920 --> 00:21:08.320
+<v George Deglin>just because it's got hype around it or things like that.
+
+343
+00:21:08.500 --> 00:21:10.380
+<v George Deglin>If we have something that we already use
+
+344
+00:21:10.380 --> 00:21:12.480
+<v George Deglin>that accomplishes what we need to do,
+
+345
+00:21:12.600 --> 00:21:15.000
+<v George Deglin>we seek to use that whenever possible.
+
+346
+00:21:15.840 --> 00:21:20.920
+<v Noah Labhart>You know, looking at OneSignal and where you are now
+
+347
+00:21:20.920 --> 00:21:23.180
+<v Noah Labhart>and what you've come from,
+
+348
+00:21:23.440 --> 00:21:27.200
+<v Noah Labhart>what are you most proud of technology-wise, team-wise,
+
+349
+00:21:27.640 --> 00:21:30.220
+<v Noah Labhart>As a CEO, what are you most proud of in what you've built?
+
+350
+00:21:31.060 --> 00:21:32.220
+<v George Deglin>It's definitely the team.
+
+351
+00:21:32.540 --> 00:21:37.800
+<v George Deglin>The work that we're doing today is all from the amazing people that we've hired.
+
+352
+00:21:38.200 --> 00:21:43.540
+<v George Deglin>Their sort of ability to go back and, you know, now clean up a lot of sort of that early technical debt.
+
+353
+00:21:43.820 --> 00:21:52.720
+<v George Deglin>And now to build all these incredible product features on top of it that I couldn't even have imagined ever building myself or would never been able to build myself.
+
+354
+00:21:53.000 --> 00:21:54.360
+<v George Deglin>That's something I'm really impressed with.
+
+355
+00:21:54.360 --> 00:22:00.580
+<v George Deglin>And also I've built just a tremendous amount of appreciation for the different functions
+
+356
+00:22:00.580 --> 00:22:02.220
+<v George Deglin>of the company outside of engineering as well.
+
+357
+00:22:02.640 --> 00:22:06.760
+<v George Deglin>Obviously, my technical background gives me a lot of admiration for the quality of technology
+
+358
+00:22:06.760 --> 00:22:10.820
+<v George Deglin>that we're building, the quality of the people we've hired on our engineering and product
+
+359
+00:22:10.820 --> 00:22:11.320
+<v George Deglin>teams.
+
+360
+00:22:11.540 --> 00:22:16.940
+<v George Deglin>But also it's really wonderful to see how well the other teams at the company work together
+
+361
+00:22:17.600 --> 00:22:20.560
+<v George Deglin>and the incredible people that we've hired across sales and other functions.
+
+362
+00:22:24.380 --> 00:22:27.400
+<v George Deglin>I've gotten the opportunity to see a lot of different startups at our stage.
+
+363
+00:22:27.660 --> 00:22:30.060
+<v George Deglin>And I think we've really built a special team here.
+
+364
+00:22:30.380 --> 00:22:31.300
+<v George Deglin>I'm proud of that.
+
+365
+00:22:34.760 --> 00:22:35.500
+<v Noah Labhart>Let's flip the
+
+366
+00:22:35.500 --> 00:22:36.460
+<v Noah Labhart>script a little bit.
+
+367
+00:22:36.800 --> 00:22:43.500
+<v Noah Labhart>Tell me about a mistake you made throughout this, the life cycle of OneSignal and how
+
+368
+00:22:43.500 --> 00:22:45.100
+<v Noah Labhart>did your team respond to it?
+
+369
+00:22:46.200 --> 00:22:49.840
+<v George Deglin>One of the things that I think has just been kind of a continuous learning experience for
+
+370
+00:22:50.560 --> 00:22:56.500
+<v George Deglin>is about how we hire people at the company. I think every company is not perfect. Sometimes you
+
+371
+00:22:56.500 --> 00:23:01.880
+<v George Deglin>hire people that aren't a fit. And it's just the nature of a growing business.
+
+372
+00:23:02.580 --> 00:23:06.140
+<v George Deglin>But I think I've definitely learned about the things that are super important in our
+
+373
+00:23:06.140 --> 00:23:10.940
+<v George Deglin>interview process to make sure that someone's gonna be a good long-term fit for us. And I think
+
+374
+00:23:10.940 --> 00:23:15.080
+<v George Deglin>the values part of the business is a big part of that. I think sometimes there's a temptation
+
+375
+00:23:15.080 --> 00:23:20.940
+<v George Deglin>to hire someone that maybe doesn't agree with the vision of the company or doesn't agree with the
+
+376
+00:23:20.940 --> 00:23:25.360
+<v George Deglin>values of the company. And you feel like it's sort of an okay compromise or necessary compromise
+
+377
+00:23:25.360 --> 00:23:28.800
+<v George Deglin>because you just really, really want to hire someone for that role. But I've always found
+
+378
+00:23:28.800 --> 00:23:29.840
+<v George Deglin>myself regretting it.
+
+379
+00:23:31.360 --> 00:23:36.020
+<v Noah Labhart>So for OneSignal, tell me what the future looks like for the product
+
+380
+00:23:36.020 --> 00:23:37.000
+<v Noah Labhart>and for your team.
+
+381
+00:23:37.540 --> 00:23:40.880
+<v George Deglin>The last year has been really eventful and we're looking to sort of continue
+
+382
+00:23:40.880 --> 00:23:43.720
+<v George Deglin>a lot of growth in 2020.
+
+383
+00:23:44.140 --> 00:23:46.860
+<v George Deglin>The team right now is about 40 people.
+
+384
+00:23:47.140 --> 00:23:50.260
+<v George Deglin>The product is very, very popular with our customers
+
+385
+00:23:50.260 --> 00:23:52.980
+<v George Deglin>and we want to keep on sort of investing into it.
+
+386
+00:23:53.080 --> 00:23:55.000
+<v George Deglin>So we're looking to sort of double the team
+
+387
+00:23:55.600 --> 00:23:56.940
+<v George Deglin>basically across all departments.
+
+388
+00:23:57.140 --> 00:24:00.600
+<v George Deglin>So we'll go from about 20 engineers that we have today
+
+389
+00:24:00.600 --> 00:24:01.500
+<v George Deglin>to about 40.
+
+390
+00:24:01.620 --> 00:24:03.540
+<v George Deglin>The product is evolving pretty quickly.
+
+391
+00:24:03.740 --> 00:24:05.700
+<v George Deglin>So some of the things that we're thinking about now
+
+392
+00:24:05.700 --> 00:24:08.220
+<v George Deglin>are how to give our customers better analytics
+
+393
+00:24:08.680 --> 00:24:09.840
+<v George Deglin>into the messages that they send
+
+394
+00:24:10.880 --> 00:24:15.640
+<v George Deglin>them use those analytics to improve the outcomes of their messages. We're also
+
+395
+00:24:15.640 --> 00:24:20.660
+<v George Deglin>introducing support for other messaging channels. So we've been great at sending
+
+396
+00:24:20.660 --> 00:24:24.460
+<v George Deglin>push notifications but we also want to be really great at sending emails and
+
+397
+00:24:24.460 --> 00:24:29.800
+<v George Deglin>SMS and other channels and that's a big product focus. We're starting to do a lot
+
+398
+00:24:29.800 --> 00:24:33.060
+<v George Deglin>of partnerships as well so we're looking at what are the companies that we want
+
+399
+00:24:33.060 --> 00:24:37.160
+<v George Deglin>to build integrations with and how can we do more than a technical integration
+
+400
+00:24:37.160 --> 00:24:44.620
+<v George Deglin>but also work with their sales team, help our customers better understand how to use our two products together, things like that.
+
+401
+00:24:44.900 --> 00:24:53.460
+<v George Deglin>And then continuing that over the next few years, there's just a tremendous opportunity in the market for OneSignal to help all businesses send more effective messages.
+
+402
+00:24:53.640 --> 00:24:55.520
+<v George Deglin>And we're trying to do that as quickly as we can.
+
+403
+00:24:58.920 --> 00:25:01.360
+<v Noah Labhart>Who influences you and how you work?
+
+404
+00:25:01.360 --> 00:25:08.280
+<v Noah Labhart>Name an architect or a CTO or CEO or person that you look up to and why.
+
+405
+00:25:09.860 --> 00:25:15.640
+<v George Deglin>People that come to mind actually are the two founders of Stripe, Patrick and John Collison.
+
+406
+00:25:15.760 --> 00:25:17.620
+<v George Deglin>They've just been really impressive individuals.
+
+407
+00:25:18.160 --> 00:25:22.580
+<v George Deglin>As I look at Stripe, I've just been really impressed with the quality of the product.
+
+408
+00:25:22.580 --> 00:25:33.060
+<v George Deglin>And I know they've followed a similar journey to myself in that being sort of very technical founders to being now leaders of this business.
+
+409
+00:25:33.420 --> 00:25:40.140
+<v George Deglin>The approach that Stripe takes in pretty much everything they do from their technology to their marketing to their hiring has been quite impressive.
+
+410
+00:25:40.380 --> 00:25:49.400
+<v George Deglin>And also, I think one thing that they've really nailed is building an incredible company culture, even as the company has scaled now to thousands of people.
+
+411
+00:25:49.400 --> 00:25:56.020
+<v George Deglin>And I think that's tremendously challenging to sort of be able to do that, especially as the company scales as fast as they have.
+
+412
+00:25:56.220 --> 00:26:07.420
+<v George Deglin>And so I really admire them for building just that such incredible business, being just very, very thoughtful and being on a journey that I'm seeking to follow myself as best as I can.
+
+413
+00:26:07.680 --> 00:26:08.180
+<v Noah Labhart>So
+
+414
+00:26:08.040 --> 00:26:17.240
+<v Noah Labhart>if you could go back to the very beginning or around the early days, what would you do differently or what would you consider taking a different approach on?
+
+415
+00:26:18.500 --> 00:26:26.300
+<v George Deglin>One of the things that I recognize we could have done better on is just how quickly we
+
+416
+00:26:26.300 --> 00:26:32.020
+<v George Deglin>moved in certain areas. For me, I think that the way that I observed this, in the early
+
+417
+00:26:32.020 --> 00:26:37.460
+<v George Deglin>days, we were just a very, very small team, but the product was really taking off. And
+
+418
+00:26:37.460 --> 00:26:42.760
+<v George Deglin>I spent a lot of my time just keeping the servers running, or trying to learn new technology,
+
+419
+00:26:42.760 --> 00:26:45.800
+<v George Deglin>technology, or trying to build things, or answering support tickets.
+
+420
+00:26:46.820 --> 00:26:52.320
+<v George Deglin>And I think that I really enjoyed it. And it was... I was very good at it. But I think
+
+421
+00:26:52.320 --> 00:26:55.520
+<v George Deglin>the company would have been better off if I had made sure to take away some of that.
+
+422
+00:26:55.540 --> 00:26:59.640
+<v George Deglin>Perhaps I'd have been more willing to let there be a little bit of downtime or let some
+
+423
+00:26:59.640 --> 00:27:04.900
+<v George Deglin>support tickets go unanswered. And instead, I sought to hire people to help take care
+
+424
+00:27:04.900 --> 00:27:07.960
+<v George Deglin>of these problems and scale the business a little bit faster.
+
+425
+00:27:07.960 --> 00:27:22.660
+<v George Deglin>So I think it worked out, but there was an opportunity for us to move more quickly just by recognizing when I was doing things that maybe weren't super scalable and seeking to find ways to automate those things or to hire people in to take over them.
+
+426
+00:27:24.180 --> 00:27:32.340
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young individual that has just built the next big thing, right?
+
+427
+00:27:32.420 --> 00:27:33.500
+<v Noah Labhart>And they're jazzed about it.
+
+428
+00:27:33.520 --> 00:27:34.020
+<v Noah Labhart>They're pumped.
+
+429
+00:27:33.980 --> 00:27:35.040
+<v Noah Labhart>They want to show it to you.
+
+430
+00:27:35.040 --> 00:27:40.440
+<v Noah Labhart>you having gone down this road a couple of times now, what advice would you give that person?
+
+431
+00:27:40.680 --> 00:27:41.180
+<v George Deglin>I
+
+432
+00:27:41.060 --> 00:27:47.140
+<v George Deglin>would come back to it after a while. As an individual, you can build an incredible product,
+
+433
+00:27:47.320 --> 00:27:54.420
+<v George Deglin>but to take that product from just being something that is small and an upstart to
+
+434
+00:27:54.420 --> 00:27:59.940
+<v George Deglin>building a really impactful, fast-growing business, it stops being about the individual
+
+435
+00:27:59.940 --> 00:28:06.980
+<v George Deglin>of individual contributions of yourself on the product or the project. But it's about the people
+
+436
+00:28:06.980 --> 00:28:13.240
+<v George Deglin>that you hire in to start scaling it. And so recognizing when it's the right time to go
+
+437
+00:28:13.240 --> 00:28:19.780
+<v George Deglin>and hire those people and being able to bring really excellent ones to your team, I think is
+
+438
+00:28:19.780 --> 00:28:25.380
+<v George Deglin>something that a lot of people wait too long on. It's an underappreciated talent. Ultimately,
+
+439
+00:28:25.500 --> 00:28:29.220
+<v George Deglin>I think that that's what drives a lot of the long-term success of a business.
+
+440
+00:28:29.940 --> 00:28:36.560
+<v Noah Labhart>Fantastic. Well, George, thank you for being on the show today. Thank you for telling the creation story of OneSignal.
+
+441
+00:28:36.640 --> 00:28:37.880
+<v George Deglin>Yeah, thank you so much. It was a pleasure.
+
+442
+00:28:38.860 --> 00:28:41.720
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+443
+00:28:47.060 --> 00:28:53.540
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Season two episodes are co-produced and edited by Bradley Denham.
+
+444
+00:28:53.800 --> 00:28:58.600
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+445
+00:28:59.940 --> 00:29:02.340
+<v Noah Labhart>on patreon.com slash Code Story
+
+446
+00:29:02.340 --> 00:29:04.140
+<v Noah Labhart>for just five to 10 bucks a month.
+
+447
+00:29:04.520 --> 00:29:05.860
+<v Noah Labhart>And when you get a chance,
+
+448
+00:29:05.940 --> 00:29:06.680
+<v Noah Labhart>leave us a review.
+
+449
+00:29:07.020 --> 00:29:08.880
+<v Noah Labhart>Both things help us out tremendously.
+
+450
+00:29:09.920 --> 00:29:11.340
+<v Noah Labhart>And thanks again for listening.

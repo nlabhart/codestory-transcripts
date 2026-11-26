@@ -1,0 +1,1459 @@
+WEBVTT
+
+NOTE S6 Bonus: Building a Hyper-Converged Console: Zero-Trust RMM Infrastructure with Tyler Rohrer of Remotely
+
+1
+00:00:01.560 --> 00:00:29.440
+<v Tyler Rohrer>Our customers shared with us that real-time meant real-time. Okay, well, what does real-time mean for me? Is it once a second? Is it once every tenth of a second? Is it, you know, once a minute? Real-time is expensive, especially when you're talking about reading and writing, you know, to a cloud or to a cloud database. You know, and so the first trade-off was, well, gosh, I've got customers that want real-time, meaning like every second, if not better, and yet I've got a huge cost penalty. Well, how can I have both?
+
+2
+00:00:30.000 --> 00:00:36.800
+<v Tyler Rohrer>can I actually inspect the machines, you know, at scale 30, 40, 100,000 machines, and yet not
+
+3
+00:00:36.800 --> 00:00:41.900
+<v Tyler Rohrer>overwhelm this database? My name is Tyler Rohrer. I'm the founder and CEO of Remotely RMM.
+
+4
+00:00:47.580 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+5
+00:00:52.920 --> 00:00:57.140
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+6
+00:00:57.140 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+7
+00:01:02.260 --> 00:01:08.120
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Tyler Rohrer enabled enterprise organizations
+
+8
+00:01:08.120 --> 00:01:12.340
+<v Noah Labhart>to see, secure, and support their hybrid workforce.
+
+9
+00:01:13.400 --> 00:01:15.760
+<v Noah Labhart>All this and more on Code Story.
+
+10
+00:01:19.260 --> 00:01:23.800
+<v Noah Labhart>In his words, Tyler Rohrer is best described through his spirit animal, Curious George.
+
+11
+00:01:24.040 --> 00:01:26.080
+<v Noah Labhart>He likes to write, try new things.
+
+12
+00:01:27.140 --> 00:01:31.780
+<v Noah Labhart>own children, one who's getting married, and he's found that his expectations of his kids were
+
+13
+00:01:31.780 --> 00:01:36.580
+<v Noah Labhart>actually met, which was welcome and surprising. He enjoys golf and used to do rally racing,
+
+14
+00:01:36.720 --> 00:01:40.500
+<v Noah Labhart>though he claims he wasn't very good at it. He had more fun building the engines and less fun
+
+15
+00:01:40.500 --> 00:01:46.000
+<v Noah Labhart>crashing the cars. With the onslaught of the pandemic and the rise of remote work, Tyler
+
+16
+00:01:46.000 --> 00:01:51.260
+<v Noah Labhart>reached out to a former customer to run an idea by them. His idea was around a cloud platform
+
+17
+00:01:51.260 --> 00:01:56.720
+<v Noah Labhart>to support remote users. The blunt feedback from the customer was that the idea was terrible.
+
+18
+00:01:57.140 --> 00:01:59.320
+<v Noah Labhart>If the users couldn't be secured.
+
+19
+00:02:01.040 --> 00:02:03.540
+<v Noah Labhart>This is the creation story of Remotely.
+
+20
+00:02:05.540 --> 00:02:12.740
+<v Tyler Rohrer>What we do at Remotely really is help observe, act, and automate the management and security and support of remote users.
+
+21
+00:02:12.880 --> 00:02:14.420
+<v Tyler Rohrer>Hence the name Remotely RMM.
+
+22
+00:02:14.680 --> 00:02:21.740
+<v Tyler Rohrer>And what that really means, Noah, is when you think about the way the last maybe 10 years or so have unfolded,
+
+23
+00:02:21.740 --> 00:02:32.340
+<v Tyler Rohrer>I think we've all felt for a while that bumper-to-bumper traffic and cubicles and $11 lattes maybe wasn't the future that we kind of liked working remotely.
+
+24
+00:02:32.580 --> 00:02:36.160
+<v Tyler Rohrer>And then we got our wish real quickly, almost overnight, it happened.
+
+25
+00:02:36.420 --> 00:02:45.060
+<v Tyler Rohrer>And so what we do is we help large organizations contend with the challenges of supporting and securing those remote users at scale.
+
+26
+00:02:45.060 --> 00:02:49.920
+<v Tyler Rohrer>We do it all up from the cloud, chose Azure in this case, where a lot of large enterprises
+
+27
+00:02:49.920 --> 00:02:53.280
+<v Tyler Rohrer>tend to be basing their center of gravity in terms of their spend.
+
+28
+00:02:53.500 --> 00:02:59.140
+<v Tyler Rohrer>So really the origin story was having lived through the adoption of a really interesting
+
+29
+00:02:59.140 --> 00:03:04.660
+<v Tyler Rohrer>and somewhat esoteric technology, VDI, but then taking those lessons learned that if
+
+30
+00:03:04.660 --> 00:03:07.940
+<v Tyler Rohrer>you didn't measure something, you couldn't manage it.
+
+31
+00:03:08.040 --> 00:03:11.180
+<v Tyler Rohrer>And if you couldn't measure something, it was really hard to make decisions about it.
+
+32
+00:03:11.180 --> 00:03:13.080
+<v Tyler Rohrer>But we applied that to the current state.
+
+33
+00:03:13.200 --> 00:03:18.260
+<v Tyler Rohrer>And what we found when we started reaching out to customers, and that's the true origin story here,
+
+34
+00:03:18.580 --> 00:03:22.640
+<v Tyler Rohrer>we reached out to a customer, I did, a former customer, and said, I have an idea.
+
+35
+00:03:22.720 --> 00:03:23.540
+<v Tyler Rohrer>Here's what I'm thinking.
+
+36
+00:03:23.720 --> 00:03:28.800
+<v Tyler Rohrer>I think that there needs to be a platform up in the cloud to help support a ton of remote users.
+
+37
+00:03:28.940 --> 00:03:29.460
+<v Tyler Rohrer>What do you think?
+
+38
+00:03:29.560 --> 00:03:32.540
+<v Tyler Rohrer>And he said, I think it's a horrible idea if you can't secure them.
+
+39
+00:03:32.800 --> 00:03:34.800
+<v Tyler Rohrer>If you can't secure them, they should be turned off.
+
+40
+00:03:34.800 --> 00:03:41.980
+<v Tyler Rohrer>And so really the origin story was a synthesis of, you know, my notion plus some really blunt early customer feedback.
+
+41
+00:03:42.100 --> 00:03:46.940
+<v Tyler Rohrer>And, you know, I guess the story wouldn't have happened if those two things didn't meet, you know, in the beginning.
+
+42
+00:03:48.740 --> 00:03:50.420
+<v Noah Labhart>Well, let's dive into the MVP.
+
+43
+00:03:50.780 --> 00:03:57.480
+<v Noah Labhart>So tell me about that first product you built, how long did it take to build, and what sort of tools did you and the team use to bring it to life?
+
+44
+00:03:58.980 --> 00:04:02.220
+<v Tyler Rohrer>So it was about six months, you know, into the development cycle.
+
+45
+00:04:02.340 --> 00:04:03.280
+<v Tyler Rohrer>That's where we are today.
+
+46
+00:04:04.800 --> 00:04:09.640
+<v Tyler Rohrer>33 days, not that I'm counting, away from, you know, showing the service to the public.
+
+47
+00:04:09.820 --> 00:04:14.700
+<v Tyler Rohrer>And it really, you know, it really began with, you know, I don't want to call it an agile mindset,
+
+48
+00:04:15.160 --> 00:04:19.680
+<v Tyler Rohrer>you know, but it really was a set of kind of, as you said, a minimal viable activity
+
+49
+00:04:20.220 --> 00:04:25.640
+<v Tyler Rohrer>and a minimal viable value that the product had to deliver, you know, upon first login.
+
+50
+00:04:25.800 --> 00:04:30.660
+<v Tyler Rohrer>And so we kind of, you know, together, myself, our CTO, who was the former customer, you know,
+
+51
+00:04:30.660 --> 00:04:36.840
+<v Tyler Rohrer>went through what a day in the life of a modern admin looked like when we were all at the NOC
+
+52
+00:04:36.840 --> 00:04:41.800
+<v Tyler Rohrer>and the SOC, you know, 10 big screens, all the tools that we wanted, you know, nice air
+
+53
+00:04:41.800 --> 00:04:46.880
+<v Tyler Rohrer>conditioners going all the time. And then where we were today and what we found was, and this is
+
+54
+00:04:46.880 --> 00:04:52.560
+<v Tyler Rohrer>really interesting, there were about 12 different tools or tool sets, some were free by the way,
+
+55
+00:04:52.640 --> 00:04:58.840
+<v Tyler Rohrer>that the typical admin of an enterprise of maybe 20,000 users or so, you know, needed to use on a
+
+56
+00:05:00.660 --> 00:05:02.380
+<v Tyler Rohrer>through each one of them and rationalizing,
+
+57
+00:05:02.480 --> 00:05:04.820
+<v Tyler Rohrer>well, why is this feature here and not there?
+
+58
+00:05:04.960 --> 00:05:06.280
+<v Tyler Rohrer>Why is this feature here at all?
+
+59
+00:05:06.540 --> 00:05:08.040
+<v Tyler Rohrer>Has anyone ever used this feature?
+
+60
+00:05:08.200 --> 00:05:10.040
+<v Tyler Rohrer>And what you found was out of 12 consoles,
+
+61
+00:05:10.280 --> 00:05:14.140
+<v Tyler Rohrer>there were maybe 20 things that actually were truly useful.
+
+62
+00:05:14.300 --> 00:05:16.220
+<v Tyler Rohrer>And what we did was compress that in
+
+63
+00:05:16.220 --> 00:05:18.060
+<v Tyler Rohrer>and that became our minimal viable product.
+
+64
+00:05:18.440 --> 00:05:21.740
+<v Tyler Rohrer>We stuck to our guns, started showing that early,
+
+65
+00:05:22.480 --> 00:05:23.700
+<v Tyler Rohrer>to your earlier point,
+
+66
+00:05:23.780 --> 00:05:25.920
+<v Tyler Rohrer>listened to that brutal and honest feedback.
+
+67
+00:05:26.680 --> 00:05:28.440
+<v Tyler Rohrer>And I think really a lot of that
+
+68
+00:05:28.440 --> 00:05:32.100
+<v Tyler Rohrer>was more about the implementation than it was the feature set.
+
+69
+00:05:32.260 --> 00:05:36.920
+<v Tyler Rohrer>People were really interested about making it more role-based access
+
+70
+00:05:36.920 --> 00:05:42.540
+<v Tyler Rohrer>or making it more federated or helping or allowing their managed service provider to get access.
+
+71
+00:05:42.800 --> 00:05:43.680
+<v Tyler Rohrer>So that's really cool.
+
+72
+00:05:43.860 --> 00:05:49.520
+<v Tyler Rohrer>As you know, once you start putting the center of the target on that MVP,
+
+73
+00:05:49.940 --> 00:05:52.600
+<v Tyler Rohrer>a lot of adjacent things started to happen as well.
+
+74
+00:05:52.740 --> 00:05:56.180
+<v Tyler Rohrer>So I can't say we're done, but I can say we're doing it.
+
+75
+00:05:57.700 --> 00:06:09.520
+<v Noah Labhart>With any MVP, you've got to make certain decisions and trade-offs, and you alluded to some of those about the SOC and the NOC and the stories around that and how you built the product and securing it, that blunt feedback.
+
+76
+00:06:10.100 --> 00:06:11.340
+<v Noah Labhart>But dive in a little bit.
+
+77
+00:06:11.420 --> 00:06:17.480
+<v Noah Labhart>I want to give open space to hear about those decisions and trade-offs you had to make and how you coped with those decisions.
+
+78
+00:06:18.060 --> 00:06:23.460
+<v Tyler Rohrer>Well, I'll give you the most recent one, which was our, I guess I'll call it our inspection interval.
+
+79
+00:06:23.460 --> 00:06:27.980
+<v Tyler Rohrer>our customers shared with us that real time meant real time, right?
+
+80
+00:06:28.100 --> 00:06:34.100
+<v Tyler Rohrer>And so everyone kind of needs to take a step back here and say, okay, well, what does real time mean for me?
+
+81
+00:06:34.160 --> 00:06:38.280
+<v Tyler Rohrer>Is it once a second? Is it once every tenth of a second? Is it, you know, once a minute?
+
+82
+00:06:38.820 --> 00:06:45.040
+<v Tyler Rohrer>And so one of the very quick or very early design constraints was real time is expensive,
+
+83
+00:06:45.300 --> 00:06:49.420
+<v Tyler Rohrer>especially when you're talking about reading and writing, you know, to a cloud or to a cloud database.
+
+84
+00:06:49.420 --> 00:06:56.700
+<v Tyler Rohrer>We, in this case, chose Cosmos DB up in Azure, very performant, very scalable, not exactly inexpensive.
+
+85
+00:06:57.280 --> 00:07:04.540
+<v Tyler Rohrer>You know, and so the first tradeoff was, well, gosh, I've got customers that want real time, meaning like every second, if not better.
+
+86
+00:07:04.740 --> 00:07:06.580
+<v Tyler Rohrer>And yet I've got a huge cost penalty.
+
+87
+00:07:06.800 --> 00:07:12.760
+<v Tyler Rohrer>You know, and so I think one of the early tradeoffs, which really became an architectural one, which was, well, how can I have both?
+
+88
+00:07:12.760 --> 00:07:23.920
+<v Tyler Rohrer>How can I actually inspect the machines, you know, at scale 30, 40, 100,000 machines every second, two or three, and yet not overwhelm this database?
+
+89
+00:07:24.120 --> 00:07:27.700
+<v Tyler Rohrer>And the key is, from an architectural standpoint, we built in a stagger.
+
+90
+00:07:28.100 --> 00:07:37.900
+<v Tyler Rohrer>You know, real time right now for 100,000 is different than a slate wobble built in so that they come back one at a time just over 100,000 seconds.
+
+91
+00:07:37.900 --> 00:07:43.520
+<v Tyler Rohrer>So that was really cool. And it just, again, is a kind of a quasi-theoretical mathematician or
+
+92
+00:07:43.520 --> 00:07:47.660
+<v Tyler Rohrer>intuitional mathematician. You get to kind of play with, I don't want to call them the suggestions
+
+93
+00:07:47.660 --> 00:07:51.700
+<v Tyler Rohrer>of physics, but you get to kind of play with some design ideas that, you know, should you
+
+94
+00:07:51.700 --> 00:07:57.100
+<v Tyler Rohrer>just stick to the blueprint you might not have normally found. So what ended up happening was
+
+95
+00:07:57.100 --> 00:08:01.980
+<v Tyler Rohrer>we chose a parallel database. We write to it first, you know, and then use kind of the most
+
+96
+00:08:01.980 --> 00:08:07.360
+<v Tyler Rohrer>important higher priority data, you know, in the more expensive data tier. So again, just a fancy
+
+97
+00:08:07.900 --> 00:08:12.720
+<v Tyler Rohrer>we chose tiering in the end. But it was cool how you end up finding those solutions.
+
+98
+00:08:14.680 --> 00:08:20.620
+<v Noah Labhart>So let's move forward then. So how did you progress the product from there? And I know
+
+99
+00:08:20.620 --> 00:08:25.620
+<v Noah Labhart>you're about to release to the world, but even when you're considering you're done with the MVP
+
+100
+00:08:25.620 --> 00:08:31.560
+<v Noah Labhart>and perhaps how you're going to progress it later, I'm curious how you're going to go about
+
+101
+00:08:31.560 --> 00:08:36.140
+<v Noah Labhart>building your roadmap and deciding, okay, now this is the next most important thing to build.
+
+102
+00:08:37.900 --> 00:08:44.440
+<v Tyler Rohrer>invented a user and we named him Patient Zero. And Patient Zero literally was just that. He or she
+
+103
+00:08:44.440 --> 00:08:50.540
+<v Tyler Rohrer>had to have the most sublime and elegant user experience, right? And so we kind of said,
+
+104
+00:08:50.580 --> 00:08:54.900
+<v Tyler Rohrer>you know, we'd love to have the following features in the product. We'd love the product to act and
+
+105
+00:08:54.900 --> 00:09:01.180
+<v Tyler Rohrer>behave in the following ways. However, what is the impact on Patient Zero? And so what you really,
+
+106
+00:09:01.220 --> 00:09:05.680
+<v Tyler Rohrer>you know, ended up doing was, again, it's a lot of compromise. And I think that that's one of the,
+
+107
+00:09:05.680 --> 00:09:13.920
+<v Tyler Rohrer>Probably another one of the big C words, aside from curiosity, would be compromise that we had and found in this organization.
+
+108
+00:09:14.320 --> 00:09:18.740
+<v Tyler Rohrer>And one of the neat things, though, was when it came to roadmap, we didn't really have to.
+
+109
+00:09:18.780 --> 00:09:19.720
+<v Tyler Rohrer>Here's what I mean by that.
+
+110
+00:09:19.980 --> 00:09:30.900
+<v Tyler Rohrer>We compromised as a team, and we made some really elegant tradeoffs to ensure that that user experience was always supreme and really ensuring high value.
+
+111
+00:09:30.900 --> 00:09:34.820
+<v Tyler Rohrer>you. But when it came to the roadmap, we kind of said, all right, so clearly there are competitors
+
+112
+00:09:34.820 --> 00:09:40.220
+<v Tyler Rohrer>out there and we could do what they did and we'd probably get some of what they got. However,
+
+113
+00:09:40.940 --> 00:09:45.720
+<v Tyler Rohrer>you know, what if, you know, pun intended, we went back from our brutal and honest feedback
+
+114
+00:09:45.720 --> 00:09:49.820
+<v Tyler Rohrer>from our customers and asked them bluntly, what are we doing wrong? You know, what would ever
+
+115
+00:09:49.820 --> 00:09:55.380
+<v Tyler Rohrer>cause you to stop using this product? And would there be an answer to that in which, you know,
+
+116
+00:09:55.380 --> 00:09:59.800
+<v Tyler Rohrer>we would find some very interesting, you know, inspiration or new innovation? It turns out,
+
+117
+00:10:00.920 --> 00:10:15.520
+<v Tyler Rohrer>We started getting really, really, well, this is, again, even during the minimal viable product, you know, what I call early beta, early alpha show and tell stages, we started getting some feedback, which was, hey, from a roadmap perspective, what are you doing about phones, watches, and wearables?
+
+118
+00:10:15.740 --> 00:10:16.260
+<v Tyler Rohrer>We said, what?
+
+119
+00:10:16.920 --> 00:10:20.120
+<v Tyler Rohrer>And they said, well, you're dealing a lot with Windows-based PCs.
+
+120
+00:10:20.240 --> 00:10:24.140
+<v Tyler Rohrer>Most remote users, pun intended, have some kind of a phone.
+
+121
+00:10:24.220 --> 00:10:24.760
+<v Tyler Rohrer>It's an iOS.
+
+122
+00:10:24.920 --> 00:10:25.680
+<v Tyler Rohrer>It's an Android.
+
+123
+00:10:25.840 --> 00:10:26.600
+<v Tyler Rohrer>Maybe it's a tablet.
+
+124
+00:10:26.700 --> 00:10:27.920
+<v Tyler Rohrer>They also might have a watch.
+
+125
+00:10:28.020 --> 00:10:28.800
+<v Tyler Rohrer>Maybe it's a Fitbit.
+
+126
+00:10:28.820 --> 00:10:29.420
+<v Tyler Rohrer>Maybe it's Wear.
+
+127
+00:10:31.020 --> 00:10:36.480
+<v Tyler Rohrer>Apple, any plans to incorporate that, you know, into your security and support fabric? So hint,
+
+128
+00:10:36.520 --> 00:10:40.440
+<v Tyler Rohrer>hint, yeah, that's a good idea. You know, and so I think that's the other interesting thing too,
+
+129
+00:10:40.500 --> 00:10:45.840
+<v Tyler Rohrer>is to be, you know, unafraid to take a roadmap that maybe you or we thought was, you know,
+
+130
+00:10:45.840 --> 00:10:51.680
+<v Tyler Rohrer>going to be, you know, the next maybe two to three way points on the map and change it a little bit,
+
+131
+00:10:51.720 --> 00:10:56.800
+<v Tyler Rohrer>you know, or incorporate or compromise in, not compromise away from, but compromise in
+
+132
+00:10:56.800 --> 00:11:02.140
+<v Tyler Rohrer>in some of the innovation that your customers might be sharing. I think that we're also,
+
+133
+00:11:03.220 --> 00:11:06.900
+<v Tyler Rohrer>I'm going to steal a line from Google, and I'm going to, I guess, because I said that I get to,
+
+134
+00:11:07.000 --> 00:11:10.840
+<v Tyler Rohrer>which is we're going to try to make decisions quickly, but if they're the wrong ones,
+
+135
+00:11:10.900 --> 00:11:14.020
+<v Tyler Rohrer>we're going to unmake them just as quickly. I heard them say that once. I always thought that
+
+136
+00:11:14.020 --> 00:11:18.320
+<v Tyler Rohrer>was just a really, really cool way to build software, which is be unafraid to make a decision,
+
+137
+00:11:18.500 --> 00:11:23.560
+<v Tyler Rohrer>but if you can validate it's the wrong one, unmake it. In other words, don't catch a falling
+
+138
+00:11:23.560 --> 00:11:25.200
+<v Tyler Rohrer>refrigerator, something like that.
+
+139
+00:11:25.440 --> 00:11:28.520
+<v Noah Labhart>I like that. Well, let's switch to team then. So tell me how
+
+140
+00:11:28.520 --> 00:11:32.920
+<v Noah Labhart>you went about building your team and what did you look for in those people to indicate that
+
+141
+00:11:32.920 --> 00:11:34.600
+<v Noah Labhart>they were the winning horses to join you?
+
+142
+00:11:35.240 --> 00:11:37.160
+<v Tyler Rohrer>Well, I'll start with what I looked for,
+
+143
+00:11:37.240 --> 00:11:43.820
+<v Tyler Rohrer>and then I'm actually going to share what I found. So I looked for a definition. I thought
+
+144
+00:11:43.820 --> 00:11:48.400
+<v Tyler Rohrer>that there was a definition of each and every role that I would need to build this idyllic
+
+145
+00:11:48.400 --> 00:11:55.100
+<v Tyler Rohrer>software company. And I found that it was really hard to find those exact right folks. What I found
+
+146
+00:11:55.100 --> 00:12:02.720
+<v Tyler Rohrer>were masters of their craft. And what very quickly came to form here remotely was we were a symphony.
+
+147
+00:12:02.880 --> 00:12:08.280
+<v Tyler Rohrer>We were each masters of our instrument. We each knew our craft, whether it was marketing or ops
+
+148
+00:12:08.280 --> 00:12:13.900
+<v Tyler Rohrer>or the gal that runs contracts or my controller or the folks in marketing or the original sales
+
+149
+00:12:13.900 --> 00:12:15.640
+<v Tyler Rohrer>or channel folks that we brought in.
+
+150
+00:12:15.740 --> 00:12:19.580
+<v Tyler Rohrer>And really my role was just to be, you know, an orchestrator,
+
+151
+00:12:19.580 --> 00:12:23.380
+<v Tyler Rohrer>a conductor, if you will, of that symphony, you know, which is really interesting.
+
+152
+00:12:23.620 --> 00:12:25.740
+<v Tyler Rohrer>A lot of folks have joked around like, well, gosh,
+
+153
+00:12:25.760 --> 00:12:27.940
+<v Tyler Rohrer>what are you starting an old folks home for tech entrepreneurs?
+
+154
+00:12:28.180 --> 00:12:30.920
+<v Tyler Rohrer>And I kind of jokingly say, sure, it's kind of what we ended up being.
+
+155
+00:12:30.980 --> 00:12:35.240
+<v Tyler Rohrer>We have a number of very seasoned veterans who are, again,
+
+156
+00:12:35.260 --> 00:12:36.720
+<v Tyler Rohrer>masters at their instrument.
+
+157
+00:12:36.840 --> 00:12:41.680
+<v Tyler Rohrer>And then we've got some really cool young protégés who are willing to learn quickly
+
+158
+00:12:41.680 --> 00:12:44.740
+<v Tyler Rohrer>and, again, are kind of unafraid to make mistakes.
+
+159
+00:12:45.040 --> 00:12:50.780
+<v Tyler Rohrer>Now, it's funny, with a name like Remotely, you would probably suspect we were scattered all over the globe,
+
+160
+00:12:50.860 --> 00:12:51.980
+<v Tyler Rohrer>and we are to a degree.
+
+161
+00:12:52.140 --> 00:12:59.200
+<v Tyler Rohrer>We do have some large overseas development contingency and presence up and down the East Coast.
+
+162
+00:12:59.500 --> 00:13:03.060
+<v Tyler Rohrer>But our home base is right in Portsmouth, New Hampshire.
+
+163
+00:13:03.200 --> 00:13:07.780
+<v Tyler Rohrer>I'm not sure if you've ever spent any time up here in New England, but about an hour north of Boston.
+
+164
+00:13:07.780 --> 00:13:13.240
+<v Tyler Rohrer>in. And so if you like clam chowder and $5 lobsters, you're all welcome. So the team is
+
+165
+00:13:13.240 --> 00:13:16.340
+<v Tyler Rohrer>primarily based up here. It's a great location to raise a family.
+
+166
+00:13:20.240 --> 00:13:26.700
+<v Noah Labhart>Okay, well then let's talk about scalability. And this will be interesting given, you know,
+
+167
+00:13:26.700 --> 00:13:32.860
+<v Noah Labhart>security and remote and cloud-based access for this product. Did you build this to scale
+
+168
+00:13:32.860 --> 00:13:37.680
+<v Noah Labhart>efficiently from day one? Or are you fighting this? Are you going to be fighting this as you
+
+169
+00:13:37.680 --> 00:13:38.880
+<v Noah Labhart>grow and release the product?
+
+170
+00:13:39.340 --> 00:13:42.680
+<v Tyler Rohrer>A hyperproductive question. And the reason it's hyperproductive
+
+171
+00:13:42.680 --> 00:13:48.360
+<v Tyler Rohrer>is that in our world, there's a second phenomenon happening. Not just are people wanting to go
+
+172
+00:13:48.360 --> 00:13:55.360
+<v Tyler Rohrer>remote or not go into a primary office. We have a secondary and kind of major migration happening
+
+173
+00:13:55.360 --> 00:14:00.940
+<v Tyler Rohrer>from what I'll call perimeter-based security to zero trust-based security. So to answer your
+
+174
+00:14:02.860 --> 00:14:07.880
+<v Tyler Rohrer>anticipate and tried to build each one of the service components for scale, we also had to
+
+175
+00:14:07.880 --> 00:14:12.320
+<v Tyler Rohrer>build it in a way that was kind of zero trust first, you know, that you had to already assume
+
+176
+00:14:12.320 --> 00:14:17.660
+<v Tyler Rohrer>an architecture that, you know, could deal with and overcome and sustain breaches or,
+
+177
+00:14:17.680 --> 00:14:23.040
+<v Tyler Rohrer>you know, or different attacks. What we basically tried to do, Noah, was break everything up front.
+
+178
+00:14:23.460 --> 00:14:27.460
+<v Tyler Rohrer>What was the mass load? What were the mass points of ingress? What were the mass,
+
+179
+00:14:28.020 --> 00:14:32.400
+<v Tyler Rohrer>you know, subservices that we needed to? And what we ended up doing was building the application
+
+180
+00:14:32.860 --> 00:14:39.500
+<v Tyler Rohrer>in Docker containers, but really as an orchestration of microservices. So each one of the microservices
+
+181
+00:14:39.500 --> 00:14:46.220
+<v Tyler Rohrer>in and of themselves is a security object with a minimal path of ingress and egress. But secondly,
+
+182
+00:14:46.300 --> 00:14:52.580
+<v Tyler Rohrer>each one is built for its own individual scale. Now, I hinted before, and we are entirely executing
+
+183
+00:14:52.580 --> 00:14:58.000
+<v Tyler Rohrer>the application in Azure today, which is, of course, Microsoft's cloud. But we wanted to build
+
+184
+00:14:58.000 --> 00:15:04.680
+<v Tyler Rohrer>in such a way that, to your point about unexpected scale, you know, should we encounter an extra zero
+
+185
+00:15:04.680 --> 00:15:10.240
+<v Tyler Rohrer>or two or three, you know, in customer adoption, we'd be able to handle it. Now, the good news is
+
+186
+00:15:10.240 --> 00:15:15.180
+<v Tyler Rohrer>that, you know, a lot of things, at least in the modern cloud, don't scale linearly. And one of
+
+187
+00:15:15.180 --> 00:15:20.740
+<v Tyler Rohrer>those is database costs, luckily. So I think as we get larger and get a larger data lake and a data
+
+188
+00:15:20.740 --> 00:15:27.300
+<v Tyler Rohrer>footprint, we're actually going to be encouraging and encountering some, you know, decrease in cost.
+
+189
+00:15:28.000 --> 00:15:32.460
+<v Tyler Rohrer>certainly want to keep your chin up in so far as performance. So that's what we're keeping our eye
+
+190
+00:15:32.460 --> 00:15:38.260
+<v Tyler Rohrer>on. With scale, congratulations, economies get better, but make sure you're not doing so at the
+
+191
+00:15:38.260 --> 00:15:40.100
+<v Tyler Rohrer>cost of performance or user experience.
+
+192
+00:15:40.420 --> 00:15:43.540
+<v Noah Labhart>I love how you describe that infrastructure too, with
+
+193
+00:15:43.540 --> 00:15:49.740
+<v Noah Labhart>every service being its own sort of scalable infrastructure. And that just makes a ton of
+
+194
+00:15:49.740 --> 00:15:58.320
+<v Noah Labhart>a ton of sense. And given the tooling that's out there today, I mean, it's easier, it's never easy,
+
+195
+00:15:58.460 --> 00:16:02.040
+<v Noah Labhart>but easier to set that up from the beginning. So I think that's fascinating.
+
+196
+00:16:02.240 --> 00:16:02.740
+<v Noah Labhart>I
+
+197
+00:16:02.400 --> 00:16:08.040
+<v Tyler Rohrer>agree. I think it's one of the very unique realities of building an application in the
+
+198
+00:16:08.040 --> 00:16:11.660
+<v Tyler Rohrer>cloud, specifically when you're using some of the new architectures and constructs
+
+199
+00:16:12.120 --> 00:16:18.280
+<v Tyler Rohrer>that are available, is you start realizing, I had a customer conversation yesterday about this topic,
+
+200
+00:16:19.740 --> 00:16:34.740
+<v Tyler Rohrer>The new stack is the API, meaning it's more about interoperability and the option or the ability for your application to add value, extract value, or amplify value in adjacent applications or services, at least in the enterprise.
+
+201
+00:16:34.960 --> 00:16:36.940
+<v Tyler Rohrer>Our theory is they're big companies.
+
+202
+00:16:37.080 --> 00:16:41.300
+<v Tyler Rohrer>They've already made big decisions and big standards and big investments in people and training.
+
+203
+00:16:41.480 --> 00:16:42.900
+<v Tyler Rohrer>Work with that, right?
+
+204
+00:16:42.980 --> 00:16:46.040
+<v Tyler Rohrer>So to us, it's all about exposing new value.
+
+205
+00:16:46.040 --> 00:16:52.080
+<v Tyler Rohrer>you, one of the examples would be we think that a lot of antivirus is owned and underutilized.
+
+206
+00:16:52.200 --> 00:16:58.060
+<v Tyler Rohrer>You'd be shocked if I told you that sometimes up to 30 percent, three zero percent of the antivirus
+
+207
+00:16:58.060 --> 00:17:03.260
+<v Tyler Rohrer>isn't updated monthly, monthly in most enterprise organizations. I can tell you some that haven't
+
+208
+00:17:03.260 --> 00:17:08.420
+<v Tyler Rohrer>even done an audit since 2018, but I won't pick on them. But the notion is that, you know, you
+
+209
+00:17:08.420 --> 00:17:12.400
+<v Tyler Rohrer>can't fix what you can't see. You know, so that's what we're hoping to do it remotely is turn on
+
+210
+00:17:12.400 --> 00:17:16.280
+<v Tyler Rohrer>that light in a dark room and show these folks what potentially you can start fixing.
+
+211
+00:17:17.280 --> 00:17:22.120
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built already,
+
+212
+00:17:22.340 --> 00:17:23.360
+<v Noah Labhart>what are you most proud of?
+
+213
+00:17:23.680 --> 00:17:27.440
+<v Tyler Rohrer>That's a strange way to answer it, but I used to love mowing lawns and it was something
+
+214
+00:17:27.440 --> 00:17:32.120
+<v Tyler Rohrer>about the before and after. Something that, you know, it was a mess before and then somehow
+
+215
+00:17:32.120 --> 00:17:36.340
+<v Tyler Rohrer>afterwards it was clean and tidy and I don't know, maybe it smelled good and fresh and I got lemonade.
+
+216
+00:17:36.500 --> 00:17:41.520
+<v Tyler Rohrer>I don't know. So I guess what I'm most proud of is, you know, there was a big problem that I know
+
+217
+00:17:42.400 --> 00:17:48.420
+<v Tyler Rohrer>exists and existed before remotely came. And I keep telling this to the team. What makes me most
+
+218
+00:17:48.420 --> 00:17:52.880
+<v Tyler Rohrer>proud is it's probably the only venture or one of the most poignant ventures that I've been a part
+
+219
+00:17:52.880 --> 00:17:58.600
+<v Tyler Rohrer>of that actually has a bit of altruism in it. I mean, if we can actually help people secure and
+
+220
+00:17:58.600 --> 00:18:03.500
+<v Tyler Rohrer>support their remote users and get them out to their kids' soccer practice at five or get them
+
+221
+00:18:03.500 --> 00:18:07.800
+<v Tyler Rohrer>out for a long weekend a little early on a Friday afternoon, I feel like we've done our job. Okay,
+
+222
+00:18:07.860 --> 00:18:11.920
+<v Tyler Rohrer>if we do some really cool math and solve some neat computer science problems in the process,
+
+223
+00:18:13.100 --> 00:18:16.920
+<v Tyler Rohrer>But I think, you know, that's probably what makes us as a team the most proud.
+
+224
+00:18:16.980 --> 00:18:20.660
+<v Tyler Rohrer>And certainly, you know, as a founder, you know, just puts a grin on your ear to ear.
+
+225
+00:18:22.080 --> 00:18:23.400
+<v Noah Labhart>Let's flip the script a little bit.
+
+226
+00:18:23.480 --> 00:18:27.260
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+227
+00:18:28.280 --> 00:18:33.540
+<v Tyler Rohrer>I think one was we had, you know, I'm going to call them vortices of negative energy.
+
+228
+00:18:33.680 --> 00:18:35.740
+<v Tyler Rohrer>That's all I'm going to, I'm not going to pick on anyone personally.
+
+229
+00:18:35.740 --> 00:18:45.940
+<v Tyler Rohrer>But what you realize early on is that vortices of negative energy, kind of like black holes, can suck a lot of really good ideas and energy into them.
+
+230
+00:18:46.100 --> 00:18:48.140
+<v Tyler Rohrer>And it was a hard decision for us to make.
+
+231
+00:18:48.240 --> 00:18:56.140
+<v Tyler Rohrer>In nine months, we had a few different opportunities where we had to make some tough decisions and see team members depart.
+
+232
+00:18:56.680 --> 00:18:59.860
+<v Tyler Rohrer>I think I look back at those and I think it was a mistake.
+
+233
+00:18:59.960 --> 00:19:03.260
+<v Tyler Rohrer>It probably was a mistake just not being the right fit in the beginning.
+
+234
+00:19:03.260 --> 00:19:07.320
+<v Tyler Rohrer>And I've got to bear some of that responsibility, you know, as a founder.
+
+235
+00:19:07.460 --> 00:19:13.860
+<v Tyler Rohrer>So, you know, I think probably, you know, one of the mistakes, if I was to summarize it, Noah, would be moving a little too quick.
+
+236
+00:19:14.000 --> 00:19:15.040
+<v Tyler Rohrer>You know, you move quick.
+
+237
+00:19:15.160 --> 00:19:24.260
+<v Tyler Rohrer>You say yes maybe a little bit before you wanted to say yes to either a decision on a team member or maybe a piece of technology or, you know, something else.
+
+238
+00:19:25.040 --> 00:19:29.140
+<v Tyler Rohrer>You know, and again, going back to that Google rule, you've got to be able to unmake those decisions as well.
+
+239
+00:19:29.140 --> 00:19:33.300
+<v Tyler Rohrer>So it's tough, but that's definitely a mistake that I think I've made.
+
+240
+00:19:33.360 --> 00:19:40.020
+<v Tyler Rohrer>From a team perspective, one of the very interesting things I was probably most proud of is we chose one CRM,
+
+241
+00:19:40.040 --> 00:19:45.960
+<v Tyler Rohrer>got really deep to the point where we're giving demos to our internal team on that CRM, and then unmade the decision.
+
+242
+00:19:46.760 --> 00:19:49.960
+<v Tyler Rohrer>They basically came to me and said, I ran a yellow light.
+
+243
+00:19:50.060 --> 00:19:51.540
+<v Tyler Rohrer>Please don't give me a speeding ticket.
+
+244
+00:19:51.780 --> 00:19:54.140
+<v Tyler Rohrer>But here's what happened, and here's how I'm fixing it.
+
+245
+00:19:54.220 --> 00:19:55.540
+<v Tyler Rohrer>And I said, problem solved.
+
+246
+00:19:55.660 --> 00:19:56.380
+<v Tyler Rohrer>That was the other joke.
+
+247
+00:19:56.380 --> 00:19:59.200
+<v Tyler Rohrer>So we pay for speeding tickets here remotely.
+
+248
+00:19:59.380 --> 00:20:00.740
+<v Tyler Rohrer>We don't pay for parking tickets.
+
+249
+00:20:00.960 --> 00:20:02.180
+<v Tyler Rohrer>I thought that was a cool one too.
+
+250
+00:20:02.340 --> 00:20:04.940
+<v Tyler Rohrer>I haven't fully decided what that means, but it sounds neat.
+
+251
+00:20:06.700 --> 00:20:08.800
+<v Noah Labhart>Well, so you're releasing in 30 days.
+
+252
+00:20:08.860 --> 00:20:13.980
+<v Noah Labhart>And so this question in the short term will make sense or will be clear.
+
+253
+00:20:14.120 --> 00:20:18.340
+<v Noah Labhart>But beyond that, what does the future look like for the product and for your team?
+
+254
+00:20:19.540 --> 00:20:24.500
+<v Tyler Rohrer>I've always been one of those entrepreneurs that was very hesitant to put the word cloud
+
+255
+00:20:26.380 --> 00:20:31.140
+<v Tyler Rohrer>cloud was and to put AI and ML in my PowerPoint before I really knew what artificial intelligence
+
+256
+00:20:31.140 --> 00:20:37.400
+<v Tyler Rohrer>or machine learning was. What I'm excited about with this is because we are endeavoring to get
+
+257
+00:20:37.400 --> 00:20:43.500
+<v Tyler Rohrer>a ton of information from endpoints by and through our agent, a ton of information through the graph
+
+258
+00:20:43.500 --> 00:20:49.040
+<v Tyler Rohrer>API, which we're reading through in Azure, and then a ton of information from the NIST CVE
+
+259
+00:20:49.040 --> 00:20:53.980
+<v Tyler Rohrer>security vulnerabilities, we're going to have an incredible amount of information to start taking
+
+260
+00:20:53.980 --> 00:20:58.580
+<v Tyler Rohrer>actions, triggers, and results based on or to actually kick off routines.
+
+261
+00:20:58.960 --> 00:21:04.480
+<v Tyler Rohrer>And so we're actually using Microsoft Power Virtual Platform and their Power Virtual Agents
+
+262
+00:21:04.480 --> 00:21:06.760
+<v Tyler Rohrer>to integrate a little bit of machine learning.
+
+263
+00:21:06.980 --> 00:21:10.300
+<v Tyler Rohrer>So we're going to have some intelligent conversation built into the platform.
+
+264
+00:21:10.640 --> 00:21:15.040
+<v Tyler Rohrer>And I think I'm smiling, if you can hear my voice, because it's a real implementation.
+
+265
+00:21:15.440 --> 00:21:17.080
+<v Tyler Rohrer>You know, it's not just big math.
+
+266
+00:21:17.300 --> 00:21:22.200
+<v Tyler Rohrer>This is truly a use case where, you know, machine learning and artificial intelligence
+
+267
+00:21:23.980 --> 00:21:28.280
+<v Tyler Rohrer>experience and, again, get admins out the door into their kids' soccer, you know, little league
+
+268
+00:21:28.280 --> 00:21:33.040
+<v Tyler Rohrer>practice, whatever they're into. So that'll be fun to see. That's about a year away. So we like to
+
+269
+00:21:33.040 --> 00:21:38.200
+<v Tyler Rohrer>say we're in the business of observing first. Later on this year, we'll be acting, and the
+
+270
+00:21:38.200 --> 00:21:40.840
+<v Tyler Rohrer>next year we'll be automating. So that falls under the automate category.
+
+271
+00:21:42.260 --> 00:21:43.420
+<v Noah Labhart>Well, let's switch to you,
+
+272
+00:21:43.480 --> 00:21:49.660
+<v Noah Labhart>Tyler. Who influences the way that you work? Name a CEO, a CTO, an architect, really any person
+
+273
+00:21:49.660 --> 00:21:50.660
+<v Noah Labhart>you look up to and why?
+
+274
+00:21:51.300 --> 00:21:57.100
+<v Tyler Rohrer>I grew up in the 80s and obviously during the 90s was in my college year.
+
+275
+00:21:57.180 --> 00:22:02.360
+<v Tyler Rohrer>So I watched Apple from maybe a different purview than a lot of people saw it. You know,
+
+276
+00:22:02.360 --> 00:22:06.920
+<v Tyler Rohrer>I watched Steve Jobs get walked out of his own company. I watched the Gil Amelios. I watched
+
+277
+00:22:06.920 --> 00:22:11.080
+<v Tyler Rohrer>the folks from Pepsi. I watched a lot of different folks come and go, you know, before Steve kind of,
+
+278
+00:22:11.080 --> 00:22:14.840
+<v Tyler Rohrer>you know, came back. And really it was that time that we all kind of got, you know, the iPhone
+
+279
+00:22:14.840 --> 00:22:20.460
+<v Tyler Rohrer>phone and one more thing. So I've got to put Steve Jobs up there, the way he would tell stories,
+
+280
+00:22:20.600 --> 00:22:27.480
+<v Tyler Rohrer>the way he would take, you know, complexity and make it simple and consumable. And yet,
+
+281
+00:22:27.500 --> 00:22:33.400
+<v Tyler Rohrer>at the same time, you knew that there was just an immense wealth of data and validation to back up
+
+282
+00:22:33.400 --> 00:22:38.260
+<v Tyler Rohrer>that simplicity. So I've got to give him, you know, a huge head nod. Also, as a tech entrepreneur,
+
+283
+00:22:38.660 --> 00:22:43.960
+<v Tyler Rohrer>you know, he really started one heck of a software company, you know, that to this day is still,
+
+284
+00:22:44.840 --> 00:22:48.220
+<v Tyler Rohrer>I think resembles a bit of his personality and soul.
+
+285
+00:22:48.440 --> 00:22:52.760
+<v Tyler Rohrer>You know, from a personal perspective, if anyone has any extra time,
+
+286
+00:22:52.820 --> 00:22:57.500
+<v Tyler Rohrer>there's some neat writings and readings out there by a fellow that's not with us anymore
+
+287
+00:22:57.500 --> 00:23:01.980
+<v Tyler Rohrer>named Terence McKenna and his brother Dennis, who is a really interesting mathematician.
+
+288
+00:23:02.500 --> 00:23:08.020
+<v Tyler Rohrer>And I think that crossroads of, you know, divinity, physics, and kind of what's going on
+
+289
+00:23:08.020 --> 00:23:10.660
+<v Tyler Rohrer>are also just what, you know, keep me going personally
+
+290
+00:23:10.660 --> 00:23:13.300
+<v Tyler Rohrer>and probably what inspire a lot of what I do in software.
+
+291
+00:23:14.840 --> 00:23:18.560
+<v Tyler Rohrer>names that I'd throw to the top of the list, Noah, although we just met. So I think our future is
+
+292
+00:23:18.560 --> 00:23:19.060
+<v Tyler Rohrer>bright as well.
+
+293
+00:23:19.720 --> 00:23:24.580
+<v Noah Labhart>I appreciate that. Well, we talked about a mistake earlier, but a little bit different
+
+294
+00:23:24.580 --> 00:23:28.800
+<v Noah Labhart>spin. If you could go back to the beginning, what would you do differently? Or where would
+
+295
+00:23:28.800 --> 00:23:30.480
+<v Noah Labhart>you consider taking a different approach?
+
+296
+00:23:31.480 --> 00:23:35.680
+<v Tyler Rohrer>You know, I look at every startup, you know,
+
+297
+00:23:35.680 --> 00:23:39.660
+<v Tyler Rohrer>at least this is probably my fourth or fifth serious, you know, one is almost the reverse
+
+298
+00:23:39.660 --> 00:23:45.160
+<v Tyler Rohrer>reverse chronology. You know, and I think in the beginning, I always trusted, you know, that there
+
+299
+00:23:45.160 --> 00:23:49.480
+<v Tyler Rohrer>was something out beyond the headlights, if that makes any sense, you know, and you were willing
+
+300
+00:23:49.480 --> 00:23:53.660
+<v Tyler Rohrer>to go, you know, fast and furious, just knowing that somehow the road would unfold itself.
+
+301
+00:23:54.000 --> 00:23:59.420
+<v Tyler Rohrer>You know, with this one, then I guess this is probably me doing it a little bit differently.
+
+302
+00:23:59.520 --> 00:24:03.600
+<v Tyler Rohrer>So I guess I'm going to answer your question in a slightly adjacent context. You know, we actually
+
+303
+00:24:03.600 --> 00:24:09.160
+<v Tyler Rohrer>went out and raised the capital to take that future state, you know, and kind of write the
+
+304
+00:24:09.660 --> 00:24:15.920
+<v Tyler Rohrer>code and reverse. If I had to do it again, you know, what I would basically do is more of the
+
+305
+00:24:15.920 --> 00:24:23.160
+<v Tyler Rohrer>same faster. You know, I think that taking that long strategic vision of where do you want to end
+
+306
+00:24:23.160 --> 00:24:28.940
+<v Tyler Rohrer>up and reverse code for that is great. And now I think I would trust myself, you know, a little bit
+
+307
+00:24:28.940 --> 00:24:33.560
+<v Tyler Rohrer>more to do that quicker. I was always, I don't know, at least as an entrepreneur personally,
+
+308
+00:24:33.720 --> 00:24:38.740
+<v Tyler Rohrer>I've always found that I drive the car with one foot on the gas and one foot on the brake. It's
+
+309
+00:24:39.660 --> 00:24:45.580
+<v Tyler Rohrer>sometimes you accelerate very rapidly other times you decelerate rather quickly you know but I think
+
+310
+00:24:45.580 --> 00:24:50.160
+<v Tyler Rohrer>that lessons learned the way that I would do it is you know trust myself enough that you know take
+
+311
+00:24:50.160 --> 00:24:54.600
+<v Tyler Rohrer>your foot off the brake you know you've got a great team that surrounds you you validated the
+
+312
+00:24:54.600 --> 00:24:59.220
+<v Tyler Rohrer>product market fit you've got a great minimally viable product and you know a team and a channel
+
+313
+00:24:59.220 --> 00:25:05.520
+<v Tyler Rohrer>that's supporting it you know trust in that but gosh it's still hard to uh to let go of the rain
+
+314
+00:25:05.520 --> 00:25:07.940
+<v Tyler Rohrer>So I guess in the end, though, I'm still just a control freak.
+
+315
+00:25:10.420 --> 00:25:11.800
+<v Noah Labhart>Hey, aren't we all?
+
+316
+00:25:12.440 --> 00:25:13.120
+<v Noah Labhart>Right, right.
+
+317
+00:25:13.240 --> 00:25:13.740
+<v Noah Labhart>Aren't we all?
+
+318
+00:25:13.720 --> 00:25:19.580
+<v Noah Labhart>But I like the visual you placed there on keeping one foot on the gas and one foot on the brake.
+
+319
+00:25:19.740 --> 00:25:21.180
+<v Noah Labhart>I think that's accurate.
+
+320
+00:25:21.540 --> 00:25:22.040
+<v Tyler Rohrer>It is.
+
+321
+00:25:22.020 --> 00:25:22.520
+<v Tyler Rohrer>It is.
+
+322
+00:25:22.460 --> 00:25:25.140
+<v Tyler Rohrer>And I think you've also got a car full of stakeholders.
+
+323
+00:25:25.140 --> 00:25:30.020
+<v Tyler Rohrer>stakeholders, you know, and so as much as, you know, I'd like to get to a certain destination or
+
+324
+00:25:30.020 --> 00:25:35.660
+<v Tyler Rohrer>the ride to be of a certain quality or, you know, pace, you also have to be mindful of your
+
+325
+00:25:35.660 --> 00:25:38.860
+<v Tyler Rohrer>passengers. That's probably the other mistake I've learned, actually. I'm going to give another
+
+326
+00:25:38.860 --> 00:25:43.980
+<v Tyler Rohrer>little addendum, which is, again, as a former race car driver and a fellow who has wrecked a few cars,
+
+327
+00:25:44.160 --> 00:25:49.180
+<v Tyler Rohrer>I certainly have to admit that my pace of play and my pace of driving is a bit rapid,
+
+328
+00:25:49.980 --> 00:25:54.160
+<v Tyler Rohrer>hence the speeding tickets, perhaps. But I think another mistake was, you know,
+
+329
+00:25:55.140 --> 00:25:58.900
+<v Tyler Rohrer>little bit more mindful that, you know, with the other stakeholders and you can't always be going
+
+330
+00:25:58.900 --> 00:26:02.460
+<v Tyler Rohrer>a thousand miles an hour. It's a lesson well learned.
+
+331
+00:26:04.180 --> 00:26:06.760
+<v Noah Labhart>Well, last question, Tyler. So you're
+
+332
+00:26:06.760 --> 00:26:11.080
+<v Noah Labhart>getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+333
+00:26:11.420 --> 00:26:14.540
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world. Can't wait to show it off to
+
+334
+00:26:14.540 --> 00:26:19.180
+<v Noah Labhart>you right there on the plane. What advice do you give that person having gone down this road a bit?
+
+335
+00:26:20.000 --> 00:26:25.520
+<v Tyler Rohrer>The best advice I could share is, you know, as a 52-year-old, I've seen, I guess I've really
+
+336
+00:26:25.520 --> 00:26:30.680
+<v Tyler Rohrer>probably been involved in clinical business for 30 years, but the rate of change has accelerated.
+
+337
+00:26:30.780 --> 00:26:37.940
+<v Tyler Rohrer>The variety, the velocity, the volume of net new ideas has changed. I mean, it's increased
+
+338
+00:26:37.940 --> 00:26:43.820
+<v Tyler Rohrer>incredibly. So I would tell that young entrepreneur that what you used to have an hour to get across
+
+339
+00:26:43.820 --> 00:26:49.180
+<v Tyler Rohrer>to a customer or a prospect, you might have a half an hour, but you probably have 12 minutes.
+
+340
+00:26:49.420 --> 00:26:57.000
+<v Tyler Rohrer>I think a lot of the way we need to tell stories and translate value and demonstrate that value
+
+341
+00:26:57.000 --> 00:27:02.240
+<v Tyler Rohrer>is going to happen more rapidly. I mean, examples are happening to me almost every day. Maybe I'm
+
+342
+00:27:02.240 --> 00:27:06.700
+<v Tyler Rohrer>looking for them. I do a little bit of writing for Forbes magazine. Yes, that was a shameless plug.
+
+343
+00:27:06.700 --> 00:27:12.360
+<v Tyler Rohrer>and now the notion of going from idea to print is ours now.
+
+344
+00:27:12.500 --> 00:27:18.080
+<v Tyler Rohrer>The idea of waiting around and stoically hoping a light bulb is going to go off over your head are gone.
+
+345
+00:27:18.260 --> 00:27:21.900
+<v Tyler Rohrer>So my advice would be trust yourself, get to the point quickly,
+
+346
+00:27:22.980 --> 00:27:25.320
+<v Tyler Rohrer>take feedback good and bad to heart.
+
+347
+00:27:25.500 --> 00:27:28.620
+<v Tyler Rohrer>Most people are actually out there to help you, not wound you.
+
+348
+00:27:28.880 --> 00:27:30.780
+<v Tyler Rohrer>And if you take that feedback to heart,
+
+349
+00:27:30.920 --> 00:27:33.860
+<v Tyler Rohrer>you'll find yourself probably getting to the point in 11 minutes the next time.
+
+350
+00:27:33.860 --> 00:27:43.340
+<v Tyler Rohrer>So that'd be probably what I'd tell that young entrepreneur before they put their headphones back on and went back to Taylor Swift or Bieber or Lizzo or whatever's in these days.
+
+351
+00:27:44.860 --> 00:27:46.320
+<v Noah Labhart>That's fantastic advice.
+
+352
+00:27:46.500 --> 00:27:48.220
+<v Noah Labhart>Well, Tyler, thank you for being on the show today.
+
+353
+00:27:48.420 --> 00:27:51.200
+<v Noah Labhart>Thank you for telling the creation story of Remotely.
+
+354
+00:27:51.300 --> 00:27:51.800
+<v Noah Labhart>I
+
+355
+00:27:51.460 --> 00:27:52.020
+<v Tyler Rohrer>appreciate it.
+
+356
+00:27:52.040 --> 00:27:52.580
+<v Tyler Rohrer>Thanks again, Noah.
+
+357
+00:27:53.960 --> 00:27:56.800
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+358
+00:27:59.620 --> 00:28:02.640
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+359
+00:28:03.860 --> 00:28:07.540
+<v Noah Labhart>Subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+360
+00:28:08.020 --> 00:28:13.040
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+361
+00:28:13.460 --> 00:28:15.640
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+362
+00:28:15.980 --> 00:28:17.860
+<v Noah Labhart>Both things help us out tremendously.
+
+363
+00:28:20.300 --> 00:28:21.740
+<v Noah Labhart>And thanks again for listening.
+
+364
+00:28:33.860 --> 00:28:35.120
+<v Tyler Rohrer>Thank you.

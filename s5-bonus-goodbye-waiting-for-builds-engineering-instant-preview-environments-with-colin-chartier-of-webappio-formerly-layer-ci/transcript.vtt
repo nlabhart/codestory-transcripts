@@ -1,0 +1,1539 @@
+WEBVTT
+
+NOTE S5 Bonus: Goodbye Waiting for Builds: Engineering Instant Preview Environments with Colin Chartier of Webapp.io (Formerly Layer CI)
+
+1
+00:00:00.000 --> 00:00:06.620
+<v Colin Chartier>It's very difficult to just sit by yourself or even sit with your team and make something that people actually want because
+
+2
+00:00:07.140 --> 00:00:14.260
+<v Colin Chartier>while you're working on your startup, the world is kind of chugging along and best practices are changing and competitors are being made.
+
+3
+00:00:14.660 --> 00:00:21.860
+<v Colin Chartier>So unless you're consistently talking to people and getting rejected or getting new customers, you're not going to know how existing workflows work.
+
+4
+00:00:21.960 --> 00:00:26.540
+<v Colin Chartier>And you're not going to know what's missing or what could be better. And you're not going to know how to pitch it.
+
+5
+00:00:28.500 --> 00:00:33.440
+<v Colin Chartier>get customers as soon as possible, even if it takes 999 rejections,
+
+6
+00:00:33.480 --> 00:00:36.440
+<v Colin Chartier>and then work with those customers to make something that people actually want.
+
+7
+00:00:38.120 --> 00:00:41.940
+<v Colin Chartier>My name is Colin. I'm the co-founder and CEO of LayerCI.
+
+8
+00:00:47.560 --> 00:00:52.940
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+9
+00:00:52.940 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+10
+00:00:57.120 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+11
+00:01:02.240 --> 00:01:03.920
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+12
+00:01:04.120 --> 00:01:07.900
+<v Noah Labhart>and today, how Colin Chartier created the best tool
+
+13
+00:01:07.900 --> 00:01:11.700
+<v Noah Labhart>to create a new environment for each developer branch.
+
+14
+00:01:13.320 --> 00:01:15.780
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:19.260 --> 00:01:22.520
+<v Noah Labhart>Colin Chartier started making video games when he was young.
+
+16
+00:01:22.940 --> 00:01:26.920
+<v Noah Labhart>He used to play Warcraft 3, which had a powerful map editor for its users.
+
+17
+00:01:27.340 --> 00:01:30.660
+<v Noah Labhart>He recalls that one game map was called Goblet Exploration,
+
+18
+00:01:30.860 --> 00:01:33.880
+<v Noah Labhart>where you were stuck in the middle of nowhere and you had to make civilization.
+
+19
+00:01:34.440 --> 00:01:38.200
+<v Noah Labhart>He found that this was really good for learning how to make things that people wanted.
+
+20
+00:01:38.740 --> 00:01:42.400
+<v Noah Labhart>He lives in Toronto and is a 20-minute bike ride from the waterfront.
+
+21
+00:01:43.100 --> 00:01:45.840
+<v Noah Labhart>Many days, he will head down to the beach and work from there,
+
+22
+00:01:45.960 --> 00:01:49.580
+<v Noah Labhart>and he enjoys getting outdoors when he doesn't have too many calls scheduled that day.
+
+23
+00:01:50.840 --> 00:01:56.040
+<v Noah Labhart>In his prior startup, he found that he and his team were very sensitive to breaking changes,
+
+24
+00:01:56.340 --> 00:01:59.220
+<v Noah Labhart>as it was critical to deliver information in a timely manner.
+
+25
+00:01:59.560 --> 00:02:03.780
+<v Noah Labhart>So much so, that his customers would churn if anything broke in the critical chain.
+
+26
+00:02:04.000 --> 00:02:06.880
+<v Noah Labhart>He created something to fill this gap at his prior venture,
+
+27
+00:02:07.000 --> 00:02:10.620
+<v Noah Labhart>which he was offering up to friends and colleagues via open source.
+
+28
+00:02:11.860 --> 00:02:16.960
+<v Noah Labhart>This is the creation story of LayerCI, now called Webapp.io.
+
+29
+00:02:22.440 --> 00:02:28.240
+<v Colin Chartier>LayerCI helps software developers review the work proposed by other software developers.
+
+30
+00:02:28.460 --> 00:02:33.760
+<v Colin Chartier>Think about, you know, you're making a site that sells pizza to people.
+
+31
+00:02:34.100 --> 00:02:38.080
+<v Colin Chartier>So you have your website, you know, you have a couple of software developers, they're making
+
+32
+00:02:38.080 --> 00:02:39.020
+<v Colin Chartier>changes to the website.
+
+33
+00:02:39.640 --> 00:02:45.500
+<v Colin Chartier>And you want it so that if one developer proposes a change, the other developer makes sure that
+
+34
+00:02:45.500 --> 00:02:46.860
+<v Colin Chartier>the change hasn't broken anything.
+
+35
+00:02:46.860 --> 00:02:56.480
+<v Colin Chartier>So a developer, if they make a code change, might make it so that the buy pizza button doesn't work anymore, which would be a really big problem for your pizza business.
+
+36
+00:02:56.980 --> 00:03:04.040
+<v Colin Chartier>So LayerCI essentially gives developers an environment that has everything set up with this new change.
+
+37
+00:03:04.580 --> 00:03:14.360
+<v Colin Chartier>And then the other developer can actually try the product so they can try buying a pizza like a customer would and then make sure that everything has worked correctly.
+
+38
+00:03:15.540 --> 00:03:19.720
+<v Colin Chartier>Prior to LayerCI, I was CTO at another startup in Toronto.
+
+39
+00:03:20.020 --> 00:03:24.260
+<v Colin Chartier>That startup was doing web scraping as a service.
+
+40
+00:03:24.540 --> 00:03:28.860
+<v Colin Chartier>So we'd help our users get data from websites.
+
+41
+00:03:29.200 --> 00:03:34.320
+<v Colin Chartier>So say you want to find which page of Amazon your listing is on, for example.
+
+42
+00:03:34.960 --> 00:03:41.400
+<v Colin Chartier>You'd like every day to go through Amazon, find where your listing is from various cities,
+
+43
+00:03:41.400 --> 00:03:47.960
+<v Colin Chartier>say, and then for each city say, from a Toronto based IP address, where are my shoes for the
+
+44
+00:03:47.960 --> 00:03:54.020
+<v Colin Chartier>search, you know, sneakers, and then we give these reports to our users, the reports were
+
+45
+00:03:54.020 --> 00:03:58.680
+<v Colin Chartier>very, you know, time sensitive, almost like if you didn't get your report on Monday, then
+
+46
+00:03:58.680 --> 00:04:01.000
+<v Colin Chartier>you wouldn't be able to make your report for your boss.
+
+47
+00:04:01.220 --> 00:04:03.060
+<v Colin Chartier>So you'd be very unhappy with us.
+
+48
+00:04:03.120 --> 00:04:06.180
+<v Colin Chartier>And you'd probably leave like you'd probably find another solution for doing this.
+
+49
+00:04:06.180 --> 00:04:15.940
+<v Colin Chartier>So we were very sensitive to bugs making it to our users and for things breaking when a developer pushed maybe a substandard change that led directly into LayerCI.
+
+50
+00:04:16.360 --> 00:04:19.980
+<v Colin Chartier>At the time, I built something that was like LayerCI, but worse.
+
+51
+00:04:20.100 --> 00:04:21.380
+<v Colin Chartier>That took a long time.
+
+52
+00:04:21.380 --> 00:04:39.500
+<v Colin Chartier>And I realized at the time that there was a gap in the market where people needed to be able to review changes with confidence, but there was no easy way of reviewing changes for websites and big applications because all of the existing tooling was for running, I guess, small checks.
+
+53
+00:04:42.620 --> 00:04:43.880
+<v Noah Labhart>Well, tell me about the MVP.
+
+54
+00:04:44.340 --> 00:04:49.600
+<v Noah Labhart>Tell me about that first product you built, how long it took you to build, and what sort of tools you used to bring it to life.
+
+55
+00:04:51.480 --> 00:04:54.960
+<v Colin Chartier>I guess the path for LayerCI was maybe a little unconventional.
+
+56
+00:04:55.220 --> 00:05:04.980
+<v Colin Chartier>The MVP was really a tech demo, because LayerCI, the product is kind of based on some novel tech that facilitates the whole thing.
+
+57
+00:05:05.420 --> 00:05:08.320
+<v Colin Chartier>So I guess the idea is you can hibernate computers.
+
+58
+00:05:08.920 --> 00:05:15.900
+<v Colin Chartier>If you have a laptop and you start your website on it, you can hibernate your laptop, and then you can make copies of the disk.
+
+59
+00:05:15.900 --> 00:05:22.020
+<v Colin Chartier>So if you set up the database and the backend, and then you hibernated your
+
+60
+00:05:22.020 --> 00:05:26.220
+<v Colin Chartier>laptop and you made 10 copies of it, you could use those copies for evaluating
+
+61
+00:05:26.220 --> 00:05:30.260
+<v Colin Chartier>different changes. In one of the copies you could download one developer's work,
+
+62
+00:05:30.400 --> 00:05:33.500
+<v Colin Chartier>in another copy you could download another developer's work, but you
+
+63
+00:05:33.500 --> 00:05:37.680
+<v Colin Chartier>wouldn't have to rerun the setup process every time. So the MVP was basically
+
+64
+00:05:37.680 --> 00:05:42.180
+<v Colin Chartier>abusing the hibernation feature to create multiple copies of everything.
+
+65
+00:05:42.180 --> 00:05:48.180
+<v Colin Chartier>thing. I was using, you know, free servers and providing this to friends in open source. And the
+
+66
+00:05:48.180 --> 00:05:54.160
+<v Colin Chartier>MVP was basically just, I wouldn't even call it a product, but like the tech demo perhaps was just
+
+67
+00:05:54.160 --> 00:06:00.220
+<v Colin Chartier>you push a change to GitHub, this environment is created automatically. And then it essentially
+
+68
+00:06:00.220 --> 00:06:06.080
+<v Colin Chartier>just runs an existing CI workflow. But with this tech underneath it, CI meaning continuous
+
+69
+00:06:06.080 --> 00:06:11.320
+<v Colin Chartier>integration, like running simple tests with no, no improvement over the state of the art.
+
+70
+00:06:12.180 --> 00:06:16.720
+<v Colin Chartier>that for a month or two to make sure that the tech was solid and then added more and more features
+
+71
+00:06:16.720 --> 00:06:18.580
+<v Colin Chartier>specifically for people building on websites.
+
+72
+00:06:20.060 --> 00:06:24.000
+<v Noah Labhart>With your tech demo, right? I get calling it
+
+73
+00:06:24.000 --> 00:06:30.020
+<v Noah Labhart>the tech demo, that first product, right? With any sort of product, maybe with that or even after,
+
+74
+00:06:30.200 --> 00:06:35.020
+<v Noah Labhart>you have to make certain decisions and trade-offs about what you do in the short term,
+
+75
+00:06:35.580 --> 00:06:41.620
+<v Noah Labhart>whether it be feature cut or technical debt acceptance. Tell me about some of those decisions
+
+76
+00:06:42.180 --> 00:06:44.180
+<v Noah Labhart>off you had to make and how you coped with them?
+
+77
+00:06:46.080 --> 00:06:49.620
+<v Colin Chartier>Sure, there's lots of to-do hacks in the codebase
+
+78
+00:06:49.620 --> 00:06:54.480
+<v Colin Chartier>that trace back to that time. So instead of making a new code path for sharing something from
+
+79
+00:06:54.480 --> 00:06:59.880
+<v Colin Chartier>something else, you might hard code a constant and say, you know, to-do hack, change this when there's
+
+80
+00:07:00.340 --> 00:07:05.740
+<v Colin Chartier>new providers. Initially, we only worked for GitHub. And I knew at the time that we'd add
+
+81
+00:07:05.740 --> 00:07:11.820
+<v Colin Chartier>support for GitLab and Bitbucket, which we've now added. But at the time, there was lots of just
+
+82
+00:07:12.180 --> 00:07:15.740
+<v Colin Chartier>repository type full colon GitHub hard coded throughout the code base.
+
+83
+00:07:15.940 --> 00:07:17.660
+<v Colin Chartier>And we didn't even have a logout button.
+
+84
+00:07:17.840 --> 00:07:22.380
+<v Colin Chartier>So I guess the idea was if you don't have any users or you don't have any customers,
+
+85
+00:07:22.500 --> 00:07:23.920
+<v Colin Chartier>then it doesn't matter if they can log out or not.
+
+86
+00:07:24.080 --> 00:07:28.320
+<v Colin Chartier>So we only had a login button and then we only had an install flow.
+
+87
+00:07:28.720 --> 00:07:32.860
+<v Colin Chartier>And then we focused entirely on the user visible portions of things.
+
+88
+00:07:33.000 --> 00:07:38.800
+<v Colin Chartier>So the landing page, the docs, the install button, like the onboarding tutorial.
+
+89
+00:07:39.560 --> 00:07:44.020
+<v Colin Chartier>And then once it was actually installed, there was a lot less maybe polish.
+
+90
+00:07:44.240 --> 00:07:47.620
+<v Colin Chartier>But then once we got our first few customers, we could work with them to actually polish
+
+91
+00:07:47.620 --> 00:07:52.400
+<v Colin Chartier>the core product workflow without needing to throw up things because it was validated
+
+92
+00:07:52.400 --> 00:07:53.680
+<v Colin Chartier>by user feedback.
+
+93
+00:07:54.180 --> 00:07:55.000
+<v Noah Labhart>That makes sense.
+
+94
+00:07:55.100 --> 00:07:59.200
+<v Noah Labhart>Did you have anybody ask about the logout button in the early days or was everybody
+
+95
+00:07:59.200 --> 00:08:00.840
+<v Noah Labhart>just jazzed to get into the product?
+
+96
+00:08:01.180 --> 00:08:04.020
+<v Colin Chartier>I mean, I guess the funny thing of selling to developers is they'll find some
+
+97
+00:08:04.020 --> 00:08:04.680
+<v Colin Chartier>way to make it work.
+
+98
+00:08:04.680 --> 00:08:16.540
+<v Colin Chartier>So like I do support calls with customers and then they clear cookies like they'd go to the developer console and then delete the storage for the page to log out, which is not something a regular user would do.
+
+99
+00:08:16.600 --> 00:08:21.500
+<v Colin Chartier>But since our users are developers, they generally figure things out and they understand why certain things are done.
+
+100
+00:08:23.480 --> 00:08:26.200
+<v Noah Labhart>OK, you're getting some traction, people using the product.
+
+101
+00:08:26.520 --> 00:08:30.060
+<v Noah Labhart>How did you progress it and how did you build your roadmap?
+
+102
+00:08:30.060 --> 00:08:36.020
+<v Noah Labhart>map? And in that, you know, how did you decide what was the next most important thing to build?
+
+103
+00:08:39.080 --> 00:08:43.080
+<v Colin Chartier>I mean, I guess the LayerCI philosophy is maybe less structured than
+
+104
+00:08:43.080 --> 00:08:49.460
+<v Colin Chartier>the most structured startups. Like, I think it really is a continuum of being purely idealistic
+
+105
+00:08:49.460 --> 00:08:55.200
+<v Colin Chartier>and being purely roadmap focused. Because if you set your roadmap in stone a year in advance,
+
+106
+00:08:55.420 --> 00:08:59.360
+<v Colin Chartier>you're barely a startup anymore because you're not incorporating user feedback into the roadmap.
+
+107
+00:09:00.060 --> 00:09:04.580
+<v Colin Chartier>And if you don't have a roadmap at all, then when you finish something, you're not sure the next thing to work on.
+
+108
+00:09:04.840 --> 00:09:09.240
+<v Colin Chartier>So we had maybe a very, very short horizon in comparison to a lot of companies.
+
+109
+00:09:09.420 --> 00:09:12.000
+<v Colin Chartier>We had two weeks in advance what we're going to build.
+
+110
+00:09:12.100 --> 00:09:18.460
+<v Colin Chartier>And then because we're working so closely with our users, we could keep building things that were immediately useful for our users.
+
+111
+00:09:18.840 --> 00:09:28.700
+<v Colin Chartier>One of the growth hacks in the early days was if one of our first few paying customers asked us for something, I'd build it, test it, and then ship it the same day they asked for it.
+
+112
+00:09:30.060 --> 00:09:34.140
+<v Colin Chartier>say, can you try it in production? And then while it was still top of mind, they'd be able to get
+
+113
+00:09:34.140 --> 00:09:38.680
+<v Colin Chartier>feedback and we'd be able to iterate very quickly. Maybe that's something that future founders should
+
+114
+00:09:38.680 --> 00:09:44.560
+<v Colin Chartier>consider, whether to have a very set roadmap or whether to be agile and take user feedback
+
+115
+00:09:44.560 --> 00:09:46.080
+<v Colin Chartier>immediately into the loop.
+
+116
+00:09:46.360 --> 00:09:50.560
+<v Noah Labhart>That makes a ton of sense. How to balance between just enough of the
+
+117
+00:09:50.560 --> 00:09:57.000
+<v Noah Labhart>North Star, just enough of a, this is what we're going to work on next, and still remain agile to
+
+118
+00:09:57.000 --> 00:10:00.880
+<v Noah Labhart>to change that roadmap with feedback from customers, market,
+
+119
+00:10:01.060 --> 00:10:03.400
+<v Noah Labhart>or even, I wouldn't say, from internal.
+
+120
+00:10:03.620 --> 00:10:06.080
+<v Noah Labhart>Was it all market-based feedback that drove the roadmap,
+
+121
+00:10:06.200 --> 00:10:09.300
+<v Noah Labhart>or did you come up with a hypothesis on your own?
+
+122
+00:10:09.840 --> 00:10:13.180
+<v Colin Chartier>The original pitch was just, it's what you're doing, but faster.
+
+123
+00:10:14.380 --> 00:10:16.340
+<v Colin Chartier>Which, I mean, people didn't believe.
+
+124
+00:10:16.620 --> 00:10:18.940
+<v Colin Chartier>Like, if you're a startup that's three months old,
+
+125
+00:10:19.510 --> 00:10:22.540
+<v Colin Chartier>and you're saying, you know, we'll do better than Microsoft.
+
+126
+00:10:22.960 --> 00:10:24.860
+<v Colin Chartier>You know, Microsoft owns GitHub, and you say,
+
+127
+00:10:24.860 --> 00:10:29.020
+<v Colin Chartier>say, you're using GitHub's product, use ours instead. It's faster. People just generally
+
+128
+00:10:29.020 --> 00:10:34.000
+<v Colin Chartier>won't believe that pitch. So my co-founder and I talked a lot in the early days about how to
+
+129
+00:10:34.000 --> 00:10:38.320
+<v Colin Chartier>position it and how to get our first few customers and what features they might need. And in
+
+130
+00:10:38.320 --> 00:10:44.220
+<v Colin Chartier>particular, we talk a lot about what they didn't know they didn't know. So customers might not even
+
+131
+00:10:44.220 --> 00:10:48.340
+<v Colin Chartier>know something's possible with your platform because they don't know the internals. We added
+
+132
+00:10:48.340 --> 00:10:53.960
+<v Colin Chartier>a feature to do manual QA, so to have an ephemeral environment, like a version of the app that a
+
+133
+00:10:54.860 --> 00:11:00.640
+<v Colin Chartier>click around in. And that wasn't something that anyone directly asked for. We had customers saying,
+
+134
+00:11:00.820 --> 00:11:04.820
+<v Colin Chartier>you know, the hard part of this whole process is manual QA. And like, are you going to support
+
+135
+00:11:05.580 --> 00:11:11.540
+<v Colin Chartier>pushing to our cloud providers to do manual QA? But it was an internal decision to think like,
+
+136
+00:11:11.560 --> 00:11:15.680
+<v Colin Chartier>we can roll this into our existing product without too much trouble and actually provide
+
+137
+00:11:15.680 --> 00:11:20.080
+<v Colin Chartier>this feature without needing customers to have any new integrations. It would just work out of
+
+138
+00:11:20.080 --> 00:11:24.120
+<v Colin Chartier>of the box. So, you know, just that sort of thing. Like, what does the landing page say?
+
+139
+00:11:24.420 --> 00:11:28.340
+<v Colin Chartier>What sort of personas are we selling to? And then what do those personas care about on the product
+
+140
+00:11:28.340 --> 00:11:33.280
+<v Colin Chartier>side? And what do they want to see in the first onboarding stages? Because that's not really
+
+141
+00:11:33.280 --> 00:11:35.540
+<v Colin Chartier>something any of your existing customers can tell you.
+
+142
+00:11:36.840 --> 00:11:38.960
+<v Noah Labhart>Let's flip the team then. So how did you go
+
+143
+00:11:38.960 --> 00:11:43.980
+<v Noah Labhart>about building your team? And what did you look for in those people to indicate that they were
+
+144
+00:11:43.980 --> 00:11:45.460
+<v Noah Labhart>were the winning horses to join you?
+
+145
+00:11:46.580 --> 00:11:50.260
+<v Colin Chartier>I guess, again, there's a lot of hiring philosophies out
+
+146
+00:11:50.260 --> 00:11:56.880
+<v Colin Chartier>there. We took one that came from my personal experience, again, as CTO. I realized that after
+
+147
+00:11:56.880 --> 00:12:02.660
+<v Colin Chartier>six months, hiring for experience only gave you very marginal benefits. Like, for example,
+
+148
+00:12:02.800 --> 00:12:08.160
+<v Colin Chartier>if you're hiring a developer, you're using Go and React like we are. If you look for resumes that
+
+149
+00:12:08.160 --> 00:12:13.340
+<v Colin Chartier>contain the keywords Go and React, that'll actually be a very weak signal for how valuable a developer
+
+150
+00:12:13.980 --> 00:12:15.640
+<v Colin Chartier>over their lifetime at the company.
+
+151
+00:12:15.920 --> 00:12:18.060
+<v Colin Chartier>So if a developer stays with you for 10 years
+
+152
+00:12:18.060 --> 00:12:20.660
+<v Colin Chartier>and it takes them two months to learn, go and react,
+
+153
+00:12:20.880 --> 00:12:22.920
+<v Colin Chartier>then it's such a negligible part of the whole,
+
+154
+00:12:23.080 --> 00:12:25.420
+<v Colin Chartier>you know, like the integral of value they provide
+
+155
+00:12:25.420 --> 00:12:27.140
+<v Colin Chartier>that it's barely worth considering.
+
+156
+00:12:27.660 --> 00:12:30.480
+<v Colin Chartier>So we really looked for past experience
+
+157
+00:12:30.480 --> 00:12:32.280
+<v Colin Chartier>and just like base skills.
+
+158
+00:12:32.560 --> 00:12:35.040
+<v Colin Chartier>So we looked for developers that had strong fundamentals.
+
+159
+00:12:35.300 --> 00:12:37.820
+<v Colin Chartier>We looked for salespeople that had good conversational
+
+160
+00:12:37.820 --> 00:12:40.520
+<v Colin Chartier>and you know, like logical skills,
+
+161
+00:12:40.660 --> 00:12:42.820
+<v Colin Chartier>like being able to piece together what a customer needs
+
+162
+00:12:44.760 --> 00:12:48.320
+<v Colin Chartier>conversations, just very strong basics.
+
+163
+00:12:49.440 --> 00:12:54.660
+<v Colin Chartier>We looked for essentially first and second year undergrad computer science knowledge.
+
+164
+00:12:54.880 --> 00:13:01.300
+<v Colin Chartier>So how do graphs work, how do operating systems work, how do syscalls work, just the very
+
+165
+00:13:01.300 --> 00:13:05.440
+<v Colin Chartier>fundamental concepts that if you don't know them, and you don't know that you don't know
+
+166
+00:13:05.440 --> 00:13:08.400
+<v Colin Chartier>them, and you hit a roadblock, it'll be very difficult for you to solve a problem.
+
+167
+00:13:08.660 --> 00:13:13.380
+<v Colin Chartier>So our interview was relatively easy in comparison to something like a Google interview, but
+
+168
+00:13:13.980 --> 00:13:18.100
+<v Colin Chartier>the same feedback because the people that could solve our interview convincingly were people that
+
+169
+00:13:18.100 --> 00:13:22.780
+<v Colin Chartier>had really mastered the fundamentals and understood how computers worked. And if you understand how
+
+170
+00:13:22.780 --> 00:13:26.860
+<v Colin Chartier>computers work, then it's easy enough to pick up a programming language and make changes.
+
+171
+00:13:27.200 --> 00:13:32.660
+<v Colin Chartier>And we've really seen that with our developer hires. One of our hires made a bitbucket integration
+
+172
+00:13:32.660 --> 00:13:37.760
+<v Colin Chartier>within a month of joining. So they made an entire integration start to end. The other one made a
+
+173
+00:13:37.760 --> 00:13:43.060
+<v Colin Chartier>feature, like a new directive for our configuration that was used by a quarter of our customers within
+
+174
+00:13:43.980 --> 00:13:49.460
+<v Colin Chartier>But the only reason they could jump into this big code base and add those features was because they understood the fundamentals.
+
+175
+00:13:49.940 --> 00:13:53.040
+<v Colin Chartier>And also just because they're very driven, motivated people.
+
+176
+00:13:56.300 --> 00:13:57.720
+<v Noah Labhart>Let's flip to scalability.
+
+177
+00:13:58.360 --> 00:14:03.440
+<v Noah Labhart>Did you build this to scale efficiently from day one, or were you fighting this as you grew?
+
+178
+00:14:04.700 --> 00:14:07.820
+<v Colin Chartier>I subscribe to the philosophy of innovation tokens.
+
+179
+00:14:07.820 --> 00:14:13.180
+<v Colin Chartier>tokens. I think if you're starting something new, you have a few tokens you can spend on
+
+180
+00:14:13.180 --> 00:14:18.440
+<v Colin Chartier>new technology that you've never used before. If you use everything new, then you kind of
+
+181
+00:14:18.440 --> 00:14:21.960
+<v Colin Chartier>flounder around and fail because you don't understand the stack. You have to learn so
+
+182
+00:14:21.960 --> 00:14:28.140
+<v Colin Chartier>much about the technology. We spent our innovation tokens on Go. So we used the Go programming
+
+183
+00:14:28.140 --> 00:14:33.600
+<v Colin Chartier>language because it was boring. Go has very few language features. So the long term bet
+
+184
+00:14:33.600 --> 00:14:35.560
+<v Colin Chartier>is that it'll be easy to onboard people onto it.
+
+185
+00:14:35.960 --> 00:14:37.560
+<v Colin Chartier>And we used Kubernetes.
+
+186
+00:14:37.900 --> 00:14:40.880
+<v Colin Chartier>So the developer laptops have Kubernetes on them,
+
+187
+00:14:40.980 --> 00:14:43.600
+<v Colin Chartier>which is a little unusual for a startup,
+
+188
+00:14:43.800 --> 00:14:46.980
+<v Colin Chartier>but it really bakes scalability into the development experience.
+
+189
+00:14:47.400 --> 00:14:49.180
+<v Colin Chartier>So if something runs in local development,
+
+190
+00:14:49.420 --> 00:14:51.340
+<v Colin Chartier>it's almost guaranteed it'll work in production
+
+191
+00:14:51.340 --> 00:14:53.100
+<v Colin Chartier>because the two environments are so similar.
+
+192
+00:14:53.920 --> 00:14:55.500
+<v Colin Chartier>Developers can just build features locally.
+
+193
+00:14:55.840 --> 00:14:59.120
+<v Colin Chartier>And then when they run LayerCI in LayerCI
+
+194
+00:14:59.120 --> 00:15:00.680
+<v Colin Chartier>for the final code review step,
+
+195
+00:15:00.960 --> 00:15:02.840
+<v Colin Chartier>there's essentially 0% chance
+
+196
+00:15:03.600 --> 00:15:08.640
+<v Colin Chartier>that worked locally won't work at a code review in the environment that looks more like production.
+
+197
+00:15:09.280 --> 00:15:14.840
+<v Noah Labhart>So if you're using Kubernetes on the laptops from day one, was that sort of baked into the
+
+198
+00:15:14.840 --> 00:15:17.880
+<v Noah Labhart>experience you were looking for in the team question?
+
+199
+00:15:19.040 --> 00:15:20.640
+<v Colin Chartier>No. I mean, again, like Kubernetes
+
+200
+00:15:20.640 --> 00:15:24.940
+<v Colin Chartier>is just a tool. If you have mentorship, it's easy enough to pick up in your first month being
+
+201
+00:15:24.940 --> 00:15:29.060
+<v Colin Chartier>onboarded. You can just keep a checklist of which commands do what. And then even if you don't
+
+202
+00:15:29.060 --> 00:15:33.640
+<v Colin Chartier>understand the very high level, like how DNS and scheduling work and all of these minutiae.
+
+203
+00:15:33.720 --> 00:15:36.860
+<v Colin Chartier>As long as you understand the fundamentals, again, like what is a pod?
+
+204
+00:15:36.980 --> 00:15:37.720
+<v Colin Chartier>What is a container?
+
+205
+00:15:38.000 --> 00:15:42.000
+<v Colin Chartier>Then you can generally go very far without being confused.
+
+206
+00:15:42.700 --> 00:15:44.920
+<v Colin Chartier>And again, I guess we're a DevOps company.
+
+207
+00:15:45.120 --> 00:15:51.200
+<v Colin Chartier>So we have guides on containers versus VMs and how to do horizontal pod autoscaling.
+
+208
+00:15:51.340 --> 00:15:54.460
+<v Colin Chartier>And all of these are resources we've made for marketing purposes.
+
+209
+00:15:54.640 --> 00:15:57.440
+<v Colin Chartier>But our developers can reference those if they need help.
+
+210
+00:15:59.060 --> 00:16:04.340
+<v Noah Labhart>that because people coming into your company, if you're not looking to say, hey, come into this
+
+211
+00:16:04.340 --> 00:16:11.600
+<v Noah Labhart>startup with me and I also need you to be a Kubernetes master, right? You give people the
+
+212
+00:16:11.600 --> 00:16:18.160
+<v Noah Labhart>opportunity to perhaps have a little experience, perhaps come in hungry, but then gain that
+
+213
+00:16:18.160 --> 00:16:23.040
+<v Noah Labhart>experience with that new tool in a very unique way. You're the first team I've heard having
+
+214
+00:16:23.040 --> 00:16:27.700
+<v Noah Labhart>Kubernetes on the laptops. I see that as an incredible opportunity for anyone joining your
+
+215
+00:16:29.060 --> 00:16:33.920
+<v Noah Labhart>jump right in and be saturated into another tool. So that's really cool.
+
+216
+00:16:36.340 --> 00:16:40.240
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built,
+
+217
+00:16:40.380 --> 00:16:41.400
+<v Noah Labhart>what are you most proud of?
+
+218
+00:16:42.260 --> 00:16:45.720
+<v Colin Chartier>I mean, the reason I got into startups in the first place was I
+
+219
+00:16:45.720 --> 00:16:51.140
+<v Colin Chartier>wanted to build something that really helped people. So the thing I'm personally most proud
+
+220
+00:16:51.140 --> 00:16:56.560
+<v Colin Chartier>of is the fact that our users are actually getting a lot of value. We do testimonials,
+
+221
+00:16:56.560 --> 00:17:01.180
+<v Colin Chartier>again for marketing purposes. But in the prep for the testimonials, we ask people how they're
+
+222
+00:17:01.180 --> 00:17:08.620
+<v Colin Chartier>using our tool. And a lot of the times it's people building things that are the... They're kind of
+
+223
+00:17:08.620 --> 00:17:13.400
+<v Colin Chartier>building the society of the next 10 years. So they're building new ways to bank, new ways to
+
+224
+00:17:13.400 --> 00:17:21.880
+<v Colin Chartier>get insurance, new ways to do HR. And they are telling us that they can build these new ways
+
+225
+00:17:21.880 --> 00:17:26.680
+<v Colin Chartier>of doing things much faster and without needing so many developers because their workflows are
+
+226
+00:17:26.680 --> 00:17:30.920
+<v Colin Chartier>so simple. They can hire a developer, give them all the tools they need,
+
+227
+00:17:31.000 --> 00:17:33.800
+<v Colin Chartier>and that developer can build the future. And that's very satisfying.
+
+228
+00:17:35.200 --> 00:17:39.020
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made
+
+229
+00:17:39.020 --> 00:17:41.720
+<v Noah Labhart>and how you and your team responded to it.
+
+230
+00:17:42.860 --> 00:17:47.000
+<v Colin Chartier>I mean, again, I guess the biggest mistake for the company so far was focusing on
+
+231
+00:17:47.000 --> 00:17:49.140
+<v Colin Chartier>on not selling to developers.
+
+232
+00:17:49.660 --> 00:17:52.820
+<v Colin Chartier>Like in the early days, we sold speed.
+
+233
+00:17:52.980 --> 00:17:56.260
+<v Colin Chartier>So we said, are you using a continuous integration tool?
+
+234
+00:17:56.700 --> 00:17:57.640
+<v Colin Chartier>Do you want speed?
+
+235
+00:17:57.920 --> 00:17:58.980
+<v Colin Chartier>We'll use our platform.
+
+236
+00:17:59.380 --> 00:18:01.060
+<v Colin Chartier>And at the time it wasn't very convincing.
+
+237
+00:18:01.180 --> 00:18:04.020
+<v Colin Chartier>So it was difficult to acquire customers with that pitch.
+
+238
+00:18:04.400 --> 00:18:08.140
+<v Colin Chartier>And so we said, let's build out this staging functionality.
+
+239
+00:18:08.480 --> 00:18:10.220
+<v Colin Chartier>We actually got into Y Combinator with the pitch,
+
+240
+00:18:10.760 --> 00:18:12.960
+<v Colin Chartier>get a dozen staging servers per developer,
+
+241
+00:18:13.840 --> 00:18:16.380
+<v Colin Chartier>which maybe on hindsight is not a great customer pitch
+
+242
+00:18:17.000 --> 00:18:18.460
+<v Colin Chartier>What does that actually provide?
+
+243
+00:18:18.960 --> 00:18:20.320
+<v Colin Chartier>We really leaned into that.
+
+244
+00:18:20.420 --> 00:18:22.740
+<v Colin Chartier>We thought because we got into Y Combinator with the pitch,
+
+245
+00:18:23.020 --> 00:18:25.820
+<v Colin Chartier>it was something that, like, it was the correct pitch.
+
+246
+00:18:26.500 --> 00:18:28.120
+<v Colin Chartier>And then if you ever think to yourself,
+
+247
+00:18:28.240 --> 00:18:30.860
+<v Colin Chartier>this is the correct pitch, that's very dangerous.
+
+248
+00:18:31.520 --> 00:18:35.260
+<v Colin Chartier>Because we took the staging server's developer's pitch
+
+249
+00:18:35.260 --> 00:18:36.420
+<v Colin Chartier>and we molded it into,
+
+250
+00:18:36.600 --> 00:18:38.560
+<v Colin Chartier>oh, you have product people on your team.
+
+251
+00:18:38.800 --> 00:18:41.820
+<v Colin Chartier>Those product people can review a change
+
+252
+00:18:41.820 --> 00:18:42.960
+<v Colin Chartier>for a specific Jira ticket
+
+253
+00:18:42.960 --> 00:18:44.600
+<v Colin Chartier>and then give the developer feedback.
+
+254
+00:18:44.900 --> 00:18:46.760
+<v Colin Chartier>And then we spent, like, months trying to sell
+
+255
+00:18:47.000 --> 00:18:49.280
+<v Colin Chartier>or you have a designer on a team
+
+256
+00:18:49.280 --> 00:18:50.960
+<v Colin Chartier>and you're implementing their design,
+
+257
+00:18:51.140 --> 00:18:52.760
+<v Colin Chartier>that designer can give you feedback.
+
+258
+00:18:53.040 --> 00:18:55.160
+<v Colin Chartier>And we even went so far as to interview designers
+
+259
+00:18:55.160 --> 00:18:56.140
+<v Colin Chartier>and product people.
+
+260
+00:18:56.460 --> 00:18:58.420
+<v Colin Chartier>And of course, both said,
+
+261
+00:18:58.620 --> 00:18:59.960
+<v Colin Chartier>oh yeah, we'd love to be more involved
+
+262
+00:18:59.960 --> 00:19:00.860
+<v Colin Chartier>in what developers are doing.
+
+263
+00:19:01.560 --> 00:19:03.360
+<v Colin Chartier>But then when we tried to solve this,
+
+264
+00:19:03.420 --> 00:19:04.440
+<v Colin Chartier>we learned that developers,
+
+265
+00:19:04.620 --> 00:19:06.660
+<v Colin Chartier>I guess developers bucket things into,
+
+266
+00:19:06.740 --> 00:19:07.680
+<v Colin Chartier>will this get me promoted?
+
+267
+00:19:07.860 --> 00:19:09.080
+<v Colin Chartier>Or is this just a chore?
+
+268
+00:19:09.340 --> 00:19:11.520
+<v Colin Chartier>And if you're selling to other stakeholders,
+
+269
+00:19:12.040 --> 00:19:14.360
+<v Colin Chartier>the developers will often bucket it into the chore.
+
+270
+00:19:17.000 --> 00:19:21.740
+<v Colin Chartier>promoted, this won't make my life much easier. And so I will put this as a low priority item,
+
+271
+00:19:21.840 --> 00:19:26.200
+<v Colin Chartier>and it'll take, you know, a year for it to eventually get installed. I guess eventually,
+
+272
+00:19:26.320 --> 00:19:31.740
+<v Colin Chartier>we learned that developers mostly care about their own experience, interacting with other
+
+273
+00:19:31.740 --> 00:19:36.640
+<v Colin Chartier>developers. And that's really the big bottleneck in the first place. Like, it's very rare to even
+
+274
+00:19:36.640 --> 00:19:41.580
+<v Colin Chartier>have a product person do a code review. The developers interacting with developers side of
+
+275
+00:19:41.580 --> 00:19:46.260
+<v Colin Chartier>things was the most important for us. Of course, that's what's on our landing page now. But it was
+
+276
+00:19:47.000 --> 00:19:51.660
+<v Colin Chartier>hole to go into staging servers, product people, designers. Product people and designers can still
+
+277
+00:19:51.660 --> 00:19:54.540
+<v Colin Chartier>use the product, of course, but it's not the primary person that we're selling to.
+
+278
+00:19:58.700 --> 00:20:02.600
+<v Noah Labhart>So what does the future look like for your product and for your team?
+
+279
+00:20:04.640 --> 00:20:13.820
+<v Colin Chartier>I mean, the long-term goal is to be like Slack for code reviews. So every team has a slightly
+
+280
+00:20:13.820 --> 00:20:19.220
+<v Colin Chartier>different process for telling whether a change is good or not. You know, if you're working with
+
+281
+00:20:19.220 --> 00:20:23.960
+<v Colin Chartier>a big bank, like if you're making enterprise software and you have a big bank as a customer,
+
+282
+00:20:24.140 --> 00:20:30.660
+<v Colin Chartier>you might care about compliance and security review and care about code review, but you might
+
+283
+00:20:30.660 --> 00:20:35.000
+<v Colin Chartier>not care so much about like product or design review because design is less important for
+
+284
+00:20:35.000 --> 00:20:40.720
+<v Colin Chartier>enterprise customers currently. Whereas if you're a startup making a B2C application,
+
+285
+00:20:40.720 --> 00:20:46.380
+<v Colin Chartier>You might care a lot about getting the designers and product people involved, but you might not care about security or compliance.
+
+286
+00:20:47.200 --> 00:20:59.760
+<v Colin Chartier>So in the long term, we want to build kind of a workflow builder similar to how Slack apps work, where companies using our tool can specify, you know, this is the template for evaluating a change.
+
+287
+00:21:00.160 --> 00:21:03.880
+<v Colin Chartier>And then we just give them all the tools to fill into that template.
+
+288
+00:21:03.880 --> 00:21:07.120
+<v Colin Chartier>So it might say something like, you know, you're building your pizza restaurant.
+
+289
+00:21:07.340 --> 00:21:16.440
+<v Colin Chartier>If you push a change and the change edits any web page, then a product person needs to give feedback on specifically the pages that change.
+
+290
+00:21:16.760 --> 00:21:27.200
+<v Colin Chartier>Or, you know, if you make a change and the change edits an API, then another developer needs to review the API change to make sure that you're not breaking functionality with the mobile app.
+
+291
+00:21:27.200 --> 00:21:32.460
+<v Colin Chartier>So if you can make these like rich workflows of when you push a change,
+
+292
+00:21:32.660 --> 00:21:35.440
+<v Colin Chartier>here's specifically who needs to be looped in to review the change,
+
+293
+00:21:35.620 --> 00:21:40.640
+<v Colin Chartier>then developers will have much more certainty about whether their change is acceptable to show
+
+294
+00:21:40.640 --> 00:21:42.640
+<v Colin Chartier>and then whether it can be deployed.
+
+295
+00:21:43.020 --> 00:21:47.840
+<v Colin Chartier>Because the faster you can deploy changes, the faster you can get feedback and the faster you can iterate.
+
+296
+00:21:50.680 --> 00:21:51.860
+<v Noah Labhart>Let's switch to you, Colin.
+
+297
+00:21:52.160 --> 00:21:54.560
+<v Noah Labhart>Who influences the way that you work?
+
+298
+00:21:54.560 --> 00:21:58.340
+<v Noah Labhart>name a CEO, a CTO, architect, really any person.
+
+299
+00:21:58.440 --> 00:22:00.180
+<v Noah Labhart>Name a person you look up to and why.
+
+300
+00:22:01.440 --> 00:22:03.360
+<v Colin Chartier>Well, my co-founder, Lynn, of course.
+
+301
+00:22:04.040 --> 00:22:09.820
+<v Colin Chartier>I mean, in the early days, I was really heads down working on the tech demo
+
+302
+00:22:09.820 --> 00:22:11.380
+<v Colin Chartier>and then building features consistently.
+
+303
+00:22:12.380 --> 00:22:15.760
+<v Colin Chartier>But Lynn was willing to seek out a lot of rejection.
+
+304
+00:22:16.200 --> 00:22:19.280
+<v Colin Chartier>I think she emailed 1,000 people before we got our first customer.
+
+305
+00:22:19.500 --> 00:22:22.260
+<v Colin Chartier>So she got rejected 999 times.
+
+306
+00:22:22.260 --> 00:22:28.780
+<v Colin Chartier>times, despite having worked at a startup before, I'd never seen just how grueling that was.
+
+307
+00:22:29.380 --> 00:22:34.360
+<v Colin Chartier>People don't reject you nicely, right? They say, stop spamming me. Or someone signs up to something
+
+308
+00:22:34.360 --> 00:22:39.080
+<v Colin Chartier>and you email them six months later saying, hey, following up. And they'd say, how'd you get my
+
+309
+00:22:39.080 --> 00:22:46.360
+<v Colin Chartier>email? And then you have to remind them that they interacted with you and your launch three months
+
+310
+00:22:46.360 --> 00:22:51.880
+<v Colin Chartier>ago. People are generally very negative to builders. They don't see the future like you do.
+
+311
+00:22:52.260 --> 00:23:00.040
+<v Colin Chartier>And I guess a large part of the experience of LayerCI has been just like seeing that no turn into a yes more and more.
+
+312
+00:23:00.420 --> 00:23:02.940
+<v Colin Chartier>But you have to get the no in the first place to get there.
+
+313
+00:23:05.800 --> 00:23:07.600
+<v Noah Labhart>We talked about mistakes, right?
+
+314
+00:23:07.680 --> 00:23:11.460
+<v Noah Labhart>We talked about a mistake you made earlier, but a little bit different spin.
+
+315
+00:23:11.720 --> 00:23:14.540
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+316
+00:23:14.600 --> 00:23:17.160
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+317
+00:23:19.280 --> 00:23:23.400
+<v Colin Chartier>I mean, I definitely would have focused more on design early on.
+
+318
+00:23:24.240 --> 00:23:27.740
+<v Colin Chartier>I mean, I had a friend that was a designer that I didn't loop in fast enough.
+
+319
+00:23:28.440 --> 00:23:31.840
+<v Colin Chartier>Because in the early days, it was like, oh, you know, we can just make something that's fast.
+
+320
+00:23:32.020 --> 00:23:35.040
+<v Colin Chartier>And then developers barely see the interface at all.
+
+321
+00:23:35.140 --> 00:23:37.700
+<v Colin Chartier>Like, you know, they push, they just want to see the checkmark in GitHub.
+
+322
+00:23:38.320 --> 00:23:41.040
+<v Colin Chartier>So it doesn't matter to them what our interface looks like.
+
+323
+00:23:41.560 --> 00:23:43.000
+<v Colin Chartier>I guess that turned out to be wrong.
+
+324
+00:23:43.000 --> 00:23:46.860
+<v Colin Chartier>because like soon after we added like a nice interface,
+
+325
+00:23:47.060 --> 00:23:48.420
+<v Colin Chartier>like something that was pleasant to look at,
+
+326
+00:23:48.480 --> 00:23:50.000
+<v Colin Chartier>and we added nice docs.
+
+327
+00:23:50.240 --> 00:23:52.820
+<v Colin Chartier>So ones that had been user tested to be readable.
+
+328
+00:23:53.200 --> 00:23:55.480
+<v Colin Chartier>We started doing significantly better with conversion.
+
+329
+00:23:56.420 --> 00:23:58.320
+<v Colin Chartier>So if I could go back to the beginning,
+
+330
+00:23:58.460 --> 00:24:01.000
+<v Colin Chartier>I would make something that's pretty before it's launched.
+
+331
+00:24:01.260 --> 00:24:03.260
+<v Colin Chartier>And I think that's something that's maybe obvious
+
+332
+00:24:03.260 --> 00:24:04.420
+<v Colin Chartier>to a lot of founders these days.
+
+333
+00:24:04.500 --> 00:24:07.000
+<v Colin Chartier>But even for super technical tools,
+
+334
+00:24:07.200 --> 00:24:09.840
+<v Colin Chartier>people associate the design of your product with trust.
+
+335
+00:24:10.020 --> 00:24:12.220
+<v Colin Chartier>If your product has a bunch of square edges
+
+336
+00:24:13.000 --> 00:24:18.100
+<v Colin Chartier>a huge amount of text, just like very close. It'll look very unprofessional and discerning
+
+337
+00:24:18.100 --> 00:24:22.400
+<v Colin Chartier>customers will think that your company is very small and not legitimate, which is true, of course,
+
+338
+00:24:22.420 --> 00:24:23.500
+<v Colin Chartier>but you don't want them thinking that.
+
+339
+00:24:25.320 --> 00:24:28.480
+<v Noah Labhart>So last question, Colin, you're getting on a plane
+
+340
+00:24:28.480 --> 00:24:33.460
+<v Noah Labhart>and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed
+
+341
+00:24:33.460 --> 00:24:36.500
+<v Noah Labhart>about it. They can't wait to show it off to the world. They can't wait to show it off to you right
+
+342
+00:24:36.500 --> 00:24:40.780
+<v Noah Labhart>there on the plane. What advice do you give that person having gone down this road a bit?
+
+343
+00:24:42.340 --> 00:24:45.740
+<v Colin Chartier>I mean, I do get people reaching out on LinkedIn and asking, you know, like I'm building something
+
+344
+00:24:45.740 --> 00:24:50.880
+<v Colin Chartier>for students. And my advice is usually like, don't talk to me, talk to people that have done this
+
+345
+00:24:50.880 --> 00:24:55.700
+<v Colin Chartier>specifically before, because the experience is so different for every industry and like every
+
+346
+00:24:55.700 --> 00:25:00.680
+<v Colin Chartier>sub-industry. But for people working business to business that are making something that people
+
+347
+00:25:00.680 --> 00:25:06.160
+<v Colin Chartier>would pay for that, you know, improves the lives of people working in companies. The immediate
+
+348
+00:25:06.160 --> 00:25:13.580
+<v Colin Chartier>advice I tell everyone that asks is get customers as soon as possible, even if it takes 999
+
+349
+00:25:13.580 --> 00:25:17.400
+<v Colin Chartier>rejections, and then work with those customers to make something that people actually want.
+
+350
+00:25:17.820 --> 00:25:22.620
+<v Colin Chartier>It's very difficult to just sit by yourself or even sit with your team and make something that
+
+351
+00:25:22.620 --> 00:25:27.500
+<v Colin Chartier>people actually want. Because while you're working on your startup, the world is kind of
+
+352
+00:25:27.500 --> 00:25:31.440
+<v Colin Chartier>chugging along and best practices are changing and competitors are being made.
+
+353
+00:25:31.440 --> 00:25:36.280
+<v Colin Chartier>So unless you're consistently talking to people and getting rejected or getting new customers,
+
+354
+00:25:36.520 --> 00:25:41.140
+<v Colin Chartier>you're not going to know how existing workflows work and you're not going to know what's missing
+
+355
+00:25:41.140 --> 00:25:45.900
+<v Colin Chartier>or what could be better, and you're not going to know how to pitch it. So for people making
+
+356
+00:25:45.900 --> 00:25:51.400
+<v Colin Chartier>business to business apps, I think it's super important you get customers, in particular paying
+
+357
+00:25:51.400 --> 00:25:56.520
+<v Colin Chartier>customers, as soon as possible. And I say paying customers because those are the ones that are
+
+358
+00:25:56.520 --> 00:26:01.040
+<v Colin Chartier>actually willing to put skin in the game. Like they'll, if they're paying you, then they'll expect
+
+359
+00:26:01.480 --> 00:26:06.020
+<v Colin Chartier>certain things and they won't be afraid to ask for them. Whereas if you have free users,
+
+360
+00:26:06.220 --> 00:26:09.760
+<v Colin Chartier>then they'll kind of think you're doing them a favor by giving it to them for free. So
+
+361
+00:26:09.760 --> 00:26:15.920
+<v Colin Chartier>they won't want to complain or threaten to leave. Once you have customers, you can obviously work
+
+362
+00:26:15.920 --> 00:26:21.720
+<v Colin Chartier>very closely with them. So I think the algorithm that worked very well for us is just get a paying
+
+363
+00:26:21.720 --> 00:26:25.960
+<v Colin Chartier>customer as soon as possible. We got it two months after launching. With those customers,
+
+364
+00:26:26.440 --> 00:26:30.280
+<v Colin Chartier>iterate very quickly. So ask them what they want and then build it the same day.
+
+365
+00:26:30.980 --> 00:26:36.000
+<v Colin Chartier>And then repeat that a few times until you have a product that actually has some concrete value
+
+366
+00:26:36.000 --> 00:26:42.860
+<v Colin Chartier>propositions. And then find people like your customer. So find the persona that cares about
+
+367
+00:26:42.860 --> 00:26:47.360
+<v Colin Chartier>the value propositions you've built. And then tune your product and your messaging towards
+
+368
+00:26:47.360 --> 00:26:49.080
+<v Colin Chartier>words of that persona and then get eyeballs
+
+369
+00:26:49.080 --> 00:26:52.820
+<v Colin Chartier>from that group of people to you.
+
+370
+00:26:52.960 --> 00:26:55.960
+<v Colin Chartier>And oftentimes that's doing launches every month,
+
+371
+00:26:56.820 --> 00:26:58.540
+<v Colin Chartier>going to industry events,
+
+372
+00:26:59.080 --> 00:27:01.720
+<v Colin Chartier>just going wherever your customers are and then talking to them.
+
+373
+00:27:02.800 --> 00:27:05.560
+<v Noah Labhart>That's great advice. Well, Colin, thank you for being
+
+374
+00:27:05.560 --> 00:27:08.420
+<v Noah Labhart>on the show today. Thank you for telling the creation story
+
+375
+00:27:08.420 --> 00:27:09.480
+<v Noah Labhart>of LayerCI.
+
+376
+00:27:10.380 --> 00:27:11.680
+<v Colin Chartier>Yeah, thanks so much for having me.
+
+377
+00:27:13.260 --> 00:27:14.540
+<v Noah Labhart>And this concludes another
+
+378
+00:27:14.540 --> 00:27:16.160
+<v Noah Labhart>chapter of Code Story.
+
+379
+00:27:20.380 --> 00:27:23.380
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+380
+00:27:23.540 --> 00:27:28.340
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+381
+00:27:28.720 --> 00:27:33.820
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+382
+00:27:34.160 --> 00:27:36.400
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+383
+00:27:36.660 --> 00:27:38.620
+<v Noah Labhart>Both things help us out tremendously.
+
+384
+00:27:41.000 --> 00:27:42.500
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1419 @@
+WEBVTT
+
+NOTE S6 E15: Mastering Day 2 Kubernetes Chaos: Building Autonomous AI SREs and Raising $67M with Itiel Schwartz of Komodor
+
+1
+00:00:00.820 --> 00:00:06.380
+<v Itiel Schwartz>I always tell the company that premature optimization is the root of all evil.
+
+2
+00:00:06.740 --> 00:00:15.920
+<v Itiel Schwartz>Sometimes you don't really care about scaling. You don't need a system that is 1000x more scalable if it requires a lot of manpower.
+
+3
+00:00:16.580 --> 00:00:21.380
+<v Itiel Schwartz>And a lot of the early conversation that we had inside the R&amp;D was me telling them,
+
+4
+00:00:21.500 --> 00:00:28.440
+<v Itiel Schwartz>I understand the perfect solution would include SQS, SNS, S3, Postgres and Redis.
+
+5
+00:00:30.000 --> 00:00:34.740
+<v Itiel Schwartz>would be a fine solution that will hold us up for like the next year because who knows
+
+6
+00:00:34.740 --> 00:00:37.200
+<v Itiel Schwartz>if that particular feature is really that important.
+
+7
+00:00:38.160 --> 00:00:39.760
+<v Itiel Schwartz>My name is Itiel Schwartz.
+
+8
+00:00:39.880 --> 00:00:41.960
+<v Itiel Schwartz>I'm the CTO and co-founder of Komodor.
+
+9
+00:00:47.500 --> 00:00:54.280
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share
+
+10
+00:00:54.280 --> 00:01:00.820
+<v Noah Labhart>Share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+11
+00:01:02.200 --> 00:01:03.780
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+12
+00:01:04.020 --> 00:01:12.140
+<v Noah Labhart>And today, how Itiel Schwartz built the platform to monitor your Kubernetes and discover root causes to your infra problems.
+
+13
+00:01:13.360 --> 00:01:15.820
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:20.580 --> 00:01:24.280
+<v Noah Labhart>For Itiel Schwartz, it's hard to remember life before his current venture.
+
+15
+00:01:24.540 --> 00:01:30.040
+<v Noah Labhart>He studied computer science and psychology in school, and during that time he started working for eBay.
+
+16
+00:01:30.540 --> 00:01:34.560
+<v Noah Labhart>He's 32 years old, he thinks, and is married with a young family.
+
+17
+00:01:34.960 --> 00:01:39.440
+<v Noah Labhart>Outside of hiking and binge-watching TV, he's a big fan of coffee and bakeries.
+
+18
+00:01:40.620 --> 00:01:49.360
+<v Noah Labhart>In spending a lot of time in the infrastructure world, he found out that in the world of DevOps troubleshooting, there's a lot of chaos to sift through.
+
+19
+00:01:49.720 --> 00:01:55.980
+<v Noah Labhart>He thought it would be amazing to build a tool to impact Kubernetes and the entire infra ecosystem.
+
+20
+00:01:58.180 --> 00:02:00.920
+<v Noah Labhart>This is the creation story of Komodor.
+
+21
+00:02:03.840 --> 00:02:07.140
+<v Itiel Schwartz>Komodor is a Kubernetes troubleshooting platform.
+
+22
+00:02:07.140 --> 00:02:13.060
+<v Itiel Schwartz>platform, we help DevOps and developers to find, detect and solve issues in Kubernetes
+
+23
+00:02:14.300 --> 00:02:16.160
+<v Itiel Schwartz>very fast, very easily.
+
+24
+00:02:16.620 --> 00:02:23.140
+<v Itiel Schwartz>And basically we take all of this very cumbersome, complicated process of understanding what
+
+25
+00:02:23.140 --> 00:02:28.740
+<v Itiel Schwartz>the hell changed, what the hell happened inside my Kubernetes cluster, and we simplify this
+
+26
+00:02:28.740 --> 00:02:35.680
+<v Itiel Schwartz>process by only allowing the users to see the problems, the root cause, and what we
+
+27
+00:02:37.140 --> 00:02:43.200
+<v Itiel Schwartz>solve them. So we are taking years of experience that we have inside the company both in the world
+
+28
+00:02:43.200 --> 00:02:48.840
+<v Itiel Schwartz>of troubleshooting and Kubernetes and we're simplifying that for our users. And we integrate
+
+29
+00:02:48.840 --> 00:02:54.280
+<v Itiel Schwartz>with existing tools such as Datadog, Prometheus, and New Relic. We don't replace them. We believe that
+
+30
+00:02:54.280 --> 00:02:58.400
+<v Itiel Schwartz>those tools are doing a great job telling you the symptoms, telling you that you have problems,
+
+31
+00:02:58.560 --> 00:03:04.420
+<v Itiel Schwartz>while Komodor is much more focused on allowing you to understand how did the system change over
+
+32
+00:03:04.420 --> 00:03:08.180
+<v Itiel Schwartz>over time what might be a possible root cause for what you're experiencing.
+
+33
+00:03:08.760 --> 00:03:12.040
+<v Itiel Schwartz>You know, I've done Infra for the last decade or so.
+
+34
+00:03:12.240 --> 00:03:17.280
+<v Itiel Schwartz>I've done it for big enterprises such as eBay and also for small companies.
+
+35
+00:03:17.540 --> 00:03:21.040
+<v Itiel Schwartz>And I really like, I don't know, like solving issues, solving problems.
+
+36
+00:03:21.280 --> 00:03:26.120
+<v Itiel Schwartz>And in my last job, like I said, I was the first developer in an Israeli startup named Rookout.
+
+37
+00:03:26.280 --> 00:03:29.020
+<v Itiel Schwartz>And Rookout, for anyone who doesn't know them,
+
+38
+00:03:29.200 --> 00:03:33.360
+<v Itiel Schwartz>is a company that helps adding a groundbreaking breakpoint for developers.
+
+39
+00:03:34.420 --> 00:03:35.420
+<v Itiel Schwartz>bubble shoot dynamically.
+
+40
+00:03:36.220 --> 00:03:39.300
+<v Itiel Schwartz>And there I was, first of all, responsible for building
+
+41
+00:03:39.300 --> 00:03:40.020
+<v Itiel Schwartz>all of the infrastructure.
+
+42
+00:03:40.320 --> 00:03:43.340
+<v Itiel Schwartz>So I became really familiar with Kubernetes.
+
+43
+00:03:43.620 --> 00:03:45.380
+<v Itiel Schwartz>And I loved the project from day one.
+
+44
+00:03:45.540 --> 00:03:46.660
+<v Itiel Schwartz>I love the community.
+
+45
+00:03:46.980 --> 00:03:48.260
+<v Itiel Schwartz>I love the terminology.
+
+46
+00:03:48.740 --> 00:03:50.200
+<v Itiel Schwartz>I love how you interact with it.
+
+47
+00:03:50.440 --> 00:03:55.380
+<v Itiel Schwartz>So after years of doing Docker and AWS and Google
+
+48
+00:03:55.380 --> 00:03:57.840
+<v Itiel Schwartz>and all of those very complicated things,
+
+49
+00:03:58.160 --> 00:04:00.620
+<v Itiel Schwartz>Kubernetes felt really elegant for me.
+
+50
+00:04:00.800 --> 00:04:03.300
+<v Itiel Schwartz>One of the things that make Kubernetes so great
+
+51
+00:04:04.420 --> 00:04:07.940
+<v Itiel Schwartz>many people are contributing to make it even better.
+
+52
+00:04:08.260 --> 00:04:12.960
+<v Itiel Schwartz>When I worked for Rookout, I also helped like selling the product, like a solution engineer,
+
+53
+00:04:13.080 --> 00:04:17.240
+<v Itiel Schwartz>because I'm a technical guy and I also know how to talk with customers.
+
+54
+00:04:17.540 --> 00:04:20.100
+<v Itiel Schwartz>So I was exposed to a lot of Rookout customers.
+
+55
+00:04:20.360 --> 00:04:26.800
+<v Itiel Schwartz>And there I found out how complex it is, like not only understanding like where to put the
+
+56
+00:04:26.800 --> 00:04:32.520
+<v Itiel Schwartz>breakpoint for a specific Java or Python program, but overall knowing where to look at once
+
+57
+00:04:34.420 --> 00:04:37.580
+<v Itiel Schwartz>When did the system change? Who deployed the last version?
+
+58
+00:04:37.840 --> 00:04:39.880
+<v Itiel Schwartz>What commits were added in the last version?
+
+59
+00:04:40.080 --> 00:04:43.080
+<v Itiel Schwartz>What wrecking changes were added in the last version?
+
+60
+00:04:43.300 --> 00:04:49.160
+<v Itiel Schwartz>I found out that in this world of high-level troubleshooting,
+
+61
+00:04:49.180 --> 00:04:50.560
+<v Itiel Schwartz>or DevOps trying to troubleshoot,
+
+62
+00:04:50.740 --> 00:04:53.720
+<v Itiel Schwartz>there is a lot of chaos and a lot of unclarity.
+
+63
+00:04:53.900 --> 00:04:58.240
+<v Itiel Schwartz>And it didn't really happen for me from a very personal experience,
+
+64
+00:04:58.440 --> 00:05:03.460
+<v Itiel Schwartz>because I spent a lot of time building those kinds of monitoring and solutions
+
+65
+00:05:04.420 --> 00:05:05.460
+<v Itiel Schwartz>companies that I worked for.
+
+66
+00:05:05.720 --> 00:05:12.900
+<v Itiel Schwartz>So it made me understand the importance of building a system that is the go-to tool for
+
+67
+00:05:12.900 --> 00:05:13.440
+<v Itiel Schwartz>troubleshooting.
+
+68
+00:05:13.920 --> 00:05:20.540
+<v Itiel Schwartz>And because I also felt the pain and I also implemented and built those kinds of systems
+
+69
+00:05:20.540 --> 00:05:25.920
+<v Itiel Schwartz>in previous companies and in Rookout, I simply thought it would be amazing if I can build
+
+70
+00:05:25.920 --> 00:05:30.760
+<v Itiel Schwartz>something that will impact all of the ecosystem and impact Kubernetes as a whole.
+
+71
+00:05:30.760 --> 00:05:36.840
+<v Itiel Schwartz>So, like Komodor was born from my pain and my partner, Ben O'Ferry, worked with Google.
+
+72
+00:05:36.960 --> 00:05:43.360
+<v Itiel Schwartz>They developed Kubernetes, obviously, and he also done infra-related jobs and tasks there.
+
+73
+00:05:43.640 --> 00:05:48.820
+<v Itiel Schwartz>So, we both believe that it's something that is really missing in today's market.
+
+74
+00:05:49.440 --> 00:05:56.020
+<v Itiel Schwartz>And one and a half year into the startup, I'm pretty happy to say that it was the right choice.
+
+75
+00:05:57.760 --> 00:06:01.040
+<v Noah Labhart>Tell me about the MVP, so that first product you built.
+
+76
+00:06:01.180 --> 00:06:04.960
+<v Noah Labhart>How long did it take you to build, and what sort of tools did you use to bring it to life?
+
+77
+00:06:06.980 --> 00:06:11.360
+<v Itiel Schwartz>First of all, we developed it in Kubernetes, like we're a Kubernetes shop.
+
+78
+00:06:11.400 --> 00:06:13.400
+<v Itiel Schwartz>We love Kubernetes, so we use Kubernetes.
+
+79
+00:06:14.280 --> 00:06:19.600
+<v Itiel Schwartz>The first MVP was what we believe the most crucial thing that is currently missing,
+
+80
+00:06:19.740 --> 00:06:23.340
+<v Itiel Schwartz>and that is knowing how your cluster is changing over time.
+
+81
+00:06:23.340 --> 00:06:28.900
+<v Itiel Schwartz>What we did is we installed an agent for our customers running as part of the cluster
+
+82
+00:06:28.900 --> 00:06:33.760
+<v Itiel Schwartz>and it reports every time there is any kind of change inside the cluster.
+
+83
+00:06:33.940 --> 00:06:40.920
+<v Itiel Schwartz>For example, a new image, the number of replicas changed, the number of CPU limits, the config map changed.
+
+84
+00:06:41.600 --> 00:06:47.920
+<v Itiel Schwartz>We sat there, we audited everything and we knew when and how the system changed over time
+
+85
+00:06:47.920 --> 00:06:49.780
+<v Itiel Schwartz>and we created a timeline for our users.
+
+86
+00:06:49.780 --> 00:06:55.300
+<v Itiel Schwartz>That is still the backbone of Komodor and this is what we believe the most important thing.
+
+87
+00:06:55.620 --> 00:07:05.860
+<v Itiel Schwartz>I think from the second that we started working on it to the first customer that played with the system and tried it, it was three months I believe,
+
+88
+00:07:06.000 --> 00:07:09.720
+<v Itiel Schwartz>we really tried to work on the bare minimum.
+
+89
+00:07:10.240 --> 00:07:15.980
+<v Itiel Schwartz>And looking now at the system that we built back then, it was really bare bones,
+
+90
+00:07:15.980 --> 00:07:21.600
+<v Itiel Schwartz>own. But we felt that it will bring value to our users. And the first three companies that
+
+91
+00:07:21.600 --> 00:07:27.280
+<v Itiel Schwartz>installed us, like I have to say that they really saw value in this. And like we did help them to
+
+92
+00:07:27.280 --> 00:07:32.760
+<v Itiel Schwartz>solve issues that were, it was like an amazing experience knowing that what you've done really
+
+93
+00:07:32.760 --> 00:07:33.700
+<v Itiel Schwartz>helped someone.
+
+94
+00:07:35.580 --> 00:07:41.120
+<v Noah Labhart>With any MVP, you've got to make certain decisions and trade-offs about what you're
+
+95
+00:07:41.120 --> 00:07:45.180
+<v Noah Labhart>going to start with, what you're not going to build, what debt you're going to take on technically.
+
+96
+00:07:45.980 --> 00:07:49.800
+<v Noah Labhart>some of those decisions and trade-offs you had to make and how you coped with those decisions.
+
+97
+00:07:51.360 --> 00:07:58.300
+<v Itiel Schwartz>It was super hard. Like, let's be honest, it was super hard. So for every feature, for every screen,
+
+98
+00:07:58.460 --> 00:08:04.340
+<v Itiel Schwartz>for every design, like you need to ask yourself, do I really need this specific feature in order
+
+99
+00:08:04.340 --> 00:08:10.120
+<v Itiel Schwartz>to bring value to the user? And there were so many big and small decisions that we needed to make.
+
+100
+00:08:10.120 --> 00:08:13.300
+<v Itiel Schwartz>and I can share with you like a battle story.
+
+101
+00:08:13.860 --> 00:08:16.480
+<v Itiel Schwartz>We wanted to have in the screen back then
+
+102
+00:08:16.480 --> 00:08:17.620
+<v Itiel Schwartz>three different screens,
+
+103
+00:08:17.780 --> 00:08:19.120
+<v Itiel Schwartz>like three different capabilities.
+
+104
+00:08:19.680 --> 00:08:22.260
+<v Itiel Schwartz>And I won't like go into the deep dive,
+
+105
+00:08:22.400 --> 00:08:25.160
+<v Itiel Schwartz>but one of them showed you all of the services
+
+106
+00:08:25.160 --> 00:08:26.700
+<v Itiel Schwartz>that are running on a specific cluster.
+
+107
+00:08:26.920 --> 00:08:30.300
+<v Itiel Schwartz>The other one showed you a timeline per each service.
+
+108
+00:08:30.420 --> 00:08:32.160
+<v Itiel Schwartz>You go to a service and you see its timeline.
+
+109
+00:08:32.360 --> 00:08:34.940
+<v Itiel Schwartz>And the third one was a high level overview
+
+110
+00:08:34.940 --> 00:08:37.560
+<v Itiel Schwartz>of everything that changed across your system,
+
+111
+00:08:37.580 --> 00:08:38.440
+<v Itiel Schwartz>like a macro level view.
+
+112
+00:08:40.120 --> 00:08:46.080
+<v Itiel Schwartz>screens and we tried developing all three at the same time but when we were really close to
+
+113
+00:08:46.080 --> 00:08:52.080
+<v Itiel Schwartz>releasing it we understand that the quality was quite bad the high level screen that showed
+
+114
+00:08:52.080 --> 00:08:58.380
+<v Itiel Schwartz>everything the change across the system simply didn't work as well as we expected so now we had
+
+115
+00:08:58.380 --> 00:09:03.540
+<v Itiel Schwartz>like a very strong strong like decision to make are we going to take like a third of the product
+
+116
+00:09:03.540 --> 00:09:09.920
+<v Itiel Schwartz>and simply release without it or are we going to try and make it work i can say that we did try to
+
+117
+00:09:10.120 --> 00:09:15.560
+<v Itiel Schwartz>it work for a short while and then it was obvious it's not worth it we decided to kill it like
+
+118
+00:09:15.560 --> 00:09:20.940
+<v Itiel Schwartz>basically we decided to put on a whole third of the product in order to make sure the other two
+
+119
+00:09:20.940 --> 00:09:26.740
+<v Itiel Schwartz>works as expected it wasn't an easy decision because we were really invested in it but i
+
+120
+00:09:26.740 --> 00:09:32.700
+<v Itiel Schwartz>think it was the right decision at the time and a couple of months later we did like we added this
+
+121
+00:09:32.700 --> 00:09:37.080
+<v Itiel Schwartz>very important screen that allowed to see everything the change across clusters across
+
+122
+00:09:37.080 --> 00:09:39.300
+<v Itiel Schwartz>cross-services, complete system timeline.
+
+123
+00:09:39.940 --> 00:09:42.860
+<v Itiel Schwartz>But back then it was hard, like, killing a third of your product
+
+124
+00:09:42.860 --> 00:09:44.980
+<v Itiel Schwartz>in order to save the other two thirds.
+
+125
+00:09:48.500 --> 00:09:52.080
+<v Noah Labhart>So you've got your MVP, you're getting some traction.
+
+126
+00:09:52.460 --> 00:09:55.720
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+127
+00:09:55.780 --> 00:09:58.080
+<v Noah Labhart>And I think to give context where I'm going with that is,
+
+128
+00:09:58.650 --> 00:10:01.360
+<v Noah Labhart>how did you build your roadmap and decide,
+
+129
+00:10:01.780 --> 00:10:04.660
+<v Noah Labhart>okay, this is the next most important thing to build?
+
+130
+00:10:05.700 --> 00:10:09.980
+<v Itiel Schwartz>I think what drives us the most is customer feedback.
+
+131
+00:10:10.180 --> 00:10:14.320
+<v Itiel Schwartz>So it was customer feedback from people that we talked with
+
+132
+00:10:14.320 --> 00:10:18.620
+<v Itiel Schwartz>and from customers, design partners, mentors, advisors,
+
+133
+00:10:18.900 --> 00:10:21.300
+<v Itiel Schwartz>telling us where are their pains,
+
+134
+00:10:21.760 --> 00:10:24.840
+<v Itiel Schwartz>where do they need Komodor to step in and to help them.
+
+135
+00:10:25.060 --> 00:10:30.000
+<v Itiel Schwartz>So we try to make sure that the product answers real needs.
+
+136
+00:10:30.480 --> 00:10:33.980
+<v Itiel Schwartz>Regarding the roadmap, there is what we believe,
+
+137
+00:10:34.660 --> 00:10:40.440
+<v Itiel Schwartz>a perfect product if we'll do a b c d e like if we do everything it's clear that the product will be
+
+138
+00:10:40.440 --> 00:10:45.740
+<v Itiel Schwartz>amazing the problem is that we have only three developers so we need to choose one so a lot of
+
+139
+00:10:45.740 --> 00:10:51.700
+<v Itiel Schwartz>like customer feedback on one hand and the other hand was going really deep into the kubernetes
+
+140
+00:10:51.700 --> 00:10:57.420
+<v Itiel Schwartz>community understanding the pains of customers that we didn't really meet so far understanding
+
+141
+00:10:57.420 --> 00:11:02.960
+<v Itiel Schwartz>where is the market going for and I think like it's a constant like
+
+142
+00:11:02.960 --> 00:11:07.020
+<v Itiel Schwartz>prioritization look of releasing something getting the feedback
+
+143
+00:11:07.020 --> 00:11:11.100
+<v Itiel Schwartz>understanding if we are on the right track if we are let's double down on
+
+144
+00:11:11.100 --> 00:11:16.480
+<v Itiel Schwartz>this if we are not let's kill it so it's a lot of like small decision that adds
+
+145
+00:11:16.480 --> 00:11:23.780
+<v Itiel Schwartz>up to one unified platform on the other hand trying to remember what would an
+
+146
+00:11:23.780 --> 00:11:28.160
+<v Itiel Schwartz>an amazing product look like and what is the goal that we are striving.
+
+147
+00:11:29.760 --> 00:11:31.700
+<v Noah Labhart>So let's switch to team then.
+
+148
+00:11:31.820 --> 00:11:35.820
+<v Noah Labhart>So how did you go about building your team and what did you look for in those people
+
+149
+00:11:35.820 --> 00:11:38.400
+<v Noah Labhart>to indicate they were the winning horses to join you?
+
+150
+00:11:39.720 --> 00:11:42.360
+<v Itiel Schwartz>First of all, take people that you know if you can.
+
+151
+00:11:42.560 --> 00:11:47.580
+<v Itiel Schwartz>I was lucky enough to work in two really great companies, Forte and Rookout.
+
+152
+00:11:47.580 --> 00:11:55.760
+<v Itiel Schwartz>up so I just took like the best employees from there and I was lucky enough for them to join me
+
+153
+00:11:56.380 --> 00:12:02.200
+<v Itiel Schwartz>along the way so like if you can work with people that you already know I think the most important
+
+154
+00:12:02.200 --> 00:12:08.500
+<v Itiel Schwartz>thing for startup in like in this area is the ability to work with a lot of uncertainty and the
+
+155
+00:12:08.500 --> 00:12:16.900
+<v Itiel Schwartz>ability to move fast without being afraid so all of our first developers have this in common they
+
+156
+00:12:17.580 --> 00:12:24.640
+<v Itiel Schwartz>afraid of doing stuff that you know like sometimes when I think about it maybe we should be a little
+
+157
+00:12:24.640 --> 00:12:30.500
+<v Itiel Schwartz>bit more afraid but having like builder type mentality that is not afraid to fail and it's
+
+158
+00:12:30.500 --> 00:12:37.340
+<v Itiel Schwartz>not afraid to have a lot of uncertainty and a lot of unclarity I think it's like a must for
+
+159
+00:12:37.340 --> 00:12:43.440
+<v Itiel Schwartz>first developers and this is like the kind of things that we looked for it wasn't even like
+
+160
+00:12:43.440 --> 00:12:50.220
+<v Itiel Schwartz>necessarily a lot of experience. We took people who are quite young, but they showed those
+
+161
+00:12:50.220 --> 00:12:56.260
+<v Itiel Schwartz>qualities, like ability to work alone without a lot of guidance. And not really alone. We have
+
+162
+00:12:56.260 --> 00:13:02.540
+<v Itiel Schwartz>a lot of teamwork, but without a lot of guidance and to deliver fast results without being afraid
+
+163
+00:13:02.540 --> 00:13:04.140
+<v Itiel Schwartz>of switching direction really fast.
+
+164
+00:13:06.980 --> 00:13:09.800
+<v Noah Labhart>Well, let's flip to scalability then. And this will be fun
+
+165
+00:13:09.800 --> 00:13:12.100
+<v Noah Labhart>given your troubleshooting Kubernetes.
+
+166
+00:13:12.780 --> 00:13:15.820
+<v Noah Labhart>So did you build this to scale efficiently from day one
+
+167
+00:13:15.820 --> 00:13:17.520
+<v Noah Labhart>or have you been fighting this
+
+168
+00:13:17.520 --> 00:13:19.000
+<v Noah Labhart>as you've grown and gained traction?
+
+169
+00:13:21.000 --> 00:13:25.440
+<v Itiel Schwartz>We are trying always to be like over-provisioned a bit,
+
+170
+00:13:25.460 --> 00:13:27.680
+<v Itiel Schwartz>like more than what we're currently supporting.
+
+171
+00:13:28.380 --> 00:13:31.160
+<v Itiel Schwartz>But, you know, I always tell like the company,
+
+172
+00:13:31.300 --> 00:13:32.760
+<v Itiel Schwartz>like the premature optimization
+
+173
+00:13:32.760 --> 00:13:34.880
+<v Itiel Schwartz>is the root of all evil.
+
+174
+00:13:35.400 --> 00:13:39.680
+<v Itiel Schwartz>And we have a lot of really talented people
+
+175
+00:13:39.800 --> 00:13:40.460
+<v Itiel Schwartz>here in the company.
+
+176
+00:13:40.800 --> 00:13:42.380
+<v Itiel Schwartz>Intelligent people sometimes
+
+177
+00:13:42.380 --> 00:13:44.940
+<v Itiel Schwartz>really like to think about scaling.
+
+178
+00:13:45.580 --> 00:13:47.640
+<v Itiel Schwartz>And sometimes you don't really care about scaling.
+
+179
+00:13:48.240 --> 00:13:50.940
+<v Itiel Schwartz>And you need to find the balance
+
+180
+00:13:50.940 --> 00:13:54.460
+<v Itiel Schwartz>between not needing to think about scale every day,
+
+181
+00:13:54.480 --> 00:13:56.040
+<v Itiel Schwartz>and necessarily because your system
+
+182
+00:13:56.040 --> 00:13:58.820
+<v Itiel Schwartz>can scale 2x or 3x the number of customers
+
+183
+00:13:58.820 --> 00:14:00.620
+<v Itiel Schwartz>that you currently have on one hand.
+
+184
+00:14:01.280 --> 00:14:02.820
+<v Itiel Schwartz>But on the other hand,
+
+185
+00:14:02.820 --> 00:14:04.040
+<v Itiel Schwartz>you don't need a system
+
+186
+00:14:04.040 --> 00:14:07.680
+<v Itiel Schwartz>that is like 1000x more scalable.
+
+187
+00:14:07.680 --> 00:14:13.240
+<v Itiel Schwartz>like if it requires a lot of like manpower and a lot of the early conversation that we had inside
+
+188
+00:14:13.240 --> 00:14:22.100
+<v Itiel Schwartz>r&amp;d was me telling them i understand the perfect solution would include sqs sns s3 postgres and
+
+189
+00:14:22.100 --> 00:14:28.880
+<v Itiel Schwartz>redis but what would be a fine solution that will hold us up for like the next year because who knows
+
+190
+00:14:28.880 --> 00:14:35.580
+<v Itiel Schwartz>if that particular feature is really that important can we maybe get along with only postgres and a
+
+191
+00:14:35.580 --> 00:14:36.860
+<v Itiel Schwartz>And a lot of the time the answer is yes.
+
+192
+00:14:37.140 --> 00:14:41.420
+<v Itiel Schwartz>So you need someone who saw the system mature.
+
+193
+00:14:42.160 --> 00:14:46.180
+<v Itiel Schwartz>It's really hard to do it if you have zero experience, even if you're very talented,
+
+194
+00:14:46.360 --> 00:14:51.860
+<v Itiel Schwartz>because you need to understand where are the places that you can select and basically not
+
+195
+00:14:51.860 --> 00:14:57.900
+<v Itiel Schwartz>invest all of your time on one hand, but what are the places that are super critical to
+
+196
+00:14:57.900 --> 00:14:58.860
+<v Itiel Schwartz>the success of the business.
+
+197
+00:14:58.860 --> 00:15:04.960
+<v Itiel Schwartz>I will say again, like I can share that at first we used both Postgres and Elasticsearch
+
+198
+00:15:05.400 --> 00:15:07.280
+<v Itiel Schwartz>as our main backends, like databases.
+
+199
+00:15:07.600 --> 00:15:12.660
+<v Itiel Schwartz>But after a while, we understand that the elastic search is giving us wasn't that valuable
+
+200
+00:15:13.020 --> 00:15:14.180
+<v Itiel Schwartz>and it holds us back.
+
+201
+00:15:14.360 --> 00:15:18.640
+<v Itiel Schwartz>So we simply decided to ditch Elasticsearch and use Postgres alone.
+
+202
+00:15:19.200 --> 00:15:24.620
+<v Itiel Schwartz>We didn't need all of these capabilities and supporting two database required us a lot
+
+203
+00:15:24.620 --> 00:15:27.700
+<v Itiel Schwartz>of knowledge, time, and it consumed a lot of resources.
+
+204
+00:15:28.880 --> 00:15:33.280
+<v Itiel Schwartz>it's hard to say I'm going to delete one of my two databases,
+
+205
+00:15:33.880 --> 00:15:38.340
+<v Itiel Schwartz>but I think it's something that really allows us to scale up our speed.
+
+206
+00:15:40.820 --> 00:15:44.460
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built,
+
+207
+00:15:44.520 --> 00:15:45.480
+<v Noah Labhart>what are you most proud of?
+
+208
+00:15:46.400 --> 00:15:50.840
+<v Itiel Schwartz>I think that the thing that I'm most proud of is not really the product, to be honest.
+
+209
+00:15:50.880 --> 00:15:52.240
+<v Itiel Schwartz>It's much more the product feedback.
+
+210
+00:15:52.240 --> 00:15:59.060
+<v Itiel Schwartz>It's the customers who are telling us how we saved their Christmas or their Thanksgiving
+
+211
+00:15:59.780 --> 00:16:05.240
+<v Itiel Schwartz>or how did we help them find issues before release of a big feature.
+
+212
+00:16:05.640 --> 00:16:10.420
+<v Itiel Schwartz>There is a lot of technical achievements and product achievements which are fun.
+
+213
+00:16:10.620 --> 00:16:11.820
+<v Itiel Schwartz>I love engineering.
+
+214
+00:16:12.300 --> 00:16:18.080
+<v Itiel Schwartz>I love solving complex problems and using cool tools and like program language and I
+
+215
+00:16:18.080 --> 00:16:19.120
+<v Itiel Schwartz>do enjoy it.
+
+216
+00:16:19.120 --> 00:16:22.460
+<v Itiel Schwartz>We are doing it to bring value to our customers.
+
+217
+00:16:23.280 --> 00:16:26.760
+<v Itiel Schwartz>And that's what we are trying to optimize in the end of the day.
+
+218
+00:16:26.940 --> 00:16:31.740
+<v Itiel Schwartz>People were telling us, yeah, like, I'm not sure how did they manage before Komodor
+
+219
+00:16:31.740 --> 00:16:35.980
+<v Itiel Schwartz>or people that leaves their company and bring Komodor to the next company.
+
+220
+00:16:36.100 --> 00:16:41.700
+<v Itiel Schwartz>I think that's what gives me the most pleasure and what I'm most proud of.
+
+221
+00:16:42.540 --> 00:16:48.440
+<v Itiel Schwartz>Obviously, it couldn't be done without a lot of hard work on the product R&amp;D, marketing and sales side.
+
+222
+00:16:49.120 --> 00:16:55.220
+<v Itiel Schwartz>It's not like one single effort, but that's the thing I'm most proud of.
+
+223
+00:16:56.480 --> 00:16:57.820
+<v Noah Labhart>Let's flip the script a little bit.
+
+224
+00:16:58.060 --> 00:17:01.660
+<v Noah Labhart>So tell me about a mistake you made and how you and your team responded to it.
+
+225
+00:17:02.880 --> 00:17:09.400
+<v Itiel Schwartz>So I underestimated how valuable certain capabilities inside the product will be.
+
+226
+00:17:09.760 --> 00:17:14.480
+<v Itiel Schwartz>And it took us a lot of time to deliver because we thought it's nice to have.
+
+227
+00:17:14.480 --> 00:17:20.480
+<v Itiel Schwartz>but once we develop it, it turns out it's a must-have because we saw the spike of usage
+
+228
+00:17:20.480 --> 00:17:24.460
+<v Itiel Schwartz>and we saw the spike of people who are happily using Komodor.
+
+229
+00:17:25.000 --> 00:17:29.520
+<v Itiel Schwartz>So I think that there are a lot of features that we developed that we should have developed
+
+230
+00:17:29.520 --> 00:17:32.240
+<v Itiel Schwartz>like three months ago or four months ago or five months ago.
+
+231
+00:17:32.620 --> 00:17:38.500
+<v Itiel Schwartz>You always need to retro on yourself and to figure out why did you do what you do?
+
+232
+00:17:38.600 --> 00:17:40.960
+<v Itiel Schwartz>Why didn't you ask for more feedback?
+
+233
+00:17:41.140 --> 00:17:43.220
+<v Itiel Schwartz>Why didn't we try some slim entity?
+
+234
+00:17:44.480 --> 00:17:48.120
+<v Itiel Schwartz>A startup is just as good as his speed.
+
+235
+00:17:48.320 --> 00:17:50.900
+<v Itiel Schwartz>So every time we're moving slow
+
+236
+00:17:50.900 --> 00:17:54.960
+<v Itiel Schwartz>or we fail to recognize a certain feature,
+
+237
+00:17:55.340 --> 00:17:57.480
+<v Itiel Schwartz>for me, it's a mistake.
+
+238
+00:17:58.220 --> 00:18:00.920
+<v Itiel Schwartz>We also develop a lot of features that people didn't use.
+
+239
+00:18:01.000 --> 00:18:03.900
+<v Itiel Schwartz>Not a lot, but we develop features that people didn't use
+
+240
+00:18:03.900 --> 00:18:05.320
+<v Itiel Schwartz>and we had to kill them.
+
+241
+00:18:05.640 --> 00:18:09.360
+<v Itiel Schwartz>But I see those kinds of things as more of an experiment
+
+242
+00:18:09.360 --> 00:18:11.760
+<v Itiel Schwartz>and I don't believe you can succeed
+
+243
+00:18:11.760 --> 00:18:13.960
+<v Itiel Schwartz>without having a couple of failed features.
+
+244
+00:18:14.480 --> 00:18:16.700
+<v Itiel Schwartz>that you thought will be great, but they aren't.
+
+245
+00:18:18.840 --> 00:18:20.880
+<v Noah Labhart>Well, this will be fun to ask.
+
+246
+00:18:21.020 --> 00:18:24.500
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+247
+00:18:25.520 --> 00:18:32.120
+<v Itiel Schwartz>We see more and more companies that are using Komodor on a daily basis.
+
+248
+00:18:32.480 --> 00:18:35.920
+<v Itiel Schwartz>And what I want to see is more companies using Komodor,
+
+249
+00:18:36.000 --> 00:18:38.500
+<v Itiel Schwartz>and we already see it, but I want more and more companies.
+
+250
+00:18:38.700 --> 00:18:43.920
+<v Itiel Schwartz>And inside the company, I want to see more users using us more frequently.
+
+251
+00:18:45.020 --> 00:18:47.980
+<v Itiel Schwartz>Basically, Komodor's goal is to be synonymous with Kubernetes.
+
+252
+00:18:48.300 --> 00:18:52.960
+<v Itiel Schwartz>If you have Kubernetes and you are not using Komodor, then something is not okay here.
+
+253
+00:18:53.660 --> 00:18:58.400
+<v Itiel Schwartz>Regarding the company, a year and a half ago, it was only me and Ben, like two people.
+
+254
+00:18:58.540 --> 00:19:04.180
+<v Itiel Schwartz>We are currently 40, and I believe we are going to double ourselves by the end of the year.
+
+255
+00:19:04.380 --> 00:19:10.280
+<v Itiel Schwartz>We are hiring for Kubernetes experts, if anyone is hearing, and marketing themselves, and so on.
+
+256
+00:19:10.480 --> 00:19:13.560
+<v Itiel Schwartz>So we see a lot of growth going forward.
+
+257
+00:19:14.480 --> 00:19:22.620
+<v Itiel Schwartz>I think we are lucky enough not only to have the right team, but also having, we're in the right time, in the right place.
+
+258
+00:19:22.820 --> 00:19:25.820
+<v Itiel Schwartz>Like more and more people are moving into Kubernetes.
+
+259
+00:19:26.240 --> 00:19:32.180
+<v Itiel Schwartz>More and more people understand that they can't really utilize or use Kubernetes without a system like Komodor.
+
+260
+00:19:32.520 --> 00:19:40.560
+<v Itiel Schwartz>So I feel that like Kubernetes, it's like a beacon that everyone are just going there like almost blindly sometimes.
+
+261
+00:19:40.560 --> 00:19:46.940
+<v Itiel Schwartz>time. They need someone to help them understand how to use it, how to best configure it, how to
+
+262
+00:19:46.940 --> 00:19:52.680
+<v Itiel Schwartz>detect issues, how to prevent them, how to solve them. And I think Komodor will be the tool for
+
+263
+00:19:52.680 --> 00:19:59.060
+<v Itiel Schwartz>everyone who is using Kubernetes, basically. I really believe that we are on the verge of a
+
+264
+00:19:59.060 --> 00:20:05.400
+<v Itiel Schwartz>very big tide and we're simply surfing it. I hope it's an expression in English.
+
+265
+00:20:06.600 --> 00:20:11.920
+<v Noah Labhart>let's switch to you who influences the way that you work name a ceo cto an architect really any
+
+266
+00:20:11.920 --> 00:20:13.560
+<v Noah Labhart>person you look up to and why
+
+267
+00:20:13.560 --> 00:20:18.420
+<v Itiel Schwartz>so a lot of people first of all i will mention like my partner like
+
+268
+00:20:18.420 --> 00:20:27.200
+<v Itiel Schwartz>ben ben of ferrida the ceo of Komodor that i believe is amazing at what he's doing but also
+
+269
+00:20:27.200 --> 00:20:34.720
+<v Itiel Schwartz>i think that we are working really well together startup it's not at least for my case it's not
+
+270
+00:20:35.400 --> 00:20:41.480
+<v Itiel Schwartz>lonely battle like you have someone with you every place of like every every
+
+271
+00:20:41.480 --> 00:20:49.980
+<v Itiel Schwartz>place in along the way so I would say I would say Ben I also try to have a lot
+
+272
+00:20:49.980 --> 00:20:58.180
+<v Itiel Schwartz>of advisors who are helping me people who are CTO or was CTOs or experienced
+
+273
+00:20:58.180 --> 00:21:03.480
+<v Itiel Schwartz>product managers and to surround myself with people who already experienced what
+
+274
+00:21:05.400 --> 00:21:09.240
+<v Itiel Schwartz>can save me a lot of frustration or calm me down.
+
+275
+00:21:09.520 --> 00:21:15.880
+<v Itiel Schwartz>So I think making sure you surround yourself with very good people is critical.
+
+276
+00:21:16.600 --> 00:21:20.500
+<v Itiel Schwartz>I was really lucky to work in, like I said, very good companies,
+
+277
+00:21:20.520 --> 00:21:23.020
+<v Itiel Schwartz>both eBay, Fortran, and Rookout.
+
+278
+00:21:23.140 --> 00:21:27.720
+<v Itiel Schwartz>I had a VP of R&amp;D that really influenced me in Fortran,
+
+279
+00:21:27.760 --> 00:21:31.760
+<v Itiel Schwartz>named Oren Ellenbogen, which is really good.
+
+280
+00:21:31.760 --> 00:21:37.660
+<v Itiel Schwartz>he has a newsletter, he writes a lot about R&amp;D leadership. So I think he really helped me to
+
+281
+00:21:37.660 --> 00:21:47.100
+<v Itiel Schwartz>develop as a developer and as a person. And also in Rookout, a lot of people, and obviously my wife
+
+282
+00:21:47.100 --> 00:22:00.540
+<v Itiel Schwartz>the most influencer out of all. Even when I try to think about what do you need in order to succeed
+
+283
+00:22:02.140 --> 00:22:08.720
+<v Itiel Schwartz>startup without a really good and strong support at home, it's simply impossible.
+
+284
+00:22:10.960 --> 00:22:14.640
+<v Noah Labhart>Well, we talked about a mistake earlier, but a little bit different spin.
+
+285
+00:22:15.140 --> 00:22:17.800
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+286
+00:22:17.880 --> 00:22:19.820
+<v Noah Labhart>Where would you consider taking a different approach?
+
+287
+00:22:21.960 --> 00:22:27.160
+<v Itiel Schwartz>I think that as much as we tried, I would make the MVP even smaller.
+
+288
+00:22:27.160 --> 00:22:33.940
+<v Itiel Schwartz>like it took us three months and I believe that because we did we won't be
+
+289
+00:22:33.940 --> 00:22:38.600
+<v Itiel Schwartz>sure what we're building back then what's the really minimum I would try to
+
+290
+00:22:38.600 --> 00:22:43.420
+<v Itiel Schwartz>shorten that time period from right on like two months maybe or even month
+
+291
+00:22:43.420 --> 00:22:49.480
+<v Itiel Schwartz>because we learned so much more once we had customers using the MVP that every
+
+292
+00:22:49.480 --> 00:22:56.140
+<v Itiel Schwartz>day that we didn't release it was a mistake so I think that's the one one
+
+293
+00:22:57.360 --> 00:23:02.240
+<v Itiel Schwartz>The other one is to select clearer goals from a company standpoint.
+
+294
+00:23:02.720 --> 00:23:08.020
+<v Itiel Schwartz>I think now that we grow, I see the importance of having a very clear goals.
+
+295
+00:23:08.180 --> 00:23:15.120
+<v Itiel Schwartz>It might be like inspirational goals. It doesn't have to be like, like it's, it's helpful if it's also like metric driven.
+
+296
+00:23:15.600 --> 00:23:25.560
+<v Itiel Schwartz>But having very clear goals make other people in the company much more effective because everyone are looking and optimizing for the same goal.
+
+297
+00:23:27.160 --> 00:23:28.840
+<v Itiel Schwartz>to move the boat to the same direction
+
+298
+00:23:28.840 --> 00:23:31.080
+<v Itiel Schwartz>and make it as clear as possible.
+
+299
+00:23:31.580 --> 00:23:33.580
+<v Itiel Schwartz>I think it's super valuable.
+
+300
+00:23:33.860 --> 00:23:36.300
+<v Itiel Schwartz>And I think I didn't really understand it back then,
+
+301
+00:23:36.400 --> 00:23:39.900
+<v Itiel Schwartz>the importance of setting very clear goals.
+
+302
+00:23:40.180 --> 00:23:43.340
+<v Itiel Schwartz>And it is something I'm trying to do better since then.
+
+303
+00:23:44.580 --> 00:23:45.400
+<v Noah Labhart>Well, last question.
+
+304
+00:23:45.640 --> 00:23:46.780
+<v Noah Labhart>So you're getting on a plane
+
+305
+00:23:46.780 --> 00:23:48.560
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+306
+00:23:48.560 --> 00:23:50.000
+<v Noah Labhart>who's built the next big thing.
+
+307
+00:23:50.320 --> 00:23:51.380
+<v Noah Labhart>They're jazzed about it.
+
+308
+00:23:51.440 --> 00:23:52.620
+<v Noah Labhart>They can't wait to show it off to the world.
+
+309
+00:23:52.800 --> 00:23:54.800
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+310
+00:23:55.200 --> 00:23:56.800
+<v Noah Labhart>What advice do you give that person
+
+311
+00:23:57.160 --> 00:23:58.180
+<v Noah Labhart>gone down this road a bit?
+
+312
+00:23:59.180 --> 00:24:01.280
+<v Itiel Schwartz>Did you validate it with customers
+
+313
+00:24:01.280 --> 00:24:02.460
+<v Itiel Schwartz>or with the market?
+
+314
+00:24:02.940 --> 00:24:04.620
+<v Itiel Schwartz>I see a lot and I try to help
+
+315
+00:24:04.620 --> 00:24:05.520
+<v Itiel Schwartz>a lot of like entrepreneurs
+
+316
+00:24:05.520 --> 00:24:07.240
+<v Itiel Schwartz>that are asking me for help
+
+317
+00:24:07.240 --> 00:24:09.480
+<v Itiel Schwartz>or asking me to raise money
+
+318
+00:24:09.480 --> 00:24:10.680
+<v Itiel Schwartz>or connection or whatever.
+
+319
+00:24:10.900 --> 00:24:12.400
+<v Itiel Schwartz>And I'm doing it like happily.
+
+320
+00:24:12.820 --> 00:24:14.760
+<v Itiel Schwartz>But I think most of them
+
+321
+00:24:14.760 --> 00:24:16.640
+<v Itiel Schwartz>don't really understand the pain
+
+322
+00:24:16.640 --> 00:24:18.420
+<v Itiel Schwartz>and the problem that they are trying to solve
+
+323
+00:24:18.420 --> 00:24:19.920
+<v Itiel Schwartz>versus the alternative,
+
+324
+00:24:20.160 --> 00:24:21.840
+<v Itiel Schwartz>versus like the money,
+
+325
+00:24:21.920 --> 00:24:23.500
+<v Itiel Schwartz>the effort, like everything.
+
+326
+00:24:23.820 --> 00:24:26.480
+<v Itiel Schwartz>So simply understand the customer
+
+327
+00:24:27.160 --> 00:24:29.300
+<v Itiel Schwartz>really well and the customer ecosystem really well.
+
+328
+00:24:29.440 --> 00:24:33.320
+<v Itiel Schwartz>I think it's very tempting to see a problem
+
+329
+00:24:33.320 --> 00:24:37.040
+<v Itiel Schwartz>and try to solve it without understanding how acute is it
+
+330
+00:24:37.660 --> 00:24:40.000
+<v Itiel Schwartz>and how is it currently being solved.
+
+331
+00:24:40.580 --> 00:24:43.040
+<v Itiel Schwartz>Just double down or like triple down
+
+332
+00:24:43.440 --> 00:24:45.860
+<v Itiel Schwartz>on what are you really trying to solve
+
+333
+00:24:45.860 --> 00:24:48.480
+<v Itiel Schwartz>and is it really going to change for the end user
+
+334
+00:24:48.480 --> 00:24:51.440
+<v Itiel Schwartz>that you have in mind and really ask him and validate.
+
+335
+00:24:51.740 --> 00:24:54.700
+<v Itiel Schwartz>And back then we did a lot of interviews with DevOps,
+
+336
+00:24:54.700 --> 00:24:56.880
+<v Itiel Schwartz>with dev, with PPR and Ds, with CTOs,
+
+337
+00:24:56.900 --> 00:24:59.380
+<v Itiel Schwartz>and we try to understand the current problems,
+
+338
+00:24:59.460 --> 00:25:00.760
+<v Itiel Schwartz>the current needs, the current pains.
+
+339
+00:25:01.100 --> 00:25:04.300
+<v Itiel Schwartz>And I think it helped us tremendously to this day.
+
+340
+00:25:04.740 --> 00:25:06.780
+<v Itiel Schwartz>And we also read The Mom Test,
+
+341
+00:25:06.980 --> 00:25:10.100
+<v Itiel Schwartz>which allow you to conduct those kinds of interviews better.
+
+342
+00:25:10.720 --> 00:25:13.060
+<v Itiel Schwartz>So I think that's the number one advice
+
+343
+00:25:13.060 --> 00:25:14.980
+<v Itiel Schwartz>that I bring pretty much everyone.
+
+344
+00:25:15.620 --> 00:25:16.640
+<v Noah Labhart>Well, that's great advice.
+
+345
+00:25:17.280 --> 00:25:19.300
+<v Noah Labhart>Well, Itiel, thank you for being on the show today.
+
+346
+00:25:19.420 --> 00:25:21.760
+<v Noah Labhart>Thank you for telling the creation story of Komodor.
+
+347
+00:25:22.520 --> 00:25:23.660
+<v Itiel Schwartz>Thanks, man. Thanks.
+
+348
+00:25:24.700 --> 00:25:27.420
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+349
+00:25:30.220 --> 00:25:33.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+350
+00:25:33.400 --> 00:25:38.200
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+351
+00:25:38.600 --> 00:25:43.680
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+352
+00:25:44.020 --> 00:25:46.260
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+353
+00:25:46.520 --> 00:25:48.580
+<v Noah Labhart>Both things help us out tremendously.
+
+354
+00:25:50.860 --> 00:25:52.380
+<v Noah Labhart>And thanks again for listening.

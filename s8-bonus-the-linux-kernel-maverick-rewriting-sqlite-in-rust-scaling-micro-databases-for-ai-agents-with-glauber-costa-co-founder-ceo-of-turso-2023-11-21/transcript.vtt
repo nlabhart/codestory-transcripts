@@ -1,0 +1,1671 @@
+WEBVTT
+
+NOTE S8 Favorite: The Linux Kernel Maverick Rewriting SQLite in Rust: Scaling Micro-Databases for AI Agents with Glauber Costa, Co-Founder & CEO of Turso
+
+1
+00:00:00.860 --> 00:00:20.960
+<v Glauber Costa>The usual answer is ask your users. The reason I don't like that answer is not because it's not true. You obviously have to ask your users. But if you ask something to 10 different people, you will get 11 different answers. So it's a very complicated process of how do we go getting that information? And now how do we make sense of that information?
+
+2
+00:00:20.960 --> 00:00:30.480
+<v Glauber Costa>One of the things that we did for the MVP that I think was very helpful is that before we made the product readily available, we had a private beta.
+
+3
+00:00:30.940 --> 00:00:37.920
+<v Glauber Costa>Give me your email. Now I'm going to send you that email with a form to fill, and I'm going to judge if you are a person that I want to give access to.
+
+4
+00:00:38.500 --> 00:00:43.080
+<v Glauber Costa>My name is Glauber Costa, and I am the founder and CEO of Turso.
+
+5
+00:00:46.680 --> 00:00:48.380
+<v Clip>This is Code Story.
+
+6
+00:00:48.380 --> 00:00:52.240
+<v Noah Labhart>A podcast bringing you interviews with tech visionaries.
+
+7
+00:00:53.200 --> 00:00:58.040
+<v Noah Labhart>Who share what it takes to change an industry.
+
+8
+00:01:01.300 --> 00:01:04.520
+<v Noah Labhart>Who built the teams that have their back.
+
+9
+00:01:08.800 --> 00:01:11.160
+<v Noah Labhart>Keeping scalability top of mind.
+
+10
+00:01:11.480 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+11
+00:01:13.360 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+12
+00:01:15.440 --> 00:01:17.780
+<v Noah Labhart>The stories you don't read in the headlines.
+
+13
+00:01:18.380 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+14
+00:01:19.960 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+15
+00:01:22.420 --> 00:01:25.840
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+16
+00:01:26.180 --> 00:01:27.520
+<v Clip>You need to really want it.
+
+17
+00:01:27.560 --> 00:01:28.920
+<v Clip>It's not just about technology.
+
+18
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+19
+00:01:33.120 --> 00:01:34.620
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+20
+00:01:34.720 --> 00:01:39.140
+<v Noah Labhart>And today, how Glauber Costa is building a way to enable the edge.
+
+21
+00:01:39.480 --> 00:01:42.860
+<v Noah Labhart>Not just for compute, but now for data.
+
+22
+00:01:49.360 --> 00:01:54.860
+<v Noah Labhart>Glauber Costa is a family man with three kids at home, so he admits with a startup and kids,
+
+23
+00:01:55.020 --> 00:01:59.600
+<v Noah Labhart>there's not much space for anything else. He made mention that the jump from two to three kids was
+
+24
+00:01:59.600 --> 00:02:04.080
+<v Noah Labhart>hard, and we joke that he and his wife are playing zone defense now over man-to-man.
+
+25
+00:02:04.920 --> 00:02:09.340
+<v Noah Labhart>As of this recording, he had already seen the Mario movie three times with his kids
+
+26
+00:02:09.340 --> 00:02:14.460
+<v Noah Labhart>and enjoys playing video games with them. But his game to play is Civilizations,
+
+27
+00:02:14.460 --> 00:02:16.300
+<v Noah Labhart>which he is highly addicted to.
+
+28
+00:02:17.820 --> 00:02:21.460
+<v Noah Labhart>Glauber comes from a heavy database and systems programming background,
+
+29
+00:02:21.740 --> 00:02:23.120
+<v Noah Labhart>as does his co-founders.
+
+30
+00:02:23.200 --> 00:02:26.480
+<v Noah Labhart>They noticed that the buyer persona of database tech is changing.
+
+31
+00:02:26.760 --> 00:02:29.600
+<v Noah Labhart>More and more front-end developers and full-stack developers
+
+32
+00:02:29.600 --> 00:02:31.780
+<v Noah Labhart>are responsible for these decisions.
+
+33
+00:02:32.640 --> 00:02:34.480
+<v Noah Labhart>After iterating on a few projects,
+
+34
+00:02:34.680 --> 00:02:37.420
+<v Noah Labhart>they figured out the pillar of their data edge solution,
+
+35
+00:02:38.200 --> 00:02:39.340
+<v Noah Labhart>which was SQLite.
+
+36
+00:02:41.640 --> 00:02:44.560
+<v Noah Labhart>This is the creation story of Turso.
+
+37
+00:02:49.140 --> 00:02:51.680
+<v Glauber Costa>Turso is a database for the edge.
+
+38
+00:02:52.100 --> 00:02:59.180
+<v Glauber Costa>First of all, it's a database where your data is replicated to the edge differently than usually the cloud.
+
+39
+00:02:59.360 --> 00:03:04.260
+<v Glauber Costa>When we talk about the edge, we're talking about dozens, if not hundreds of locations.
+
+40
+00:03:04.760 --> 00:03:08.320
+<v Glauber Costa>In our case, we're offering the service in more than 28 locations.
+
+41
+00:03:09.340 --> 00:03:12.780
+<v Glauber Costa>You wouldn't have just like in the cloud, US East, US West.
+
+42
+00:03:13.020 --> 00:03:24.260
+<v Glauber Costa>You now have data centers, you have locations, points of presence, like some people call it, plus other regions of the world, Japan and Australia and lots of places in Europe, a couple of places in South America.
+
+43
+00:03:24.680 --> 00:03:28.260
+<v Glauber Costa>So you really want to have like this last mile latency advantages.
+
+44
+00:03:28.720 --> 00:03:37.220
+<v Glauber Costa>And also when you look at the platforms that are today used for edge compute, like Vercel, Cloudflare, Netlify, there is itself a packaging of Deno Deploy.
+
+45
+00:03:37.220 --> 00:03:39.420
+<v Glauber Costa>They pack very restricted environments.
+
+46
+00:03:39.780 --> 00:03:44.240
+<v Glauber Costa>So connecting to normal databases from those environments is quite challenging.
+
+47
+00:03:44.380 --> 00:03:46.120
+<v Glauber Costa>You can't really even open TCP connections.
+
+48
+00:03:46.540 --> 00:03:54.700
+<v Glauber Costa>So another thing that an edge database does is that it makes itself available through those protocols like HTTP, WebSockets, and et cetera.
+
+49
+00:03:54.880 --> 00:03:56.600
+<v Glauber Costa>So you can work from anywhere, essentially.
+
+50
+00:03:57.200 --> 00:04:03.280
+<v Glauber Costa>We had the previous product in our company called Chiselstrike that we still maintain as an open source project.
+
+51
+00:04:03.280 --> 00:04:04.380
+<v Glauber Costa>We put some effort.
+
+52
+00:04:04.560 --> 00:04:07.880
+<v Glauber Costa>Open source never truly dies, which is an amazing thing about open source.
+
+53
+00:04:08.000 --> 00:04:10.600
+<v Glauber Costa>I've been doing open source for 20 plus years now.
+
+54
+00:04:11.680 --> 00:04:16.020
+<v Glauber Costa>We started the company and we started looking in that direction, my co-founder and I, because
+
+55
+00:04:16.020 --> 00:04:19.440
+<v Glauber Costa>we come from a background of heavy databases and system programming.
+
+56
+00:04:19.780 --> 00:04:22.000
+<v Glauber Costa>I was in the Linux kernel for around 10 years.
+
+57
+00:04:22.120 --> 00:04:23.600
+<v Glauber Costa>So I was back on my co-founder.
+
+58
+00:04:23.880 --> 00:04:29.080
+<v Glauber Costa>And then we joined a database company called ScyllaDB, a database company focused on petabyte
+
+59
+00:04:29.080 --> 00:04:30.520
+<v Glauber Costa>scale, NoSQL workloads.
+
+60
+00:04:30.520 --> 00:04:37.040
+<v Glauber Costa>So we come from those like very back and heavy infrastructure systems programming, low level background.
+
+61
+00:04:37.640 --> 00:04:47.820
+<v Glauber Costa>And when we were looking a little bit around what's going on in the world today, one of the things we noticed is that buyer persona of a database is changing a little bit.
+
+62
+00:04:47.960 --> 00:04:59.240
+<v Glauber Costa>Go back 10 years in time, the person in the company responsible for database decisions was a very particular individual who almost exclusively specializes in dealing with databases and have infrastructure.
+
+63
+00:05:00.520 --> 00:05:03.300
+<v Glauber Costa>Fast forward to today, we don't think this is the case anymore.
+
+64
+00:05:03.500 --> 00:05:09.880
+<v Glauber Costa>I mean, obviously, there is still some of that going on, but you have more and more people that are front-end developers,
+
+65
+00:05:10.000 --> 00:05:15.100
+<v Glauber Costa>or in some cases, they call themselves full-stack developers, in charge of those database decisions.
+
+66
+00:05:15.460 --> 00:05:17.620
+<v Glauber Costa>And we started to try to understand why.
+
+67
+00:05:17.900 --> 00:05:23.300
+<v Glauber Costa>We started to look around and see what are the things that are taking the world in that direction,
+
+68
+00:05:23.460 --> 00:05:26.000
+<v Glauber Costa>and is this a trend worth batting on or not?
+
+69
+00:05:26.000 --> 00:05:38.280
+<v Glauber Costa>And one of the things that we saw that was making those people more capable of making those database decisions was that with serverless and edge, which is something lots of people conflate together and think to be the same thing.
+
+70
+00:05:38.360 --> 00:05:52.200
+<v Glauber Costa>They're not. But like with serverless and edge growing in popularity, it was much easier for those folks that were doing their websites on Vercel and deploying them on Netlify and Cloudflare and et cetera to have the full backend under their control.
+
+71
+00:05:52.200 --> 00:05:56.260
+<v Glauber Costa>We started working on a project to take advantage of that.
+
+72
+00:05:56.420 --> 00:06:00.920
+<v Glauber Costa>And that project has a couple of things that we just don't think we got it right.
+
+73
+00:06:01.100 --> 00:06:10.040
+<v Glauber Costa>But it also had one thing that we absolutely got right, which was the fact that it had internally something that we construed to replicate data with SQLite.
+
+74
+00:06:10.200 --> 00:06:15.100
+<v Glauber Costa>So why SQLite? And the idea was that with SQLite, you can deploy everything locally.
+
+75
+00:06:15.200 --> 00:06:18.060
+<v Glauber Costa>You can do everything locally. You can develop your application locally.
+
+76
+00:06:18.060 --> 00:06:22.600
+<v Glauber Costa>locally but then if you find a way to distribute the data at that point because you know SQLite
+
+77
+00:06:22.600 --> 00:06:27.060
+<v Glauber Costa>is not meant to be a distributed database but if you find a way to distribute that database later
+
+78
+00:06:27.060 --> 00:06:34.220
+<v Glauber Costa>you now have the same code running locally and later in production and also the edge because
+
+79
+00:06:34.220 --> 00:06:39.420
+<v Glauber Costa>it's this thing that is deployed to 20-30 locations it has a lot fewer resources than
+
+80
+00:06:39.420 --> 00:06:44.140
+<v Glauber Costa>the cloud so you really need a database that is not as heavy as other databases so SQLite just
+
+81
+00:06:44.140 --> 00:06:49.080
+<v Glauber Costa>fit the bill perfectly. And we started building on it. The idea of Turso really came from this
+
+82
+00:06:49.080 --> 00:06:54.700
+<v Glauber Costa>realization. We understood that the edge was the next thing for us to deal with. And we knew that
+
+83
+00:06:54.700 --> 00:06:59.060
+<v Glauber Costa>this part of the product was the part that people loved the most. The product did have this
+
+84
+00:06:59.060 --> 00:07:03.800
+<v Glauber Costa>experience of like develop locally and then just push to the cloud, right? So this was like those
+
+85
+00:07:03.800 --> 00:07:09.160
+<v Glauber Costa>two things coming together. We just said, hey, let's just put a product out that does just that
+
+86
+00:07:09.160 --> 00:07:11.380
+<v Glauber Costa>and see how it fares and it fares fantastically.
+
+87
+00:07:12.600 --> 00:07:14.040
+<v Noah Labhart>Let's dive into the MVP then.
+
+88
+00:07:14.180 --> 00:07:17.380
+<v Noah Labhart>So tell me about that first version of the product you built.
+
+89
+00:07:17.460 --> 00:07:18.780
+<v Noah Labhart>How long did it take to build
+
+90
+00:07:18.780 --> 00:07:20.820
+<v Noah Labhart>and what sort of tools did you use to bring it to life?
+
+91
+00:07:22.760 --> 00:07:24.780
+<v Glauber Costa>The MVP was also an interesting story
+
+92
+00:07:24.780 --> 00:07:27.260
+<v Glauber Costa>because around the MVP, my third kid,
+
+93
+00:07:27.320 --> 00:07:28.560
+<v Glauber Costa>my second daughter was born.
+
+94
+00:07:29.060 --> 00:07:30.740
+<v Glauber Costa>She was born prematurely.
+
+95
+00:07:30.740 --> 00:07:31.920
+<v Glauber Costa>So it was a little bit of an emergency
+
+96
+00:07:31.920 --> 00:07:33.300
+<v Glauber Costa>and I just have to drop everything
+
+97
+00:07:33.300 --> 00:07:34.920
+<v Glauber Costa>and go be with my family.
+
+98
+00:07:35.640 --> 00:07:37.680
+<v Glauber Costa>And then my co-founder essentially built
+
+99
+00:07:39.160 --> 00:07:45.760
+<v Glauber Costa>control plane in Go. And we are a very strong Rust shop. We use Rust a lot. We've been using Rust for
+
+100
+00:07:45.760 --> 00:07:51.420
+<v Glauber Costa>all the other technical stuff. So I came back, I see this control plane in Go, I almost killed him,
+
+101
+00:07:51.460 --> 00:07:55.720
+<v Glauber Costa>but I came to like it. So that's the running joke. I mean, Go was a happy accident.
+
+102
+00:07:56.200 --> 00:08:00.700
+<v Glauber Costa>All the CLI tooling and all the control plane, the things that does the automation is essentially
+
+103
+00:08:00.700 --> 00:08:06.980
+<v Glauber Costa>built on Go. The other thing that we use very heavily is Fly.io. Fly.io is also a platform
+
+104
+00:08:06.980 --> 00:08:08.460
+<v Glauber Costa>where you can deploy containers.
+
+105
+00:08:08.820 --> 00:08:10.160
+<v Glauber Costa>So it's not just functions,
+
+106
+00:08:10.360 --> 00:08:11.880
+<v Glauber Costa>which is again, one of the main differences
+
+107
+00:08:11.880 --> 00:08:13.020
+<v Glauber Costa>between serverless and edge.
+
+108
+00:08:13.120 --> 00:08:14.860
+<v Glauber Costa>They are on the edge, but they're not serverless.
+
+109
+00:08:15.340 --> 00:08:17.300
+<v Glauber Costa>So they allow you to have a server abstraction
+
+110
+00:08:17.920 --> 00:08:19.440
+<v Glauber Costa>in all of those locations,
+
+111
+00:08:19.480 --> 00:08:21.140
+<v Glauber Costa>in more than 20 locations as well.
+
+112
+00:08:21.680 --> 00:08:24.380
+<v Glauber Costa>And the other thing that we do still use very heavily
+
+113
+00:08:24.380 --> 00:08:25.260
+<v Glauber Costa>is Rust itself,
+
+114
+00:08:25.380 --> 00:08:27.300
+<v Glauber Costa>because at the database level, at the core level,
+
+115
+00:08:28.060 --> 00:08:29.520
+<v Glauber Costa>we don't use a lot of AWS.
+
+116
+00:08:29.680 --> 00:08:30.960
+<v Glauber Costa>We use some of that.
+
+117
+00:08:31.240 --> 00:08:33.700
+<v Glauber Costa>There is some of HashiCorp tools as well,
+
+118
+00:08:33.740 --> 00:08:35.600
+<v Glauber Costa>like Vault that we use for storing secrets.
+
+119
+00:08:36.980 --> 00:08:41.700
+<v Glauber Costa>was mostly out of it. I mean, I was looking, I was at the hospital at the time with my family,
+
+120
+00:08:41.760 --> 00:08:46.120
+<v Glauber Costa>trying to understand like, hey, is my daughter going to be okay or not? It was a really fast
+
+121
+00:08:46.120 --> 00:08:51.400
+<v Glauber Costa>paced process. It took around two months in total to just get something together, put in the hands
+
+122
+00:08:51.400 --> 00:08:56.300
+<v Glauber Costa>of some early users. And we had, as I said, a couple of early users that were using our previous
+
+123
+00:08:56.300 --> 00:09:00.540
+<v Glauber Costa>product and they say, hey, I mean, this is all cool. I love that. But the SQLite stuff is the
+
+124
+00:09:00.540 --> 00:09:05.480
+<v Glauber Costa>stuff that we're interested in the most. So we put this in the hand of those early users. They
+
+125
+00:09:06.980 --> 00:09:12.840
+<v Glauber Costa>And then the work started to actually release something public, like a free tier that people could just sign up to use it.
+
+126
+00:09:13.940 --> 00:09:16.560
+<v Noah Labhart>Okay, let's stay on the MVP for a minute.
+
+127
+00:09:16.660 --> 00:09:20.900
+<v Noah Labhart>Obviously, there's a lot going on personally and professionally during that time building the MVP.
+
+128
+00:09:21.760 --> 00:09:28.500
+<v Noah Labhart>Some of the decisions and trade-offs you have to make when building an MVP around technical debt or tool choice.
+
+129
+00:09:28.580 --> 00:09:30.780
+<v Noah Labhart>And I heard you kind of touch on some of those things.
+
+130
+00:09:30.860 --> 00:09:35.060
+<v Noah Labhart>Tell me about those decisions you had to make and the team had to make and how you coped with them.
+
+131
+00:09:36.980 --> 00:09:42.680
+<v Glauber Costa>a couple of architectural decisions that we had made before I left. We had had a bunch of meetings
+
+132
+00:09:42.680 --> 00:09:46.840
+<v Glauber Costa>and we tried to understand like, what is the architecture that we want to build? Some of those
+
+133
+00:09:46.840 --> 00:09:50.420
+<v Glauber Costa>things were not built. There were some good things that came out of that. There were some bad things
+
+134
+00:09:50.420 --> 00:09:55.800
+<v Glauber Costa>that came out of that. I had to understand and let the team build it and let the team own it.
+
+135
+00:09:55.880 --> 00:10:00.640
+<v Glauber Costa>So for me, it was a great experience on a personal level as well because of that. I was wanting to
+
+136
+00:10:00.640 --> 00:10:05.900
+<v Glauber Costa>learn more how to be operating from the sidelines, but then life came and forced me in that situation.
+
+137
+00:10:07.000 --> 00:10:18.040
+<v Glauber Costa>Going on the technical aspects of that, I think one of the biggest trade-offs that we made was we had this vision that SQLite was a tool that one of the strengths of it is that it can work from anywhere.
+
+138
+00:10:18.280 --> 00:10:25.800
+<v Glauber Costa>You can embed it in the browser. You can deploy it on the edge. We can essentially put it all the way down to your inside your serverless function.
+
+139
+00:10:26.360 --> 00:10:31.880
+<v Glauber Costa>But we couldn't do all of those things at once. So for the MVP, we had to choose very, very strictly.
+
+140
+00:10:31.880 --> 00:10:36.900
+<v Glauber Costa>you know the biggest thing that we had in mind is like we can't just make this be yet another
+
+141
+00:10:36.900 --> 00:10:42.540
+<v Glauber Costa>database so if it's just a database that you access over some network protocol what is the
+
+142
+00:10:42.540 --> 00:10:46.220
+<v Glauber Costa>big difference between this and any postgres offering what is the big difference between
+
+143
+00:10:46.220 --> 00:10:51.260
+<v Glauber Costa>this and any mysql offering but at the same time i mean we couldn't really realize and we can't
+
+144
+00:10:51.260 --> 00:10:56.500
+<v Glauber Costa>still to this day realize this full vision of like hey this is the database that can run really
+
+145
+00:10:56.500 --> 00:11:01.600
+<v Glauber Costa>anywhere and and again there are technical avenues that you pursue that lead you to those very
+
+146
+00:11:01.880 --> 00:11:06.540
+<v Glauber Costa>paths? Are we going to build this really all over HTTP or are we going to really try to make this
+
+147
+00:11:06.540 --> 00:11:11.760
+<v Glauber Costa>something that is WebAssembly from the ground up and can run on the browser? So we had to spend
+
+148
+00:11:11.760 --> 00:11:16.320
+<v Glauber Costa>around the month. What are the advantages and disadvantages? And then we settle essentially on
+
+149
+00:11:16.320 --> 00:11:22.760
+<v Glauber Costa>let's just make something that doesn't go all the way inside the function. That is not really
+
+150
+00:11:22.760 --> 00:11:27.820
+<v Glauber Costa>something that you can push all the way inside your Netlify, inside your Vercel, inside your
+
+151
+00:11:27.820 --> 00:11:31.740
+<v Glauber Costa>cloudflare infrastructure to WebAssembly, but let's build something more traditional instead
+
+152
+00:11:31.740 --> 00:11:38.180
+<v Glauber Costa>that at the end of the day is just a database indeed that you can access over a network protocol,
+
+153
+00:11:38.400 --> 00:11:42.640
+<v Glauber Costa>but this protocol is going to be HTTP and we're going to massively replicate this through the
+
+154
+00:11:42.640 --> 00:11:46.220
+<v Glauber Costa>replication layer. So that was the biggest trade-off that we made in the beginning, right?
+
+155
+00:11:46.280 --> 00:11:51.860
+<v Glauber Costa>So at which point did we draw the line? And we could have drawn this line in many places and
+
+156
+00:11:51.860 --> 00:11:56.900
+<v Glauber Costa>finding the exact place for the MVP was a great challenge. It worked out fantastic. We're all at
+
+157
+00:11:57.820 --> 00:11:58.880
+<v Glauber Costa>looking for product market fit.
+
+158
+00:11:59.020 --> 00:12:00.500
+<v Glauber Costa>And it's very refreshing
+
+159
+00:12:00.500 --> 00:12:02.780
+<v Glauber Costa>when you start to see the users coming in
+
+160
+00:12:02.780 --> 00:12:03.960
+<v Glauber Costa>and telling you,
+
+161
+00:12:03.980 --> 00:12:05.880
+<v Glauber Costa>yeah, that's exactly how I want this built.
+
+162
+00:12:07.120 --> 00:12:10.120
+<v Noah Labhart>So you've got your MVP and it's working.
+
+163
+00:12:10.200 --> 00:12:11.400
+<v Noah Labhart>You've got some feedback.
+
+164
+00:12:11.540 --> 00:12:12.680
+<v Noah Labhart>You're moving forward.
+
+165
+00:12:12.800 --> 00:12:14.980
+<v Noah Labhart>How did you progress the product from there?
+
+166
+00:12:15.080 --> 00:12:15.900
+<v Noah Labhart>And how did you mature it?
+
+167
+00:12:15.980 --> 00:12:17.700
+<v Noah Labhart>And I think what I'm curious about there
+
+168
+00:12:17.700 --> 00:12:18.680
+<v Noah Labhart>is how you built your roadmap
+
+169
+00:12:18.680 --> 00:12:19.980
+<v Noah Labhart>and how you went about deciding,
+
+170
+00:12:20.260 --> 00:12:22.640
+<v Noah Labhart>okay, this is the next most important thing
+
+171
+00:12:22.640 --> 00:12:23.920
+<v Noah Labhart>to build with Turso.
+
+172
+00:12:25.160 --> 00:12:26.700
+<v Glauber Costa>The usual answer for that
+
+173
+00:12:27.980 --> 00:12:33.520
+<v Glauber Costa>users. And again, the reason I don't like that answer is not because it's not true. You obviously
+
+174
+00:12:33.520 --> 00:12:38.840
+<v Glauber Costa>have to ask your users. But if you ask something to 10 different people, you will get 11 different
+
+175
+00:12:38.840 --> 00:12:45.560
+<v Glauber Costa>answers, right? So it's a very complicated process of, yes, how do we go around? How do we go
+
+176
+00:12:45.560 --> 00:12:51.300
+<v Glauber Costa>getting that information? And now how do we make sense of that information? And obviously, one of
+
+177
+00:12:51.300 --> 00:12:58.000
+<v Glauber Costa>of the things that help a lot is trying to step out and look into this from broader view. One of
+
+178
+00:12:58.000 --> 00:13:02.780
+<v Glauber Costa>the things that we did for the MVP that I think was very helpful is that before we made the product
+
+179
+00:13:02.780 --> 00:13:09.680
+<v Glauber Costa>readily available, we had a time, we had a period of time that we called the private beta. So before
+
+180
+00:13:09.680 --> 00:13:16.500
+<v Glauber Costa>we announced this as publicly available, you had to give us your email to use the product and to
+
+181
+00:13:16.500 --> 00:13:19.020
+<v Glauber Costa>And to your email, we sent a form, right?
+
+182
+00:13:19.080 --> 00:13:22.580
+<v Glauber Costa>So it was not just give me your email and here's the instructions on how to use it.
+
+183
+00:13:22.840 --> 00:13:24.760
+<v Glauber Costa>We introduced actually a little friction.
+
+184
+00:13:25.020 --> 00:13:26.000
+<v Glauber Costa>Give me your email.
+
+185
+00:13:26.080 --> 00:13:28.440
+<v Glauber Costa>Now I'm going to send you that email with a form to fill.
+
+186
+00:13:28.520 --> 00:13:31.900
+<v Glauber Costa>And I'm going to judge if you are a person that I want you to give access to.
+
+187
+00:13:32.440 --> 00:13:35.580
+<v Glauber Costa>At the end of the day, I mean, we gave access to almost everybody who asked.
+
+188
+00:13:35.900 --> 00:13:38.080
+<v Glauber Costa>One of the things you want to be careful is just like people
+
+189
+00:13:38.500 --> 00:13:41.060
+<v Glauber Costa>frauding or, you know, not giving you real information.
+
+190
+00:13:41.560 --> 00:13:43.280
+<v Glauber Costa>But in that form, we had a question.
+
+191
+00:13:43.380 --> 00:13:44.740
+<v Glauber Costa>What do you want to use this for?
+
+192
+00:13:46.500 --> 00:13:52.160
+<v Glauber Costa>than 200 people who told us this was very exciting and told us why exactly they wanted to use it.
+
+193
+00:13:52.620 --> 00:13:57.940
+<v Glauber Costa>Not everybody, by the way, had the same use case, but once you have this host of data with 200
+
+194
+00:13:57.940 --> 00:14:03.620
+<v Glauber Costa>people, two to 300 people that are telling you this is what I want to do with that, now the use
+
+195
+00:14:03.620 --> 00:14:08.760
+<v Glauber Costa>case becomes very clear and now you can make those decisions. When you have other people asking you,
+
+196
+00:14:08.780 --> 00:14:13.360
+<v Glauber Costa>can I have this feature or can I have that feature? You now can ask yourself, is that feature
+
+197
+00:14:13.360 --> 00:14:19.600
+<v Glauber Costa>Feature is something that will help this specific persona that we now understand that is the persona that is using this product.
+
+198
+00:14:19.840 --> 00:14:20.820
+<v Glauber Costa>Maybe a couple of examples.
+
+199
+00:14:21.160 --> 00:14:21.920
+<v Glauber Costa>It's easy.
+
+200
+00:14:22.040 --> 00:14:26.940
+<v Glauber Costa>And there are some people who come and say, hey, can you add a feature, for example, to use this from the browser?
+
+201
+00:14:27.040 --> 00:14:30.620
+<v Glauber Costa>So directly from the browser, which is already something that we were thinking of.
+
+202
+00:14:30.980 --> 00:14:33.360
+<v Glauber Costa>Now you can think of that feature in that framework.
+
+203
+00:14:33.480 --> 00:14:36.260
+<v Glauber Costa>OK, but what is it the thing that my early users are doing of this?
+
+204
+00:14:36.360 --> 00:14:37.560
+<v Glauber Costa>Do they really have this need?
+
+205
+00:14:37.860 --> 00:14:41.500
+<v Glauber Costa>And if they don't, then it's a feature that you can safely defer.
+
+206
+00:14:43.360 --> 00:14:48.180
+<v Noah Labhart>to team. So how did you go about building your team? And what did you look for in those people
+
+207
+00:14:48.180 --> 00:14:50.700
+<v Noah Labhart>to indicate that they were the winning horses to join you?
+
+208
+00:14:51.420 --> 00:14:53.220
+<v Glauber Costa>Team building is one of the most
+
+209
+00:14:53.220 --> 00:14:59.600
+<v Glauber Costa>challenging things in any startup. I believe much harder than in big companies. And I think the
+
+210
+00:14:59.600 --> 00:15:04.960
+<v Glauber Costa>reason this is much harder than in big companies is that you just don't have that much to spare.
+
+211
+00:15:05.440 --> 00:15:10.100
+<v Glauber Costa>One of the things that we take into consideration a lot, and I'm not exactly proud of that,
+
+212
+00:15:10.100 --> 00:15:14.460
+<v Glauber Costa>I wish it was different, but we like to work together with people we have worked in the past.
+
+213
+00:15:14.680 --> 00:15:20.640
+<v Glauber Costa>And again, the reason for that is that we know them and we know already what they're good at, what they're bad at.
+
+214
+00:15:20.800 --> 00:15:23.680
+<v Glauber Costa>And this is not being like a technical recommendation.
+
+215
+00:15:23.860 --> 00:15:26.540
+<v Glauber Costa>Right. This is really just being a personality issue.
+
+216
+00:15:26.700 --> 00:15:32.960
+<v Glauber Costa>There are a lot of there are lots of people out there that they do fantastic technical work, but you put them in the wrong environment.
+
+217
+00:15:33.140 --> 00:15:36.780
+<v Glauber Costa>They just don't fit. Right. And startups are a very particular environment.
+
+218
+00:15:36.780 --> 00:15:42.380
+<v Glauber Costa>environment it's incredibly difficult to to to do and you have to have the the right mindset you
+
+219
+00:15:42.380 --> 00:15:47.120
+<v Glauber Costa>have to fit with the team if you don't fit with the team you're now 10 of the team because you
+
+220
+00:15:47.120 --> 00:15:52.120
+<v Glauber Costa>have like 10 people and you're just not performing because we come from this background both my
+
+221
+00:15:52.120 --> 00:15:57.800
+<v Glauber Costa>co-founder and i of developing databases doing heavy systems programming we have built over those
+
+222
+00:15:57.800 --> 00:16:03.900
+<v Glauber Costa>the past 20 years a very healthy network of people who do that kind of stuff and we know which of
+
+223
+00:16:03.900 --> 00:16:06.700
+<v Glauber Costa>of them are technically brilliant, but won't fit in their environment.
+
+224
+00:16:07.260 --> 00:16:10.100
+<v Glauber Costa>That's not to say that we didn't make mistakes along the way, which we did.
+
+225
+00:16:10.220 --> 00:16:13.600
+<v Glauber Costa>And then we had to, you know, essentially go the hard route and let them go.
+
+226
+00:16:14.020 --> 00:16:17.920
+<v Glauber Costa>But we, we try to work a lot with people that we know, obviously this wasn't
+
+227
+00:16:17.920 --> 00:16:21.240
+<v Glauber Costa>possible all the time because we were hiring for positions in which, you
+
+228
+00:16:21.240 --> 00:16:25.560
+<v Glauber Costa>know, as startup is a lot broader than just the team of four or five, but
+
+229
+00:16:25.560 --> 00:16:29.440
+<v Glauber Costa>then we try to see like, if those people have the same personality traits of
+
+230
+00:16:29.440 --> 00:16:32.800
+<v Glauber Costa>those people that we already know, and it's been working fine for now.
+
+231
+00:16:36.400 --> 00:16:38.060
+<v Noah Labhart>Let's talk about scalability.
+
+232
+00:16:38.180 --> 00:16:39.260
+<v Noah Labhart>This will be interesting,
+
+233
+00:16:39.360 --> 00:16:41.980
+<v Noah Labhart>given your edge and your data.
+
+234
+00:16:42.880 --> 00:16:44.720
+<v Noah Labhart>So this had to be a factor somewhere,
+
+235
+00:16:44.900 --> 00:16:46.660
+<v Noah Labhart>but I'm curious, I'm going to ask it openly.
+
+236
+00:16:47.100 --> 00:16:49.940
+<v Noah Labhart>Did you build this to scale efficiently from day one,
+
+237
+00:16:50.040 --> 00:16:51.020
+<v Noah Labhart>or have you been fighting this
+
+238
+00:16:51.020 --> 00:16:52.380
+<v Noah Labhart>as you grow in any sort of capacity?
+
+239
+00:16:55.000 --> 00:16:57.040
+<v Glauber Costa>Scaling has so many dimensions.
+
+240
+00:16:58.200 --> 00:17:00.280
+<v Glauber Costa>This is one of the things that I don't think as engineers
+
+241
+00:17:00.280 --> 00:17:02.340
+<v Glauber Costa>we sometimes stop to think about.
+
+242
+00:17:04.120 --> 00:17:09.660
+<v Glauber Costa>scaling as if it really means like, hey, just scaling in general, but it's not like that,
+
+243
+00:17:09.720 --> 00:17:13.600
+<v Glauber Costa>right? So there are many things that can scale. There are many dimensions that can scale.
+
+244
+00:17:13.700 --> 00:17:18.520
+<v Glauber Costa>And the reality is like that in some of those dimensions, we are built to scale from day one.
+
+245
+00:17:18.600 --> 00:17:25.860
+<v Glauber Costa>And in some of those, we're not. From day one, we are built so to scale the number of locations
+
+246
+00:17:25.860 --> 00:17:33.080
+<v Glauber Costa>that we provide horizontally. So you can just add through Turso more locations and you can
+
+247
+00:17:33.900 --> 00:17:39.140
+<v Glauber Costa>more read capacity to the system very easily so i mean this is built from day one this is also part
+
+248
+00:17:39.140 --> 00:17:43.800
+<v Glauber Costa>of the value proposition but there are a couple of things that they're not like that and it's really
+
+249
+00:17:43.800 --> 00:17:49.520
+<v Glauber Costa>just because if you do that exercise of scaling everything from day one it's going to take you
+
+250
+00:17:49.520 --> 00:17:53.560
+<v Glauber Costa>two years to get anything out of the ground so i think you really need to make this exercise of
+
+251
+00:17:53.560 --> 00:17:57.800
+<v Glauber Costa>saying what are the parts of this product that really need to scale what are the parts of this
+
+252
+00:17:57.800 --> 00:18:03.760
+<v Glauber Costa>product that I really expect if people start coming tomorrow, we'll expect people to put
+
+253
+00:18:03.760 --> 00:18:09.760
+<v Glauber Costa>stress on that system. And what are the parts of the system that don't? There were some things that
+
+254
+00:18:09.760 --> 00:18:14.500
+<v Glauber Costa>we were not expecting people to pile up on and they kind of did. But the reality is that you
+
+255
+00:18:14.500 --> 00:18:18.860
+<v Glauber Costa>have to be very mindful in the beginning. If you don't build anything for scale, I think you're
+
+256
+00:18:18.860 --> 00:18:22.700
+<v Glauber Costa>setting yourself up for failure because your system just will not be robust. But if you build
+
+257
+00:18:22.700 --> 00:18:26.620
+<v Glauber Costa>everything for scaling, it just takes too long. You can't put a product out in the market.
+
+258
+00:18:27.800 --> 00:18:32.020
+<v Glauber Costa>an exercise of like, okay, scaling, but in which dimensions? What are the things that I want
+
+259
+00:18:32.020 --> 00:18:34.720
+<v Glauber Costa>scaling? What are the things that I'm comfortable if they don't?
+
+260
+00:18:36.100 --> 00:18:38.880
+<v Noah Labhart>So as you step out on the balcony
+
+261
+00:18:38.880 --> 00:18:42.000
+<v Noah Labhart>and you look across all that you've built, what are you most proud of?
+
+262
+00:18:43.800 --> 00:18:45.200
+<v Glauber Costa>I think the thing I am
+
+263
+00:18:45.200 --> 00:18:51.260
+<v Glauber Costa>proud of the most is how simple the product ended up being. I'm a very big fan of simplicity.
+
+264
+00:18:51.640 --> 00:18:56.240
+<v Glauber Costa>And I love that phrase. You've probably heard of it because of the internet is attributed to like
+
+265
+00:18:57.800 --> 00:18:58.960
+<v Glauber Costa>of different people, right?
+
+266
+00:18:59.020 --> 00:19:00.260
+<v Glauber Costa>There's always like this problem
+
+267
+00:19:00.260 --> 00:19:01.320
+<v Glauber Costa>of internet attribution
+
+268
+00:19:01.320 --> 00:19:04.000
+<v Glauber Costa>that is very easy to come up
+
+269
+00:19:04.000 --> 00:19:04.880
+<v Glauber Costa>with something complicated.
+
+270
+00:19:04.900 --> 00:19:06.860
+<v Glauber Costa>It takes genius to build something simple.
+
+271
+00:19:07.580 --> 00:19:10.760
+<v Glauber Costa>And we, one of the things that help us,
+
+272
+00:19:10.800 --> 00:19:13.020
+<v Glauber Costa>I think was this understanding that,
+
+273
+00:19:13.080 --> 00:19:14.860
+<v Glauber Costa>hey, we're building something for the edge.
+
+274
+00:19:15.020 --> 00:19:17.920
+<v Glauber Costa>So we decided to build as a building block,
+
+275
+00:19:18.160 --> 00:19:19.660
+<v Glauber Costa>a very simple database.
+
+276
+00:19:19.840 --> 00:19:21.360
+<v Glauber Costa>So that helped us a lot
+
+277
+00:19:21.360 --> 00:19:22.720
+<v Glauber Costa>to resist this temptation
+
+278
+00:19:22.720 --> 00:19:25.560
+<v Glauber Costa>of like just making this more complicated
+
+279
+00:19:25.560 --> 00:19:26.880
+<v Glauber Costa>because the default answer
+
+280
+00:19:27.800 --> 00:19:30.960
+<v Glauber Costa>or almost all the problems that you see in engineering is that let's just
+
+281
+00:19:30.960 --> 00:19:32.440
+<v Glauber Costa>build this one more feature, right?
+
+282
+00:19:32.580 --> 00:19:35.720
+<v Glauber Costa>Let's build this just one more capability, this one more layer.
+
+283
+00:19:36.020 --> 00:19:38.900
+<v Glauber Costa>And then you don't even recognize the thing you built anymore.
+
+284
+00:19:39.000 --> 00:19:40.500
+<v Glauber Costa>It's so complex that it has become.
+
+285
+00:19:41.560 --> 00:19:45.760
+<v Glauber Costa>And I'm very proud of the fact that we've managed to keep our offering very
+
+286
+00:19:45.760 --> 00:19:49.120
+<v Glauber Costa>simple and yet solving a very real problem that people keep acknowledging
+
+287
+00:19:49.120 --> 00:19:53.720
+<v Glauber Costa>that they have and just not to come to the temptation of just becoming a
+
+288
+00:19:53.720 --> 00:19:54.520
+<v Glauber Costa>complex database.
+
+289
+00:19:55.140 --> 00:19:57.320
+<v Glauber Costa>And at this point, why not Postgres, right?
+
+290
+00:19:57.800 --> 00:19:59.100
+<v Glauber Costa>So that I'm very proud of.
+
+291
+00:19:59.200 --> 00:20:05.600
+<v Glauber Costa>And I think we were helped by the fact that the technology choices that we made had simple spelled on them all over.
+
+292
+00:20:07.740 --> 00:20:09.480
+<v Noah Labhart>Let's flip the script a little bit.
+
+293
+00:20:09.700 --> 00:20:13.400
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+294
+00:20:14.240 --> 00:20:20.480
+<v Glauber Costa>Have you seen that Homer Simpson, that meme that he's talking to Bart Simpson and say, hey, this is the worst day of my life.
+
+295
+00:20:20.540 --> 00:20:22.060
+<v Glauber Costa>It's the worst day of your life so far.
+
+296
+00:20:23.720 --> 00:20:24.740
+<v Glauber Costa>Always a good reminder.
+
+297
+00:20:24.760 --> 00:20:25.460
+<v Glauber Costa>I love that meme.
+
+298
+00:20:25.460 --> 00:20:28.560
+<v Glauber Costa>but we haven't made lots of mistakes so far.
+
+299
+00:20:29.480 --> 00:20:31.180
+<v Glauber Costa>I think, as I mentioned before,
+
+300
+00:20:31.360 --> 00:20:33.020
+<v Glauber Costa>I mean, Turso is the result, essentially,
+
+301
+00:20:33.060 --> 00:20:34.680
+<v Glauber Costa>of a reorientation of this company.
+
+302
+00:20:35.160 --> 00:20:36.300
+<v Glauber Costa>In the previous iteration,
+
+303
+00:20:36.580 --> 00:20:37.820
+<v Glauber Costa>I think we did make a bunch of mistakes.
+
+304
+00:20:38.000 --> 00:20:40.260
+<v Glauber Costa>And I think one of the big mistakes that we made
+
+305
+00:20:40.260 --> 00:20:44.280
+<v Glauber Costa>was exactly not to jump in this direction sooner.
+
+306
+00:20:44.800 --> 00:20:47.900
+<v Glauber Costa>And again, Turso is a product of its own.
+
+307
+00:20:47.980 --> 00:20:50.800
+<v Glauber Costa>It's not just something surgically removed
+
+308
+00:20:50.800 --> 00:20:51.880
+<v Glauber Costa>from the previous product,
+
+309
+00:20:51.960 --> 00:20:55.340
+<v Glauber Costa>but it was an aspect of the previous product
+
+310
+00:20:55.460 --> 00:20:57.000
+<v Glauber Costa>that we decided to build a new product upon.
+
+311
+00:20:57.500 --> 00:20:59.160
+<v Glauber Costa>And we were hearing for months
+
+312
+00:20:59.160 --> 00:21:00.580
+<v Glauber Costa>that this was the thing
+
+313
+00:21:00.580 --> 00:21:02.320
+<v Glauber Costa>that people were interested the most at,
+
+314
+00:21:02.500 --> 00:21:04.580
+<v Glauber Costa>but we just thought it was something there.
+
+315
+00:21:04.660 --> 00:21:06.260
+<v Glauber Costa>I mean, no, let's invest a little bit more.
+
+316
+00:21:06.500 --> 00:21:07.460
+<v Glauber Costa>So in hindsight,
+
+317
+00:21:07.660 --> 00:21:10.480
+<v Glauber Costa>I wish we had a better internal process
+
+318
+00:21:10.480 --> 00:21:12.520
+<v Glauber Costa>or like this human process
+
+319
+00:21:12.520 --> 00:21:14.820
+<v Glauber Costa>and even the courage to some extent, right?
+
+320
+00:21:14.880 --> 00:21:15.740
+<v Glauber Costa>You look at this and say,
+
+321
+00:21:15.820 --> 00:21:17.620
+<v Glauber Costa>hey, what we're hearing very clearly
+
+322
+00:21:17.620 --> 00:21:19.860
+<v Glauber Costa>is that this part of our offering
+
+323
+00:21:19.860 --> 00:21:21.780
+<v Glauber Costa>is the part that people like the most.
+
+324
+00:21:21.920 --> 00:21:23.900
+<v Glauber Costa>The fact they deployed this to the edge
+
+325
+00:21:23.900 --> 00:21:25.100
+<v Glauber Costa>is what people are excited about,
+
+326
+00:21:25.460 --> 00:21:29.540
+<v Glauber Costa>the API, not this, not that, right? Not all of the other things we were thinking about.
+
+327
+00:21:29.920 --> 00:21:36.460
+<v Glauber Costa>So I just wish we had quality courage or foresight or whatnot to understand that this would, you
+
+328
+00:21:36.460 --> 00:21:41.600
+<v Glauber Costa>know, let's sunset the other project and just build a new thing, completely rethought just to
+
+329
+00:21:41.600 --> 00:21:46.380
+<v Glauber Costa>solve this edge problem from the get-go. Definitely in hindsight, there was a mistake. We should have
+
+330
+00:21:46.380 --> 00:21:53.400
+<v Glauber Costa>done it a lot sooner. So that I think is the biggest so far, so far mistake that we've made.
+
+331
+00:21:56.200 --> 00:21:57.520
+<v Noah Labhart>Okay, this will be fun.
+
+332
+00:21:58.020 --> 00:22:02.820
+<v Noah Labhart>What does the future look like for Turso, the product, and for your team?
+
+333
+00:22:04.320 --> 00:22:11.120
+<v Glauber Costa>The more we talk about Turso, the more we hear this validation that putting your data at the edge really is a problem that people want solved.
+
+334
+00:22:11.340 --> 00:22:15.840
+<v Glauber Costa>So I definitely look forward for this becoming more mainstream.
+
+335
+00:22:16.140 --> 00:22:22.800
+<v Glauber Costa>As I said, I don't believe the edge is a niche in terms of something that only a few people need to do.
+
+336
+00:22:22.800 --> 00:22:28.140
+<v Glauber Costa>but it's definitely a growing technology in the sense that it's something that only a handful of people are doing.
+
+337
+00:22:29.020 --> 00:22:35.400
+<v Glauber Costa>I also look a lot to the rise of WebAssembly as something that will also enable lots of interesting use cases around it.
+
+338
+00:22:35.500 --> 00:22:37.100
+<v Glauber Costa>I'm very eager to see that happening.
+
+339
+00:22:37.500 --> 00:22:42.080
+<v Glauber Costa>And another thing that I look forward to in the future is that people keep talking.
+
+340
+00:22:42.220 --> 00:22:45.940
+<v Glauber Costa>If you remember, I mean, look back a couple of months in the beginning of the year when the,
+
+341
+00:22:46.000 --> 00:22:48.980
+<v Glauber Costa>can we already say the AI revolution or too early?
+
+342
+00:22:49.260 --> 00:22:51.620
+<v Glauber Costa>But when the AI revolution started, right?
+
+343
+00:22:52.800 --> 00:22:53.860
+<v Glauber Costa>hey, this is the end of the world.
+
+344
+00:22:54.020 --> 00:22:57.020
+<v Glauber Costa>Or other people like, I don't need my job anymore.
+
+345
+00:22:57.420 --> 00:22:59.060
+<v Glauber Costa>And I think as those things progresses,
+
+346
+00:22:59.320 --> 00:23:03.100
+<v Glauber Costa>we're starting to understand that this is just a technology like any other, right?
+
+347
+00:23:03.180 --> 00:23:04.320
+<v Glauber Costa>With its pros and cons.
+
+348
+00:23:05.500 --> 00:23:08.700
+<v Glauber Costa>I see very similar dynamics of,
+
+349
+00:23:08.840 --> 00:23:12.360
+<v Glauber Costa>hey, I have this big corporation offering you this proprietary model
+
+350
+00:23:12.360 --> 00:23:15.380
+<v Glauber Costa>versus a lot of open source stuff happening.
+
+351
+00:23:15.440 --> 00:23:20.160
+<v Glauber Costa>Things like LangChain, things like Llama and like llama.cpp, right?
+
+352
+00:23:20.180 --> 00:23:22.520
+<v Glauber Costa>Just people re-implementing those things in C++.
+
+353
+00:23:22.800 --> 00:23:26.860
+<v Glauber Costa>very similar dynamics that we've seen before, like with the rise of open source.
+
+354
+00:23:26.980 --> 00:23:30.480
+<v Glauber Costa>And when I look at like how open source became table stakes for our industry,
+
+355
+00:23:30.640 --> 00:23:35.400
+<v Glauber Costa>I don't think people are just dropping this and say, hey, this doesn't matter anymore because AI.
+
+356
+00:23:35.680 --> 00:23:40.680
+<v Glauber Costa>So I do expect one of the theories that I have is that we will see a lot more open source adoption
+
+357
+00:23:40.680 --> 00:23:45.600
+<v Glauber Costa>of those open source AI models. And I'm hoping like in the future that we can position to our
+
+358
+00:23:45.600 --> 00:23:51.360
+<v Glauber Costa>to be a great database to host use cases related to that, not to the full stack of AI applications,
+
+359
+00:23:52.800 --> 00:23:54.080
+<v Glauber Costa>that can go to the edge, right?
+
+360
+00:23:54.140 --> 00:23:55.420
+<v Glauber Costa>I'm not ready to just say,
+
+361
+00:23:55.540 --> 00:23:56.440
+<v Glauber Costa>hey, like whatever.
+
+362
+00:23:56.640 --> 00:23:58.180
+<v Glauber Costa>I think we found with Turso
+
+363
+00:23:58.180 --> 00:23:59.180
+<v Glauber Costa>was something very valuable,
+
+364
+00:23:59.320 --> 00:24:00.320
+<v Glauber Costa>which is this edge story.
+
+365
+00:24:00.480 --> 00:24:02.060
+<v Glauber Costa>So I'm not reorienting the company
+
+366
+00:24:02.060 --> 00:24:03.520
+<v Glauber Costa>towards like a general purpose database,
+
+367
+00:24:03.680 --> 00:24:07.540
+<v Glauber Costa>but there is a part of this AI application landscape
+
+368
+00:24:07.540 --> 00:24:08.840
+<v Glauber Costa>that really, I believe,
+
+369
+00:24:08.920 --> 00:24:10.100
+<v Glauber Costa>we want to be at the edge.
+
+370
+00:24:10.280 --> 00:24:12.940
+<v Glauber Costa>And I'm really excited to be the best database
+
+371
+00:24:12.940 --> 00:24:14.180
+<v Glauber Costa>for people to do that.
+
+372
+00:24:15.380 --> 00:24:16.680
+<v Noah Labhart>Let's switch to you, Glauber.
+
+373
+00:24:16.780 --> 00:24:18.580
+<v Noah Labhart>Who influences the way that you work?
+
+374
+00:24:18.740 --> 00:24:20.820
+<v Noah Labhart>Name a person or many persons or something
+
+375
+00:24:20.820 --> 00:24:22.220
+<v Noah Labhart>you look up to and why.
+
+376
+00:24:23.040 --> 00:24:27.740
+<v Glauber Costa>I don't have anybody in technology and business I think that I look forward to.
+
+377
+00:24:27.920 --> 00:24:31.100
+<v Glauber Costa>And I think the reason for that is that I've met most of them.
+
+378
+00:24:31.340 --> 00:24:33.500
+<v Glauber Costa>Have you heard that phrase like never meet your heroes?
+
+379
+00:24:33.720 --> 00:24:40.280
+<v Glauber Costa>I think I'm a lot more influenced by dead people because they were likely as horrible, but we just don't know.
+
+380
+00:24:40.560 --> 00:24:45.440
+<v Glauber Costa>So one person that I think influences me a lot was Emperor Marcus Aurelius.
+
+381
+00:24:45.600 --> 00:24:50.360
+<v Glauber Costa>So the Stoics in general are people that I have a lot of respect for.
+
+382
+00:24:50.360 --> 00:25:01.140
+<v Glauber Costa>And I try to, I mostly fail, but I try to bring a lot of those principles to my life and to my work on like how to just look at the world and understand that, you know what, we're all aft anyway.
+
+383
+00:25:01.840 --> 00:25:05.780
+<v Glauber Costa>So just raise your head, make the best of it and go forward.
+
+384
+00:25:05.920 --> 00:25:09.800
+<v Glauber Costa>And I bet that he's done a lot of horrible things, but we don't know about it.
+
+385
+00:25:09.800 --> 00:25:10.340
+<v Glauber Costa>He's not around.
+
+386
+00:25:10.940 --> 00:25:12.060
+<v Glauber Costa>So you never get disappointed.
+
+387
+00:25:12.560 --> 00:25:16.080
+<v Glauber Costa>So looking out for dead people is always a good thing to do.
+
+388
+00:25:16.140 --> 00:25:16.640
+<v Glauber Costa>Yes.
+
+389
+00:25:17.660 --> 00:25:18.160
+<v Noah Labhart>Okay.
+
+390
+00:25:18.040 --> 00:25:19.280
+<v Noah Labhart>Well, Glauber, last question.
+
+391
+00:25:20.360 --> 00:25:24.660
+<v Noah Labhart>getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing
+
+392
+00:25:24.660 --> 00:25:27.740
+<v Noah Labhart>they're jazzed about it they can't wait to show it off to the world and can't wait to show it off
+
+393
+00:25:27.740 --> 00:25:32.420
+<v Noah Labhart>to you right there on the plane what advice do you give that person having gone down this road a bit
+
+394
+00:25:34.000 --> 00:25:40.780
+<v Glauber Costa>just build it and ship it this is the usual like startup advice but i think that again we haven't
+
+395
+00:25:40.780 --> 00:25:45.520
+<v Glauber Costa>done it that great that well in the beginning of this company like before we reoriented the
+
+396
+00:25:45.520 --> 00:25:50.440
+<v Glauber Costa>the company to Turso. So we try to take this into a lot more account now. And again, the reason for
+
+397
+00:25:50.440 --> 00:25:54.220
+<v Glauber Costa>that is that I think it's really hard at the end of the day to like build something and not fall
+
+398
+00:25:54.220 --> 00:25:59.380
+<v Glauber Costa>in love with that and just keep pushing. But I think the advice that I would give this person
+
+399
+00:25:59.380 --> 00:26:05.620
+<v Glauber Costa>is just build your stuff, put it out there, see what comes out and be ready to always change
+
+400
+00:26:05.620 --> 00:26:10.680
+<v Glauber Costa>directions. Like be very flexible, resist the temptation, understand, look around you, understand
+
+401
+00:26:10.680 --> 00:26:18.120
+<v Glauber Costa>understand how the world and how yourself will pile this pressure every now and then you see
+
+402
+00:26:18.120 --> 00:26:23.280
+<v Glauber Costa>stories like figma that this guy was just building this product not really getting all that traction
+
+403
+00:26:23.280 --> 00:26:28.480
+<v Glauber Costa>for four years building the engine of this or that or that you hear those amazing stories about this
+
+404
+00:26:28.480 --> 00:26:34.100
+<v Glauber Costa>person with a vision that just kept doing it so you always think that that's the same thing that's
+
+405
+00:26:34.100 --> 00:26:39.280
+<v Glauber Costa>going to happen to me it's very unlikely though so the advice that i would give to the young
+
+406
+00:26:40.680 --> 00:26:46.260
+<v Glauber Costa>the statistics. And unless you really have this vision, have the money, the funds and the
+
+407
+00:26:46.260 --> 00:26:51.000
+<v Glauber Costa>infrastructure, because I think Figma also wouldn't have survived in today's interest rates.
+
+408
+00:26:51.220 --> 00:26:56.000
+<v Glauber Costa>Unless you're the right person at the right time, at the right situation, you're just like everyone
+
+409
+00:26:56.000 --> 00:27:01.960
+<v Glauber Costa>else. So if the situation calls for it, just be ready to look around and understand that maybe
+
+410
+00:27:01.960 --> 00:27:06.740
+<v Glauber Costa>let's do something else and be very receptive to what the market is telling you.
+
+411
+00:27:06.740 --> 00:27:07.240
+<v Glauber Costa>That's
+
+412
+00:27:07.200 --> 00:27:12.960
+<v Noah Labhart>great advice. Well, Glauber, thank you for being on the show today. And thank you for telling the creation story of Turso.
+
+413
+00:27:13.280 --> 00:27:15.760
+<v Glauber Costa>It's my pleasure. Thank you very much for having me.
+
+414
+00:27:18.400 --> 00:27:21.280
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+415
+00:27:23.860 --> 00:27:31.840
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify or the podcasting app of your choice.
+
+416
+00:27:31.840 --> 00:27:36.860
+<v Noah Labhart>and when you get a chance leave us a review both things help us out tremendously
+
+417
+00:27:39.380 --> 00:27:41.300
+<v Noah Labhart>and thanks again for listening

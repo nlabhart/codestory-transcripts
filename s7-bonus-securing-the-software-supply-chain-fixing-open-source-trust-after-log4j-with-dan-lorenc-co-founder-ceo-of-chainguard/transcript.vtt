@@ -1,0 +1,991 @@
+WEBVTT
+
+NOTE S7 Bonus: Securing the Software Supply Chain: Fixing Open-Source Trust After Log4j with Dan Lorenc, Co-Founder & CEO of Chainguard
+
+1
+00:00:00.600 --> 00:00:08.820
+<v Dan Lorenc>When I say software supply chain, I mean the actual supply chain for software itself, like your code, your dependencies, the build process, the build system, all of that stuff.
+
+2
+00:00:09.220 --> 00:00:17.420
+<v Dan Lorenc>So I got into this space probably about four or five years ago now, when I was working at Google. I was at Google for about nine years before starting Chainguard.
+
+3
+00:00:17.560 --> 00:00:26.160
+<v Dan Lorenc>The first project I did in open source, kind of outside of Google's internal world, was called Minikube. It's the official way to get a Kubernetes cluster running on your laptop.
+
+4
+00:00:26.160 --> 00:00:28.800
+<v Dan Lorenc>And it came time to actually do a release of this thing.
+
+5
+00:00:28.900 --> 00:00:37.420
+<v Dan Lorenc>There was no kind of good, sanctioned, secure way to do a build of this program that the entire community was basically downloading and running as root on their laptops.
+
+6
+00:00:38.560 --> 00:00:42.220
+<v Dan Lorenc>My name is Dan Lorenc, and I'm a co-founder and CEO at Chainguard.
+
+7
+00:00:47.660 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+8
+00:00:52.920 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+9
+00:00:57.100 --> 00:01:00.800
+<v Noah Labhart>and build and lead a team that has your back.
+
+10
+00:01:02.260 --> 00:01:04.020
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+11
+00:01:04.100 --> 00:01:08.840
+<v Noah Labhart>and today how Dan Lorenc created a solution for your software supply chain
+
+12
+00:01:08.840 --> 00:01:11.720
+<v Noah Labhart>to make it secure by default.
+
+13
+00:01:13.300 --> 00:01:15.840
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:21.100 --> 00:01:24.140
+<v Noah Labhart>Dan Lorenc got into tech in a roundabout way.
+
+15
+00:01:24.420 --> 00:01:28.160
+<v Noah Labhart>Most of his time in school was dedicated to the study of mechanical engineering,
+
+16
+00:01:28.420 --> 00:01:31.960
+<v Noah Labhart>building in the world of atoms and machine shops and with 3D printers.
+
+17
+00:01:32.440 --> 00:01:35.320
+<v Noah Labhart>He learned how to program through MATLAB and he got hooked.
+
+18
+00:01:35.580 --> 00:01:38.700
+<v Noah Labhart>He lives in Austin, enjoys taking in the live music scene,
+
+19
+00:01:38.840 --> 00:01:43.440
+<v Noah Labhart>and likes to get outdoors when it's not 108 degrees like it was when we did this recording.
+
+20
+00:01:44.700 --> 00:01:50.400
+<v Noah Labhart>While Dan was at Google, the well-known SolarWinds attack happened, illustrating the gaps and
+
+21
+00:01:50.400 --> 00:01:52.500
+<v Noah Labhart>holes in the software supply chain space.
+
+22
+00:01:53.080 --> 00:01:58.340
+<v Noah Labhart>Given he had experience in this area, paired with the Biden administration's executive
+
+23
+00:01:58.340 --> 00:02:03.980
+<v Noah Labhart>order to secure this space, this led Dan and his co-founders to give their startup a try.
+
+24
+00:02:05.920 --> 00:02:08.700
+<v Noah Labhart>This is the creation story of Chainguard.
+
+25
+00:02:11.400 --> 00:02:16.980
+<v Dan Lorenc>Chainguard is a pretty new startup. We founded back in October of last year, so eight, nine months
+
+26
+00:02:16.980 --> 00:02:21.440
+<v Dan Lorenc>ago or something like that. Our kind of goal and overall mission is to help make the software
+
+27
+00:02:21.440 --> 00:02:26.560
+<v Dan Lorenc>supply chain secure by default. When I say software supply chain, I mean the actual supply
+
+28
+00:02:26.560 --> 00:02:31.300
+<v Dan Lorenc>chain for software itself, like your code, your dependencies, the build process, the build system,
+
+29
+00:02:31.380 --> 00:02:36.180
+<v Dan Lorenc>all of that stuff. We don't do software for physical supply chains. That turns out to also
+
+30
+00:02:36.180 --> 00:02:39.780
+<v Dan Lorenc>be a giant mess right now. We get a lot of confusion about that. So I got into
+
+31
+00:02:39.780 --> 00:02:43.980
+<v Dan Lorenc>this space probably about four or five years ago now when I was working at
+
+32
+00:02:43.980 --> 00:02:47.120
+<v Dan Lorenc>Google. I was at Google for about nine years before starting Chainguard.
+
+33
+00:02:47.400 --> 00:02:50.100
+<v Dan Lorenc>While I was at Google I had to work on a bunch of different parts of the cloud
+
+34
+00:02:50.100 --> 00:02:54.460
+<v Dan Lorenc>platform there, mostly in the developer tool space. When containers and
+
+35
+00:02:54.460 --> 00:02:57.760
+<v Dan Lorenc>Kubernetes and Docker all started to take off I got pretty lucky and had an
+
+36
+00:02:57.760 --> 00:03:00.900
+<v Dan Lorenc>opportunity to start working on a bunch of the open source code there. The first
+
+37
+00:03:00.900 --> 00:03:04.420
+<v Dan Lorenc>project I did in open source kind of outside of Google's internal world is
+
+38
+00:03:06.340 --> 00:03:10.780
+<v Dan Lorenc>Minikube. Minikube is the official way to get a Kubernetes cluster running on your laptop.
+
+39
+00:03:11.760 --> 00:03:15.920
+<v Dan Lorenc>When it came time to actually do a release of this thing, there was no good,
+
+40
+00:03:17.140 --> 00:03:21.740
+<v Dan Lorenc>secure way to do a build of this program that the entire community was basically downloading and running
+
+41
+00:03:21.740 --> 00:03:26.920
+<v Dan Lorenc>as root on their laptops. People were just grabbing this 80 meg binary off of GitHub and installing it.
+
+42
+00:03:27.020 --> 00:03:31.700
+<v Dan Lorenc>Just kind of went down this rabbit hole of installing Jenkins on Mac Minis under my desk
+
+43
+00:03:31.700 --> 00:03:34.660
+<v Dan Lorenc>that the security team probably wasn't too happy about,
+
+44
+00:03:34.740 --> 00:03:35.920
+<v Dan Lorenc>but there was nothing else I could do.
+
+45
+00:03:36.240 --> 00:03:37.220
+<v Dan Lorenc>It was kind of boring.
+
+46
+00:03:37.300 --> 00:03:39.460
+<v Dan Lorenc>Nobody really cared or prioritized it for a while.
+
+47
+00:03:39.620 --> 00:03:40.940
+<v Dan Lorenc>It just felt like we were bothering everybody
+
+48
+00:03:40.940 --> 00:03:41.900
+<v Dan Lorenc>and making their lives harder.
+
+49
+00:03:42.560 --> 00:03:44.940
+<v Dan Lorenc>A bunch of kind of open source supply chain attacks
+
+50
+00:03:44.940 --> 00:03:47.480
+<v Dan Lorenc>started to rise over the last couple of years.
+
+51
+00:03:47.760 --> 00:03:50.700
+<v Dan Lorenc>Different package managers like NPM, PyPI,
+
+52
+00:03:50.720 --> 00:03:52.760
+<v Dan Lorenc>people accounts getting taken over,
+
+53
+00:03:52.860 --> 00:03:54.660
+<v Dan Lorenc>maintainers deleting code, that kind of thing.
+
+54
+00:03:55.120 --> 00:03:56.640
+<v Dan Lorenc>We've also seen it affect enterprises,
+
+55
+00:03:56.700 --> 00:03:58.020
+<v Dan Lorenc>and that's kind of where the company came from.
+
+56
+00:03:58.480 --> 00:04:00.420
+<v Dan Lorenc>At the very end of 2020,
+
+57
+00:04:01.700 --> 00:04:05.000
+<v Dan Lorenc>the most famous breach in the space, was SolarWinds.
+
+58
+00:04:05.640 --> 00:04:07.720
+<v Dan Lorenc>Essentially, one of their build systems got compromised,
+
+59
+00:04:07.780 --> 00:04:12.740
+<v Dan Lorenc>and an attacker used that to insert malware into their product that they were building and shipping.
+
+60
+00:04:13.160 --> 00:04:17.940
+<v Dan Lorenc>This is a security product, so it's running in a bunch of sensitive environments, including the U.S. government.
+
+61
+00:04:18.300 --> 00:04:21.040
+<v Dan Lorenc>That was kind of malware stealing and exfiltrating data,
+
+62
+00:04:21.320 --> 00:04:26.820
+<v Dan Lorenc>which led to a whole bunch of new regulations and an executive order from the Biden administration
+
+63
+00:04:26.820 --> 00:04:29.500
+<v Dan Lorenc>to help secure this part of the ecosystem.
+
+64
+00:04:29.500 --> 00:04:34.760
+<v Dan Lorenc>system. So the space kind of picked up overnight and it seemed like a pretty good time to try a
+
+65
+00:04:34.760 --> 00:04:35.260
+<v Dan Lorenc>startup.
+
+66
+00:04:37.040 --> 00:04:42.040
+<v Noah Labhart>So tell me about the MVP. Maybe this is the Mac minis under your desk or, you know,
+
+67
+00:04:42.040 --> 00:04:45.820
+<v Noah Labhart>wherever you want to take it, but tell me about the MVP. How long did it take to build and what
+
+68
+00:04:45.820 --> 00:04:47.700
+<v Noah Labhart>sort of tools did you use to bring it to life?
+
+69
+00:04:48.760 --> 00:04:50.680
+<v Dan Lorenc>A bunch of our product and strategy is actually
+
+70
+00:04:50.680 --> 00:04:54.300
+<v Dan Lorenc>around open source because that's kind of in everyone's supply chain and it's kind of where
+
+71
+00:04:54.300 --> 00:04:59.360
+<v Dan Lorenc>everything starts. No build is created in a vacuum. 99.9% of organizations in some
+
+72
+00:04:59.500 --> 00:05:03.980
+<v Dan Lorenc>survey were using open source and kind of that 0.01% left, I think probably misunderstood the
+
+73
+00:05:03.980 --> 00:05:08.780
+<v Dan Lorenc>question or something. And so we actually had a lot of our MVP and a lot of our ecosystem and
+
+74
+00:05:08.780 --> 00:05:12.040
+<v Dan Lorenc>kind of a whole community before we started the company, just from a whole bunch of different
+
+75
+00:05:12.040 --> 00:05:15.680
+<v Dan Lorenc>open source projects. So it was pretty clear which direction we were going to go and open
+
+76
+00:05:15.680 --> 00:05:20.460
+<v Dan Lorenc>source stuff already had adoption. And so it was pretty easy to start experimenting and playing
+
+77
+00:05:20.460 --> 00:05:23.540
+<v Dan Lorenc>with some kind of products around that. If we weren't starting from scratch, that would have
+
+78
+00:05:23.540 --> 00:05:24.040
+<v Dan Lorenc>been much harder.
+
+79
+00:05:25.440 --> 00:05:29.620
+<v Noah Labhart>Okay, so then, even with, you know, the open source world and having some things
+
+80
+00:05:29.620 --> 00:05:35.020
+<v Noah Labhart>to start with, you probably, and I would even say, I could guarantee you did have to make some
+
+81
+00:05:35.020 --> 00:05:39.200
+<v Noah Labhart>decisions and trade offs, right about what were you going to make in the short term, what sort of
+
+82
+00:05:39.200 --> 00:05:43.000
+<v Noah Labhart>debt you were going to take on. So tell me about those decisions and how you coped with them.
+
+83
+00:05:44.120 --> 00:05:49.260
+<v Dan Lorenc>I mean, we tried to do kind of the basic startup approach as close to the book as you can, right,
+
+84
+00:05:49.300 --> 00:05:52.680
+<v Dan Lorenc>get some early customers, get some early design partners, people that want to work with you want
+
+85
+00:05:53.640 --> 00:05:57.740
+<v Dan Lorenc>And that was working pretty well, but kind of the problem we ran into is that this is
+
+86
+00:05:57.740 --> 00:06:02.440
+<v Dan Lorenc>a really new space and everybody knows that this is a big area of risk from a security
+
+87
+00:06:02.440 --> 00:06:04.640
+<v Dan Lorenc>perspective, but nobody really knows the answers yet.
+
+88
+00:06:04.780 --> 00:06:09.080
+<v Dan Lorenc>And there's no kind of one size fits all answer for every organization or every phase in the
+
+89
+00:06:09.080 --> 00:06:09.640
+<v Dan Lorenc>development lifecycle.
+
+90
+00:06:09.980 --> 00:06:12.000
+<v Dan Lorenc>And so feedback just kind of started to stall.
+
+91
+00:06:12.180 --> 00:06:13.840
+<v Dan Lorenc>People would say, that seems like a good idea.
+
+92
+00:06:13.920 --> 00:06:15.080
+<v Dan Lorenc>That one seems fine too.
+
+93
+00:06:15.260 --> 00:06:19.860
+<v Dan Lorenc>So that's kind of the last thing you want to do at the start is just kind of guess,
+
+94
+00:06:19.940 --> 00:06:21.480
+<v Dan Lorenc>make stuff up and hope people like it.
+
+95
+00:06:21.520 --> 00:06:22.560
+<v Dan Lorenc>You want constant feedback.
+
+96
+00:06:23.620 --> 00:06:26.800
+<v Dan Lorenc>But we just couldn't really get any more data because customers didn't know.
+
+97
+00:06:27.080 --> 00:06:30.040
+<v Dan Lorenc>They really just wanted us to help them improve security in any way possible.
+
+98
+00:06:30.660 --> 00:06:33.140
+<v Dan Lorenc>So that was kind of one of the big decisions and trade-offs we had to make is,
+
+99
+00:06:33.220 --> 00:06:34.760
+<v Dan Lorenc>are we really running out of feedback?
+
+100
+00:06:34.860 --> 00:06:38.580
+<v Dan Lorenc>Are we really going to have to start guessing and kind of lean in on our own expertise?
+
+101
+00:06:39.280 --> 00:06:41.120
+<v Dan Lorenc>And we did, and it's been working out so far.
+
+102
+00:06:41.900 --> 00:06:45.760
+<v Noah Labhart>That's interesting because, you know, normally you get into a passionate crowd of folks.
+
+103
+00:06:45.840 --> 00:06:48.660
+<v Noah Labhart>They're going to give you feedback, you know, left and right, morning and night.
+
+104
+00:06:48.980 --> 00:06:52.320
+<v Noah Labhart>And it seems like this is a little bit different.
+
+105
+00:06:53.540 --> 00:06:56.360
+<v Dan Lorenc>feedback you get, you know, some really high level directional stuff.
+
+106
+00:06:56.980 --> 00:07:00.040
+<v Dan Lorenc>But at some point, you know, we're not getting the, oh, I want that button to be blue.
+
+107
+00:07:00.140 --> 00:07:02.740
+<v Dan Lorenc>You should put that over here kind of fine grained stuff anymore.
+
+108
+00:07:02.880 --> 00:07:03.520
+<v Dan Lorenc>That kind of stopped.
+
+109
+00:07:04.060 --> 00:07:07.200
+<v Dan Lorenc>We just kind of had to guess and go out on a limb and actually build some products and
+
+110
+00:07:07.200 --> 00:07:10.140
+<v Dan Lorenc>get them in people's hands before the next kind of wave of feedback started.
+
+111
+00:07:10.900 --> 00:07:13.580
+<v Dan Lorenc>Mocks and demos and that kind of thing weren't cutting it anymore.
+
+112
+00:07:16.080 --> 00:07:19.040
+<v Noah Labhart>So then from that point, you got your MVP, right?
+
+113
+00:07:19.140 --> 00:07:22.460
+<v Noah Labhart>You've got enough feedback and you've got enough expertise to be building the product.
+
+114
+00:07:23.540 --> 00:07:27.920
+<v Noah Labhart>it and mature it. And, you know, what would be interesting is how did you build your roadmap
+
+115
+00:07:27.920 --> 00:07:31.860
+<v Noah Labhart>and decide, okay, this is the next most important thing to build or address?
+
+116
+00:07:33.160 --> 00:07:36.640
+<v Dan Lorenc>You know, the problem we ran into before kind of started to inform the roadmap of,
+
+117
+00:07:37.080 --> 00:07:40.900
+<v Dan Lorenc>well, we need feedback. We really want feedback. We're not getting it. So let's build something,
+
+118
+00:07:41.040 --> 00:07:46.280
+<v Dan Lorenc>get in people's hands, and then get that next wave of feedback. So the roadmap turned from being
+
+119
+00:07:46.280 --> 00:07:51.300
+<v Dan Lorenc>kind of feature-based to how do we get the next set of feedback that we need from the next set
+
+120
+00:07:51.300 --> 00:07:51.880
+<v Dan Lorenc>set of organizations.
+
+121
+00:07:52.280 --> 00:07:53.460
+<v Dan Lorenc>And let's go do that.
+
+122
+00:07:53.600 --> 00:07:57.180
+<v Dan Lorenc>And if that involves running a survey, cool, we can figure that out.
+
+123
+00:07:57.320 --> 00:08:01.180
+<v Dan Lorenc>But here it involved actually building products and finding people willing to install them
+
+124
+00:08:01.180 --> 00:08:02.120
+<v Dan Lorenc>in their production environments.
+
+125
+00:08:02.960 --> 00:08:04.180
+<v Dan Lorenc>So that's kind of where we went.
+
+126
+00:08:04.280 --> 00:08:08.500
+<v Dan Lorenc>We tried to keep stuff as lean as possible, really MVP focused of like, will you actually
+
+127
+00:08:08.500 --> 00:08:13.480
+<v Dan Lorenc>take this and hand this to your DevOps team, have them install it in a production or development
+
+128
+00:08:13.480 --> 00:08:15.540
+<v Dan Lorenc>environment and use it every single day.
+
+129
+00:08:16.520 --> 00:08:20.420
+<v Dan Lorenc>From there, once you actually get three or four or five organizations that are doing
+
+130
+00:08:21.300 --> 00:08:25.720
+<v Dan Lorenc>back starts pouring in. And then you can kind of shift back to normal kind of customer driven
+
+131
+00:08:25.720 --> 00:08:26.220
+<v Dan Lorenc>development.
+
+132
+00:08:28.180 --> 00:08:32.200
+<v Noah Labhart>So let's switch to team, Dan, how did you go about building your team? And what do you
+
+133
+00:08:32.200 --> 00:08:35.880
+<v Noah Labhart>look for in those people to indicate that they're the winning horses to join you?
+
+134
+00:08:37.800 --> 00:08:41.720
+<v Dan Lorenc>Yeah, that was one of the easiest things for us, honestly, this is since it's such a new space,
+
+135
+00:08:41.760 --> 00:08:45.960
+<v Dan Lorenc>the whole software supply chain security space, it's a pretty tight knit network of folks that
+
+136
+00:08:45.960 --> 00:08:49.080
+<v Dan Lorenc>have been working on it for longer than, you know, the last couple of months before it got pretty
+
+137
+00:08:49.080 --> 00:08:53.260
+<v Dan Lorenc>popular. From having been in the space for a while, we had a pretty big network
+
+138
+00:08:53.260 --> 00:08:57.040
+<v Dan Lorenc>there, kind of of those folks that were interested in this, had expertise, enjoyed
+
+139
+00:08:57.040 --> 00:09:00.660
+<v Dan Lorenc>it, and wanted to keep working in the space. So it was pretty easy to hire from our
+
+140
+00:09:00.660 --> 00:09:04.880
+<v Dan Lorenc>network. We had a big kind of founding team too, there were five of us at the
+
+141
+00:09:04.880 --> 00:09:08.980
+<v Dan Lorenc>start. By combining all of those networks we were able to get off to a
+
+142
+00:09:08.980 --> 00:09:11.520
+<v Dan Lorenc>pretty quick start with hiring and get a bunch of people that we had all known
+
+143
+00:09:11.520 --> 00:09:15.420
+<v Dan Lorenc>and worked with for years and didn't really need to dip too far into the kind
+
+144
+00:09:15.420 --> 00:09:18.740
+<v Dan Lorenc>kind of interview screening, kind of blind hiring process.
+
+145
+00:09:22.060 --> 00:09:24.400
+<v Noah Labhart>Well, let's flip to scalability then.
+
+146
+00:09:24.560 --> 00:09:28.660
+<v Noah Labhart>So did you build this to scale efficiently from day one?
+
+147
+00:09:28.900 --> 00:09:32.400
+<v Noah Labhart>Or, you know, have you been fighting this as you've grown?
+
+148
+00:09:32.520 --> 00:09:34.580
+<v Noah Labhart>And I think it's going to be interesting,
+
+149
+00:09:34.680 --> 00:09:38.760
+<v Noah Labhart>the combination of the solutions that you're using in the early days.
+
+150
+00:09:38.940 --> 00:09:40.420
+<v Noah Labhart>But I'm curious where you're going to take it.
+
+151
+00:09:40.480 --> 00:09:41.420
+<v Noah Labhart>So tell me about scalability.
+
+152
+00:09:42.920 --> 00:09:47.960
+<v Dan Lorenc>On the engineering side, we've obviously all worked on big distributed systems for a while.
+
+153
+00:09:48.160 --> 00:09:53.320
+<v Dan Lorenc>Scalability comes up a lot, but it turns out that in this space you're in with software
+
+154
+00:09:53.320 --> 00:09:59.260
+<v Dan Lorenc>builds and metadata about software itself, things tend to be a lot lower on the scale
+
+155
+00:09:59.260 --> 00:10:00.820
+<v Dan Lorenc>requirements than they are in other areas.
+
+156
+00:10:00.960 --> 00:10:03.820
+<v Dan Lorenc>If you build a piece of software, you're going to deploy it, it's going to run, and it's
+
+157
+00:10:03.820 --> 00:10:07.360
+<v Dan Lorenc>going to serve a lot more requests than that one build itself, almost tautologically.
+
+158
+00:10:07.360 --> 00:10:11.880
+<v Dan Lorenc>And so kind of the amount of data that you're dealing with from kind of dependency management,
+
+159
+00:10:11.940 --> 00:10:15.960
+<v Dan Lorenc>everything can seem big, but in perspective, right, this isn't petabytes or terabytes of
+
+160
+00:10:15.960 --> 00:10:17.900
+<v Dan Lorenc>data that an organization is going to have to deal with.
+
+161
+00:10:18.460 --> 00:10:22.960
+<v Dan Lorenc>It's kind of a couple zeros shaved off from whatever they're dealing with in production.
+
+162
+00:10:23.840 --> 00:10:27.100
+<v Dan Lorenc>The scaling problems there are a little bit different, more about keeping things fast
+
+163
+00:10:27.100 --> 00:10:31.000
+<v Dan Lorenc>and interactive for developers rather than dealing with massive amounts of data or QPS
+
+164
+00:10:31.000 --> 00:10:31.500
+<v Dan Lorenc>or anything.
+
+165
+00:10:32.000 --> 00:10:34.460
+<v Dan Lorenc>Yeah, the team side has definitely been more interesting, right?
+
+166
+00:10:34.460 --> 00:10:38.040
+<v Dan Lorenc>There were five of us in October and there's 46 of us now.
+
+167
+00:10:38.320 --> 00:10:44.640
+<v Dan Lorenc>So every time we add another five or 10 folks or another job function or something like that,
+
+168
+00:10:44.720 --> 00:10:46.500
+<v Dan Lorenc>we have to relearn how to do all of this.
+
+169
+00:10:46.720 --> 00:10:51.340
+<v Dan Lorenc>Especially in this remote environment, there were a lot of startups that were full remote before.
+
+170
+00:10:51.620 --> 00:10:53.620
+<v Dan Lorenc>Things are a little bit different now in this pandemic world.
+
+171
+00:10:53.720 --> 00:10:54.840
+<v Dan Lorenc>Getting together is hard.
+
+172
+00:10:55.100 --> 00:10:56.340
+<v Dan Lorenc>Communication is tough.
+
+173
+00:10:56.460 --> 00:10:59.800
+<v Dan Lorenc>Every time we come up with a process, it feels like we outgrow it and need a new one two weeks later.
+
+174
+00:11:05.620 --> 00:11:10.720
+<v Noah Labhart>So as you step out on the balcony, you look across all that you've built, what are you most proud of?
+
+175
+00:11:12.000 --> 00:11:15.420
+<v Dan Lorenc>Definitely the team, right? We're still pretty early. We're tackling a big problem.
+
+176
+00:11:15.900 --> 00:11:20.440
+<v Dan Lorenc>We've got a lot of awesome stuff coming, a lot of awesome products and open source projects coming down the pipeline.
+
+177
+00:11:20.620 --> 00:11:24.900
+<v Dan Lorenc>But yeah, this team that we've been able to hire and assemble is definitely the thing that I'm most proud of here at the company.
+
+178
+00:11:26.620 --> 00:11:32.660
+<v Noah Labhart>Let's flip the script a little bit then. So tell me about a mistake you made and how you and your team responded to it.
+
+179
+00:11:34.460 --> 00:11:40.560
+<v Dan Lorenc>Certainly in startups, especially this is my first time, this is a lot of our first time being an early stage startup like this,
+
+180
+00:11:40.660 --> 00:11:44.120
+<v Dan Lorenc>you don't know the questions you're supposed to ask.
+
+181
+00:11:44.260 --> 00:11:47.320
+<v Dan Lorenc>There's a lot of unknown unknowns that you don't find out until later.
+
+182
+00:11:48.400 --> 00:11:52.040
+<v Dan Lorenc>The very first decision we made when we were setting up a company and incorporating is,
+
+183
+00:11:52.580 --> 00:11:54.900
+<v Dan Lorenc>where do you actually incorporate, where do you put the headquarters?
+
+184
+00:11:55.820 --> 00:11:59.120
+<v Dan Lorenc>Companies always incorporate in Delaware, but you still need an address for the company.
+
+185
+00:11:59.720 --> 00:12:03.340
+<v Dan Lorenc>We thought it didn't matter, we could just pick anything, so we picked one of the houses.
+
+186
+00:12:04.460 --> 00:12:07.640
+<v Dan Lorenc>It turned out that there are a lot of implications for which state that you're headquartered in.
+
+187
+00:12:07.900 --> 00:12:09.400
+<v Dan Lorenc>We didn't find that out until much later.
+
+188
+00:12:09.540 --> 00:12:11.760
+<v Dan Lorenc>You know, limited the health care plans we were able to get.
+
+189
+00:12:11.840 --> 00:12:13.260
+<v Dan Lorenc>That was one of the hardest things we had to go do.
+
+190
+00:12:13.980 --> 00:12:19.100
+<v Dan Lorenc>He now has like 45 compliance posters that get shipped to his address because that's our official office.
+
+191
+00:12:19.200 --> 00:12:22.680
+<v Dan Lorenc>Every time somebody gets started, we have to put those like workspace safety things up.
+
+192
+00:12:22.740 --> 00:12:23.900
+<v Dan Lorenc>So they're all sitting in his room.
+
+193
+00:12:24.000 --> 00:12:27.080
+<v Dan Lorenc>Yeah, just kind of basic stuff like that that you don't figure out until much later.
+
+194
+00:12:28.940 --> 00:12:32.720
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+195
+00:12:34.460 --> 00:12:39.580
+<v Noah Labhart>a bit in a really short amount of time. This is a popular space. What does the future look like?
+
+196
+00:12:41.020 --> 00:12:45.920
+<v Dan Lorenc>Yeah, that's been pretty interesting too. Just kind of the crazy shifting market conditions
+
+197
+00:12:45.920 --> 00:12:50.400
+<v Dan Lorenc>across the whole venture capital landscape and the software space in general, even at the public
+
+198
+00:12:50.400 --> 00:12:57.240
+<v Dan Lorenc>markets. 2020 and 2021 were kind of crazy in a lot of perspectives that way. Money was basically
+
+199
+00:12:57.240 --> 00:13:03.460
+<v Dan Lorenc>free. Startups were fundraising every six or eight months. Valuations were crazy, all because
+
+200
+00:13:04.460 --> 00:13:09.640
+<v Dan Lorenc>so low. And then all of a sudden that changed at the start of 2022. So everybody's kind of
+
+201
+00:13:09.640 --> 00:13:13.700
+<v Dan Lorenc>readjusting to that new landscape. Thankfully, we were a little early on that side and hadn't
+
+202
+00:13:13.700 --> 00:13:17.700
+<v Dan Lorenc>made too many mistakes there yet. But yeah, you see a lot of companies, unfortunately,
+
+203
+00:13:17.780 --> 00:13:22.040
+<v Dan Lorenc>having to go through layoffs and restructuring everything to adjust to the new kind of rules
+
+204
+00:13:22.040 --> 00:13:26.560
+<v Dan Lorenc>at play in this whole world. So I think growth is a little bit different. It looks a little
+
+205
+00:13:26.560 --> 00:13:30.700
+<v Dan Lorenc>different now, especially on kind of like the sales and marketing side, a lot slower,
+
+206
+00:13:30.700 --> 00:13:34.560
+<v Dan Lorenc>or a lot more of a focus on profitability rather than just kind of growth at all costs.
+
+207
+00:13:36.060 --> 00:13:37.600
+<v Noah Labhart>So, okay, Dan, let's switch to you.
+
+208
+00:13:37.700 --> 00:13:39.440
+<v Noah Labhart>Who influences the way that you work?
+
+209
+00:13:39.620 --> 00:13:40.920
+<v Noah Labhart>Tell me someone you look up to and why.
+
+210
+00:13:42.460 --> 00:13:44.560
+<v Dan Lorenc>Oh, man, I really mean on our team here, right?
+
+211
+00:13:44.580 --> 00:13:48.000
+<v Dan Lorenc>All of the other founders and all the other people in leadership here.
+
+212
+00:13:48.180 --> 00:13:50.200
+<v Dan Lorenc>Being a CEO is lonely in a lot of ways, right?
+
+213
+00:13:50.240 --> 00:13:51.880
+<v Dan Lorenc>You kind of have to make a lot of decisions.
+
+214
+00:13:52.240 --> 00:13:57.540
+<v Dan Lorenc>But being able to gather feedback and kind of just chat over tough decisions
+
+215
+00:13:57.540 --> 00:14:01.540
+<v Dan Lorenc>with people that you trust and have worked with for years and years and years is really a big help.
+
+216
+00:14:01.760 --> 00:14:08.720
+<v Dan Lorenc>Being able to lean on them to actually get frank and honest answers and not just things that I want to hear on tough decisions has been the most helpful.
+
+217
+00:14:09.960 --> 00:14:13.180
+<v Noah Labhart>Okay, we talked about a mistake a minute ago, but a little bit different spin.
+
+218
+00:14:13.400 --> 00:14:16.280
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+219
+00:14:16.380 --> 00:14:18.360
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+220
+00:14:20.760 --> 00:14:24.800
+<v Dan Lorenc>Easiest answer there is I would have started earlier, like six months earlier or something like that, right?
+
+221
+00:14:24.800 --> 00:14:27.740
+<v Dan Lorenc>Right. You know, we got asked that a lot. Like, why are you starting the company now?
+
+222
+00:14:27.860 --> 00:14:29.720
+<v Dan Lorenc>It's like, well, six months ago probably would have been better.
+
+223
+00:14:29.760 --> 00:14:34.060
+<v Dan Lorenc>But now is the best time we possibly can. Waiting isn't going to make it any better.
+
+224
+00:14:34.180 --> 00:14:39.020
+<v Dan Lorenc>But yeah, I think, you know, two years earlier probably wouldn't have worked because there just wasn't enough attention to the space.
+
+225
+00:14:39.620 --> 00:14:43.460
+<v Dan Lorenc>Six months a year or something like that probably would have put us in a little bit better of a position.
+
+226
+00:14:43.600 --> 00:14:44.980
+<v Dan Lorenc>So we're playing a little bit of catch up.
+
+227
+00:14:47.220 --> 00:14:53.480
+<v Noah Labhart>Well, Dan, last question. So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+228
+00:14:54.800 --> 00:14:55.920
+<v Noah Labhart>I can't wait to show it off to the world.
+
+229
+00:14:55.980 --> 00:14:57.640
+<v Noah Labhart>Can we show it off to you right there on the plane?
+
+230
+00:14:58.060 --> 00:15:01.560
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+231
+00:15:03.080 --> 00:15:05.280
+<v Dan Lorenc>Yeah, kind of same answer that I just hit before.
+
+232
+00:15:05.420 --> 00:15:07.400
+<v Dan Lorenc>Almost just, just go for it, get started.
+
+233
+00:15:07.920 --> 00:15:11.300
+<v Dan Lorenc>And, you know, show stuff as often as you possibly can.
+
+234
+00:15:11.460 --> 00:15:14.720
+<v Dan Lorenc>And I know there's a lot of like, you know, different schools of thought there.
+
+235
+00:15:14.820 --> 00:15:18.080
+<v Dan Lorenc>I don't know whether you stay stealth until you have a big launch moment or something like that.
+
+236
+00:15:18.160 --> 00:15:23.820
+<v Dan Lorenc>But, you know, I think just get started early and show stuff as early and frequently as you can.
+
+237
+00:15:24.800 --> 00:15:28.480
+<v Dan Lorenc>hide stuff don't keep secrets just start getting feedback start showing everything you're doing to
+
+238
+00:15:28.480 --> 00:15:30.920
+<v Dan Lorenc>the world as early as you possibly can and tell that story
+
+239
+00:15:30.920 --> 00:15:34.100
+<v Noah Labhart>amazing advice well dan thank you for
+
+240
+00:15:34.100 --> 00:15:38.460
+<v Noah Labhart>being on the show today. Thank you for telling the creation story of Chainguard. Yeah,
+
+241
+00:15:38.460 --> 00:15:38.960
+<v Dan Lorenc>thanks for
+
+242
+00:15:38.800 --> 00:15:39.300
+<v Dan Lorenc>having me
+
+243
+00:15:39.120 --> 00:15:43.780
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+244
+00:15:47.580 --> 00:15:53.880
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart be sure to subscribe on apple podcast spotify or
+
+245
+00:15:54.800 --> 00:16:00.880
+<v Noah Labhart>app of your choice. Support the show on patreon.com slash Code Story for just five to ten bucks a
+
+246
+00:16:00.880 --> 00:16:05.840
+<v Noah Labhart>month. And when you get a chance, leave us a review. Both things help us out tremendously.
+
+247
+00:16:08.300 --> 00:16:09.740
+<v Noah Labhart>And thanks again for listening.

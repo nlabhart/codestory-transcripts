@@ -1,0 +1,1643 @@
+WEBVTT
+
+NOTE S11 Bonus: The On-Call Burnout Cure: Moving Past Noise-Heavy Dashboards to Autonomous Agentic SRE Triage with Goutham "Gou" Rao, Co-Founder & CEO of NeuBird
+
+1
+00:00:00.000 --> 00:00:29.920
+<v Goutham Rao>Many times when somebody's creating a product, they're creating a product for some other persona, somebody else to use it. And I don't know how people do that. God bless them for doing that because you're trying to figure out what some other expert in an industry and how they're going to use the product you're building. And you may not exactly be from that industry or understand their mindset. Luckily for us, we are industry practitioners in this space, meaning everybody here at the NeuBird founding team, we have been in the IT ops roles. So we understand
+
+2
+00:00:30.000 --> 00:00:34.020
+<v Goutham Rao>the requirements. We understand how somebody would use this. We understand how somebody would go
+
+3
+00:00:34.020 --> 00:00:40.520
+<v Goutham Rao>about solving this problem. So for us to build out the MVP was fairly easy. My name is Goutham
+
+4
+00:00:40.520 --> 00:00:43.500
+<v Goutham Rao>Rao. I'm the co-founder and CEO at NeuBird.ai.
+
+5
+00:00:46.600 --> 00:00:50.460
+<v Noah Labhart>This is Code Story, a podcast bringing you
+
+6
+00:00:50.460 --> 00:00:55.240
+<v Noah Labhart>interviews with tech visionaries. It's six months moonlighting. There's nothing on the back end.
+
+7
+00:00:55.240 --> 00:00:58.100
+<v Noah Labhart>who share what it takes to change an industry.
+
+8
+00:00:58.260 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+9
+00:01:00.220 --> 00:01:01.220
+<v Clip>It took many goes to get right.
+
+10
+00:01:01.880 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+11
+00:01:04.560 --> 00:01:06.120
+<v Clip>A company is its people.
+
+12
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+13
+00:01:07.500 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+14
+00:01:08.920 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+15
+00:01:11.460 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+16
+00:01:12.880 --> 00:01:14.260
+<v Clip>Yes, we've been fighting it as we grow.
+
+17
+00:01:14.460 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+18
+00:01:15.560 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+19
+00:01:18.280 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+20
+00:01:20.020 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+21
+00:01:22.080 --> 00:01:25.820
+<v Noah Labhart>game to ride the ups and downs of the startup life.
+
+22
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+23
+00:01:27.560 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+24
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+25
+00:01:32.480 --> 00:01:38.860
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Goutham Rao has built autonomous real-time
+
+26
+00:01:38.860 --> 00:01:42.940
+<v Noah Labhart>incident response with an agentic AI SRE.
+
+27
+00:01:49.840 --> 00:01:52.580
+<v Noah Labhart>Goutham Rao grew up in Brooklyn, a nerd all his life.
+
+28
+00:01:53.020 --> 00:01:58.500
+<v Noah Labhart>Back in the day, his dad bought him a Commodore 64, from which he started to learn to write code and basic.
+
+29
+00:01:59.080 --> 00:02:03.200
+<v Noah Labhart>Eventually, he attended the University of Pennsylvania to get his master's in computer science.
+
+30
+00:02:03.560 --> 00:02:05.720
+<v Noah Labhart>But outside of tech, he's married with two kids.
+
+31
+00:02:05.880 --> 00:02:07.560
+<v Noah Labhart>He likes to travel and he likes to run.
+
+32
+00:02:07.560 --> 00:02:13.160
+<v Noah Labhart>He used to compete in half marathons, but nowadays he does his running as more of a mental exercise.
+
+33
+00:02:15.780 --> 00:02:20.500
+<v Noah Labhart>Goutham saw that IT telemetry logs have a lot of complexity within their data.
+
+34
+00:02:20.760 --> 00:02:25.520
+<v Noah Labhart>Fast forward to today, he and his co-founders noticed the way that LLMs were processing data.
+
+35
+00:02:25.800 --> 00:02:33.860
+<v Noah Labhart>They thought they could build something to interpret this information and clone themselves to create something that mimics issue triage.
+
+36
+00:02:36.500 --> 00:02:39.260
+<v Noah Labhart>This is the creation story of NeuBird.
+
+37
+00:02:43.640 --> 00:02:48.940
+<v Goutham Rao>Myself, my co-founder Vinod, and both of us, when we grew up around the same time frame,
+
+38
+00:02:49.080 --> 00:02:53.680
+<v Goutham Rao>not that we knew each other back then in graduate school, but we both share a passion for AI
+
+39
+00:02:53.680 --> 00:02:55.720
+<v Goutham Rao>and especially data science.
+
+40
+00:02:56.080 --> 00:03:00.960
+<v Goutham Rao>In our careers, and we've worked together for, I don't know, 15 plus years now, we've
+
+41
+00:03:00.960 --> 00:03:02.920
+<v Goutham Rao>always been involved with enterprise data.
+
+42
+00:03:03.860 --> 00:03:07.980
+<v Goutham Rao>is very tricky to handle, leaving aside the governance and all the regulatory aspects.
+
+43
+00:03:08.160 --> 00:03:13.080
+<v Goutham Rao>But just the nature of the data is very complex, as you can imagine, and it's very varied.
+
+44
+00:03:13.800 --> 00:03:19.740
+<v Goutham Rao>And as it relates to IT telemetry, which will be relevant for the rest of this conversation today,
+
+45
+00:03:19.880 --> 00:03:25.160
+<v Goutham Rao>IT telemetry involves very complex data structure that exists within your logs.
+
+46
+00:03:25.300 --> 00:03:30.720
+<v Goutham Rao>These are telemetry that are being displayed from application and physical infrastructure.
+
+47
+00:03:30.720 --> 00:03:36.120
+<v Goutham Rao>So your application logs, your server logs, your network logs, your database logs, and so on.
+
+48
+00:03:36.220 --> 00:03:37.460
+<v Goutham Rao>These are very complex.
+
+49
+00:03:37.740 --> 00:03:39.780
+<v Goutham Rao>And so the logs are one thing.
+
+50
+00:03:39.860 --> 00:03:42.580
+<v Goutham Rao>And then you have time series data, which are called metrics.
+
+51
+00:03:42.820 --> 00:03:48.180
+<v Goutham Rao>CPU samples on a millisecond by millisecond basis, for instance, your network throughput.
+
+52
+00:03:48.520 --> 00:03:52.720
+<v Goutham Rao>And then you have complex traces of what application is talking to what infrastructure.
+
+53
+00:03:53.340 --> 00:03:56.780
+<v Goutham Rao>Anyway, short of this long story is there's a lot of complexity in the data.
+
+54
+00:03:56.780 --> 00:04:09.080
+<v Goutham Rao>And we have a good appreciation for that because in creating enterprise software in our careers, we've had to deal with all of this complex data to be able to troubleshoot, create better software.
+
+55
+00:04:09.340 --> 00:04:12.540
+<v Goutham Rao>And so we've studied it. We are domain experts in that field.
+
+56
+00:04:12.760 --> 00:04:14.380
+<v Goutham Rao>All right, what does that have to do with AI?
+
+57
+00:04:14.620 --> 00:04:20.340
+<v Goutham Rao>Fast forward to today, everybody's familiar with ChatGPT, GenAI, and LLMs.
+
+58
+00:04:20.340 --> 00:04:41.460
+<v Goutham Rao>And we saw a way in which these LLMs were thinking that we thought, hey, if we know how to interpret data correctly, can we use the knowledge that exists in these large language models to mimic what you and I do, what we do as engineers, to be able to troubleshoot and remediate and find issues?
+
+59
+00:04:41.460 --> 00:05:03.820
+<v Goutham Rao>And that's what we've built. That was the genesis behind NeuBird.ai, which is we said, you know, we've spent way too much time debugging issues at two in the morning and we don't want to do that anymore. Can we clone ourselves? Can we create a persona that does the job we would do and has the same intelligence in triaging and debugging a problem like we would do? And let's go in and create that.
+
+60
+00:05:03.820 --> 00:05:08.480
+<v Goutham Rao>So back in 23, Vinod and I started this project privately.
+
+61
+00:05:08.620 --> 00:05:14.580
+<v Goutham Rao>We were working on seeing how we could clone ourselves and create something that mimics what we do.
+
+62
+00:05:14.880 --> 00:05:21.800
+<v Goutham Rao>We created ways in which we could interface with these large language models and extract the reasoning capabilities that exist in them.
+
+63
+00:05:21.940 --> 00:05:27.100
+<v Goutham Rao>We invented this thing for IT telemetry using something called a chain of thought reasoning,
+
+64
+00:05:27.300 --> 00:05:32.560
+<v Goutham Rao>which basically iteratively talks to itself and figures out what's going on in the environment.
+
+65
+00:05:33.820 --> 00:05:39.520
+<v Goutham Rao>what today is known as agentic systems. So coming to your first part of the question,
+
+66
+00:05:39.660 --> 00:05:45.320
+<v Goutham Rao>that's what is NeuBird.ai do? We create an agent, which is what is called an SRE,
+
+67
+00:05:45.500 --> 00:05:49.740
+<v Goutham Rao>Site Reliability Engineer. It's an agent that is responsible for managing
+
+68
+00:05:49.740 --> 00:05:52.660
+<v Goutham Rao>the health of your IT operations using what we've built.
+
+69
+00:05:54.480 --> 00:06:00.360
+<v Noah Labhart>Let's dive into what you would consider the MVP for NeuBird, that first version of the product
+
+70
+00:06:00.360 --> 00:06:01.480
+<v Noah Labhart>and the platform you built?
+
+71
+00:06:01.580 --> 00:06:02.700
+<v Noah Labhart>How long did it take to build
+
+72
+00:06:02.700 --> 00:06:04.180
+<v Noah Labhart>and what sort of tools were you using
+
+73
+00:06:04.180 --> 00:06:05.000
+<v Noah Labhart>to bring it to life?
+
+74
+00:06:06.080 --> 00:06:07.780
+<v Goutham Rao>Let me just walk you through
+
+75
+00:06:07.780 --> 00:06:09.960
+<v Goutham Rao>how our journey and where we are now
+
+76
+00:06:09.960 --> 00:06:10.880
+<v Goutham Rao>and how we got here.
+
+77
+00:06:11.160 --> 00:06:13.440
+<v Goutham Rao>Many times when somebody's creating a product,
+
+78
+00:06:13.540 --> 00:06:15.920
+<v Goutham Rao>they're creating a product for some other persona,
+
+79
+00:06:16.160 --> 00:06:17.260
+<v Goutham Rao>somebody else to use it.
+
+80
+00:06:17.360 --> 00:06:19.140
+<v Goutham Rao>And I don't know how people do that.
+
+81
+00:06:19.260 --> 00:06:20.680
+<v Goutham Rao>God bless them for doing that
+
+82
+00:06:20.680 --> 00:06:22.320
+<v Goutham Rao>because you're trying to figure out
+
+83
+00:06:22.320 --> 00:06:24.620
+<v Goutham Rao>what some other expert in an industry
+
+84
+00:06:24.620 --> 00:06:26.500
+<v Goutham Rao>and how they're going to use the product you're building.
+
+85
+00:06:26.640 --> 00:06:29.660
+<v Goutham Rao>And you may not exactly be from that industry
+
+86
+00:06:30.360 --> 00:06:35.460
+<v Goutham Rao>their mindset. Luckily for us, we are industry practitioners in this space, meaning everybody
+
+87
+00:06:35.460 --> 00:06:40.980
+<v Goutham Rao>here at the NeuBird founding team, we have been in the IT ops roles. So we understand the
+
+88
+00:06:40.980 --> 00:06:44.580
+<v Goutham Rao>requirements. We understand how somebody would use this. We understand how somebody would go
+
+89
+00:06:44.580 --> 00:06:50.700
+<v Goutham Rao>about solving this problem. So for us to build out the MVP was fairly easy. We know what problems
+
+90
+00:06:50.700 --> 00:06:57.080
+<v Goutham Rao>we're solving for because we've been in that boat. Everybody else that is struggling with IT ops,
+
+91
+00:06:57.080 --> 00:06:59.840
+<v Goutham Rao>They're not that different from what I've done in the past.
+
+92
+00:07:00.000 --> 00:07:03.520
+<v Goutham Rao>So I understand the MVP, which is, I'll describe what that is.
+
+93
+00:07:03.660 --> 00:07:09.640
+<v Goutham Rao>These are people that are managing production operations, whether it's a website or let's
+
+94
+00:07:09.640 --> 00:07:13.100
+<v Goutham Rao>take a financial institution, a credit card payment processing pipeline.
+
+95
+00:07:13.540 --> 00:07:17.820
+<v Goutham Rao>You could take a generic engineering organization, could be a CI/CD pipeline.
+
+96
+00:07:18.040 --> 00:07:23.400
+<v Goutham Rao>You could take a motor company, which is software that's managing the manufacturing and
+
+97
+00:07:23.400 --> 00:07:27.120
+<v Goutham Rao>and analyzing smart card test runs, for instance.
+
+98
+00:07:27.200 --> 00:07:30.740
+<v Goutham Rao>So any of these pipelines have a general similar look and feel.
+
+99
+00:07:30.880 --> 00:07:32.540
+<v Goutham Rao>These are microservices.
+
+100
+00:07:32.840 --> 00:07:38.220
+<v Goutham Rao>In many cases, they use Kubernetes as the application control plane.
+
+101
+00:07:38.400 --> 00:07:43.180
+<v Goutham Rao>You have networking ingress layers, and you have varied data services that you rely on,
+
+102
+00:07:43.300 --> 00:07:46.860
+<v Goutham Rao>whether it's databases, object stores, message queues.
+
+103
+00:07:47.020 --> 00:07:48.520
+<v Goutham Rao>These are common components.
+
+104
+00:07:48.520 --> 00:07:54.060
+<v Goutham Rao>And so we're solving for something that we understand the basic building blocks that everybody uses.
+
+105
+00:07:54.240 --> 00:08:00.100
+<v Goutham Rao>Now, in terms of the MVP, who we're going after are people that are responsible for managing these pipelines.
+
+106
+00:08:00.320 --> 00:08:02.380
+<v Goutham Rao>Again, these are IT ops managers.
+
+107
+00:08:02.620 --> 00:08:03.820
+<v Goutham Rao>These are SRE managers.
+
+108
+00:08:04.280 --> 00:08:06.720
+<v Goutham Rao>These are people that carry the PagerDuty alerts.
+
+109
+00:08:06.960 --> 00:08:11.620
+<v Goutham Rao>They're responsible for if something goes wrong, there's an alert, an application crash.
+
+110
+00:08:11.860 --> 00:08:12.780
+<v Goutham Rao>These trigger an alert.
+
+111
+00:08:12.880 --> 00:08:16.660
+<v Goutham Rao>The alerts get routed to an engineer who has to respond to it.
+
+112
+00:08:18.520 --> 00:08:23.840
+<v Goutham Rao>description. Then they have to go log into the system, look at the logs, look at the telemetry,
+
+113
+00:08:23.880 --> 00:08:29.060
+<v Goutham Rao>look at the metrics, probe different areas in the stack. This has now taken many hours.
+
+114
+00:08:29.400 --> 00:08:34.140
+<v Goutham Rao>You can't expect any one engineer to be an expert in all fields. So the person responding to the
+
+115
+00:08:34.140 --> 00:08:38.600
+<v Goutham Rao>issue will say, oh, maybe I need to get a network expert on the line. You get the network expert,
+
+116
+00:08:38.740 --> 00:08:43.040
+<v Goutham Rao>network expert may say, hey, I see some database errors. Let's go get the database expert. And so
+
+117
+00:08:43.040 --> 00:08:48.320
+<v Goutham Rao>now you're pulling in a community here to solve this. That's our MVP. We go after those teams
+
+118
+00:08:48.520 --> 00:08:54.760
+<v Goutham Rao>say, we can make your life easier. We will deploy these LLMs, which are presumably experts in
+
+119
+00:08:54.760 --> 00:09:01.360
+<v Goutham Rao>networking and Kubernetes and analyzing cases and data services, and let it do the dirty work
+
+120
+00:09:01.360 --> 00:09:04.460
+<v Goutham Rao>of looking at your telemetry and reduce your time to incident response.
+
+121
+00:09:06.440 --> 00:09:08.460
+<v Noah Labhart>So that MVP makes sense to
+
+122
+00:09:08.460 --> 00:09:13.540
+<v Noah Labhart>me. And from that point, I'm curious about how you progressed and matured the product. And to wrap
+
+123
+00:09:13.540 --> 00:09:17.620
+<v Noah Labhart>that in a box a little bit, what I'm looking for is how you built your roadmap, how you went about
+
+124
+00:09:18.520 --> 00:09:23.220
+<v Noah Labhart>that, okay, this is the next most important thing to build or to address with NeuBird.
+
+125
+00:09:23.960 --> 00:09:28.200
+<v Goutham Rao>Now, let's break that into three separate talking points then, if you wouldn't mind.
+
+126
+00:09:28.400 --> 00:09:30.120
+<v Goutham Rao>The past, the present, and the future.
+
+127
+00:09:30.240 --> 00:09:31.520
+<v Goutham Rao>The roadmap being the future.
+
+128
+00:09:31.880 --> 00:09:35.580
+<v Goutham Rao>Walking through the past, our journey from inception to so far.
+
+129
+00:09:36.040 --> 00:09:41.340
+<v Goutham Rao>I'm a firm believer in building alongside what we call co-development partners.
+
+130
+00:09:41.660 --> 00:09:43.980
+<v Goutham Rao>Your early customers are not customers.
+
+131
+00:09:44.280 --> 00:09:45.720
+<v Goutham Rao>They're your partners in crime.
+
+132
+00:09:45.720 --> 00:09:53.460
+<v Goutham Rao>There are people that resonate with the pain point you depict, and they want to see you build a product because it's going to help them.
+
+133
+00:09:53.540 --> 00:09:55.060
+<v Goutham Rao>They want to help you build a product.
+
+134
+00:09:55.140 --> 00:09:56.420
+<v Goutham Rao>They want to provide feedback.
+
+135
+00:09:56.640 --> 00:10:02.680
+<v Goutham Rao>They want to be early users, and they want to deal with a product that is, let's just call it, half-baked.
+
+136
+00:10:02.920 --> 00:10:15.200
+<v Goutham Rao>And we're fortunate enough to have worked in the enterprise industry that we know some awesome companies of various sizes in financial and manufacturing and retail and pharmaceutical that we called on.
+
+137
+00:10:15.720 --> 00:10:20.260
+<v Goutham Rao>said, hey, Mr. Smith, you used our product in the past. We had a great relationship together.
+
+138
+00:10:20.780 --> 00:10:25.520
+<v Goutham Rao>These are fans of our prior products. The company that Vinod and I came from is called Portworx,
+
+139
+00:10:25.620 --> 00:10:29.400
+<v Goutham Rao>which is still the leader in the enterprise data space for cloud-native applications,
+
+140
+00:10:29.780 --> 00:10:34.980
+<v Goutham Rao>wildly successful product. So we called on our prior customers and said, we have this idea,
+
+141
+00:10:35.180 --> 00:10:39.500
+<v Goutham Rao>this concept, does it resonate? Obviously it does. Who doesn't have this IT ops problem?
+
+142
+00:10:39.700 --> 00:10:43.500
+<v Goutham Rao>And we said, here's what we're building. Will you help build this with us? And yep,
+
+143
+00:10:43.500 --> 00:10:49.740
+<v Goutham Rao>up. But sure enough, we sign up a few of these e-design partners. We gave them beta versions of
+
+144
+00:10:49.740 --> 00:10:54.020
+<v Goutham Rao>our agent is called Hawkeye, by the way. So if I say the term Hawkeye, that's the agent,
+
+145
+00:10:54.160 --> 00:11:00.500
+<v Goutham Rao>our IT ops agent that we built here at NeuBird.ai. So we gave them beta versions of Hawkeye. It was
+
+146
+00:11:00.500 --> 00:11:06.240
+<v Goutham Rao>slow because it had to do a lot of thinking and people had to nudge it a bit. People being
+
+147
+00:11:06.240 --> 00:11:11.940
+<v Goutham Rao>users generally did a good enough job, but we identified areas for where we need to improve.
+
+148
+00:11:13.500 --> 00:11:15.860
+<v Goutham Rao>The beta process took three, four, five months.
+
+149
+00:11:16.200 --> 00:11:17.580
+<v Goutham Rao>We learned from them.
+
+150
+00:11:17.640 --> 00:11:18.760
+<v Goutham Rao>We made Hawkeye smarter.
+
+151
+00:11:19.100 --> 00:11:22.700
+<v Goutham Rao>We identified what's more critical for the ops teams.
+
+152
+00:11:22.860 --> 00:11:24.400
+<v Goutham Rao>What did they want to see first?
+
+153
+00:11:24.560 --> 00:11:26.660
+<v Goutham Rao>How do people interact with agents?
+
+154
+00:11:26.860 --> 00:11:28.200
+<v Goutham Rao>And this was a learning for us.
+
+155
+00:11:28.280 --> 00:11:33.000
+<v Goutham Rao>This part now, and I'm going through the journey really quick here, and this is leading all
+
+156
+00:11:33.000 --> 00:11:36.740
+<v Goutham Rao>the way up to our GA, which was sometime around December last year.
+
+157
+00:11:36.920 --> 00:11:40.080
+<v Goutham Rao>We realized that agentic systems are pretty new.
+
+158
+00:11:40.080 --> 00:11:48.940
+<v Goutham Rao>Who would have thought? I just kind of coined the term and it hit us later that people take time to adapt to new technologies.
+
+159
+00:11:49.240 --> 00:11:55.280
+<v Goutham Rao>And it was difficult for people to wrap their heads around how to interface with Hawkeye because it is an agentic system.
+
+160
+00:11:55.460 --> 00:11:58.720
+<v Goutham Rao>It's a new way for them to change their way of operations.
+
+161
+00:11:59.000 --> 00:12:04.540
+<v Goutham Rao>And so we said quickly, no, let's not change their workflow. Let's have Hawkeye adapt to their workflow.
+
+162
+00:12:04.540 --> 00:12:18.720
+<v Goutham Rao>So we made our agent a lot more behind the scenes, and we call it now an agentic backplane that inserts into their existing ITSM, their IT service management tools and workflows, and silently does the work for them.
+
+163
+00:12:18.920 --> 00:12:24.420
+<v Goutham Rao>And so now, post-GA, what is a typical interaction with a customer look?
+
+164
+00:12:24.620 --> 00:12:29.820
+<v Goutham Rao>We call on the manager or the director that is responsible for operations.
+
+165
+00:12:30.240 --> 00:12:32.140
+<v Goutham Rao>We show them Hawkeye.
+
+166
+00:12:32.260 --> 00:12:33.100
+<v Goutham Rao>They like it.
+
+167
+00:12:33.160 --> 00:12:34.200
+<v Goutham Rao>We deploy Hawkeye.
+
+168
+00:12:34.540 --> 00:12:58.520
+<v Goutham Rao>We tell them, don't tell anybody that you've deployed it. Let's just see how things pan out. Hawkeye starts doing its work in the back. Their teams are getting these PagerDuty alerts. And all of a sudden, within minutes, Hawkeye says, I'm on it. And a couple of minutes later, it creates what's called this root cause analysis report, which contains detailed information about the incident, the evidence, what the issue is, and what the remediation is.
+
+169
+00:12:58.520 --> 00:13:01.540
+<v Goutham Rao>and then the engineers are looking at it going,
+
+170
+00:13:01.660 --> 00:13:02.560
+<v Goutham Rao>wow, what is this?
+
+171
+00:13:02.680 --> 00:13:03.960
+<v Goutham Rao>And now I just have to review it.
+
+172
+00:13:04.000 --> 00:13:05.700
+<v Goutham Rao>I don't have to do all the dirty work.
+
+173
+00:13:06.180 --> 00:13:08.560
+<v Goutham Rao>We call back on the engineering manager and say,
+
+174
+00:13:08.680 --> 00:13:09.420
+<v Goutham Rao>hey, how has it been?
+
+175
+00:13:09.460 --> 00:13:10.180
+<v Goutham Rao>It's been two weeks.
+
+176
+00:13:10.900 --> 00:13:13.280
+<v Goutham Rao>Ideally we get, look, all my engineers
+
+177
+00:13:13.280 --> 00:13:14.420
+<v Goutham Rao>are so much more happier.
+
+178
+00:13:14.560 --> 00:13:16.380
+<v Goutham Rao>They're saying that their quality of life is better.
+
+179
+00:13:16.460 --> 00:13:17.720
+<v Goutham Rao>They're not getting alert fatigue.
+
+180
+00:13:18.460 --> 00:13:19.940
+<v Goutham Rao>They've gotten all this time back
+
+181
+00:13:19.940 --> 00:13:22.040
+<v Goutham Rao>so that they can focus on more creative tasks.
+
+182
+00:13:22.740 --> 00:13:24.160
+<v Goutham Rao>That's what we're engineering toward.
+
+183
+00:13:24.340 --> 00:13:26.120
+<v Goutham Rao>That's been, now that's the present.
+
+184
+00:13:26.260 --> 00:13:27.320
+<v Goutham Rao>That's where we are today.
+
+185
+00:13:28.520 --> 00:13:35.500
+<v Goutham Rao>work is not done. If it were, I'd be retired. So we have still a lot to do ahead of us. And this is
+
+186
+00:13:35.500 --> 00:13:41.340
+<v Goutham Rao>the roadmap part. The roadmap is interestingly evolving because agentic solutions are a new
+
+187
+00:13:41.340 --> 00:13:47.300
+<v Goutham Rao>concept. And so not just NeuBird, but everybody's trying to figure out how do agents coexist with
+
+188
+00:13:47.300 --> 00:13:51.740
+<v Goutham Rao>other agents? What are inner agent workflows? What's the handoff of work from one agent to
+
+189
+00:13:51.740 --> 00:13:57.160
+<v Goutham Rao>another? How do you determine the accuracy of the work? What's the governance around these agents?
+
+190
+00:13:58.520 --> 00:14:02.800
+<v Goutham Rao>of these agents interface with their human counterpart? Do they have a certain personality?
+
+191
+00:14:03.060 --> 00:14:07.760
+<v Goutham Rao>Do they adapt the personality? We have to figure these things out over the course of the next one,
+
+192
+00:14:07.800 --> 00:14:12.140
+<v Goutham Rao>maybe one plus even longer periods of time in terms of years.
+
+193
+00:14:14.780 --> 00:14:20.420
+<v Noah Labhart>You know, I hear you saying we in the, you know, in the past, present, future explanation there,
+
+194
+00:14:20.460 --> 00:14:24.780
+<v Noah Labhart>tell me about how you built your team. And I'm curious about what you look for in those people
+
+195
+00:14:24.780 --> 00:14:26.820
+<v Noah Labhart>to indicate that they're the winning horses to join you.
+
+196
+00:14:27.660 --> 00:14:30.200
+<v Goutham Rao>Look, I've been fortunate enough that
+
+197
+00:14:30.200 --> 00:14:33.840
+<v Goutham Rao>over the past, I don't know how many ever years of my career, 30, let's just say 30,
+
+198
+00:14:34.520 --> 00:14:40.580
+<v Goutham Rao>I've been in the Valley that long, worked with a lot of great people. So I know in our domain,
+
+199
+00:14:40.700 --> 00:14:45.440
+<v Goutham Rao>who to call on. Then the people that we work with here at NeuBird, almost all, a lot of them are
+
+200
+00:14:45.440 --> 00:14:50.780
+<v Goutham Rao>people that I worked with in the past. And we have, luckily the new people, we've been able to
+
+201
+00:14:50.780 --> 00:14:56.020
+<v Goutham Rao>attract top-notch talent because I think the problem we're solving is so interesting.
+
+202
+00:14:56.680 --> 00:15:02.760
+<v Goutham Rao>People also have an element of trust in us. We raised money from the top VCs in the Valley,
+
+203
+00:15:02.900 --> 00:15:08.220
+<v Goutham Rao>actually in the world. Mayfield was an investor in my last company, Portworx, and is an investor
+
+204
+00:15:08.220 --> 00:15:14.740
+<v Goutham Rao>in us now. And Navin Chaddha, who's the managing director at Mayfield, is on our board. He's one
+
+205
+00:15:14.740 --> 00:15:19.160
+<v Goutham Rao>of the smartest people I know. Two seconds and he gets the problem statement. An iconic VC,
+
+206
+00:15:20.580 --> 00:15:26.560
+<v Goutham Rao>companies. And so that attracts a lot of, adds a lot of clout to NeuBird, attracts a lot of talent.
+
+207
+00:15:26.980 --> 00:15:30.840
+<v Goutham Rao>We've been able to raise additional funds from Microsoft, for instance,
+
+208
+00:15:31.040 --> 00:15:34.640
+<v Goutham Rao>halfway through our journey, Microsoft got interested in what we're doing.
+
+209
+00:15:34.800 --> 00:15:40.960
+<v Goutham Rao>We had customers that were using Hawkeye on Microsoft cloud on Azure, high profile customers,
+
+210
+00:15:41.260 --> 00:15:47.840
+<v Goutham Rao>big logos. And so Microsoft being one of the leaders in the AI space said, look, IT ops is
+
+211
+00:15:47.840 --> 00:15:53.720
+<v Goutham Rao>our core area of interest and so is AI and we like what you're doing at NeuBird
+
+212
+00:15:53.720 --> 00:15:58.540
+<v Goutham Rao>and how about we also invest in you and so they increased our funding to a
+
+213
+00:15:58.540 --> 00:16:02.580
+<v Goutham Rao>healthy amount somewhere around 44 million. I'm not saying that this is what
+
+214
+00:16:02.580 --> 00:16:07.240
+<v Goutham Rao>it takes to build a team. This certainly helped us, right? Having top tier VCs,
+
+215
+00:16:07.440 --> 00:16:12.800
+<v Goutham Rao>having the cash we need, but also having a starting team at NeuBird that's done
+
+216
+00:16:12.800 --> 00:16:17.820
+<v Goutham Rao>it before and has a track record clearly understands this space. So we essentially
+
+217
+00:16:17.840 --> 00:16:23.300
+<v Goutham Rao>We assembled an initial team of around, I would say, six or seven people as we were building out the core product.
+
+218
+00:16:23.720 --> 00:16:27.320
+<v Goutham Rao>Our Justin, who's our product manager, is a key part of this team.
+
+219
+00:16:27.460 --> 00:16:32.640
+<v Goutham Rao>He comes from the observability space, really understands the product requirements very well,
+
+220
+00:16:32.680 --> 00:16:37.840
+<v Goutham Rao>and is very articulate and is able to detail out the details of what he wants to have built.
+
+221
+00:16:38.320 --> 00:16:41.360
+<v Goutham Rao>It helps that the team has fun working together.
+
+222
+00:16:41.580 --> 00:16:43.060
+<v Goutham Rao>We're an in-office culture.
+
+223
+00:16:43.060 --> 00:16:48.600
+<v Goutham Rao>We make it a point to build a very good cultural experience, so to speak, around NeuBird.
+
+224
+00:16:48.980 --> 00:16:54.620
+<v Goutham Rao>We work in downtown Redwood City, which for your audience is in the middle of the Silicon Valley.
+
+225
+00:16:54.740 --> 00:17:02.280
+<v Goutham Rao>And where we are, some of the better restaurants in the Bay Area, right there all clustered around our office.
+
+226
+00:17:03.040 --> 00:17:06.400
+<v Goutham Rao>We got this fun building, one of the oldest buildings in Redwood City.
+
+227
+00:17:06.580 --> 00:17:07.540
+<v Goutham Rao>The roof opens up.
+
+228
+00:17:07.940 --> 00:17:10.940
+<v Goutham Rao>In any event, I'm just trying to say that it's fun going into work.
+
+229
+00:17:10.940 --> 00:17:14.360
+<v Goutham Rao>and people like each other and they've worked with each other in the past.
+
+230
+00:17:14.520 --> 00:17:18.860
+<v Goutham Rao>A lot of the folks that we work with have worked in one way, shape or form with each other before.
+
+231
+00:17:19.040 --> 00:17:20.360
+<v Goutham Rao>So they have that history.
+
+232
+00:17:21.260 --> 00:17:24.060
+<v Goutham Rao>We are now a company of the 30 people.
+
+233
+00:17:24.200 --> 00:17:27.340
+<v Goutham Rao>Our go-to-market team came on board early this year.
+
+234
+00:17:27.560 --> 00:17:31.300
+<v Goutham Rao>Again, people that I've worked with, Paul, who leads our go-to-market,
+
+235
+00:17:31.520 --> 00:17:34.680
+<v Goutham Rao>for instance, or Patrick, who leads our business,
+
+236
+00:17:34.740 --> 00:17:38.300
+<v Goutham Rao>or Francois, our field CTO at EAST.
+
+237
+00:17:38.300 --> 00:17:41.240
+<v Goutham Rao>These are all people I work with really understand the space very well.
+
+238
+00:17:41.860 --> 00:17:48.260
+<v Goutham Rao>And it helps where you don't have to overly communicate with people because you understand each other's expectations, body language.
+
+239
+00:17:48.540 --> 00:17:50.320
+<v Goutham Rao>These things are things you learn over time.
+
+240
+00:17:50.600 --> 00:17:56.680
+<v Goutham Rao>So communication is super efficient and we know what we need to do and we just get that thing done.
+
+241
+00:18:00.440 --> 00:18:02.460
+<v Noah Labhart>Okay, so let's flip to scalability.
+
+242
+00:18:02.580 --> 00:18:05.660
+<v Noah Labhart>And this will be interesting given you're serving, you know, you're serving enterprises.
+
+243
+00:18:05.660 --> 00:18:12.000
+<v Noah Labhart>I'm curious about how you approach scalability and if there's been any interesting areas where you've had to fight it as you've grown.
+
+244
+00:18:12.780 --> 00:18:14.800
+<v Goutham Rao>There are two aspects to this.
+
+245
+00:18:15.360 --> 00:18:18.900
+<v Goutham Rao>Enterprise data has always been the Achilles heel of an enterprise.
+
+246
+00:18:18.980 --> 00:18:20.260
+<v Goutham Rao>There is just too much data.
+
+247
+00:18:20.380 --> 00:18:24.420
+<v Goutham Rao>And what too much data does is it causes too much noise.
+
+248
+00:18:24.660 --> 00:18:27.700
+<v Goutham Rao>And noise is not good for AI.
+
+249
+00:18:28.420 --> 00:18:30.520
+<v Goutham Rao>LLMs will always create an answer.
+
+250
+00:18:30.700 --> 00:18:32.200
+<v Goutham Rao>They'll always come up with something.
+
+251
+00:18:32.320 --> 00:18:33.840
+<v Goutham Rao>And the whole point here is context.
+
+252
+00:18:35.660 --> 00:18:39.800
+<v Goutham Rao>to scale, one of the key problems that we've had to solve algorithmically and scientifically
+
+253
+00:18:40.620 --> 00:18:47.520
+<v Goutham Rao>is you are sitting on a sea of data and all of that is largely useless for the issue at hand,
+
+254
+00:18:47.680 --> 00:18:52.660
+<v Goutham Rao>for the incident at hand that you're dealing with. You have these LLMs that have this rich
+
+255
+00:18:52.660 --> 00:18:58.060
+<v Goutham Rao>information in them, this complex reasoning capabilities, but they're useless if you're
+
+256
+00:18:58.060 --> 00:19:02.300
+<v Goutham Rao>not going to give it the right information. I give an analogy where you could go to the
+
+257
+00:19:02.300 --> 00:19:06.860
+<v Goutham Rao>the best doctor on the planet, and if you're vague about your symptoms or you mislead,
+
+258
+00:19:07.600 --> 00:19:11.480
+<v Goutham Rao>that doctor is useless. You're not going to get a good result. But if you're very surgical in
+
+259
+00:19:11.480 --> 00:19:18.740
+<v Goutham Rao>explaining this exactly hurts here, exactly when I do this at this time, you get a higher quality
+
+260
+00:19:18.740 --> 00:19:24.640
+<v Goutham Rao>result. And so that there is context. And so we've had to solve that problem of sitting on
+
+261
+00:19:24.640 --> 00:19:30.000
+<v Goutham Rao>a massive amount of data, going back to your scale question, and how do you surgically extract
+
+262
+00:19:30.000 --> 00:19:34.540
+<v Goutham Rao>exactly what could be relevant for this issue so that the LLMs can do the right job.
+
+263
+00:19:35.080 --> 00:19:39.500
+<v Goutham Rao>That's some of our secret sauce in how we do that. That's a mathematical problem. It's an
+
+264
+00:19:39.500 --> 00:19:45.060
+<v Goutham Rao>algorithmic problem. It's a data structure problem. And we've spent most of our time solving exactly
+
+265
+00:19:45.060 --> 00:19:51.620
+<v Goutham Rao>that problem. At NeuBird.ai, more than anything, we are a data science company. While we are an AI
+
+266
+00:19:51.620 --> 00:19:57.880
+<v Goutham Rao>company, we know how to make the AI work because we know how to extract the right data by solving
+
+267
+00:19:57.880 --> 00:20:02.360
+<v Goutham Rao>solving that data science problem when understanding that IT telemetry is vast.
+
+268
+00:20:03.200 --> 00:20:08.280
+<v Goutham Rao>We, since we're an inference platform, that's what an agent is, it's doing the inference,
+
+269
+00:20:08.540 --> 00:20:12.660
+<v Goutham Rao>we don't have to store any data. So luckily for us, this is not a storage problem.
+
+270
+00:20:13.040 --> 00:20:17.300
+<v Goutham Rao>I've solved that problem in the past at Portworx. That's not a fun problem to solve
+
+271
+00:20:17.300 --> 00:20:22.440
+<v Goutham Rao>because you're dealing with the scale of how do you store massive amounts of terabytes and how do
+
+272
+00:20:22.440 --> 00:20:27.340
+<v Goutham Rao>you access that data quickly. Luckily, we work with the people that have solved that, which are
+
+273
+00:20:27.880 --> 00:20:33.260
+<v Goutham Rao>observability platforms like a Datadog or Splunk or Sysdig, or just even object stores, raw
+
+274
+00:20:33.260 --> 00:20:40.480
+<v Goutham Rao>telemetry like Prometheus. And so we leverage existing observability platforms. So storing
+
+275
+00:20:40.480 --> 00:20:46.600
+<v Goutham Rao>massive amounts of data is not a scale issue we've had to solve for. And then the third degree here
+
+276
+00:20:46.600 --> 00:20:54.260
+<v Goutham Rao>to the scale problem for us really is, look, GPUs are limited. So how many incidents can you handle
+
+277
+00:20:54.260 --> 00:20:59.560
+<v Goutham Rao>simultaneously. That ultimately becomes our problem because that adds to time. If a company
+
+278
+00:20:59.560 --> 00:21:04.400
+<v Goutham Rao>is getting thousands of alerts in an hour, how do you efficiently go through those? So we had to
+
+279
+00:21:04.400 --> 00:21:10.600
+<v Goutham Rao>deploy AI to do things like incident grouping, deduplication, correlation, causality analysis
+
+280
+00:21:10.600 --> 00:21:15.580
+<v Goutham Rao>before we actually go do the inference. That's been another very hard problem for us to solve.
+
+281
+00:21:15.640 --> 00:21:21.380
+<v Goutham Rao>That's again, another data science problem in how do you break down a barrage of issues that are
+
+282
+00:21:21.380 --> 00:21:25.560
+<v Goutham Rao>are coming in and distill it down to a few core set of issues that you can focus on.
+
+283
+00:21:25.960 --> 00:21:31.580
+<v Goutham Rao>That's a very hard problem. And that alone has its own roadmap of how we solve that.
+
+284
+00:21:31.780 --> 00:21:35.260
+<v Goutham Rao>But that's been a big pillar for us that we've had to take down.
+
+285
+00:21:37.080 --> 00:21:42.580
+<v Noah Labhart>So as you step on the balcony and you look across all that you've built thus far with NeuBird,
+
+286
+00:21:42.720 --> 00:21:44.620
+<v Noah Labhart>what are you most proud of? I'm
+
+287
+00:21:44.620 --> 00:21:47.440
+<v Goutham Rao>really proud of a couple of things. I'm proud of the team
+
+288
+00:21:47.440 --> 00:21:49.580
+<v Goutham Rao>and the team that has built Hawkeye so far.
+
+289
+00:21:50.080 --> 00:21:51.760
+<v Goutham Rao>I'm really proud of Hawkeye.
+
+290
+00:21:51.860 --> 00:21:53.680
+<v Goutham Rao>There are times where Vinod and I,
+
+291
+00:21:53.760 --> 00:21:55.860
+<v Goutham Rao>we're constantly testing this because,
+
+292
+00:21:55.900 --> 00:21:59.220
+<v Goutham Rao>first of all, we're like two kids in a candy store with Hawkeye
+
+293
+00:21:59.220 --> 00:22:00.940
+<v Goutham Rao>because we've seen all of these problems
+
+294
+00:22:00.940 --> 00:22:02.200
+<v Goutham Rao>that we'd had to solve ourselves.
+
+295
+00:22:02.540 --> 00:22:05.560
+<v Goutham Rao>So I'm really proud when I see Hawkeye solve a problem
+
+296
+00:22:05.560 --> 00:22:07.180
+<v Goutham Rao>and that we pose it.
+
+297
+00:22:07.420 --> 00:22:09.360
+<v Goutham Rao>And we're like, wow, how did it?
+
+298
+00:22:09.620 --> 00:22:11.400
+<v Goutham Rao>Because the whole point behind Gen AI
+
+299
+00:22:11.400 --> 00:22:15.040
+<v Goutham Rao>is you're leveraging the cognitive aspect of these LLMs.
+
+300
+00:22:15.040 --> 00:22:18.720
+<v Goutham Rao>So what I mean by that is it's not the outcome is not predictable.
+
+301
+00:22:19.220 --> 00:22:22.020
+<v Goutham Rao>You're hoping for a certain type of thought process.
+
+302
+00:22:22.180 --> 00:22:33.040
+<v Goutham Rao>But every time Hawkeye thinks it is applying, you know, deep in its neural networks, information that it's pulling out is from varied sources of its training that we wouldn't know.
+
+303
+00:22:33.160 --> 00:22:41.900
+<v Goutham Rao>We know that it's seen all of these things and been trained by people building these foundational models by training it on massive amounts of data sets that are out there in the public.
+
+304
+00:22:41.900 --> 00:22:46.300
+<v Goutham Rao>but we don't know what those are and we wouldn't know that somebody else had seen something like
+
+305
+00:22:46.300 --> 00:22:51.020
+<v Goutham Rao>this before and so when Hawkeye pulls that out of its brain and says I'm going to solve it this way
+
+306
+00:22:51.020 --> 00:22:56.460
+<v Goutham Rao>and it just blows our mind and we're like that's you expect it but you don't when you see it it's
+
+307
+00:22:56.460 --> 00:23:01.020
+<v Goutham Rao>a different experience and that feeling that you get is something else and so I'm really proud of
+
+308
+00:23:01.020 --> 00:23:04.100
+<v Goutham Rao>that and yeah if I had to pick two things I would say those two.
+
+309
+00:23:05.320 --> 00:23:06.760
+<v Noah Labhart>Okay let's flip the script a little
+
+310
+00:23:06.760 --> 00:23:10.420
+<v Noah Labhart>little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+311
+00:23:12.960 --> 00:23:19.600
+<v Goutham Rao>Mistakes are, if they're not binary, unfortunately, it's a sliding scale. You have to make mistakes.
+
+312
+00:23:19.720 --> 00:23:24.820
+<v Goutham Rao>If you're not making mistakes, you're doing something wrong. And you make the mistakes
+
+313
+00:23:24.820 --> 00:23:30.980
+<v Goutham Rao>sometimes purposely to even learn and find out what the push buttons are, what the no,
+
+314
+00:23:31.000 --> 00:23:36.460
+<v Goutham Rao>you definitely don't do that kind of things are. You have to test those boundaries and you do
+
+315
+00:23:36.760 --> 00:23:38.320
+<v Goutham Rao>Both things are going to make mistakes.
+
+316
+00:23:38.660 --> 00:23:44.400
+<v Goutham Rao>You can get very ambitious in our domain in saying we're going to solve for all types of IT telemetry.
+
+317
+00:23:44.740 --> 00:23:47.940
+<v Goutham Rao>Well, do you really need to solve all possible use cases?
+
+318
+00:23:48.240 --> 00:23:54.740
+<v Goutham Rao>Because the domain is so vast, you don't have to solve, for instance, edge networking use cases.
+
+319
+00:23:54.860 --> 00:24:01.720
+<v Goutham Rao>IT ops is big enough where just around four infrastructure ops alone, there are so many different use cases there.
+
+320
+00:24:01.860 --> 00:24:03.040
+<v Goutham Rao>So focus on that.
+
+321
+00:24:03.180 --> 00:24:06.220
+<v Goutham Rao>And so early on, we said, hey, do we solve for this?
+
+322
+00:24:06.760 --> 00:24:11.960
+<v Goutham Rao>tried a few things while we could it would be its own rabbit hole we're going to go down so while i
+
+323
+00:24:11.960 --> 00:24:15.820
+<v Goutham Rao>wouldn't necessarily call it a mistake it's something you test and say okay we'll defer
+
+324
+00:24:15.820 --> 00:24:22.520
+<v Goutham Rao>that come back to that later another one do you necessarily only have users interface with the
+
+325
+00:24:22.520 --> 00:24:27.560
+<v Goutham Rao>agent and i don't think that's right so we quickly learned that while that's very interesting and
+
+326
+00:24:27.560 --> 00:24:33.680
+<v Goutham Rao>necessary that having that as the only interface is wrong and so we corrected that and we now
+
+327
+00:24:33.680 --> 00:24:40.000
+<v Goutham Rao>now mostly sit autonomously and asynchronously resolve issues in the background and letting
+
+328
+00:24:40.000 --> 00:24:45.340
+<v Goutham Rao>people don't be front and center in their face that you're an agent, just do things in the back
+
+329
+00:24:45.340 --> 00:24:51.940
+<v Goutham Rao>and let people understand the benefits of silent AI. So on a daily basis, we're always making
+
+330
+00:24:51.940 --> 00:24:56.100
+<v Goutham Rao>mistakes and learning from it. And I don't think it's something to be scared about. But what I want
+
+331
+00:24:56.100 --> 00:25:00.420
+<v Goutham Rao>to say is the point behind making mistakes, though, you have to know is you have to be able to recover
+
+332
+00:25:00.420 --> 00:25:04.740
+<v Goutham Rao>hover fast, undo, course correct, micro pivot, and move on.
+
+333
+00:25:05.120 --> 00:25:10.380
+<v Goutham Rao>So as long as you can be that agile, mistakes are a necessary part of building something.
+
+334
+00:25:14.240 --> 00:25:15.500
+<v Noah Labhart>Okay, this will be interesting.
+
+335
+00:25:15.640 --> 00:25:17.080
+<v Noah Labhart>What does the future look like?
+
+336
+00:25:17.200 --> 00:25:21.500
+<v Noah Labhart>For NeuBird, for the product, and for your team, what are you dreaming about?
+
+337
+00:25:22.180 --> 00:25:27.260
+<v Goutham Rao>Obviously, nobody has a crystal ball, but you engineer toward where you want to be headed.
+
+338
+00:25:27.420 --> 00:25:29.500
+<v Goutham Rao>You paint a picture of this is what you would like.
+
+339
+00:25:30.420 --> 00:25:34.300
+<v Goutham Rao>And for us, that obviously is to be the leader in the agentic SRE space.
+
+340
+00:25:34.520 --> 00:25:42.260
+<v Goutham Rao>We are today by far in terms of customer engagements, in terms of the quality of results and the accuracy of the agent.
+
+341
+00:25:42.400 --> 00:25:50.940
+<v Goutham Rao>In the future, as this goes on, what we want to see is just that Hawkeye is a household name, at least in the IT portion of enterprises,
+
+342
+00:25:51.040 --> 00:25:58.320
+<v Goutham Rao>that every enterprise out there has a team of Hawkeyes working as part of the IT ops workforce,
+
+343
+00:25:58.320 --> 00:26:04.380
+<v Goutham Rao>forth that dealing with noisy PagerDuty alerts or this is a fact you go into any enterprise and
+
+344
+00:26:04.380 --> 00:26:09.760
+<v Goutham Rao>say how many open tickets you have and it's in the thousands and those things are no longer the case
+
+345
+00:26:09.760 --> 00:26:14.500
+<v Goutham Rao>in the very not so distant future. I think it'll take a year and a half for us to start cracking
+
+346
+00:26:14.500 --> 00:26:19.920
+<v Goutham Rao>that but it'll be many years before anybody actually gets to claim the household name status.
+
+347
+00:26:21.120 --> 00:26:26.280
+<v Noah Labhart>Okay let's switch to you. Who influences the way that you work? Name a person or many persons or
+
+348
+00:26:26.280 --> 00:26:27.760
+<v Noah Labhart>something you look up to and why?
+
+349
+00:26:28.480 --> 00:26:31.620
+<v Goutham Rao>Oh, there are many different influences I have
+
+350
+00:26:31.620 --> 00:26:35.340
+<v Goutham Rao>when it comes to focus on that relentless focus
+
+351
+00:26:35.340 --> 00:26:37.140
+<v Goutham Rao>on end user experience.
+
+352
+00:26:37.560 --> 00:26:40.760
+<v Goutham Rao>No, I'm very opinionated in how this is going to be built.
+
+353
+00:26:40.880 --> 00:26:42.020
+<v Goutham Rao>You guess who that is?
+
+354
+00:26:42.060 --> 00:26:44.360
+<v Goutham Rao>You can't not look at Steve Jobs and what he's done.
+
+355
+00:26:44.520 --> 00:26:46.680
+<v Goutham Rao>So I'm very driven by that
+
+356
+00:26:46.680 --> 00:26:48.680
+<v Goutham Rao>and all the products that we've built in,
+
+357
+00:26:48.740 --> 00:26:51.080
+<v Goutham Rao>especially as it relates to Hawkeye,
+
+358
+00:26:51.120 --> 00:26:51.780
+<v Goutham Rao>which is an agent,
+
+359
+00:26:51.840 --> 00:26:53.740
+<v Goutham Rao>which is the shiny new thing
+
+360
+00:26:53.740 --> 00:26:55.600
+<v Goutham Rao>that people are going to be interfacing with.
+
+361
+00:26:56.280 --> 00:27:02.060
+<v Goutham Rao>focused on its UX. As it relates to work ethics, there are a number of people that come to mind,
+
+362
+00:27:02.060 --> 00:27:06.900
+<v Goutham Rao>even in the non-tech space. I can name people in music, but I don't know that everybody knows
+
+363
+00:27:06.900 --> 00:27:12.940
+<v Goutham Rao>some of the folks I'd cite. But just to focus on getting the quality of the chords right and just
+
+364
+00:27:12.940 --> 00:27:18.980
+<v Goutham Rao>focusing on relentlessly just that. You can just tell what their work ethic is like. I have a lot
+
+365
+00:27:18.980 --> 00:27:23.080
+<v Goutham Rao>of personal friends that your audience wouldn't know that I draw inspiration from.
+
+366
+00:27:24.520 --> 00:27:30.740
+<v Noah Labhart>Last question. So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+367
+00:27:30.880 --> 00:27:33.260
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world.
+
+368
+00:27:33.300 --> 00:27:34.780
+<v Noah Labhart>They can't wait to show it off to you right there on the plane.
+
+369
+00:27:34.900 --> 00:27:38.080
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+370
+00:27:38.860 --> 00:27:42.460
+<v Goutham Rao>My advice would be, or it's not an advice necessarily.
+
+371
+00:27:42.920 --> 00:27:50.460
+<v Goutham Rao>I would just say what I'm scared of as, you know, look, first of all, even though you've done this before, you're always in that boat again.
+
+372
+00:27:50.460 --> 00:27:53.100
+<v Goutham Rao>Again, it's back to square one when you start a new company.
+
+373
+00:27:53.240 --> 00:27:59.860
+<v Goutham Rao>It's your past experience is just your experience, but that doesn't give you the right for success at all.
+
+374
+00:28:00.180 --> 00:28:05.940
+<v Goutham Rao>It's for you as an entrepreneur to draw from it, to say, I'm going to take on that experience, but you're starting from scratch again.
+
+375
+00:28:06.120 --> 00:28:10.540
+<v Goutham Rao>So that person on that plane you're talking about that's built the next best thing is me.
+
+376
+00:28:11.280 --> 00:28:13.820
+<v Goutham Rao>So it's the question you're asking me.
+
+377
+00:28:13.940 --> 00:28:15.860
+<v Goutham Rao>I would say, what advice would I give myself?
+
+378
+00:28:15.860 --> 00:28:20.560
+<v Goutham Rao>self. And knowing what I know now, I would say, look, if you believe you've built the next best
+
+379
+00:28:20.560 --> 00:28:25.640
+<v Goutham Rao>thing, be paranoid because somebody else is building that. And you're not the only one with
+
+380
+00:28:25.640 --> 00:28:31.780
+<v Goutham Rao>that idea. So then what you have to do is get out there quickly in front of customers and make that
+
+381
+00:28:31.780 --> 00:28:36.460
+<v Goutham Rao>next best thing even better because it's never the best thing. It will only be better over time.
+
+382
+00:28:36.640 --> 00:28:41.820
+<v Goutham Rao>So don't sit back and say, this is it. And to do that, you need to find customers that are using
+
+383
+00:28:41.820 --> 00:28:44.200
+<v Goutham Rao>using it and giving you feedback and making it better.
+
+384
+00:28:44.420 --> 00:28:47.400
+<v Goutham Rao>And then just outmaneuver everybody else.
+
+385
+00:28:47.420 --> 00:28:48.120
+<v Goutham Rao>Be an athlete.
+
+386
+00:28:48.300 --> 00:28:48.840
+<v Goutham Rao>Go fast.
+
+387
+00:28:49.180 --> 00:28:50.060
+<v Goutham Rao>Go wide.
+
+388
+00:28:50.100 --> 00:28:53.060
+<v Goutham Rao>Get as many runs on the board as possible very quickly.
+
+389
+00:28:53.600 --> 00:28:55.280
+<v Goutham Rao>There's somebody right behind you.
+
+390
+00:28:55.360 --> 00:28:59.500
+<v Goutham Rao>So don't even look in the rearview mirror because there are a lot of people behind you.
+
+391
+00:28:59.540 --> 00:29:02.580
+<v Goutham Rao>Just keep running like you have a pack of zombies running behind you.
+
+392
+00:29:02.660 --> 00:29:03.640
+<v Goutham Rao>And don't tire.
+
+393
+00:29:03.900 --> 00:29:06.600
+<v Goutham Rao>And just let the whole world know what you're doing.
+
+394
+00:29:06.660 --> 00:29:07.760
+<v Goutham Rao>Be loud about it.
+
+395
+00:29:07.820 --> 00:29:08.480
+<v Goutham Rao>Be proud about
+
+396
+00:29:08.480 --> 00:29:08.980
+<v Noah Labhart>it.
+
+397
+00:29:08.760 --> 00:29:09.900
+<v Noah Labhart>That's fantastic advice.
+
+398
+00:29:11.820 --> 00:29:13.800
+<v Noah Labhart>today. Thank you for telling the creation story
+
+399
+00:29:13.800 --> 00:29:14.680
+<v Noah Labhart>of NeuBird.
+
+400
+00:29:14.860 --> 00:29:15.540
+<v Goutham Rao>Thank you, Noah.
+
+401
+00:29:17.760 --> 00:29:19.380
+<v Noah Labhart>And this concludes another chapter
+
+402
+00:29:19.380 --> 00:29:20.400
+<v Noah Labhart>of Code Story.
+
+403
+00:29:26.020 --> 00:29:27.960
+<v Noah Labhart>Code Story is hosted and produced
+
+404
+00:29:27.960 --> 00:29:29.960
+<v Noah Labhart>by Noah Labhart. Be sure to
+
+405
+00:29:29.960 --> 00:29:31.800
+<v Noah Labhart>subscribe on Apple Podcasts, Spotify,
+
+406
+00:29:32.000 --> 00:29:33.940
+<v Noah Labhart>or the podcasting app of your choice.
+
+407
+00:29:34.580 --> 00:29:35.960
+<v Noah Labhart>And when you get a chance,
+
+408
+00:29:36.020 --> 00:29:37.840
+<v Noah Labhart>leave us a review. Both things
+
+409
+00:29:37.840 --> 00:29:38.960
+<v Noah Labhart>help us out tremendously.
+
+410
+00:29:41.900 --> 00:29:43.380
+<v Noah Labhart>And thanks again for listening.

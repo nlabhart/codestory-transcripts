@@ -1,0 +1,1555 @@
+WEBVTT
+
+NOTE S9 E25: The Incident Response Revolution: Overthrowing War-Room Chaos and Automating Slack-Native SRE Workflows with JJ Tang, Co-Founder & CEO of Rootly
+
+1
+00:00:02.460 --> 00:00:12.460
+<v JJ Tang>Companies, although on the surface look the same, kind of use the same tools, they all run a really different process based on their culture, based on their communication, based on the processes they have.
+
+2
+00:00:12.540 --> 00:00:18.220
+<v JJ Tang>So actually, the MVP we had at Instacart did not work for other types of companies, which was surprising.
+
+3
+00:00:18.480 --> 00:00:24.420
+<v JJ Tang>And myself and Quintin, my CTO, we looked at each other and we said, do we just do we just make the wrong decision here?
+
+4
+00:00:26.600 --> 00:00:32.720
+<v JJ Tang>As it turns out, we just needed something a little bit more generic that fit more use cases to begin with.
+
+5
+00:00:32.840 --> 00:00:38.420
+<v JJ Tang>So we started with thinking about how can we get this in the hands of users as quickly as possible?
+
+6
+00:00:39.260 --> 00:00:42.840
+<v JJ Tang>I'm JJ Tang. I'm the co-founder and CEO here at Rootly.
+
+7
+00:00:46.540 --> 00:00:52.200
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+8
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+9
+00:00:55.160 --> 00:00:58.060
+<v Noah Labhart>who share what it takes to change an industry
+
+10
+00:00:58.060 --> 00:00:58.560
+<v Noah Labhart>who
+
+11
+00:00:58.520 --> 00:01:00.980
+<v Clip>built
+
+12
+00:01:00.980 --> 00:01:04.500
+<v Noah Labhart>the teams that have their back
+
+13
+00:01:08.740 --> 00:01:11.220
+<v Noah Labhart>keeping scalability top of mind
+
+14
+00:01:14.960 --> 00:01:17.820
+<v Noah Labhart>the stories you don't read in the headlines
+
+15
+00:01:17.820 --> 00:01:19.820
+<v Clip>it's not an easy thing to achieve
+
+16
+00:01:19.820 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+17
+00:01:22.620 --> 00:01:25.860
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+18
+00:01:26.200 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+19
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+20
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+21
+00:01:32.520 --> 00:01:34.040
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+22
+00:01:34.280 --> 00:01:42.580
+<v Noah Labhart>And today, how JJ Tang built beautiful, modern incident management centered around Slack and powered by AI.
+
+23
+00:01:49.000 --> 00:01:54.520
+<v Noah Labhart>J.J. Tang grew up in mainland China, though eventually he came to the U.S. for university and stayed.
+
+24
+00:01:54.960 --> 00:02:00.620
+<v Noah Labhart>He found a job, started working, and eventually moved to Canada as the entrepreneur ecosystem was quite friendly.
+
+25
+00:02:00.880 --> 00:02:07.320
+<v Noah Labhart>He has worked for companies like Instacart, IBM, and Cisco, gaining vast experience in a myriad of roles.
+
+26
+00:02:07.320 --> 00:02:13.200
+<v Noah Labhart>But outside of tech, he is engaged to be married in 2025 and is big into road cycling.
+
+27
+00:02:13.440 --> 00:02:18.420
+<v Noah Labhart>In addition to this, he has a dog named Nova, which his current venture centers their merch design around.
+
+28
+00:02:20.240 --> 00:02:24.380
+<v Noah Labhart>At Instacart, JJ started to build a tool for infrastructure monitoring.
+
+29
+00:02:24.740 --> 00:02:29.200
+<v Noah Labhart>When he realized that building it was cumbersome and nothing existed in the market,
+
+30
+00:02:29.340 --> 00:02:35.140
+<v Noah Labhart>he decided to take one of the company's best SRE engineers and start a company, building this very product.
+
+31
+00:02:37.520 --> 00:02:40.220
+<v Noah Labhart>This is the creation story of Rootly.
+
+32
+00:02:44.700 --> 00:02:52.080
+<v JJ Tang>Rootly is an incident management and on-call platform, specifically, for the most part, focused on engineers.
+
+33
+00:02:52.260 --> 00:02:55.680
+<v JJ Tang>We help you manage and resolve critical incidents.
+
+34
+00:02:55.940 --> 00:03:00.880
+<v JJ Tang>So, for example, if your website is having an outage, we're going to page you in the middle of the night.
+
+35
+00:03:00.880 --> 00:03:11.000
+<v JJ Tang>We'll help you get started on the incident, collaborate, jump in, work on it, ultimately put together your postmortem, your timeline, gather metrics around it, and keep that feedback loop going.
+
+36
+00:03:11.220 --> 00:03:19.740
+<v JJ Tang>So we are the critical platform that companies like LinkedIn and Figma and hundreds of others use to manage their incidents.
+
+37
+00:03:20.400 --> 00:03:26.140
+<v JJ Tang>I used to work at the grocery delivery company Instacart, and I'd fly all around middle America.
+
+38
+00:03:26.140 --> 00:03:30.280
+<v JJ Tang>I live in Toronto, but I fly all around America meeting grocery executives.
+
+39
+00:03:30.560 --> 00:03:36.620
+<v JJ Tang>And a large part of my conversation was explaining what was going on during these incidents that we would have.
+
+40
+00:03:36.920 --> 00:03:41.260
+<v JJ Tang>And when I looked internally, it turned out the incidents themselves weren't too bad.
+
+41
+00:03:41.440 --> 00:03:48.500
+<v JJ Tang>The part that was really painful was getting a really good consistent process around it, depending on the type of incident that was happening.
+
+42
+00:03:48.500 --> 00:03:54.900
+<v JJ Tang>So for example, like a shopper couldn't check out or during COVID, everyone was trying to order toilet paper.
+
+43
+00:03:55.060 --> 00:03:57.220
+<v JJ Tang>So we had no availability for toilet paper.
+
+44
+00:03:57.380 --> 00:03:58.600
+<v JJ Tang>How would you fix those?
+
+45
+00:03:58.860 --> 00:04:07.780
+<v JJ Tang>And because we didn't have a great process, we were mostly just pinging each other on Slack and pinging the most senior engineer in the company and hoping for the best.
+
+46
+00:04:07.920 --> 00:04:13.760
+<v JJ Tang>I asked my now CTO, who was the first SRE site reliability engineer at Instacart.
+
+47
+00:04:13.860 --> 00:04:17.520
+<v JJ Tang>I said, hey, we should start building product that kind of solves this.
+
+48
+00:04:18.500 --> 00:04:24.580
+<v JJ Tang>building Rootly actually internally as a tool at Instacart. And one of the senior executives asked
+
+49
+00:04:24.580 --> 00:04:30.380
+<v JJ Tang>me, he said, isn't it odd that we are building critical infrastructure tooling ourselves and
+
+50
+00:04:30.380 --> 00:04:34.900
+<v JJ Tang>we're a grocery delivery company? And I said, yeah, that is really odd. Let me go look for
+
+51
+00:04:35.380 --> 00:04:39.520
+<v JJ Tang>other tools that are out there and see if we can just bring something in because it's very
+
+52
+00:04:39.520 --> 00:04:43.620
+<v JJ Tang>burdensome to build it yourself. And I did a quick search and it turned out at the time,
+
+53
+00:04:43.620 --> 00:04:45.980
+<v JJ Tang>There was nothing really out there that solved this problem.
+
+54
+00:04:46.260 --> 00:04:52.280
+<v JJ Tang>And so my report and debrief to him was, hey, I'm actually going to go start this company myself.
+
+55
+00:04:52.380 --> 00:04:55.120
+<v JJ Tang>And your best SRE, he's also going to come with me.
+
+56
+00:04:55.480 --> 00:04:57.400
+<v JJ Tang>And that's how the company started.
+
+57
+00:04:57.520 --> 00:04:59.460
+<v JJ Tang>So it was really out of our own necessity.
+
+58
+00:05:00.340 --> 00:05:04.900
+<v JJ Tang>Everyone has incidents and they never go away and they never really get better.
+
+59
+00:05:04.960 --> 00:05:07.040
+<v JJ Tang>You just get way better at managing it.
+
+60
+00:05:07.140 --> 00:05:13.440
+<v JJ Tang>And our goal is really we want not only be the go-to way on how companies manage or solve these incidents,
+
+61
+00:05:13.620 --> 00:05:21.420
+<v JJ Tang>But we also want to help you improve that process ultimately and turn these incidents into unplanned learning opportunities for your company.
+
+62
+00:05:23.440 --> 00:05:27.860
+<v Noah Labhart>Let's dive into the MVP. Tell me about that first version of the product you built.
+
+63
+00:05:27.940 --> 00:05:31.700
+<v Noah Labhart>Maybe this is within Instacart or maybe it's after. I'll let you decide.
+
+64
+00:05:31.860 --> 00:05:33.960
+<v Noah Labhart>Or maybe it's a little bit of both. But tell me about that MVP.
+
+65
+00:05:34.180 --> 00:05:37.340
+<v Noah Labhart>How long it took you to build and what sort of tools were you using to bring it to life?
+
+66
+00:05:38.640 --> 00:05:42.400
+<v JJ Tang>The solution we had originally started was too specific for Instacart.
+
+67
+00:05:43.680 --> 00:05:48.260
+<v JJ Tang>although on the surface look the same, kind of use the same tools, they all run a really
+
+68
+00:05:48.260 --> 00:05:52.640
+<v JJ Tang>different process based on their culture, based on their communication, based on the processes
+
+69
+00:05:52.640 --> 00:05:58.180
+<v JJ Tang>they have. So actually the MVP we had at Instacart did not work for other types of companies, which
+
+70
+00:05:58.180 --> 00:06:03.080
+<v JJ Tang>was surprising. And myself and Quinton, my CTO, we looked at each other and we said,
+
+71
+00:06:03.180 --> 00:06:05.780
+<v JJ Tang>did we just make the wrong decision here?
+
+72
+00:06:07.620 --> 00:06:12.800
+<v JJ Tang>As it turns out, we just needed something a little bit more generic that fit more use cases
+
+73
+00:06:13.620 --> 00:06:19.300
+<v JJ Tang>So we started with thinking about how can we get this in the hands of users as quickly as possible?
+
+74
+00:06:19.460 --> 00:06:24.660
+<v JJ Tang>How can we drive a wedge into a company's existing processes and stacks?
+
+75
+00:06:24.900 --> 00:06:32.000
+<v JJ Tang>And the easiest way for us that we identified was, hey, we're not going to just go out and try to replace PagerDuty from the beginning.
+
+76
+00:06:32.260 --> 00:06:35.580
+<v JJ Tang>Let's go capitalize on areas that they have gaps, which is collaboration.
+
+77
+00:06:36.040 --> 00:06:42.780
+<v JJ Tang>And so we said our MVP is strictly just going to be this very simple bot that we built on Slack.
+
+78
+00:06:43.620 --> 00:06:45.700
+<v JJ Tang>It was really easy to understand.
+
+79
+00:06:45.860 --> 00:06:51.740
+<v JJ Tang>Companies could visualize very quickly that I already collaborate on incidents on Slack
+
+80
+00:06:51.740 --> 00:06:57.260
+<v JJ Tang>today, already pinged Noah and James and Rebecca and JJ in these incidents.
+
+81
+00:06:57.500 --> 00:07:00.660
+<v JJ Tang>So having a layer on top of it was actually really digestible.
+
+82
+00:07:00.760 --> 00:07:04.060
+<v JJ Tang>So from a marketing and positioning perspective, it was really easy.
+
+83
+00:07:04.180 --> 00:07:07.820
+<v JJ Tang>And the contrast to that was we started testing some of our positioning.
+
+84
+00:07:08.120 --> 00:07:11.880
+<v JJ Tang>We marketed ourselves as this all-in-one incident management platform.
+
+85
+00:07:13.620 --> 00:07:19.640
+<v JJ Tang>that were much bigger. So some of our customers are now like NVIDIA and Cisco and Elastic, for
+
+86
+00:07:19.640 --> 00:07:24.680
+<v JJ Tang>example. And when we went originally to these companies and we said, hey, we're this like all
+
+87
+00:07:24.680 --> 00:07:30.680
+<v JJ Tang>in one incident management platform, we do A, B, C, and D and all the way to Z. Although it would
+
+88
+00:07:30.680 --> 00:07:35.580
+<v JJ Tang>have been useful, the psychology of the buyer and the people that we were selling to actually got
+
+89
+00:07:35.580 --> 00:07:41.420
+<v JJ Tang>really intimidated. They said, whoa, this sounds cool, but maybe it's a little bit much for me.
+
+90
+00:07:41.420 --> 00:07:46.360
+<v JJ Tang>and in our mind, we originally thought, wait, how can it be too much for you? Like you're an
+
+91
+00:07:46.360 --> 00:07:52.180
+<v JJ Tang>enterprise, you need this kind of stuff. So as it turns out, focusing on the MVP really helped us
+
+92
+00:07:52.180 --> 00:07:57.560
+<v JJ Tang>figure out our positioning and what that wedge into these company stacks were. And so when we
+
+93
+00:07:57.560 --> 00:08:03.260
+<v JJ Tang>started with Slack, it really helped us grow the company and the adoption because it was so easy
+
+94
+00:08:03.260 --> 00:08:05.240
+<v JJ Tang>to understand and use. Okay.
+
+95
+00:08:05.400 --> 00:08:08.600
+<v Noah Labhart>Interesting, you know, things that come up with an MVP, right?
+
+96
+00:08:08.600 --> 00:08:11.960
+<v Noah Labhart>right? When you're building an MVP, you got to make certain decisions and trade-offs and you're
+
+97
+00:08:11.960 --> 00:08:16.660
+<v Noah Labhart>kind of touching on some in a high level. Maybe dive into the main one or one or two or something
+
+98
+00:08:16.660 --> 00:08:21.320
+<v Noah Labhart>like that around, you know, decisions you had to make. Could be technical debt, could be approach.
+
+99
+00:08:21.520 --> 00:08:25.920
+<v Noah Labhart>You mentioned, you know, the bot approach. And I'm curious about making those decisions and how
+
+100
+00:08:25.920 --> 00:08:26.600
+<v Noah Labhart>you coped with them.
+
+101
+00:08:28.040 --> 00:08:32.880
+<v JJ Tang>I was always a product guy at Instacart and IBM before. When people come to
+
+102
+00:08:32.880 --> 00:08:39.180
+<v JJ Tang>with feature requests, your default answer is no. Let me assess it. I'll put it on the roadmap.
+
+103
+00:08:39.360 --> 00:08:43.920
+<v JJ Tang>But when you're starting a company and you don't really have your first 50 customers yet,
+
+104
+00:08:44.020 --> 00:08:48.700
+<v JJ Tang>and you're just trying to see if this is something people will use and buy, your default answer
+
+105
+00:08:48.700 --> 00:08:54.580
+<v JJ Tang>actually starts turning into yes. So a lot of the decisions that we made early on was building
+
+106
+00:08:54.580 --> 00:08:59.700
+<v JJ Tang>towards custom things that customers like Grammarly wanted and customers like Canva wanted.
+
+107
+00:08:59.700 --> 00:09:14.060
+<v JJ Tang>So that was the interesting bit. And as your company grows and matures, you start having a lot more discipline. You have a way more say into your own roadmap and direction and influence, which is a lot more exciting.
+
+108
+00:09:14.380 --> 00:09:26.800
+<v JJ Tang>So some of the decisions and tradeoffs was usually this balance between speed and everything else. And speed was the most important thing. Shipping very quickly became a superpower.
+
+109
+00:09:26.800 --> 00:09:33.120
+<v JJ Tang>power. In the early days, our platform, to be quite candid, was quite buggy. And one of the
+
+110
+00:09:33.120 --> 00:09:38.280
+<v JJ Tang>smart things that we did was we knew the platform, customers were going to find little issues that
+
+111
+00:09:38.280 --> 00:09:42.880
+<v JJ Tang>were wrong with it, maybe a dropdown didn't load fast enough, things like that. So we said, we need
+
+112
+00:09:42.880 --> 00:09:47.120
+<v JJ Tang>to really tighten the feedback loop with these customers. We can't have them sitting for days
+
+113
+00:09:47.120 --> 00:09:53.840
+<v JJ Tang>over email support, finding these issues. And so what we did was we said for every customer,
+
+114
+00:09:53.840 --> 00:09:56.920
+<v JJ Tang>We have to have a shared Slack channel with them.
+
+115
+00:09:56.960 --> 00:10:00.320
+<v JJ Tang>And it allowed us to ping us any hour of the day with any issue.
+
+116
+00:10:00.520 --> 00:10:04.740
+<v JJ Tang>And what we do when we saw something was we went in there and we often fixed it within
+
+117
+00:10:04.740 --> 00:10:05.280
+<v JJ Tang>the hour.
+
+118
+00:10:06.260 --> 00:10:09.040
+<v JJ Tang>That blew our customers' minds away.
+
+119
+00:10:09.220 --> 00:10:14.600
+<v JJ Tang>And it really was an awesome tool for growth because they would find things and you fix
+
+120
+00:10:14.600 --> 00:10:19.720
+<v JJ Tang>it so quickly and they would start forming this deepened partnership with you.
+
+121
+00:10:19.820 --> 00:10:22.940
+<v JJ Tang>And that's something that I thought would never scale too well.
+
+122
+00:10:23.840 --> 00:10:27.260
+<v JJ Tang>this day with hundreds of customers, we have hundreds of Slack channels. And the platform
+
+123
+00:10:27.260 --> 00:10:33.240
+<v JJ Tang>obviously is way different than it was before. But by having a tighter feedback loop, it made
+
+124
+00:10:33.240 --> 00:10:38.460
+<v JJ Tang>the speed trade-offs that we had to make to get things out there much easier.
+
+125
+00:10:40.200 --> 00:10:46.000
+<v Noah Labhart>So you've got the MVP, you flip things to be an advantage for you, you're getting some traction.
+
+126
+00:10:46.160 --> 00:10:51.020
+<v Noah Labhart>How did you progress the product and mature it from that point? And I think what I'm asking
+
+127
+00:10:51.020 --> 00:10:54.820
+<v Noah Labhart>kind of wrap that in a box a little bit. What I'm looking for is how you built your roadmap,
+
+128
+00:10:54.960 --> 00:10:59.940
+<v Noah Labhart>how you went about deciding, okay, this is the next most important thing to build or to address
+
+129
+00:10:59.940 --> 00:11:00.680
+<v Noah Labhart>with Rootly.
+
+130
+00:11:01.800 --> 00:11:06.300
+<v JJ Tang>So we have a roadmap, but we also have this really interesting other model that is,
+
+131
+00:11:06.400 --> 00:11:12.520
+<v JJ Tang>we have a team called the goodness team. And this is a collection of engineers that strictly do
+
+132
+00:11:12.520 --> 00:11:18.640
+<v JJ Tang>things that break the model of normal planning. Normal planning would say the small feature
+
+133
+00:11:18.640 --> 00:11:24.840
+<v JJ Tang>feature would need to come in Q3, Q4. But the goodness team looks at it and says, hey, this is
+
+134
+00:11:24.840 --> 00:11:31.780
+<v JJ Tang>low value, but also really low effort. And we can get wins and brownie points by doing this, or this
+
+135
+00:11:31.780 --> 00:11:37.060
+<v JJ Tang>is a really nice polish to our craft. And they'll just go ahead and smash it and they'll get it out
+
+136
+00:11:37.060 --> 00:11:41.740
+<v JJ Tang>there. And it's something that would never have fallen into the normal planning cycle and got
+
+137
+00:11:41.740 --> 00:11:48.800
+<v JJ Tang>got prioritized. And this allows us to keep a lot of the high velocity magic that wows customers and
+
+138
+00:11:48.800 --> 00:11:54.200
+<v JJ Tang>wows the market and wows us. When we talked about the MVP, our focus was, hey, we need to build a
+
+139
+00:11:54.200 --> 00:12:02.520
+<v JJ Tang>wedge into these existing companies. Phase two from the MVP, I think about is how do I now deepen
+
+140
+00:12:02.520 --> 00:12:07.600
+<v JJ Tang>the moat within these companies? How do I grow horizontally? So for example, for us, we launched
+
+141
+00:12:07.600 --> 00:12:19.500
+<v JJ Tang>A stellar, enterprise-ready, super exciting offering around writing your retrospectives that help you drive more accountability and help you build it way faster and way more consistently.
+
+142
+00:12:19.980 --> 00:12:23.360
+<v JJ Tang>That was something we wouldn't have thought about maybe a year or two ago.
+
+143
+00:12:23.540 --> 00:12:33.880
+<v JJ Tang>But we noticed that was a really interesting way to keep customers keep returning to our platform even when they weren't actively in an incident because they also used our platform for learning.
+
+144
+00:12:33.880 --> 00:12:41.080
+<v JJ Tang>So phase two of maybe I'll call it the master plan is we need to deepen our moat and grow horizontally.
+
+145
+00:12:41.500 --> 00:12:50.560
+<v JJ Tang>And phase three, what we're working on right now, and also phase four, phase three is how do we own the reactive reliability loop that I like to call it?
+
+146
+00:12:50.580 --> 00:12:53.780
+<v JJ Tang>And in this reactive reliability loop, there's a bunch of tools.
+
+147
+00:12:53.880 --> 00:12:55.100
+<v JJ Tang>There's monitoring tools.
+
+148
+00:12:55.300 --> 00:12:56.480
+<v JJ Tang>There's paging tools.
+
+149
+00:12:56.680 --> 00:12:58.100
+<v JJ Tang>There's collaboration tools.
+
+150
+00:12:58.200 --> 00:12:59.020
+<v JJ Tang>There's data tools.
+
+151
+00:12:59.220 --> 00:13:00.560
+<v JJ Tang>There's communication tools.
+
+152
+00:13:00.560 --> 00:13:03.900
+<v JJ Tang>tools, and we started off by owning different segments of this.
+
+153
+00:13:04.000 --> 00:13:09.980
+<v JJ Tang>And now as we grow more horizontally, I think about how do we now own this entire tool chain?
+
+154
+00:13:10.240 --> 00:13:15.020
+<v JJ Tang>Because as you look at the market today, companies are racing to consolidate vendors.
+
+155
+00:13:15.920 --> 00:13:20.940
+<v JJ Tang>When you consolidate these tools together, they start working a lot better.
+
+156
+00:13:21.000 --> 00:13:25.540
+<v JJ Tang>There's no broken telephone that's occurring from one tool talking to another.
+
+157
+00:13:25.540 --> 00:13:31.600
+<v JJ Tang>other. So we think about building the platform effectively for incident management and for
+
+158
+00:13:31.600 --> 00:13:37.580
+<v JJ Tang>reliability in general. And the fourth phase of this is, okay, we have this reactive reliability
+
+159
+00:13:37.580 --> 00:13:43.340
+<v JJ Tang>loop where companies rely on us when things go wrong, but how do we shorten that loop? Because
+
+160
+00:13:43.340 --> 00:13:48.620
+<v JJ Tang>ultimately shortening the loop is your defensible advantage as a product. Otherwise everyone can
+
+161
+00:13:48.620 --> 00:13:53.740
+<v JJ Tang>just copy feature for feature. And so we think about shortening the loop through things such
+
+162
+00:13:55.540 --> 00:14:00.100
+<v JJ Tang>layered a ton of generative AI in a very thoughtful way on our platform, whether it's
+
+163
+00:14:00.100 --> 00:14:07.000
+<v JJ Tang>through response or through the learning side of incidents as well. For example, we help you detect
+
+164
+00:14:07.000 --> 00:14:12.580
+<v JJ Tang>when there's a related incident and how did people diagnose and resolve it previously. We'll give you
+
+165
+00:14:12.580 --> 00:14:17.520
+<v JJ Tang>the step-by-step guidance. So you're moving a lot faster there. And also as you build reports,
+
+166
+00:14:17.720 --> 00:14:22.560
+<v JJ Tang>you can use plain natural language to ask our product to say, hey, I need a chart that kind
+
+167
+00:14:22.560 --> 00:14:27.480
+<v JJ Tang>kind of shows me the top incidents for this particular payment service over the last three
+
+168
+00:14:27.480 --> 00:14:33.600
+<v JJ Tang>months. Or you could ask it things like, what were the common questions that people asked during this
+
+169
+00:14:33.600 --> 00:14:39.360
+<v JJ Tang>incident? And that might indicate to you that, hey, this is something that we need to, you know,
+
+170
+00:14:39.380 --> 00:14:44.020
+<v JJ Tang>proactively address and educate our users on. So we think about intelligence as the fourth phase
+
+171
+00:14:44.020 --> 00:14:49.460
+<v JJ Tang>of how do we shorten the reactive reliability loop? So we think about every feature, how does
+
+172
+00:14:49.460 --> 00:14:53.920
+<v JJ Tang>does it play into these pillars and how do we continue moving further down the pipeline?
+
+173
+00:14:54.300 --> 00:14:58.640
+<v JJ Tang>Especially now that we've, we built a large part of the platform. We built a large part of
+
+174
+00:14:58.640 --> 00:15:01.500
+<v JJ Tang>driving the wedge and the moat and things like that.
+
+175
+00:15:01.900 --> 00:15:03.760
+<v Noah Labhart>Okay. I hear you saying we, I'm curious
+
+176
+00:15:03.760 --> 00:15:08.780
+<v Noah Labhart>about how you built your team. I heard the story about you, you, you took the SRE from Instacart
+
+177
+00:15:08.780 --> 00:15:12.700
+<v Noah Labhart>and you started the company, but you know, how do you go about building your team and
+
+178
+00:15:12.700 --> 00:15:16.320
+<v Noah Labhart>what do you look for in those people to indicate that they're the winning horses to join you?
+
+179
+00:15:17.960 --> 00:15:21.780
+<v JJ Tang>I'd probably talk about this forever, but a few things that really stood out to me that I don't
+
+180
+00:15:21.780 --> 00:15:26.540
+<v JJ Tang>see a lot of people talking about, maybe a lot of people disagree with this mentality, but it's
+
+181
+00:15:26.540 --> 00:15:32.940
+<v JJ Tang>something that has worked really well for us. The first thing is, I think all managers, when we
+
+182
+00:15:32.940 --> 00:15:37.920
+<v JJ Tang>build our team, so we have a leadership staff, I think all managers must be really good operators.
+
+183
+00:15:38.180 --> 00:15:44.220
+<v JJ Tang>And what that means is our engineering leaders do a take-home coding exercise. They need to be
+
+184
+00:15:44.220 --> 00:15:48.640
+<v JJ Tang>be able to write phenomenal code, even if they're not going to do it every day, because they need
+
+185
+00:15:48.640 --> 00:15:53.360
+<v JJ Tang>to be able to empathize with what the engineers are doing. Our business development team, our
+
+186
+00:15:53.360 --> 00:15:59.920
+<v JJ Tang>leader on that team also has to be very confident on cold calls. How can you coach someone to cold
+
+187
+00:15:59.920 --> 00:16:07.200
+<v JJ Tang>call more and better, write better emails, if you yourself can't do it? Before this realization,
+
+188
+00:16:07.520 --> 00:16:11.780
+<v JJ Tang>we made the mistake of, hey, people have great resumes, they have great track records,
+
+189
+00:16:11.780 --> 00:16:16.980
+<v JJ Tang>they interview really well. And the reality is when they're not great operators themselves,
+
+190
+00:16:17.440 --> 00:16:22.480
+<v JJ Tang>they will take playbooks that they've learned at other companies and try to copy and paste it over
+
+191
+00:16:22.480 --> 00:16:28.500
+<v JJ Tang>to your company. And oftentimes that is the wrong answer. So for example, imagine you and I,
+
+192
+00:16:28.540 --> 00:16:32.200
+<v JJ Tang>we're the same stage company, we're the same size, and we have the same investors,
+
+193
+00:16:32.280 --> 00:16:38.960
+<v JJ Tang>but we're building different products. The hiring plan our investors give you will most likely not
+
+194
+00:16:38.960 --> 00:16:44.340
+<v JJ Tang>be applicable to me. So why should any other process that people build ultimately work here?
+
+195
+00:16:44.640 --> 00:16:49.360
+<v JJ Tang>In a similar vein, people that are excited, especially the ones that are joining you early,
+
+196
+00:16:49.520 --> 00:16:54.120
+<v JJ Tang>that are building the playbook with you, we most likely do not have the answers. We most likely
+
+197
+00:16:54.120 --> 00:16:59.420
+<v JJ Tang>will not find all the answers ourselves. And that is certainly true. But people that are excited to
+
+198
+00:16:59.420 --> 00:17:06.640
+<v JJ Tang>define how it will look like for the next 50, 100, 200 people are the people that are genuinely in
+
+199
+00:17:06.640 --> 00:17:12.880
+<v JJ Tang>it to win it. And those two types of mindsets are really helpful. And so we've done a really good
+
+200
+00:17:12.880 --> 00:17:17.580
+<v JJ Tang>job here of promoting internally people that are operators, because we can teach them leadership
+
+201
+00:17:17.580 --> 00:17:23.620
+<v JJ Tang>skills, but we can't motivate and teach someone that they should be in the weeds and know how
+
+202
+00:17:23.620 --> 00:17:28.300
+<v JJ Tang>the business works. And because of that, the decisions that we make are much clearer and much
+
+203
+00:17:28.300 --> 00:17:30.120
+<v JJ Tang>faster and much more accurate now.
+
+204
+00:17:34.300 --> 00:17:38.280
+<v Noah Labhart>Let's move on to scalability then. And this will be interesting, you know, given what you're
+
+205
+00:17:38.280 --> 00:17:44.040
+<v Noah Labhart>building and who you're building for. So did you build this to scale efficiently from day one from
+
+206
+00:17:44.040 --> 00:17:48.120
+<v Noah Labhart>that early MVP or with scale in mind, maybe abstractions, things like that? Or are there
+
+207
+00:17:48.120 --> 00:17:50.200
+<v Noah Labhart>interesting areas where you've had to fight it as you've grown?
+
+208
+00:17:52.040 --> 00:17:54.000
+<v JJ Tang>I would say if I took the product
+
+209
+00:17:54.000 --> 00:17:59.600
+<v JJ Tang>we had and try to give it to customers today, it would almost certainly fail. And so I can't say
+
+210
+00:17:59.600 --> 00:18:04.700
+<v JJ Tang>it was designed to scale from day one. But if scale was something that we layered on, and a lot
+
+211
+00:18:04.700 --> 00:18:09.680
+<v JJ Tang>of the catalyst and motivation for scale was as we started working with bigger enterprises. We
+
+212
+00:18:09.680 --> 00:18:14.880
+<v JJ Tang>started working with more mid-sized companies to begin with, Patreon or Squarespace, for example.
+
+213
+00:18:14.960 --> 00:18:20.820
+<v JJ Tang>And then as we quickly grown into the very large enterprises, we realized that, hey, everything
+
+214
+00:18:20.820 --> 00:18:27.060
+<v JJ Tang>thing you think about has to grow with you. For example, we have a workflows product and the
+
+215
+00:18:27.060 --> 00:18:31.600
+<v JJ Tang>workflows are extremely powerful. You can do a lot of amazing things in it. It works really well
+
+216
+00:18:31.600 --> 00:18:38.560
+<v JJ Tang>across many teams, but does it work well for 10,000 users, 20,000 users? And it's really
+
+217
+00:18:38.560 --> 00:18:44.220
+<v JJ Tang>interesting because as we build products now, we always try to apply that kind of thinking.
+
+218
+00:18:44.620 --> 00:18:49.900
+<v JJ Tang>As we scaled and as we help organizations scale, we think a lot about how do we actually bake that
+
+219
+00:18:50.820 --> 00:18:56.740
+<v JJ Tang>the product and features itself. So one example of that is when we deployed Rootly to a company with,
+
+220
+00:18:56.800 --> 00:19:02.720
+<v JJ Tang>let's say, 100 users or 200 users, it's actually quite easy. People often will make a quick video,
+
+221
+00:19:02.920 --> 00:19:07.620
+<v JJ Tang>write a quick doc, send an email, talk about it very quickly at their all hands, and people use
+
+222
+00:19:07.620 --> 00:19:13.560
+<v JJ Tang>it. But when you roll out to 15,000 users, the team that is actually adopting, buying your tool
+
+223
+00:19:13.560 --> 00:19:19.080
+<v JJ Tang>and responsible for the adoption of it, they can't really go talk to 15,000 users. So how does the
+
+224
+00:19:20.820 --> 00:19:29.680
+<v JJ Tang>way, aid them to do their tasks in a scalable way. So for example, we built in the concept of
+
+225
+00:19:29.680 --> 00:19:35.200
+<v JJ Tang>interactive tutorials that you can customize with your own docs. And so the people that are buying
+
+226
+00:19:35.200 --> 00:19:40.340
+<v JJ Tang>our tool can actually see, are people trained on the tool or are they just logging in and never
+
+227
+00:19:40.340 --> 00:19:46.340
+<v JJ Tang>doing anything again? And then obviously from an infrastructure perspective, the biggest thing
+
+228
+00:19:46.340 --> 00:19:50.880
+<v JJ Tang>that we've done from a scale perspective is at the beginning of last year, we said going to
+
+229
+00:19:50.880 --> 00:19:56.880
+<v JJ Tang>multi-cloud would be totally overkill. And as we thought more about our next product, our biggest
+
+230
+00:19:56.880 --> 00:20:04.760
+<v JJ Tang>demand was, hey, we really dislike using legacy paging tools. We want Rootly to build it. And as
+
+231
+00:20:04.760 --> 00:20:10.860
+<v JJ Tang>we started building it, the feature set was awesome and very differentiated and exciting and capitalized
+
+232
+00:20:10.860 --> 00:20:15.320
+<v JJ Tang>and all these things. But when we really thought about it, reliability was going to be the number
+
+233
+00:20:16.340 --> 00:20:21.840
+<v JJ Tang>sold. We had to make sure reliability scaled better than anything else on the market. And so
+
+234
+00:20:21.840 --> 00:20:27.300
+<v JJ Tang>we made this enormous infrastructure decision to actually go from running on just AWS, but also
+
+235
+00:20:27.300 --> 00:20:34.680
+<v JJ Tang>running on GCP as well. The multi-cloud setup has allowed us to have just absurd amounts of
+
+236
+00:20:34.680 --> 00:20:42.140
+<v JJ Tang>redundancy and also talk about reliability in a very scalable way. And that has done wonders for
+
+237
+00:20:42.140 --> 00:20:43.280
+<v JJ Tang>for us, I would say.
+
+238
+00:20:44.380 --> 00:20:48.740
+<v Noah Labhart>Okay, JJ, as you step out on the balcony and you look across all that you've
+
+239
+00:20:48.740 --> 00:20:50.080
+<v Noah Labhart>built, what are you most proud of?
+
+240
+00:20:51.440 --> 00:20:54.900
+<v JJ Tang>So often what you hear on a day-to-day basis and what you immerse
+
+241
+00:20:54.900 --> 00:20:59.980
+<v JJ Tang>yourself in a day-to-day basis is you're focusing on the things that are broken and the times that
+
+242
+00:20:59.980 --> 00:21:04.900
+<v JJ Tang>I really get a chance to step back and look at and think about something like this question is,
+
+243
+00:21:05.020 --> 00:21:11.420
+<v JJ Tang>I think about this during our all hands. We're there to celebrate the wins. The thing that I'm
+
+244
+00:21:12.140 --> 00:21:17.720
+<v JJ Tang>far the most proud of anything other than deploying to all these amazing companies around
+
+245
+00:21:17.720 --> 00:21:24.280
+<v JJ Tang>the world that I, when I was a student, I dreamed of working at is the part that brings me the most
+
+246
+00:21:24.280 --> 00:21:30.140
+<v JJ Tang>joy is seeing people grow their careers in a company that I built from nothing. Seeing them
+
+247
+00:21:30.140 --> 00:21:37.380
+<v JJ Tang>get promoted, make more money than they ever could have at AWS or Google, that brings so much joy
+
+248
+00:21:37.380 --> 00:21:43.400
+<v JJ Tang>to me and it motivates me like nothing else. Seeing people be able to genuinely provide
+
+249
+00:21:43.400 --> 00:21:50.020
+<v JJ Tang>for their families and have the best career that they've ever had in their lives and genuinely
+
+250
+00:21:50.020 --> 00:21:57.300
+<v JJ Tang>love coming to work and seeing their careers flourish. I think no matter what the outcome
+
+251
+00:21:57.300 --> 00:22:03.340
+<v JJ Tang>for the company, luckily it's up into the right now, I will look back still and probably think
+
+252
+00:22:03.340 --> 00:22:06.720
+<v JJ Tang>I think that is the most proud moment of my career.
+
+253
+00:22:07.920 --> 00:22:09.860
+<v Noah Labhart>Okay, let's flip the script a little bit.
+
+254
+00:22:09.980 --> 00:22:14.000
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+255
+00:22:15.700 --> 00:22:22.240
+<v JJ Tang>I think the mistake that we made as a company was we under-invested in marketing.
+
+256
+00:22:22.820 --> 00:22:25.400
+<v JJ Tang>Not to say our marketing's not good.
+
+257
+00:22:25.620 --> 00:22:28.500
+<v JJ Tang>It's just a lot of it, in my opinion, could be much better.
+
+258
+00:22:29.040 --> 00:22:32.900
+<v JJ Tang>Because the nature of the product is very collaborative when you work on incidents.
+
+259
+00:22:33.340 --> 00:22:35.400
+<v JJ Tang>So it naturally grew very viral.
+
+260
+00:22:35.880 --> 00:22:41.780
+<v JJ Tang>And when people left their organization and went to a new company, they would buy it again.
+
+261
+00:22:42.240 --> 00:22:47.360
+<v JJ Tang>Someone has bought our product four times because they've changed jobs four times.
+
+262
+00:22:47.420 --> 00:22:52.320
+<v JJ Tang>And every time it was one quick 15 minute, 30 minute call, which was awesome.
+
+263
+00:22:52.460 --> 00:22:57.080
+<v JJ Tang>And I think that flywheel is still spinning really fast and doing wonders for us.
+
+264
+00:22:57.160 --> 00:23:01.540
+<v JJ Tang>But I think there's a lot of surface area that we put off and we didn't cover.
+
+265
+00:23:03.340 --> 00:23:08.760
+<v JJ Tang>from a marketing perspective, I wish we would have invested. And just to get the word out
+
+266
+00:23:08.760 --> 00:23:14.360
+<v JJ Tang>more about all the great things that we're doing and the customer stories and all of that. But
+
+267
+00:23:14.360 --> 00:23:20.020
+<v JJ Tang>otherwise, from a pure product perspective, I think we roughly made the right bets at the same
+
+268
+00:23:20.020 --> 00:23:24.880
+<v JJ Tang>time. Sometimes there's quite a few minor things. You build a feature and you're like, oh, that was
+
+269
+00:23:24.880 --> 00:23:30.640
+<v JJ Tang>actually really incorrect. And we roll it back. And we'll do that multiple times a quarter because
+
+270
+00:23:30.640 --> 00:23:36.440
+<v JJ Tang>we rather default to building the features, seeing how it performs in the wild than sitting
+
+271
+00:23:36.440 --> 00:23:41.340
+<v JJ Tang>through a PRD and going through an approval process and a ton of research. Sometimes it's
+
+272
+00:23:41.340 --> 00:23:46.820
+<v JJ Tang>just too overkill. We'll build something. It doesn't work. We'll roll it back. We prefer to
+
+273
+00:23:46.820 --> 00:23:48.520
+<v JJ Tang>move quicker, but also very safe.
+
+274
+00:23:50.920 --> 00:23:54.460
+<v Noah Labhart>This will be super fun. What does the future look like for
+
+275
+00:23:54.460 --> 00:23:55.900
+<v Noah Labhart>for the product and for your team.
+
+276
+00:23:57.120 --> 00:24:00.580
+<v JJ Tang>We're building this platform of owning this entire tool chain
+
+277
+00:24:00.580 --> 00:24:02.480
+<v JJ Tang>for the reactive reliability loop.
+
+278
+00:24:02.620 --> 00:24:04.220
+<v JJ Tang>And we're just getting started here.
+
+279
+00:24:04.320 --> 00:24:07.380
+<v JJ Tang>We're owning parts of collaboration and data and learning.
+
+280
+00:24:07.520 --> 00:24:09.420
+<v JJ Tang>And now we're owning bits and pieces
+
+281
+00:24:09.420 --> 00:24:12.380
+<v JJ Tang>or parts such as on-call and paging.
+
+282
+00:24:12.620 --> 00:24:15.400
+<v JJ Tang>And I see that growing further up the stack
+
+283
+00:24:15.400 --> 00:24:17.420
+<v JJ Tang>and also further down the stack,
+
+284
+00:24:17.520 --> 00:24:19.580
+<v JJ Tang>like learning even more from incidents,
+
+285
+00:24:19.780 --> 00:24:21.400
+<v JJ Tang>detecting trends and patterns
+
+286
+00:24:21.400 --> 00:24:24.580
+<v JJ Tang>and how you can evolve your process.
+
+287
+00:24:24.800 --> 00:24:27.980
+<v JJ Tang>So the company itself will become more multi-product
+
+288
+00:24:27.980 --> 00:24:29.160
+<v JJ Tang>than ever before,
+
+289
+00:24:29.360 --> 00:24:33.420
+<v JJ Tang>as we see growth across all of these different areas.
+
+290
+00:24:33.600 --> 00:24:35.620
+<v JJ Tang>But the part that I'm most excited about right now
+
+291
+00:24:35.620 --> 00:24:36.780
+<v JJ Tang>is our on-call business.
+
+292
+00:24:37.880 --> 00:24:40.720
+<v JJ Tang>This is the critical phone call you get
+
+293
+00:24:40.720 --> 00:24:41.800
+<v JJ Tang>in the middle of the night
+
+294
+00:24:41.800 --> 00:24:43.320
+<v JJ Tang>to tell you that something is wrong.
+
+295
+00:24:43.460 --> 00:24:45.520
+<v JJ Tang>That phone call that must always work
+
+296
+00:24:45.520 --> 00:24:47.860
+<v JJ Tang>no matter if AWS is up or down.
+
+297
+00:24:47.960 --> 00:24:50.380
+<v JJ Tang>And that is really exciting for us
+
+298
+00:24:51.400 --> 00:24:55.440
+<v JJ Tang>further ingrained into a company's process and infrastructure and stack.
+
+299
+00:24:55.620 --> 00:25:00.800
+<v JJ Tang>And we get to solve one of the most jarring and painful problems that every engineer faces.
+
+300
+00:25:01.020 --> 00:25:07.020
+<v JJ Tang>They go to a company they dreamed of working at and let's say a ride sharing company and
+
+301
+00:25:07.020 --> 00:25:08.960
+<v JJ Tang>they get to work on these really cool projects.
+
+302
+00:25:09.060 --> 00:25:09.780
+<v JJ Tang>But you know what?
+
+303
+00:25:09.940 --> 00:25:13.360
+<v JJ Tang>You still got to carry your laptop with you once every six weeks.
+
+304
+00:25:13.560 --> 00:25:15.060
+<v JJ Tang>And that kind of sucks.
+
+305
+00:25:15.180 --> 00:25:19.200
+<v JJ Tang>And we want to make that process way better, way more enjoyable.
+
+306
+00:25:19.200 --> 00:25:23.060
+<v JJ Tang>And we want you to almost not hate when you get paged.
+
+307
+00:25:23.340 --> 00:25:26.200
+<v JJ Tang>And so that part of the product is really exciting.
+
+308
+00:25:26.400 --> 00:25:30.680
+<v JJ Tang>And also right now is the fastest growing part of our product.
+
+309
+00:25:30.760 --> 00:25:36.240
+<v JJ Tang>And also one of the newest, which I can't wait to see what the potential looks like even further down this year.
+
+310
+00:25:37.160 --> 00:25:38.720
+<v Noah Labhart>Well, JJ, let's switch to you.
+
+311
+00:25:38.800 --> 00:25:40.600
+<v Noah Labhart>Who influences the way that you work?
+
+312
+00:25:40.780 --> 00:25:43.400
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+313
+00:25:44.420 --> 00:25:48.880
+<v JJ Tang>One of the leaders that I look up to most is probably Brian Chesky at Airbnb.
+
+314
+00:25:49.260 --> 00:25:54.880
+<v JJ Tang>I think he's a phenomenal peacetime leader, and he's also probably one of the best wartime leaders.
+
+315
+00:25:55.260 --> 00:25:59.420
+<v JJ Tang>Airbnb, during COVID, almost overnight, lost 80% of their revenue.
+
+316
+00:25:59.600 --> 00:26:02.200
+<v JJ Tang>And they had all these liabilities that they paid.
+
+317
+00:26:02.360 --> 00:26:07.500
+<v JJ Tang>They still had to pay the hosts, and they had to find a way to extend their runway.
+
+318
+00:26:07.660 --> 00:26:09.240
+<v JJ Tang>And Brian Chesky did a phenomenal job.
+
+319
+00:26:09.420 --> 00:26:12.340
+<v JJ Tang>And I think his leadership principles really resonate to me.
+
+320
+00:26:13.400 --> 00:26:19.240
+<v JJ Tang>very excited about being in the details. If you listen to Brian Chesky, he thinks managers almost
+
+321
+00:26:19.240 --> 00:26:25.660
+<v JJ Tang>in a way, not in a micromanaging way, but you should know what's going on. And the reason for
+
+322
+00:26:25.660 --> 00:26:31.340
+<v JJ Tang>that is you cannot make great decisions unless you're into the weeds. And this kind of goes back
+
+323
+00:26:31.340 --> 00:26:35.320
+<v JJ Tang>to our principal, you know, that earlier question he asked, like, how do we build a team? We build
+
+324
+00:26:35.320 --> 00:26:40.260
+<v JJ Tang>a team of operators and we grow them into leaders, but we never just hire a leader that cannot be
+
+325
+00:26:40.260 --> 00:26:45.360
+<v JJ Tang>and operator. And the reason for that is a lot of what I've learned from Brian. And luckily,
+
+326
+00:26:45.500 --> 00:26:50.500
+<v JJ Tang>we went through some of our investors like Google, but also namely Y Combinator, where
+
+327
+00:26:50.500 --> 00:26:55.500
+<v JJ Tang>you get a chance to collaborate with him on growing the team and how that gets done.
+
+328
+00:26:56.120 --> 00:27:02.400
+<v JJ Tang>And I think because of his influence and a lot of that mentality, we get to move a lot quicker and
+
+329
+00:27:02.400 --> 00:27:07.360
+<v JJ Tang>we get to be a lot more accurate in our decisions. And it's almost counterintuitive. Sometimes being
+
+330
+00:27:07.360 --> 00:27:11.340
+<v JJ Tang>in the details, you think, especially at the beginning, you have a lot more work on your
+
+331
+00:27:11.340 --> 00:27:15.380
+<v JJ Tang>plate and you feel like you go slower. But the dividends start paying off a month, two months
+
+332
+00:27:15.380 --> 00:27:21.160
+<v JJ Tang>later when you realize that we are making a lot less mistakes now. So with every group function,
+
+333
+00:27:21.780 --> 00:27:26.500
+<v JJ Tang>every single morning, I have a standup with everyone. Not with every individual, of course,
+
+334
+00:27:26.580 --> 00:27:30.480
+<v JJ Tang>but with every group function. And I know the decisions that we're making and I'll be able to
+
+335
+00:27:30.480 --> 00:27:35.940
+<v JJ Tang>break down silos and other leaders on our team break down silos where, hey, there's actually a
+
+336
+00:27:37.360 --> 00:27:41.340
+<v JJ Tang>for the launch of this product, but engineering thinks it's a beta. That's a misalignment because
+
+337
+00:27:41.340 --> 00:27:45.120
+<v JJ Tang>we're about to tell a customer something that is inaccurate from what engineering believes.
+
+338
+00:27:45.480 --> 00:27:50.620
+<v JJ Tang>And so those are the things that we're able to catch super early on. But we have standups every
+
+339
+00:27:50.620 --> 00:27:56.280
+<v JJ Tang>single day with every single function. And I know for sometimes when people hear that in the
+
+340
+00:27:56.280 --> 00:28:00.540
+<v JJ Tang>interview, they're like, oh my gosh, that is not a company I want to work at. And that's totally fine.
+
+341
+00:28:02.120 --> 00:28:06.740
+<v Noah Labhart>Okay. Last question, JJ. So you're getting on a plane and you're sitting next to a young
+
+342
+00:28:07.360 --> 00:28:08.700
+<v Noah Labhart>who's built the next big thing.
+
+343
+00:28:08.940 --> 00:28:10.100
+<v Noah Labhart>They're jazzed about it.
+
+344
+00:28:10.160 --> 00:28:11.500
+<v Noah Labhart>They can't wait to show it off to the world
+
+345
+00:28:11.500 --> 00:28:12.700
+<v Noah Labhart>and can't wait to show it off to you
+
+346
+00:28:12.700 --> 00:28:13.320
+<v Noah Labhart>right there on the plane.
+
+347
+00:28:13.700 --> 00:28:15.280
+<v Noah Labhart>What advice do you give that person
+
+348
+00:28:15.280 --> 00:28:16.760
+<v Noah Labhart>having gone down this road a bit?
+
+349
+00:28:19.240 --> 00:28:20.300
+<v JJ Tang>One of our seed investors
+
+350
+00:28:20.780 --> 00:28:22.220
+<v JJ Tang>really early into the company,
+
+351
+00:28:22.420 --> 00:28:24.640
+<v JJ Tang>he told me execution cures everything.
+
+352
+00:28:24.880 --> 00:28:25.860
+<v JJ Tang>And that is so true.
+
+353
+00:28:26.060 --> 00:28:28.900
+<v JJ Tang>When you're faced with a really tough problem,
+
+354
+00:28:29.060 --> 00:28:31.160
+<v JJ Tang>just sit down and think about how you can execute.
+
+355
+00:28:31.520 --> 00:28:34.160
+<v JJ Tang>And so for us, it was in the very early days,
+
+356
+00:28:34.320 --> 00:28:35.580
+<v JJ Tang>we talked about the product
+
+357
+00:28:35.580 --> 00:28:37.020
+<v JJ Tang>being too specific for Instacart.
+
+358
+00:28:37.360 --> 00:28:40.360
+<v JJ Tang>We weren't sure it was the product, it was the market, the product market fit.
+
+359
+00:28:40.560 --> 00:28:42.360
+<v JJ Tang>Maybe I was really bad at sales.
+
+360
+00:28:42.580 --> 00:28:45.320
+<v JJ Tang>It was probably a combination of all four of those.
+
+361
+00:28:45.520 --> 00:28:49.160
+<v JJ Tang>But we just put our heads down and we said, hey, we're going to try to keep selling this
+
+362
+00:28:49.840 --> 00:28:55.200
+<v JJ Tang>nonstop and we're not going to stop because that level of execution is what's going to
+
+363
+00:28:55.200 --> 00:28:56.720
+<v JJ Tang>get us closer to success.
+
+364
+00:28:57.140 --> 00:28:59.160
+<v JJ Tang>And so I think about that all the time.
+
+365
+00:28:59.200 --> 00:29:04.460
+<v JJ Tang>When we're dealing with something really hard and really ambiguous, I don't think that there's
+
+366
+00:29:04.460 --> 00:29:05.520
+<v JJ Tang>some magic answer.
+
+367
+00:29:07.360 --> 00:29:13.600
+<v JJ Tang>there's a magic hire that would help solve this. No, the thing that's going to solve it is execution.
+
+368
+00:29:13.980 --> 00:29:19.480
+<v JJ Tang>You're not going to land. It's very unlikely you're going to land upon some secret sauce that's going
+
+369
+00:29:19.480 --> 00:29:24.740
+<v JJ Tang>to get you there. And the other thing I learned, if this young entrepreneur is not tired of listening
+
+370
+00:29:24.740 --> 00:29:29.520
+<v JJ Tang>to me on the plane, I think one of the best things I heard, another one of our investors,
+
+371
+00:29:29.680 --> 00:29:34.960
+<v JJ Tang>he was the VP of infrastructure at Dropbox and a really dear friend of mine. He told me,
+
+372
+00:29:34.960 --> 00:29:41.540
+<v JJ Tang>I managed a team of three, 400 people. And you have to expect every day, someone is having a
+
+373
+00:29:41.540 --> 00:29:45.660
+<v JJ Tang>really bad day. And as a leader, you need to think about how you would deal with that and how you
+
+374
+00:29:45.660 --> 00:29:50.700
+<v JJ Tang>will empathize and get them through it. And that could not be more true. Every week, someone's
+
+375
+00:29:50.700 --> 00:29:56.280
+<v JJ Tang>having a bad day, having a bad week. And you just have to know that is part of the job. Part of the
+
+376
+00:29:56.280 --> 00:30:03.280
+<v JJ Tang>job is building the team. Do not underestimate how important that is. As much as you love coding and
+
+377
+00:30:04.960 --> 00:30:06.860
+<v JJ Tang>The team is ultimately your biggest asset.
+
+378
+00:30:07.240 --> 00:30:13.940
+<v JJ Tang>And it's something that you continuously need to invest in time and time again, over and over.
+
+379
+00:30:14.280 --> 00:30:15.940
+<v Noah Labhart>Well, I think that's fantastic advice.
+
+380
+00:30:16.100 --> 00:30:18.140
+<v Noah Labhart>Well, JJ, thank you for being on the show today.
+
+381
+00:30:18.280 --> 00:30:20.700
+<v Noah Labhart>Thank you for telling the creation story of Rootly.
+
+382
+00:30:20.980 --> 00:30:22.520
+<v JJ Tang>Thank you so much for having me.
+
+383
+00:30:24.300 --> 00:30:27.060
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+384
+00:30:30.400 --> 00:30:33.420
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+385
+00:30:34.960 --> 00:30:38.340
+<v Noah Labhart>on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+386
+00:30:38.980 --> 00:30:41.160
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+387
+00:30:41.500 --> 00:30:43.360
+<v Noah Labhart>Both things help us out tremendously.
+
+388
+00:30:46.320 --> 00:30:47.800
+<v Noah Labhart>And thanks again for listening.

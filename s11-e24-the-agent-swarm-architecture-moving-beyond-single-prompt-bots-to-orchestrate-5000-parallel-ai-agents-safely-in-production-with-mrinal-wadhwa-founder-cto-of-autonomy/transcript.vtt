@@ -1,0 +1,1507 @@
+WEBVTT
+
+NOTE S11 E24: The Agent Swarm Architecture: Moving Beyond Single-Prompt Bots to Orchestrate 5,000 Parallel AI Agents Safely in Production with Mrinal Wadhwa, Founder & CTO of Autonomy
+
+1
+00:00:00.000 --> 00:00:09.120
+<v Mrinal Wadhwa>So by choosing this actor Model Based Design, we're able to spin up thousands of parallel agents in a single tiny container.
+
+2
+00:00:09.400 --> 00:00:18.020
+<v Mrinal Wadhwa>So once we made the right design decisions, we tested how many agents can we spin up in a single 250 MB container, and it turns out tens of thousands.
+
+3
+00:00:18.380 --> 00:00:22.500
+<v Mrinal Wadhwa>Then we were like, okay, we have this ability to spin up tens of thousands agents in a single container.
+
+4
+00:00:22.500 --> 00:00:27.340
+<v Mrinal Wadhwa>Ockam allows us to connect securely several containers together.
+
+5
+00:00:27.500 --> 00:00:33.620
+<v Mrinal Wadhwa>So how many agents can we spin up in parallel across a distributed fleet of containers that
+
+6
+00:00:33.620 --> 00:00:34.940
+<v Mrinal Wadhwa>are connected using Ockam?
+
+7
+00:00:35.020 --> 00:00:37.920
+<v Mrinal Wadhwa>And turns out hundreds of thousands, even millions.
+
+8
+00:00:37.960 --> 00:00:43.480
+<v Mrinal Wadhwa>My name is Mrinal Wadhwa. I am CTO and co-founder of Autonomy.
+
+9
+00:00:43.480 --> 00:00:52.820
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries. It's six
+
+10
+00:00:52.820 --> 00:00:53.700
+<v Noah Labhart>months moonlighting.
+
+11
+00:00:53.760 --> 00:00:55.880
+<v Mrinal Wadhwa>There's nothing on the back end. Who
+
+12
+00:00:55.880 --> 00:00:58.100
+<v Noah Labhart>share what it takes to change an industry.
+
+13
+00:00:58.280 --> 00:01:04.460
+<v Noah Labhart>I don't exactly know what to do next. It took many goes to get right. Who built the teams that have their back.
+
+14
+00:01:04.560 --> 00:01:10.040
+<v Clip>A company is its people. The teams help each other achieve more. Most proud of our team. Keeping scalability
+
+15
+00:01:10.040 --> 00:01:15.300
+<v Clip>top of mind. All that infrastructure was a pain. Yes, we've been fighting it as we grow. Total waste of time.
+
+16
+00:01:15.540 --> 00:01:20.780
+<v Noah Labhart>The stories you don't read in the headlines. It's not an easy thing to achieve. Took it off the shelf and
+
+17
+00:01:20.780 --> 00:01:22.140
+<v Clip>dusted it off and tried it again.
+
+18
+00:01:22.360 --> 00:01:25.820
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+19
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+20
+00:01:27.660 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+21
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+22
+00:01:32.460 --> 00:01:33.960
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+23
+00:01:34.280 --> 00:01:36.420
+<v Noah Labhart>And today, I'm Mrinal Wadhwa,
+
+24
+00:01:36.580 --> 00:01:40.040
+<v Noah Labhart>is enabling developers to ship autonomous products
+
+25
+00:01:40.040 --> 00:01:44.000
+<v Noah Labhart>from agents build to deploy in 10 minutes.
+
+26
+00:01:49.440 --> 00:01:53.940
+<v Noah Labhart>Mrinal Wadhwa grew up in India with a dad in the armed forces, so he moved around a lot.
+
+27
+00:01:54.100 --> 00:01:58.560
+<v Noah Labhart>His mother was a teacher for 40 plus years and greatly influenced his love for teaching.
+
+28
+00:01:58.880 --> 00:02:01.680
+<v Noah Labhart>In addition to this, he grew up loving to build things.
+
+29
+00:02:01.940 --> 00:02:06.740
+<v Noah Labhart>He was introduced to computers and the internet by his cousin, and at that point, he was hooked.
+
+30
+00:02:06.920 --> 00:02:10.520
+<v Noah Labhart>But outside of tech, he is married and enjoys attending concerts in the Bay Area.
+
+31
+00:02:10.720 --> 00:02:12.640
+<v Noah Labhart>He plays pool very seriously.
+
+32
+00:02:14.000 --> 00:02:17.360
+<v Noah Labhart>He's the guy carrying the little bag into a party with his own pool stick.
+
+33
+00:02:19.280 --> 00:02:22.020
+<v Noah Labhart>Mrinal is one of the minds behind Ockam,
+
+34
+00:02:22.100 --> 00:02:27.300
+<v Noah Labhart>a popular open-source Rust toolkit to build secure communications between applications.
+
+35
+00:02:27.980 --> 00:02:33.920
+<v Noah Labhart>Late last year, he observed people desiring to build the layer between agent communications
+
+36
+00:02:34.420 --> 00:02:37.440
+<v Noah Labhart>and set out to build something to do it the right way.
+
+37
+00:02:39.760 --> 00:02:42.480
+<v Noah Labhart>This is the creation story of Autonomy.
+
+38
+00:02:46.340 --> 00:02:56.960
+<v Mrinal Wadhwa>Autonomy is a platform for developers to build and ship autonomous AI products. You can find us
+
+39
+00:02:56.960 --> 00:03:06.360
+<v Mrinal Wadhwa>on autonomy.computer. That's our website. And what it does is it's a tool for developers to
+
+40
+00:03:06.360 --> 00:03:11.860
+<v Mrinal Wadhwa>to run products for AI products for other people, right?
+
+41
+00:03:11.920 --> 00:03:13.240
+<v Mrinal Wadhwa>Not build a personal script,
+
+42
+00:03:13.360 --> 00:03:15.700
+<v Mrinal Wadhwa>but build a product that you want to give to customers.
+
+43
+00:03:15.840 --> 00:03:18.580
+<v Mrinal Wadhwa>Now, these customers might be internal to your company
+
+44
+00:03:18.580 --> 00:03:20.160
+<v Mrinal Wadhwa>or external facing customers,
+
+45
+00:03:20.480 --> 00:03:22.720
+<v Mrinal Wadhwa>but it's about building these like reliable,
+
+46
+00:03:22.860 --> 00:03:25.200
+<v Mrinal Wadhwa>scalable, secure products
+
+47
+00:03:25.200 --> 00:03:30.400
+<v Mrinal Wadhwa>that you can be responsible for towards your customers.
+
+48
+00:03:30.780 --> 00:03:32.840
+<v Mrinal Wadhwa>And the user experience of it
+
+49
+00:03:32.840 --> 00:03:36.020
+<v Mrinal Wadhwa>is getting simpler and simpler by the day,
+
+50
+00:03:36.360 --> 00:03:45.160
+<v Mrinal Wadhwa>But right now, for example, what you can do is write a little prompt in Claude Code and say, hey, here's a reference to the autonomy documentation.
+
+51
+00:03:45.860 --> 00:04:01.120
+<v Mrinal Wadhwa>Build a app for me that uses AI agents to fact check news items or it uses AI agents to automate a recruitment process.
+
+52
+00:04:01.120 --> 00:04:07.720
+<v Mrinal Wadhwa>So you can give these little prompts and you drop it into a coding agent like Claude Code or Cursor or something like that.
+
+53
+00:04:07.940 --> 00:04:20.400
+<v Mrinal Wadhwa>And 10 minutes later, because you've given it that reference to our documentation, 10 minutes later, you will have a live product on the internet with a public URL, a set of APIs, streaming APIs.
+
+54
+00:04:20.820 --> 00:04:23.100
+<v Mrinal Wadhwa>Under the hood, it's a multi-tenant product.
+
+55
+00:04:23.200 --> 00:04:28.020
+<v Mrinal Wadhwa>So you have baked in kind of scope, isolation, user management, et cetera.
+
+56
+00:04:28.020 --> 00:04:32.420
+<v Mrinal Wadhwa>You also get underlying databases managed and scaled for you.
+
+57
+00:04:32.540 --> 00:04:38.840
+<v Mrinal Wadhwa>And you can create these massively parallel multi-agent fleets in this environment.
+
+58
+00:04:38.980 --> 00:04:48.660
+<v Mrinal Wadhwa>So it's really good at scaling and connecting to various places where data might live at a company, like internal databases and things like that.
+
+59
+00:04:48.740 --> 00:04:49.880
+<v Mrinal Wadhwa>So that's what autonomy is.
+
+60
+00:04:50.480 --> 00:04:53.400
+<v Mrinal Wadhwa>It's a tool to build this new generation of products.
+
+61
+00:04:53.400 --> 00:05:00.820
+<v Mrinal Wadhwa>Before Autonomy, a few years ago, me and my co-founder, we started an open source project called Ockam.
+
+62
+00:05:01.000 --> 00:05:13.800
+<v Mrinal Wadhwa>And Ockam is a really popular Rust library to create end-to-end encrypted, mutually authenticated, secure communication between systems or applications.
+
+63
+00:05:14.000 --> 00:05:19.800
+<v Mrinal Wadhwa>So think of it like WhatsApp, but for applications talking to other applications.
+
+64
+00:05:19.800 --> 00:05:23.780
+<v Mrinal Wadhwa>And these could be applications in one cloud talking to another application in a different cloud.
+
+65
+00:05:23.940 --> 00:05:31.320
+<v Mrinal Wadhwa>It could be distributed parts of the same application talking to each other across clouds or across companies, etc.
+
+66
+00:05:31.580 --> 00:05:36.380
+<v Mrinal Wadhwa>So we built this Rust toolkit, which was Rust as a programming language for developers.
+
+67
+00:05:36.640 --> 00:05:44.360
+<v Mrinal Wadhwa>And so we built this toolkit that developers could integrate into their applications and build any kind of distributed communication system.
+
+68
+00:05:44.360 --> 00:05:56.800
+<v Mrinal Wadhwa>And what we started to see is lots of developers were applying it to various problems from cross-cloud communication to connecting to internal data sources or connecting to customer data sources.
+
+69
+00:05:57.080 --> 00:06:08.360
+<v Mrinal Wadhwa>Like a really common use case was SaaS applications connecting to an internal database at a customer to enable that customer to use the SaaS application or in a fruitful way.
+
+70
+00:06:08.360 --> 00:06:22.240
+<v Mrinal Wadhwa>And late last year, we started to also see some of our customers think about building agents and AI products and enabling the sort of the communication aspects of that using Ockam.
+
+71
+00:06:22.500 --> 00:06:30.720
+<v Mrinal Wadhwa>And that's when we started to think further about, look, we could, if we do it ourselves, we can polish this user experience and make it really easy for our customers.
+
+72
+00:06:30.980 --> 00:06:34.400
+<v Mrinal Wadhwa>And that's then started the journey towards building autonomy.
+
+73
+00:06:36.760 --> 00:06:42.580
+<v Noah Labhart>I'm curious about the MVP process then. So that's a perfect segue, perfect timing into that question.
+
+74
+00:06:42.580 --> 00:06:47.320
+<v Noah Labhart>What was the process of building the MVP? How many, you know, how long did it take? And what
+
+75
+00:06:47.320 --> 00:06:51.660
+<v Noah Labhart>sort of tools were you using to bring it to life? Obviously using Ockam, but I'm curious about
+
+76
+00:06:51.660 --> 00:06:56.400
+<v Noah Labhart>anything else, you know, any sort of screwdrivers and hammers you were using there.
+
+77
+00:06:57.680 --> 00:07:01.120
+<v Mrinal Wadhwa>So our starting point was we had a bunch of things we've built around
+
+78
+00:07:01.120 --> 00:07:07.120
+<v Mrinal Wadhwa>Ockam, which gave us a communication fabric, a secure communication fabric.
+
+79
+00:07:07.400 --> 00:07:10.840
+<v Mrinal Wadhwa>But then there was a lot more that we had to build on top.
+
+80
+00:07:11.180 --> 00:07:15.480
+<v Mrinal Wadhwa>From the get-go, our key thought process was that we'd like this to be
+
+81
+00:07:15.480 --> 00:07:22.140
+<v Mrinal Wadhwa>a highly scalable and secure place to run this next generation of products.
+
+82
+00:07:22.540 --> 00:07:25.840
+<v Mrinal Wadhwa>So we started thinking about what features should such a thing have?
+
+83
+00:07:26.350 --> 00:07:28.240
+<v Mrinal Wadhwa>And some of the features were really obvious.
+
+84
+00:07:28.240 --> 00:07:44.600
+<v Mrinal Wadhwa>Okay, AI agents are starting to become a thing. So we need a mechanism to run for a developer to define what an agent is, how does it work, how does it use a language model, we need a place to serve language models and things like that. So this part was fairly obvious.
+
+85
+00:07:44.600 --> 00:07:52.480
+<v Mrinal Wadhwa>And the main choice we had to make there was, okay, which language do we expose this capability in?
+
+86
+00:07:52.480 --> 00:07:58.760
+<v Mrinal Wadhwa>And we landed on Python, because that is a really popular language for people building AI things.
+
+87
+00:07:58.760 --> 00:08:03.860
+<v Mrinal Wadhwa>Over time we might add more languages, but currently we chose that we'll make our framework
+
+88
+00:08:03.860 --> 00:08:09.640
+<v Mrinal Wadhwa>for developing AI agents and autonomous applications. We'll provide that framework in Python.
+
+89
+00:08:09.640 --> 00:08:17.080
+<v Mrinal Wadhwa>But in that environment, there is a key important kind of scalability decision we made early on.
+
+90
+00:08:17.160 --> 00:08:24.820
+<v Mrinal Wadhwa>We chose that each agent in autonomy will be an actor, as in the actor model.
+
+91
+00:08:25.260 --> 00:08:32.060
+<v Mrinal Wadhwa>An actor model is a design pattern developed in the 70s, and it's used in very highly scalable systems.
+
+92
+00:08:32.260 --> 00:08:34.760
+<v Mrinal Wadhwa>Apache Spark uses the actor model.
+
+93
+00:08:35.000 --> 00:08:36.880
+<v Mrinal Wadhwa>Discord uses the actor model.
+
+94
+00:08:36.880 --> 00:08:50.800
+<v Mrinal Wadhwa>WhatsApp uses the actor model in the background. So these are like highly scalable concurrent systems in which a lot of entities are talking to each other in a very kind of streaming messaging oriented way.
+
+95
+00:08:50.800 --> 00:09:01.380
+<v Mrinal Wadhwa>And so a key design decision for us very early on was those properties are properties agents should have because agents are these long-lived concurrent state machines.
+
+96
+00:09:01.660 --> 00:09:05.880
+<v Mrinal Wadhwa>And you might want to run, for most applications, many of these agents.
+
+97
+00:09:06.340 --> 00:09:15.160
+<v Mrinal Wadhwa>We chose to build agents in a way that they could be actors and we could create thousands of parallel agents really easily and cheaply.
+
+98
+00:09:15.300 --> 00:09:20.320
+<v Mrinal Wadhwa>So to do that, we built a, in Rust, we built a actor runtime.
+
+99
+00:09:20.800 --> 00:09:29.080
+<v Mrinal Wadhwa>And we wrapped that actor runtime and the Ockam communication capabilities together with a Python kind of wrapper.
+
+100
+00:09:29.300 --> 00:09:37.660
+<v Mrinal Wadhwa>And that's what became our framework for building and defining autonomy applications, our autonomous applications, right?
+
+101
+00:09:37.820 --> 00:09:44.880
+<v Mrinal Wadhwa>So what that enables for a developer is without writing much code, they can define an agent.
+
+102
+00:09:45.000 --> 00:09:46.840
+<v Mrinal Wadhwa>This agent becomes a stateful actor.
+
+103
+00:09:47.460 --> 00:09:50.580
+<v Mrinal Wadhwa>You can run many replicas of these agents.
+
+104
+00:09:50.800 --> 00:09:57.220
+<v Mrinal Wadhwa>So the end result is that an agent can create thousands of sub-agents to achieve a job faster.
+
+105
+00:09:57.460 --> 00:10:01.980
+<v Mrinal Wadhwa>It's also really good for keeping context in an agent really small.
+
+106
+00:10:02.200 --> 00:10:03.960
+<v Mrinal Wadhwa>So that was a key design decision.
+
+107
+00:10:04.300 --> 00:10:06.260
+<v Mrinal Wadhwa>And then along the way, we made some other decisions.
+
+108
+00:10:06.380 --> 00:10:08.200
+<v Mrinal Wadhwa>We're running in AWS.
+
+109
+00:10:08.680 --> 00:10:11.160
+<v Mrinal Wadhwa>Primarily, currently, we'll add multi-cloud support later.
+
+110
+00:10:11.840 --> 00:10:16.920
+<v Mrinal Wadhwa>And in AWS, we're running on their Kubernetes offering, EKS.
+
+111
+00:10:17.260 --> 00:10:19.940
+<v Mrinal Wadhwa>And we do isolation with things like Fargate.
+
+112
+00:10:22.840 --> 00:10:27.000
+<v Noah Labhart>So then from that point, you've got the MVP and it's working.
+
+113
+00:10:27.360 --> 00:10:28.800
+<v Noah Labhart>You've chosen the tools.
+
+114
+00:10:28.920 --> 00:10:32.580
+<v Noah Labhart>You've got it up and being able to service customers.
+
+115
+00:10:32.680 --> 00:10:34.760
+<v Noah Labhart>How did you progress and mature the product from there?
+
+116
+00:10:34.880 --> 00:10:38.640
+<v Noah Labhart>And I think to wrap that in a box a little bit, what I'm looking for is how did you build your roadmap?
+
+117
+00:10:38.800 --> 00:10:43.740
+<v Noah Labhart>How did you decide that, okay, this is the next most important thing to build or to address?
+
+118
+00:10:44.820 --> 00:10:52.880
+<v Mrinal Wadhwa>is. So we had this like minimum viable thing where we were able to define a made up agent to do
+
+119
+00:10:52.880 --> 00:10:56.680
+<v Mrinal Wadhwa>something. I think initially we started thinking of internally in the team, we were using examples
+
+120
+00:10:56.680 --> 00:11:01.780
+<v Mrinal Wadhwa>because an agent that does translation of documents. And if it's given a lot of documents,
+
+121
+00:11:01.940 --> 00:11:07.360
+<v Mrinal Wadhwa>it can split up that work into thousands of parallel things and translate thousands of
+
+122
+00:11:07.360 --> 00:11:11.540
+<v Mrinal Wadhwa>parallel documents in a few seconds. So these were our initial examples. But you're right,
+
+123
+00:11:11.540 --> 00:11:15.440
+<v Mrinal Wadhwa>Like, we didn't know if we're building the right thing and should we continue in this direction?
+
+124
+00:11:15.580 --> 00:11:16.080
+<v Mrinal Wadhwa>What are we doing?
+
+125
+00:11:16.620 --> 00:11:23.320
+<v Mrinal Wadhwa>Pretty early on, we started reaching out to people in our network, friends, etc.
+
+126
+00:11:23.660 --> 00:11:29.320
+<v Mrinal Wadhwa>And talk to them about what type of agents or agentic products are they thinking about building.
+
+127
+00:11:29.740 --> 00:11:34.140
+<v Mrinal Wadhwa>And we found a few interesting scenarios through these conversations.
+
+128
+00:11:34.140 --> 00:11:42.180
+<v Mrinal Wadhwa>So the first two to two and a half months were us building in isolation, minimum demo-able thing.
+
+129
+00:11:42.400 --> 00:11:43.900
+<v Mrinal Wadhwa>I wouldn't even call it viable.
+
+130
+00:11:44.140 --> 00:11:49.240
+<v Mrinal Wadhwa>It was minimum demo-able thing that we could go show to someone so it would evoke their ideas.
+
+131
+00:11:49.640 --> 00:11:57.820
+<v Mrinal Wadhwa>And then from there, as they shared their ideas of what they would like to build, we worked with them to build these things.
+
+132
+00:11:58.060 --> 00:12:01.180
+<v Mrinal Wadhwa>The first customer we found, they were a
+
+133
+00:12:01.180 --> 00:12:02.260
+<v Mrinal Wadhwa>bank.
+
+134
+00:12:04.500 --> 00:12:11.980
+<v Mrinal Wadhwa>a loan processing agent, like a loan application document processing agent. So because we showed
+
+135
+00:12:11.980 --> 00:12:16.540
+<v Mrinal Wadhwa>this like document processing example, they immediately went down this case of, look,
+
+136
+00:12:16.700 --> 00:12:21.180
+<v Mrinal Wadhwa>we have these loan officers that receive phone calls. And during those phone calls,
+
+137
+00:12:21.400 --> 00:12:26.240
+<v Mrinal Wadhwa>they're given hundreds of documents about a business to decide whether to give the business
+
+138
+00:12:26.240 --> 00:12:32.620
+<v Mrinal Wadhwa>a loan or not. And currently, we're unable to use those documents in real time and make a really
+
+139
+00:12:34.140 --> 00:12:36.260
+<v Mrinal Wadhwa>is this a person we want to issue a loan to or not?
+
+140
+00:12:36.560 --> 00:12:38.240
+<v Mrinal Wadhwa>And so the example you've shown,
+
+141
+00:12:38.320 --> 00:12:43.320
+<v Mrinal Wadhwa>if it could be transformed into this like parallel document analysis
+
+142
+00:12:43.320 --> 00:12:47.620
+<v Mrinal Wadhwa>for loan applications, then it could be very useful for us.
+
+143
+00:12:47.820 --> 00:12:48.740
+<v Mrinal Wadhwa>So we built that.
+
+144
+00:12:48.920 --> 00:12:51.540
+<v Mrinal Wadhwa>And as we built that, we learned that we had not exposed
+
+145
+00:12:51.540 --> 00:12:54.380
+<v Mrinal Wadhwa>some of the correct APIs or we needed to tweak our interface,
+
+146
+00:12:54.600 --> 00:12:56.940
+<v Mrinal Wadhwa>the library's interface a little bit, et cetera.
+
+147
+00:12:57.020 --> 00:12:58.160
+<v Mrinal Wadhwa>So we had these learnings.
+
+148
+00:12:58.180 --> 00:13:02.620
+<v Mrinal Wadhwa>And three weeks later, we went back to them with a working example.
+
+149
+00:13:04.140 --> 00:13:05.440
+<v Mrinal Wadhwa>some really cool things started to happen.
+
+150
+00:13:05.500 --> 00:13:07.840
+<v Mrinal Wadhwa>What we noticed is that this director of engineering
+
+151
+00:13:07.840 --> 00:13:10.060
+<v Mrinal Wadhwa>at this bank decided,
+
+152
+00:13:10.340 --> 00:13:11.820
+<v Mrinal Wadhwa>okay, you've given me something working,
+
+153
+00:13:11.980 --> 00:13:13.080
+<v Mrinal Wadhwa>I want to adapt it.
+
+154
+00:13:13.200 --> 00:13:15.900
+<v Mrinal Wadhwa>And they immediately pulled up Cursor
+
+155
+00:13:15.900 --> 00:13:20.780
+<v Mrinal Wadhwa>and started improving the example that we'd given them
+
+156
+00:13:20.780 --> 00:13:22.200
+<v Mrinal Wadhwa>and deploying it.
+
+157
+00:13:22.420 --> 00:13:24.960
+<v Mrinal Wadhwa>And so what we noticed is that people are entering
+
+158
+00:13:24.960 --> 00:13:29.160
+<v Mrinal Wadhwa>this new age of building with coding assistants.
+
+159
+00:13:29.440 --> 00:13:31.180
+<v Mrinal Wadhwa>This was about five, six months ago.
+
+160
+00:13:31.480 --> 00:13:33.360
+<v Mrinal Wadhwa>And so immediately at that point,
+
+161
+00:13:34.140 --> 00:13:36.240
+<v Mrinal Wadhwa>that we should make it so that our documentation
+
+162
+00:13:36.240 --> 00:13:39.620
+<v Mrinal Wadhwa>is really usable and friendly to coding agents
+
+163
+00:13:39.620 --> 00:13:41.340
+<v Mrinal Wadhwa>like Cursor at the time,
+
+164
+00:13:41.440 --> 00:13:44.080
+<v Mrinal Wadhwa>but later on, Claude Code and Gemini, et cetera.
+
+165
+00:13:44.560 --> 00:13:46.840
+<v Mrinal Wadhwa>And that has worked out really well.
+
+166
+00:13:47.000 --> 00:13:48.700
+<v Mrinal Wadhwa>And so as we went to more customers,
+
+167
+00:13:49.040 --> 00:13:50.920
+<v Mrinal Wadhwa>instead of giving them a working example,
+
+168
+00:13:51.100 --> 00:13:53.620
+<v Mrinal Wadhwa>we started giving them these little example prompts.
+
+169
+00:13:53.860 --> 00:13:55.920
+<v Mrinal Wadhwa>And we said, hey, why don't you go paste this
+
+170
+00:13:55.920 --> 00:13:58.940
+<v Mrinal Wadhwa>into your Cursor or Claude Code
+
+171
+00:13:58.940 --> 00:14:01.840
+<v Mrinal Wadhwa>and see what gets built and deployed.
+
+172
+00:14:02.040 --> 00:14:03.300
+<v Mrinal Wadhwa>It takes 10, 15 minutes.
+
+173
+00:14:04.140 --> 00:14:11.720
+<v Mrinal Wadhwa>then adapt it the way you want. And that has worked out really well. So in refining our user experience
+
+174
+00:14:11.720 --> 00:14:18.340
+<v Mrinal Wadhwa>and getting to this state where we feel like it's a minimum viable thing, this was an iteration of
+
+175
+00:14:18.340 --> 00:14:23.940
+<v Mrinal Wadhwa>working with five or six different early customers around their specific problems, but in this kind
+
+176
+00:14:23.940 --> 00:14:30.600
+<v Mrinal Wadhwa>of new way. And so a month ago, when we finally announced autonomy, we already had five customers
+
+177
+00:14:30.600 --> 00:14:37.840
+<v Mrinal Wadhwa>live in production, applying agents for various use cases from banking to pharma to recruitment
+
+178
+00:14:37.840 --> 00:14:39.500
+<v Mrinal Wadhwa>and some other use cases.
+
+179
+00:14:41.240 --> 00:14:44.500
+<v Noah Labhart>I hear you saying we a lot. Tell me about how you built your team.
+
+180
+00:14:44.600 --> 00:14:48.220
+<v Noah Labhart>What do you look for in those people to indicate that they are the winning horses to join you?
+
+181
+00:14:48.480 --> 00:14:55.120
+<v Mrinal Wadhwa>Good question. So we are tiny at the moment. It's me and my co-founder. We met a few years ago
+
+182
+00:14:55.120 --> 00:14:57.780
+<v Mrinal Wadhwa>and we were strangers at the time,
+
+183
+00:14:57.800 --> 00:15:01.500
+<v Mrinal Wadhwa>but we met because we were saying the same things online
+
+184
+00:15:01.500 --> 00:15:07.780
+<v Mrinal Wadhwa>about the problem of identity in distributed systems
+
+185
+00:15:07.780 --> 00:15:09.460
+<v Mrinal Wadhwa>and this like challenge of like,
+
+186
+00:15:09.500 --> 00:15:13.860
+<v Mrinal Wadhwa>how do you enable trust in a complex distributed setting?
+
+187
+00:15:14.220 --> 00:15:16.140
+<v Mrinal Wadhwa>And so we really connected on that.
+
+188
+00:15:16.220 --> 00:15:18.260
+<v Mrinal Wadhwa>Some of the thoughts, both of us had shared online.
+
+189
+00:15:18.620 --> 00:15:20.980
+<v Mrinal Wadhwa>And then when we met in person, we were like, okay,
+
+190
+00:15:21.000 --> 00:15:24.180
+<v Mrinal Wadhwa>we're thinking about very similar challenges in the world.
+
+191
+00:15:25.120 --> 00:15:30.260
+<v Mrinal Wadhwa>Let's go together and try to build something that goes and addresses this challenge.
+
+192
+00:15:30.760 --> 00:15:33.660
+<v Mrinal Wadhwa>So that's what started the Ockam Open Source Project.
+
+193
+00:15:34.020 --> 00:15:36.000
+<v Mrinal Wadhwa>We built a really nice community around it.
+
+194
+00:15:36.060 --> 00:15:43.280
+<v Mrinal Wadhwa>It has, I think, 320 or 330 different contributors so far and a much larger community that's using it.
+
+195
+00:15:43.580 --> 00:15:50.960
+<v Mrinal Wadhwa>And so part of building the team was nurturing and engaging and encouraging that community aspect.
+
+196
+00:15:50.960 --> 00:16:06.640
+<v Mrinal Wadhwa>But we also built a team of developers around Ockam that as we transitioned over to autonomy, they've moved on to doing other things. And we're building autonomy from scratch as a new company. But yeah, that's been our journey so far. So far, we're just two people.
+
+197
+00:16:08.940 --> 00:16:14.740
+<v Noah Labhart>So let's move into scalability, because it's so early. Maybe this is still interesting
+
+198
+00:16:14.740 --> 00:16:19.860
+<v Noah Labhart>based on what you're building, and I'm curious if you've already run into areas where you've had to
+
+199
+00:16:19.860 --> 00:16:23.320
+<v Noah Labhart>you know, fight scale as you've grown.
+
+200
+00:16:23.320 --> 00:16:28.100
+<v Mrinal Wadhwa>Yeah, definitely. From the get-go we decided we
+
+201
+00:16:28.100 --> 00:16:33.940
+<v Mrinal Wadhwa>want to build for scale use cases, and so we wanted to convince ourselves that the architectural
+
+202
+00:16:33.940 --> 00:16:40.800
+<v Mrinal Wadhwa>approaches we were choosing really did lend themselves well to scale. So the counter example,
+
+203
+00:16:41.040 --> 00:16:46.600
+<v Mrinal Wadhwa>if someone was not using autonomy, what they would be doing if they're building a application with
+
+204
+00:16:46.600 --> 00:16:52.620
+<v Mrinal Wadhwa>lots of users that has agents is they would probably assemble a messaging infrastructure.
+
+205
+00:16:52.860 --> 00:16:59.920
+<v Mrinal Wadhwa>So maybe use some real-time messaging thing like Amazon SQS or Kafka. So they'll place this
+
+206
+00:16:59.920 --> 00:17:04.620
+<v Mrinal Wadhwa>messaging infrastructure in the middle. And then they'll try to consume messages off this
+
+207
+00:17:04.620 --> 00:17:09.140
+<v Mrinal Wadhwa>messaging infrastructure in either containers running in Kubernetes that they've provisioned
+
+208
+00:17:09.140 --> 00:17:15.520
+<v Mrinal Wadhwa>themselves or things like AWS Lambda and react into it. So this is the thing that a lot of people
+
+209
+00:17:15.520 --> 00:17:19.620
+<v Mrinal Wadhwa>that are building and deploying agents currently are doing. We wanted to take a very different
+
+210
+00:17:19.620 --> 00:17:27.700
+<v Mrinal Wadhwa>approach because what they're doing has really, really hard scale boundaries, right? So if you do
+
+211
+00:17:27.700 --> 00:17:32.540
+<v Mrinal Wadhwa>that, first of all, you have to know how to provision a complex messaging infrastructure,
+
+212
+00:17:33.140 --> 00:17:38.980
+<v Mrinal Wadhwa>design an app in an event-driven distributed messaging way. And then you have to provision
+
+213
+00:17:38.980 --> 00:17:44.700
+<v Mrinal Wadhwa>a lot of underlying infrastructure, either run a complex Kubernetes environment or run things in
+
+214
+00:17:44.700 --> 00:17:50.780
+<v Mrinal Wadhwa>Lambda. But then as you try to scale, sure, you can run a few hundred agents easily. The moment
+
+215
+00:17:50.780 --> 00:17:55.000
+<v Mrinal Wadhwa>you get into thousands of agents, it starts to get really hard because in Kubernetes, you're running
+
+216
+00:17:55.000 --> 00:18:00.220
+<v Mrinal Wadhwa>thousands of containers at that point. Or in Lambda, you're provisioning thousands of little
+
+217
+00:18:00.220 --> 00:18:05.060
+<v Mrinal Wadhwa>Lambdas. And then you start hitting another problem is that agents by their very nature
+
+218
+00:18:05.060 --> 00:18:11.760
+<v Mrinal Wadhwa>are not like apps everybody has used to building in the past. A three-tier web app only consumes
+
+219
+00:18:11.760 --> 00:18:20.000
+<v Mrinal Wadhwa>a few milliseconds of compute time on a server, whereas an agent is a long-lived thing that runs
+
+220
+00:18:20.000 --> 00:18:21.680
+<v Mrinal Wadhwa>for minutes, hours, or days.
+
+221
+00:18:22.000 --> 00:18:23.820
+<v Mrinal Wadhwa>And infrastructure like Lambda
+
+222
+00:18:23.820 --> 00:18:26.120
+<v Mrinal Wadhwa>isn't really designed for that type of thing.
+
+223
+00:18:26.200 --> 00:18:28.300
+<v Mrinal Wadhwa>In fact, AWS will, if you run a Lambda
+
+224
+00:18:28.300 --> 00:18:29.860
+<v Mrinal Wadhwa>longer than like a few seconds,
+
+225
+00:18:30.260 --> 00:18:33.120
+<v Mrinal Wadhwa>AWS will actively kill your Lambdas.
+
+226
+00:18:33.160 --> 00:18:34.600
+<v Mrinal Wadhwa>That is a set of constraints
+
+227
+00:18:34.600 --> 00:18:37.780
+<v Mrinal Wadhwa>the world without autonomy was dealing with.
+
+228
+00:18:37.960 --> 00:18:38.940
+<v Mrinal Wadhwa>So our choice was,
+
+229
+00:18:39.060 --> 00:18:41.700
+<v Mrinal Wadhwa>how do we design autonomy in a way
+
+230
+00:18:41.700 --> 00:18:43.880
+<v Mrinal Wadhwa>that those constraints go away?
+
+231
+00:18:44.080 --> 00:18:46.980
+<v Mrinal Wadhwa>And so by choosing this actor model-based design,
+
+232
+00:18:46.980 --> 00:18:54.140
+<v Mrinal Wadhwa>were able to spin up thousands of parallel agents in a single tiny container.
+
+233
+00:18:54.640 --> 00:18:57.300
+<v Mrinal Wadhwa>So that's when we started, okay, can we do that?
+
+234
+00:18:57.500 --> 00:18:59.080
+<v Mrinal Wadhwa>So once we made the right design decisions,
+
+235
+00:18:59.360 --> 00:19:04.280
+<v Mrinal Wadhwa>we tested how many agents can we spin up in a single 250 megabyte container,
+
+236
+00:19:04.500 --> 00:19:06.260
+<v Mrinal Wadhwa>and it turns out tens of thousands.
+
+237
+00:19:06.660 --> 00:19:11.040
+<v Mrinal Wadhwa>Then we were like, okay, we have this ability to spin up tens of thousands agents in a single container.
+
+238
+00:19:11.480 --> 00:19:15.800
+<v Mrinal Wadhwa>Ockam allows us to connect securely several containers together.
+
+239
+00:19:16.980 --> 00:19:24.060
+<v Mrinal Wadhwa>How many agents can we spin up in parallel across a distributed fleet of containers that are connected using Ockam?
+
+240
+00:19:24.200 --> 00:19:29.760
+<v Mrinal Wadhwa>And turns out hundreds of thousands, even millions, in a few seconds, they spin up.
+
+241
+00:19:29.820 --> 00:19:35.060
+<v Mrinal Wadhwa>They can work on a task entirely in parallel and then spin down.
+
+242
+00:19:35.320 --> 00:19:39.420
+<v Mrinal Wadhwa>And so we, of course, did a lot of measurement around, does this all work or not?
+
+243
+00:19:39.740 --> 00:19:43.460
+<v Mrinal Wadhwa>And because of the work we'd already done with Ockam,
+
+244
+00:19:43.460 --> 00:19:47.500
+<v Mrinal Wadhwa>we also knew that we could move data, even though it's end-to-end encrypted data,
+
+245
+00:19:47.640 --> 00:19:49.820
+<v Mrinal Wadhwa>at really high throughput and low latency.
+
+246
+00:19:50.200 --> 00:19:57.720
+<v Mrinal Wadhwa>So that combined effect was that if you take a problem of analyzing lots of documents or running,
+
+247
+00:19:57.900 --> 00:20:05.260
+<v Mrinal Wadhwa>let's say one of our customers is building a voice recruiter that conducts first-round interviews.
+
+248
+00:20:05.520 --> 00:20:09.540
+<v Mrinal Wadhwa>So if their voice recruiter is conducting a thousand interviews in parallel,
+
+249
+00:20:09.540 --> 00:20:19.180
+<v Mrinal Wadhwa>You need thousands of stateful agents running long-lived, one-hour-long interviews in a voice-based streaming way.
+
+250
+00:20:19.520 --> 00:20:25.360
+<v Mrinal Wadhwa>And so we ran tests of can we support that type of use case and it turns out very easily.
+
+251
+00:20:25.660 --> 00:20:35.720
+<v Mrinal Wadhwa>And similarly, can we process lots of documents very quickly with a different customer that is analyzing videos and images, like over a petabyte of videos and images.
+
+252
+00:20:35.720 --> 00:20:50.220
+<v Mrinal Wadhwa>And they're able to use autonomy to do a parallel, almost MapReduce-like, distributed, agentic processing of thousands of images in only a few minutes, which before autonomy would simply be impossible.
+
+253
+00:20:50.720 --> 00:20:53.200
+<v Mrinal Wadhwa>So, yeah, we've been dealing with a lot of scale challenges.
+
+254
+00:20:55.500 --> 00:21:02.240
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built thus far with autonomy, what are you most proud of?
+
+255
+00:21:03.980 --> 00:21:11.800
+<v Mrinal Wadhwa>I think my proudest moments have been like delight, seeing the delight of customers. And it's, it's
+
+256
+00:21:11.800 --> 00:21:18.320
+<v Mrinal Wadhwa>everything around AI and agents building things on their own and achieving complex goals on their
+
+257
+00:21:18.320 --> 00:21:24.380
+<v Mrinal Wadhwa>own is all so new that every time there's like a success, even though we all, we built it, we know it
+
+258
+00:21:24.380 --> 00:21:28.880
+<v Mrinal Wadhwa>should work because we've seen it work before. Every time someone successfully is able to achieve
+
+259
+00:21:28.880 --> 00:21:35.880
+<v Mrinal Wadhwa>the goal. It's very exciting to me personally, but it's even more exciting when I get to see
+
+260
+00:21:35.880 --> 00:21:43.840
+<v Mrinal Wadhwa>others experience that delight. So for example, a week ago, Autonomy hosted a hackathon in San
+
+261
+00:21:43.840 --> 00:21:50.920
+<v Mrinal Wadhwa>Francisco in the Ferry Building. And there were 150 developers here at the hackathon. And over a
+
+262
+00:21:50.920 --> 00:21:58.460
+<v Mrinal Wadhwa>period of five or six hours, I saw several of them build and ship and make a live application
+
+263
+00:21:59.220 --> 00:22:04.380
+<v Mrinal Wadhwa>using autonomy. And in many cases, I saw that like moment of delight of almost like multiple
+
+264
+00:22:04.380 --> 00:22:10.080
+<v Mrinal Wadhwa>times people were like, oh, it worked and it's live. And all I did is type two sentences. So
+
+265
+00:22:10.080 --> 00:22:12.180
+<v Mrinal Wadhwa>it's pretty amazing when that happens.
+
+266
+00:22:14.640 --> 00:22:16.120
+<v Noah Labhart>Let's flip the script a little bit.
+
+267
+00:22:16.620 --> 00:22:20.500
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+268
+00:22:20.500 --> 00:22:33.840
+<v Mrinal Wadhwa>The world around agents is evolving rapidly and understanding of what is the right way to build these types of applications is also evolving very rapidly.
+
+269
+00:22:34.080 --> 00:22:39.240
+<v Mrinal Wadhwa>We made several kind of architectural choices that had to be corrected.
+
+270
+00:22:39.240 --> 00:22:55.020
+<v Mrinal Wadhwa>For example, initially we thought that we will have long-term memory and we will keep the entire history of the conversation an agent is having with its LLM in a loop.
+
+271
+00:22:55.120 --> 00:22:58.540
+<v Mrinal Wadhwa>And we keep feeding that history back to the LLM.
+
+272
+00:22:58.540 --> 00:23:01.100
+<v Mrinal Wadhwa>And it seemed to work initially.
+
+273
+00:23:01.300 --> 00:23:05.540
+<v Mrinal Wadhwa>Like in our initial prototypes, when you have agents that only need to do,
+
+274
+00:23:06.320 --> 00:23:11.860
+<v Mrinal Wadhwa>only need to autonomously take five or 10 independent steps, that approach works really well.
+
+275
+00:23:12.060 --> 00:23:16.140
+<v Mrinal Wadhwa>But if an agent needs to take 500 independent steps,
+
+276
+00:23:16.860 --> 00:23:21.880
+<v Mrinal Wadhwa>if you keep all the history of the conversation it's been having with its LLM and with its tools,
+
+277
+00:23:21.880 --> 00:23:25.820
+<v Mrinal Wadhwa>and you feed it back in, 10, 20, 30 iterations in,
+
+278
+00:23:25.960 --> 00:23:29.740
+<v Mrinal Wadhwa>it's too much information to feed to an LLM.
+
+279
+00:23:29.800 --> 00:23:30.800
+<v Mrinal Wadhwa>It's too noisy.
+
+280
+00:23:31.020 --> 00:23:34.080
+<v Mrinal Wadhwa>And there's a term now in the industry around it,
+
+281
+00:23:34.100 --> 00:23:36.000
+<v Mrinal Wadhwa>like it creates context rot.
+
+282
+00:23:36.480 --> 00:23:39.140
+<v Mrinal Wadhwa>So what ends up happening is that the LLM gets confused
+
+283
+00:23:39.140 --> 00:23:41.240
+<v Mrinal Wadhwa>and makes a wrong turn.
+
+284
+00:23:41.500 --> 00:23:44.200
+<v Mrinal Wadhwa>And it makes a wrong turn and then makes another wrong turn.
+
+285
+00:23:44.260 --> 00:23:45.500
+<v Mrinal Wadhwa>The problem continues to compound
+
+286
+00:23:45.500 --> 00:23:48.620
+<v Mrinal Wadhwa>and the agent is never able to achieve its goal.
+
+287
+00:23:49.080 --> 00:23:55.260
+<v Mrinal Wadhwa>So the learning from that was actually what we need to do is prune and trim very carefully
+
+288
+00:23:55.260 --> 00:23:59.920
+<v Mrinal Wadhwa>what we send to the LLM in each iteration of the agent's loop.
+
+289
+00:24:00.060 --> 00:24:05.940
+<v Mrinal Wadhwa>And if we do that well, we can have agents that are able to coherently work towards their
+
+290
+00:24:05.940 --> 00:24:07.780
+<v Mrinal Wadhwa>goal over many hours.
+
+291
+00:24:08.040 --> 00:24:13.260
+<v Mrinal Wadhwa>So I earlier gave that example of that interview agent that conducts first-round voice interviews.
+
+292
+00:24:13.700 --> 00:24:17.780
+<v Mrinal Wadhwa>What we saw was like, you know, it'll ask two good questions or three good questions
+
+293
+00:24:18.620 --> 00:24:23.540
+<v Mrinal Wadhwa>But at the fourth or fifth question, it would start to steer the interview in some completely incorrect direction.
+
+294
+00:24:23.800 --> 00:24:26.140
+<v Mrinal Wadhwa>And the reason was it had too much noise in its context.
+
+295
+00:24:26.320 --> 00:24:32.440
+<v Mrinal Wadhwa>And so once we had this realization that we need to be careful about what we put in, we were able to run hour-long interviews.
+
+296
+00:24:32.540 --> 00:24:37.520
+<v Mrinal Wadhwa>So this is just one example of the type of mistake we made along the way, but there were several others.
+
+297
+00:24:42.260 --> 00:24:43.620
+<v Noah Labhart>Mrinal, this will be interesting.
+
+298
+00:24:43.820 --> 00:24:48.740
+<v Noah Labhart>And this will be really exciting to hear the passion in your voice, which is already coming through in the whole interview.
+
+299
+00:24:49.000 --> 00:24:54.560
+<v Noah Labhart>But I'm curious about what the future looks like for autonomy, for the product, the company, and for your team.
+
+300
+00:24:55.800 --> 00:25:01.860
+<v Mrinal Wadhwa>About a year ago, we started to see website builders that were autonomous, right?
+
+301
+00:25:01.900 --> 00:25:06.820
+<v Mrinal Wadhwa>So we saw examples like Bolt and Lovable and v0 and some others,
+
+302
+00:25:07.520 --> 00:25:11.600
+<v Mrinal Wadhwa>where they could pull together a website almost on their own.
+
+303
+00:25:11.640 --> 00:25:14.340
+<v Mrinal Wadhwa>You gave it a little prompt and it pieced together a website.
+
+304
+00:25:14.700 --> 00:25:16.380
+<v Mrinal Wadhwa>But it had all sorts of challenges.
+
+305
+00:25:16.600 --> 00:25:19.420
+<v Mrinal Wadhwa>It's not a website you can build a company around.
+
+306
+00:25:19.620 --> 00:25:23.500
+<v Mrinal Wadhwa>Maybe you can use it for some prototyping, gathering feedback, etc.
+
+307
+00:25:23.920 --> 00:25:27.680
+<v Mrinal Wadhwa>But if it's a critical product of your business,
+
+308
+00:25:28.020 --> 00:25:30.880
+<v Mrinal Wadhwa>you can't have it change behavior randomly,
+
+309
+00:25:31.120 --> 00:25:33.060
+<v Mrinal Wadhwa>or you can't have mistakes in it.
+
+310
+00:25:33.200 --> 00:25:37.160
+<v Mrinal Wadhwa>You want very precise control over how it looks, feels, behaves.
+
+311
+00:25:37.520 --> 00:25:44.160
+<v Mrinal Wadhwa>and that so far hasn't been that easy to do in this kind of new way of building things
+
+312
+00:25:44.160 --> 00:25:48.060
+<v Mrinal Wadhwa>but that's changing and autonomy is a good example of this there are other people
+
+313
+00:25:48.060 --> 00:25:52.460
+<v Mrinal Wadhwa>building, working towards this goal as well. I feel like Claude Code is a good example of this
+
+314
+00:25:52.460 --> 00:26:00.140
+<v Mrinal Wadhwa>evolution and so what i'm excited about is this possibility that where we're able to build and
+
+315
+00:26:00.140 --> 00:26:07.500
+<v Mrinal Wadhwa>iterate on products that are stable, production-ready, highly secure, and scalable in this
+
+316
+00:26:07.500 --> 00:26:12.800
+<v Mrinal Wadhwa>kind of new approach of talking to the computer rather than writing all the code ourselves.
+
+317
+00:26:13.360 --> 00:26:19.920
+<v Mrinal Wadhwa>But by no means do I mean that that takes away the thing I love to do, which is build software,
+
+318
+00:26:20.060 --> 00:26:24.660
+<v Mrinal Wadhwa>right? Like, it's a lot of programming, engineering, thinking about systems,
+
+319
+00:26:24.800 --> 00:26:29.800
+<v Mrinal Wadhwa>thinking about architecture is still very critical to success in this new way.
+
+320
+00:26:30.140 --> 00:26:33.580
+<v Mrinal Wadhwa>But maybe we won't be typing a lot of it anymore.
+
+321
+00:26:33.880 --> 00:26:41.780
+<v Mrinal Wadhwa>We'll instead drive these agents with either voice or other kind of spec-driven instructions.
+
+322
+00:26:42.280 --> 00:26:45.280
+<v Mrinal Wadhwa>But I think that architecture is still very important.
+
+323
+00:26:45.420 --> 00:26:47.120
+<v Mrinal Wadhwa>In fact, it's critical to success.
+
+324
+00:26:47.480 --> 00:26:59.440
+<v Mrinal Wadhwa>But what's exciting to me about this kind of change is it's easy to iterate and see the parts that lead to mistakes because you can very quickly create five variations of an approach.
+
+325
+00:27:00.140 --> 00:27:03.900
+<v Mrinal Wadhwa>Or try five different approaches and see which ones leads to the right result.
+
+326
+00:27:04.020 --> 00:27:10.300
+<v Mrinal Wadhwa>Whereas earlier in the old way of building software, we would have to spend weeks trying out each experiment.
+
+327
+00:27:10.700 --> 00:27:20.300
+<v Mrinal Wadhwa>So I'm very excited about this new way of building software, which I think that borrows from skills that software engineers have built and developed over the years.
+
+328
+00:27:20.440 --> 00:27:29.240
+<v Mrinal Wadhwa>And those skills are critical, but at the same time, it unlocks new possibilities to build more powerful, scalable things.
+
+329
+00:27:30.880 --> 00:27:32.820
+<v Noah Labhart>Okay, Mrinal, let's switch to you.
+
+330
+00:27:32.900 --> 00:27:34.960
+<v Noah Labhart>Who influences the way that you work?
+
+331
+00:27:35.120 --> 00:27:37.940
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+332
+00:27:38.500 --> 00:27:40.060
+<v Mrinal Wadhwa>My parents are a big influence.
+
+333
+00:27:40.500 --> 00:27:44.200
+<v Mrinal Wadhwa>They have a very sincere, dedicated work ethic.
+
+334
+00:27:44.480 --> 00:27:47.780
+<v Mrinal Wadhwa>And that has been quite an influence throughout my career.
+
+335
+00:27:48.580 --> 00:27:51.440
+<v Mrinal Wadhwa>Publicly, I learn a lot from my co-founder all the time.
+
+336
+00:27:51.520 --> 00:27:52.900
+<v Mrinal Wadhwa>We spend a lot of time together chatting.
+
+337
+00:27:53.380 --> 00:27:59.520
+<v Mrinal Wadhwa>He has a lot of experience with the Azure team before this and Heroku before that.
+
+338
+00:28:00.140 --> 00:28:09.720
+<v Mrinal Wadhwa>I also try to find smart people online that have good balanced views because there's also a lot of like extreme views online these days.
+
+339
+00:28:09.780 --> 00:28:16.540
+<v Mrinal Wadhwa>But good balanced views on how to evolve and learn in this kind of changing world.
+
+340
+00:28:16.920 --> 00:28:18.640
+<v Mrinal Wadhwa>Yeah, there's some ways of learning.
+
+341
+00:28:20.740 --> 00:28:21.860
+<v Noah Labhart>Mrinal, last question.
+
+342
+00:28:22.180 --> 00:28:27.340
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who built the next big thing.
+
+343
+00:28:27.780 --> 00:28:28.940
+<v Noah Labhart>They're jazzed about it.
+
+344
+00:28:30.140 --> 00:28:31.640
+<v Noah Labhart>and kick my shit off to you right down the plane.
+
+345
+00:28:31.800 --> 00:28:33.340
+<v Noah Labhart>What advice do you give that person
+
+346
+00:28:33.340 --> 00:28:35.080
+<v Noah Labhart>having gone down this road a bit?
+
+347
+00:28:37.760 --> 00:28:39.420
+<v Mrinal Wadhwa>Entrepreneurship is a long journey.
+
+348
+00:28:39.960 --> 00:28:41.940
+<v Mrinal Wadhwa>If you look at like the, I don't know,
+
+349
+00:28:41.960 --> 00:28:43.640
+<v Mrinal Wadhwa>Twitter or LinkedIn or whatever, right?
+
+350
+00:28:44.000 --> 00:28:47.980
+<v Mrinal Wadhwa>It's important to note that world is heavily influenced
+
+351
+00:28:47.980 --> 00:28:50.020
+<v Mrinal Wadhwa>by like selection bias, right?
+
+352
+00:28:50.080 --> 00:28:53.400
+<v Mrinal Wadhwa>So what you hear is one in thousand,
+
+353
+00:28:53.960 --> 00:28:56.100
+<v Mrinal Wadhwa>one in, I don't know what the right ratio is.
+
+354
+00:28:56.160 --> 00:28:57.220
+<v Mrinal Wadhwa>Maybe it's one in 10,000.
+
+355
+00:28:57.220 --> 00:28:59.060
+<v Mrinal Wadhwa>One in 10,000 company that ends up raising
+
+356
+00:29:00.280 --> 00:29:08.880
+<v Mrinal Wadhwa>or one in a hundred thousand company that ends up growing their revenue at an extremely fast rate or whatever.
+
+357
+00:29:09.200 --> 00:29:15.420
+<v Mrinal Wadhwa>But it's those stories get amplified so much online that it feels like that's the journey all entrepreneurs have.
+
+358
+00:29:15.800 --> 00:29:17.180
+<v Mrinal Wadhwa>And that's not the case.
+
+359
+00:29:17.240 --> 00:29:20.160
+<v Mrinal Wadhwa>I know so many friends who are entrepreneurs and even my own journey.
+
+360
+00:29:20.400 --> 00:29:22.200
+<v Mrinal Wadhwa>It's a slow ride.
+
+361
+00:29:22.340 --> 00:29:23.880
+<v Mrinal Wadhwa>You have successes, you have failures.
+
+362
+00:29:24.040 --> 00:29:25.680
+<v Mrinal Wadhwa>You learn along the way.
+
+363
+00:29:25.680 --> 00:29:30.140
+<v Mrinal Wadhwa>But it doesn't mean you can't build a successful business taking that slow approach.
+
+364
+00:29:30.240 --> 00:29:43.140
+<v Mrinal Wadhwa>It's a long-term commitment to that goal of I would like to build something, employ other people, create employment and opportunities for other people to build interesting things with me.
+
+365
+00:29:43.600 --> 00:29:54.520
+<v Mrinal Wadhwa>I guess my advice to someone like that would be prepared for the more likely outcome, which is this is going to be tough and hard and will take a long time, many years.
+
+366
+00:29:55.680 --> 00:30:06.240
+<v Mrinal Wadhwa>And if you're prepared for it, it is a transformative, learning-centric journey and a lot of fun if you take it from that, take it with that mindset.
+
+367
+00:30:06.540 --> 00:30:07.720
+<v Noah Labhart>That's fantastic advice.
+
+368
+00:30:07.920 --> 00:30:09.820
+<v Noah Labhart>Well, Mrinal, thank you for being on the show today.
+
+369
+00:30:09.900 --> 00:30:12.320
+<v Noah Labhart>Thank you for telling the creation story of autonomy.
+
+370
+00:30:12.960 --> 00:30:13.580
+<v Noah Labhart>Thank you.
+
+371
+00:30:16.200 --> 00:30:19.040
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+372
+00:30:26.640 --> 00:30:29.640
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+373
+00:30:29.760 --> 00:30:34.540
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+374
+00:30:35.140 --> 00:30:37.360
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+375
+00:30:37.660 --> 00:30:39.580
+<v Noah Labhart>Both things help us out tremendously.
+
+376
+00:30:42.500 --> 00:30:43.980
+<v Noah Labhart>And thanks again for listening.

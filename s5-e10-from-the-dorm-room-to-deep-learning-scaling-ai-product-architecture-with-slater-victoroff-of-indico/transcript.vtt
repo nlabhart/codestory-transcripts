@@ -1,0 +1,1935 @@
+WEBVTT
+
+NOTE S5 E10: From the Dorm Room to Deep Learning: Scaling AI Product Architecture with Slater Victoroff of Indico
+
+1
+00:00:00.000 --> 00:00:06.580
+<v Slater Victoroff>I probably shouldn't admit this, but we spent years kind of bouncing from provider to provider to figure out who would give us the most credits.
+
+2
+00:00:06.800 --> 00:00:11.200
+<v Slater Victoroff>We didn't have to pay for compute at all for years, but it does eventually run out.
+
+3
+00:00:11.720 --> 00:00:19.320
+<v Slater Victoroff>So our dream, right, our first dream was we want to shift sentiment analysis to people in a way that is radically accessible.
+
+4
+00:00:19.640 --> 00:00:26.140
+<v Slater Victoroff>We want to offer these ML models in a way that's as easy to consume as any regular function.
+
+5
+00:00:26.140 --> 00:00:37.420
+<v Slater Victoroff>That was what our MVP was, right? It was this set of ML models, very different than what we do today. And honestly, I think that we're probably not ambitious enough with that initial MVP.
+
+6
+00:00:38.760 --> 00:00:41.840
+<v Slater Victoroff>My name is Slater Victoroff. I'm the founder and CTO of Indico.
+
+7
+00:00:47.360 --> 00:01:00.840
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+8
+00:01:02.400 --> 00:01:08.080
+<v Noah Labhart>I'm your host Noah Labhart and today how Slater Victoroff created a tool to allow
+
+9
+00:01:08.080 --> 00:01:15.760
+<v Noah Labhart>enterprises to embrace intelligent process automation. All this and more on Code Story.
+
+10
+00:01:22.080 --> 00:01:27.380
+<v Noah Labhart>Slater Victoroff has had some pretty cool hobbies over his life. Though he claims to be a weird guy,
+
+11
+00:01:27.380 --> 00:01:32.840
+<v Noah Labhart>he has a well-rounded set of activities. He's a vegan baker, which is half-mad science,
+
+12
+00:01:33.160 --> 00:01:36.840
+<v Noah Labhart>requiring the breakdown of recipes to the fundamentals of their elements.
+
+13
+00:01:37.440 --> 00:01:41.740
+<v Noah Labhart>He's also a fiction writer, halfway through his second book, which he started during the pandemic.
+
+14
+00:01:42.660 --> 00:01:49.220
+<v Noah Labhart>He had a short MMA career too, believe it or not, and has studied Yoshukai karate for quite some
+
+15
+00:01:49.220 --> 00:01:53.740
+<v Noah Labhart>time. Post high school, he was burned out on academics, so he jumped headfirst into martial
+
+16
+00:01:53.740 --> 00:01:57.940
+<v Noah Labhart>martial arts, spent some time in Japan studying the craft, and did some MMA fights in LA.
+
+17
+00:01:58.440 --> 00:02:03.480
+<v Noah Labhart>He has learned over the years that most tech people are typically afraid of being punched
+
+18
+00:02:03.480 --> 00:02:03.980
+<v Noah Labhart>in the face.
+
+19
+00:02:05.020 --> 00:02:09.740
+<v Noah Labhart>He and his co-founders fell in love with the technology centered around intelligent process
+
+20
+00:02:09.740 --> 00:02:16.580
+<v Noah Labhart>automation, which enables organizations to automate processes involving structured, semi-structured,
+
+21
+00:02:16.600 --> 00:02:18.260
+<v Noah Labhart>and unstructured document formats.
+
+22
+00:02:18.980 --> 00:02:23.680
+<v Noah Labhart>Since 2014, they have been at the forefront of innovation in enterprise AI.
+
+23
+00:02:25.400 --> 00:02:28.100
+<v Noah Labhart>This is the creation story of Indico.
+
+24
+00:02:31.820 --> 00:02:36.620
+<v Slater Victoroff>So Indico at the 10,000 foot level is an intelligent process automation company.
+
+25
+00:02:36.880 --> 00:02:41.560
+<v Slater Victoroff>What that means for us is that we're taking some of the most complex ML on the planet, right?
+
+26
+00:02:41.580 --> 00:02:44.280
+<v Slater Victoroff>The kind of stuff that you hear coming out of OpenAI and Google.
+
+27
+00:02:44.280 --> 00:02:49.000
+<v Slater Victoroff>goal, you know, not only do we have Indico alums at those organizations and sort of advisors,
+
+28
+00:02:49.120 --> 00:02:53.560
+<v Slater Victoroff>and, you know, we collaborate with them occasionally, but our goal really, rather than
+
+29
+00:02:54.140 --> 00:02:57.940
+<v Slater Victoroff>incrementally kind of moving forward, the architectural state of the art is really this
+
+30
+00:02:57.940 --> 00:03:03.280
+<v Slater Victoroff>idea of how do we take that technology and make it accessible specifically to non-technical users.
+
+31
+00:03:04.380 --> 00:03:09.460
+<v Slater Victoroff>And then in intelligent process automation, we do that primarily in the document domain,
+
+32
+00:03:09.580 --> 00:03:13.340
+<v Slater Victoroff>if you will, from an ML perspective, the thing that's cool about documents is that
+
+33
+00:03:14.280 --> 00:03:19.900
+<v Slater Victoroff>image data combined with text data. So, you know, we do image and text use cases as well,
+
+34
+00:03:20.060 --> 00:03:26.660
+<v Slater Victoroff>but documents primarily. We're a very classic dorm room startup. I would love to tell you
+
+35
+00:03:26.660 --> 00:03:32.520
+<v Slater Victoroff>that, you know, I was some, you know, brilliant, you know, engineer in undergrad and I plotted
+
+36
+00:03:32.520 --> 00:03:37.960
+<v Slater Victoroff>out, you know, this 10-year plan of, you know, like AI is going to become a thing. But it really
+
+37
+00:03:37.960 --> 00:03:43.120
+<v Slater Victoroff>wasn't that. Honestly, me and my co-founders, and that's Alec Radford, Madison, and Diana,
+
+38
+00:03:44.280 --> 00:03:45.980
+<v Slater Victoroff>into it accidentally, frankly.
+
+39
+00:03:46.400 --> 00:03:49.560
+<v Slater Victoroff>We fell in love with the technology
+
+40
+00:03:49.560 --> 00:03:52.700
+<v Slater Victoroff>and then we became entranced with this idea
+
+41
+00:03:52.700 --> 00:03:55.020
+<v Slater Victoroff>of how do we actually make this accessible to people.
+
+42
+00:03:55.280 --> 00:03:58.420
+<v Slater Victoroff>Did not realize the path it was going to lead us on at the time,
+
+43
+00:03:58.500 --> 00:04:00.440
+<v Slater Victoroff>but very happy that it's ended up this way.
+
+44
+00:04:02.620 --> 00:04:03.780
+<v Noah Labhart>Tell me about that MVP.
+
+45
+00:04:04.180 --> 00:04:06.180
+<v Noah Labhart>Tell me about that first product you built,
+
+46
+00:04:06.280 --> 00:04:08.180
+<v Noah Labhart>how long it took you to build,
+
+47
+00:04:08.240 --> 00:04:10.340
+<v Noah Labhart>and what sort of tools you used to bring it to life.
+
+48
+00:04:11.260 --> 00:04:13.300
+<v Slater Victoroff>Back when we were getting started,
+
+49
+00:04:14.280 --> 00:04:20.820
+<v Slater Victoroff>2013, 2014. Our goal was not making it accessible all the way to non-technical users. We were just
+
+50
+00:04:20.820 --> 00:04:26.700
+<v Slater Victoroff>trying to make it accessible to developers. So our dream, right, our first dream was we want to
+
+51
+00:04:26.700 --> 00:04:33.620
+<v Slater Victoroff>shift sentiment analysis to people in a way that is radically accessible, right? We want to offer
+
+52
+00:04:33.620 --> 00:04:39.960
+<v Slater Victoroff>these ML models in a way that's, you know, as easy to consume as any regular function. That was
+
+53
+00:04:39.960 --> 00:04:41.660
+<v Slater Victoroff>was what our MVP was, right?
+
+54
+00:04:41.740 --> 00:04:43.320
+<v Slater Victoroff>It was this set of ML models,
+
+55
+00:04:43.340 --> 00:04:44.920
+<v Slater Victoroff>very different than what we do today.
+
+56
+00:04:45.120 --> 00:04:47.480
+<v Slater Victoroff>And honestly, I think that we were probably
+
+57
+00:04:47.480 --> 00:04:49.400
+<v Slater Victoroff>not ambitious enough with that initial MVP.
+
+58
+00:04:49.800 --> 00:04:51.780
+<v Slater Victoroff>But it was this set of function calls, right,
+
+59
+00:04:51.880 --> 00:04:54.480
+<v Slater Victoroff>with just a really slick usable API.
+
+60
+00:04:54.880 --> 00:04:56.480
+<v Slater Victoroff>And that's really what we focused on is,
+
+61
+00:04:56.560 --> 00:04:57.800
+<v Slater Victoroff>you know, it wasn't very scalable,
+
+62
+00:04:57.980 --> 00:05:00.200
+<v Slater Victoroff>you know, it was running on the AWS kind of free tier.
+
+63
+00:05:00.720 --> 00:05:02.800
+<v Slater Victoroff>And ultimately we figured out that that product
+
+64
+00:05:02.800 --> 00:05:04.540
+<v Slater Victoroff>was not what the market wanted.
+
+65
+00:05:04.780 --> 00:05:06.540
+<v Slater Victoroff>But we were able to launch that
+
+66
+00:05:06.540 --> 00:05:09.360
+<v Slater Victoroff>and get some really nice user response and feedback
+
+67
+00:05:09.960 --> 00:05:12.160
+<v Slater Victoroff>this was a problem that was resonating with people,
+
+68
+00:05:12.280 --> 00:05:14.400
+<v Slater Victoroff>you know, while we were still in school, right?
+
+69
+00:05:14.460 --> 00:05:15.900
+<v Slater Victoroff>So we had thousands of users.
+
+70
+00:05:16.060 --> 00:05:18.760
+<v Slater Victoroff>You know, we launched it as a pip package on GCP.
+
+71
+00:05:19.020 --> 00:05:22.680
+<v Slater Victoroff>We got $1,000 in credit for winning some hackathon on GCP.
+
+72
+00:05:23.000 --> 00:05:24.780
+<v Slater Victoroff>And then we used that to launch our MVP.
+
+73
+00:05:25.320 --> 00:05:26.720
+<v Slater Victoroff>I probably shouldn't admit this,
+
+74
+00:05:26.820 --> 00:05:30.140
+<v Slater Victoroff>but we spent years kind of bouncing from provider to provider
+
+75
+00:05:30.140 --> 00:05:31.660
+<v Slater Victoroff>to figure out who would give us the most credits.
+
+76
+00:05:31.900 --> 00:05:34.160
+<v Slater Victoroff>We didn't have to pay for compute at all for years,
+
+77
+00:05:34.340 --> 00:05:36.780
+<v Slater Victoroff>but it does eventually run out.
+
+78
+00:05:39.960 --> 00:05:50.200
+<v Noah Labhart>With any MVP, you have to make certain trade-offs and decisions about what features you're going to cut, what technical debt you're going to accept and pay off later.
+
+79
+00:05:50.440 --> 00:05:54.620
+<v Noah Labhart>So tell me about some of those decisions and trade-offs that you had to make and how you coped with them.
+
+80
+00:05:55.760 --> 00:05:57.960
+<v Slater Victoroff>You know, it is really brutally difficult.
+
+81
+00:05:58.100 --> 00:06:02.320
+<v Slater Victoroff>And I think probably here, let's talk about the Indico V2 MVP.
+
+82
+00:06:02.560 --> 00:06:07.320
+<v Slater Victoroff>Just because the V1 MVP, we made the decisions, but we probably didn't do them the right way.
+
+83
+00:06:07.320 --> 00:06:12.180
+<v Slater Victoroff>So the V2 was kind of this, you know, it was a labeling app, it was a discovery app, and
+
+84
+00:06:12.180 --> 00:06:13.560
+<v Slater Victoroff>it was explainability, right?
+
+85
+00:06:13.640 --> 00:06:17.180
+<v Slater Victoroff>So it was kind of those three modules come together, built for a non-technical user.
+
+86
+00:06:18.060 --> 00:06:23.420
+<v Slater Victoroff>And I'll say that the MVP never really stops, because there's the MVP of the product, but
+
+87
+00:06:23.420 --> 00:06:27.400
+<v Slater Victoroff>also every time we've got a new feature that we want to build out, you know, our vision
+
+88
+00:06:27.400 --> 00:06:29.940
+<v Slater Victoroff>is always going to be bigger than what we can actually execute.
+
+89
+00:06:30.240 --> 00:06:35.820
+<v Slater Victoroff>And it turns out that, you know, the number one thing that I really focus on now is how
+
+90
+00:06:37.320 --> 00:06:42.200
+<v Slater Victoroff>the data model and the architecture figured out as early ahead of time as possible, and then set
+
+91
+00:06:42.200 --> 00:06:47.100
+<v Slater Victoroff>ourselves up so that we can iterate quickly on the product side after we've done that initial launch.
+
+92
+00:06:48.120 --> 00:06:52.480
+<v Slater Victoroff>You've got this massive vision in front of you. And I think one of the really, really difficult
+
+93
+00:06:52.480 --> 00:06:59.080
+<v Slater Victoroff>trade-offs is general versus specific, right? Is how much am I going to build towards the platform
+
+94
+00:06:59.080 --> 00:07:03.200
+<v Slater Victoroff>that we want to go to eventually? How much am I going to just execute on the thing in front of me?
+
+95
+00:07:03.200 --> 00:07:10.240
+<v Slater Victoroff>and what we really have kind of decided is that the right thing the thing that you really need
+
+96
+00:07:10.240 --> 00:07:15.500
+<v Slater Victoroff>to get right is the abstraction you're using right kind of the architecture and very much
+
+97
+00:07:15.500 --> 00:07:19.500
+<v Slater Victoroff>the developer experience for you know the the next engineer that comes here think about what
+
+98
+00:07:19.500 --> 00:07:24.900
+<v Slater Victoroff>it's going to be like to develop on this and once if you've got those right um the rest doesn't
+
+99
+00:07:24.900 --> 00:07:29.120
+<v Slater Victoroff>matter as much because you've set yourself up to move really really quickly after you've gotten
+
+100
+00:07:29.120 --> 00:07:30.640
+<v Slater Victoroff>whatever the initial thing out is.
+
+101
+00:07:30.760 --> 00:07:33.320
+<v Slater Victoroff>Because I don't know anything about the MVP
+
+102
+00:07:33.320 --> 00:07:34.880
+<v Slater Victoroff>that other folks are going to build.
+
+103
+00:07:35.020 --> 00:07:37.360
+<v Slater Victoroff>The only thing that's true about every MVP
+
+104
+00:07:37.360 --> 00:07:39.400
+<v Slater Victoroff>is that it's not right.
+
+105
+00:07:40.260 --> 00:07:41.380
+<v Slater Victoroff>That's the only constant.
+
+106
+00:07:43.060 --> 00:07:44.960
+<v Noah Labhart>Getting the abstractions right,
+
+107
+00:07:45.100 --> 00:07:47.720
+<v Noah Labhart>and that can be down to the domain level
+
+108
+00:07:47.720 --> 00:07:48.960
+<v Noah Labhart>or a little bit higher.
+
+109
+00:07:49.500 --> 00:07:51.020
+<v Noah Labhart>Getting the abstractions right
+
+110
+00:07:51.020 --> 00:07:53.840
+<v Noah Labhart>so that it allows you to expand
+
+111
+00:07:53.840 --> 00:07:56.060
+<v Noah Labhart>and move quicker later on
+
+112
+00:07:56.060 --> 00:07:57.360
+<v Noah Labhart>is absolutely critical.
+
+113
+00:07:59.120 --> 00:08:03.040
+<v Noah Labhart>little bit about some of those abstractions, without getting too detailed, obviously,
+
+114
+00:08:03.180 --> 00:08:05.480
+<v Noah Labhart>but some of those that you worked through that were important.
+
+115
+00:08:07.560 --> 00:08:11.500
+<v Slater Victoroff>One philosophy that has been helpful for us, and then I'll talk about something specific
+
+116
+00:08:11.500 --> 00:08:15.940
+<v Slater Victoroff>after that, is something that we call RDD, or readme-driven development.
+
+117
+00:08:16.540 --> 00:08:21.140
+<v Slater Victoroff>And I'll say a huge source of inspiration, though I might be flashing a little bit, but
+
+118
+00:08:21.140 --> 00:08:23.640
+<v Slater Victoroff>for our kind of API design and how we think about it.
+
+119
+00:08:24.280 --> 00:08:28.800
+<v Slater Victoroff>So the requests library in Python, I always thought was such a beautiful example of someone
+
+120
+00:08:29.120 --> 00:08:33.560
+<v Slater Victoroff>took a problem that, you know, like the internet is complicated, making connections and, you know,
+
+121
+00:08:33.560 --> 00:08:37.300
+<v Slater Victoroff>like getting request histories, like it is fundamentally a complicated thing and just
+
+122
+00:08:37.300 --> 00:08:43.060
+<v Slater Victoroff>made such a simple, usable interface for it. And he used this approach of readme-driven development
+
+123
+00:08:43.060 --> 00:08:48.420
+<v Slater Victoroff>and he's a real big advocate for it. And the idea is sort of exactly what it sounds like.
+
+124
+00:08:48.480 --> 00:08:53.440
+<v Slater Victoroff>You start by writing your readme. You say, okay, what's the interface that I want to use to control
+
+125
+00:08:53.440 --> 00:08:59.380
+<v Slater Victoroff>whatever it is that I'm building. Once you build that interface, the idea is actually the rest will
+
+126
+00:08:59.380 --> 00:09:04.660
+<v Slater Victoroff>follow from that, right? And that however you achieve that interface, that's kind of up to you
+
+127
+00:09:04.660 --> 00:09:09.520
+<v Slater Victoroff>and actually matters a lot less going forward. And so that's something that's been really,
+
+128
+00:09:09.560 --> 00:09:15.760
+<v Slater Victoroff>really helpful to us just because again, I think people focus too much often on how to be clever
+
+129
+00:09:15.760 --> 00:09:21.620
+<v Slater Victoroff>in the data model, right? Or clever in the architecture. If you like move some piece of
+
+130
+00:09:23.440 --> 00:09:27.680
+<v Slater Victoroff>you know, you know, N squared to N log N, you know, that that can be really helpful.
+
+131
+00:09:27.980 --> 00:09:32.900
+<v Slater Victoroff>But maybe it's not a bottleneck at all. And working through your interface first and thinking,
+
+132
+00:09:33.000 --> 00:09:37.180
+<v Slater Victoroff>you know, will often let you identify those bottlenecks even and help you figure out where
+
+133
+00:09:37.180 --> 00:09:43.480
+<v Slater Victoroff>you should be focusing. One piece for us really specifically, just to give you a sense of kind of
+
+134
+00:09:43.480 --> 00:09:48.700
+<v Slater Victoroff>some of the really tough problems that we've got to deal with documents, right? So just think about,
+
+135
+00:09:48.740 --> 00:09:52.740
+<v Slater Victoroff>you know, a page of a book, we'll say, because that's, that's maybe a little bit more accessible
+
+136
+00:09:53.440 --> 00:09:56.060
+<v Slater Victoroff>And how do you represent a document?
+
+137
+00:09:56.320 --> 00:09:59.500
+<v Slater Victoroff>Because the thing is, there's a hundred things I might want to do with a page of a book.
+
+138
+00:09:59.640 --> 00:10:02.360
+<v Slater Victoroff>You know, I might want to pull all of the names off of that page.
+
+139
+00:10:02.540 --> 00:10:06.780
+<v Slater Victoroff>I might want to classify that page as to whether it's well written or badly written.
+
+140
+00:10:06.920 --> 00:10:11.360
+<v Slater Victoroff>Right. I might want to extract all the paragraphs that have dialogue in them.
+
+141
+00:10:11.420 --> 00:10:12.880
+<v Slater Victoroff>Right. To just sort of name a couple of things.
+
+142
+00:10:13.840 --> 00:10:17.920
+<v Slater Victoroff>Each one of those problems actually kind of the format that you'd want for a document.
+
+143
+00:10:18.100 --> 00:10:23.180
+<v Slater Victoroff>Right. And, you know, the data format you can imagine is actually very, very complex.
+
+144
+00:10:23.440 --> 00:10:29.360
+<v Slater Victoroff>And the thing is, you might want to have your UI involve highlighting, which means that you have to work over characters.
+
+145
+00:10:29.480 --> 00:10:33.560
+<v Slater Victoroff>But fundamentally, the data that you're working with is image data.
+
+146
+00:10:34.220 --> 00:10:41.420
+<v Slater Victoroff>Those are really where we found some of the hardest abstraction problems are where, you know, it's sort of this multimodal data view.
+
+147
+00:10:41.800 --> 00:10:45.900
+<v Slater Victoroff>Depending on the use case you take through it, it feels like it takes really radically different paths.
+
+148
+00:10:46.160 --> 00:10:49.440
+<v Slater Victoroff>And I will say we've kind of messed up on that one a couple of times.
+
+149
+00:10:49.500 --> 00:10:51.360
+<v Slater Victoroff>And I think that we keep improving on it.
+
+150
+00:10:51.360 --> 00:10:56.080
+<v Slater Victoroff>it. But it's sort of like each improvement to the abstraction is like a major product revision for
+
+151
+00:10:56.080 --> 00:11:01.440
+<v Slater Victoroff>us. And in our seven years, we've had three shots at it, you know, it's the way to think of it.
+
+152
+00:11:03.200 --> 00:11:08.360
+<v Noah Labhart>So you've got MVP two, in a good stable place, you've got the abstractions where
+
+153
+00:11:08.360 --> 00:11:13.360
+<v Noah Labhart>you're happy with them in the beginning, how did you progress the product from there? How did you
+
+154
+00:11:13.360 --> 00:11:19.120
+<v Noah Labhart>mature it? And I'm curious about how you went about building your roadmap and deciding this
+
+155
+00:11:19.120 --> 00:11:21.260
+<v Noah Labhart>this is the next most important thing to build.
+
+156
+00:11:22.340 --> 00:11:25.820
+<v Slater Victoroff>You know, when we were a team of four or five engineers,
+
+157
+00:11:26.260 --> 00:11:28.840
+<v Slater Victoroff>this was a really down in the weeds,
+
+158
+00:11:29.000 --> 00:11:30.980
+<v Slater Victoroff>kind of we all get together in a table
+
+159
+00:11:30.980 --> 00:11:31.900
+<v Slater Victoroff>and we figure out, okay,
+
+160
+00:11:31.940 --> 00:11:34.640
+<v Slater Victoroff>what does the next week look like for us, right?
+
+161
+00:11:34.760 --> 00:11:37.020
+<v Slater Victoroff>In not an insane amount of detail, right?
+
+162
+00:11:37.080 --> 00:11:38.880
+<v Slater Victoroff>But figuring out, literally going to each person,
+
+163
+00:11:38.980 --> 00:11:40.480
+<v Slater Victoroff>like what are your top three priorities?
+
+164
+00:11:40.560 --> 00:11:41.300
+<v Slater Victoroff>What are your top three priorities?
+
+165
+00:11:41.900 --> 00:11:44.520
+<v Slater Victoroff>Now that's not a very scalable process.
+
+166
+00:11:44.680 --> 00:11:45.640
+<v Slater Victoroff>That's not really effective.
+
+167
+00:11:45.880 --> 00:11:47.640
+<v Slater Victoroff>And honestly, in those early days,
+
+168
+00:11:49.120 --> 00:11:50.540
+<v Slater Victoroff>It's less about a roadmap, right?
+
+169
+00:11:50.600 --> 00:11:53.480
+<v Slater Victoroff>Just because we had so much stuff that we so obviously had to get done.
+
+170
+00:11:53.900 --> 00:11:55.680
+<v Slater Victoroff>That's changed quite a lot for us, right?
+
+171
+00:11:55.780 --> 00:11:59.940
+<v Slater Victoroff>I think when we look at our product now, the size of our vision has only grown, right?
+
+172
+00:12:00.060 --> 00:12:04.080
+<v Slater Victoroff>So one of the things that we joke is, you know, we've got six modules in the product
+
+173
+00:12:04.080 --> 00:12:04.580
+<v Slater Victoroff>right now.
+
+174
+00:12:04.660 --> 00:12:08.800
+<v Slater Victoroff>For any of one of those modules, you could get a couple of execs together and, you know,
+
+175
+00:12:08.860 --> 00:12:12.660
+<v Slater Victoroff>we'd spit out literally a decade long roadmap for that thing, right?
+
+176
+00:12:12.760 --> 00:12:14.500
+<v Slater Victoroff>Of what would be awesome and what we'd like.
+
+177
+00:12:14.880 --> 00:12:16.960
+<v Slater Victoroff>Now, obviously that's super important.
+
+178
+00:12:16.960 --> 00:12:23.780
+<v Slater Victoroff>So the way things have really, really changed for us over the years is now the roadmap is not about what gets built.
+
+179
+00:12:24.040 --> 00:12:27.700
+<v Slater Victoroff>It's about it's purely a prioritization exercise. Right.
+
+180
+00:12:28.220 --> 00:12:30.980
+<v Slater Victoroff>And so we do a couple of different axes of this.
+
+181
+00:12:31.060 --> 00:12:35.420
+<v Slater Victoroff>We've got an annual planning cycle where we say, here's all the stuff that we want to get done in the year.
+
+182
+00:12:35.480 --> 00:12:39.040
+<v Slater Victoroff>But we're going into that knowing that it's maybe 50 percent right.
+
+183
+00:12:39.180 --> 00:12:42.300
+<v Slater Victoroff>And really just focusing on what is the first half of the year.
+
+184
+00:12:42.300 --> 00:12:47.180
+<v Slater Victoroff>we also have quarterly planning cycles which again you know what did we think we were going to
+
+185
+00:12:47.180 --> 00:12:51.860
+<v Slater Victoroff>try to get done this quarter how are we stacking up against our yearly goals uh and again you know
+
+186
+00:12:51.860 --> 00:12:55.800
+<v Slater Victoroff>what are the difficult prioritization decisions that we've got to make for what makes it onto
+
+187
+00:12:55.800 --> 00:13:00.340
+<v Slater Victoroff>the roadmap uh actually there's an analogy that one of our advisors used that i think is perfect
+
+188
+00:13:00.340 --> 00:13:07.360
+<v Slater Victoroff>is that the best products are like spheres you want the minimum surface area and the maximum
+
+189
+00:13:07.360 --> 00:13:11.840
+<v Slater Victoroff>volume right and the sphere kind of maximizes that and i think it's it's a mistake that a lot
+
+190
+00:13:12.300 --> 00:13:15.760
+<v Slater Victoroff>make when they're designing their product roadmaps is that they think much more about like,
+
+191
+00:13:15.780 --> 00:13:19.760
+<v Slater Victoroff>I would put all these flashing new features in, right? I want to let people do anything. Like I
+
+192
+00:13:19.760 --> 00:13:24.080
+<v Slater Victoroff>want to kind of send it all out. And the problem when you've got all of that surface area, all of
+
+193
+00:13:24.080 --> 00:13:29.600
+<v Slater Victoroff>those different pieces that customers interact with, it really slows down the pace at which you
+
+194
+00:13:29.600 --> 00:13:34.360
+<v Slater Victoroff>can iterate. Because, you know, the second, it's very easy to ship a feature, right? But then you
+
+195
+00:13:34.360 --> 00:13:39.840
+<v Slater Victoroff>have to maintain that for forever. And we talk about it like wake, like a boat wake, right? It's
+
+196
+00:13:39.840 --> 00:13:42.100
+<v Slater Victoroff>kind of the more surface area you've got in your app, right?
+
+197
+00:13:42.160 --> 00:13:46.660
+<v Slater Victoroff>It creates this massive wake, and a lot of companies, you know, that can kill the company,
+
+198
+00:13:46.820 --> 00:13:47.380
+<v Slater Victoroff>right?
+
+199
+00:13:47.480 --> 00:13:52.440
+<v Slater Victoroff>Because that wake sort of grows unabated, and what ends up happening is that, you know,
+
+200
+00:13:52.440 --> 00:13:55.540
+<v Slater Victoroff>you've got a whole bunch of features in your product that seemed really interesting at
+
+201
+00:13:55.540 --> 00:14:00.220
+<v Slater Victoroff>first, and, you know, you've got one customer almost that uses each of them, and then you
+
+202
+00:14:00.220 --> 00:14:05.840
+<v Slater Victoroff>can't get after the features that you then really need to build without, you know, pissing
+
+203
+00:14:05.840 --> 00:14:06.740
+<v Slater Victoroff>off half your user base.
+
+204
+00:14:08.180 --> 00:14:16.960
+<v Noah Labhart>Well, let's switch to team. So tell me about how you built your team and what you looked for in those people to indicate that they were the winning horses to join you.
+
+205
+00:14:18.940 --> 00:14:43.020
+<v Slater Victoroff>I love our team. I mean, if folks follow me on LinkedIn, they probably know this already, but I'm just, I mean, I post all the time. My team absolutely blows me away. You know, when I was in school, I thought it was a very easy heuristic, right? Because I'm like, okay, you know, I have all these people I've been with for years, so I'm just going to try to hire the smartest people that I know.
+
+206
+00:14:43.540 --> 00:14:48.460
+<v Slater Victoroff>And, you know, if I ever met someone, I was like, wow, you know, this person is just like so sharp.
+
+207
+00:14:48.560 --> 00:14:51.600
+<v Slater Victoroff>They really bring something to the table. Right. I'm just going to try to hire them.
+
+208
+00:14:51.700 --> 00:14:58.400
+<v Slater Victoroff>So it was it was pretty simple. But again, you know, that's that's like a couple of hires that really I mean, those were those were co-founders.
+
+209
+00:14:58.520 --> 00:15:03.220
+<v Slater Victoroff>Right. And, you know, maybe maybe kind of call it up to the first 10 employees.
+
+210
+00:15:03.340 --> 00:15:11.160
+<v Slater Victoroff>It was purely people that I had already worked with and there were enough of them that, you know, I was able to get to join Indico that it worked out.
+
+211
+00:15:13.020 --> 00:15:14.120
+<v Slater Victoroff>That's one really big plus.
+
+212
+00:15:14.380 --> 00:15:23.680
+<v Slater Victoroff>While there's a lot of minuses of starting a company in school, that's one really big plus is that if you've got a bunch of friends that are graduating, you know are good.
+
+213
+00:15:24.520 --> 00:15:26.220
+<v Slater Victoroff>That's just an awesome way.
+
+214
+00:15:26.340 --> 00:15:29.760
+<v Slater Victoroff>It's a huge leg up on the rest of people founding companies.
+
+215
+00:15:31.220 --> 00:15:38.920
+<v Slater Victoroff>And then past that, you know, when we talked about really structuring the technical interviews, there are a couple things that we wanted to check for from the very beginning.
+
+216
+00:15:39.420 --> 00:15:45.820
+<v Slater Victoroff>Number one is people who will overcomplicate problems, right?
+
+217
+00:15:45.900 --> 00:15:49.580
+<v Slater Victoroff>And that's actually one of our biggest sort of negatives that we watch out for.
+
+218
+00:15:49.700 --> 00:15:54.920
+<v Slater Victoroff>So one of our questions that we used to use was sort of this load balancing question,
+
+219
+00:15:55.080 --> 00:16:00.680
+<v Slater Victoroff>and we would set it up with kind of not even necessarily complicated words, right?
+
+220
+00:16:00.720 --> 00:16:06.100
+<v Slater Victoroff>But we'd use a lot of technical terms, and then we'd ask them a very, very simple question, right?
+
+221
+00:16:06.100 --> 00:16:11.880
+<v Slater Victoroff>And you could tell immediately there were people that, I mean, they would look a little weird and they'd be like, oh, you know, whatever, you just do it randomly.
+
+222
+00:16:12.080 --> 00:16:15.040
+<v Slater Victoroff>Or, you know, round robin, you know, it's like a hello world kind of answer.
+
+223
+00:16:15.600 --> 00:16:17.140
+<v Slater Victoroff>And we're like, yes, you know, perfect.
+
+224
+00:16:17.240 --> 00:16:23.040
+<v Slater Victoroff>You know, when there is the simple solution, identifying that and going for that, that's a huge, huge, huge advantage.
+
+225
+00:16:23.140 --> 00:16:24.500
+<v Slater Victoroff>It's something that's very hard for people to do.
+
+226
+00:16:24.920 --> 00:16:26.940
+<v Slater Victoroff>So that's one key piece.
+
+227
+00:16:27.080 --> 00:16:31.160
+<v Slater Victoroff>Another piece, and this might be unique to Indico because we are very much a deep tech company.
+
+228
+00:16:31.160 --> 00:16:40.380
+<v Slater Victoroff>But I kind of, we don't have the luxury that, you know, an e-commerce company may have where, you know, that's a well-established problem.
+
+229
+00:16:40.500 --> 00:16:42.160
+<v Slater Victoroff>And there are people that have been doing that for decades.
+
+230
+00:16:42.360 --> 00:16:49.040
+<v Slater Victoroff>So in our space, right, I mean, our space has arguably not existed for as long as we've been doing it, right?
+
+231
+00:16:49.140 --> 00:16:50.580
+<v Slater Victoroff>Because we are sort of a,
+
+232
+00:16:50.620 --> 00:16:52.380
+<v Slater Victoroff>we've
+
+233
+00:16:52.380 --> 00:16:54.180
+<v Slater Victoroff>been very, very early to this space, I'll say.
+
+234
+00:16:56.220 --> 00:17:02.740
+<v Slater Victoroff>and we hire people explicitly with the notion that we are going to be training them to get good at
+
+235
+00:17:02.740 --> 00:17:08.120
+<v Slater Victoroff>this this particular kind of software right that we know they don't have experience with and that's
+
+236
+00:17:08.120 --> 00:17:12.760
+<v Slater Victoroff>the other thing we look for is people we don't want people like we know that you're not an expert
+
+237
+00:17:12.760 --> 00:17:18.280
+<v Slater Victoroff>in this right no one is an expert in this we want people that are going to be really open about that
+
+238
+00:17:18.280 --> 00:17:22.960
+<v Slater Victoroff>say hey i'm not an expert are you going to be willing to train me right um and you know obviously
+
+239
+00:17:24.180 --> 00:17:26.620
+<v Slater Victoroff>At the same time, you know, obviously you have to bring a lot to the table.
+
+240
+00:17:27.400 --> 00:17:33.760
+<v Slater Victoroff>But I would say that one of the best interviews I ever had, because we also highly value transparency.
+
+241
+00:17:34.780 --> 00:17:36.160
+<v Slater Victoroff>Again, that may be an Indico thing.
+
+242
+00:17:36.380 --> 00:17:47.340
+<v Slater Victoroff>But the candidate asked me, and this is a very first, you know, after a 30, 45 minute phone call, right, was, do you think, you know, do you really think I could be qualified enough to join your company?
+
+243
+00:17:48.320 --> 00:17:52.960
+<v Slater Victoroff>Right. And like a lot of people have that sentiment, I think, because, you know, the stuff that we do is really, really complicated.
+
+244
+00:17:54.180 --> 00:17:55.940
+<v Slater Victoroff>of transparency, that level of humility.
+
+245
+00:17:56.200 --> 00:17:58.100
+<v Slater Victoroff>And again, you know, I talked, I mean,
+
+246
+00:17:58.100 --> 00:18:00.080
+<v Slater Victoroff>she was a very competent engineer, right?
+
+247
+00:18:00.160 --> 00:18:01.540
+<v Slater Victoroff>And incredibly motivated.
+
+248
+00:18:01.660 --> 00:18:02.800
+<v Slater Victoroff>And I just thought, I'm like, you know,
+
+249
+00:18:02.800 --> 00:18:05.140
+<v Slater Victoroff>the fact that you are asking that question tells me
+
+250
+00:18:05.140 --> 00:18:06.780
+<v Slater Victoroff>that the answer is yes, absolutely.
+
+251
+00:18:07.000 --> 00:18:08.580
+<v Slater Victoroff>You will do an incredible job here.
+
+252
+00:18:08.900 --> 00:18:11.620
+<v Slater Victoroff>And she has, and she has done an incredible job here.
+
+253
+00:18:11.920 --> 00:18:13.600
+<v Slater Victoroff>I don't know, those are a couple
+
+254
+00:18:13.600 --> 00:18:15.100
+<v Slater Victoroff>of the really, really key things.
+
+255
+00:18:15.160 --> 00:18:18.060
+<v Slater Victoroff>You know, I would say that a lot of my general advice
+
+256
+00:18:18.060 --> 00:18:20.700
+<v Slater Victoroff>for folks is just remember that the person
+
+257
+00:18:20.700 --> 00:18:22.500
+<v Slater Victoroff>on the other side of the table is looking
+
+258
+00:18:24.180 --> 00:18:26.260
+<v Slater Victoroff>you're looking for a job. Probably they care more.
+
+259
+00:18:29.980 --> 00:18:32.460
+<v Noah Labhart>Let's switch to scalability. So did you
+
+260
+00:18:32.460 --> 00:18:37.100
+<v Noah Labhart>build this to scale efficiently from day one or were you fighting this as you grew?
+
+261
+00:18:39.120 --> 00:18:44.840
+<v Slater Victoroff>You know, it's a little of column A, a little bit of column B. I think that there are, like,
+
+262
+00:18:44.880 --> 00:18:50.580
+<v Slater Victoroff>you do have to do things when you start that are not scalable and that, you know, just be strategic
+
+263
+00:18:50.580 --> 00:18:52.340
+<v Slater Victoroff>and intentional about where you're doing that.
+
+264
+00:18:52.440 --> 00:18:55.140
+<v Slater Victoroff>You know, you do want to do things that don't scale,
+
+265
+00:18:55.280 --> 00:18:58.600
+<v Slater Victoroff>but you don't want to do them for everything all the time.
+
+266
+00:18:59.480 --> 00:19:04.160
+<v Slater Victoroff>And what we'll also often talk about when we're thinking about scale problems
+
+267
+00:19:04.160 --> 00:19:08.180
+<v Slater Victoroff>is what we call problems that we would be so lucky to have, right?
+
+268
+00:19:08.420 --> 00:19:12.080
+<v Slater Victoroff>So, you know, when we're going out and we're talking about, you know, scalability for,
+
+269
+00:19:13.060 --> 00:19:15.720
+<v Slater Victoroff>let's just say you've got numbers of users on your website,
+
+270
+00:19:15.900 --> 00:19:20.400
+<v Slater Victoroff>and let's say each user, you know, pays you 5,000 bucks a year,
+
+271
+00:19:20.580 --> 00:19:23.460
+<v Slater Victoroff>and your projections say that you need,
+
+272
+00:19:23.460 --> 00:19:25.500
+<v Slater Victoroff>whatever, 1,000 users by the end of the year.
+
+273
+00:19:25.800 --> 00:19:27.580
+<v Slater Victoroff>If someone comes to you and they're like,
+
+274
+00:19:27.660 --> 00:19:30.600
+<v Slater Victoroff>hey, our platform, we are going to hit a wall
+
+275
+00:19:30.600 --> 00:19:33.200
+<v Slater Victoroff>at 10,000 users and everything is going to break.
+
+276
+00:19:33.820 --> 00:19:34.700
+<v Slater Victoroff>Obviously, that's bad.
+
+277
+00:19:37.040 --> 00:19:39.620
+<v Slater Victoroff>But let's say it's going to take three months to solve that.
+
+278
+00:19:39.980 --> 00:19:42.000
+<v Slater Victoroff>I'm like, okay, in our current projections,
+
+279
+00:19:42.520 --> 00:19:44.780
+<v Slater Victoroff>that's not going to happen for three years
+
+280
+00:19:44.780 --> 00:19:46.140
+<v Slater Victoroff>and it only takes three months.
+
+281
+00:19:46.640 --> 00:19:49.220
+<v Slater Victoroff>It could still happen earlier and it will still be painful,
+
+282
+00:19:49.340 --> 00:19:50.160
+<v Slater Victoroff>but that's something where we say,
+
+283
+00:19:50.580 --> 00:19:54.720
+<v Slater Victoroff>a problem we'd be so lucky to have. It doesn't mean it's not a problem, it doesn't mean it won't
+
+284
+00:19:54.720 --> 00:19:59.540
+<v Slater Victoroff>be a problem, but it means that if we are having that problem, the business is going to be in a
+
+285
+00:19:59.540 --> 00:20:03.880
+<v Slater Victoroff>good spot and so we're going to have tools to navigate around it that we wouldn't have otherwise.
+
+286
+00:20:05.080 --> 00:20:12.740
+<v Slater Victoroff>So that's the one side. The other side, right, because I think that there are pieces where we
+
+287
+00:20:12.740 --> 00:20:18.540
+<v Slater Victoroff>have had to build to scale from day one to a really extensive level, right? I think a lot of
+
+288
+00:20:18.540 --> 00:20:24.760
+<v Slater Victoroff>that comes down to product weight. And I think where I see founders go wrong with this, the one
+
+289
+00:20:24.760 --> 00:20:29.940
+<v Slater Victoroff>thing that you do have to make sure scales is your product and your delivery model. And by that,
+
+290
+00:20:30.020 --> 00:20:33.860
+<v Slater Victoroff>I mean, not, you know, the product in terms of number of users, but I mean, kind of product
+
+291
+00:20:33.860 --> 00:20:39.320
+<v Slater Victoroff>use case, right? If you're having to build, you know, new features for every customer, right? If
+
+292
+00:20:39.320 --> 00:20:42.140
+<v Slater Victoroff>you're doing a huge amount of custom work on top of your product and your product's not getting
+
+293
+00:20:42.140 --> 00:20:46.380
+<v Slater Victoroff>your customer where they need to be, that's the kind of thing that's actually really not scalable
+
+294
+00:20:46.380 --> 00:20:48.660
+<v Slater Victoroff>and is going to become insidious very, very quickly.
+
+295
+00:20:49.620 --> 00:20:52.180
+<v Slater Victoroff>So, you know, from day one on the product,
+
+296
+00:20:52.240 --> 00:20:54.640
+<v Slater Victoroff>we had to be really, really focused on this idea
+
+297
+00:20:54.640 --> 00:20:57.380
+<v Slater Victoroff>that someone had to be able to pick this up
+
+298
+00:20:57.380 --> 00:20:59.060
+<v Slater Victoroff>and, you know, build a thousand models,
+
+299
+00:20:59.300 --> 00:21:01.840
+<v Slater Victoroff>you know, over the course of a month or whatever
+
+300
+00:21:01.840 --> 00:21:04.760
+<v Slater Victoroff>and do these things that people simply weren't doing today
+
+301
+00:21:05.500 --> 00:21:09.880
+<v Slater Victoroff>because we knew that it was such a key part of the product, right?
+
+302
+00:21:09.940 --> 00:21:12.080
+<v Slater Victoroff>And it was, you know, I think where people can go wrong
+
+303
+00:21:12.080 --> 00:21:16.040
+<v Slater Victoroff>is there's this belief that if you solve a bunch of specific problems,
+
+304
+00:21:16.380 --> 00:21:21.960
+<v Slater Victoroff>eventually the problem to the the solution to the generic problem will appear and it actually it
+
+305
+00:21:21.960 --> 00:21:27.420
+<v Slater Victoroff>doesn't work like that you have to build the general solution first right and then test your
+
+306
+00:21:27.420 --> 00:21:32.500
+<v Slater Victoroff>general solution by building something specific and then you know if the second one is easier than
+
+307
+00:21:32.500 --> 00:21:37.220
+<v Slater Victoroff>the first one and the third one is easier than the second one then you're on the right path and i
+
+308
+00:21:37.220 --> 00:21:42.980
+<v Slater Victoroff>think that so long as that works out nothing else about the business really has to be scalable from
+
+309
+00:21:42.980 --> 00:21:44.120
+<v Slater Victoroff>day one, but that does.
+
+310
+00:21:46.140 --> 00:21:50.440
+<v Noah Labhart>Well, as you step out on the balcony and look across all you've built,
+
+311
+00:21:50.520 --> 00:21:51.500
+<v Noah Labhart>what are you most proud of?
+
+312
+00:21:52.860 --> 00:21:58.900
+<v Slater Victoroff>It is so awesome to wake up in the morning and know that I'm going
+
+313
+00:21:58.900 --> 00:22:04.900
+<v Slater Victoroff>to get to deal with some of the smartest people I have ever met, right? To know that we've got
+
+314
+00:22:04.900 --> 00:22:09.340
+<v Slater Victoroff>the kind of culture where, you know, if I'm out in front of the, you know, even the rest of the
+
+315
+00:22:09.340 --> 00:22:13.180
+<v Slater Victoroff>company, right, we're doing some presentation on something and I'm mistaken, right, they feel
+
+316
+00:22:13.180 --> 00:22:17.500
+<v Slater Victoroff>comfortable like calling me out and saying, hey, no, like you were wrong about that. And I learn
+
+317
+00:22:17.500 --> 00:22:23.480
+<v Slater Victoroff>every single day. You know, recently, one really big shift for me, right, is especially with the
+
+318
+00:22:23.480 --> 00:22:26.920
+<v Slater Victoroff>pandemic, there were a whole bunch of people that, you know, I didn't meet them when they interviewed,
+
+319
+00:22:27.100 --> 00:22:30.600
+<v Slater Victoroff>right? For the longest time, as kind of the founder, I met every single person, I interviewed
+
+320
+00:22:30.600 --> 00:22:34.680
+<v Slater Victoroff>every single person. And I, you know, was kind of a final say on whether or not we hired them.
+
+321
+00:22:34.840 --> 00:22:39.220
+<v Slater Victoroff>And now, obviously, as we scale, that's not true anymore. And the first couple of times I met
+
+322
+00:22:39.340 --> 00:22:43.660
+<v Slater Victoroff>people that I had never interviewed, I, you know, I was super nervous, right? I'm like, oh my God,
+
+323
+00:22:43.740 --> 00:22:48.480
+<v Slater Victoroff>I'm not going to like this person. They're not going to be Indico. And it was the exact opposite,
+
+324
+00:22:48.540 --> 00:22:54.580
+<v Slater Victoroff>right? I mean, I loved every single one of them. And what I would just say, you know, like give
+
+325
+00:22:54.580 --> 00:22:59.160
+<v Slater Victoroff>this advice to any founders, it's like team is everything, right? Execution is everything,
+
+326
+00:22:59.640 --> 00:23:04.980
+<v Slater Victoroff>right? Your idea sucks. Like, I don't care what your idea is. It sucks. My ideas suck. Everyone's
+
+327
+00:23:04.980 --> 00:23:10.760
+<v Slater Victoroff>ideas suck. Execution is what matters and people are what matters. And so long as you execute on
+
+328
+00:23:10.760 --> 00:23:15.740
+<v Slater Victoroff>that, so long as you get that done, everything else is going to work out, right? But if you
+
+329
+00:23:15.740 --> 00:23:20.480
+<v Slater Victoroff>mess those up, you know, best idea in the world, best founder in the world, right? Best investors
+
+330
+00:23:20.480 --> 00:23:22.180
+<v Slater Victoroff>in the world, bad team, it's not going to work.
+
+331
+00:23:23.040 --> 00:23:25.040
+<v Noah Labhart>Well, let's flip the script a little bit. Tell
+
+332
+00:23:25.040 --> 00:23:28.920
+<v Noah Labhart>me about a mistake you made and how you and your team responded to it.
+
+333
+00:23:30.040 --> 00:23:31.580
+<v Slater Victoroff>Oh yeah. Oh my goodness.
+
+334
+00:23:31.580 --> 00:23:33.680
+<v Slater Victoroff>You know, I've made so many over the years.
+
+335
+00:23:35.280 --> 00:23:40.020
+<v Slater Victoroff>Look, I think the biggest mistake that I made in the early years, and honestly, this is
+
+336
+00:23:40.020 --> 00:23:47.200
+<v Slater Victoroff>probably one of the things that brought Indico closest to not existing anymore, was I trusted
+
+337
+00:23:47.200 --> 00:23:53.240
+<v Slater Victoroff>people's credentials over my own gut feeling and over my own expertise in the space.
+
+338
+00:23:53.580 --> 00:23:59.220
+<v Slater Victoroff>And I think especially with founders that are first-time founders and they don't have
+
+339
+00:23:59.220 --> 00:24:05.140
+<v Slater Victoroff>have a mentor network. And especially if they are successful first time founders, right? There are a
+
+340
+00:24:05.140 --> 00:24:09.520
+<v Slater Victoroff>lot of people out there that see that as kind of a prime opportunity. And you're going to have a lot
+
+341
+00:24:09.520 --> 00:24:13.500
+<v Slater Victoroff>of people coming to you with advice, a lot of people that want to be advisors or mentors, you
+
+342
+00:24:13.500 --> 00:24:17.200
+<v Slater Victoroff>know, some of them want your money, some of them want your equity, some of them are really just
+
+343
+00:24:17.200 --> 00:24:24.220
+<v Slater Victoroff>there to help. But you don't know who is who you don't know which is which. And I, you know, I took
+
+344
+00:24:24.220 --> 00:24:27.720
+<v Slater Victoroff>some advice from people that I shouldn't have, right? I mean, not not exclusively, because I was
+
+345
+00:24:29.220 --> 00:24:31.580
+<v Slater Victoroff>And you have to do that to de-risk this kind of stuff.
+
+346
+00:24:34.180 --> 00:24:40.220
+<v Slater Victoroff>You know, I think that the biggest issue is that when you're trying to build something new,
+
+347
+00:24:40.380 --> 00:24:46.460
+<v Slater Victoroff>there are a lot of people that don't understand what you're building and will try to tell you to build something else.
+
+348
+00:24:47.300 --> 00:24:50.600
+<v Slater Victoroff>And we had people doing that, and I listened to a couple of them.
+
+349
+00:24:50.600 --> 00:25:02.660
+<v Slater Victoroff>And, you know, we wasted months and maybe even years, you know, chasing down these specific kind of appified, you know, killer app sort of consumer-y sort of things.
+
+350
+00:25:02.760 --> 00:25:05.140
+<v Slater Victoroff>And that was never the company that we were, right?
+
+351
+00:25:05.200 --> 00:25:06.900
+<v Slater Victoroff>That was never the company that we were going to be.
+
+352
+00:25:07.560 --> 00:25:16.820
+<v Slater Victoroff>And Indico was never successful until I told all of those people with, you know, their – and again, some people with credentials are great.
+
+353
+00:25:16.920 --> 00:25:20.060
+<v Slater Victoroff>It's just that that's not, you know, what I look at anymore, right?
+
+354
+00:25:20.600 --> 00:25:24.740
+<v Slater Victoroff>with these incredible pedigrees that I just had to turn around and say, like, look, I don't care
+
+355
+00:25:24.740 --> 00:25:29.440
+<v Slater Victoroff>what your pedigree is. Like, you don't know what's right for my business and I'm not going to listen
+
+356
+00:25:29.440 --> 00:25:33.440
+<v Slater Victoroff>to you. And some of those conversations were really difficult. You know, I had to kick some
+
+357
+00:25:33.440 --> 00:25:40.180
+<v Slater Victoroff>advisors out of the company. It was actually, I had a conversation with Mark Cuban that really
+
+358
+00:25:40.840 --> 00:25:45.260
+<v Slater Victoroff>shone a light on it for me. I had the kind of pleasure to meet him at South by Southwest.
+
+359
+00:25:45.560 --> 00:25:50.260
+<v Slater Victoroff>He's just one of those good folks that really, really cares about helping young entrepreneurs.
+
+360
+00:25:51.500 --> 00:25:56.360
+<v Slater Victoroff>so we had this conversation and we traded some messages afterwards and I still I remember this
+
+361
+00:25:56.360 --> 00:26:01.220
+<v Slater Victoroff>is I sent him an example of a proposal that we were sending to a customer and he said like
+
+362
+00:26:01.220 --> 00:26:06.440
+<v Slater Victoroff>wow you know like this looks like this looks terrible you know you absolutely need to change
+
+363
+00:26:06.440 --> 00:26:11.580
+<v Slater Victoroff>this and I realized it was the first concrete piece of feedback I had gotten on my company
+
+364
+00:26:11.580 --> 00:26:16.320
+<v Slater Victoroff>I've gotten on my company in months and you know I had to go through and I had to figure out okay
+
+365
+00:26:16.320 --> 00:26:20.260
+<v Slater Victoroff>who's adding value who isn't you know where did we make these mistakes and you know it was one of
+
+366
+00:26:20.600 --> 00:26:23.680
+<v Slater Victoroff>that eventually we did bring in the CEO, Tom.
+
+367
+00:26:24.000 --> 00:26:25.460
+<v Slater Victoroff>You know, I was the CEO to that point.
+
+368
+00:26:25.500 --> 00:26:26.320
+<v Slater Victoroff>I shifted over to CTO.
+
+369
+00:26:26.500 --> 00:26:28.400
+<v Slater Victoroff>And again, all of those shifts,
+
+370
+00:26:28.460 --> 00:26:30.340
+<v Slater Victoroff>there were things that I had felt from day one,
+
+371
+00:26:30.760 --> 00:26:32.520
+<v Slater Victoroff>that's actually what was holding Indico back,
+
+372
+00:26:32.640 --> 00:26:34.420
+<v Slater Victoroff>that I wasn't following my gut.
+
+373
+00:26:34.580 --> 00:26:37.700
+<v Slater Victoroff>And I was listening too much to, I mean, frankly,
+
+374
+00:26:37.800 --> 00:26:39.480
+<v Slater Victoroff>you know, if people knew how to build a company,
+
+375
+00:26:39.620 --> 00:26:41.460
+<v Slater Victoroff>they would build a company, right?
+
+376
+00:26:41.540 --> 00:26:43.240
+<v Slater Victoroff>Like, you know more than they do.
+
+377
+00:26:43.300 --> 00:26:44.780
+<v Slater Victoroff>That's why you are where you are.
+
+378
+00:26:44.920 --> 00:26:47.800
+<v Slater Victoroff>And it's on you to figure out where their advice
+
+379
+00:26:47.800 --> 00:26:49.720
+<v Slater Victoroff>can be followed and where it can't.
+
+380
+00:26:50.600 --> 00:26:54.360
+<v Slater Victoroff>Remember that in so many ways, you are the expert for your business.
+
+381
+00:26:54.620 --> 00:26:55.480
+<v Slater Victoroff>And don't forget that.
+
+382
+00:26:57.140 --> 00:27:01.220
+<v Noah Labhart>Well, tell me what the future looks like for your product and for your team.
+
+383
+00:27:02.900 --> 00:27:06.840
+<v Slater Victoroff>So we've got a lot of really, really exciting things on our roadmap.
+
+384
+00:27:07.140 --> 00:27:16.720
+<v Slater Victoroff>Our massive vision for the future, right, is when you look at unstructured content and when you look at documents and when you look at ML in general.
+
+385
+00:27:16.720 --> 00:27:22.180
+<v Slater Victoroff>role. You know, what Indico is fundamentally building is a better way for humans and ML to
+
+386
+00:27:22.180 --> 00:27:26.380
+<v Slater Victoroff>interact, right? It is a new kind of supervision. You know, sometimes we call it machine teaching
+
+387
+00:27:26.380 --> 00:27:30.700
+<v Slater Victoroff>instead of machine learning. It's this idea that, you know, yes, we do have cutting edge technology,
+
+388
+00:27:31.020 --> 00:27:37.980
+<v Slater Victoroff>absolutely state of the art, right? But the goal is to make it accessible. And I think that not a
+
+389
+00:27:37.980 --> 00:27:41.900
+<v Slater Victoroff>lot of people are focused on that problem right now. And I think that when we look at the ripples
+
+390
+00:27:41.900 --> 00:27:45.760
+<v Slater Victoroff>of it, yes, you know, intelligent process automation and intelligent automation broadly,
+
+391
+00:27:46.720 --> 00:27:49.920
+<v Slater Victoroff>place for us to be and you know we're doing really really well in that market
+
+392
+00:27:49.920 --> 00:27:53.560
+<v Slater Victoroff>but I think what people don't realize is that this unlocking of unstructured
+
+393
+00:27:53.560 --> 00:27:57.480
+<v Slater Victoroff>content is even bigger than just automation automation is kind of the tip
+
+394
+00:27:57.480 --> 00:28:01.720
+<v Slater Victoroff>of the spear here and so going out to this notion of you know unstructured
+
+395
+00:28:01.720 --> 00:28:05.720
+<v Slater Victoroff>analytics and unstructured applications you think you know as a programmer if
+
+396
+00:28:05.720 --> 00:28:09.860
+<v Slater Victoroff>you've ever dealt with PDF documents right it's this massive nightmare and
+
+397
+00:28:09.860 --> 00:28:13.760
+<v Slater Victoroff>Indico in a lot of ways is answering the question of you know how do we make that
+
+398
+00:28:13.760 --> 00:28:18.340
+<v Slater Victoroff>accessible? How do we unlock that unstructured data and make it productive for people? And again,
+
+399
+00:28:18.420 --> 00:28:22.760
+<v Slater Victoroff>automation is the first part of that, but unstructured data is a much bigger problem
+
+400
+00:28:22.760 --> 00:28:23.600
+<v Slater Victoroff>than just automation.
+
+401
+00:28:24.600 --> 00:28:28.020
+<v Noah Labhart>We'll switch to you, Slater. Who influences the way that you work?
+
+402
+00:28:28.420 --> 00:28:34.100
+<v Noah Labhart>Name a CEO, a CTO, architect, really any person. Name a person you look up to and why.
+
+403
+00:28:35.420 --> 00:28:41.820
+<v Slater Victoroff>I'd say one person I really look up to is one of my co-founders, Madison, for sure. I don't know
+
+404
+00:28:43.760 --> 00:28:49.500
+<v Slater Victoroff>You know, Madison's a really, really sharp guy and he keeps me honest and I keep him honest and we butt heads.
+
+405
+00:28:49.700 --> 00:28:53.780
+<v Slater Victoroff>But it's a lot of fun. Right. Maybe butt heads is even too severe. Right.
+
+406
+00:28:53.800 --> 00:28:59.100
+<v Slater Victoroff>We've got strongly different opinions on certain pieces and we've got different philosophies.
+
+407
+00:28:59.100 --> 00:29:04.760
+<v Slater Victoroff>And we just have a great relationship that really helps us turn that into really productive friction.
+
+408
+00:29:04.900 --> 00:29:08.620
+<v Slater Victoroff>And we get to, you know, a better solution because both of us are there.
+
+409
+00:29:08.760 --> 00:29:13.440
+<v Slater Victoroff>And he's just got a really, really incredible selfless demeanor to him.
+
+410
+00:29:13.760 --> 00:29:19.300
+<v Slater Victoroff>Right. And I think that in so many ways, kind of the ideal of leadership is this servant leadership mentality.
+
+411
+00:29:19.960 --> 00:29:22.960
+<v Slater Victoroff>And, you know, he's been an example for me over the years. Right.
+
+412
+00:29:23.060 --> 00:29:26.100
+<v Slater Victoroff>And I'm very, very happy to say that, you know, I follow in his footsteps.
+
+413
+00:29:26.360 --> 00:29:29.340
+<v Slater Victoroff>I mean, Diane, also like my other co-founder, I mean, she's incredible.
+
+414
+00:29:29.560 --> 00:29:34.800
+<v Slater Victoroff>I mean, you talk about the shift to remote and how difficult that is for companies.
+
+415
+00:29:34.880 --> 00:29:39.860
+<v Slater Victoroff>And she's our she's our head of HR. And I actually I credit her 100 percent.
+
+416
+00:29:39.860 --> 00:29:44.060
+<v Slater Victoroff>She, we more than doubled our head count, you know, during the pandemic.
+
+417
+00:29:44.100 --> 00:29:45.920
+<v Slater Victoroff>Most of us have never met each other in person.
+
+418
+00:29:46.000 --> 00:29:50.240
+<v Slater Victoroff>And somehow our culture has gotten stronger over time.
+
+419
+00:29:50.360 --> 00:29:52.260
+<v Slater Victoroff>And I credit her with that, you know, 100%.
+
+420
+00:29:52.260 --> 00:29:55.440
+<v Slater Victoroff>And it's something that I just would not know how to do that.
+
+421
+00:29:55.580 --> 00:29:56.620
+<v Slater Victoroff>It's incredibly impressive.
+
+422
+00:29:58.880 --> 00:30:01.040
+<v Noah Labhart>Well, we talked about mistakes, right?
+
+423
+00:30:01.120 --> 00:30:02.440
+<v Noah Labhart>But a little bit different spin.
+
+424
+00:30:03.040 --> 00:30:05.720
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+425
+00:30:05.780 --> 00:30:08.460
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+426
+00:30:10.820 --> 00:30:20.420
+<v Slater Victoroff>the most important thing is that reminder that the only thing stopping you from doing something
+
+427
+00:30:20.420 --> 00:30:28.180
+<v Slater Victoroff>is yourself. Um, uh, you know, the most impactful moment for me as, as an early entrepreneur,
+
+428
+00:30:28.440 --> 00:30:34.360
+<v Slater Victoroff>um, I met, uh, Katie Ray and she was the, the old head of Techstars Boston. She came,
+
+429
+00:30:34.360 --> 00:30:37.800
+<v Slater Victoroff>she came to my school. I didn't exactly know who she was. I just knew that she was a big wig.
+
+430
+00:30:37.800 --> 00:30:39.720
+<v Slater Victoroff>I tracked her down at lunch.
+
+431
+00:30:41.560 --> 00:30:46.120
+<v Slater Victoroff>It was probably a little aggressive, but she was very, very nice and patient.
+
+432
+00:30:46.360 --> 00:30:47.040
+<v Slater Victoroff>And I sat her down.
+
+433
+00:30:47.060 --> 00:30:53.200
+<v Slater Victoroff>I gave her this 10-minute rambling long pitch about some biomedical nonsense.
+
+434
+00:30:53.840 --> 00:30:57.000
+<v Slater Victoroff>And I remember she turns to me and she says, great idea.
+
+435
+00:30:57.300 --> 00:30:58.380
+<v Slater Victoroff>Why aren't you doing it?
+
+436
+00:30:59.480 --> 00:31:00.860
+<v Slater Victoroff>And I didn't have an answer.
+
+437
+00:31:01.220 --> 00:31:05.920
+<v Slater Victoroff>And that was the question that ultimately led me to found Indico.
+
+438
+00:31:07.800 --> 00:31:09.580
+<v Slater Victoroff>again, to kind of the earlier points, right?
+
+439
+00:31:11.220 --> 00:31:13.440
+<v Slater Victoroff>You know, you embrace the power of yourself as an individual.
+
+440
+00:31:13.680 --> 00:31:17.000
+<v Slater Victoroff>You know, the thing that got me into this space in the first place
+
+441
+00:31:17.000 --> 00:31:19.720
+<v Slater Victoroff>is the fact that you can pick up this two-pound piece of metal
+
+442
+00:31:19.720 --> 00:31:23.160
+<v Slater Victoroff>and you can build an empire with nothing but your mind and your fingertips, right?
+
+443
+00:31:23.380 --> 00:31:24.980
+<v Slater Victoroff>And that's incredible.
+
+444
+00:31:25.120 --> 00:31:27.880
+<v Slater Victoroff>That's never been possible before in the history of humanity.
+
+445
+00:31:28.220 --> 00:31:33.860
+<v Slater Victoroff>And I think that it's easy to forget that you can build anything, right?
+
+446
+00:31:33.900 --> 00:31:35.200
+<v Slater Victoroff>Like, it's all at your fingertips.
+
+447
+00:31:35.200 --> 00:31:41.080
+<v Slater Victoroff>tips. And don't feel and realize that the only person that's holding you from doing something is
+
+448
+00:31:41.080 --> 00:31:41.580
+<v Slater Victoroff>you.
+
+449
+00:31:43.400 --> 00:31:48.120
+<v Noah Labhart>Well, last question, Slater. You're getting on a plane and you're sitting next to a young
+
+450
+00:31:48.120 --> 00:31:52.540
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show
+
+451
+00:31:52.540 --> 00:31:56.720
+<v Noah Labhart>it off to the world. They can't wait to show it off to you right there on the plane. What advice
+
+452
+00:31:56.720 --> 00:31:59.520
+<v Noah Labhart>do you give that person having gone down this road a bit?
+
+453
+00:32:00.820 --> 00:32:02.900
+<v Slater Victoroff>I think what I would tell them is that
+
+454
+00:32:02.900 --> 00:32:09.120
+<v Slater Victoroff>that it's really hard, and no one tells you just how hard it is.
+
+455
+00:32:10.520 --> 00:32:16.260
+<v Slater Victoroff>I think that, you know, someone said recently, you know,
+
+456
+00:32:16.300 --> 00:32:18.920
+<v Slater Victoroff>oh yeah, dropping out of college and founding a startup, right,
+
+457
+00:32:18.960 --> 00:32:20.220
+<v Slater Victoroff>that's the American dream.
+
+458
+00:32:20.540 --> 00:32:22.420
+<v Slater Victoroff>And it's like, I just had to laugh at that, right?
+
+459
+00:32:22.480 --> 00:32:23.960
+<v Slater Victoroff>Because it's not that he's wrong, right?
+
+460
+00:32:24.020 --> 00:32:28.180
+<v Slater Victoroff>I think people really, really do, they aggrandize it, right?
+
+461
+00:32:28.220 --> 00:32:30.060
+<v Slater Victoroff>They make it seem really, really glorious and glamorous.
+
+462
+00:32:30.060 --> 00:32:36.200
+<v Slater Victoroff>Bruce. Like if you're, if you're here to make money, you're not going to succeed. It's, it's
+
+463
+00:32:36.200 --> 00:32:42.000
+<v Slater Victoroff>really hard making a company is one of the hardest things you can possibly do. And one of the most
+
+464
+00:32:42.000 --> 00:32:46.860
+<v Slater Victoroff>important things, and one, one of the biggest things that, that differentiates people that are
+
+465
+00:32:46.860 --> 00:32:52.580
+<v Slater Victoroff>successful from people who aren't is just their ability to pick themselves back up and try again.
+
+466
+00:32:52.760 --> 00:32:58.240
+<v Slater Victoroff>And I truly think that if, if anyone knew what they were getting themselves into the first time
+
+467
+00:33:00.060 --> 00:33:05.340
+<v Slater Victoroff>And every single founder I've talked to who's with me on this is that it is so much harder than anything you can imagine.
+
+468
+00:33:06.200 --> 00:33:09.440
+<v Slater Victoroff>And you can't imagine it, especially when things are going really well.
+
+469
+00:33:09.540 --> 00:33:11.720
+<v Slater Victoroff>But I don't care how good your business is.
+
+470
+00:33:11.820 --> 00:33:14.240
+<v Slater Victoroff>You know, things aren't always going to be going really well.
+
+471
+00:33:14.700 --> 00:33:20.440
+<v Slater Victoroff>Yeah, and I guess just make sure you've got people there to help you when things are going sideways because it's going to happen.
+
+472
+00:33:21.020 --> 00:33:21.880
+<v Noah Labhart>That's great advice.
+
+473
+00:33:22.660 --> 00:33:24.680
+<v Noah Labhart>Well, Slater, thank you for being on the show today.
+
+474
+00:33:24.780 --> 00:33:27.280
+<v Noah Labhart>Thank you for telling the creation story of Indico.
+
+475
+00:33:27.720 --> 00:33:28.220
+<v Noah Labhart>It
+
+476
+00:33:28.120 --> 00:33:28.960
+<v Slater Victoroff>was a total pleasure, Noah.
+
+477
+00:33:30.060 --> 00:33:31.120
+<v Slater Victoroff>It was a lot of fun.
+
+478
+00:33:32.840 --> 00:33:35.880
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+479
+00:33:41.740 --> 00:33:44.740
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+480
+00:33:44.940 --> 00:33:49.700
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+481
+00:33:50.160 --> 00:33:55.200
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+482
+00:33:55.580 --> 00:33:57.780
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+483
+00:33:57.780 --> 00:34:03.900
+<v Noah Labhart>you. Both things help us out tremendously. And thanks again for listening.

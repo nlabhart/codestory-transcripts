@@ -1,0 +1,1839 @@
+WEBVTT
+
+NOTE S12 Bonus: The Context Window Mirage: Why Generic Prompt Engineering Fails Enterprise Workflows and the Rise of Dynamic, Task-Specific RAG Orchestration with Ankit Dheendsa, Co-Founder & CEO of Morphos AI
+
+1
+00:00:01.760 --> 00:00:29.540
+<v Ankit Dheendsa>We've actually built three products so far, but our MVP and what we're going to market with is called Katana. And that is an infrastructure product. It comes in the form, it's a hybrid model of a software developer kit and an API. And it allows companies that are utilizing RAG, so Retrieval Augmented Generation, for ChatGPT wrapper companies or whatever the case is, whenever you're utilizing data with AI. It allows you to plug our system in very easily. You can set it up in the span of an hour for the average developer.
+
+2
+00:00:30.000 --> 00:00:38.840
+<v Ankit Dheendsa>And then you're able to reap the benefits of reducing your vector storage, increasing your accuracy and decreasing latency and getting much faster query speeds.
+
+3
+00:00:39.520 --> 00:00:43.100
+<v Ankit Dheendsa>My name is Ankit Dheendsa. I'm the Chief Technology Officer of Morphos AI.
+
+4
+00:00:43.460 --> 00:00:47.560
+<v Ankit Dheendsa>This is
+
+5
+00:00:47.560 --> 00:00:52.240
+<v Noah Labhart>Code Story, a podcast bringing you interviews with tech visionaries.
+
+6
+00:00:52.360 --> 00:00:53.720
+<v Clip>Six months moonlighting.
+
+7
+00:00:53.740 --> 00:00:55.260
+<v Clip>There's nothing on the back end.
+
+8
+00:00:55.520 --> 00:00:58.120
+<v Noah Labhart>Who share what it takes to change an industry.
+
+9
+00:00:58.300 --> 00:00:59.860
+<v Clip>I don't exactly know what to do.
+
+10
+00:01:00.000 --> 00:01:01.280
+<v Clip>Many goes to get right.
+
+11
+00:01:01.900 --> 00:01:04.500
+<v Noah Labhart>Who built the teams that have their back.
+
+12
+00:01:04.580 --> 00:01:06.140
+<v Clip>A company is its people.
+
+13
+00:01:06.140 --> 00:01:07.520
+<v Clip>The teams help each other achieve more.
+
+14
+00:01:07.520 --> 00:01:08.600
+<v Clip>Most proud of our team.
+
+15
+00:01:08.940 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+16
+00:01:11.500 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+17
+00:01:12.880 --> 00:01:14.340
+<v Clip>Yes, we've been fighting it as we've grown.
+
+18
+00:01:14.520 --> 00:01:15.320
+<v Clip>Total waste of time.
+
+19
+00:01:15.600 --> 00:01:17.840
+<v Noah Labhart>The stories you don't read in the headlines.
+
+20
+00:01:18.300 --> 00:01:20.040
+<v Clip>It's not an easy thing to achieve, mind you.
+
+21
+00:01:20.060 --> 00:01:22.120
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+22
+00:01:22.680 --> 00:01:25.820
+<v Noah Labhart>Dry the ups and downs of the startup life.
+
+23
+00:01:26.020 --> 00:01:27.580
+<v Clip>You need to really want it.
+
+24
+00:01:27.600 --> 00:01:28.960
+<v Clip>It's not just about technology.
+
+25
+00:01:29.080 --> 00:01:29.700
+<v Clip>All this and more.
+
+26
+00:01:30.000 --> 00:01:31.060
+<v Clip>on Code Story.
+
+27
+00:01:32.240 --> 00:01:33.820
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+28
+00:01:33.940 --> 00:01:36.200
+<v Noah Labhart>and today, how Ankit Dheendsa
+
+29
+00:01:36.200 --> 00:01:39.880
+<v Noah Labhart>is cutting vector storage by 99.5%
+
+30
+00:01:39.880 --> 00:01:43.120
+<v Noah Labhart>without trading away retrieval quality.
+
+31
+00:01:49.000 --> 00:01:51.580
+<v Noah Labhart>Ankit Dheendsa is a Canadian born and raised
+
+32
+00:01:51.580 --> 00:01:53.440
+<v Noah Labhart>living outside of Toronto today.
+
+33
+00:01:53.680 --> 00:01:56.520
+<v Noah Labhart>He claims he is fortunate to have a great ecosystem
+
+34
+00:01:56.520 --> 00:01:59.100
+<v Noah Labhart>of professionals and mentors in his area
+
+35
+00:02:00.000 --> 00:02:04.040
+<v Noah Labhart>advise him through thick and thin. When he was younger, he was inspired to pursue building
+
+36
+00:02:04.040 --> 00:02:09.340
+<v Noah Labhart>things after he watched Iron Man for the first time. But outside of tech, he's an avid boxer
+
+37
+00:02:09.340 --> 00:02:14.260
+<v Noah Labhart>and kickboxer. He loves to work out and train, but when he's away from the mat, he likes
+
+38
+00:02:14.260 --> 00:02:15.160
+<v Noah Labhart>to read a lot of books.
+
+39
+00:02:17.240 --> 00:02:23.340
+<v Noah Labhart>Ankit and his team quickly realized that although the advent of AI was exciting, hallucinations
+
+40
+00:02:23.340 --> 00:02:26.440
+<v Noah Labhart>within the LLMs area was a big problem.
+
+41
+00:02:26.700 --> 00:02:29.480
+<v Noah Labhart>They started to dig into how to lower
+
+42
+00:02:29.480 --> 00:02:31.520
+<v Noah Labhart>and or eliminate hallucinations
+
+43
+00:02:31.520 --> 00:02:35.520
+<v Noah Labhart>and ensure that LLMs only hold onto the most important data.
+
+44
+00:02:35.840 --> 00:02:38.500
+<v Noah Labhart>And they landed on a powerful approach
+
+45
+00:02:38.500 --> 00:02:40.720
+<v Noah Labhart>to vector size reduction.
+
+46
+00:02:43.220 --> 00:02:46.420
+<v Noah Labhart>This is the creation story of Morphos AI.
+
+47
+00:02:51.060 --> 00:02:57.260
+<v Ankit Dheendsa>Morphos AI at its core is an AI infrastructure company. And so what does that mean? Right?
+
+48
+00:02:57.380 --> 00:03:04.140
+<v Ankit Dheendsa>What we specifically focus on is data and how do we reduce the size of it? So majority of people
+
+49
+00:03:04.140 --> 00:03:09.260
+<v Ankit Dheendsa>are very pixeled and know the term compression. It's been utilized for decades and it's very,
+
+50
+00:03:09.420 --> 00:03:15.640
+<v Ankit Dheendsa>very in demand and much needed technology in order to compress data across networks and workflows.
+
+51
+00:03:16.420 --> 00:03:20.220
+<v Ankit Dheendsa>What we do is we focus on data specifically for AI workflows.
+
+52
+00:03:20.400 --> 00:03:23.180
+<v Ankit Dheendsa>And as a result, you end up working with what we call vectors.
+
+53
+00:03:23.760 --> 00:03:27.540
+<v Ankit Dheendsa>And when I talk about vectors, I'm not talking about the despicable me villain.
+
+54
+00:03:27.760 --> 00:03:33.040
+<v Ankit Dheendsa>I'm talking about a multi-dimensional variable that describes data, right?
+
+55
+00:03:33.120 --> 00:03:36.260
+<v Ankit Dheendsa>You can describe anything in the form of vector.
+
+56
+00:03:36.320 --> 00:03:40.280
+<v Ankit Dheendsa>I can describe a water bottle or an iPhone with different things, right?
+
+57
+00:03:40.340 --> 00:03:41.240
+<v Ankit Dheendsa>What does it look like?
+
+58
+00:03:41.280 --> 00:03:41.900
+<v Ankit Dheendsa>What are the colors?
+
+59
+00:03:42.040 --> 00:03:44.240
+<v Ankit Dheendsa>What are the dimensions, the sizes, the materials?
+
+60
+00:03:44.240 --> 00:03:48.540
+<v Ankit Dheendsa>all of those different data points describe a single object.
+
+61
+00:03:48.680 --> 00:03:50.160
+<v Ankit Dheendsa>And so that is what a vector is.
+
+62
+00:03:50.440 --> 00:03:55.060
+<v Ankit Dheendsa>When you store documents or data and you want to have, let's just say,
+
+63
+00:03:55.100 --> 00:03:58.960
+<v Ankit Dheendsa>ChatGPT, utilize those documents to give you answers, right?
+
+64
+00:03:59.000 --> 00:04:03.480
+<v Ankit Dheendsa>If you utilize NotebookLM or ChatGPT to study or to do any type of work
+
+65
+00:04:03.480 --> 00:04:06.820
+<v Ankit Dheendsa>and you're storing data, then you have to store it in what we call a vector database.
+
+66
+00:04:07.060 --> 00:04:09.920
+<v Ankit Dheendsa>And the problem with vector databases is that they're so bloated.
+
+67
+00:04:10.000 --> 00:04:12.540
+<v Ankit Dheendsa>You're storing so much noise, right?
+
+68
+00:04:14.240 --> 00:04:19.520
+<v Ankit Dheendsa>that you don't really need but you have to store anyways and as a result we're starting to see ram
+
+69
+00:04:19.520 --> 00:04:23.980
+<v Ankit Dheendsa>prices are going up high bandwidth memory prices are going up we've already sold up the supply for
+
+70
+00:04:23.980 --> 00:04:28.460
+<v Ankit Dheendsa>2026. everybody wants to put data centers everywhere and elon musk is talking about
+
+71
+00:04:28.460 --> 00:04:34.060
+<v Ankit Dheendsa>putting them up in space and kevin o'leary wants to do i think a 40 000 acre project in utah
+
+72
+00:04:34.060 --> 00:04:39.160
+<v Ankit Dheendsa>and energy prices are going up and all these things that is because of the underlying issue
+
+73
+00:04:39.160 --> 00:04:46.240
+<v Ankit Dheendsa>you that the data bloat is so large and the need for this data is paramount because you need to
+
+74
+00:04:46.240 --> 00:04:52.460
+<v Ankit Dheendsa>utilize for AI workflows. And so what we do is we reduce that data size by up to 99.5%
+
+75
+00:04:52.460 --> 00:04:59.340
+<v Ankit Dheendsa>without any form of compression. And what this results in is you get much faster queries when
+
+76
+00:04:59.340 --> 00:05:03.860
+<v Ankit Dheendsa>you're utilizing a model, let's just say ChatGPT or Claude or Gemini in conjunction with the data,
+
+77
+00:05:03.940 --> 00:05:08.760
+<v Ankit Dheendsa>we get up to 10x faster queries. We reduce the size of vector databases, which is actually very
+
+78
+00:05:09.160 --> 00:05:15.980
+<v Ankit Dheendsa>So to store data, just for context, we would take an $8 million bill per year and turn it into 40,000.
+
+79
+00:05:16.160 --> 00:05:19.160
+<v Ankit Dheendsa>Right. And so massive savings on vector storage.
+
+80
+00:05:19.280 --> 00:05:28.200
+<v Ankit Dheendsa>And we are able to get up to 95% accuracy, which is far better than any LLM will get you on its own.
+
+81
+00:05:28.200 --> 00:05:40.200
+<v Ankit Dheendsa>And in conjunction with some of the top industry standard and top industry compression models like Google's TurboQuant or Elastic's BBQ model, you don't get anywhere near that level of accuracy, right?
+
+82
+00:05:40.260 --> 00:05:42.820
+<v Ankit Dheendsa>So hallucination has been a big problem of LLMs.
+
+83
+00:05:42.900 --> 00:05:52.560
+<v Ankit Dheendsa>That's why they've had a hard time introducing some of these technology into specific industries such as medical or military because you can't afford for it to be wrong even once in those industries, right?
+
+84
+00:05:52.640 --> 00:05:54.600
+<v Ankit Dheendsa>How many times have you asked ChatGPT a question?
+
+85
+00:05:54.680 --> 00:05:56.940
+<v Ankit Dheendsa>It gives you a wrong answer, right?
+
+86
+00:05:58.300 --> 00:06:10.620
+<v Ankit Dheendsa>So those are the things that we solve for by reducing the vector size at its core, by only keeping the most important information, the actual purity of your data, and getting rid of all of the noise.
+
+87
+00:06:13.180 --> 00:06:27.020
+<v Noah Labhart>Tell me about the MVP. I know there's a handful of products, or definitely one that has been brought up to my attention, but tell me about what you would consider the MVP for Morphos, and how long it took to build, and what sort of tools were you using to bring it to life?
+
+88
+00:06:28.240 --> 00:06:34.140
+<v Ankit Dheendsa>We've actually built three products so far, but our MVP and what we're going to market with is called Katana.
+
+89
+00:06:34.260 --> 00:06:36.140
+<v Ankit Dheendsa>And that is an infrastructure product.
+
+90
+00:06:36.280 --> 00:06:37.280
+<v Ankit Dheendsa>It comes in the form.
+
+91
+00:06:37.360 --> 00:06:40.060
+<v Ankit Dheendsa>It's a hybrid model of a software developer kit and an API.
+
+92
+00:06:40.480 --> 00:06:50.300
+<v Ankit Dheendsa>And it allows companies that are utilizing RAG, so Retrieval Augmented Generation, for ChatGPT wrapper companies or whatever the case is, whenever you're utilizing data with AI.
+
+93
+00:06:50.500 --> 00:06:53.200
+<v Ankit Dheendsa>It allows you to plug our system in very easily.
+
+94
+00:06:53.340 --> 00:06:56.500
+<v Ankit Dheendsa>You can set it up in the span of an hour for the average developer.
+
+95
+00:06:58.200 --> 00:07:04.240
+<v Ankit Dheendsa>the benefits of reducing your vector storage, increasing your accuracy and decreasing latency
+
+96
+00:07:04.240 --> 00:07:07.800
+<v Ankit Dheendsa>and getting much faster query speeds. And so that's what we're going to market with. It's
+
+97
+00:07:07.800 --> 00:07:14.100
+<v Ankit Dheendsa>an infrastructure product specific B2B. However, we've also built, just to showcase the technology,
+
+98
+00:07:14.420 --> 00:07:20.500
+<v Ankit Dheendsa>we've built a ChatGPT wrapper that we call Key, which is basically ChatGPT. At the time we built
+
+99
+00:07:20.500 --> 00:07:25.600
+<v Ankit Dheendsa>it, we were utilizing 4.1. We built a custom UI with Lovable and we slapped our technology on it
+
+100
+00:07:25.600 --> 00:07:27.060
+<v Ankit Dheendsa>just to showcase side by side,
+
+101
+00:07:27.140 --> 00:07:28.680
+<v Ankit Dheendsa>hey, if you upload a document
+
+102
+00:07:28.680 --> 00:07:30.660
+<v Ankit Dheendsa>to regular chat GPT versus ours,
+
+103
+00:07:30.880 --> 00:07:32.500
+<v Ankit Dheendsa>what does the difference look like?
+
+104
+00:07:32.560 --> 00:07:34.180
+<v Ankit Dheendsa>And we were able to see massive gains.
+
+105
+00:07:34.300 --> 00:07:36.380
+<v Ankit Dheendsa>That would be more of a B2C product
+
+106
+00:07:36.380 --> 00:07:37.860
+<v Ankit Dheendsa>that we're not going to market with,
+
+107
+00:07:37.960 --> 00:07:39.580
+<v Ankit Dheendsa>but we just feel like there's more impact
+
+108
+00:07:39.580 --> 00:07:40.760
+<v Ankit Dheendsa>on the infrastructure side.
+
+109
+00:07:40.920 --> 00:07:42.560
+<v Ankit Dheendsa>And then finally, we actually,
+
+110
+00:07:42.600 --> 00:07:44.460
+<v Ankit Dheendsa>just to really showcase and hammer home
+
+111
+00:07:44.460 --> 00:07:45.920
+<v Ankit Dheendsa>how strong this technology is,
+
+112
+00:07:46.000 --> 00:07:48.300
+<v Ankit Dheendsa>we built a standalone device
+
+113
+00:07:48.300 --> 00:07:51.600
+<v Ankit Dheendsa>and we put all of Wikipedia up until 2025
+
+114
+00:07:51.600 --> 00:07:53.640
+<v Ankit Dheendsa>on a Raspberry Pi 5
+
+115
+00:07:55.600 --> 00:08:00.820
+<v Ankit Dheendsa>no server-side technology. We 3D printed the case and we slapped on all of Wikipedia as well as a
+
+116
+00:08:00.820 --> 00:08:07.380
+<v Ankit Dheendsa>small language model so you can actually query any question regarding Wikipedia completely on the
+
+117
+00:08:07.380 --> 00:08:12.360
+<v Ankit Dheendsa>edge. This has never been done before at this scale and a small form factor like the one that
+
+118
+00:08:12.360 --> 00:08:17.320
+<v Ankit Dheendsa>we built and we call it the Key Boy and we're planning on iterating it to become an attachment
+
+119
+00:08:17.320 --> 00:08:23.880
+<v Ankit Dheendsa>to your iPhone or your Android to be able to enable pure edge artificial intelligence and
+
+120
+00:08:25.600 --> 00:08:27.980
+<v Ankit Dheendsa>and becoming less reliant on third-party technologies.
+
+121
+00:08:28.380 --> 00:08:30.800
+<v Ankit Dheendsa>But in terms of building our actual MVP
+
+122
+00:08:30.800 --> 00:08:32.620
+<v Ankit Dheendsa>and the technology that we use,
+
+123
+00:08:32.740 --> 00:08:34.260
+<v Ankit Dheendsa>when you're building infrastructure products
+
+124
+00:08:34.260 --> 00:08:35.880
+<v Ankit Dheendsa>and you're building APIs and whatnot,
+
+125
+00:08:35.980 --> 00:08:38.580
+<v Ankit Dheendsa>you're pretty much utilizing the standard tech stack.
+
+126
+00:08:38.820 --> 00:08:41.620
+<v Ankit Dheendsa>We're building in Python, PostgreSQL,
+
+127
+00:08:42.880 --> 00:08:44.820
+<v Ankit Dheendsa>Postman for API calls and whatnot.
+
+128
+00:08:45.120 --> 00:08:46.060
+<v Ankit Dheendsa>And so that's what we built.
+
+129
+00:08:46.140 --> 00:08:47.220
+<v Ankit Dheendsa>And in terms of how long,
+
+130
+00:08:47.300 --> 00:08:50.380
+<v Ankit Dheendsa>it took us about, I would say, two weeks to implement.
+
+131
+00:08:50.700 --> 00:08:52.740
+<v Ankit Dheendsa>But when you're building an infrastructure product like this,
+
+132
+00:08:52.740 --> 00:08:57.460
+<v Ankit Dheendsa>because the core technology had been developed over the course of two years,
+
+133
+00:08:57.600 --> 00:08:59.720
+<v Ankit Dheendsa>where you're testing it, you're breaking your own toys,
+
+134
+00:08:59.800 --> 00:09:02.460
+<v Ankit Dheendsa>you're figuring out where does it work and how do you iterate on it.
+
+135
+00:09:02.540 --> 00:09:05.420
+<v Ankit Dheendsa>Once you have that core solution finalized,
+
+136
+00:09:05.480 --> 00:09:08.200
+<v Ankit Dheendsa>creating the quote-unquote wrappers around it
+
+137
+00:09:08.200 --> 00:09:10.900
+<v Ankit Dheendsa>and the connections around it is a relatively simple task.
+
+138
+00:09:11.120 --> 00:09:13.460
+<v Ankit Dheendsa>But that's what we were able to build in January.
+
+139
+00:09:13.540 --> 00:09:16.540
+<v Ankit Dheendsa>And ever since then, we've been running pilots with enterprise customers
+
+140
+00:09:16.540 --> 00:09:20.320
+<v Ankit Dheendsa>and we're officially onboarding our first enterprise client this week
+
+141
+00:09:20.320 --> 00:09:22.580
+<v Ankit Dheendsa>with a larger scale enterprise with a lot of data.
+
+142
+00:09:22.740 --> 00:09:28.080
+<v Ankit Dheendsa>And so we've been seeing some really great results and we're excited to see what the next steps are and where we can take it.
+
+143
+00:09:29.940 --> 00:09:32.320
+<v Noah Labhart>Let's move into those next steps, right?
+
+144
+00:09:32.400 --> 00:09:34.800
+<v Noah Labhart>How are you progressing and maturing it?
+
+145
+00:09:34.880 --> 00:09:36.520
+<v Noah Labhart>How are you going to take it forward?
+
+146
+00:09:36.980 --> 00:09:39.000
+<v Noah Labhart>And I'm curious about how you build your roadmap.
+
+147
+00:09:39.140 --> 00:09:43.540
+<v Noah Labhart>How do you go about deciding that, okay, this is the next most important thing to build or to address?
+
+148
+00:09:45.020 --> 00:09:46.620
+<v Ankit Dheendsa>There's two sides to that, actually.
+
+149
+00:09:46.620 --> 00:09:57.360
+<v Ankit Dheendsa>There's number one, it's when you're strategically building out a product roadmap, the most important thing that you want to look at is if you're an infrastructure company like ours, you want to be building leverage in your product ecosystem.
+
+150
+00:09:57.800 --> 00:10:05.820
+<v Ankit Dheendsa>So you want to be building products that benefit each other and that work in cohesion with one another to start building out an ecosystem very much like Apple has, right?
+
+151
+00:10:05.880 --> 00:10:08.380
+<v Ankit Dheendsa>Like they built the iPhone platform as a result.
+
+152
+00:10:08.580 --> 00:10:10.880
+<v Ankit Dheendsa>They're able to build iPods.
+
+153
+00:10:10.880 --> 00:10:18.740
+<v Ankit Dheendsa>They're able to now get into the smart glasses market and a lot of technologies that surround it that all interconnect perfectly on your one device.
+
+154
+00:10:19.080 --> 00:10:25.500
+<v Ankit Dheendsa>And so there's that side of it, building products that have leverage and to building products that the market needs right now.
+
+155
+00:10:25.620 --> 00:10:31.140
+<v Ankit Dheendsa>And so we're kind of lucky that we're able to sit right as the wave is starting to come.
+
+156
+00:10:31.280 --> 00:10:37.900
+<v Ankit Dheendsa>And what we're looking at doing now is building a lineup of products that are solving AI's biggest problems as of right now.
+
+157
+00:10:37.900 --> 00:10:41.820
+<v Ankit Dheendsa>Now the first one that we are planning on working on, and we've actually started to
+
+158
+00:10:41.820 --> 00:10:46.240
+<v Ankit Dheendsa>work on this and it's probably going to take maybe a couple more months of R&amp;D, is solving
+
+159
+00:10:46.240 --> 00:10:51.600
+<v Ankit Dheendsa>the memory and context layer for agent orchestration as well as parallel agent orchestration.
+
+160
+00:10:51.680 --> 00:10:55.880
+<v Ankit Dheendsa>If you play around with perplexity computer or Claude Code or any of these other, or even
+
+161
+00:10:55.880 --> 00:10:59.800
+<v Ankit Dheendsa>Codex, you notice that in the first 10 minutes you get pretty great results.
+
+162
+00:11:00.080 --> 00:11:03.960
+<v Ankit Dheendsa>If you want to build a website, any type of tool, whatever the case is, you get really
+
+163
+00:11:03.960 --> 00:11:04.460
+<v Ankit Dheendsa>great results.
+
+164
+00:11:04.420 --> 00:11:12.980
+<v Ankit Dheendsa>If you start using it for an hour, two hours, five hours, ten hours on the same project, now you're starting to get diminishing returns, right?
+
+165
+00:11:13.100 --> 00:11:17.500
+<v Ankit Dheendsa>And your tokenization cost is going through the roof and you're burning through token.
+
+166
+00:11:17.840 --> 00:11:19.300
+<v Ankit Dheendsa>And it's very expensive to do.
+
+167
+00:11:19.340 --> 00:11:26.220
+<v Ankit Dheendsa>That's why we're seeing many companies, large scale enterprises as well, they're burning through their token budgets in the first quarter of what was planned for the fiscal year.
+
+168
+00:11:26.220 --> 00:11:36.020
+<v Ankit Dheendsa>And no one has really been able to solve the memory and context layer the way that we would be able to because everyone is utilizing standard compression technology that currently exists.
+
+169
+00:11:36.300 --> 00:11:41.960
+<v Ankit Dheendsa>And no one really has access to the proprietary tech that we have to be able to reduce it so drastically.
+
+170
+00:11:42.580 --> 00:11:50.420
+<v Ankit Dheendsa>And as a result, we would be able to enable parallel agent orchestration, or I should say true parallel agent orchestration.
+
+171
+00:11:50.420 --> 00:11:51.960
+<v Ankit Dheendsa>because of our core solution,
+
+172
+00:11:52.200 --> 00:11:54.660
+<v Ankit Dheendsa>us being able to reduce data sizes so much
+
+173
+00:11:54.660 --> 00:11:58.860
+<v Ankit Dheendsa>means that if you have five agents building a website
+
+174
+00:11:58.860 --> 00:12:00.700
+<v Ankit Dheendsa>and agent one is building the front end,
+
+175
+00:12:00.780 --> 00:12:02.080
+<v Ankit Dheendsa>agent two is building the back end,
+
+176
+00:12:02.120 --> 00:12:03.560
+<v Ankit Dheendsa>agent three is working on security and whatnot,
+
+177
+00:12:03.800 --> 00:12:06.500
+<v Ankit Dheendsa>every single time an agent does something,
+
+178
+00:12:06.640 --> 00:12:07.800
+<v Ankit Dheendsa>as of right now,
+
+179
+00:12:07.900 --> 00:12:10.940
+<v Ankit Dheendsa>it's not really talking to other agents, right?
+
+180
+00:12:11.020 --> 00:12:13.380
+<v Ankit Dheendsa>And even if it is, the data bloat is so large,
+
+181
+00:12:13.460 --> 00:12:16.080
+<v Ankit Dheendsa>it takes other agents so much time and energy
+
+182
+00:12:16.080 --> 00:12:18.760
+<v Ankit Dheendsa>to figure out what the original agent did, right?
+
+183
+00:12:20.420 --> 00:12:24.280
+<v Ankit Dheendsa>work, right? If I work on a project, I'm working with my team. I need to be communicating with my
+
+184
+00:12:24.280 --> 00:12:28.320
+<v Ankit Dheendsa>team back and forth that this is what I'm doing, this is what you're doing. But AI agents don't
+
+185
+00:12:28.320 --> 00:12:32.580
+<v Ankit Dheendsa>really work that way as of right now. We would be able to enable that with a middle layer solution
+
+186
+00:12:32.580 --> 00:12:39.220
+<v Ankit Dheendsa>to enable true parallel agent orchestration. One of the core attributes of our technology is that
+
+187
+00:12:39.220 --> 00:12:46.000
+<v Ankit Dheendsa>it allows for the seamless ingestion of new data. And so basically right now is if you're a company
+
+188
+00:12:46.000 --> 00:12:51.300
+<v Ankit Dheendsa>that stores vector databases, or sorry, vectors in a vector database, every single time you want
+
+189
+00:12:51.300 --> 00:12:55.520
+<v Ankit Dheendsa>to add new data into that vector database, you actually have to basically delete the whole thing,
+
+190
+00:12:56.160 --> 00:13:00.860
+<v Ankit Dheendsa>re-upload the brand new data set that includes the new data, and re-vectorize the whole thing.
+
+191
+00:13:01.180 --> 00:13:05.760
+<v Ankit Dheendsa>And that's what companies are doing right now on a nightly basis. And it requires a designated team
+
+192
+00:13:05.760 --> 00:13:09.680
+<v Ankit Dheendsa>and a couple of devs to be able to do it. It's expensive, it's time consuming, it's energy
+
+193
+00:13:09.680 --> 00:13:15.480
+<v Ankit Dheendsa>expensive, or energy intensive, I should say. And so what we are able to enable is true
+
+194
+00:13:16.000 --> 00:13:19.680
+<v Ankit Dheendsa>a seamless data ingestion. So you don't need to wipe out your current vector database
+
+195
+00:13:19.680 --> 00:13:25.480
+<v Ankit Dheendsa>to add a new data. You can just ingest it seamlessly. And so as a result, every single
+
+196
+00:13:25.480 --> 00:13:32.660
+<v Ankit Dheendsa>time an agent performs some task and contributes to a repo or to a project, all other agents are
+
+197
+00:13:32.660 --> 00:13:37.520
+<v Ankit Dheendsa>able to get that context immediately. So that way they're building more scalable and thorough
+
+198
+00:13:37.520 --> 00:13:42.820
+<v Ankit Dheendsa>solutions rather than what people in the industry are now calling AI slop. And so that's the next
+
+199
+00:13:42.820 --> 00:13:44.000
+<v Ankit Dheendsa>iteration on the software side.
+
+200
+00:13:45.560 --> 00:13:49.420
+<v Noah Labhart>Let's flip to team. I'm curious about how you've built your
+
+201
+00:13:49.420 --> 00:13:53.440
+<v Noah Labhart>team and what do you look for in those people to indicate that they are the winning horses to join
+
+202
+00:13:53.440 --> 00:13:53.940
+<v Noah Labhart>you?
+
+203
+00:13:54.720 --> 00:13:59.120
+<v Ankit Dheendsa>When you're in a position of leadership, there's two sides to you that says, one side
+
+204
+00:13:59.120 --> 00:14:04.540
+<v Ankit Dheendsa>says you want to hire the best talent in terms of the skill sets. And the other side of you tells
+
+205
+00:14:04.540 --> 00:14:09.380
+<v Ankit Dheendsa>you that you want to hire people that have great cultural fits. And it's all about finding a
+
+206
+00:14:09.380 --> 00:14:10.060
+<v Ankit Dheendsa>a balance in between.
+
+207
+00:14:10.500 --> 00:14:13.820
+<v Ankit Dheendsa>What we've noticed is that we're better off having a team
+
+208
+00:14:14.440 --> 00:14:17.960
+<v Ankit Dheendsa>that is pretty good at a certain skill set
+
+209
+00:14:17.960 --> 00:14:20.900
+<v Ankit Dheendsa>that are all great cultural fits that work with one another,
+
+210
+00:14:21.060 --> 00:14:23.720
+<v Ankit Dheendsa>that have the ability to progress and self-learn
+
+211
+00:14:23.720 --> 00:14:25.020
+<v Ankit Dheendsa>and boost each other up,
+
+212
+00:14:25.080 --> 00:14:26.980
+<v Ankit Dheendsa>rather than just having one great performer
+
+213
+00:14:27.480 --> 00:14:28.600
+<v Ankit Dheendsa>that brings down the rest.
+
+214
+00:14:28.780 --> 00:14:29.800
+<v Ankit Dheendsa>Just like the saying goes,
+
+215
+00:14:29.880 --> 00:14:31.160
+<v Ankit Dheendsa>if you wanna move fast, go alone,
+
+216
+00:14:31.280 --> 00:14:32.360
+<v Ankit Dheendsa>but if you wanna move far,
+
+217
+00:14:32.500 --> 00:14:33.820
+<v Ankit Dheendsa>then you have to go with a group.
+
+218
+00:14:34.120 --> 00:14:37.120
+<v Ankit Dheendsa>And so we really prioritize cultural fit
+
+219
+00:14:37.120 --> 00:14:43.800
+<v Ankit Dheendsa>it over almost anything else. It's probably our biggest weight in terms of what we look for when
+
+220
+00:14:43.800 --> 00:14:49.120
+<v Ankit Dheendsa>it comes to new hires and team members. If you are not the type of person that acts as a leader
+
+221
+00:14:49.120 --> 00:14:55.280
+<v Ankit Dheendsa>in your own department, in your own team, then it typically doesn't really fit. We really tell
+
+222
+00:14:55.280 --> 00:15:00.400
+<v Ankit Dheendsa>everybody that, hey, we don't believe in the traditional bureaucratic systems and designs
+
+223
+00:15:00.400 --> 00:15:04.380
+<v Ankit Dheendsa>that some large enterprise have to take on because of compartmentalization and whatnot.
+
+224
+00:15:04.380 --> 00:15:08.780
+<v Ankit Dheendsa>not, we want everybody involved in the project and everybody's opinion matters. And you need to be
+
+225
+00:15:09.220 --> 00:15:12.940
+<v Ankit Dheendsa>fact-checking and cross-checking things with everybody else. We want to hear your inputs and
+
+226
+00:15:12.940 --> 00:15:16.980
+<v Ankit Dheendsa>you need to be able to boost other people up when they're not getting work done or if they're in a
+
+227
+00:15:16.980 --> 00:15:21.360
+<v Ankit Dheendsa>slump. And when you're in a slump, you can rely on them to help you out. And so it's all about
+
+228
+00:15:22.060 --> 00:15:26.520
+<v Ankit Dheendsa>helping each other get the job done. We're all focused on the same role. If you have people that
+
+229
+00:15:26.520 --> 00:15:30.320
+<v Ankit Dheendsa>are really great at what they do, but the ego gets in the way, then that typically doesn't really fit
+
+230
+00:15:30.320 --> 00:15:32.160
+<v Ankit Dheendsa>fit our criteria as a team.
+
+231
+00:15:32.260 --> 00:15:36.700
+<v Ankit Dheendsa>And so I would say that would be the biggest variable in terms of bringing on new team
+
+232
+00:15:36.700 --> 00:15:37.200
+<v Ankit Dheendsa>members.
+
+233
+00:15:37.060 --> 00:15:38.380
+<v Ankit Dheendsa>It's something that we value very much.
+
+234
+00:15:41.320 --> 00:15:42.500
+<v Noah Labhart>This will be interesting.
+
+235
+00:15:42.660 --> 00:15:48.860
+<v Noah Labhart>I'm curious about scalability and how you approached scale from the beginning, from
+
+236
+00:15:48.860 --> 00:15:49.600
+<v Noah Labhart>the early days.
+
+237
+00:15:49.820 --> 00:15:53.580
+<v Noah Labhart>And also, have there been interesting areas where you've had to fight scale as you've
+
+238
+00:15:53.580 --> 00:15:54.080
+<v Noah Labhart>grown?
+
+239
+00:15:55.200 --> 00:15:55.700
+<v Noah Labhart>on.
+
+240
+00:15:55.680 --> 00:15:59.260
+<v Ankit Dheendsa>Because of our technology and what it is that we're able to do in terms of reducing
+
+241
+00:15:59.800 --> 00:16:05.560
+<v Ankit Dheendsa>data size, scalability actually hasn't been much of an issue for us. Even if we're talking about
+
+242
+00:16:05.560 --> 00:16:10.000
+<v Ankit Dheendsa>utilizing cloud services and whatnot, horizontally scaling, we haven't really had to do that much
+
+243
+00:16:10.000 --> 00:16:16.480
+<v Ankit Dheendsa>because when you're able to reduce vectors pre-ingestion, you don't need, you hit that
+
+244
+00:16:17.200 --> 00:16:22.140
+<v Ankit Dheendsa>bottleneck much later rather than sooner. And we haven't even gotten to the point with our pilots
+
+245
+00:16:23.880 --> 00:16:28.260
+<v Ankit Dheendsa>client that we're onboarding right now where that's been a problem for us. And it's something
+
+246
+00:16:28.260 --> 00:16:32.320
+<v Ankit Dheendsa>that we're definitely considering for the future. I always like to plan months ahead that if we hit
+
+247
+00:16:32.320 --> 00:16:35.860
+<v Ankit Dheendsa>certain conditions, we need to start acting on some of these contingency methods and whatnot.
+
+248
+00:16:36.240 --> 00:16:41.480
+<v Ankit Dheendsa>But scaling up in terms of tech infrastructure has not been a big issue because of the nature
+
+249
+00:16:41.480 --> 00:16:47.900
+<v Ankit Dheendsa>of the solution itself. However, in terms of scaling up the team, we have a lot of plans to
+
+250
+00:16:47.900 --> 00:16:52.280
+<v Ankit Dheendsa>be able to scale really fast. We're in the midst of raising our seed round. We're raising an $8
+
+251
+00:16:53.880 --> 00:16:55.320
+<v Ankit Dheendsa>at $100 million pre-money valuation.
+
+252
+00:16:55.880 --> 00:16:58.680
+<v Ankit Dheendsa>And we're on the brink of closing out a deal
+
+253
+00:16:58.680 --> 00:16:59.460
+<v Ankit Dheendsa>to be able to do.
+
+254
+00:16:59.520 --> 00:17:01.500
+<v Ankit Dheendsa>And our plan is to scale as much as possible,
+
+255
+00:17:01.580 --> 00:17:02.700
+<v Ankit Dheendsa>as fast as possible.
+
+256
+00:17:02.840 --> 00:17:04.720
+<v Ankit Dheendsa>Like many other startups, speed is everything.
+
+257
+00:17:05.120 --> 00:17:07.640
+<v Ankit Dheendsa>And because we want to get into the hardware space
+
+258
+00:17:07.640 --> 00:17:09.280
+<v Ankit Dheendsa>with iterations on the Keyboy,
+
+259
+00:17:09.400 --> 00:17:12.140
+<v Ankit Dheendsa>as well as developing out our software product suite,
+
+260
+00:17:12.380 --> 00:17:14.340
+<v Ankit Dheendsa>scaling out teams is going to be
+
+261
+00:17:14.340 --> 00:17:17.040
+<v Ankit Dheendsa>the most important factor in terms of that.
+
+262
+00:17:17.120 --> 00:17:18.700
+<v Ankit Dheendsa>And we're starting to actively work on
+
+263
+00:17:18.700 --> 00:17:21.140
+<v Ankit Dheendsa>hiring and recruiting pipelines as of right now,
+
+264
+00:17:21.140 --> 00:17:25.480
+<v Ankit Dheendsa>defining roles and personas for those roles to make sure that we're getting the best hires and
+
+265
+00:17:25.480 --> 00:17:26.700
+<v Ankit Dheendsa>the best talent that we possibly can.
+
+266
+00:17:28.260 --> 00:17:31.060
+<v Noah Labhart>Okay, as you step out on the balcony and you look across
+
+267
+00:17:31.060 --> 00:17:33.660
+<v Noah Labhart>all that you've built thus far, what are you most proud of?
+
+268
+00:17:34.740 --> 00:17:36.160
+<v Ankit Dheendsa>I'm definitely most proud of the
+
+269
+00:17:36.160 --> 00:17:42.080
+<v Ankit Dheendsa>key boy as of right now, because nobody has really done something like that ever before. People have
+
+270
+00:17:42.080 --> 00:17:46.980
+<v Ankit Dheendsa>put Wikipedia on a Raspberry Pi. That's not something new. And people have put small languages
+
+271
+00:17:46.980 --> 00:17:50.920
+<v Ankit Dheendsa>which is on Raspberry Pis, but the form factor is not as small.
+
+272
+00:17:51.100 --> 00:17:52.880
+<v Ankit Dheendsa>It still requires an internet connection.
+
+273
+00:17:53.100 --> 00:17:55.260
+<v Ankit Dheendsa>It still requires third-party service providers.
+
+274
+00:17:55.400 --> 00:17:58.760
+<v Ankit Dheendsa>We were able to do it purely on the edge in the span of a weekend.
+
+275
+00:17:58.880 --> 00:18:01.220
+<v Ankit Dheendsa>That's something that's tangible, that's physical.
+
+276
+00:18:01.360 --> 00:18:02.440
+<v Ankit Dheendsa>You could hold in your hand.
+
+277
+00:18:02.540 --> 00:18:04.800
+<v Ankit Dheendsa>You can actually ask it questions and see it come to life.
+
+278
+00:18:04.860 --> 00:18:07.020
+<v Ankit Dheendsa>And you're like, holy cow, how does this even work?
+
+279
+00:18:07.140 --> 00:18:08.540
+<v Ankit Dheendsa>I'm not connecting to any servers.
+
+280
+00:18:08.700 --> 00:18:09.680
+<v Ankit Dheendsa>I'm not doing any of this stuff.
+
+281
+00:18:09.800 --> 00:18:11.100
+<v Ankit Dheendsa>And I'm getting better results.
+
+282
+00:18:11.440 --> 00:18:14.540
+<v Ankit Dheendsa>If I were to utilize Claude's latest and greatest model
+
+283
+00:18:14.540 --> 00:18:16.200
+<v Ankit Dheendsa>or Gemini's latest and greatest model
+
+284
+00:18:16.200 --> 00:18:18.920
+<v Ankit Dheendsa>in conjunction with this data on server-side infrastructure,
+
+285
+00:18:19.140 --> 00:18:22.760
+<v Ankit Dheendsa>I'm getting better results on the edge with a smaller model, right?
+
+286
+00:18:22.900 --> 00:18:24.600
+<v Ankit Dheendsa>And that's something that I'm very proud of.
+
+287
+00:18:24.640 --> 00:18:25.780
+<v Ankit Dheendsa>That was a very fun project.
+
+288
+00:18:26.440 --> 00:18:28.600
+<v Ankit Dheendsa>Tinkering and building things physically is always great
+
+289
+00:18:28.600 --> 00:18:29.960
+<v Ankit Dheendsa>because you have an idea in your mind,
+
+290
+00:18:30.040 --> 00:18:31.780
+<v Ankit Dheendsa>and that's why we get into software dev,
+
+291
+00:18:31.880 --> 00:18:34.500
+<v Ankit Dheendsa>is that it's an easy way for you to ideate things
+
+292
+00:18:34.500 --> 00:18:35.420
+<v Ankit Dheendsa>and bring them to life.
+
+293
+00:18:35.540 --> 00:18:37.720
+<v Ankit Dheendsa>But when you're able to build it in the physical world,
+
+294
+00:18:38.140 --> 00:18:41.200
+<v Ankit Dheendsa>that's a whole new level of satisfaction
+
+295
+00:18:41.200 --> 00:18:42.460
+<v Ankit Dheendsa>when you're able to hold it in your hand.
+
+296
+00:18:44.840 --> 00:18:49.480
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+297
+00:18:51.420 --> 00:18:57.940
+<v Ankit Dheendsa>I would say the biggest mistake actually that we made was figuring out what we wanted to do and focus on.
+
+298
+00:18:59.080 --> 00:19:02.540
+<v Ankit Dheendsa>Because with our technology, there's so many different routes you can take, right?
+
+299
+00:19:02.600 --> 00:19:07.520
+<v Ankit Dheendsa>You can go into hardware, you can go into infrastructure products, you can go into B2C products.
+
+300
+00:19:07.860 --> 00:19:10.840
+<v Ankit Dheendsa>What industries do you want to focus on? How do you want to play this whole thing?
+
+301
+00:19:10.840 --> 00:19:17.340
+<v Ankit Dheendsa>and we went down through so many different rabbit holes of figuring out where do we fit best and we
+
+302
+00:19:17.340 --> 00:19:23.320
+<v Ankit Dheendsa>started exploring so many different technologies satellites autonomous drone systems you name it
+
+303
+00:19:23.320 --> 00:19:27.320
+<v Ankit Dheendsa>and we have a massive impact on all of those things and we can definitely work on all those
+
+304
+00:19:27.320 --> 00:19:31.840
+<v Ankit Dheendsa>things but the number one rule that I think that we forgot about for a while was just keep it simple
+
+305
+00:19:31.840 --> 00:19:37.160
+<v Ankit Dheendsa>right keep it simple work on the thing that you can get done the quickest that has a good level
+
+306
+00:19:37.160 --> 00:19:42.760
+<v Ankit Dheendsa>level of impact, test it, get customers to review it, give it away for free, figure out what's good
+
+307
+00:19:42.760 --> 00:19:47.180
+<v Ankit Dheendsa>about it, what's bad about it, review, and then iterate, right? Especially if you're a startup
+
+308
+00:19:47.180 --> 00:19:50.320
+<v Ankit Dheendsa>and you're going to market, you're looking to raise round and generate some revenue.
+
+309
+00:19:51.160 --> 00:19:55.880
+<v Ankit Dheendsa>Speed is everything. If you get caught up in the research stage for a year, that's where a lot of
+
+310
+00:19:55.880 --> 00:20:00.880
+<v Ankit Dheendsa>startups do die because you're burning through so much funding so quickly. And we tried to do,
+
+311
+00:20:00.980 --> 00:20:06.400
+<v Ankit Dheendsa>throw as many darts on the board, if you will, and then see what sticks. And we had noticed what
+
+312
+00:20:07.320 --> 00:20:13.020
+<v Ankit Dheendsa>prior, but we still chose to explore other rabbit holes. I think going back the past six,
+
+313
+00:20:13.160 --> 00:20:17.600
+<v Ankit Dheendsa>seven months, if we had just decided to, hey, we're going to focus on this B2B product that
+
+314
+00:20:17.600 --> 00:20:21.660
+<v Ankit Dheendsa>we now have, which is called Katana, we would have been able to go to market with it much quicker.
+
+315
+00:20:21.940 --> 00:20:26.480
+<v Ankit Dheendsa>However, I think all mistakes are really great. I don't think a lot of these are really blunders.
+
+316
+00:20:26.480 --> 00:20:30.580
+<v Ankit Dheendsa>They're learning opportunities. And as a result, we did get some great things out of it. We got to
+
+317
+00:20:30.580 --> 00:20:35.240
+<v Ankit Dheendsa>explore what impact we would have on different sectors and whatnot. So whenever we talk to people
+
+318
+00:20:37.160 --> 00:20:41.440
+<v Ankit Dheendsa>private sector regarding any type of technology, if you're data centers, energy, satellites,
+
+319
+00:20:42.200 --> 00:20:46.000
+<v Ankit Dheendsa>autonomous AI systems, we have an answer and we can talk to you and have a great conversation
+
+320
+00:20:46.000 --> 00:20:50.160
+<v Ankit Dheendsa>about it. But in terms of business and actually going to market, I would say focusing on the
+
+321
+00:20:50.160 --> 00:20:55.440
+<v Ankit Dheendsa>simple stuff, keeping it simple throughout the process, and only focusing on the tasks
+
+322
+00:20:55.440 --> 00:21:00.680
+<v Ankit Dheendsa>that really push the needle forward and just letting go of everything else was probably the
+
+323
+00:21:00.680 --> 00:21:01.240
+<v Ankit Dheendsa>the biggest mistake.
+
+324
+00:21:05.840 --> 00:21:07.360
+<v Noah Labhart>Okay, let's move forward then.
+
+325
+00:21:07.420 --> 00:21:09.960
+<v Noah Labhart>What does the future look like for Morphos AI?
+
+326
+00:21:10.140 --> 00:21:11.600
+<v Noah Labhart>For the products mentioned,
+
+327
+00:21:11.900 --> 00:21:15.100
+<v Noah Labhart>Ki and Ki-Boy and Katana, all the things,
+
+328
+00:21:15.180 --> 00:21:16.540
+<v Noah Labhart>where the industry is going?
+
+329
+00:21:16.720 --> 00:21:18.760
+<v Noah Labhart>I'm really curious to hear what the future looks like.
+
+330
+00:21:19.940 --> 00:21:22.500
+<v Ankit Dheendsa>We want to build our next product.
+
+331
+00:21:22.680 --> 00:21:25.120
+<v Ankit Dheendsa>We're internally calling it Deepsea,
+
+332
+00:21:25.220 --> 00:21:27.140
+<v Ankit Dheendsa>but we're definitely gonna have to change the name on that
+
+333
+00:21:27.140 --> 00:21:28.820
+<v Ankit Dheendsa>because it's too close to DeepSeek
+
+334
+00:21:30.680 --> 00:21:35.660
+<v Ankit Dheendsa>taking the two. But Deepsea was what I talked about earlier in terms of that memory and context
+
+335
+00:21:35.660 --> 00:21:41.820
+<v Ankit Dheendsa>layer solution for agent orchestration. And so we want to build that out and we are actively looking
+
+336
+00:21:41.820 --> 00:21:48.520
+<v Ankit Dheendsa>into acquiring other companies. We're very blessed to have a great network of investors and people
+
+337
+00:21:48.520 --> 00:21:53.700
+<v Ankit Dheendsa>that are willing to fund some of these deals. And we want to be able to acquire vector storage
+
+338
+00:21:53.700 --> 00:21:59.200
+<v Ankit Dheendsa>companies and be able to provide vector storage at a much cheaper rate than what industry and
+
+339
+00:22:00.680 --> 00:22:17.640
+<v Ankit Dheendsa>In terms of development on the software side, the one thing that I'm most excited about that I can talk about now is what we're internally calling Project Darkstar, which is a new model architecture that we believe is going to be monumentally impactful in industry.
+
+340
+00:22:18.020 --> 00:22:27.600
+<v Ankit Dheendsa>And what that is, instead of embedding intelligence into models via training and large data sets, we actually embed intelligence into the memory.
+
+341
+00:22:28.140 --> 00:22:37.580
+<v Ankit Dheendsa>And so instead of right now, if you want to build a brand new model, you got to, let's just say a convolutional neural network, but you've got to flood it with an absolute ton of training data.
+
+342
+00:22:37.700 --> 00:22:42.020
+<v Ankit Dheendsa>You have to make sure it doesn't overfit or under fit, but you have to go through that entire process.
+
+343
+00:22:42.220 --> 00:22:43.460
+<v Ankit Dheendsa>Building these models is very expensive.
+
+344
+00:22:43.800 --> 00:22:51.440
+<v Ankit Dheendsa>It requires a lot of hardware if you're doing it on-prem and if you're not, then a service side technology, you run up the bill pretty quick with building in new models.
+
+345
+00:22:51.540 --> 00:22:55.480
+<v Ankit Dheendsa>That's why a lot of these AI labs need to have a good amount of funding for R and D.
+
+346
+00:22:55.480 --> 00:23:00.500
+<v Ankit Dheendsa>And so the problem with that is that once you've trained the model, it's only good at what it's been trained on.
+
+347
+00:23:00.780 --> 00:23:05.320
+<v Ankit Dheendsa>So every single time you want to add new intelligence into it, now you have to retrain it on that new intelligence.
+
+348
+00:23:05.520 --> 00:23:10.820
+<v Ankit Dheendsa>And yeah, there's techniques to do it and companies are definitely doing it, but it's a whole process and it's a very large lift.
+
+349
+00:23:11.120 --> 00:23:15.600
+<v Ankit Dheendsa>And it doesn't fit on small IoT devices, right?
+
+350
+00:23:15.660 --> 00:23:17.960
+<v Ankit Dheendsa>In order to run these models, you need specialist hardware.
+
+351
+00:23:17.960 --> 00:23:29.400
+<v Ankit Dheendsa>That's why Nvidia stock has been booming because now you're going to be utilizing their GPUs, their server racks, and all their other platforms to power these AI workflows that also are very energy hungry.
+
+352
+00:23:29.540 --> 00:23:30.980
+<v Ankit Dheendsa>So your electricity bill is going to go up.
+
+353
+00:23:31.040 --> 00:23:42.420
+<v Ankit Dheendsa>What Darkstar would do is that it allows you to utilize a single neural network, let's just say a convolutional neural network, and you can hot swap the intelligence by hot swapping the data.
+
+354
+00:23:42.560 --> 00:23:47.500
+<v Ankit Dheendsa>Just like a Game Boy, I'm assuming you played with the Game Boy when you were younger or maybe even today.
+
+355
+00:23:47.960 --> 00:23:49.520
+<v Noah Labhart>Yeah, yeah. I mean, it's been a while, but yeah.
+
+356
+00:23:49.580 --> 00:23:52.900
+<v Ankit Dheendsa>Awesome. So you know how the games used to come in Game Boy cartridges, right?
+
+357
+00:23:52.980 --> 00:23:55.000
+<v Ankit Dheendsa>And so if you just want to play a different game,
+
+358
+00:23:55.080 --> 00:23:57.140
+<v Ankit Dheendsa>you just take one cartridge out and you put a new one in.
+
+359
+00:23:57.360 --> 00:23:59.540
+<v Ankit Dheendsa>So we're actually planning on doing that with the Key Boy.
+
+360
+00:23:59.700 --> 00:24:02.620
+<v Ankit Dheendsa>Right now, Wikipedia has been downloaded onto the Pi itself,
+
+361
+00:24:03.100 --> 00:24:05.080
+<v Ankit Dheendsa>or I should say onto the memory of the Pi itself.
+
+362
+00:24:05.400 --> 00:24:08.100
+<v Ankit Dheendsa>And what we're going to be doing is creating these data cartridges
+
+363
+00:24:08.100 --> 00:24:10.600
+<v Ankit Dheendsa>where you can hot swap the data sets, right?
+
+364
+00:24:10.660 --> 00:24:14.260
+<v Ankit Dheendsa>To prove that you can inference any data set by hot swapping it,
+
+365
+00:24:14.320 --> 00:24:16.260
+<v Ankit Dheendsa>and it's all in very small form factor.
+
+366
+00:24:17.960 --> 00:24:22.600
+<v Ankit Dheendsa>project Dark Star, you'd be able to utilize a single model and then hot swap data in and out
+
+367
+00:24:22.600 --> 00:24:27.440
+<v Ankit Dheendsa>to change the intelligence. So you can, for example, utilize one model and then upload a
+
+368
+00:24:27.440 --> 00:24:32.760
+<v Ankit Dheendsa>data set of dogs and cats. And every single time you take a picture with this device, let's just
+
+369
+00:24:32.760 --> 00:24:38.500
+<v Ankit Dheendsa>say your phone, it simply reduces, it vectorizes that image, reduces the vectors because of our
+
+370
+00:24:38.500 --> 00:24:43.880
+<v Ankit Dheendsa>technology, and then runs vector similarity searches with the memory layer that has all the
+
+371
+00:24:43.880 --> 00:24:47.780
+<v Ankit Dheendsa>the vector signatures of different dogs and cats to be able to determine what breed am
+
+372
+00:24:47.780 --> 00:24:48.960
+<v Ankit Dheendsa>I looking at, right?
+
+373
+00:24:49.100 --> 00:24:54.240
+<v Ankit Dheendsa>And you can apply that across all model types when it comes to vision models, audio models,
+
+374
+00:24:54.360 --> 00:24:54.960
+<v Ankit Dheendsa>you name it.
+
+375
+00:24:55.040 --> 00:25:00.300
+<v Ankit Dheendsa>And so that's a big play that we're very excited about because it enables small devices to
+
+376
+00:25:00.300 --> 00:25:06.320
+<v Ankit Dheendsa>be able to host very lightweight models that already run on the chips that we have in existence
+
+377
+00:25:06.320 --> 00:25:10.000
+<v Ankit Dheendsa>as of right now, like on iPhones and Androids and whatnot, people are building their chips
+
+378
+00:25:10.000 --> 00:25:11.360
+<v Ankit Dheendsa>to be really great at some of this stuff.
+
+379
+00:25:11.360 --> 00:25:15.160
+<v Ankit Dheendsa>we would enable a really lightweight model to be hosted completely locally on the edge.
+
+380
+00:25:15.320 --> 00:25:19.440
+<v Ankit Dheendsa>And whenever you want it to specialize in a certain type of model type, I should say,
+
+381
+00:25:19.520 --> 00:25:25.380
+<v Ankit Dheendsa>then you just hot swap the data set that you want it to refer back to. And if it's dogs and cats one
+
+382
+00:25:25.380 --> 00:25:31.960
+<v Ankit Dheendsa>day, but the next day you want to upload a data set of vehicles to figure out how you can fix your
+
+383
+00:25:31.960 --> 00:25:36.760
+<v Ankit Dheendsa>car or fix this broken down Humvee if you're in the military, you'll be able to just hot swap that
+
+384
+00:25:36.760 --> 00:25:41.420
+<v Ankit Dheendsa>that data set in, take pictures, ask questions, and it would be able to inference that data set,
+
+385
+00:25:41.520 --> 00:25:46.300
+<v Ankit Dheendsa>everything regarding the whatever it is that you uploaded. And so that would be monumentally
+
+386
+00:25:46.300 --> 00:25:52.920
+<v Ankit Dheendsa>important when it comes to AI on edge devices, as well as empowering your IoT devices to be able to
+
+387
+00:25:52.920 --> 00:25:53.880
+<v Ankit Dheendsa>process AI workflows.
+
+388
+00:25:56.400 --> 00:26:00.160
+<v Noah Labhart>Let's switch to you, Ankit. Who influences the way that you work? Name a person
+
+389
+00:26:00.160 --> 00:26:02.640
+<v Noah Labhart>or many persons or something you look up to and why.
+
+390
+00:26:04.200 --> 00:26:06.500
+<v Ankit Dheendsa>I've looked up to, I would say, growing
+
+391
+00:26:06.760 --> 00:26:13.360
+<v Ankit Dheendsa>a lot of athletes, NBA athletes, the Kobe Bryants, the Michael Jordans, the LeBron James. In my early
+
+392
+00:26:13.360 --> 00:26:19.060
+<v Ankit Dheendsa>years, in terms of just learning what discipline looks like, learning what work ethic looks like,
+
+393
+00:26:19.120 --> 00:26:24.480
+<v Ankit Dheendsa>and if you want to make great impact or even any impact, the amount of work that actually goes into
+
+394
+00:26:24.480 --> 00:26:30.440
+<v Ankit Dheendsa>it, being able to hear it from them and the people that play at the top of their game was really
+
+395
+00:26:30.440 --> 00:26:36.020
+<v Ankit Dheendsa>impactful on me at a young age in order to chase excellence and trying to get as good as I possibly
+
+396
+00:26:36.760 --> 00:26:41.620
+<v Ankit Dheendsa>set. Now going into my later years and entering industry and actually working on things,
+
+397
+00:26:41.720 --> 00:26:47.540
+<v Ankit Dheendsa>I would say some big inspirations for me are people like Jensen Huang, CEO of NVIDIA. I would
+
+398
+00:26:47.540 --> 00:26:53.480
+<v Ankit Dheendsa>say the typical Steve Jobs and now Tim Cook as well has done an excellent job with Apple. Palmer
+
+399
+00:26:53.480 --> 00:26:58.080
+<v Ankit Dheendsa>Luckey has been a big inspiration as of late, especially the past couple of years with his work
+
+400
+00:26:58.080 --> 00:27:03.520
+<v Ankit Dheendsa>on what he did with the Oculus Rift and now what he's doing at Anduril. Being able to look at some
+
+401
+00:27:03.520 --> 00:27:07.620
+<v Ankit Dheendsa>of these figures and see that you build amazing stuff and you have large companies and amazing
+
+402
+00:27:07.620 --> 00:27:12.500
+<v Ankit Dheendsa>funding and all these things yet you still clock in so many hours you're still constantly working
+
+403
+00:27:12.500 --> 00:27:19.340
+<v Ankit Dheendsa>on solutions yet you never take it easy and get lax and lazy with your approaches and you're just
+
+404
+00:27:19.340 --> 00:27:25.280
+<v Ankit Dheendsa>always a professional has been very humbling a lot of people believe that once you raise your round
+
+405
+00:27:25.280 --> 00:27:29.900
+<v Ankit Dheendsa>and you can take it easy a little bit you can relax you're getting paid but the fun part really
+
+406
+00:27:29.900 --> 00:27:34.500
+<v Ankit Dheendsa>begins. For me, it's once you raise a round and you start working with clients, the responsibility
+
+407
+00:27:34.500 --> 00:27:40.600
+<v Ankit Dheendsa>only increases. And so for me, I've never attached success with the raising of the round. I've never
+
+408
+00:27:40.600 --> 00:27:44.640
+<v Ankit Dheendsa>attached success with the amount of revenue we're generating. I've always attached success with,
+
+409
+00:27:44.700 --> 00:27:48.560
+<v Ankit Dheendsa>did you show up today? Did you put in the work? Are you working on something cool?
+
+410
+00:27:48.820 --> 00:27:52.660
+<v Ankit Dheendsa>And are you trying to push the needle forward even just a little bit every single day? Just
+
+411
+00:27:52.660 --> 00:27:57.340
+<v Ankit Dheendsa>being a little bit better than yesterday has been the goal for me. And so consistency has always
+
+412
+00:27:57.340 --> 00:28:01.940
+<v Ankit Dheendsa>been something that I've aimed for rather than just feeling motivated and trying to do things
+
+413
+00:28:01.940 --> 00:28:07.120
+<v Ankit Dheendsa>and sell it and get a quick win. It's always been the consistent work. And with that being said,
+
+414
+00:28:07.720 --> 00:28:11.960
+<v Ankit Dheendsa>instead of thinking of months, weeks or months in terms of progress or even a year,
+
+415
+00:28:12.040 --> 00:28:16.680
+<v Ankit Dheendsa>thinking in decades, right? There was an interview that Jensen Huang did years ago,
+
+416
+00:28:16.780 --> 00:28:22.960
+<v Ankit Dheendsa>and he said, I don't need to make an impact on the world in a year, right? I can do that in 50 years.
+
+417
+00:28:22.960 --> 00:28:27.080
+<v Ankit Dheendsa>and that really speaks to their mindset and their vision.
+
+418
+00:28:27.200 --> 00:28:30.580
+<v Ankit Dheendsa>So I'm committed to what it is that we're doing for decades.
+
+419
+00:28:30.740 --> 00:28:34.000
+<v Ankit Dheendsa>And as a result, I'm going to be able to do a lot of work.
+
+420
+00:28:35.460 --> 00:28:36.500
+<v Noah Labhart>I got one more question.
+
+421
+00:28:36.900 --> 00:28:40.220
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur
+
+422
+00:28:40.680 --> 00:28:42.540
+<v Noah Labhart>who's built the next big thing.
+
+423
+00:28:42.640 --> 00:28:43.380
+<v Noah Labhart>They're jazzed about it.
+
+424
+00:28:43.400 --> 00:28:44.740
+<v Noah Labhart>They can't wait to show it off to the world.
+
+425
+00:28:44.780 --> 00:28:46.520
+<v Noah Labhart>And can't wait to show it off to you right there on the plane.
+
+426
+00:28:46.940 --> 00:28:50.280
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+427
+00:28:51.140 --> 00:28:55.460
+<v Ankit Dheendsa>it. You know, when you've built something amazing that you think is going to be truly impactful,
+
+428
+00:28:55.620 --> 00:28:59.860
+<v Ankit Dheendsa>you get super excited about it and you always feel like it's going to be the next big thing
+
+429
+00:28:59.860 --> 00:29:04.080
+<v Ankit Dheendsa>and it's going to change the world and do all these things. But you have to realize that it's
+
+430
+00:29:04.080 --> 00:29:10.120
+<v Ankit Dheendsa>your baby. And as a result, you're going to be the most excited about it. Your ability to articulate
+
+431
+00:29:10.120 --> 00:29:17.140
+<v Ankit Dheendsa>value and translate it in a way that other people can now feel excited about it is arguably going to
+
+432
+00:29:17.140 --> 00:29:23.440
+<v Ankit Dheendsa>to be more important than the thing itself, right? If I can't get people to get excited about what it
+
+433
+00:29:23.440 --> 00:29:28.280
+<v Ankit Dheendsa>is that I'm building, then as a result, it's going to be very difficult to bring on hires when you're
+
+434
+00:29:28.280 --> 00:29:31.980
+<v Ankit Dheendsa>trying to hire A-level players and the best of the best in the industry. It's going to be very
+
+435
+00:29:31.980 --> 00:29:36.180
+<v Ankit Dheendsa>difficult when you're trying to raise round. It's going to be near impossible to even get customers
+
+436
+00:29:36.180 --> 00:29:40.640
+<v Ankit Dheendsa>to want to actually buy what it is that you have. And if you're an engineer, for example, and you've
+
+437
+00:29:40.640 --> 00:29:44.600
+<v Ankit Dheendsa>built some amazing creation, which a lot of engineers do, I would say the biggest piece of
+
+438
+00:29:44.600 --> 00:29:49.500
+<v Ankit Dheendsa>of advice that I would get is learning how to articulate its value in very simple terms and
+
+439
+00:29:49.500 --> 00:29:53.360
+<v Ankit Dheendsa>getting other people excited about it. If you can get other people excited about it, you can get
+
+440
+00:29:53.360 --> 00:29:57.820
+<v Ankit Dheendsa>them kinetic about it. And if they're kinetic, that's where things happen because you're going
+
+441
+00:29:57.820 --> 00:30:02.140
+<v Ankit Dheendsa>to need people to help you. When it comes to building a company, it's never a one-man team.
+
+442
+00:30:02.360 --> 00:30:06.660
+<v Ankit Dheendsa>You're always going to need help, right? If that's in the form of VCs, customers, team members,
+
+443
+00:30:06.800 --> 00:30:13.560
+<v Ankit Dheendsa>whoever. Now your role is going to be starting to shift more into being a people person. And so that
+
+444
+00:30:14.600 --> 00:30:17.560
+<v Ankit Dheendsa>I see a lot of founders struggle with, especially technical founders.
+
+445
+00:30:17.740 --> 00:30:19.340
+<v Ankit Dheendsa>They struggle with articulation.
+
+446
+00:30:19.420 --> 00:30:23.840
+<v Ankit Dheendsa>They struggle with motivating other people and projecting the vision and getting people
+
+447
+00:30:23.840 --> 00:30:24.480
+<v Ankit Dheendsa>excited about it.
+
+448
+00:30:24.540 --> 00:30:26.040
+<v Ankit Dheendsa>So that would be probably the most important.
+
+449
+00:30:26.240 --> 00:30:27.260
+<v Noah Labhart>That's fantastic advice.
+
+450
+00:30:27.500 --> 00:30:29.180
+<v Noah Labhart>Thank you for being on the show today.
+
+451
+00:30:29.320 --> 00:30:31.980
+<v Noah Labhart>And thank you for telling the creation story of Morphos AI.
+
+452
+00:30:32.380 --> 00:30:33.420
+<v Ankit Dheendsa>Noah, thank you very much.
+
+453
+00:30:33.500 --> 00:30:34.040
+<v Ankit Dheendsa>Appreciate it.
+
+454
+00:30:35.620 --> 00:30:38.380
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+455
+00:30:45.220 --> 00:30:48.220
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+456
+00:30:48.340 --> 00:30:53.120
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+457
+00:30:53.720 --> 00:30:55.960
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+458
+00:30:56.240 --> 00:30:58.160
+<v Noah Labhart>Both things help us out tremendously.
+
+459
+00:31:01.080 --> 00:31:02.560
+<v Noah Labhart>And thanks again for listening.

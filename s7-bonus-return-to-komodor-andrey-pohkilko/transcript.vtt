@@ -1,0 +1,1239 @@
+WEBVTT
+
+NOTE S7 Bonus: Return to Komodor - Andrey Pohkilko
+
+1
+00:00:01.180 --> 00:00:29.680
+<v Noah Labhart>Hello, listeners. You might remember in season six, episode 15, I interviewed Itiel, the co-founder of Komodor. Today, I have a special episode of the Code Story podcast, bringing back our friends at Komodor. I'm chatting with their open source dev leader, Andrey, about the latest initiatives at the company, including some exciting tooling around Helm and further advances in Kubernetes troubleshooting and expertise. As a reminder, Komodor enables development teams to monitor their entire Kubernetes
+
+2
+00:00:30.000 --> 00:00:34.680
+<v Noah Labhart>stack, identify issues, uncover root causes, and get the context needed to troubleshoot
+
+3
+00:00:34.680 --> 00:00:41.240
+<v Noah Labhart>their orchestration efficiently and independently. Well, today I have a special guest on the Code
+
+4
+00:00:41.240 --> 00:00:47.220
+<v Noah Labhart>Story podcast, Andrey. He's the head of open source at Komodor. Now we're gonna be talking about
+
+5
+00:00:47.220 --> 00:00:52.220
+<v Noah Labhart>some new initiatives and some new goals for the company. Andrey, thank you for being on the show
+
+6
+00:00:52.220 --> 00:00:59.240
+<v Noah Labhart>today. Hey, welcome everyone. So before we jump into Komodor, your role and what is, you know,
+
+7
+00:01:00.000 --> 00:01:05.180
+<v Noah Labhart>things happening at Komodor. I'd love to learn a little more about you. Tell me a little bit more
+
+8
+00:01:05.180 --> 00:01:07.640
+<v Noah Labhart>about you and your story and how you got to Komodor.
+
+9
+00:01:08.500 --> 00:01:11.320
+<v Andrey Pokhilko>It's a long story which starts back
+
+10
+00:01:11.320 --> 00:01:18.320
+<v Andrey Pokhilko>in 2009 when I started to write the first plugins for the open source load testing tool called
+
+11
+00:01:18.320 --> 00:01:25.060
+<v Andrey Pokhilko>JMeter. Back then, it was all new. The open source was only starting to conquer the world.
+
+12
+00:01:25.060 --> 00:01:36.260
+<v Andrey Pokhilko>It was a pretty exciting experience over the years. It was always connected to my main job, but as a result of this excitement, I started to make the project after project.
+
+13
+00:01:36.260 --> 00:01:57.240
+<v Andrey Pokhilko>And I was always curious, how do I do these open source projects, not just pieces of code online, but the successful, let's call it social projects when people come and share and something bigger appears after all of these joint effort of people come together.
+
+14
+00:01:57.240 --> 00:02:02.140
+<v Andrey Pokhilko>I've been doing many open sources in most of my workplaces.
+
+15
+00:02:02.180 --> 00:02:15.100
+<v Andrey Pokhilko>I've been in that role of doing open source activities, making sure that commercial part of the company understands the value and business value of the open sources.
+
+16
+00:02:15.220 --> 00:02:26.080
+<v Andrey Pokhilko>And that this counter business activity of doing something for free co-lives and naturally connects to the business side of things.
+
+17
+00:02:27.240 --> 00:02:33.660
+<v Andrey Pokhilko>And over the years, I made projects varying from the load testing tools to these Kubernetes
+
+18
+00:02:33.660 --> 00:02:40.600
+<v Andrey Pokhilko>Helm related thing and also some really funny activities like programming robots with Lego,
+
+19
+00:02:40.820 --> 00:02:42.340
+<v Andrey Pokhilko>AI driven chess.
+
+20
+00:02:42.600 --> 00:02:48.440
+<v Andrey Pokhilko>You know, back then there was this Queen's Gambit popularity of chess wave.
+
+21
+00:02:48.560 --> 00:02:54.240
+<v Andrey Pokhilko>And even before that, I started doing something with AI related things around chess just to
+
+22
+00:02:54.240 --> 00:02:55.400
+<v Andrey Pokhilko>experiment, just for fun.
+
+23
+00:02:57.240 --> 00:03:03.340
+<v Andrey Pokhilko>surprised me, that social aspect of the open source, how people discover you, how they come,
+
+24
+00:03:03.580 --> 00:03:11.140
+<v Andrey Pokhilko>how they share their excitement. When somebody shows their Lego robot built with my Python
+
+25
+00:03:11.140 --> 00:03:18.640
+<v Andrey Pokhilko>library, it's just the most fulfilling experience that I had by seeing these random people around
+
+26
+00:03:18.640 --> 00:03:23.560
+<v Andrey Pokhilko>the world contributing, doing joint activities with me in the open source.
+
+27
+00:03:24.560 --> 00:03:29.000
+<v Noah Labhart>Super interesting. You know, it's something I don't have a ton of experience with, with the open source world.
+
+28
+00:03:29.520 --> 00:03:35.000
+<v Noah Labhart>Just kind of in a broad overview, give me a refresher on Komodor for my audience.
+
+29
+00:03:35.200 --> 00:03:37.620
+<v Noah Labhart>What is Komodor setting out to achieve?
+
+30
+00:03:38.260 --> 00:03:46.300
+<v Andrey Pokhilko>Komodor's goal is to help all the Kubernetes users to manage their clusters more efficiently,
+
+31
+00:03:46.460 --> 00:03:52.940
+<v Andrey Pokhilko>especially in the situations when there's difficult problems happening in the infrastructure,
+
+32
+00:03:54.560 --> 00:04:04.560
+<v Andrey Pokhilko>when you are just doing your normal day-to-day activities like upgrading applications, deploying those applications, and observing how they operate.
+
+33
+00:04:04.840 --> 00:04:07.800
+<v Andrey Pokhilko>This is the goal of Komodor on the top level.
+
+34
+00:04:08.240 --> 00:04:08.740
+<v Andrey Pokhilko>You
+
+35
+00:04:08.520 --> 00:04:10.880
+<v Noah Labhart>know, I look at it from a Komodor standpoint, right?
+
+36
+00:04:10.960 --> 00:04:13.460
+<v Noah Labhart>So you're doing open source work here.
+
+37
+00:04:13.740 --> 00:04:18.800
+<v Noah Labhart>Has it been an interesting and helpful recruiting tool for Komodor as well?
+
+38
+00:04:18.880 --> 00:04:21.340
+<v Noah Labhart>Because people are essentially working on the product.
+
+39
+00:04:21.560 --> 00:04:22.360
+<v Noah Labhart>Is that correct?
+
+40
+00:04:22.360 --> 00:04:23.340
+<v Noah Labhart>I
+
+41
+00:04:23.340 --> 00:04:27.720
+<v Andrey Pokhilko>would say it's not the main focus of the open source that Komodor does.
+
+42
+00:04:27.880 --> 00:04:31.220
+<v Andrey Pokhilko>As a funny side effect, it's actually true.
+
+43
+00:04:31.440 --> 00:04:37.880
+<v Andrey Pokhilko>What you described, it happens because people start to engage with the company from the developer perspective.
+
+44
+00:04:38.400 --> 00:04:40.020
+<v Andrey Pokhilko>They like what they see.
+
+45
+00:04:40.100 --> 00:04:45.100
+<v Andrey Pokhilko>They understand that the company owns the expertise and they want to join that.
+
+46
+00:04:45.420 --> 00:04:49.340
+<v Andrey Pokhilko>But I would say this is a secondary aspect of what we do
+
+47
+00:04:49.340 --> 00:04:56.040
+<v Andrey Pokhilko>because the main power of what we do in Komodor through the open source and in any other place
+
+48
+00:04:56.040 --> 00:05:02.420
+<v Andrey Pokhilko>where we do open source even outside of the companies is the fact that people are able to
+
+49
+00:05:02.420 --> 00:05:08.840
+<v Andrey Pokhilko>do their daily job through using these open source. The fact that somebody may come to you
+
+50
+00:05:08.840 --> 00:05:17.420
+<v Andrey Pokhilko>after contributing and become your resource is really, really second or third tier of the impact
+
+51
+00:05:19.340 --> 00:05:22.640
+<v Andrey Pokhilko>This is not something that I put into the center of things.
+
+52
+00:05:22.800 --> 00:05:28.780
+<v Andrey Pokhilko>I don't plan on starting new open source project because I want to attract more developers.
+
+53
+00:05:29.600 --> 00:05:36.380
+<v Andrey Pokhilko>Yes, that would happen as a result of what we do, but that's not something that we set
+
+54
+00:05:36.380 --> 00:05:38.180
+<v Andrey Pokhilko>as our primary goal.
+
+55
+00:05:38.340 --> 00:05:42.260
+<v Andrey Pokhilko>It's never on the list of the goals that we want to achieve there.
+
+56
+00:05:42.720 --> 00:05:43.280
+<v Andrey Pokhilko>Okay,
+
+57
+00:05:43.320 --> 00:05:44.480
+<v Noah Labhart>well, let's dive into that then.
+
+58
+00:05:44.580 --> 00:05:48.980
+<v Noah Labhart>What are the goals for the open source initiatives with Komodor?
+
+59
+00:05:49.340 --> 00:05:52.260
+<v Noah Labhart>Because my understanding is, you know, Komodor is a product.
+
+60
+00:05:52.320 --> 00:05:56.320
+<v Noah Labhart>You are selling it to the enterprise or your bigger customers.
+
+61
+00:05:56.460 --> 00:05:59.000
+<v Noah Labhart>And the open source is kind of a different approach there.
+
+62
+00:05:59.040 --> 00:06:01.100
+<v Noah Labhart>Tell me about why you're going that way.
+
+63
+00:06:01.680 --> 00:06:02.280
+<v Noah Labhart>It's
+
+64
+00:06:02.280 --> 00:06:06.720
+<v Andrey Pokhilko>a part of some bigger transformation in what Komodor does recently.
+
+65
+00:06:07.040 --> 00:06:11.200
+<v Andrey Pokhilko>We see that we can basically do much, much more.
+
+66
+00:06:11.360 --> 00:06:17.060
+<v Andrey Pokhilko>The things we do can be much bigger than just a commercial platform for troubleshooting Kubernetes.
+
+67
+00:06:17.060 --> 00:06:25.540
+<v Andrey Pokhilko>And we accumulated certain expertise over time, what interests people, what are their needs in the Kubernetes world.
+
+68
+00:06:25.980 --> 00:06:36.760
+<v Andrey Pokhilko>And some of those insights that we have, they are outside of our current product, which leads to two ways we can use those insights.
+
+69
+00:06:36.760 --> 00:06:40.880
+<v Andrey Pokhilko>One way is to affect the main product, and that process is happening.
+
+70
+00:06:41.020 --> 00:06:45.640
+<v Andrey Pokhilko>Komodor is transforming the product to address a wider spectrum of use cases.
+
+71
+00:06:45.780 --> 00:06:51.040
+<v Andrey Pokhilko>As opposed to the past when Komodor was only the troubleshooting platform,
+
+72
+00:06:51.500 --> 00:06:57.680
+<v Andrey Pokhilko>now you will see the Komodor becoming a more general place where you can take your cluster
+
+73
+00:06:57.680 --> 00:07:04.500
+<v Andrey Pokhilko>and do all of the best practices regarding Kubernetes, regarding your day-to-day operations of Kubernetes.
+
+74
+00:07:04.500 --> 00:07:08.460
+<v Andrey Pokhilko>not only when things go wrong, but also when the things go right.
+
+75
+00:07:08.640 --> 00:07:12.500
+<v Andrey Pokhilko>So that transformation will continue to happen to Komodor.
+
+76
+00:07:12.680 --> 00:07:17.740
+<v Andrey Pokhilko>But on the other side, there can be much faster things that we can do.
+
+77
+00:07:17.900 --> 00:07:21.520
+<v Andrey Pokhilko>And this is my role to look around, to look inside the company,
+
+78
+00:07:21.620 --> 00:07:25.560
+<v Andrey Pokhilko>because there's so many ideas floating around in the company,
+
+79
+00:07:25.640 --> 00:07:31.800
+<v Andrey Pokhilko>and pick what can we take as a satellite project, as a side project that we can implement
+
+80
+00:07:31.800 --> 00:07:38.700
+<v Andrey Pokhilko>that will impact the industry, that will impact the Kubernetes world, and people will just use it.
+
+81
+00:07:38.800 --> 00:07:45.560
+<v Andrey Pokhilko>And there is the good reputational outcome from that. And I know that it was always from my past
+
+82
+00:07:45.560 --> 00:07:50.260
+<v Andrey Pokhilko>experience, for example, when I worked in Blazemeter, which was another company that was
+
+83
+00:07:50.260 --> 00:07:56.840
+<v Andrey Pokhilko>built on top of the open source first idea of continuing the commercial value on top of the
+
+84
+00:07:56.840 --> 00:08:03.020
+<v Andrey Pokhilko>the open source. So I know from the practice that it's really, really good and organic when
+
+85
+00:08:03.020 --> 00:08:09.540
+<v Andrey Pokhilko>you contribute something to the community and people enjoy and use it. And for the serious
+
+86
+00:08:09.540 --> 00:08:15.280
+<v Andrey Pokhilko>companies, for the bigger players, there will always be some added enterprise level, let's call
+
+87
+00:08:15.280 --> 00:08:21.000
+<v Andrey Pokhilko>it value or company level value that you would like to pay for. And these are usually boring
+
+88
+00:08:21.000 --> 00:08:28.160
+<v Andrey Pokhilko>things like authentication, SSO, role-based access, all of that. But the main, main creative
+
+89
+00:08:28.160 --> 00:08:35.340
+<v Andrey Pokhilko>piece is usually fine to be just shared with the community and don't ask anything in exchange.
+
+90
+00:08:35.860 --> 00:08:41.960
+<v Andrey Pokhilko>That's the idea of open source, that we can quickly apply whatever we have in our minds
+
+91
+00:08:41.960 --> 00:08:48.780
+<v Andrey Pokhilko>as a next idea to improve the world and separate commercial value from it and leave the commercial
+
+92
+00:08:48.780 --> 00:08:55.580
+<v Andrey Pokhilko>value to those who really need it. So there's no conflict between commercial and open source.
+
+93
+00:08:55.780 --> 00:09:01.560
+<v Andrey Pokhilko>It's a natural thing. We know that it's possible and there are a number of success stories around
+
+94
+00:09:01.560 --> 00:09:06.220
+<v Andrey Pokhilko>that. So
+
+95
+00:09:06.220 --> 00:09:13.180
+<v Noah Labhart>with Komodor, now you have the open source version to push. How are you getting people
+
+96
+00:09:13.180 --> 00:09:22.240
+<v Noah Labhart>How are you communicating to the open source world that this initiative is underway? How are you getting people in to work on it?
+
+97
+00:09:22.240 --> 00:09:33.540
+<v Andrey Pokhilko>If you would look at back of my experience with open sources, that would probably be the key to the success of every open source project that became successful.
+
+98
+00:09:33.780 --> 00:09:41.120
+<v Andrey Pokhilko>Because it's easy to write some genius code that will be amazing and beautiful internally.
+
+99
+00:09:41.320 --> 00:09:47.400
+<v Andrey Pokhilko>But if you didn't tell anyone, nobody will know that such a great thing exists.
+
+100
+00:09:47.400 --> 00:09:54.100
+<v Andrey Pokhilko>exists. For open source projects, the marketing, the promotional activities actually matter a lot.
+
+101
+00:09:54.320 --> 00:09:59.520
+<v Andrey Pokhilko>This is one of the benefits of doing open sources from inside of commercial company,
+
+102
+00:09:59.700 --> 00:10:05.700
+<v Andrey Pokhilko>because we can ask those commercial guys to share a bit of their marketing budget and actually let
+
+103
+00:10:05.700 --> 00:10:13.760
+<v Andrey Pokhilko>people know that they can use something for free. We went to the stage of KubeCon North America,
+
+104
+00:10:13.760 --> 00:10:21.620
+<v Andrey Pokhilko>And we said to everyone, guys, there's this cool thing called Helm Dashboard that we did as part of our open source.
+
+105
+00:10:21.800 --> 00:10:23.180
+<v Andrey Pokhilko>And it's not the only thing.
+
+106
+00:10:23.280 --> 00:10:25.320
+<v Andrey Pokhilko>We also did others like ValidCube.
+
+107
+00:10:26.240 --> 00:10:28.680
+<v Andrey Pokhilko>People started to look at it.
+
+108
+00:10:28.740 --> 00:10:30.580
+<v Andrey Pokhilko>And if it's a cool thing, it's free.
+
+109
+00:10:30.740 --> 00:10:32.360
+<v Andrey Pokhilko>You can take and use it.
+
+110
+00:10:32.480 --> 00:10:33.800
+<v Andrey Pokhilko>Why not to share it?
+
+111
+00:10:33.860 --> 00:10:35.820
+<v Andrey Pokhilko>So people started to share the excitement.
+
+112
+00:10:36.420 --> 00:10:39.300
+<v Andrey Pokhilko>We got a lot of stars on GitHub from that.
+
+113
+00:10:39.300 --> 00:10:45.780
+<v Andrey Pokhilko>And we now see the organic wave of people just finding the project, seeing that it's cool.
+
+114
+00:10:45.860 --> 00:10:50.460
+<v Andrey Pokhilko>It helps them in their daily life with Helm operations in Kubernetes.
+
+115
+00:10:50.720 --> 00:10:53.180
+<v Andrey Pokhilko>And they just share their excitement.
+
+116
+00:10:53.320 --> 00:11:01.060
+<v Andrey Pokhilko>They share it in LinkedIn, in Twitter, and in different medium platforms where people usually discuss.
+
+117
+00:11:01.520 --> 00:11:04.720
+<v Andrey Pokhilko>This is how open source projects become popular.
+
+118
+00:11:05.060 --> 00:11:07.080
+<v Andrey Pokhilko>You need to basically bring the value.
+
+119
+00:11:07.080 --> 00:11:12.900
+<v Andrey Pokhilko>you. You should be doing the thing that you promised you do. Then people will spread the
+
+120
+00:11:12.900 --> 00:11:18.200
+<v Andrey Pokhilko>word. You just need to ignite the first announcement of the thing. And Komodor
+
+121
+00:11:18.200 --> 00:11:23.060
+<v Andrey Pokhilko>is a well-known company, so we could just announce it and start this process.
+
+122
+00:11:23.940 --> 00:11:30.700
+<v Noah Labhart>So with Helm, there's an understanding of Helm from my side, but I'm not 100% sure that my
+
+123
+00:11:30.700 --> 00:11:36.740
+<v Noah Labhart>audience knows exactly what Helm is. Tell me about Helm and how Komodor is integrating itself into
+
+124
+00:11:37.080 --> 00:11:41.440
+<v Andrey Pokhilko>So Helm is basically the package manager for Kubernetes.
+
+125
+00:11:41.880 --> 00:11:45.960
+<v Andrey Pokhilko>Kubernetes surprisingly doesn't have the package manager by itself,
+
+126
+00:11:46.220 --> 00:11:53.360
+<v Andrey Pokhilko>which I would say it really, really asks or begs for a packaging system for it.
+
+127
+00:11:53.440 --> 00:11:57.780
+<v Andrey Pokhilko>And they only recently introduced their own templating language there.
+
+128
+00:11:57.960 --> 00:12:04.320
+<v Andrey Pokhilko>So Helm is a package manager and also a way to template your Kubernetes manifests
+
+129
+00:12:04.320 --> 00:12:07.700
+<v Andrey Pokhilko>that you package into that application.
+
+130
+00:12:07.980 --> 00:12:11.460
+<v Andrey Pokhilko>So you can think of it as some package
+
+131
+00:12:11.460 --> 00:12:14.960
+<v Andrey Pokhilko>that the author of the application has designed.
+
+132
+00:12:15.120 --> 00:12:20.080
+<v Andrey Pokhilko>So when you take that package and run it with the help of Helm,
+
+133
+00:12:20.140 --> 00:12:22.680
+<v Andrey Pokhilko>it generates you the Kubernetes manifests
+
+134
+00:12:22.680 --> 00:12:25.520
+<v Andrey Pokhilko>and applies those manifests to your cluster.
+
+135
+00:12:25.660 --> 00:12:29.440
+<v Andrey Pokhilko>And it has very nice features like configuration values
+
+136
+00:12:29.440 --> 00:12:30.540
+<v Andrey Pokhilko>that you can set,
+
+137
+00:12:30.540 --> 00:12:35.880
+<v Andrey Pokhilko>and those manifests will be generated slightly differently for your specific needs.
+
+138
+00:12:35.980 --> 00:12:39.920
+<v Andrey Pokhilko>So it's like a smart installer with some good set of options.
+
+139
+00:12:40.200 --> 00:12:41.540
+<v Andrey Pokhilko>This is what Helm is.
+
+140
+00:12:41.740 --> 00:12:47.660
+<v Andrey Pokhilko>And the last piece of it is the approach to repositories to store those applications
+
+141
+00:12:47.660 --> 00:12:49.920
+<v Andrey Pokhilko>so you can access and upgrade them.
+
+142
+00:12:50.160 --> 00:12:52.620
+<v Andrey Pokhilko>And this is what Helm actually is.
+
+143
+00:12:53.300 --> 00:12:59.200
+<v Andrey Pokhilko>And obviously, it's such a crucial thing for the Kubernetes ecosystem
+
+144
+00:13:00.540 --> 00:13:01.840
+<v Andrey Pokhilko>became super, super popular.
+
+145
+00:13:02.060 --> 00:13:07.720
+<v Andrey Pokhilko>A lot of people contributed to package the main applications
+
+146
+00:13:07.720 --> 00:13:13.120
+<v Andrey Pokhilko>that exist in Commodore, like Grafana, Redis, whatever,
+
+147
+00:13:13.360 --> 00:13:16.240
+<v Andrey Pokhilko>you name it, ingresses of all the kinds.
+
+148
+00:13:16.480 --> 00:13:21.020
+<v Andrey Pokhilko>So basically anything that is in common used in Kubernetes,
+
+149
+00:13:21.320 --> 00:13:24.740
+<v Andrey Pokhilko>you can find that packaged as a helm and vice versa.
+
+150
+00:13:24.840 --> 00:13:26.980
+<v Andrey Pokhilko>If you do anything with Kubernetes,
+
+151
+00:13:26.980 --> 00:13:33.000
+<v Andrey Pokhilko>Kubernetes, people will come to you and ask to have Helm packaging on top of that.
+
+152
+00:13:33.660 --> 00:13:40.520
+<v Andrey Pokhilko>So that led to a very critical role of Helm in the current ecosystem. So we know that everyone
+
+153
+00:13:40.520 --> 00:13:45.260
+<v Andrey Pokhilko>uses it. It's a widespread, even if you don't like it, you will have to take it because there
+
+154
+00:13:45.260 --> 00:13:50.280
+<v Andrey Pokhilko>are some good applications that have no other packaging except Helm packaging.
+
+155
+00:13:50.560 --> 00:13:51.060
+<v Andrey Pokhilko>Okay,
+
+156
+00:13:51.100 --> 00:13:56.140
+<v Noah Labhart>makes sense. So it's kind of like an NPM for Kubernetes. Is that a pretty good comparison?
+
+157
+00:13:56.980 --> 00:13:59.840
+<v Andrey Pokhilko>Exactly. It's exactly the right comparison.
+
+158
+00:14:00.680 --> 00:14:10.880
+<v Noah Labhart>So I hear the open source initiatives, and I think I understand right that you're expanding your positioning in enterprise as well as how you can help people on the commercial front.
+
+159
+00:14:10.960 --> 00:14:17.820
+<v Noah Labhart>Tell me more about that, more about kind of what you're known for, but where you're going to push the envelope in the future for the commercial customers.
+
+160
+00:14:17.820 --> 00:14:44.800
+<v Andrey Pokhilko>The plans, the evolution of Komodor, which was starting initially from the only the troubleshooting narrow use cases, is now expanding into the vision when we take any aspect of the day-to-day operations with Kubernetes, offering certain help through the platform, through the integrated platform that we have, offering certain help of day-to-day managing operations of the Kubernetes.
+
+161
+00:14:44.800 --> 00:14:55.720
+<v Andrey Pokhilko>For example, deploying the applications, first of all, understanding the state of those applications, seeing who was changing it, when the change was happening.
+
+162
+00:14:55.940 --> 00:15:10.800
+<v Andrey Pokhilko>And of course, all of the classical Komodor expertise on the troubleshooting, the node issues, workload issues, all of the kind of troubles that you may face with your Kubernetes.
+
+163
+00:15:10.800 --> 00:15:11.920
+<v Andrey Pokhilko>Kubernetes. So
+
+164
+00:15:11.920 --> 00:15:16.440
+<v Noah Labhart>give me an example of a problem someone runs into with Kubernetes, right? So,
+
+165
+00:15:16.500 --> 00:15:23.920
+<v Noah Labhart>you know, Kubernetes in general is orchestration and replication, automated, etc. What sort of
+
+166
+00:15:23.920 --> 00:15:29.020
+<v Noah Labhart>problems are they running into? It sounds maybe to the layman like it's just sort of a turn it on
+
+167
+00:15:29.020 --> 00:15:31.640
+<v Noah Labhart>and let it go. But what sort of problems are they running into?
+
+168
+00:15:32.580 --> 00:15:34.560
+<v Andrey Pokhilko>Kubernetes indeed, as a concept,
+
+169
+00:15:34.560 --> 00:15:41.080
+<v Andrey Pokhilko>promises something that you would just run and it runs transparently for you. But in the reality,
+
+170
+00:15:41.380 --> 00:15:48.020
+<v Andrey Pokhilko>Kubernetes runs on the infrastructure. So there is very, very painful level of node level issues
+
+171
+00:15:48.020 --> 00:15:53.480
+<v Andrey Pokhilko>happening. For example, when the node, the actual machine which runs the Kubernetes cluster
+
+172
+00:15:53.480 --> 00:15:59.340
+<v Andrey Pokhilko>runs out of memory or it needs to go down for the upgrade of the software or something,
+
+173
+00:15:59.340 --> 00:16:05.060
+<v Andrey Pokhilko>the workloads that are running on that machine are finding no place to go, for example.
+
+174
+00:16:05.280 --> 00:16:12.200
+<v Andrey Pokhilko>So all of those problematic node issues, they are the typical pains that Komodor surfaces.
+
+175
+00:16:12.600 --> 00:16:15.160
+<v Andrey Pokhilko>And it's really time to fix.
+
+176
+00:16:15.880 --> 00:16:21.820
+<v Andrey Pokhilko>And another problem is the typical problems of deploying or upgrading the application.
+
+177
+00:16:21.840 --> 00:16:26.820
+<v Andrey Pokhilko>When you did an upgrade of the application, but for some reason,
+
+178
+00:16:26.820 --> 00:16:29.900
+<v Andrey Pokhilko>that new version never become operational.
+
+179
+00:16:29.960 --> 00:16:32.620
+<v Andrey Pokhilko>It always fails with some issue.
+
+180
+00:16:32.920 --> 00:16:36.760
+<v Andrey Pokhilko>And it's again, you are on timer of what is the problem?
+
+181
+00:16:36.880 --> 00:16:38.780
+<v Andrey Pokhilko>How do I get to the root cause of it?
+
+182
+00:16:38.860 --> 00:16:41.740
+<v Andrey Pokhilko>How do I quickly mitigate the problem?
+
+183
+00:16:41.860 --> 00:16:44.460
+<v Andrey Pokhilko>So I roll back or do I fix anything?
+
+184
+00:16:44.740 --> 00:16:47.680
+<v Andrey Pokhilko>Is it happening again because of that node
+
+185
+00:16:47.680 --> 00:16:50.680
+<v Andrey Pokhilko>that is problematic or it's a workload itself
+
+186
+00:16:51.320 --> 00:16:53.080
+<v Andrey Pokhilko>that I need to just roll back?
+
+187
+00:16:53.080 --> 00:17:04.860
+<v Andrey Pokhilko>And yes, you can resolve that all through kubectl commands by your own, but it's really a matter of how fast can you do that.
+
+188
+00:17:05.040 --> 00:17:09.340
+<v Andrey Pokhilko>And with Komodor, you can do that very, very fast and conveniently.
+
+189
+00:17:09.760 --> 00:17:13.720
+<v Noah Labhart>So you're kind of health monitoring, essentially, with Komodor.
+
+190
+00:17:13.800 --> 00:17:15.020
+<v Noah Labhart>You're troubleshooting.
+
+191
+00:17:15.140 --> 00:17:21.240
+<v Noah Labhart>You're seeing an end-to-end visibility solution, but you have expertise baked into the product.
+
+192
+00:17:23.080 --> 00:17:27.020
+<v Noah Labhart>you hope to replicate that into the open source world?
+
+193
+00:17:27.160 --> 00:17:28.420
+<v Noah Labhart>Tell me about that.
+
+194
+00:17:28.500 --> 00:17:35.000
+<v Noah Labhart>How you are ensuring that the open source is going to be just as good as the core product.
+
+195
+00:17:35.080 --> 00:17:35.740
+<v Noah Labhart>Tell me a little bit about that.
+
+196
+00:17:36.300 --> 00:17:37.580
+<v Andrey Pokhilko>It's a good question.
+
+197
+00:17:37.800 --> 00:17:44.640
+<v Andrey Pokhilko>If I would take my more managerial hat to put on here, I would say that you always do
+
+198
+00:17:44.640 --> 00:17:48.940
+<v Andrey Pokhilko>achieve the perfection through getting the right people on board.
+
+199
+00:17:49.160 --> 00:17:52.580
+<v Andrey Pokhilko>And in Komodor, it's not only me doing the open source.
+
+200
+00:17:53.080 --> 00:17:56.940
+<v Andrey Pokhilko>Actually, the whole team, I'm probably just the most experienced with that.
+
+201
+00:17:57.000 --> 00:18:03.440
+<v Andrey Pokhilko>But the number of people, like it's at least a handful of people are closely involved with open source.
+
+202
+00:18:03.640 --> 00:18:10.740
+<v Andrey Pokhilko>So the recipe on the general level is to get the right people, make sure they understand the goal,
+
+203
+00:18:10.900 --> 00:18:13.860
+<v Andrey Pokhilko>and then let them do the thing.
+
+204
+00:18:14.480 --> 00:18:17.900
+<v Andrey Pokhilko>Don't interfere and keep on managing them.
+
+205
+00:18:18.220 --> 00:18:22.460
+<v Andrey Pokhilko>And this is the highest level of the managerial stuff.
+
+206
+00:18:23.080 --> 00:18:28.780
+<v Andrey Pokhilko>the level of particular things that we can do? Well, first is that the things that we do is,
+
+207
+00:18:28.840 --> 00:18:35.620
+<v Andrey Pokhilko>again, in open source, it's not tightly connected to the main Komodor product. It's not usable
+
+208
+00:18:35.620 --> 00:18:42.880
+<v Andrey Pokhilko>for you only if you are somehow a customer of Komodor. No, it's actually the reverse of that.
+
+209
+00:18:42.980 --> 00:18:49.300
+<v Andrey Pokhilko>The open source projects that we create, they allow you to improve your day-to-day with
+
+210
+00:18:49.300 --> 00:18:52.160
+<v Andrey Pokhilko>with Kubernetes, and for example, specifically with Helm,
+
+211
+00:18:52.160 --> 00:18:56.240
+<v Andrey Pokhilko>even without any connection to the main Komodor application.
+
+212
+00:18:56.680 --> 00:18:59.420
+<v Andrey Pokhilko>We are not forcing that because it would not be natural.
+
+213
+00:18:59.980 --> 00:19:07.120
+<v Andrey Pokhilko>And it would be correct here to switch and talk a bit more about the Helm dashboard project.
+
+214
+00:19:07.320 --> 00:19:11.540
+<v Andrey Pokhilko>What is it and how it relates to the other things?
+
+215
+00:19:11.600 --> 00:19:16.800
+<v Andrey Pokhilko>Because it's probably the biggest open source initiative of Komodor at the moment.
+
+216
+00:19:16.800 --> 00:19:25.140
+<v Andrey Pokhilko>And it's really interesting to see how it evolves, to understand how it started and the goals it tries to achieve.
+
+217
+00:19:25.380 --> 00:19:27.400
+<v Noah Labhart>Makes sense. So tell me more about the Helm dashboard.
+
+218
+00:19:27.600 --> 00:19:34.140
+<v Noah Labhart>Tell me about how that plays into the overall story, because it's obviously super important for Kubernetes, right?
+
+219
+00:19:34.200 --> 00:19:36.160
+<v Noah Labhart>It's the NPM for Kubernetes. So tell me more about that.
+
+220
+00:19:36.960 --> 00:19:43.900
+<v Andrey Pokhilko>One of the first thing we looked at is the fact that this popularity of Helm and its critical role,
+
+221
+00:19:43.900 --> 00:19:49.640
+<v Andrey Pokhilko>it was on the one hand and on the other hand, we heard that people, they were all saying,
+
+222
+00:19:49.840 --> 00:19:54.940
+<v Andrey Pokhilko>guys, you are so great at Kubernetes troubleshooting. Can you do something around
+
+223
+00:19:54.940 --> 00:20:02.340
+<v Andrey Pokhilko>Helm that would also be great? And we look at it and what can be done with Helm? It's pretty
+
+224
+00:20:02.340 --> 00:20:08.860
+<v Andrey Pokhilko>settled and mature project. What can we do about it? Let's look at the trends, at the current
+
+225
+00:20:08.860 --> 00:20:15.300
+<v Andrey Pokhilko>trends that are happening in the Kubernetes world. Everyone speaks about developer empowerment,
+
+226
+00:20:15.800 --> 00:20:23.100
+<v Andrey Pokhilko>developer enablement to do things on their own. And to do that in Kubernetes world,
+
+227
+00:20:23.260 --> 00:20:29.460
+<v Andrey Pokhilko>you would need to make developer to manage the helm as a tool, as a thing. So this leads us to
+
+228
+00:20:29.460 --> 00:20:36.260
+<v Andrey Pokhilko>the obvious answers. What can you do to helm to improve the daily life of people? And it's exactly
+
+229
+00:20:36.260 --> 00:20:43.780
+<v Andrey Pokhilko>that we can allow less experienced Kubernetes users to do their daily operations more easily
+
+230
+00:20:43.780 --> 00:20:50.320
+<v Andrey Pokhilko>with the Helm. And how do you do that? Well, Helm is a command line. And with all of my respect to
+
+231
+00:20:50.320 --> 00:20:57.420
+<v Andrey Pokhilko>command lines and to the Helm, it's quite cumbersome to operate when you have less experience in
+
+232
+00:20:57.420 --> 00:21:03.560
+<v Andrey Pokhilko>Kubernetes and you are willing to get more experience in Kubernetes and your way of packaging
+
+233
+00:21:03.560 --> 00:21:10.200
+<v Andrey Pokhilko>applications or installing them is the Helm. And we did exactly that. We made a UI representation
+
+234
+00:21:10.200 --> 00:21:15.960
+<v Andrey Pokhilko>of Helm universe for you. It's a very, very simplistic thing. It's very straightforward.
+
+235
+00:21:16.320 --> 00:21:21.780
+<v Andrey Pokhilko>The first thing you see is the list of your installed Helm applications in your cluster,
+
+236
+00:21:21.880 --> 00:21:26.960
+<v Andrey Pokhilko>and you continue from there. You see what you have installed. If you want to install more,
+
+237
+00:21:26.960 --> 00:21:34.480
+<v Andrey Pokhilko>there is an area for you to go and connect repositories and install more. You can dive
+
+238
+00:21:34.480 --> 00:21:42.480
+<v Andrey Pokhilko>deeper into your install charts and understand the history of their evolution of different versions
+
+239
+00:21:42.480 --> 00:21:47.660
+<v Andrey Pokhilko>or reconfigurations happening. All of these operations could be done through the command
+
+240
+00:21:47.660 --> 00:21:54.480
+<v Andrey Pokhilko>line, but that's kind of hardcore, I would say. We can all say that the hardcore is the only
+
+241
+00:21:54.480 --> 00:22:03.600
+<v Andrey Pokhilko>a true way of true man to go through life, but it's too long. The obvious step was to democratize
+
+242
+00:22:03.600 --> 00:22:10.000
+<v Andrey Pokhilko>for the regular developers or beginners the operations with Helm. As an interesting side
+
+243
+00:22:10.000 --> 00:22:16.700
+<v Andrey Pokhilko>effect of that, what's happening is that the more experienced people would also enjoy using the Helm
+
+244
+00:22:16.700 --> 00:22:22.540
+<v Andrey Pokhilko>dashboard or visualization, because those people, they know where to look at. They just need to save
+
+245
+00:22:24.480 --> 00:22:32.360
+<v Andrey Pokhilko>commands to the Helm. And we saw that to do the basic investigation of what is the cause of my
+
+246
+00:22:32.360 --> 00:22:39.600
+<v Andrey Pokhilko>Helm chart failing or my Helm packaged application failing, what was the exact change? The answer to
+
+247
+00:22:39.600 --> 00:22:45.680
+<v Andrey Pokhilko>that is five different commands in the command line, sometimes even eight different commands.
+
+248
+00:22:45.820 --> 00:22:51.820
+<v Andrey Pokhilko>And that's for only one pass of root cause analysis. So when we look at that, it was obvious
+
+249
+00:22:51.820 --> 00:22:53.360
+<v Andrey Pokhilko>is that we can save a lot of time
+
+250
+00:22:53.360 --> 00:22:56.060
+<v Andrey Pokhilko>by doing all of these commands behind the scenes
+
+251
+00:22:56.060 --> 00:22:58.200
+<v Andrey Pokhilko>automatically, really quickly,
+
+252
+00:22:58.300 --> 00:23:01.180
+<v Andrey Pokhilko>and surfacing, presenting the information
+
+253
+00:23:01.180 --> 00:23:03.980
+<v Andrey Pokhilko>in a really natural UI way.
+
+254
+00:23:04.160 --> 00:23:07.340
+<v Andrey Pokhilko>So the command line tool became a GUI tool.
+
+255
+00:23:07.900 --> 00:23:11.320
+<v Andrey Pokhilko>Still, it's all 100% Helm inside,
+
+256
+00:23:11.740 --> 00:23:14.060
+<v Andrey Pokhilko>but it's such a relief for everyone
+
+257
+00:23:14.060 --> 00:23:17.720
+<v Andrey Pokhilko>to look at Helm through the perspective of this GUI.
+
+258
+00:23:17.860 --> 00:23:20.460
+<v Andrey Pokhilko>And that's exactly the idea of Helm dashboard.
+
+259
+00:23:20.740 --> 00:23:21.680
+<v Andrey Pokhilko>This is what we do.
+
+260
+00:23:21.820 --> 00:23:26.700
+<v Andrey Pokhilko>we provide the visualization of the helm for the people.
+
+261
+00:23:27.200 --> 00:23:30.500
+<v Andrey Pokhilko>There is an obvious next question of,
+
+262
+00:23:30.560 --> 00:23:33.840
+<v Andrey Pokhilko>isn't this something that happened before and existed before?
+
+263
+00:23:34.140 --> 00:23:35.780
+<v Andrey Pokhilko>And the answer is yes.
+
+264
+00:23:35.940 --> 00:23:41.760
+<v Andrey Pokhilko>There were some alternatives that exist for visualizing the helm operations.
+
+265
+00:23:41.940 --> 00:23:46.260
+<v Andrey Pokhilko>The problem of those is the fact that they're, in most of the cases,
+
+266
+00:23:46.280 --> 00:23:48.820
+<v Andrey Pokhilko>they are connected to some bigger platform,
+
+267
+00:23:48.820 --> 00:23:54.680
+<v Andrey Pokhilko>something like some big beast of managing Kubernetes in all ways,
+
+268
+00:23:54.920 --> 00:23:59.280
+<v Andrey Pokhilko>and it has a small corner of Helm operations inside it.
+
+269
+00:23:59.360 --> 00:24:07.720
+<v Andrey Pokhilko>You kind of have to invest a lot of upfront time to set up that heavy application to just get to Helm.
+
+270
+00:24:07.720 --> 00:24:10.580
+<v Andrey Pokhilko>And that's what we wanted to avoid.
+
+271
+00:24:10.880 --> 00:24:14.020
+<v Andrey Pokhilko>So we created something that is Helm first.
+
+272
+00:24:14.020 --> 00:24:19.580
+<v Andrey Pokhilko>The first and only concern that you have is Helm, and everything else is secondary.
+
+273
+00:24:20.100 --> 00:24:29.160
+<v Andrey Pokhilko>Yes, we can continue, and we did introduce some interesting features like integrations with code scanners, Checkov, Trivy.
+
+274
+00:24:29.460 --> 00:24:39.360
+<v Andrey Pokhilko>We're planning to add more scanners because it's one of the day-to-day activities that people do, all these trouble scanners, problem scanners for Kubernetes.
+
+275
+00:24:39.500 --> 00:24:41.520
+<v Andrey Pokhilko>But this is, again, secondary.
+
+276
+00:24:41.520 --> 00:24:46.560
+<v Andrey Pokhilko>you look from the perspective of the Helm as your main framework.
+
+277
+00:24:47.120 --> 00:24:50.760
+<v Noah Labhart>It's a great framing around some of the troubles with Helm
+
+278
+00:24:50.760 --> 00:24:52.840
+<v Noah Labhart>because Helm is obviously a super powerful tool,
+
+279
+00:24:52.940 --> 00:24:56.140
+<v Noah Labhart>but being command line, not having a dashboard for it
+
+280
+00:24:56.140 --> 00:24:58.800
+<v Noah Labhart>really paints the picture of why this is super helpful.
+
+281
+00:24:59.020 --> 00:25:02.040
+<v Noah Labhart>If someone's wanting to jump in and start helping you
+
+282
+00:25:02.040 --> 00:25:05.560
+<v Noah Labhart>with the dashboard and the open source efforts with Komodor,
+
+283
+00:25:05.760 --> 00:25:07.540
+<v Noah Labhart>how do they get started? Where do they go?
+
+284
+00:25:07.540 --> 00:25:20.820
+<v Andrey Pokhilko>We have several contributors. I don't remember exact number, but we have already 10 different people coming to the project and bringing in some small changes or bigger changes, depending on their expertise.
+
+285
+00:25:21.300 --> 00:25:34.240
+<v Andrey Pokhilko>It all happens in a regular way through GitHub. You just find the repository. You can quickly look it up through Helm dashboard by Komodor, and you will find the GitHub project.
+
+286
+00:25:34.240 --> 00:25:37.740
+<v Andrey Pokhilko>And you can go there, ask your questions in the issues section.
+
+287
+00:25:37.980 --> 00:25:40.940
+<v Andrey Pokhilko>You can contribute feature requests.
+
+288
+00:25:41.260 --> 00:25:46.680
+<v Andrey Pokhilko>It's already a contribution if you just create the feature request or you ask the question.
+
+289
+00:25:46.820 --> 00:25:56.120
+<v Andrey Pokhilko>And you can look through the existing issues, find the one that you understand and capable of doing, and just write some code.
+
+290
+00:25:56.380 --> 00:25:58.820
+<v Andrey Pokhilko>We will review that and merge it.
+
+291
+00:25:58.880 --> 00:26:02.100
+<v Andrey Pokhilko>We'll have some good improvements to the community.
+
+292
+00:26:02.580 --> 00:26:03.220
+<v Andrey Pokhilko>Good
+
+293
+00:26:03.220 --> 00:26:03.720
+<v Noah Labhart>stuff.
+
+294
+00:26:04.240 --> 00:26:05.820
+<v Noah Labhart>Thank you for being on the show today.
+
+295
+00:26:06.140 --> 00:26:08.560
+<v Noah Labhart>Thank you for telling me the update on Komodor,
+
+296
+00:26:08.840 --> 00:26:10.420
+<v Noah Labhart>the approach to open source
+
+297
+00:26:10.420 --> 00:26:12.580
+<v Noah Labhart>and where Komodor is in its journey.
+
+298
+00:26:12.760 --> 00:26:13.780
+<v Noah Labhart>Much appreciated.
+
+299
+00:26:14.000 --> 00:26:15.300
+<v Noah Labhart>Really appreciate you being on the show.
+
+300
+00:26:15.560 --> 00:26:16.560
+<v Andrey Pokhilko>Thank you very much.
+
+301
+00:26:16.600 --> 00:26:18.420
+<v Andrey Pokhilko>It was very interesting to talk to you.
+
+302
+00:26:20.240 --> 00:26:21.400
+<v Noah Labhart>There you have it, folks.
+
+303
+00:26:21.520 --> 00:26:22.960
+<v Noah Labhart>Komodor is leading the way
+
+304
+00:26:22.960 --> 00:26:25.120
+<v Noah Labhart>to make your Kubernetes tooling better
+
+305
+00:26:25.120 --> 00:26:26.700
+<v Noah Labhart>with their open source initiatives
+
+306
+00:26:26.700 --> 00:26:28.340
+<v Noah Labhart>and up-leveling of Helm.
+
+307
+00:26:28.540 --> 00:26:29.980
+<v Noah Labhart>To learn more about their tools,
+
+308
+00:26:30.120 --> 00:26:31.460
+<v Noah Labhart>visit Komodor.io.
+
+309
+00:26:31.460 --> 00:26:34.260
+<v Noah Labhart>And as always, thanks for listening.

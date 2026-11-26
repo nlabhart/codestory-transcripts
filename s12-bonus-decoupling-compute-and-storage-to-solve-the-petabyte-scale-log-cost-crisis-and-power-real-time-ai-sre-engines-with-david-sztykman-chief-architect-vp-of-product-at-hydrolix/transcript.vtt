@@ -1,0 +1,1899 @@
+WEBVTT
+
+NOTE S12 Bonus: Decoupling Compute and Storage to Solve the Petabyte-Scale Log Cost Crisis and Power Real-Time AI SRE Engines with David Sztykman, Chief Architect & VP of Product at Hydrolix
+
+1
+00:00:00.000 --> 00:00:09.240
+<v David Sztykman>When we built the company, the whole idea was we need something that can scale to the needs that we had in previous company, which was massive.
+
+2
+00:00:09.460 --> 00:00:16.660
+<v David Sztykman>We always knew from the get-go that we needed a system that can scale dynamically based on demand up and down.
+
+3
+00:00:16.860 --> 00:00:24.160
+<v David Sztykman>We need to be as stateless as we can. But at some point, we also can't afford to lose data on the ingest pipeline.
+
+4
+00:00:24.160 --> 00:00:30.220
+<v David Sztykman>line. Initially, we started working with another system, another component that would give us a
+
+5
+00:00:30.220 --> 00:00:36.740
+<v David Sztykman>statefulness for incoming messages to ensure that we were not dropping any data. And then for the
+
+6
+00:00:36.740 --> 00:00:42.680
+<v David Sztykman>Super Bowl, this component completely killed us. I'm David Sztykman, Chief Architect at Hydrolix.
+
+7
+00:00:46.520 --> 00:00:52.160
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+8
+00:00:54.160 --> 00:00:55.220
+<v Clip>Nothing on the back end.
+
+9
+00:00:55.440 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+10
+00:00:58.260 --> 00:00:59.840
+<v Clip>I don't exactly know what to do next.
+
+11
+00:00:59.840 --> 00:01:01.240
+<v Clip>Took many goes to get right.
+
+12
+00:01:01.900 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:01:04.560 --> 00:01:06.120
+<v Clip>A company is its people.
+
+14
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+15
+00:01:07.500 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+16
+00:01:08.920 --> 00:01:11.160
+<v Noah Labhart>Keeping scalability top of mind.
+
+17
+00:01:11.460 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+18
+00:01:12.880 --> 00:01:14.260
+<v Clip>Yes, we've been fighting it as we grow.
+
+19
+00:01:14.460 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+20
+00:01:15.560 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+21
+00:01:18.280 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, my dear.
+
+22
+00:01:20.020 --> 00:01:22.060
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+23
+00:01:22.060 --> 00:01:22.560
+<v Clip>again
+
+24
+00:01:22.240 --> 00:01:26.560
+<v Noah Labhart>To ride the ups and downs of the startup life, you need to
+
+25
+00:01:26.560 --> 00:01:27.520
+<v Clip>really want it.
+
+26
+00:01:27.520 --> 00:01:28.360
+<v Noah Labhart>Not just about
+
+27
+00:01:28.360 --> 00:01:36.180
+<v Noah Labhart>technology. All this and more on Code Story. I'm your host, Noah Labhart, and today, how David Sztykman
+
+28
+00:01:36.180 --> 00:01:43.280
+<v Noah Labhart>has built real-time CDN observability so you can have analytics at the speed of insight.
+
+29
+00:01:49.600 --> 00:01:53.080
+<v Noah Labhart>David Sztykman lives in Paris, but used to live in New York for a time.
+
+30
+00:01:53.280 --> 00:01:56.020
+<v Noah Labhart>He's always been into video, streaming, and photography.
+
+31
+00:01:56.480 --> 00:02:00.400
+<v Noah Labhart>For the latter, as a kid, his dad had a film developing lab in their basement,
+
+32
+00:02:00.560 --> 00:02:03.600
+<v Noah Labhart>so he spent many hours doing that before digital changed it all.
+
+33
+00:02:03.840 --> 00:02:07.560
+<v Noah Labhart>As a student, he used to tinker with open-source video streaming libraries
+
+34
+00:02:07.560 --> 00:02:11.380
+<v Noah Labhart>and eventually worked for Akamai, responsible for the streaming media for Europe.
+
+35
+00:02:11.480 --> 00:02:13.120
+<v Noah Labhart>Think the Olympics or the Super Bowl.
+
+36
+00:02:13.660 --> 00:02:16.900
+<v Noah Labhart>Outside of tech, he has two kids and they like to do a lot of Legos together.
+
+37
+00:02:17.180 --> 00:02:22.060
+<v Noah Labhart>But in general, they are outside kids, so usually they like to get out of the house and do active things.
+
+38
+00:02:25.120 --> 00:02:30.600
+<v Noah Labhart>In his prior role, David was consistently alerted about poor performance on the video streaming side.
+
+39
+00:02:31.180 --> 00:02:36.700
+<v Noah Labhart>He started to dig into the data streaming portion of it to be alerted on shifts in the stream itself.
+
+40
+00:02:36.700 --> 00:02:45.160
+<v Noah Labhart>After a few other opportunities, he was approached to build real-time CDN observability for distributed infrastructure.
+
+41
+00:02:47.900 --> 00:02:50.940
+<v Noah Labhart>This is the creation story of Hydrolix.
+
+42
+00:02:55.240 --> 00:02:57.460
+<v David Sztykman>Hydrolix is a streaming data platform.
+
+43
+00:02:57.840 --> 00:03:04.280
+<v David Sztykman>The principal idea of Hydrolix is there's a ton of data that exists all the time and everything is generating data.
+
+44
+00:03:04.280 --> 00:03:10.440
+<v David Sztykman>data. And it's usually very expensive to be able to ingest, query and retain that data
+
+45
+00:03:10.440 --> 00:03:14.760
+<v David Sztykman>all the time. And so most of the systems that exist right now in the market are telling
+
+46
+00:03:14.760 --> 00:03:21.520
+<v David Sztykman>you 90% of your data is garbage. Let's discard it. We took the opposite approach. We think
+
+47
+00:03:21.520 --> 00:03:26.520
+<v David Sztykman>everything is super valuable. You don't really know what's interesting about your data until
+
+48
+00:03:26.520 --> 00:03:32.900
+<v David Sztykman>you see it. And so we want to keep your data. But the trick is how do you keep it at a cost
+
+49
+00:03:34.280 --> 00:03:39.740
+<v David Sztykman>affect you. And so that's where the idea of Hydrolix is. If we're able to index that data
+
+50
+00:03:39.740 --> 00:03:46.500
+<v David Sztykman>really well and compress that data really well, we can then store it into object storage. But at
+
+51
+00:03:46.500 --> 00:03:50.520
+<v David Sztykman>the same time, it means that because it's fully indexed, I'm able to retrieve those information
+
+52
+00:03:50.520 --> 00:03:57.260
+<v David Sztykman>really quickly. The novelty of Hydrolix is really the fact that we are completely stateless
+
+53
+00:03:57.260 --> 00:04:03.200
+<v David Sztykman>in the sense that we decouple completely storage from compute and we're able to stream data into
+
+54
+00:04:04.280 --> 00:04:06.900
+<v David Sztykman>press that data, store it into object storage,
+
+55
+00:04:07.080 --> 00:04:08.940
+<v David Sztykman>and then retrieve it when you need it.
+
+56
+00:04:09.200 --> 00:04:11.880
+<v David Sztykman>So that's really the biggest thing that we've done.
+
+57
+00:04:12.180 --> 00:04:14.480
+<v David Sztykman>The funny thing about it, like if you think
+
+58
+00:04:14.480 --> 00:04:16.860
+<v David Sztykman>Snowflake is doing something similar at the end of the day,
+
+59
+00:04:16.920 --> 00:04:19.000
+<v David Sztykman>like they decouple storage from compute,
+
+60
+00:04:19.180 --> 00:04:21.020
+<v David Sztykman>they're storing the data into object storage,
+
+61
+00:04:21.140 --> 00:04:22.140
+<v David Sztykman>it's the same principle.
+
+62
+00:04:22.380 --> 00:04:24.720
+<v David Sztykman>The big difference is we are focusing
+
+63
+00:04:24.720 --> 00:04:26.400
+<v David Sztykman>on real-time live streaming,
+
+64
+00:04:26.600 --> 00:04:28.880
+<v David Sztykman>whereas most of the vendors right now
+
+65
+00:04:28.880 --> 00:04:31.440
+<v David Sztykman>are able to support like batch of old data
+
+66
+00:04:31.440 --> 00:04:37.860
+<v David Sztykman>with that purpose, but not really do it with millions of logs coming in at the time.
+
+67
+00:04:38.120 --> 00:04:42.440
+<v David Sztykman>And so what we build is really a streaming ingest system that allows us to do that.
+
+68
+00:04:43.280 --> 00:04:48.180
+<v David Sztykman>So funnily enough, as I mentioned, I used to work at Akamai, and at Akamai, I used to
+
+69
+00:04:48.180 --> 00:04:49.200
+<v David Sztykman>work on live events.
+
+70
+00:04:49.300 --> 00:04:54.220
+<v David Sztykman>So typically, the Olympics, the Apple keynote, the Super Bowl, those kind of horrible events
+
+71
+00:04:54.220 --> 00:04:58.780
+<v David Sztykman>when something happens, you don't really know what's going on, and your customer is calling
+
+72
+00:04:58.780 --> 00:05:04.740
+<v David Sztykman>you say someone is complaining about poor quality in New York City and okay let me pull up the log
+
+73
+00:05:04.740 --> 00:05:09.280
+<v David Sztykman>it's going to take half an hour and but the problem is after half an hour the event is almost
+
+74
+00:05:09.280 --> 00:05:15.640
+<v David Sztykman>done so like literally you're losing visibility at Akamai I started working on a data pipeline
+
+75
+00:05:15.640 --> 00:05:21.820
+<v David Sztykman>which would allow us to get insights in real time about what's going on video streaming so the idea
+
+76
+00:05:21.820 --> 00:05:27.960
+<v David Sztykman>was to stream Akamai data into ourselves and to build a data pipeline and platform that would
+
+77
+00:05:28.780 --> 00:05:34.280
+<v David Sztykman>view in real time what's going on at the edge and so we can then tell customers okay we're seeing
+
+78
+00:05:34.280 --> 00:05:39.140
+<v David Sztykman>bitrate shifting or rebuffering event for specific geolocation or specific cities
+
+79
+00:05:39.860 --> 00:05:46.060
+<v David Sztykman>while i was doing that at akamai i actually used elasticsearch which is very well known for
+
+80
+00:05:46.060 --> 00:05:51.580
+<v David Sztykman>logging system and the problem that i had was scaling elasticsearch was really hard because
+
+81
+00:05:52.020 --> 00:05:57.400
+<v David Sztykman>the more data coming in the more nodes you need to add and the problem is when the data is coming in
+
+82
+00:05:58.780 --> 00:06:00.500
+<v David Sztykman>that you need to move the shard around
+
+83
+00:06:00.500 --> 00:06:01.800
+<v David Sztykman>to keep a cluster balanced.
+
+84
+00:06:02.120 --> 00:06:04.480
+<v David Sztykman>And when you need the data the most,
+
+85
+00:06:04.500 --> 00:06:06.320
+<v David Sztykman>that's when everything slows down
+
+86
+00:06:06.320 --> 00:06:09.420
+<v David Sztykman>because rebalancing shards and rebalancing your cluster
+
+87
+00:06:09.420 --> 00:06:11.160
+<v David Sztykman>is actually an expensive process.
+
+88
+00:06:11.800 --> 00:06:15.180
+<v David Sztykman>So I worked at Elastic for a couple of years after Akamai
+
+89
+00:06:15.180 --> 00:06:16.780
+<v David Sztykman>because I really loved the technology.
+
+90
+00:06:16.900 --> 00:06:19.040
+<v David Sztykman>It was super exciting what you could do with it.
+
+91
+00:06:19.180 --> 00:06:23.280
+<v David Sztykman>And at some point, Marty Gagan, the CEO and founder of Hydrolix,
+
+92
+00:06:23.320 --> 00:06:24.080
+<v David Sztykman>reached out to me saying,
+
+93
+00:06:24.240 --> 00:06:25.900
+<v David Sztykman>okay, I've got an idea.
+
+94
+00:06:25.900 --> 00:06:32.360
+<v David Sztykman>If we're able to ingest a terabyte of data, petabyte of data in a stateless way and streaming
+
+95
+00:06:32.360 --> 00:06:35.680
+<v David Sztykman>and streaming into the platform, how do you feel about building it?
+
+96
+00:06:35.840 --> 00:06:36.420
+<v David Sztykman>I'm like, sure.
+
+97
+00:06:36.680 --> 00:06:37.780
+<v David Sztykman>That sounds really exciting.
+
+98
+00:06:37.960 --> 00:06:38.720
+<v David Sztykman>How would you do it?
+
+99
+00:06:38.840 --> 00:06:42.160
+<v David Sztykman>And we started talking about the fact that we needed statelessness.
+
+100
+00:06:42.200 --> 00:06:46.320
+<v David Sztykman>So we need to be able to scale up ingest and scale down ingest, scale up queries, et cetera.
+
+101
+00:06:46.640 --> 00:06:51.180
+<v David Sztykman>And so after he reached out to me saying, this is the idea, I'm like, I'm sold because
+
+102
+00:06:51.180 --> 00:06:55.940
+<v David Sztykman>because this actually completely fulfilled all the stuff that I've been dealing with,
+
+103
+00:06:56.080 --> 00:06:58.640
+<v David Sztykman>which is painful, which is, okay, it's a stateful system.
+
+104
+00:06:58.820 --> 00:06:59.840
+<v David Sztykman>I need to add more capacity.
+
+105
+00:07:00.040 --> 00:07:02.460
+<v David Sztykman>I was tired of dealing with that.
+
+106
+00:07:02.600 --> 00:07:06.540
+<v David Sztykman>And the idea of having a full system that is fully stateless,
+
+107
+00:07:06.560 --> 00:07:09.500
+<v David Sztykman>that allows us to scale up and down all the different components dynamically,
+
+108
+00:07:09.780 --> 00:07:12.840
+<v David Sztykman>was completely brilliant to me.
+
+109
+00:07:13.100 --> 00:07:16.460
+<v David Sztykman>And so four years, yeah, a little over four years ago,
+
+110
+00:07:16.540 --> 00:07:17.720
+<v David Sztykman>I joined Hydrolix.
+
+111
+00:07:17.780 --> 00:07:20.260
+<v David Sztykman>And at the time, it was a really tiny company.
+
+112
+00:07:20.920 --> 00:07:29.620
+<v David Sztykman>people. The product was just running on AWS. It was using AWS services and not running on
+
+113
+00:07:29.620 --> 00:07:34.780
+<v David Sztykman>Kubernetes. There was a lot of things that we changed over time after that. But we built the
+
+114
+00:07:34.780 --> 00:07:39.420
+<v David Sztykman>first version of that ID fully running on AWS, and it was quite exciting.
+
+115
+00:07:41.460 --> 00:07:45.000
+<v Noah Labhart>I think that's a perfect segue into my next question. So tell me about the MVP,
+
+116
+00:07:45.360 --> 00:07:49.740
+<v Noah Labhart>that first version. What sort of tools were you using to bring it to life, and how long did it
+
+117
+00:07:51.180 --> 00:07:54.660
+<v David Sztykman>So the first version was fully running on AWS.
+
+118
+00:07:55.100 --> 00:07:58.320
+<v David Sztykman>So we had a binary called Turbine,
+
+119
+00:07:58.460 --> 00:08:02.980
+<v David Sztykman>which is basically the tool that we use to generate partition of Hydrolix
+
+120
+00:08:02.980 --> 00:08:04.320
+<v David Sztykman>and to query Hydrolix partition.
+
+121
+00:08:04.800 --> 00:08:09.780
+<v David Sztykman>And so Turbine was a binary that was deployed in different EC2 instances.
+
+122
+00:08:10.120 --> 00:08:14.140
+<v David Sztykman>We had CloudFormation that were scaling up and down
+
+123
+00:08:14.140 --> 00:08:16.660
+<v David Sztykman>different components of the platform that we needed.
+
+124
+00:08:16.880 --> 00:08:19.020
+<v David Sztykman>We separated the product into pieces.
+
+125
+00:08:19.020 --> 00:08:21.840
+<v David Sztykman>So one was really the incoming data.
+
+126
+00:08:22.060 --> 00:08:25.940
+<v David Sztykman>The other one was merging that incoming data after the fact.
+
+127
+00:08:26.040 --> 00:08:28.440
+<v David Sztykman>And the last bit was really querying that data.
+
+128
+00:08:28.720 --> 00:08:31.680
+<v David Sztykman>And so the platform was really separated into three pieces.
+
+129
+00:08:32.080 --> 00:08:35.380
+<v David Sztykman>Ingest, merge, basically, and query after that.
+
+130
+00:08:35.580 --> 00:08:39.560
+<v David Sztykman>And all of those components were different components that were running on EC2.
+
+131
+00:08:39.760 --> 00:08:45.060
+<v David Sztykman>We had something called CloudFormation, which allowed us to deploy a Hydrolix cluster
+
+132
+00:08:45.060 --> 00:08:48.480
+<v David Sztykman>and then manage the different scale of that cluster.
+
+133
+00:08:49.020 --> 00:08:50.840
+<v David Sztykman>So the scale was not really dynamic.
+
+134
+00:08:51.140 --> 00:08:54.540
+<v David Sztykman>We were calculating, like a customer was telling us,
+
+135
+00:08:54.620 --> 00:08:57.280
+<v David Sztykman>okay, I'm going to ingest a terabyte a day of data.
+
+136
+00:08:57.460 --> 00:08:58.580
+<v David Sztykman>So we were calculating.
+
+137
+00:08:58.980 --> 00:09:04.400
+<v David Sztykman>We know that a single ingest node is able to take 10 megabits a second per core.
+
+138
+00:09:04.600 --> 00:09:05.780
+<v David Sztykman>So we need this amount of core.
+
+139
+00:09:05.920 --> 00:09:08.740
+<v David Sztykman>And we were pre-calculating the different scale that we needed.
+
+140
+00:09:08.900 --> 00:09:11.760
+<v David Sztykman>So it was not as dynamic as we wanted,
+
+141
+00:09:11.920 --> 00:09:15.020
+<v David Sztykman>but the idea was, can we make something that works,
+
+142
+00:09:15.020 --> 00:09:18.480
+<v David Sztykman>that's efficient, that is able to ingest data in real time
+
+143
+00:09:19.020 --> 00:09:23.580
+<v David Sztykman>high scale, store that data in S3 and retrieve it with really great performance.
+
+144
+00:09:23.860 --> 00:09:25.740
+<v David Sztykman>That was really like, can we build it?
+
+145
+00:09:25.980 --> 00:09:28.620
+<v David Sztykman>And that was what we built, what we've delivered.
+
+146
+00:09:28.960 --> 00:09:34.040
+<v David Sztykman>And so the idea was really, let's try with a couple of very large data set and customer
+
+147
+00:09:34.040 --> 00:09:40.260
+<v David Sztykman>to stream millions and millions of data points to us and then see if we can query that data
+
+148
+00:09:40.260 --> 00:09:40.760
+<v David Sztykman>efficiently.
+
+149
+00:09:41.000 --> 00:09:44.220
+<v David Sztykman>And if I add more capacity, is the query performance improving?
+
+150
+00:09:44.220 --> 00:09:50.700
+<v David Sztykman>prove it. So if I have one query peer, for example, a query might take a minute. If I have 10 query
+
+151
+00:09:50.700 --> 00:09:57.340
+<v David Sztykman>peer, maybe it's going to take two seconds, etc. And so the idea was to really check that we could
+
+152
+00:09:57.340 --> 00:10:03.680
+<v David Sztykman>scale based on CPU, based on the different metrics that we wanted, and ensure that we had the right
+
+153
+00:10:03.680 --> 00:10:10.360
+<v David Sztykman>performances that we wanted. But one of the things we quickly realized was a lot of customers wanted
+
+154
+00:10:10.360 --> 00:10:15.000
+<v David Sztykman>wanted to run that not only on their own environment in AWS,
+
+155
+00:10:15.280 --> 00:10:18.800
+<v David Sztykman>but someone wanted to run it into a different cloud provider
+
+156
+00:10:18.800 --> 00:10:20.540
+<v David Sztykman>like GCP or someone else.
+
+157
+00:10:20.760 --> 00:10:22.880
+<v David Sztykman>And that's where it got tricky
+
+158
+00:10:22.880 --> 00:10:24.520
+<v David Sztykman>because everything that we built out
+
+159
+00:10:24.520 --> 00:10:27.340
+<v David Sztykman>was really leveraging only AWS services.
+
+160
+00:10:27.660 --> 00:10:30.300
+<v David Sztykman>So EC2, Kinesis, a bunch of things like that.
+
+161
+00:10:30.460 --> 00:10:34.080
+<v David Sztykman>And so moving it into a full stateless platform
+
+162
+00:10:34.080 --> 00:10:38.860
+<v David Sztykman>in a sense that we don't rely on specific vendor-specific services
+
+163
+00:10:40.360 --> 00:10:41.040
+<v David Sztykman>was a piece of work.
+
+164
+00:10:43.040 --> 00:10:48.320
+<v Noah Labhart>So then from that point, you've got, you know, the MVP built, you put in
+
+165
+00:10:48.320 --> 00:10:52.700
+<v Noah Labhart>the work, you figured out the way you want to approach this. How did you mature and progress
+
+166
+00:10:52.700 --> 00:10:55.920
+<v Noah Labhart>the product forward? I think to wrap it in a box a little bit, what I'm looking for is,
+
+167
+00:10:55.940 --> 00:11:00.860
+<v Noah Labhart>how did you build your roadmap? How did you go about deciding that, okay, this is the next most
+
+168
+00:11:00.860 --> 00:11:03.480
+<v Noah Labhart>important thing to build or to address with Hydrolix?
+
+169
+00:11:05.000 --> 00:11:07.580
+<v David Sztykman>So it was really by talking with
+
+170
+00:11:07.580 --> 00:11:08.540
+<v David Sztykman>with our first customers.
+
+171
+00:11:08.860 --> 00:11:12.560
+<v David Sztykman>The first very large customer that we had was Paramount,
+
+172
+00:11:12.740 --> 00:11:15.880
+<v David Sztykman>and Paramount wanted to use us to monitor the Super Bowl.
+
+173
+00:11:16.180 --> 00:11:19.640
+<v David Sztykman>And Paramount didn't want to run on AWS.
+
+174
+00:11:19.960 --> 00:11:21.520
+<v David Sztykman>They wanted to run on GCP.
+
+175
+00:11:21.760 --> 00:11:24.680
+<v David Sztykman>So first thing is, OK, what do we do then?
+
+176
+00:11:25.220 --> 00:11:30.120
+<v David Sztykman>How do we migrate all the stuff that we have from AWS to GCP?
+
+177
+00:11:30.400 --> 00:11:34.020
+<v David Sztykman>And so the obvious solution was, let's build everything
+
+178
+00:11:34.020 --> 00:11:38.980
+<v David Sztykman>thing in Kubernetes so we can then have a Kubernetes operator that allows us to manage
+
+179
+00:11:38.980 --> 00:11:44.680
+<v David Sztykman>Hydrolix into different cloud provider. And that was, I think, probably a year worth of effort
+
+180
+00:11:44.680 --> 00:11:51.720
+<v David Sztykman>moving out of all the different AWS services that we use like Kinesis, EC2, etc. into Kubernetes
+
+181
+00:11:51.720 --> 00:11:57.220
+<v David Sztykman>operator that we owned. So we could then create all the different components that we needed to
+
+182
+00:11:57.220 --> 00:12:03.540
+<v David Sztykman>be able to achieve a full statelessness into different cloud provider. So that was one big
+
+183
+00:12:04.020 --> 00:12:08.720
+<v David Sztykman>things. The second part was when Paramount told us they wanted to use us for the Super Bowl. We
+
+184
+00:12:08.720 --> 00:12:13.220
+<v David Sztykman>were really excited, but at the same time the amount of data they were going to collect was
+
+185
+00:12:13.220 --> 00:12:20.320
+<v David Sztykman>massive. And actually it was massive. And funnily enough, for the Super Bowl you don't necessarily
+
+186
+00:12:20.320 --> 00:12:26.520
+<v David Sztykman>want to view all the raw logs all the time, all right? What you want is have an aggregated
+
+187
+00:12:26.520 --> 00:12:32.900
+<v David Sztykman>view of specific data points. So you want for example the network throughput per ASN,
+
+188
+00:12:34.020 --> 00:12:38.920
+<v David Sztykman>per minute, for example. But to calculate that, you still need to ingest all your data points.
+
+189
+00:12:39.460 --> 00:12:46.340
+<v David Sztykman>And so one of the key features that we built out for Paramount in particular was this, what we call
+
+190
+00:12:46.340 --> 00:12:51.520
+<v David Sztykman>the summary table, which allows us to pre-aggregate data as the data is flowing into the platform.
+
+191
+00:12:52.160 --> 00:12:57.660
+<v David Sztykman>Initially, we didn't have that capabilities. And when we tried to build a dashboard and report
+
+192
+00:12:57.660 --> 00:13:03.480
+<v David Sztykman>that worked for Paramount, we actually were not able to do a really a great job at it because
+
+193
+00:13:03.480 --> 00:13:09.500
+<v David Sztykman>the query performance was, it was okay when it was a small scale, but when we were talking about
+
+194
+00:13:09.500 --> 00:13:14.980
+<v David Sztykman>millions of logs per second, then the query performance started to degrade. And so this idea
+
+195
+00:13:14.980 --> 00:13:21.300
+<v David Sztykman>of pre-aggregating the information as the data is going into Hydrolix really helped us because
+
+196
+00:13:21.300 --> 00:13:26.600
+<v David Sztykman>instead of querying billions of data points all the time, because those data points are pre-aggregated,
+
+197
+00:13:27.660 --> 00:13:28.580
+<v David Sztykman>a couple of data points.
+
+198
+00:13:29.020 --> 00:13:31.260
+<v David Sztykman>And that was one of the key features
+
+199
+00:13:31.260 --> 00:13:34.240
+<v David Sztykman>that allowed us to scale to paramount needs
+
+200
+00:13:34.240 --> 00:13:36.820
+<v David Sztykman>and to be able to pre-build everything
+
+201
+00:13:36.820 --> 00:13:38.840
+<v David Sztykman>that they wanted for the Super Bowl
+
+202
+00:13:38.840 --> 00:13:39.700
+<v David Sztykman>and for different events.
+
+203
+00:13:40.080 --> 00:13:42.740
+<v David Sztykman>So I think really the key for me here
+
+204
+00:13:42.740 --> 00:13:44.280
+<v David Sztykman>is like the customer communication.
+
+205
+00:13:44.760 --> 00:13:47.880
+<v David Sztykman>Like you have to have a really key customer
+
+206
+00:13:47.880 --> 00:13:50.780
+<v David Sztykman>that you trust, that also trusts you
+
+207
+00:13:50.780 --> 00:13:54.580
+<v David Sztykman>because for them, it was difficult to rely on a vendor
+
+208
+00:13:54.580 --> 00:13:58.100
+<v David Sztykman>that basically was unknown that had a couple of customers,
+
+209
+00:13:58.360 --> 00:13:59.760
+<v David Sztykman>but for their biggest event,
+
+210
+00:13:59.860 --> 00:14:01.360
+<v David Sztykman>they actually trusted us to deliver.
+
+211
+00:14:01.640 --> 00:14:04.140
+<v David Sztykman>And so I think really building trust
+
+212
+00:14:04.140 --> 00:14:07.040
+<v David Sztykman>with a couple of really key customers is critical
+
+213
+00:14:07.040 --> 00:14:09.720
+<v David Sztykman>because that's how you get really good feedback
+
+214
+00:14:09.720 --> 00:14:11.720
+<v David Sztykman>about how it's currently working,
+
+215
+00:14:12.040 --> 00:14:14.240
+<v David Sztykman>what they want to address later.
+
+216
+00:14:14.760 --> 00:14:18.840
+<v David Sztykman>And if what they ask is something that makes sense
+
+217
+00:14:18.840 --> 00:14:21.420
+<v David Sztykman>for multiple customers, obviously you're going to build it.
+
+218
+00:14:21.420 --> 00:14:26.680
+<v David Sztykman>If it's something that's really super specific and tailored for one customer, maybe it doesn't make sense.
+
+219
+00:14:26.740 --> 00:14:29.000
+<v David Sztykman>But it depends on how much revenue it is.
+
+220
+00:14:29.020 --> 00:14:30.980
+<v David Sztykman>Like, it's always a struggle from that point of
+
+221
+00:14:30.980 --> 00:14:31.480
+<v Noah Labhart>view.
+
+222
+00:14:31.300 --> 00:14:32.380
+<v Noah Labhart>It's a really interesting story.
+
+223
+00:14:32.480 --> 00:14:33.920
+<v Noah Labhart>And you're right on with the partner.
+
+224
+00:14:34.020 --> 00:14:36.740
+<v Noah Labhart>It sounds like you got a really good one and a really big one early on.
+
+225
+00:14:36.840 --> 00:14:37.340
+<v Noah Labhart>Yes,
+
+226
+00:14:37.040 --> 00:14:38.680
+<v David Sztykman>that definitely helped us, for sure.
+
+227
+00:14:39.480 --> 00:14:42.600
+<v Noah Labhart>Okay, so in that story, I hear you saying we a lot.
+
+228
+00:14:42.640 --> 00:14:43.980
+<v Noah Labhart>Tell me about how you built your team.
+
+229
+00:14:44.180 --> 00:14:48.120
+<v Noah Labhart>What did you look for in those people to indicate that they were the winning horses to join you?
+
+230
+00:14:48.580 --> 00:14:50.540
+<v David Sztykman>The big thing, I think, for me is curiosity.
+
+231
+00:14:51.420 --> 00:14:54.820
+<v David Sztykman>I want people to literally ask why all the time.
+
+232
+00:14:55.160 --> 00:14:56.480
+<v David Sztykman>Why do we do it this way?
+
+233
+00:14:56.580 --> 00:14:57.680
+<v David Sztykman>Why do we do it this way?
+
+234
+00:14:57.800 --> 00:14:59.320
+<v David Sztykman>Did you think about something else?
+
+235
+00:14:59.700 --> 00:15:02.560
+<v David Sztykman>Because what we need, I think,
+
+236
+00:15:02.560 --> 00:15:04.420
+<v David Sztykman>when you're a small company and a small startup
+
+237
+00:15:04.420 --> 00:15:07.280
+<v David Sztykman>is to be challenged about the decision that you're making.
+
+238
+00:15:07.620 --> 00:15:09.940
+<v David Sztykman>And so what I was looking for
+
+239
+00:15:09.940 --> 00:15:11.700
+<v David Sztykman>was really people that were super curious
+
+240
+00:15:11.700 --> 00:15:13.480
+<v David Sztykman>and that can push back
+
+241
+00:15:13.480 --> 00:15:14.900
+<v David Sztykman>and are not afraid to push back
+
+242
+00:15:14.900 --> 00:15:16.360
+<v David Sztykman>when they think that the decision
+
+243
+00:15:16.360 --> 00:15:18.160
+<v David Sztykman>is actually not the right one.
+
+244
+00:15:18.160 --> 00:15:24.400
+<v David Sztykman>So it's difficult at some point because some people are actually not going to say
+
+245
+00:15:24.400 --> 00:15:29.660
+<v David Sztykman>pleaser but they don't necessarily feel like going against your idea is actually
+
+246
+00:15:29.660 --> 00:15:33.900
+<v David Sztykman>going against you but that's not the case. Like really I think where Hydrolix
+
+247
+00:15:33.900 --> 00:15:38.700
+<v David Sztykman>thrive is really in conflict is not the right term but it's basically like
+
+248
+00:15:38.700 --> 00:15:42.860
+<v David Sztykman>challenging ideas and so what we are looking for is really people that can
+
+249
+00:15:42.860 --> 00:15:47.200
+<v David Sztykman>challenge us into different ideas to figure out what is the right solution to
+
+250
+00:15:48.420 --> 00:15:54.320
+<v David Sztykman>One thing that also worked out quite well was getting people in the industry that we knew.
+
+251
+00:15:54.580 --> 00:15:58.680
+<v David Sztykman>So Hydrolix is really working a lot with media company.
+
+252
+00:15:58.880 --> 00:16:04.540
+<v David Sztykman>And having people that had media experience really helped us build the right solution and the right product.
+
+253
+00:16:04.640 --> 00:16:10.200
+<v David Sztykman>Because they knew the ecosystem and they knew the pain point that most of the broadcasters were having.
+
+254
+00:16:10.300 --> 00:16:13.040
+<v David Sztykman>And what is the thing that we need to build to solve it.
+
+255
+00:16:13.280 --> 00:16:17.560
+<v David Sztykman>And so to me, it was really like people that need to be super curious.
+
+256
+00:16:18.160 --> 00:16:22.780
+<v David Sztykman>that are not afraid to challenge us on things and that has BGA expertise.
+
+257
+00:16:25.620 --> 00:16:33.640
+<v Noah Labhart>So my next question will be really interesting because it's built into the bread and butter of your experience and also what you've built at Hydrolix.
+
+258
+00:16:33.680 --> 00:16:35.060
+<v Noah Labhart>I'm curious about scalability.
+
+259
+00:16:35.420 --> 00:16:39.900
+<v Noah Labhart>How did you approach thinking about scalability in the beginning?
+
+260
+00:16:40.160 --> 00:16:44.660
+<v Noah Labhart>And then also, have there been interesting areas where you've had to fight it as you've grown?
+
+261
+00:16:46.060 --> 00:16:48.960
+<v David Sztykman>So scalability for us was part of our DNA.
+
+262
+00:16:49.560 --> 00:16:59.380
+<v David Sztykman>When we built the company, the whole idea was we need something that can scale to the needs that we had in previous company, which was massive amount of data.
+
+263
+00:16:59.580 --> 00:17:11.100
+<v David Sztykman>And so we always knew from the get-go that we needed a system that can scale dynamically based on demand up and down for ingest in particular and for query after the fact.
+
+264
+00:17:11.660 --> 00:17:14.600
+<v David Sztykman>So when we designed Hydrolix, the whole idea was really,
+
+265
+00:17:14.700 --> 00:17:17.200
+<v David Sztykman>we need to be as stateless as we can.
+
+266
+00:17:17.620 --> 00:17:22.840
+<v David Sztykman>But at some point, we also can't afford to lose data on the ingest pipeline.
+
+267
+00:17:23.220 --> 00:17:26.700
+<v David Sztykman>And so initially, we started working with another system,
+
+268
+00:17:26.760 --> 00:17:31.440
+<v David Sztykman>another component that would give us a statefulness for incoming messages
+
+269
+00:17:31.440 --> 00:17:34.060
+<v David Sztykman>to ensure that we were not dropping any data.
+
+270
+00:17:35.340 --> 00:17:38.840
+<v David Sztykman>And we were quite happy with it initially.
+
+271
+00:17:38.840 --> 00:17:43.140
+<v David Sztykman>and then for the Super Bowl, this component completely killed us.
+
+272
+00:17:43.340 --> 00:17:47.080
+<v David Sztykman>At some point, we needed to upscale that component
+
+273
+00:17:47.080 --> 00:17:49.560
+<v David Sztykman>and because that component is stateful,
+
+274
+00:17:49.720 --> 00:17:51.400
+<v David Sztykman>whenever we were adding capacity,
+
+275
+00:17:51.760 --> 00:17:54.440
+<v David Sztykman>we had the same problem of we need to move the shard around,
+
+276
+00:17:54.580 --> 00:17:56.200
+<v David Sztykman>we need to ensure that everything is balanced.
+
+277
+00:17:56.380 --> 00:17:58.280
+<v David Sztykman>And whenever we added extra capacity,
+
+278
+00:17:58.600 --> 00:18:02.800
+<v David Sztykman>we were losing time and losing messages and losing data.
+
+279
+00:18:03.140 --> 00:18:06.880
+<v David Sztykman>And so we, after the first Super Bowl that we worked on,
+
+280
+00:18:08.840 --> 00:18:12.020
+<v David Sztykman>saying, okay, stateful services is important,
+
+281
+00:18:12.300 --> 00:18:13.360
+<v David Sztykman>but at the same time,
+
+282
+00:18:13.380 --> 00:18:15.820
+<v David Sztykman>when you need to scale to millions of logs a second,
+
+283
+00:18:16.060 --> 00:18:17.220
+<v David Sztykman>it doesn't really scale.
+
+284
+00:18:17.540 --> 00:18:19.740
+<v David Sztykman>And so we went back to the drawing board saying,
+
+285
+00:18:19.880 --> 00:18:22.660
+<v David Sztykman>okay, how do we build a buffering system
+
+286
+00:18:22.660 --> 00:18:26.800
+<v David Sztykman>that allows us to scale more components in the background
+
+287
+00:18:26.800 --> 00:18:28.560
+<v David Sztykman>without losing the incoming data,
+
+288
+00:18:28.700 --> 00:18:31.900
+<v David Sztykman>but without the need to talk to everything else?
+
+289
+00:18:32.100 --> 00:18:35.560
+<v David Sztykman>And so that was a really major design choice for us
+
+290
+00:18:35.560 --> 00:18:39.500
+<v David Sztykman>to remove that Kafkaesque system of incoming messages
+
+291
+00:18:39.500 --> 00:18:42.600
+<v David Sztykman>and to move everything into statelessness
+
+292
+00:18:42.600 --> 00:18:45.140
+<v David Sztykman>and be able to buffer data, incoming data,
+
+293
+00:18:45.300 --> 00:18:46.720
+<v David Sztykman>and not drop it.
+
+294
+00:18:46.840 --> 00:18:49.660
+<v David Sztykman>And how do we manage retry mechanism and all of that?
+
+295
+00:18:49.860 --> 00:18:54.180
+<v David Sztykman>That was really interesting how we architected all of that
+
+296
+00:18:54.180 --> 00:18:56.320
+<v David Sztykman>and how we're leveraging S3 actually
+
+297
+00:18:56.320 --> 00:18:58.860
+<v David Sztykman>as a queuing mechanism at some point
+
+298
+00:18:58.860 --> 00:19:00.680
+<v David Sztykman>that allows us to scale this way.
+
+299
+00:19:00.820 --> 00:19:04.120
+<v David Sztykman>But yes, for us really building a system
+
+300
+00:19:05.560 --> 00:19:06.620
+<v David Sztykman>and down was critical.
+
+301
+00:19:07.060 --> 00:19:10.340
+<v David Sztykman>And really the design of Hydrolix was,
+
+302
+00:19:10.960 --> 00:19:13.960
+<v David Sztykman>let's make sure that there's no dependency on other system,
+
+303
+00:19:14.120 --> 00:19:17.100
+<v David Sztykman>that we can completely have autonomous system
+
+304
+00:19:17.100 --> 00:19:20.300
+<v David Sztykman>that can scale up, that can also send messages to us
+
+305
+00:19:20.300 --> 00:19:22.140
+<v David Sztykman>saying I need to have more capacity.
+
+306
+00:19:22.480 --> 00:19:24.920
+<v David Sztykman>That was part of a lot of effort on our side.
+
+307
+00:19:25.300 --> 00:19:28.180
+<v David Sztykman>Typically, Kubernetes is really good at auto scaling
+
+308
+00:19:28.180 --> 00:19:30.620
+<v David Sztykman>based on memory usage and CPU usage,
+
+309
+00:19:30.820 --> 00:19:32.120
+<v David Sztykman>but for us, it's not enough.
+
+310
+00:19:32.280 --> 00:19:34.160
+<v David Sztykman>Like at some point we want to auto scale
+
+311
+00:19:35.560 --> 00:19:37.900
+<v David Sztykman>that we have of incoming messages, for example.
+
+312
+00:19:38.120 --> 00:19:41.100
+<v David Sztykman>And so we started building a custom autoscaler
+
+313
+00:19:41.100 --> 00:19:42.480
+<v David Sztykman>as part of our platform
+
+314
+00:19:42.480 --> 00:19:44.920
+<v David Sztykman>to allow us to scale the different components
+
+315
+00:19:44.920 --> 00:19:46.060
+<v David Sztykman>with different metrics
+
+316
+00:19:46.060 --> 00:19:48.780
+<v David Sztykman>that are not part of the standard Kubernetes services.
+
+317
+00:19:49.180 --> 00:19:51.640
+<v David Sztykman>And so we now have the ability to scale
+
+318
+00:19:51.640 --> 00:19:53.220
+<v David Sztykman>based on other metrics
+
+319
+00:19:53.220 --> 00:19:56.900
+<v David Sztykman>that are completely irrelevant for most of the people.
+
+320
+00:19:58.900 --> 00:20:00.640
+<v Noah Labhart>David, as you step out on the balcony
+
+321
+00:20:00.640 --> 00:20:02.300
+<v Noah Labhart>and look across all that you've built,
+
+322
+00:20:02.320 --> 00:20:03.580
+<v Noah Labhart>with Hydrolix in particular,
+
+323
+00:20:03.760 --> 00:20:04.900
+<v Noah Labhart>what are you most proud of?
+
+324
+00:20:06.060 --> 00:20:10.240
+<v David Sztykman>really like the ability to manage a terabyte a minute of log data.
+
+325
+00:20:10.380 --> 00:20:12.700
+<v David Sztykman>That's what we did with Fox for the Super Bowl.
+
+326
+00:20:12.820 --> 00:20:15.760
+<v David Sztykman>We literally took a terabyte a minute of log
+
+327
+00:20:15.760 --> 00:20:19.580
+<v David Sztykman>and were able to query and respond in real time for them
+
+328
+00:20:19.580 --> 00:20:21.660
+<v David Sztykman>and give them visibility in real time
+
+329
+00:20:21.660 --> 00:20:23.400
+<v David Sztykman>into everything that's going on at the edge.
+
+330
+00:20:23.540 --> 00:20:27.620
+<v David Sztykman>For me, that was like, it was a make it or break it day.
+
+331
+00:20:27.980 --> 00:20:31.300
+<v David Sztykman>But yet, like the fact that we supported that kind of event
+
+332
+00:20:31.300 --> 00:20:33.260
+<v David Sztykman>is completely insane and messy.
+
+333
+00:20:33.260 --> 00:20:36.260
+<v David Sztykman>see probably like the proudest day we've had in the company.
+
+334
+00:20:38.660 --> 00:20:43.160
+<v Noah Labhart>Okay, let's flip the script a little bit. Tell me about a mistake you made and how you and your team
+
+335
+00:20:43.160 --> 00:20:44.100
+<v Noah Labhart>responded to it.
+
+336
+00:20:45.440 --> 00:20:51.800
+<v David Sztykman>So to go back to the first Super Bowl that actually was not great, we dropped a lot
+
+337
+00:20:51.800 --> 00:20:58.460
+<v David Sztykman>of data on that day. The big mistake that we made was again to trust a stateful services and its
+
+338
+00:20:58.460 --> 00:21:01.320
+<v David Sztykman>its capacity to ingest more than it could, basically.
+
+339
+00:21:01.920 --> 00:21:04.580
+<v David Sztykman>And so there was this bit.
+
+340
+00:21:04.740 --> 00:21:06.000
+<v David Sztykman>The other part, which is,
+
+341
+00:21:07.260 --> 00:21:11.540
+<v David Sztykman>we were really good at known data sources at Hydrolix.
+
+342
+00:21:11.680 --> 00:21:15.180
+<v David Sztykman>How do you ingest data that is completely unknown
+
+343
+00:21:15.180 --> 00:21:17.860
+<v David Sztykman>where you need to build a schema is a different story.
+
+344
+00:21:17.980 --> 00:21:20.940
+<v David Sztykman>And it's actually more, it's really difficult.
+
+345
+00:21:21.200 --> 00:21:25.080
+<v David Sztykman>And so there's a lot of things that we put effort in
+
+346
+00:21:25.080 --> 00:21:26.960
+<v David Sztykman>that really didn't pan out necessarily.
+
+347
+00:21:28.460 --> 00:21:34.400
+<v David Sztykman>effort was building a partnership with the big cloud vendors. We thought that we would be able
+
+348
+00:21:34.400 --> 00:21:40.400
+<v David Sztykman>to build a really good logging platform for them, but at the same time, they already had everything
+
+349
+00:21:40.400 --> 00:21:46.200
+<v David Sztykman>that they needed. They didn't really see the need of our solution. And so we spent a lot of time
+
+350
+00:21:46.200 --> 00:21:51.880
+<v David Sztykman>trying to build bridges and connectors for them, but at the same time, it didn't really pan out.
+
+351
+00:21:51.880 --> 00:21:58.220
+<v David Sztykman>And so how do you pivot from building a really good ecosystem for a specific vendors into,
+
+352
+00:21:58.820 --> 00:22:00.560
+<v David Sztykman>okay, this vendor is actually all set.
+
+353
+00:22:00.700 --> 00:22:02.500
+<v David Sztykman>They don't necessarily need to work with us.
+
+354
+00:22:02.680 --> 00:22:05.500
+<v David Sztykman>What is the next partner that you want to work with?
+
+355
+00:22:05.620 --> 00:22:08.960
+<v David Sztykman>And how soon do you realize that this is not panning out?
+
+356
+00:22:09.280 --> 00:22:11.240
+<v David Sztykman>Because always it's a struggle.
+
+357
+00:22:11.360 --> 00:22:16.080
+<v David Sztykman>Like when you're working with a major cloud vendor, you know that it's going to take a
+
+358
+00:22:16.080 --> 00:22:19.800
+<v David Sztykman>year maybe to build a proper relationship and to build a proper product for them.
+
+359
+00:22:19.800 --> 00:22:27.000
+<v David Sztykman>but after a year and it's still not working what do you do do you think it's a mistake because it's
+
+360
+00:22:27.000 --> 00:22:31.940
+<v David Sztykman>actually a product issue do you think it's a relationship issue it's very hard to figure out
+
+361
+00:22:31.940 --> 00:22:38.880
+<v David Sztykman>why it's a failure actually you think you're solving problem but at the same time nobody's
+
+362
+00:22:38.880 --> 00:22:44.360
+<v David Sztykman>buying it so why is nobody purchasing the product is it because it's impossible to find in the
+
+363
+00:22:44.360 --> 00:22:49.500
+<v David Sztykman>marketplace is it because it's not usable is it because the purchase workflow is too difficult
+
+364
+00:22:49.800 --> 00:22:51.200
+<v David Sztykman>Is it the onboarding?
+
+365
+00:22:51.660 --> 00:22:55.020
+<v David Sztykman>It's very hard to figure out what's not working
+
+366
+00:22:55.020 --> 00:22:57.520
+<v David Sztykman>when you don't have a lot of feedback.
+
+367
+00:22:57.960 --> 00:23:00.280
+<v David Sztykman>That, I think, is the tricky part.
+
+368
+00:23:00.480 --> 00:23:03.580
+<v David Sztykman>How do you get really good feedback from customers
+
+369
+00:23:03.580 --> 00:23:05.840
+<v David Sztykman>or not even customers, but from prospects?
+
+370
+00:23:06.300 --> 00:23:10.320
+<v David Sztykman>It's critical to figure out why it's not working,
+
+371
+00:23:10.440 --> 00:23:11.160
+<v David Sztykman>why it's failing,
+
+372
+00:23:11.340 --> 00:23:14.800
+<v David Sztykman>and what kind of KPI you need to keep on.
+
+373
+00:23:15.560 --> 00:23:17.720
+<v David Sztykman>Those are hard things to solve.
+
+374
+00:23:18.280 --> 00:23:23.920
+<v David Sztykman>the real question is like when do you switch like when do you say okay this is not working
+
+375
+00:23:23.920 --> 00:23:29.080
+<v David Sztykman>what is this the real signal that's telling you that this is actually not working and you need
+
+376
+00:23:29.080 --> 00:23:34.620
+<v David Sztykman>to switch to something else it's very difficult because it's also emotional you've put six months
+
+377
+00:23:34.620 --> 00:23:41.020
+<v David Sztykman>of effort building something and it's not working out and you can't know why it's not working out
+
+378
+00:23:41.020 --> 00:23:45.960
+<v David Sztykman>because you don't get feedback but at the same time you spend already six months on it when do
+
+379
+00:23:47.720 --> 00:23:48.320
+<v David Sztykman>Enough is enough.
+
+380
+00:23:48.840 --> 00:23:52.420
+<v David Sztykman>Let's like, let's bin this one and move to something else.
+
+381
+00:23:52.940 --> 00:23:53.900
+<v David Sztykman>It's hard decision.
+
+382
+00:23:58.520 --> 00:23:59.560
+<v Noah Labhart>Let's move forward then.
+
+383
+00:23:59.600 --> 00:24:00.420
+<v Noah Labhart>This will be exciting.
+
+384
+00:24:00.580 --> 00:24:09.540
+<v Noah Labhart>You know, given what you've built thus far and it's serving so much, what does the future look like for Hydrolix, for the company, the product and for your team?
+
+385
+00:24:10.300 --> 00:24:12.440
+<v David Sztykman>There's a lot of things that we're looking into.
+
+386
+00:24:12.440 --> 00:24:19.120
+<v David Sztykman>The main one is really diversification because as I mentioned, like we're really well known in the media industry.
+
+387
+00:24:19.340 --> 00:24:22.380
+<v David Sztykman>We are working with pretty much all the broadcasters in the world.
+
+388
+00:24:22.640 --> 00:24:27.020
+<v David Sztykman>But it's a very large ecosystem, but at the same time, it's a small market, right?
+
+389
+00:24:27.160 --> 00:24:35.340
+<v David Sztykman>And so extending our product into other areas like security, like I think that's a major challenge for us.
+
+390
+00:24:35.400 --> 00:24:36.480
+<v David Sztykman>But that's also very exciting.
+
+391
+00:24:36.680 --> 00:24:41.440
+<v David Sztykman>Because if you think about it, like security practitioners, they want to keep the data for a long time.
+
+392
+00:24:42.440 --> 00:24:47.220
+<v David Sztykman>that data, when there is a security incident, the first question that you ask is, when did
+
+393
+00:24:47.220 --> 00:24:47.720
+<v David Sztykman>that happen?
+
+394
+00:24:47.860 --> 00:24:48.660
+<v David Sztykman>When did it start?
+
+395
+00:24:49.140 --> 00:24:54.160
+<v David Sztykman>And if you're dropping the data on the floor because it's too expensive to keep, then you're
+
+396
+00:24:54.160 --> 00:24:54.820
+<v David Sztykman>losing visibility.
+
+397
+00:24:55.220 --> 00:25:00.120
+<v David Sztykman>And so for us, one of the most exciting developments that we're working on is really, how do we
+
+398
+00:25:00.120 --> 00:25:01.900
+<v David Sztykman>integrate better with security vendors?
+
+399
+00:25:02.160 --> 00:25:07.420
+<v David Sztykman>How do we integrate with agents and security agents, EDR and solutions that can push data
+
+400
+00:25:07.420 --> 00:25:11.180
+<v David Sztykman>into Hydrolix that people can then use to solve problems?
+
+401
+00:25:12.440 --> 00:25:18.480
+<v David Sztykman>area which is quite exciting the second which is i think everyone is excited about is ai
+
+402
+00:25:19.320 --> 00:25:25.140
+<v David Sztykman>because funnily enough like people don't like to write sql statement i don't understand why
+
+403
+00:25:25.140 --> 00:25:32.480
+<v David Sztykman>they rather ask a question about data and so for us having an interface which is like an LLM based
+
+404
+00:25:32.480 --> 00:25:37.460
+<v David Sztykman>which is a conversation with an agent that generates a chart generate the output for you
+
+405
+00:25:37.460 --> 00:25:38.720
+<v David Sztykman>is really incredible.
+
+406
+00:25:39.000 --> 00:25:42.120
+<v David Sztykman>And the evolution of really model is incredible
+
+407
+00:25:42.120 --> 00:25:43.460
+<v David Sztykman>how fast it's evolving.
+
+408
+00:25:43.760 --> 00:25:46.220
+<v David Sztykman>I think that's going to change really the industry completely
+
+409
+00:25:46.220 --> 00:25:49.140
+<v David Sztykman>because that's going to open up data science
+
+410
+00:25:49.140 --> 00:25:51.420
+<v David Sztykman>to everyone at the end of the day.
+
+411
+00:25:51.480 --> 00:25:54.160
+<v David Sztykman>Like from, like right now, if you have a question,
+
+412
+00:25:54.260 --> 00:25:56.060
+<v David Sztykman>you need to ask it to an engineer
+
+413
+00:25:56.060 --> 00:25:57.460
+<v David Sztykman>that's going to write the SQL statement,
+
+414
+00:25:57.540 --> 00:25:59.080
+<v David Sztykman>generate the dashboard for you, et cetera,
+
+415
+00:25:59.160 --> 00:26:00.220
+<v David Sztykman>and then you can use it.
+
+416
+00:26:00.360 --> 00:26:03.020
+<v David Sztykman>But imagine anybody can ask question
+
+417
+00:26:03.020 --> 00:26:05.140
+<v David Sztykman>about their own data directly in English.
+
+418
+00:26:05.280 --> 00:26:06.260
+<v David Sztykman>That's quite brilliant.
+
+419
+00:26:07.780 --> 00:26:09.160
+<v Noah Labhart>Okay, David, let's switch to you.
+
+420
+00:26:09.220 --> 00:26:11.040
+<v Noah Labhart>Who influences the way that you work?
+
+421
+00:26:11.260 --> 00:26:13.980
+<v Noah Labhart>Name a person or many persons or something you look up to.
+
+422
+00:26:14.020 --> 00:26:14.520
+<v Noah Labhart>Why?
+
+423
+00:26:15.360 --> 00:26:19.580
+<v David Sztykman>I'm going to go with our founder, Marty Gagan, the founder of Hydrolix.
+
+424
+00:26:19.960 --> 00:26:21.040
+<v David Sztykman>It was quite funny.
+
+425
+00:26:21.160 --> 00:26:24.400
+<v David Sztykman>When I started in the company, I wanted everything to be perfect.
+
+426
+00:26:24.860 --> 00:26:28.720
+<v David Sztykman>And Marty was like, if you wait for it to be perfect, you'll never ship anything.
+
+427
+00:26:29.840 --> 00:26:35.120
+<v David Sztykman>And for me, it was really hard because I was like, yeah, but I really like I'm putting so much effort.
+
+428
+00:26:35.200 --> 00:26:36.220
+<v David Sztykman>I need it to be perfect.
+
+429
+00:26:37.460 --> 00:26:39.160
+<v David Sztykman>But at the same time, nothing is ever perfect.
+
+430
+00:26:39.360 --> 00:26:42.440
+<v David Sztykman>And so he really taught me that,
+
+431
+00:26:42.520 --> 00:26:45.840
+<v David Sztykman>okay, we're going to ship fast and iterate quickly.
+
+432
+00:26:46.080 --> 00:26:47.940
+<v David Sztykman>And that's really the vision that I have.
+
+433
+00:26:48.100 --> 00:26:49.840
+<v David Sztykman>It's like nothing is ever perfect,
+
+434
+00:26:49.940 --> 00:26:52.620
+<v David Sztykman>but the only way to get something perfect
+
+435
+00:26:52.620 --> 00:26:55.040
+<v David Sztykman>is really to get feedback and iterate really quickly.
+
+436
+00:26:55.260 --> 00:26:57.720
+<v David Sztykman>And so to me, that was like an eye-opener.
+
+437
+00:26:57.960 --> 00:27:00.060
+<v David Sztykman>The way I completely changed the way I work
+
+438
+00:27:00.060 --> 00:27:02.000
+<v David Sztykman>to be able to build a prototype,
+
+439
+00:27:02.140 --> 00:27:03.900
+<v David Sztykman>build something really quickly, ship it,
+
+440
+00:27:03.980 --> 00:27:06.460
+<v David Sztykman>and then see how people react to it.
+
+441
+00:27:07.340 --> 00:27:07.840
+<v David Sztykman>interesting.
+
+442
+00:27:09.460 --> 00:27:12.940
+<v Noah Labhart>David, last question. So you're getting on a plane and you're sitting next to
+
+443
+00:27:12.940 --> 00:27:16.720
+<v Noah Labhart>a young entrepreneur who's built the next big thing. They're jazzed about it. They can't wait
+
+444
+00:27:16.720 --> 00:27:20.440
+<v Noah Labhart>to show it off to the world. And can we show it off to you right there on the plane? What advice
+
+445
+00:27:20.440 --> 00:27:24.040
+<v Noah Labhart>do you give that person having gone down this road a bit with Hydrolix?
+
+446
+00:27:24.740 --> 00:27:26.320
+<v David Sztykman>First of all, show me what
+
+447
+00:27:26.320 --> 00:27:31.680
+<v David Sztykman>you have. I'm always interested. I'm always curious. The second bit is who did you build it
+
+448
+00:27:31.680 --> 00:27:38.340
+<v David Sztykman>for? What is your market? Because at the end of the day, everyone has great ideas, right? But a
+
+449
+00:27:38.340 --> 00:27:43.640
+<v David Sztykman>great idea does not necessarily translate to a market need. And so the first question I would
+
+450
+00:27:43.640 --> 00:27:48.480
+<v David Sztykman>ask him is, what market research did you do? Are you sure you're actually fulfilling a need
+
+451
+00:27:48.480 --> 00:27:54.980
+<v David Sztykman>for your customer? What is your customer? Did you talk to a customer before building it? Because I
+
+452
+00:27:54.980 --> 00:28:00.060
+<v David Sztykman>think that is the most critical bit. We're not here to build technology for the sake of technology.
+
+453
+00:28:01.700 --> 00:28:06.580
+<v David Sztykman>problem, right? And so the first question you need to ask yourself, what is the problem you're
+
+454
+00:28:06.580 --> 00:28:12.160
+<v David Sztykman>solving? Is it a real problem? Is it a problem that's massive enough that you're going to be
+
+455
+00:28:12.160 --> 00:28:16.780
+<v David Sztykman>successful because there's enough people that have that problem that are going to buy your solution?
+
+456
+00:28:17.300 --> 00:28:21.860
+<v David Sztykman>That's really the question I would ask him. And then I would tell him, are you willing to put
+
+457
+00:28:21.860 --> 00:28:28.300
+<v David Sztykman>the hours? Because it is a rough patch. You have ups and downs. We always joke about it
+
+458
+00:28:28.300 --> 00:28:31.240
+<v David Sztykman>internally, it's a rollercoaster startup.
+
+459
+00:28:31.540 --> 00:28:34.320
+<v David Sztykman>You have days where everything's working beautifully
+
+460
+00:28:34.320 --> 00:28:36.880
+<v David Sztykman>and you're in the clouds, right?
+
+461
+00:28:37.080 --> 00:28:39.140
+<v David Sztykman>And then the next day you find a major bug
+
+462
+00:28:39.140 --> 00:28:42.000
+<v David Sztykman>and you're like, oh man, is it even a viable product?
+
+463
+00:28:42.360 --> 00:28:46.220
+<v David Sztykman>And so you have to be ready for the rollercoaster of life
+
+464
+00:28:46.220 --> 00:28:46.740
+<v David Sztykman>that it is.
+
+465
+00:28:46.960 --> 00:28:47.760
+<v Noah Labhart>Couldn't agree more.
+
+466
+00:28:47.900 --> 00:28:48.900
+<v Noah Labhart>That's fantastic advice.
+
+467
+00:28:49.080 --> 00:28:50.640
+<v Noah Labhart>Well, David, thanks for being on the show today.
+
+468
+00:28:50.860 --> 00:28:53.400
+<v Noah Labhart>Thanks for telling the creation story of Hydrolix.
+
+469
+00:28:54.040 --> 00:28:54.980
+<v David Sztykman>Thanks for having me.
+
+470
+00:28:57.560 --> 00:29:00.560
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+471
+00:29:09.420 --> 00:29:15.840
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart be sure to subscribe on apple podcast spotify or
+
+472
+00:29:15.840 --> 00:29:21.740
+<v Noah Labhart>the podcasting app of your choice and when you get a chance leave us a review both things help
+
+473
+00:29:21.740 --> 00:29:22.580
+<v Noah Labhart>us out tremendously
+
+474
+00:29:25.500 --> 00:29:27.000
+<v Noah Labhart>And thanks again for listening.

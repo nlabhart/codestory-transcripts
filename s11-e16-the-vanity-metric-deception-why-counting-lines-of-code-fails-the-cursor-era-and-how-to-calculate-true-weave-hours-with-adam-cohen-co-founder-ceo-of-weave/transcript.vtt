@@ -1,0 +1,963 @@
+WEBVTT
+
+NOTE S11 E16: The Vanity Metric Deception: Why Counting Lines of Code Fails the Cursor Era and How to Calculate True "Weave Hours" with Adam Cohen, Co-Founder & CEO of Weave
+
+1
+00:00:00.660 --> 00:00:10.600
+<v Adam Cohen>When we released that insights tool, the feedback was, hey, this is like really interesting, but prove to me that it works. And we were like, what do you mean? Nobody can prove that it
+
+2
+00:00:10.600 --> 00:00:15.740
+<v Adam Cohen>works. That's been impossible. This is like the age-old question in engineering. Every founder
+
+3
+00:00:15.740 --> 00:00:20.180
+<v Adam Cohen>struggled with this, of understanding how much work is my engineering team getting done.
+
+4
+00:00:20.360 --> 00:00:26.260
+<v Adam Cohen>What we did is we went and built a model to actually measure engineering work. So how did
+
+5
+00:00:26.260 --> 00:00:30.880
+<v Adam Cohen>we do this? We had to train our own custom machine learning model. Ultimately, it's trained on
+
+6
+00:00:30.880 --> 00:00:36.760
+<v Adam Cohen>thousands and thousands of PRs, like hand-labeled PRs, to measure how much work is actually getting
+
+7
+00:00:36.760 --> 00:00:38.880
+<v Adam Cohen>getting done and how long these PRs should take.
+
+8
+00:00:39.620 --> 00:00:43.220
+<v Adam Cohen>I'm Adam Cohen, the co-founder and CEO of Weave.
+
+9
+00:00:43.220 --> 00:00:52.460
+<v Noah Labhart>We've... This is Code Story, a podcast bringing you interviews with tech visionaries, six
+
+10
+00:00:52.460 --> 00:00:58.100
+<v Noah Labhart>months moonlighting, nothing on the back end, who share what it takes to change an industry.
+
+11
+00:00:58.200 --> 00:01:04.140
+<v Noah Labhart>I don't exactly know what many goes to get right, who built the teams that have their
+
+12
+00:01:04.140 --> 00:01:06.760
+<v Clip>back. Company is its people. Teams help each other.
+
+13
+00:01:06.760 --> 00:01:11.900
+<v Clip>each other achieve. Most proud of our team. Keeping scalability top of mind. All that
+
+14
+00:01:11.900 --> 00:01:15.300
+<v Clip>infrastructure was a pain. Yes, we've been fighting it as we grow. Total waste of time.
+
+15
+00:01:15.540 --> 00:01:20.280
+<v Clip>The stories you don't read in the headlines. It's not an easy thing to achieve. Took it off
+
+16
+00:01:20.280 --> 00:01:25.820
+<v Clip>the shelf and dusted it off and tried it again. To ride the ups and downs of the startup life.
+
+17
+00:01:26.020 --> 00:01:30.940
+<v Clip>You need to really want it. It's not just about technology. All this and more on Code Story.
+
+18
+00:01:32.180 --> 00:01:43.840
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Adam Cohen is giving you engineering metrics for the AI era, combining LLMs and domain-specific ML.
+
+19
+00:01:48.600 --> 00:01:51.640
+<v Noah Labhart>Adam Cohen grew up in Toronto and North York.
+
+20
+00:01:51.640 --> 00:01:57.500
+<v Noah Labhart>He showed early signs of entrepreneurship by putting his lemonade stand on a wagon and taking it door to door,
+
+21
+00:01:57.620 --> 00:02:01.380
+<v Noah Labhart>or hustling his friends to buy souvenirs on a school field trip.
+
+22
+00:02:01.760 --> 00:02:06.720
+<v Noah Labhart>His dad was in VC and was a big influence on his life, pushing him hard to succeed.
+
+23
+00:02:07.380 --> 00:02:10.960
+<v Noah Labhart>But outside of his professional life, he's big into sports, specifically basketball.
+
+24
+00:02:11.280 --> 00:02:16.180
+<v Noah Labhart>In the past, he loved playing fantasy sports, which also influenced how he built his business ventures.
+
+25
+00:02:18.580 --> 00:02:22.040
+<v Noah Labhart>Adam and his team went through several iterations of AI tooling
+
+26
+00:02:22.040 --> 00:02:25.700
+<v Noah Labhart>summarizing Slack, integrating Git and Jira, etc
+
+27
+00:02:25.700 --> 00:02:29.480
+<v Noah Labhart>While they were doing this, they realized that the best way to make a difference
+
+28
+00:02:29.480 --> 00:02:32.120
+<v Noah Labhart>was to first focus on the data itself
+
+29
+00:02:33.780 --> 00:02:36.840
+<v Noah Labhart>This is the creation story of Weave
+
+30
+00:02:42.480 --> 00:02:45.860
+<v Adam Cohen>Ultimately, what we do is we combine machine learning
+
+31
+00:02:46.180 --> 00:02:51.840
+<v Adam Cohen>with LLMs to show engineering teams how much work is getting done, how good it is, and how much is
+
+32
+00:02:51.840 --> 00:02:59.920
+<v Adam Cohen>done by AI. So we got here on a bit of a long and windy road, but ultimately where we started is
+
+33
+00:02:59.920 --> 00:03:06.580
+<v Adam Cohen>around going from Slack summarization to insights for engineers. But the kind of vision here is we
+
+34
+00:03:06.580 --> 00:03:11.660
+<v Adam Cohen>want to build Gong for the engineering teams. And we just realized that to do that, you actually
+
+35
+00:03:11.660 --> 00:03:15.640
+<v Adam Cohen>have to start with really good data, which you're not able to get anywhere right now.
+
+36
+00:03:15.780 --> 00:03:21.800
+<v Adam Cohen>The first iteration was we ultimately, Andrew and I, wanted to create something that was just
+
+37
+00:03:21.800 --> 00:03:26.760
+<v Adam Cohen>summarizing Slack. Using AI to summarize all of your work. We started with Slack, then we wanted
+
+38
+00:03:26.760 --> 00:03:31.780
+<v Adam Cohen>to integrate your Git, your Jira, and say, here's what went on this week, here are the actions that
+
+39
+00:03:31.780 --> 00:03:36.600
+<v Adam Cohen>you need to take, here's what went well, and here's where things could improve. We joke now that we
+
+40
+00:03:36.600 --> 00:03:39.580
+<v Adam Cohen>We think this is like the AI modern tar pit idea.
+
+41
+00:03:39.920 --> 00:03:43.040
+<v Adam Cohen>I think everyone has tried some iteration of this.
+
+42
+00:03:43.220 --> 00:03:46.500
+<v Adam Cohen>So we released that to the wild after about a week of work.
+
+43
+00:03:46.640 --> 00:03:51.240
+<v Adam Cohen>And the feedback was quite constructive, to say the least.
+
+44
+00:03:51.680 --> 00:03:55.680
+<v Adam Cohen>In general, just people felt like it was noisy and it wasn't actually solving any pain.
+
+45
+00:03:55.980 --> 00:04:01.960
+<v Adam Cohen>From there, what we decided was, OK, we need to get a bit more advanced in the insights we're providing.
+
+46
+00:04:02.140 --> 00:04:05.760
+<v Adam Cohen>So we actually started building out a platform not in Slack.
+
+47
+00:04:06.600 --> 00:04:08.540
+<v Adam Cohen>And it was focused just around insights.
+
+48
+00:04:08.800 --> 00:04:14.300
+<v Adam Cohen>So an insight could be for engineering, it was like your PR size is too big.
+
+49
+00:04:14.440 --> 00:04:23.180
+<v Adam Cohen>And it would actually scan the PR, run it through an LLM and say, based on what you were doing, you actually had two or three different focuses in this one PR.
+
+50
+00:04:23.260 --> 00:04:25.600
+<v Adam Cohen>And it should have been split into multiple PRs.
+
+51
+00:04:25.660 --> 00:04:29.840
+<v Adam Cohen>For those listening that are non-technical, I'm not sure how many of those will be.
+
+52
+00:04:29.920 --> 00:04:31.760
+<v Adam Cohen>But think of a PR as like a task.
+
+53
+00:04:31.860 --> 00:04:34.340
+<v Adam Cohen>That's how we like to describe to non-technical folks.
+
+54
+00:04:34.340 --> 00:04:38.840
+<v Adam Cohen>So if one task is too big, it's actually recommending breaking it down into like smaller tasks.
+
+55
+00:04:41.460 --> 00:04:48.160
+<v Noah Labhart>I'm curious now about the MVP for Weave, maybe the MVP of the version of what it is right now.
+
+56
+00:04:48.340 --> 00:04:53.820
+<v Noah Labhart>How long did it take to build, which probably is a combination of a bunch of things and what sort of tools are you using to bring it to life?
+
+57
+00:04:55.680 --> 00:05:03.060
+<v Adam Cohen>Ultimately, when we released that insights tool, the feedback was, hey, this is like really interesting, but prove to me that it works.
+
+58
+00:05:04.340 --> 00:05:09.000
+<v Adam Cohen>like, what do you mean? Nobody can prove that it works. That's been impossible. This is like the
+
+59
+00:05:09.000 --> 00:05:13.580
+<v Adam Cohen>age old question engineering. Every founder struggled with this of understanding like how
+
+60
+00:05:13.580 --> 00:05:19.560
+<v Adam Cohen>much work is my engineering team getting done? What we did is we went and built a model to
+
+61
+00:05:19.560 --> 00:05:24.760
+<v Adam Cohen>actually measure engineering work. So how did we do this? We had to train our own custom machine
+
+62
+00:05:24.760 --> 00:05:31.160
+<v Adam Cohen>learning model. And ultimately, it's trained on like 1000s and 1000s of PRs, like hand labeled
+
+63
+00:05:31.160 --> 00:05:38.040
+<v Adam Cohen>PRs to measure how much work is actually getting done and how long these PRs should take. So that
+
+64
+00:05:38.040 --> 00:05:44.220
+<v Adam Cohen>took us about two to three weeks to get the base version out. Obviously, we've had to continue to
+
+65
+00:05:44.220 --> 00:05:49.940
+<v Adam Cohen>fine tune it since. And that was about November last year before we officially launched it.
+
+66
+00:05:51.140 --> 00:05:55.340
+<v Noah Labhart>You know, you're building anything, you've got to make decisions and trade offs around,
+
+67
+00:05:55.540 --> 00:05:59.020
+<v Noah Labhart>you know, how you're going to approach the problem. And I think you touched on a few
+
+68
+00:05:59.020 --> 00:06:03.140
+<v Noah Labhart>few things that I could probably cherry pick, but I just want to ask directly, what is the,
+
+69
+00:06:03.160 --> 00:06:07.360
+<v Noah Labhart>maybe the biggest decision or trade-off you had to make in that early version of Weave and how
+
+70
+00:06:07.360 --> 00:06:08.560
+<v Noah Labhart>you coped with it? I
+
+71
+00:06:08.560 --> 00:06:11.740
+<v Adam Cohen>think some of the early trade-offs that we had to make was this like
+
+72
+00:06:11.740 --> 00:06:18.460
+<v Adam Cohen>insights versus data. Ultimately, our vision is like, we want to be the helper to every single
+
+73
+00:06:18.460 --> 00:06:23.220
+<v Adam Cohen>knowledge worker that's reading all of your data and being able to provide very specific action
+
+74
+00:06:23.220 --> 00:06:27.440
+<v Adam Cohen>items of here's where you can improve. We believe that there will always be like humans in the loop
+
+75
+00:06:29.020 --> 00:06:30.280
+<v Adam Cohen>where we're going to piggyback off.
+
+76
+00:06:30.740 --> 00:06:32.780
+<v Adam Cohen>So the trade-off here is,
+
+77
+00:06:32.800 --> 00:06:35.920
+<v Adam Cohen>okay, you can veer off your initial plan
+
+78
+00:06:35.920 --> 00:06:37.120
+<v Adam Cohen>of just providing insights
+
+79
+00:06:37.120 --> 00:06:39.200
+<v Adam Cohen>and go the data route or not.
+
+80
+00:06:39.400 --> 00:06:40.520
+<v Adam Cohen>You could try, sorry,
+
+81
+00:06:40.660 --> 00:06:41.780
+<v Adam Cohen>you could either do the insights
+
+82
+00:06:41.780 --> 00:06:44.280
+<v Adam Cohen>or you can go down the data route.
+
+83
+00:06:44.420 --> 00:06:46.240
+<v Adam Cohen>And what we ultimately decided was
+
+84
+00:06:46.240 --> 00:06:49.300
+<v Adam Cohen>for best use for our customers,
+
+85
+00:06:49.480 --> 00:06:51.980
+<v Adam Cohen>as well as to actually get first paying users,
+
+86
+00:06:52.160 --> 00:06:53.620
+<v Adam Cohen>we had to go down this data road.
+
+87
+00:06:53.820 --> 00:06:55.080
+<v Adam Cohen>So that's what we built.
+
+88
+00:06:55.200 --> 00:06:56.540
+<v Adam Cohen>And that's why we started there.
+
+89
+00:06:56.700 --> 00:06:58.820
+<v Adam Cohen>And now we're starting to really explore
+
+90
+00:06:59.020 --> 00:07:01.340
+<v Adam Cohen>getting back to more of the inside side of the platform.
+
+91
+00:07:03.420 --> 00:07:05.120
+<v Noah Labhart>Awesome. Okay. That's actually a perfect
+
+92
+00:07:05.120 --> 00:07:11.080
+<v Noah Labhart>segue into my next question, Adam. So I'm curious about, you know, how you are progressing and
+
+93
+00:07:11.080 --> 00:07:15.780
+<v Noah Labhart>maturing the product and to kind of wrap that in a box a little bit and look for is how you are
+
+94
+00:07:15.780 --> 00:07:20.320
+<v Noah Labhart>building your roadmap, how you go about deciding that, okay, this is the next most important thing
+
+95
+00:07:20.320 --> 00:07:22.380
+<v Noah Labhart>to build or to address.
+
+96
+00:07:23.560 --> 00:07:27.020
+<v Adam Cohen>We are not in a unique spot. Everyone has to balance their roadmap of
+
+97
+00:07:29.020 --> 00:07:30.080
+<v Adam Cohen>versus what is your vision?
+
+98
+00:07:30.220 --> 00:07:32.260
+<v Adam Cohen>And how do you make those two things align?
+
+99
+00:07:32.520 --> 00:07:34.320
+<v Adam Cohen>How do you make sure that you're building for them
+
+100
+00:07:34.320 --> 00:07:36.040
+<v Adam Cohen>while still building what you believe
+
+101
+00:07:36.040 --> 00:07:37.120
+<v Adam Cohen>is the right solution?
+
+102
+00:07:37.780 --> 00:07:40.160
+<v Adam Cohen>What I think is maybe a bit unique right now
+
+103
+00:07:40.160 --> 00:07:44.180
+<v Adam Cohen>is it is the fastest changing environment
+
+104
+00:07:44.180 --> 00:07:46.700
+<v Adam Cohen>that you could imagine selling to engineering teams.
+
+105
+00:07:46.860 --> 00:07:49.220
+<v Adam Cohen>Their needs are changing pretty much every month.
+
+106
+00:07:49.380 --> 00:07:51.760
+<v Adam Cohen>The data that we're able to connect with
+
+107
+00:07:51.760 --> 00:07:52.740
+<v Adam Cohen>is changing weekly.
+
+108
+00:07:53.080 --> 00:07:55.400
+<v Adam Cohen>APIs from Cursor, Windsurf,
+
+109
+00:07:55.560 --> 00:07:58.140
+<v Adam Cohen>being able to integrate and take data from Devin,
+
+110
+00:07:59.020 --> 00:08:04.060
+<v Adam Cohen>is getting like quite complex and changing super quickly. To go back to your question, really what
+
+111
+00:08:04.060 --> 00:08:08.780
+<v Adam Cohen>we're doing is we're doing it in sprints where we're looking at here are all the requests from
+
+112
+00:08:08.780 --> 00:08:14.400
+<v Adam Cohen>customers. If it can be done really quickly, we're going to go get that done immediately. If not,
+
+113
+00:08:14.520 --> 00:08:20.080
+<v Adam Cohen>we're going to really add it to the roadmap, but really try to focus our time on what we believe
+
+114
+00:08:20.080 --> 00:08:24.940
+<v Adam Cohen>is going to be the biggest bang for our buck. Specifically right now, that's been focused on
+
+115
+00:08:24.940 --> 00:08:31.800
+<v Adam Cohen>AI usage analytics. So understanding who's using AI the best and how to replicate those best
+
+116
+00:08:31.800 --> 00:08:36.960
+<v Adam Cohen>practices and start suggesting how teams can actually use AI for their engineering function
+
+117
+00:08:36.960 --> 00:08:37.460
+<v Adam Cohen>better.
+
+118
+00:08:38.780 --> 00:08:43.140
+<v Noah Labhart>So how did you go about building your team and what do you look for in those people
+
+119
+00:08:43.140 --> 00:08:45.440
+<v Noah Labhart>to indicate that they're the winning horses to join you?
+
+120
+00:08:45.880 --> 00:08:48.720
+<v Adam Cohen>We look for passion more than anything.
+
+121
+00:08:48.720 --> 00:08:53.620
+<v Adam Cohen>I want people that are fanatic about anything previously.
+
+122
+00:08:54.000 --> 00:08:55.880
+<v Adam Cohen>So that's like our core.
+
+123
+00:08:56.060 --> 00:09:01.440
+<v Adam Cohen>That being willing to just be very open-minded are the two kind of core pieces.
+
+124
+00:09:01.800 --> 00:09:07.960
+<v Adam Cohen>One of our teammates is a triathlete, Ironman, does every single thing in the book and is
+
+125
+00:09:07.960 --> 00:09:10.060
+<v Adam Cohen>like super passionate about fitness.
+
+126
+00:09:10.340 --> 00:09:16.040
+<v Adam Cohen>Another is obsessed with movies, has watched pretty much a movie every single day, has
+
+127
+00:09:16.040 --> 00:09:17.800
+<v Adam Cohen>the biggest laundry list of movies.
+
+128
+00:09:18.720 --> 00:09:23.660
+<v Adam Cohen>a big bonus for my life getting his list as well. So in general, we just want to find people that
+
+129
+00:09:23.660 --> 00:09:28.260
+<v Adam Cohen>are like super passionate about things that they've done before and that are passionate
+
+130
+00:09:28.260 --> 00:09:33.440
+<v Adam Cohen>about being efficient and bettering themselves because that's what our product is about as well.
+
+131
+00:09:36.720 --> 00:09:41.740
+<v Noah Labhart>Let's flip to scalability. I'm really curious about scale and where that comes into play.
+
+132
+00:09:41.940 --> 00:09:45.700
+<v Noah Labhart>You know, you can approach scale, right? Building it from the beginning, but there's always
+
+133
+00:09:45.700 --> 00:09:49.520
+<v Noah Labhart>always interesting places where it pops up its head. Can you tell me some stories around where
+
+134
+00:09:49.520 --> 00:09:51.020
+<v Noah Labhart>you had to fight scale as you grew?
+
+135
+00:09:52.360 --> 00:09:56.360
+<v Adam Cohen>Transparently, we are just starting to get into these issues.
+
+136
+00:09:56.640 --> 00:10:04.020
+<v Adam Cohen>We're still on the earlier stage. So I think one more recent example was our platform's performance
+
+137
+00:10:04.020 --> 00:10:11.000
+<v Adam Cohen>just went to complete garbage about a month ago. It was taking 30 seconds a minute for pages to
+
+138
+00:10:11.000 --> 00:10:16.540
+<v Adam Cohen>load, and we just realized, like, we had a few customers complain, but we also had a couple of
+
+139
+00:10:16.540 --> 00:10:22.540
+<v Adam Cohen>prospects say no to us for that reason, and we just had to go blitz and fix that. So we did a ton of
+
+140
+00:10:22.540 --> 00:10:29.060
+<v Adam Cohen>performance optimization, a lot on our queries, and now we're like wicked fast again. But it's a perfect
+
+141
+00:10:29.060 --> 00:10:34.240
+<v Adam Cohen>example of just like we were shipping as fast as we possibly could without performance in mind.
+
+142
+00:10:34.240 --> 00:10:39.200
+<v Adam Cohen>It caught up to us, and then we had to go fix that. And now I'm sure there's going to be the same issue
+
+143
+00:10:42.520 --> 00:10:43.020
+<v Adam Cohen>out.
+
+144
+00:10:42.920 --> 00:10:46.900
+<v Noah Labhart>Well, Adam, as you step out on the balcony, look across all that you've built thus far.
+
+145
+00:10:47.240 --> 00:10:48.760
+<v Noah Labhart>With Weave, what are you most proud of?
+
+146
+00:10:49.500 --> 00:10:53.640
+<v Adam Cohen>Andrew and I were talking about this just recently. We did a
+
+147
+00:10:53.640 --> 00:10:59.500
+<v Adam Cohen>product hunt launch last week and also about a year and a week ago, completely coincidentally.
+
+148
+00:11:00.200 --> 00:11:05.480
+<v Adam Cohen>And he was just leaving on a trip, first trip he's taken in that year as well. And we were just
+
+149
+00:11:05.480 --> 00:11:10.080
+<v Adam Cohen>having a debrief about this. And I think the thing we're most proud of is just about the team that
+
+150
+00:11:11.000 --> 00:11:16.540
+<v Adam Cohen>think the movement that we've started in general. When we started selling or pushing this narrative
+
+151
+00:11:16.540 --> 00:11:21.900
+<v Adam Cohen>that engineering could be measured, pretty much every single person laughed in our face, rejected
+
+152
+00:11:21.900 --> 00:11:28.520
+<v Adam Cohen>us, said it wasn't possible, said that we were doing it the wrong way. And since then, it's already the
+
+153
+00:11:28.520 --> 00:11:33.120
+<v Adam Cohen>narrative's completely changing, where people are excited about it. They're looking at it as an
+
+154
+00:11:33.120 --> 00:11:38.560
+<v Adam Cohen>empowerment tool, as an enhancement or optimization tool. We've had a bunch of competitors like attempt
+
+155
+00:11:38.560 --> 00:11:43.860
+<v Adam Cohen>to copy us. They're doing a really poor job so far, but I'm excited that they're trying because
+
+156
+00:11:43.860 --> 00:11:47.920
+<v Adam Cohen>I do think that like everyone should get behind this mindset of everything can be measured
+
+157
+00:11:47.920 --> 00:11:52.200
+<v Adam Cohen>and it can be used to really help us if it's used in the right ways.
+
+158
+00:11:54.500 --> 00:11:58.740
+<v Noah Labhart>So let's flip the script a little bit. Tell me about a mistake you made and how you
+
+159
+00:11:58.740 --> 00:12:00.880
+<v Noah Labhart>and your team responded to it.
+
+160
+00:12:01.180 --> 00:12:05.800
+<v Adam Cohen>One mistake we made, and I still struggle thinking about what
+
+161
+00:12:05.800 --> 00:12:07.180
+<v Adam Cohen>what was the right thing to do here?
+
+162
+00:12:07.340 --> 00:12:11.020
+<v Adam Cohen>But we were going through our seed fundraising in March
+
+163
+00:12:11.020 --> 00:12:14.860
+<v Adam Cohen>and we also had our biggest enterprise contract on the line.
+
+164
+00:12:14.940 --> 00:12:16.440
+<v Adam Cohen>And even though our seed fundraising
+
+165
+00:12:16.440 --> 00:12:19.180
+<v Adam Cohen>was able to be wrapped up quite quickly,
+
+166
+00:12:19.720 --> 00:12:21.440
+<v Adam Cohen>we ended up losing that deal.
+
+167
+00:12:21.560 --> 00:12:23.480
+<v Adam Cohen>And I think it was like quite a winnable deal.
+
+168
+00:12:23.560 --> 00:12:25.140
+<v Adam Cohen>It would have made a meaningful impact
+
+169
+00:12:25.140 --> 00:12:26.300
+<v Adam Cohen>to like us as a company,
+
+170
+00:12:26.420 --> 00:12:29.200
+<v Adam Cohen>but we lost it because I was spending way too much time
+
+171
+00:12:29.200 --> 00:12:30.360
+<v Adam Cohen>talking to investors,
+
+172
+00:12:30.980 --> 00:12:33.120
+<v Adam Cohen>dealing with creating a deck,
+
+173
+00:12:33.260 --> 00:12:34.960
+<v Adam Cohen>negotiation of those things.
+
+174
+00:12:35.800 --> 00:12:44.360
+<v Adam Cohen>I think like what we've learned from that is just no matter what we need to prioritize our customers, revenue, fundraising is very important.
+
+175
+00:12:44.520 --> 00:12:45.220
+<v Adam Cohen>Don't get me wrong.
+
+176
+00:12:45.360 --> 00:12:48.180
+<v Adam Cohen>But still, the most important thing is winning these deals.
+
+177
+00:12:48.320 --> 00:12:50.700
+<v Adam Cohen>As long as you win, the fundraising will follow.
+
+178
+00:12:53.560 --> 00:12:54.780
+<v Noah Labhart>Adam, this will be fun.
+
+179
+00:12:54.900 --> 00:12:57.560
+<v Noah Labhart>I'm curious to hear, you know, the passion in your voice.
+
+180
+00:12:57.620 --> 00:13:01.500
+<v Noah Labhart>What does the future look like for Weave, for the product, for what you're building, for the team?
+
+181
+00:13:02.420 --> 00:13:06.380
+<v Adam Cohen>Ultimately, what we're doing is we're building the operating system for knowledge workers
+
+182
+00:13:06.380 --> 00:13:12.440
+<v Adam Cohen>in this AI age. So we really look at engineering as just the beginning. We think it's the perfect
+
+183
+00:13:12.440 --> 00:13:18.900
+<v Adam Cohen>testing ground because everything is recorded and therefore should be quantifiable, and engineers are
+
+184
+00:13:18.900 --> 00:13:23.380
+<v Adam Cohen>the most skeptical, meaning that if you can win here, similar as Slack, then you can likely win
+
+185
+00:13:23.380 --> 00:13:28.860
+<v Adam Cohen>in other spots as well. So our vision is to become this like measurement and optimization layer for
+
+186
+00:13:28.860 --> 00:13:33.980
+<v Adam Cohen>all of the knowledge workers. And yeah, I guess you can imagine a company where every person,
+
+187
+00:13:34.140 --> 00:13:40.140
+<v Adam Cohen>every AI agent is continuously improving, continuously getting feedback, understanding
+
+188
+00:13:40.140 --> 00:13:46.600
+<v Adam Cohen>exactly where they can improve. And human potential is really maximized through partnering with these
+
+189
+00:13:46.600 --> 00:13:52.040
+<v Adam Cohen>AI tools. We want to be that like data layer and that insight layer that makes that really possible.
+
+190
+00:13:53.520 --> 00:13:57.400
+<v Noah Labhart>Adam, let's switch to you. Who influences the way that you work?
+
+191
+00:13:57.480 --> 00:14:00.460
+<v Noah Labhart>I'm a person or many persons or something you look up to and why?
+
+192
+00:14:01.420 --> 00:14:04.220
+<v Adam Cohen>My dad was like a huge influence to me.
+
+193
+00:14:04.460 --> 00:14:10.180
+<v Adam Cohen>That was like the biggest one, just seeing how he worked, his work ethic, his balance of work and family.
+
+194
+00:14:10.260 --> 00:14:11.080
+<v Adam Cohen>That was massive.
+
+195
+00:14:11.260 --> 00:14:18.340
+<v Adam Cohen>I think more recently, our Y Combinator partners, specifically like Jared Friedman, Eli Brown, Ankit,
+
+196
+00:14:18.340 --> 00:14:22.380
+<v Adam Cohen>were instrumental in just like how we think about building.
+
+197
+00:14:22.680 --> 00:14:24.600
+<v Adam Cohen>They all give Jared the,
+
+198
+00:14:24.640 --> 00:14:27.360
+<v Adam Cohen>he specializes in taking very complex ideas
+
+199
+00:14:27.360 --> 00:14:30.080
+<v Adam Cohen>and being able to say them in a single sentence
+
+200
+00:14:30.080 --> 00:14:31.560
+<v Adam Cohen>that really like packs a punch.
+
+201
+00:14:31.700 --> 00:14:34.380
+<v Adam Cohen>And it just made our understanding of ourselves
+
+202
+00:14:34.380 --> 00:14:35.920
+<v Adam Cohen>and our product much more clear.
+
+203
+00:14:36.440 --> 00:14:38.580
+<v Adam Cohen>Eli brings this like intensity.
+
+204
+00:14:38.720 --> 00:14:41.120
+<v Adam Cohen>He probably built one of the best engineering teams
+
+205
+00:14:41.120 --> 00:14:42.540
+<v Adam Cohen>around at Gilded.
+
+206
+00:14:42.700 --> 00:14:44.740
+<v Adam Cohen>And he really influenced the way
+
+207
+00:14:44.740 --> 00:14:45.980
+<v Adam Cohen>that we think about building
+
+208
+00:14:45.980 --> 00:14:49.560
+<v Adam Cohen>and that truly the most important thing is shipping speed.
+
+209
+00:14:49.780 --> 00:14:52.300
+<v Adam Cohen>We believe that if we continue to ship and sell,
+
+210
+00:14:52.400 --> 00:14:54.320
+<v Adam Cohen>then those are the only two things that matter.
+
+211
+00:14:54.460 --> 00:14:57.100
+<v Adam Cohen>And we sign off every single daily standup
+
+212
+00:14:57.100 --> 00:14:59.360
+<v Adam Cohen>as ship and sell for that exact reason.
+
+213
+00:15:01.460 --> 00:15:02.700
+<v Noah Labhart>Okay, Adam, last question.
+
+214
+00:15:02.840 --> 00:15:04.360
+<v Noah Labhart>So you're getting on a plane
+
+215
+00:15:04.360 --> 00:15:06.100
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+216
+00:15:06.100 --> 00:15:07.440
+<v Noah Labhart>who's built the next big thing.
+
+217
+00:15:07.720 --> 00:15:08.840
+<v Noah Labhart>They're jazzed about it.
+
+218
+00:15:08.880 --> 00:15:10.020
+<v Noah Labhart>They can't wait to show it off to the world
+
+219
+00:15:10.020 --> 00:15:11.260
+<v Noah Labhart>and can't wait to show it off to you
+
+220
+00:15:11.260 --> 00:15:11.920
+<v Noah Labhart>right there on the plane.
+
+221
+00:15:12.080 --> 00:15:13.600
+<v Noah Labhart>What advice do you give that person
+
+222
+00:15:13.600 --> 00:15:14.900
+<v Noah Labhart>having gone down this road a bit?
+
+223
+00:15:15.980 --> 00:15:21.420
+<v Adam Cohen>On the plane, be fanatical. Take every opportunity you can. I know I'm certainly probably rub people
+
+224
+00:15:21.420 --> 00:15:28.440
+<v Adam Cohen>the wrong way with how aggressive I've been with selling, but it's a name of the game. Ultimately, I
+
+225
+00:15:28.440 --> 00:15:34.700
+<v Adam Cohen>strongly believe that we are massively helping teams get better and helping individuals perform
+
+226
+00:15:34.700 --> 00:15:40.960
+<v Adam Cohen>better. If you are starting something, be super realistic with yourself, but sell, take the feedback
+
+227
+00:15:40.960 --> 00:15:45.380
+<v Adam Cohen>back, iterate, sell, take the feedback, and iterate again.
+
+228
+00:15:45.660 --> 00:15:46.860
+<v Noah Labhart>That's fantastic advice.
+
+229
+00:15:47.020 --> 00:15:49.020
+<v Noah Labhart>Well, Adam, thank you for being on the show today.
+
+230
+00:15:49.140 --> 00:15:51.440
+<v Noah Labhart>And thank you for telling the creation story of Weave.
+
+231
+00:15:51.580 --> 00:15:53.440
+<v Adam Cohen>I really appreciate your time.
+
+232
+00:15:53.480 --> 00:15:57.160
+<v Adam Cohen>And Noah, I haven't gotten the chance to interview you yet, but maybe we can save that
+
+233
+00:15:57.160 --> 00:15:57.820
+<v Adam Cohen>for another day.
+
+234
+00:15:58.340 --> 00:15:59.320
+<v Noah Labhart>We'll work on that.
+
+235
+00:15:59.460 --> 00:16:02.040
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+236
+00:16:13.160 --> 00:16:16.180
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+237
+00:16:16.280 --> 00:16:21.080
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+238
+00:16:21.660 --> 00:16:23.900
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+239
+00:16:24.180 --> 00:16:26.120
+<v Noah Labhart>Both things help us out tremendously.
+
+240
+00:16:29.020 --> 00:16:30.520
+<v Noah Labhart>And thanks again for listening.

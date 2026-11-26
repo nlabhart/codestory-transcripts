@@ -1,0 +1,931 @@
+WEBVTT
+
+NOTE S6 Bonus: Moving Beyond Real-Time: Engineering Zero Trust Payment Precision with Ben Turner of Verituity
+
+1
+00:00:01.700 --> 00:00:08.280
+<v Ben Turner>Payments are oddly technical. They shouldn't be, but they are. There are about 12 different
+
+2
+00:00:08.280 --> 00:00:14.000
+<v Ben Turner>payment types, and all of them have their own complexity. And so one of the mistakes
+
+3
+00:00:14.000 --> 00:00:20.820
+<v Ben Turner>we made is we tried to tackle too many of them at one time, which caused serious complexity
+
+4
+00:00:20.820 --> 00:00:28.680
+<v Ben Turner>from an engineering standpoint that probably cost us a good six, eight weeks in our timeline.
+
+5
+00:00:30.000 --> 00:00:37.940
+<v Ben Turner>The learning from that was take advantage of breaking things into smaller bytes and set some milestones when those bytes should come together.
+
+6
+00:00:38.640 --> 00:00:42.900
+<v Ben Turner>My name is Ben Turner, and I'm the founder and CEO of Verituity.
+
+7
+00:00:47.340 --> 00:01:00.820
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+8
+00:01:02.180 --> 00:01:03.860
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+9
+00:01:04.360 --> 00:01:12.120
+<v Noah Labhart>It's how Ben Turner assembled microservices and created a best-in-class platform for verified payments.
+
+10
+00:01:13.360 --> 00:01:15.720
+<v Noah Labhart>All this and more on Code Story.
+
+11
+00:01:19.840 --> 00:01:22.580
+<v Noah Labhart>Ben Turner's grandfathers were both entrepreneurs.
+
+12
+00:01:23.180 --> 00:01:27.800
+<v Noah Labhart>One grandfather went to Cornell but ended up buying a fishing boat and then eventually a hardware store.
+
+13
+00:01:28.020 --> 00:01:33.300
+<v Noah Labhart>His other grandfather started a grain elevator after World War II, followed by going into real estate.
+
+14
+00:01:33.880 --> 00:01:38.600
+<v Noah Labhart>He learned to be blind to risk, which is important in starting something new.
+
+15
+00:01:38.600 --> 00:01:44.220
+<v Noah Labhart>Outside of tech, he likes to do outdoor activities like kayaking, mountain biking, and trail running.
+
+16
+00:01:45.300 --> 00:01:51.940
+<v Noah Labhart>Ben was a part of a company called Network Solutions, and when they started that company, there wasn't the concept of a payment gateway.
+
+17
+00:01:52.160 --> 00:01:55.500
+<v Noah Labhart>To make a solution work, you had many technical hurdles that existed.
+
+18
+00:01:55.840 --> 00:01:59.500
+<v Noah Labhart>Two years ago, Ben started looking into how you solve this problem.
+
+19
+00:02:00.980 --> 00:02:03.720
+<v Noah Labhart>This is the creation story of Verituity.
+
+20
+00:02:07.000 --> 00:02:15.340
+<v Ben Turner>We started the company two years ago, and what we focus on is connecting banks, businesses, and payees,
+
+21
+00:02:15.340 --> 00:02:21.700
+<v Ben Turner>so people that receive insurance payments, suppliers that receive payments from their buyers, etc.
+
+22
+00:02:21.700 --> 00:02:29.620
+<v Ben Turner>to what we call first time and on time verified payouts and intelligent pay by anything experiences.
+
+23
+00:02:29.620 --> 00:02:46.440
+<v Ben Turner>And so let me break that down a little bit. We're very intentional with the words we use. So when we talk about connect, that means that our platform, our cloud-based platform, makes it easy for a bank, a business, and a payee to simply connect and interact to make those payouts possible.
+
+24
+00:02:46.440 --> 00:03:00.720
+<v Ben Turner>And when we talk about first time in the world of payouts, your expectation when you're expecting an insurance claim payment or you're expecting to get a commission payment is that it's going to happen the first time someone tries to pay you.
+
+25
+00:03:01.100 --> 00:03:03.060
+<v Ben Turner>The same thing is true on time.
+
+26
+00:03:03.180 --> 00:03:06.600
+<v Ben Turner>So you have an expectation when you should receive that payout.
+
+27
+00:03:06.700 --> 00:03:10.440
+<v Ben Turner>The payer, the business, has an expectation when they want to make it.
+
+28
+00:03:10.580 --> 00:03:13.600
+<v Ben Turner>So on time could be right now.
+
+29
+00:03:13.720 --> 00:03:15.300
+<v Ben Turner>It could be later today.
+
+30
+00:03:16.440 --> 00:03:21.480
+<v Ben Turner>from now, but it's meeting those expectations. And then verified, you
+
+31
+00:03:21.480 --> 00:03:26.360
+<v Ben Turner>really should make sure that you're paying the right amount, the right person,
+
+32
+00:03:26.360 --> 00:03:30.820
+<v Ben Turner>the right payment account. And then finally, when we talk about intelligent
+
+33
+00:03:30.820 --> 00:03:36.000
+<v Ben Turner>pay by anything, the reason we chose those words is as a business, you should
+
+34
+00:03:36.000 --> 00:03:42.880
+<v Ben Turner>be able to choose how you pay someone, whether it's using ACH or using RTP or
+
+35
+00:03:42.880 --> 00:03:48.720
+<v Ben Turner>or using check, and the payee should be able to choose how they receive that money, whether
+
+36
+00:03:48.720 --> 00:03:52.620
+<v Ben Turner>they get it through PayPal, whether they get it through Zelle, or they get it right into
+
+37
+00:03:52.620 --> 00:03:53.420
+<v Ben Turner>their bank account.
+
+38
+00:03:54.060 --> 00:04:00.800
+<v Ben Turner>And so to do all that, you have to have intelligence so that neither the business nor the payee
+
+39
+00:04:00.800 --> 00:04:02.360
+<v Ben Turner>has to make any decisions.
+
+40
+00:04:02.800 --> 00:04:04.300
+<v Ben Turner>And that's our company.
+
+41
+00:04:05.180 --> 00:04:11.380
+<v Ben Turner>The way it got started is it really has roots back to the early days of the internet.
+
+42
+00:04:12.880 --> 00:04:15.120
+<v Ben Turner>I was part of a company called Network Solutions.
+
+43
+00:04:15.640 --> 00:04:23.360
+<v Ben Turner>And when we started that company, there weren't the concepts of payment gateways.
+
+44
+00:04:23.400 --> 00:04:27.260
+<v Ben Turner>There wasn't an e-commerce platform you could buy out of the box.
+
+45
+00:04:27.340 --> 00:04:30.100
+<v Ben Turner>There were all these challenges of how are you going to take a payment?
+
+46
+00:04:31.840 --> 00:04:36.280
+<v Ben Turner>Well, those quickly got solved as e-commerce drove those solutions.
+
+47
+00:04:36.400 --> 00:04:38.460
+<v Ben Turner>But that didn't happen on the payout side.
+
+48
+00:04:39.200 --> 00:04:44.060
+<v Ben Turner>And so two years ago, when I started looking around, you know, how do you solve this problem?
+
+49
+00:04:45.460 --> 00:04:47.960
+<v Ben Turner>That's how we started Verituity.
+
+50
+00:04:48.020 --> 00:04:49.340
+<v Ben Turner>That's why we started Verituity.
+
+51
+00:04:51.780 --> 00:04:56.860
+<v Noah Labhart>Well, tell me about the MVP for Verituity, the first product you built.
+
+52
+00:04:56.920 --> 00:05:00.920
+<v Noah Labhart>How long did it take to build and what sort of tools did you use to bring it to life?
+
+53
+00:05:02.220 --> 00:05:07.960
+<v Ben Turner>We started Verituity with a suite of microservices that we had used elsewhere.
+
+54
+00:05:08.460 --> 00:05:17.680
+<v Ben Turner>and assembled those. So the way we built it was, it's in Go, and it's a microservices architecture.
+
+55
+00:05:18.200 --> 00:05:25.260
+<v Ben Turner>We basically assembled microservices for each of the interactions that Verituity handles. So
+
+56
+00:05:25.260 --> 00:05:33.420
+<v Ben Turner>pay verification, payment account verification, choosing how you want to receive that payment,
+
+57
+00:05:33.420 --> 00:05:38.860
+<v Ben Turner>interacting with the payer's bank and funding account.
+
+58
+00:05:39.540 --> 00:05:45.500
+<v Ben Turner>All those are independent microservices that allows our platform to give the flexibility
+
+59
+00:05:45.500 --> 00:05:52.620
+<v Ben Turner>that businesses expect when they're interacting with their customers on the internet.
+
+60
+00:05:53.620 --> 00:05:58.180
+<v Noah Labhart>So with any MVP, you've got to make certain decisions and trade-offs.
+
+61
+00:05:58.180 --> 00:06:15.160
+<v Noah Labhart>And given you're using some services that you built that fit the different pieces of what you're offering, I'm sure there were a ton of them and how you built it, what you limited the first versions to, and even sort of perhaps technical debt that you took on.
+
+62
+00:06:15.520 --> 00:06:20.060
+<v Noah Labhart>So tell me about some of those decisions and tradeoffs you had to make and how you coped with those decisions.
+
+63
+00:06:21.240 --> 00:06:22.740
+<v Ben Turner>I'll start with technical debt.
+
+64
+00:06:22.860 --> 00:06:26.720
+<v Ben Turner>I find the term technical debt kind of funny as a startup.
+
+65
+00:06:28.180 --> 00:06:33.320
+<v Ben Turner>technical debt and we just went through this as a company is if it works do we really have
+
+66
+00:06:33.320 --> 00:06:40.700
+<v Ben Turner>technical debt i'm a big believer that you're constantly once you have a microservice or a
+
+67
+00:06:40.700 --> 00:06:46.720
+<v Ben Turner>function or feature working get rid of the backlog that's associated with that you'll find things
+
+68
+00:06:46.720 --> 00:06:51.340
+<v Ben Turner>that you need to do to make it a more stable or to take it to the next version of the product but
+
+69
+00:06:51.340 --> 00:06:57.240
+<v Ben Turner>it's probably not in the backlog so that was one of the you know that had to happen from day one
+
+70
+00:06:58.180 --> 00:07:04.880
+<v Ben Turner>to deliver what we called our version one platform, not an MVP to a customer, because our
+
+71
+00:07:04.880 --> 00:07:10.480
+<v Ben Turner>first customer was one of the world's largest banks. And so you can't deliver an MVP to one
+
+72
+00:07:10.480 --> 00:07:13.660
+<v Ben Turner>of the world's largest banks. You have to deliver a version one platform.
+
+73
+00:07:13.900 --> 00:07:15.160
+<v Noah Labhart>That makes a ton of sense.
+
+74
+00:07:15.300 --> 00:07:22.840
+<v Noah Labhart>So you had this big enterprise bank, you know, client, et cetera, to deliver to. So you had to
+
+75
+00:07:22.840 --> 00:07:26.440
+<v Noah Labhart>to build it to where it was going to work day one as a version,
+
+76
+00:07:26.540 --> 00:07:30.900
+<v Noah Labhart>not a clunky MVP, for lack of a better term.
+
+77
+00:07:31.280 --> 00:07:31.880
+<v Ben Turner>That's right.
+
+78
+00:07:32.020 --> 00:07:33.320
+<v Ben Turner>And that's, I mean, quite honestly,
+
+79
+00:07:33.440 --> 00:07:36.160
+<v Ben Turner>that's one of the advantages of using the microservices architecture.
+
+80
+00:07:36.820 --> 00:07:40.660
+<v Ben Turner>And, you know, we fully containerized each of the services.
+
+81
+00:07:40.820 --> 00:07:45.380
+<v Ben Turner>It allowed us to deliver the scalability, the security,
+
+82
+00:07:45.440 --> 00:07:50.160
+<v Ben Turner>and the rigor that is required to support a large enterprise.
+
+83
+00:07:50.160 --> 00:07:50.660
+<v Ben Turner>enterprise.
+
+84
+00:07:51.900 --> 00:07:58.080
+<v Noah Labhart>Okay, then. So from that point, you've got your MVP, you launched MVP, you've got your
+
+85
+00:07:58.080 --> 00:08:04.240
+<v Noah Labhart>version one, and you launched it to the enterprise client. How have you progressed the product since
+
+86
+00:08:04.240 --> 00:08:08.920
+<v Noah Labhart>that point and matured it? And I think what to wrap that in a box, what I'm interested in is how
+
+87
+00:08:08.920 --> 00:08:14.880
+<v Noah Labhart>you built your roadmap and how you decided, okay, now this is the next most important thing to build.
+
+88
+00:08:16.260 --> 00:08:22.760
+<v Ben Turner>so the version one we really focused on for things like payee verification so knowing that you're
+
+89
+00:08:22.760 --> 00:08:28.900
+<v Ben Turner>paying the right payee knowing you're paying the right payment account using traditional ways to
+
+90
+00:08:28.900 --> 00:08:34.440
+<v Ben Turner>do that verification that quite honestly we did back at network solutions and verisign you just
+
+91
+00:08:34.440 --> 00:08:41.460
+<v Ben Turner>couldn't do it as fast because the technology wasn't there the version two it we've we've you
+
+92
+00:08:41.460 --> 00:08:45.860
+<v Ben Turner>really is driven by how do you change that model for two reasons.
+
+93
+00:08:46.620 --> 00:08:51.400
+<v Ben Turner>One, it's costly to do verification the traditional way,
+
+94
+00:08:51.480 --> 00:08:58.480
+<v Ben Turner>where you're hitting a LexisNexis or you're reliant on a suite of third-party data.
+
+95
+00:08:59.080 --> 00:09:06.620
+<v Ben Turner>The second is it also, if you think about when you get a Q&amp;A to verify that you are who you are,
+
+96
+00:09:06.720 --> 00:09:09.320
+<v Ben Turner>they're asking things like, where did you live in first grade?
+
+97
+00:09:09.400 --> 00:09:10.820
+<v Ben Turner>Or what was your first car?
+
+98
+00:09:11.460 --> 00:09:13.480
+<v Ben Turner>Every bad guy in the world can find that data.
+
+99
+00:09:13.540 --> 00:09:14.640
+<v Ben Turner>It's out on the internet.
+
+100
+00:09:15.180 --> 00:09:19.680
+<v Ben Turner>So we focused on how do you really solve for making sure you're paying the right payee?
+
+101
+00:09:19.800 --> 00:09:24.100
+<v Ben Turner>And that was about, and our version two is all about verifying relationships.
+
+102
+00:09:24.580 --> 00:09:27.520
+<v Ben Turner>What's the relationship between the payer and the payee?
+
+103
+00:09:27.600 --> 00:09:28.680
+<v Ben Turner>Can we verify that?
+
+104
+00:09:28.760 --> 00:09:31.640
+<v Ben Turner>What's the relationship between the payee and their payment account?
+
+105
+00:09:31.780 --> 00:09:32.800
+<v Ben Turner>Can we verify that?
+
+106
+00:09:33.320 --> 00:09:36.920
+<v Ben Turner>What's the relationship the payee may have with something else that's relevant?
+
+107
+00:09:37.220 --> 00:09:38.640
+<v Ben Turner>Can we verify that?
+
+108
+00:09:38.640 --> 00:09:45.460
+<v Ben Turner>And that allows us to increase the level of fidelity around that verification, but it
+
+109
+00:09:45.460 --> 00:09:49.380
+<v Ben Turner>makes it a lot harder to spoof it, to get around verification.
+
+110
+00:09:50.300 --> 00:09:54.260
+<v Ben Turner>Second part that we focused on is on the payment side or the payout side.
+
+111
+00:09:54.540 --> 00:09:59.880
+<v Ben Turner>And that's really adding intelligence to how the payment types are.
+
+112
+00:10:00.040 --> 00:10:05.580
+<v Ben Turner>The payment type is things like Zelle or ACH or PayPal.
+
+113
+00:10:05.580 --> 00:10:13.000
+<v Ben Turner>but how do you add intelligence to the selection of the right payment type so that you're taking
+
+114
+00:10:13.000 --> 00:10:18.880
+<v Ben Turner>into account the risk of the transaction, you're taking into account the size of the transaction,
+
+115
+00:10:19.200 --> 00:10:24.260
+<v Ben Turner>and you're taking into account the preferences of the payer and the payee. And so that's our
+
+116
+00:10:24.260 --> 00:10:30.900
+<v Ben Turner>version two. And then our roadmap where we're headed in our version three is moving from
+
+117
+00:10:30.900 --> 00:10:34.980
+<v Ben Turner>From knowing the payee, knowing the payment account, to knowing the transaction.
+
+118
+00:10:35.380 --> 00:10:44.440
+<v Ben Turner>Because if you know the transaction, you now can deliver with a high degree of certainty the most cost-effective, safest route to pay someone.
+
+119
+00:10:45.620 --> 00:10:47.420
+<v Noah Labhart>So let's switch to team, Ben.
+
+120
+00:10:47.640 --> 00:10:50.040
+<v Noah Labhart>How did you go about building your team?
+
+121
+00:10:50.260 --> 00:10:54.960
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+122
+00:10:54.960 --> 00:11:02.500
+<v Ben Turner>You know, I'm a big believer that building a business is a lot like putting together a sports team.
+
+123
+00:11:02.540 --> 00:11:05.180
+<v Ben Turner>I'm a big soccer fan, big college football fan.
+
+124
+00:11:05.840 --> 00:11:11.920
+<v Ben Turner>And the teams that win get the right players in the right place on the field.
+
+125
+00:11:12.100 --> 00:11:13.500
+<v Ben Turner>We focused on that.
+
+126
+00:11:13.580 --> 00:11:24.280
+<v Ben Turner>And the foundation of it was I was fortunate to be able to get, you know, half, almost half of my current team have worked together in prior jobs.
+
+127
+00:11:24.960 --> 00:11:42.840
+<v Ben Turner>And so that's a great foundation. And kind of when I look at that, I think the reason we were able to do that is, one, we've built a culture that encourages people to want to collaborate, that encourages people to want to win, that encourages people to be a participant and an owner in the business.
+
+128
+00:11:42.840 --> 00:11:50.080
+<v Ben Turner>And by doing that, we've been able to not only bring back people we've all worked with before, but that also helps in recruiting.
+
+129
+00:11:50.480 --> 00:11:55.480
+<v Ben Turner>And so we do a couple of things that are unique as we go to find people.
+
+130
+00:11:55.960 --> 00:12:09.260
+<v Ben Turner>One, I'm a big believer in having at least a quarter of the company interview any one candidate, whether it's someone right out of college or whether it's someone that has 15 years of experience.
+
+131
+00:12:09.260 --> 00:12:15.380
+<v Ben Turner>experience because fit really matters. Just like on a team, you get the wrong player on that field,
+
+132
+00:12:15.560 --> 00:12:23.100
+<v Ben Turner>you're going to fail. And so we spend an awful lot of time making sure there's fit from a cultural
+
+133
+00:12:23.100 --> 00:12:28.360
+<v Ben Turner>standpoint. They have the skill we need. They have the diversity of skills that a startup requires.
+
+134
+00:12:28.840 --> 00:12:33.220
+<v Ben Turner>And then they have that drive that says, hey, I want to go win.
+
+135
+00:12:35.820 --> 00:12:41.000
+<v Noah Labhart>in. So then let's switch to scalability. And you mentioned this earlier and, you know, touching on
+
+136
+00:12:41.000 --> 00:12:45.820
+<v Noah Labhart>microservices and, and how it was built in the beginning. I kind of have an idea of where you're
+
+137
+00:12:45.820 --> 00:12:50.900
+<v Noah Labhart>going to go, but I'm going to ask it generically. Did you build this to scale efficiently from day
+
+138
+00:12:50.900 --> 00:12:56.440
+<v Noah Labhart>one, or are you fighting this at any capacity as you grow? So we
+
+139
+00:12:56.440 --> 00:12:58.960
+<v Ben Turner>build it to scale from day one,
+
+140
+00:12:58.960 --> 00:13:03.940
+<v Ben Turner>right I mean we were very deliberate and it took us probably a little longer than
+
+141
+00:13:03.940 --> 00:13:08.880
+<v Ben Turner>you would expect to build that version one but we we took the time to do that
+
+142
+00:13:08.880 --> 00:13:14.700
+<v Ben Turner>so that we didn't have to pay the cost of fixing how do you scale so the great
+
+143
+00:13:14.700 --> 00:13:17.680
+<v Ben Turner>thing as you probably know the micro services architectures is highly
+
+144
+00:13:17.680 --> 00:13:22.220
+<v Ben Turner>scalable but it's the interaction between those services that can limit
+
+145
+00:13:22.220 --> 00:13:26.820
+<v Ben Turner>your ability to scale so we made sure that not only were those micro services
+
+146
+00:13:26.820 --> 00:13:31.620
+<v Ben Turner>as efficient and as tight as we could make them,
+
+147
+00:13:31.740 --> 00:13:36.200
+<v Ben Turner>but also the communication between those microservices was scalable.
+
+148
+00:13:37.000 --> 00:13:40.400
+<v Noah Labhart>With that, how did you architect the communication?
+
+149
+00:13:40.580 --> 00:13:45.240
+<v Noah Labhart>What was important about the communication between those services in addressing?
+
+150
+00:13:45.500 --> 00:13:47.520
+<v Noah Labhart>How did you layer the blocks of communication?
+
+151
+00:13:48.280 --> 00:13:52.700
+<v Ben Turner>Yeah, so I'll go back to something I learned when I was at Network Solutions
+
+152
+00:13:52.700 --> 00:13:59.560
+<v Ben Turner>solutions and then VeriSign after they acquired us, is that if you think about never being down,
+
+153
+00:13:59.800 --> 00:14:05.180
+<v Ben Turner>what does that mean you have to do? Well, that means that you have to expect, you know, a
+
+154
+00:14:05.180 --> 00:14:10.460
+<v Ben Turner>microservice is going down, but you can't lose the data. You can't lose the discussion between
+
+155
+00:14:10.460 --> 00:14:17.140
+<v Ben Turner>those two microservices or suite of microservices. So as we architected it, we looked for places
+
+156
+00:14:17.140 --> 00:14:23.260
+<v Ben Turner>where we could have built in a methodology that if something was down, we didn't lose that data.
+
+157
+00:14:23.380 --> 00:14:29.340
+<v Ben Turner>It queued, it knew when to keep talking, it knew then when to connect and then do the interaction.
+
+158
+00:14:30.740 --> 00:14:36.000
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+159
+00:14:37.060 --> 00:14:42.380
+<v Ben Turner>Two things. One, we spent a lot of time making sure we understood
+
+160
+00:14:43.340 --> 00:14:49.000
+<v Ben Turner>understood how to meet the needs of a business or payer and how to meet the needs of a bank.
+
+161
+00:14:49.180 --> 00:14:53.800
+<v Ben Turner>Because in the world of payouts, banks play a central role in providing liquidity
+
+162
+00:14:53.800 --> 00:15:00.080
+<v Ben Turner>and payers are having to interact with their customers or suppliers in a way that doesn't
+
+163
+00:15:00.080 --> 00:15:04.700
+<v Ben Turner>cause friction. So I think one of the biggest things that I'm amazed that we pulled off
+
+164
+00:15:04.700 --> 00:15:12.020
+<v Ben Turner>is we truly have a frictionless interaction. So if you're a payer and you want to initiate a payout,
+
+165
+00:15:12.380 --> 00:15:15.820
+<v Ben Turner>It can be everything as simple as just send us your check file,
+
+166
+00:15:15.960 --> 00:15:20.860
+<v Ben Turner>even if that check file is being produced out of a COBOL system and is space-delivered.
+
+167
+00:15:21.080 --> 00:15:23.980
+<v Ben Turner>We'll transform that into a modern payout file.
+
+168
+00:15:24.200 --> 00:15:28.460
+<v Ben Turner>Or you can connect to us via an API and do a real-time transaction.
+
+169
+00:15:28.760 --> 00:15:34.500
+<v Ben Turner>Or you can send us a batch file you would expect to see in a more modern architecture.
+
+170
+00:15:35.280 --> 00:15:38.680
+<v Ben Turner>We thought about how do you put intelligence at every step of the way.
+
+171
+00:15:39.000 --> 00:15:41.620
+<v Ben Turner>So, you know, version one is basic intelligence.
+
+172
+00:15:42.380 --> 00:15:43.600
+<v Ben Turner>Version two is a little bit more.
+
+173
+00:15:43.760 --> 00:15:49.260
+<v Ben Turner>But that intelligence takes friction out of the process and it lets the network handle it.
+
+174
+00:15:49.320 --> 00:15:55.840
+<v Ben Turner>One of the biggest learnings I ever got in technology was from the original CEO at Network Solutions who said,
+
+175
+00:15:55.960 --> 00:16:00.720
+<v Ben Turner>why do technologists think about building products where the end user has to make a decision?
+
+176
+00:16:01.120 --> 00:16:09.600
+<v Ben Turner>And so that's what we focused on is how can you build a payout network where the network handles all the decision making and the complexities?
+
+177
+00:16:09.600 --> 00:16:10.100
+<v Ben Turner>cities.
+
+178
+00:16:10.640 --> 00:16:15.780
+<v Noah Labhart>Well, Ben, let's flip the script a little bit. Tell me about a mistake you made and how you
+
+179
+00:16:15.780 --> 00:16:17.100
+<v Noah Labhart>and your team responded to it.
+
+180
+00:16:17.800 --> 00:16:23.080
+<v Ben Turner>One of the early mistakes that we made was, so in the world of
+
+181
+00:16:23.080 --> 00:16:30.320
+<v Ben Turner>payments or payouts, there are about 12 different payment types and all of them have their own
+
+182
+00:16:30.320 --> 00:16:35.300
+<v Ben Turner>complexity and payments for people that don't know payments, payments are oddly technical.
+
+183
+00:16:35.300 --> 00:16:56.060
+<v Ben Turner>They shouldn't be, but they are. And so one of the mistakes we made is we tried to tackle too many of them at one time, which caused serious complexity from an engineering standpoint that probably cost us a good six, eight weeks in our timeline.
+
+184
+00:16:56.060 --> 00:17:03.100
+<v Ben Turner>line. I think that, you know, the learning from that was, you know, take advantage of the concept.
+
+185
+00:17:03.220 --> 00:17:07.200
+<v Ben Turner>We like, I like squads, right? So take advantage of breaking things into smaller bites
+
+186
+00:17:07.200 --> 00:17:10.960
+<v Ben Turner>and set some milestones when those bites should come together.
+
+187
+00:17:12.820 --> 00:17:19.240
+<v Noah Labhart>You mentioned this a bit earlier with, you know, phase three of the product and understanding the
+
+188
+00:17:19.240 --> 00:17:25.120
+<v Noah Labhart>transaction, but a little more to that and beyond, what does the future look like for the product and
+
+189
+00:17:26.540 --> 00:17:39.040
+<v Ben Turner>You know, when we look out in the future and, you know, quarter the vision of our company is literally the way we think the world should work is a business should say how much to whom and when.
+
+190
+00:17:39.420 --> 00:17:42.560
+<v Ben Turner>And that's all they have to do. And the network handles the rest.
+
+191
+00:17:42.800 --> 00:17:51.420
+<v Ben Turner>And that's really why this phase three, know your transaction is so important, because once we get that, we can make that true.
+
+192
+00:17:51.420 --> 00:18:01.780
+<v Ben Turner>And that will take out costs, that will take out risk, and that will drive up customer satisfaction, both from a payer standpoint and a payee standpoint.
+
+193
+00:18:03.020 --> 00:18:11.720
+<v Noah Labhart>Well, let's switch to you, Ben. Who influences the way that you work? Name a CEO, a CTO, an architect, really any person that you look up to and why.
+
+194
+00:18:12.800 --> 00:18:25.160
+<v Ben Turner>I'm a big history guy. So believe it or not, Ben Franklin has a big influence on how I do business or how I think about startups and technology.
+
+195
+00:18:25.460 --> 00:18:37.020
+<v Ben Turner>And kind of the big takeaway when you study Ben Franklin is his ability to constantly keep an open mind and question, why does it work this way? Why shouldn't it work that way?
+
+196
+00:18:38.200 --> 00:18:53.640
+<v Ben Turner>The second is, and we talked about it earlier, is the original CEO at Network Solutions, Gabe Battista, and his philosophy that, you know, why do technologists make technology complex for the end user?
+
+197
+00:18:54.760 --> 00:19:03.380
+<v Ben Turner>And then, you know, I would say a third is this guy, Bob Korzenewski, who was the CFO at Network Solutions.
+
+198
+00:19:04.460 --> 00:19:11.640
+<v Ben Turner>He really taught me the value of putting together a quality team that's not just based on skill, but based on the people.
+
+199
+00:19:13.600 --> 00:19:17.420
+<v Noah Labhart>Well, we talked about, you know, a mistake, but a little bit different spin.
+
+200
+00:19:17.940 --> 00:19:20.780
+<v Noah Labhart>If you go back to the beginning, what would you do different?
+
+201
+00:19:20.860 --> 00:19:22.860
+<v Noah Labhart>Where would you consider taking a different approach?
+
+202
+00:19:23.880 --> 00:19:33.980
+<v Ben Turner>I think the only thing I would look at differently is our sales model is we sell to banks and help banks sell to their commercial customers.
+
+203
+00:19:35.220 --> 00:19:38.880
+<v Ben Turner>And now we also sell to large payers directly.
+
+204
+00:19:39.120 --> 00:19:45.280
+<v Ben Turner>I would have started selling to large payers directly sooner for two reasons.
+
+205
+00:19:45.440 --> 00:19:51.600
+<v Ben Turner>One, when we sell a large payer like an insurance company, they bring their banks with them.
+
+206
+00:19:51.640 --> 00:19:53.200
+<v Ben Turner>So it helps us build our network.
+
+207
+00:19:53.640 --> 00:19:59.400
+<v Ben Turner>The second is they have a higher economic incentive to start putting transaction on the network sooner.
+
+208
+00:20:01.460 --> 00:20:08.680
+<v Ben Turner>And so I think that would have made the early days of scaling easier.
+
+209
+00:20:09.400 --> 00:20:14.140
+<v Ben Turner>And now we've course corrected and we sell to large payers and banks.
+
+210
+00:20:14.300 --> 00:20:16.140
+<v Ben Turner>And we love banks as a partner.
+
+211
+00:20:16.300 --> 00:20:22.960
+<v Ben Turner>They have lots of payers that they have to interact with and they have to be able to provide solutions for.
+
+212
+00:20:24.800 --> 00:20:39.420
+<v Noah Labhart>Well, last question, Ben. So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show it off to the world. Can't wait to show it off to you right there on the plane. What advice do you give that person having gone down this road a bit?
+
+213
+00:20:40.440 --> 00:20:48.720
+<v Ben Turner>To me, it's simple. It's, can you tell me why someone would buy your product and what is the value you're giving them?
+
+214
+00:20:48.840 --> 00:20:51.260
+<v Ben Turner>If you can answer that, then you're ready to start your company.
+
+215
+00:20:52.060 --> 00:20:55.840
+<v Ben Turner>Go talk to some who they think their customers are and learn.
+
+216
+00:20:56.120 --> 00:20:58.840
+<v Ben Turner>Like, what is that problem that they need to solve?
+
+217
+00:20:59.240 --> 00:21:02.800
+<v Ben Turner>So I'm talking more, you know, B2B here versus B2C.
+
+218
+00:21:02.800 --> 00:21:09.260
+<v Ben Turner>but you know that's getting out as an as you're starting your company getting out and talking
+
+219
+00:21:09.260 --> 00:21:14.840
+<v Ben Turner>to potential buyers gives you a huge advantage when you launch so we went out and we talked
+
+220
+00:21:14.840 --> 00:21:21.840
+<v Ben Turner>to over 15 banks about what we were trying to solve before we launched the the company
+
+221
+00:21:22.540 --> 00:21:28.060
+<v Noah Labhart>that's fantastic advice ben well thank you for being on the show today ben and thank you for
+
+222
+00:21:28.060 --> 00:21:30.180
+<v Noah Labhart>telling the creation story of verituity
+
+223
+00:21:30.180 --> 00:21:32.500
+<v Ben Turner>Thank you for your time. I really appreciate it.
+
+224
+00:21:34.460 --> 00:21:37.340
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+225
+00:21:37.340 --> 00:21:37.840
+<v Noah Labhart>Code Story.
+
+226
+00:21:42.140 --> 00:21:44.780
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+227
+00:21:44.900 --> 00:21:49.700
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+228
+00:21:50.140 --> 00:21:55.180
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+229
+00:21:55.560 --> 00:21:57.780
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+230
+00:21:58.060 --> 00:22:00.140
+<v Noah Labhart>Both things help us out tremendously.
+
+231
+00:22:02.420 --> 00:22:02.920
+<v Noah Labhart>And thank
+
+232
+00:22:02.800 --> 00:22:03.860
+<v Noah Labhart>And thanks again for listening.

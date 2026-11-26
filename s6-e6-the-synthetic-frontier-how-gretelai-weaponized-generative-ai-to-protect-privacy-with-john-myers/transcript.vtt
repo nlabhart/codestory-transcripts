@@ -1,0 +1,1643 @@
+WEBVTT
+
+NOTE S6 E6: The Synthetic Frontier: How Gretel.ai Weaponized Generative AI to Protect Privacy with John Myers
+
+1
+00:00:00.920 --> 00:00:07.180
+<v John Myers>So we had two iterations of a beta, beta one and beta two that we call them because we're very clever at naming things.
+
+2
+00:00:07.820 --> 00:00:15.280
+<v John Myers>And the first beta that we released, we kind of made some rough assumptions on how people wanted to send us data.
+
+3
+00:00:15.920 --> 00:00:19.980
+<v John Myers>You were able to send us a couple of pieces of data and get like real time results.
+
+4
+00:00:20.580 --> 00:00:26.320
+<v John Myers>The challenge there was it was really good to demo. Like, hey, I could show you real time.
+
+5
+00:00:26.320 --> 00:00:30.460
+<v John Myers>Like I could take this JSON blob, you could send it to our API and you got results back right away.
+
+6
+00:00:30.960 --> 00:00:32.240
+<v John Myers>People are like, this is great.
+
+7
+00:00:32.360 --> 00:00:33.060
+<v John Myers>Like I'm in.
+
+8
+00:00:33.140 --> 00:00:35.480
+<v John Myers>And they're like, now I have a five gigabyte file.
+
+9
+00:00:35.620 --> 00:00:36.680
+<v John Myers>How do we process that?
+
+10
+00:00:37.980 --> 00:00:39.300
+<v John Myers>My name is John Myers.
+
+11
+00:00:39.580 --> 00:00:42.420
+<v John Myers>I'm a co-founder and CTO at Gretel AI.
+
+12
+00:00:47.640 --> 00:00:49.300
+<v Noah Labhart>This is Code Story.
+
+13
+00:00:49.740 --> 00:00:52.940
+<v Noah Labhart>The podcast bringing you interviews with tech visionaries.
+
+14
+00:00:52.940 --> 00:01:00.820
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+15
+00:01:02.180 --> 00:01:12.340
+<v Noah Labhart>I'm your host, Noah Labhart, and today how John Myers built a software machine to anonymize info and created privacy engineering for all.
+
+16
+00:01:13.320 --> 00:01:15.760
+<v Noah Labhart>All this and more on Code Story.
+
+17
+00:01:20.680 --> 00:01:23.140
+<v Noah Labhart>John Myers comes from a big military family.
+
+18
+00:01:23.400 --> 00:01:26.320
+<v Noah Labhart>He was convinced he was going to be a pilot his whole life.
+
+19
+00:01:26.600 --> 00:01:31.020
+<v Noah Labhart>And when he was a junior in high school, he started doing C++ programming, and he got hooked.
+
+20
+00:01:31.680 --> 00:01:36.900
+<v Noah Labhart>After graduation, he got accepted to RPI in upstate New York and started studying computer science.
+
+21
+00:01:37.580 --> 00:01:40.780
+<v Noah Labhart>He eventually joined the Air Force and focused on information systems.
+
+22
+00:01:41.400 --> 00:01:46.000
+<v Noah Labhart>Through an interesting turn of events, John got accepted to the NSA, while a good friend
+
+23
+00:01:46.000 --> 00:01:47.880
+<v Noah Labhart>of his took his deployment spot to Iraq.
+
+24
+00:01:48.740 --> 00:01:54.480
+<v Noah Labhart>This job launched him into the world of cybersecurity, which took him to Afghanistan doing engineering
+
+25
+00:01:54.480 --> 00:01:55.220
+<v Noah Labhart>for the military.
+
+26
+00:01:56.280 --> 00:02:00.220
+<v Noah Labhart>When he came back to the States, he jumped head first into the startup world.
+
+27
+00:02:01.260 --> 00:02:04.820
+<v Noah Labhart>He's into exercise, likes to bike in the summer and ski in the winter.
+
+28
+00:02:05.120 --> 00:02:07.880
+<v Noah Labhart>Mostly, he likes to decompress with his friends and family.
+
+29
+00:02:08.720 --> 00:02:13.280
+<v Noah Labhart>Post-acquisition of his first startup, John started working on a bunch of projects,
+
+30
+00:02:13.520 --> 00:02:18.140
+<v Noah Labhart>one of them requiring him to aggregate a large amount of data and anonymize it.
+
+31
+00:02:18.280 --> 00:02:23.660
+<v Noah Labhart>This took a lot of work, and there wasn't anything out on the market that provided this type of functionality,
+
+32
+00:02:24.920 --> 00:02:26.560
+<v Noah Labhart>which got John's attention.
+
+33
+00:02:27.820 --> 00:02:30.360
+<v Noah Labhart>This is the creation story of Gretel.
+
+34
+00:02:33.420 --> 00:02:38.540
+<v John Myers>Gretel is a privacy toolkit that allows developers, engineers, and scientists
+
+35
+00:02:38.540 --> 00:02:41.600
+<v John Myers>to quickly create safe versions of data
+
+36
+00:02:41.600 --> 00:02:45.040
+<v John Myers>so they can be more productive with their teams and within their organizations.
+
+37
+00:02:46.120 --> 00:02:50.780
+<v John Myers>I came back from Afghanistan, stayed around in Maryland for another year or so,
+
+38
+00:02:50.920 --> 00:02:55.480
+<v John Myers>went to Las Vegas, did some regular Air Force stuff in Las Vegas,
+
+39
+00:02:55.720 --> 00:02:58.000
+<v John Myers>working with live fly exercises.
+
+40
+00:02:58.000 --> 00:03:02.660
+<v John Myers>sizes. You know, I kind of had this decision to make, like I was going to either have to switch
+
+41
+00:03:02.660 --> 00:03:09.400
+<v John Myers>over into the upper management ranks of the Air Force or get out. So I decided to get out. I still
+
+42
+00:03:09.400 --> 00:03:15.000
+<v John Myers>stayed in the reserves and I launched a startup in cybersecurity with a couple other veterans.
+
+43
+00:03:15.440 --> 00:03:21.800
+<v John Myers>I did that for a couple of years, got off the ground. Then we got acquired by a company that
+
+44
+00:03:21.800 --> 00:03:27.660
+<v John Myers>does performance network monitoring. And while I was there, I started working on a lot of different
+
+45
+00:03:28.000 --> 00:03:32.860
+<v John Myers>as an architect and one of the projects I was working on was creating this
+
+46
+00:03:32.860 --> 00:03:38.200
+<v John Myers>analysis product that used anonymized customer data to kind of show general
+
+47
+00:03:38.200 --> 00:03:43.040
+<v John Myers>threat landscapes in the internet. What we needed to do was take a bunch of this
+
+48
+00:03:43.040 --> 00:03:47.080
+<v John Myers>feedback that we get from products that were sold to customers and anonymize the
+
+49
+00:03:47.080 --> 00:03:51.300
+<v John Myers>data and then make it queryable and that was all pretty straightforward except
+
+50
+00:03:51.300 --> 00:03:55.440
+<v John Myers>for the anonymization side of things. I was very familiar with the data because
+
+51
+00:03:55.440 --> 00:03:56.740
+<v John Myers>because it was all like network telemetry
+
+52
+00:03:56.740 --> 00:03:58.800
+<v John Myers>and stuff I've always lived inside, right?
+
+53
+00:03:58.860 --> 00:04:01.520
+<v John Myers>DNS information and TCP IP data.
+
+54
+00:04:01.780 --> 00:04:03.760
+<v John Myers>And I was like, oh, we gotta figure out how to anonymize this
+
+55
+00:04:03.760 --> 00:04:05.680
+<v John Myers>which turned out to be probably more work
+
+56
+00:04:05.680 --> 00:04:06.840
+<v John Myers>than building the end-to-end product.
+
+57
+00:04:07.280 --> 00:04:09.140
+<v John Myers>I was like, well, that was a lot of work.
+
+58
+00:04:09.260 --> 00:04:10.720
+<v John Myers>Like there was really nothing out there
+
+59
+00:04:11.140 --> 00:04:13.960
+<v John Myers>that was really of a developer friendly way to do that.
+
+60
+00:04:14.040 --> 00:04:15.220
+<v John Myers>Like all the tools that are out there
+
+61
+00:04:15.220 --> 00:04:17.520
+<v John Myers>kind of like really high level APIs
+
+62
+00:04:17.520 --> 00:04:19.880
+<v John Myers>or enterprise applications that you install.
+
+63
+00:04:20.020 --> 00:04:21.520
+<v John Myers>And like, you know, they crawl your data stores
+
+64
+00:04:21.520 --> 00:04:24.400
+<v John Myers>and they help you identify where sensitive information is.
+
+65
+00:04:25.440 --> 00:04:31.360
+<v John Myers>I needed to put something in the path of this data pipeline that we were building that could process records at a time.
+
+66
+00:04:31.540 --> 00:04:39.420
+<v John Myers>And at the same time, with my current co-founders, Alex Watson and Ali Golshan, we were always just catching up and talking.
+
+67
+00:04:40.300 --> 00:04:41.740
+<v John Myers>I forget what we were talking about.
+
+68
+00:04:41.780 --> 00:04:43.600
+<v John Myers>We were talking about like Alexas and stuff like that.
+
+69
+00:04:43.940 --> 00:04:51.760
+<v John Myers>One of the 800 news articles about how your Alexas are spying on you and stuff like that or capturing too much information.
+
+70
+00:04:51.820 --> 00:04:53.640
+<v John Myers>How are they using all the audio that they collect?
+
+71
+00:04:55.440 --> 00:04:59.500
+<v John Myers>CEO now, Ali, and one of my really good friends. And I was like, you know what I want to do? Like,
+
+72
+00:04:59.580 --> 00:05:03.200
+<v John Myers>I'm just going to create some kind of thing that injects a ton of like white noise. So
+
+73
+00:05:03.200 --> 00:05:07.900
+<v John Myers>you can't make sense of like what I'm actually talking about. And like all the white noise I
+
+74
+00:05:07.900 --> 00:05:14.040
+<v John Myers>inject and it's just like going to help mask my privacy concerns. At the time, I didn't really
+
+75
+00:05:14.040 --> 00:05:17.700
+<v John Myers>know what differential privacy was, but I kind of just like inadvertently made a joke about
+
+76
+00:05:17.700 --> 00:05:22.260
+<v John Myers>differential privacy and injecting noise in the data. And Ali's like, you know, that's a really
+
+77
+00:05:22.260 --> 00:05:25.920
+<v John Myers>interesting idea like maybe not like trying to like throw off the people to
+
+78
+00:05:25.920 --> 00:05:30.360
+<v John Myers>Alexa, but what about like, you know, how do we make these kind of tools that do this
+
+79
+00:05:30.360 --> 00:05:34.080
+<v John Myers>kind of thing and then we just from there we just kind of spent nights and
+
+80
+00:05:34.080 --> 00:05:39.200
+<v John Myers>weekends kind of riffing on this idea we backed into basically privacy being an
+
+81
+00:05:39.200 --> 00:05:44.380
+<v John Myers>engineering problem where if you enabled engineers to make safe versions of data
+
+82
+00:05:45.020 --> 00:05:49.960
+<v John Myers>at the source of where the data gets created before the data gets put into a
+
+83
+00:05:49.960 --> 00:05:54.660
+<v John Myers>a data silo or a database or a data warehouse and it gets replicated a million times because
+
+84
+00:05:54.660 --> 00:05:55.520
+<v John Myers>it's being shared everywhere.
+
+85
+00:05:56.620 --> 00:05:57.700
+<v John Myers>What if we could do that?
+
+86
+00:05:57.840 --> 00:06:02.480
+<v John Myers>So then anyone processing sensitive information could always fork off a copy of the safe version
+
+87
+00:06:02.480 --> 00:06:03.000
+<v John Myers>of the data.
+
+88
+00:06:03.140 --> 00:06:07.660
+<v John Myers>And so then when you go into that data replication problem because you're sharing data with partners
+
+89
+00:06:07.660 --> 00:06:10.260
+<v John Myers>or inside your org, it's already clean.
+
+90
+00:06:11.740 --> 00:06:15.640
+<v John Myers>That was Gretel that we kind of just described Gretel before we even launched it.
+
+91
+00:06:16.420 --> 00:06:18.920
+<v John Myers>And then we were like, well, should we just do this?
+
+92
+00:06:18.980 --> 00:06:20.120
+<v John Myers>Because no one else is doing this.
+
+93
+00:06:20.260 --> 00:06:21.400
+<v John Myers>We were like, all right, let's do it.
+
+94
+00:06:21.500 --> 00:06:23.800
+<v John Myers>So that's what we did like two years ago.
+
+95
+00:06:24.000 --> 00:06:28.260
+<v John Myers>You know, we had all left our various positions and launched Gretel.
+
+96
+00:06:30.320 --> 00:06:31.660
+<v Noah Labhart>Well, tell me about the MVP.
+
+97
+00:06:31.880 --> 00:06:35.000
+<v Noah Labhart>And you touched on it a little bit, but tell me a little bit more about it.
+
+98
+00:06:35.100 --> 00:06:37.580
+<v Noah Labhart>What sort of tools did you use to bring it to life?
+
+99
+00:06:37.700 --> 00:06:39.140
+<v Noah Labhart>How long it took you to build?
+
+100
+00:06:39.260 --> 00:06:41.960
+<v Noah Labhart>And give me a little bit more of the story there.
+
+101
+00:06:41.960 --> 00:06:47.600
+<v John Myers>You know, I think MVP is kind of a broad term for any startup.
+
+102
+00:06:47.760 --> 00:06:57.280
+<v John Myers>But what we wanted to do was demonstrate that it was possible to take what is otherwise a pretty complex operation,
+
+103
+00:06:57.400 --> 00:07:06.520
+<v John Myers>such as detecting PII or creating synthetic data and actually just put it behind a friendly API call.
+
+104
+00:07:07.240 --> 00:07:11.020
+<v John Myers>We want to demonstrate that was possible because there's a ton of frameworks out there that
+
+105
+00:07:11.020 --> 00:07:16.300
+<v John Myers>can do a bunch of different things like PII detection or data transforms.
+
+106
+00:07:16.680 --> 00:07:21.540
+<v John Myers>But usually you have to kind of really dive deep into the SDK and you have to kind of
+
+107
+00:07:21.540 --> 00:07:23.220
+<v John Myers>connect it in with what you're building.
+
+108
+00:07:23.740 --> 00:07:25.700
+<v John Myers>And it might not be compatible, right?
+
+109
+00:07:25.820 --> 00:07:29.220
+<v John Myers>Like some of these tools are written in Python or some of these tools are written in Java.
+
+110
+00:07:29.420 --> 00:07:33.520
+<v John Myers>And then if you're working and you're building a Golang stack for whatever reason, and you
+
+111
+00:07:33.520 --> 00:07:35.480
+<v John Myers>you need to try to wire that stuff in.
+
+112
+00:07:35.620 --> 00:07:37.060
+<v John Myers>It becomes a little challenging, right?
+
+113
+00:07:37.140 --> 00:07:37.980
+<v John Myers>You have to build a, you know,
+
+114
+00:07:38.000 --> 00:07:40.040
+<v John Myers>decoupled services and that's fine to do,
+
+115
+00:07:40.160 --> 00:07:42.280
+<v John Myers>but we were like, what if we can just make it
+
+116
+00:07:43.140 --> 00:07:44.700
+<v John Myers>through these common REST APIs?
+
+117
+00:07:45.180 --> 00:07:47.060
+<v John Myers>And so when we built the MVP,
+
+118
+00:07:48.020 --> 00:07:50.720
+<v John Myers>you know, what we really kind of created at first
+
+119
+00:07:50.720 --> 00:07:54.900
+<v John Myers>was a bunch of Jupyter notebooks that made REST API calls.
+
+120
+00:07:55.160 --> 00:07:55.920
+<v John Myers>We wrote them in Python.
+
+121
+00:07:56.220 --> 00:07:58.640
+<v John Myers>We demonstrated that, you know, given a data set
+
+122
+00:07:58.640 --> 00:08:00.980
+<v John Myers>and then given a couple of API calls,
+
+123
+00:08:00.980 --> 00:08:03.400
+<v John Myers>you could build safe versions of data.
+
+124
+00:08:04.600 --> 00:08:07.260
+<v John Myers>We built some tools and we just like built them in Docker containers
+
+125
+00:08:07.260 --> 00:08:08.920
+<v John Myers>and they were running around little REST APIs
+
+126
+00:08:08.920 --> 00:08:10.880
+<v John Myers>and we can spin it up on our local machine
+
+127
+00:08:10.880 --> 00:08:13.580
+<v John Myers>and push a bunch of data into it.
+
+128
+00:08:13.660 --> 00:08:16.520
+<v John Myers>And then we can make another API call to get the transform
+
+129
+00:08:16.520 --> 00:08:18.900
+<v John Myers>or the synthetic data back out on the other side.
+
+130
+00:08:19.240 --> 00:08:21.220
+<v John Myers>And we were able to just kind of went on a roadshow
+
+131
+00:08:21.220 --> 00:08:23.700
+<v John Myers>and we talked to a ton of different engineers
+
+132
+00:08:23.700 --> 00:08:24.860
+<v John Myers>at different companies that we knew.
+
+133
+00:08:25.380 --> 00:08:26.660
+<v John Myers>Obviously, we were talking to investors
+
+134
+00:08:26.660 --> 00:08:28.520
+<v John Myers>and demonstrating the capability to them.
+
+135
+00:08:28.520 --> 00:08:35.680
+<v John Myers>And, you know, really it was all about extrapolating this little deployable tool that we build that you can run on like your own workstation.
+
+136
+00:08:35.920 --> 00:08:46.340
+<v John Myers>Now we're like, imagine this, but now imagine deployed in the cloud and, you know, making it infinitely scalable because you can host it on, you know, any one of different cloud providers.
+
+137
+00:08:46.500 --> 00:08:56.400
+<v John Myers>Imagine that developers everywhere can sign up and use this thing and drastically increase the productivity of their organizations because now they can create safe data that they can share anywhere.
+
+138
+00:08:57.480 --> 00:09:02.120
+<v Noah Labhart>Tell me about some of the decisions and trade-offs you had to make in that MVP.
+
+139
+00:09:02.680 --> 00:09:04.680
+<v Noah Labhart>Feature cut, technical debt.
+
+140
+00:09:04.940 --> 00:09:08.720
+<v Noah Labhart>I could extract a few of those from some of the things you're saying, but I want to give
+
+141
+00:09:08.720 --> 00:09:09.480
+<v Noah Labhart>space to it.
+
+142
+00:09:09.600 --> 00:09:13.560
+<v Noah Labhart>So tell me about some of those decisions and trade-offs you had to make and how you coped
+
+143
+00:09:13.560 --> 00:09:14.060
+<v Noah Labhart>with them.
+
+144
+00:09:15.520 --> 00:09:19.880
+<v John Myers>The market that we're in is basically a market we're creating, privacy engineering.
+
+145
+00:09:20.760 --> 00:09:25.100
+<v John Myers>And so MVP is all about demonstrability, I think, in that sense.
+
+146
+00:09:26.400 --> 00:09:36.420
+<v John Myers>What we knew would take a lot longer as we built a service that people could sign up for and use was probably too long of a stretch.
+
+147
+00:09:36.600 --> 00:09:46.920
+<v John Myers>So we said that's where we kind of decided to build kind of this locally deployable version of Gretel very early on and kind of go on this roadshow and have people just install it on their own workstations.
+
+148
+00:09:46.940 --> 00:09:53.940
+<v John Myers>Because everyone who's working with that already has like, you know, in your downloads folder, you probably have some CSVs you downloaded from like a database dump.
+
+149
+00:09:53.940 --> 00:09:56.700
+<v John Myers>And then we said, hey, just use this on your local system.
+
+150
+00:09:58.100 --> 00:10:07.620
+<v John Myers>We got that built way faster than building an actual like hosted MVP that would allow people to log in and actually like test things.
+
+151
+00:10:07.880 --> 00:10:15.180
+<v John Myers>Now, the sacrifice there is it takes more time up front to kind of go on the roadshow versus like putting it out there and letting people log in.
+
+152
+00:10:15.180 --> 00:10:23.860
+<v John Myers>But when we're kind of trying to create this new market, we have to go out and kind of get people excited as fast as possible.
+
+153
+00:10:24.880 --> 00:10:42.540
+<v John Myers>On the converse, I would say if you're in a market that's well established and you're doing like something, a new take on it or something additive to that market, then I would lean more towards building something that you could unveil and have like tons of people sign up for.
+
+154
+00:10:42.540 --> 00:10:46.820
+<v John Myers>Now, with that said, the MVP for us was all about getting that initial funding.
+
+155
+00:10:47.460 --> 00:10:53.640
+<v John Myers>Once we got that secured, we did then launch a public beta eight months later that we call our beta one.
+
+156
+00:10:53.800 --> 00:10:57.920
+<v John Myers>We had like, you know, all the people starting to sign up and starting to use Gretel at that point.
+
+157
+00:10:58.140 --> 00:11:03.520
+<v John Myers>But our MVP was really about the roadshow to get the initial funding so we could bootstrap the team and get going.
+
+158
+00:11:03.720 --> 00:11:09.460
+<v John Myers>And I think that's what's important to note, like your MVP should have an end goal in mind.
+
+159
+00:11:09.580 --> 00:11:10.560
+<v John Myers>And that's what ours was.
+
+160
+00:11:12.900 --> 00:11:18.720
+<v Noah Labhart>Well, then how did you progress the product from there, post-funding, post that goal?
+
+161
+00:11:18.900 --> 00:11:20.100
+<v Noah Labhart>How did you progress the product?
+
+162
+00:11:20.240 --> 00:11:28.540
+<v Noah Labhart>And I'm curious how you built your roadmap and figured out, okay, this is the next thing, the next most important thing to address or to build with Gretel.
+
+163
+00:11:30.460 --> 00:11:38.160
+<v John Myers>Right after we got our funding, I think the most important thing that you could do is really bootstrap your team with the right talent.
+
+164
+00:11:38.320 --> 00:11:39.580
+<v John Myers>And that's what we did first.
+
+165
+00:11:39.580 --> 00:11:45.500
+<v John Myers>we were able to leverage our networks and we were able to bootstrap probably four to five folks to
+
+166
+00:11:45.500 --> 00:11:51.580
+<v John Myers>come on board and just start building with us. At that point, you know, you have a decision to make
+
+167
+00:11:51.580 --> 00:11:57.620
+<v John Myers>on how you're going to get people to use the next evolution of the product. And traditionally,
+
+168
+00:11:57.740 --> 00:12:04.480
+<v John Myers>you'll have a lot of startups build an MVP and then you'll start to build the next iteration of
+
+169
+00:12:04.480 --> 00:12:09.780
+<v John Myers>that and then you get it into customers hands one of different ways right one way is you can bring
+
+170
+00:12:09.780 --> 00:12:13.500
+<v John Myers>on sales folks to go out and start building relationships with companies and enterprises
+
+171
+00:12:14.700 --> 00:12:21.940
+<v John Myers>and we've all done that before what was interesting to us was to make it attractable to developers so
+
+172
+00:12:21.940 --> 00:12:27.820
+<v John Myers>they could sign up and get started right away and if you look at like companies like like stripe or
+
+173
+00:12:27.820 --> 00:12:29.800
+<v John Myers>or Sentry for error tracking,
+
+174
+00:12:29.980 --> 00:12:31.900
+<v John Myers>or Snyk for security vulnerabilities,
+
+175
+00:12:32.140 --> 00:12:34.420
+<v John Myers>or GitHub for collaboration.
+
+176
+00:12:34.720 --> 00:12:36.540
+<v John Myers>It's so easy to get started.
+
+177
+00:12:37.180 --> 00:12:41.440
+<v John Myers>And we really wanted to provide that experience.
+
+178
+00:12:41.960 --> 00:12:44.660
+<v John Myers>And so our roadmap was really focused on
+
+179
+00:12:44.660 --> 00:12:48.100
+<v John Myers>how do we take the functionality we built,
+
+180
+00:12:48.260 --> 00:12:49.760
+<v John Myers>like the actual capability,
+
+181
+00:12:50.180 --> 00:12:52.640
+<v John Myers>and make it as consumable as possible,
+
+182
+00:12:52.700 --> 00:12:53.940
+<v John Myers>as easily as possible.
+
+183
+00:12:54.120 --> 00:12:55.700
+<v John Myers>And that kind of shaped our roadmap.
+
+184
+00:12:55.700 --> 00:13:00.540
+<v John Myers>map and it still shapes our roadmap today right things like well you go to our landing page and
+
+185
+00:13:00.540 --> 00:13:06.320
+<v John Myers>like you can just sign in with a github account or a google account and then once you're in we'll
+
+186
+00:13:06.320 --> 00:13:11.540
+<v John Myers>have like here's a couple api calls you can make to to see what's all in the realm of possible and
+
+187
+00:13:11.540 --> 00:13:15.760
+<v John Myers>then once you see that okay here's some tutorials that you could follow on how to kind of go to the
+
+188
+00:13:15.760 --> 00:13:21.220
+<v John Myers>next level and operationalize things so it's just kind of like progressive disclosure of complexity
+
+189
+00:13:21.220 --> 00:13:25.740
+<v John Myers>complexity and using the product stealing that phrase from my co-founder alex who says that all
+
+190
+00:13:25.740 --> 00:13:29.760
+<v John Myers>the time about how we build features is that you want to get people started really really fast
+
+191
+00:13:29.760 --> 00:13:33.920
+<v John Myers>and then here's the next thing you do and the next thing you can do so people can like build
+
+192
+00:13:33.920 --> 00:13:38.540
+<v John Myers>their expertise with your product and that's how we that's really how we shape it today we just we
+
+193
+00:13:38.540 --> 00:13:44.240
+<v John Myers>try to build something that is usable very quickly and we get it out there and then we iterate on it
+
+194
+00:13:44.240 --> 00:13:49.680
+<v John Myers>as opposed to you know capturing as much feedback as possible and building it in a vacuum and having
+
+195
+00:13:51.220 --> 00:13:51.760
+<v John Myers>later on.
+
+196
+00:13:53.480 --> 00:13:58.520
+<v Noah Labhart>We touched on this a little bit earlier, but I want to give it space here. So how did you
+
+197
+00:13:58.520 --> 00:14:03.180
+<v Noah Labhart>go about building your team? And what did you look for in those people to indicate that they
+
+198
+00:14:03.180 --> 00:14:04.820
+<v Noah Labhart>were the winning horses to join you?
+
+199
+00:14:06.700 --> 00:14:10.800
+<v John Myers>Yeah, so the way we built the team, we basically wanted to
+
+200
+00:14:11.360 --> 00:14:16.240
+<v John Myers>enhance our strengths with people that were arguably better at us than what we think we
+
+201
+00:14:16.240 --> 00:14:21.660
+<v John Myers>we were good at. And so what I mean by that is, you know, my expertise is more in, I'll call it
+
+202
+00:14:21.660 --> 00:14:29.100
+<v John Myers>like service engineering, right? So like building scalable compute storage, decoupled microservices,
+
+203
+00:14:29.740 --> 00:14:35.420
+<v John Myers>delivering complex things through clean interfaces, maintaining our, you know, our code base and our
+
+204
+00:14:35.420 --> 00:14:39.520
+<v John Myers>build systems. That's kind of like where, where I live, like call it like general engineering,
+
+205
+00:14:39.680 --> 00:14:45.600
+<v John Myers>if you will. And then Alex's strength, you know, he lives in AI, machine learning engineering,
+
+206
+00:14:46.240 --> 00:14:53.000
+<v John Myers>uh, research. And we said, we're each going to surround ourselves with people that are one,
+
+207
+00:14:53.140 --> 00:14:57.380
+<v John Myers>really passionate about what we're doing. Cause they, they could, they could share the pain that
+
+208
+00:14:57.380 --> 00:15:02.480
+<v John Myers>we used to have in trying to solve this problem. And then two arguably are probably better than us
+
+209
+00:15:02.480 --> 00:15:07.500
+<v John Myers>at what it is that we think our strengths are. And that's how we continue to do it today is,
+
+210
+00:15:07.580 --> 00:15:13.680
+<v John Myers>you know, we try to surround ourselves with, uh, other team members that just continually make us
+
+211
+00:15:13.680 --> 00:15:19.880
+<v John Myers>us better as practitioners ourselves. And then, of course, that makes the company better. We're
+
+212
+00:15:19.880 --> 00:15:24.640
+<v John Myers>really fortunate to have a pretty strong network of folks that we've worked with in the past who
+
+213
+00:15:24.640 --> 00:15:29.760
+<v John Myers>were able to kind of bring on as initial cadre and bootstrap the company with. And then from there,
+
+214
+00:15:29.920 --> 00:15:35.260
+<v John Myers>you know, we were able to kind of build the muscle to go out and source new candidates and talk to
+
+215
+00:15:35.260 --> 00:15:35.760
+<v John Myers>them.
+
+216
+00:15:38.840 --> 00:15:43.040
+<v Noah Labhart>Well, let's talk about scalability. So did you build this to scale efficiently
+
+217
+00:15:43.680 --> 00:15:47.380
+<v Noah Labhart>day one or are you fighting this as you grow and gain traction
+
+218
+00:15:47.380 --> 00:15:49.820
+<v John Myers>kind of like a goldilocks problem
+
+219
+00:15:49.820 --> 00:15:54.760
+<v John Myers>i think you you want it to scale to the amount of people you think that are going to come in and use
+
+220
+00:15:54.760 --> 00:16:00.580
+<v John Myers>it and you don't want to spend too much time making it i'll say infinitely scale up front
+
+221
+00:16:00.580 --> 00:16:06.220
+<v John Myers>because you're gonna you're gonna you're gonna just take too much time to do that so i'd say
+
+222
+00:16:06.220 --> 00:16:11.860
+<v John Myers>we moderately sized it so we know we can support we put our finger in the air we said you know in
+
+223
+00:16:13.680 --> 00:16:17.360
+<v John Myers>50 to 100 users on the system, kind of sending moderate workloads through it.
+
+224
+00:16:17.520 --> 00:16:23.680
+<v John Myers>We called that the metrics we needed to kind of determine that this was the right fit for the right problem.
+
+225
+00:16:23.800 --> 00:16:25.260
+<v John Myers>So like a problem market fit analysis.
+
+226
+00:16:26.180 --> 00:16:29.780
+<v John Myers>We built it so basically we could scale it that way with some soft limits on it,
+
+227
+00:16:29.840 --> 00:16:35.700
+<v John Myers>where if we knew we really needed to scale it more, then we could do that by, you know,
+
+228
+00:16:35.700 --> 00:16:38.140
+<v John Myers>horizontally scaling the different components that we had.
+
+229
+00:16:38.900 --> 00:16:44.000
+<v John Myers>At that stage, we were very conscious about our burn and what we were spending every day
+
+230
+00:16:44.000 --> 00:16:48.060
+<v John Myers>because we knew every user that was coming in at this point, it was a free beta.
+
+231
+00:16:48.280 --> 00:16:50.560
+<v John Myers>And so we needed to kind of mind that.
+
+232
+00:16:50.800 --> 00:16:55.540
+<v John Myers>So it's really hard to kind of get that initial metric, but it's good to kind of identify
+
+233
+00:16:55.540 --> 00:17:00.100
+<v John Myers>those types of metrics that everyone can agree on upfront, because then you can kind of orient
+
+234
+00:17:00.780 --> 00:17:05.400
+<v John Myers>your engineering efforts around that versus just saying, well, I want this thing to scale
+
+235
+00:17:05.400 --> 00:17:09.720
+<v John Myers>like forever and you're just going to get caught in this kind of like bill trap of trying to figure
+
+236
+00:17:09.720 --> 00:17:13.560
+<v John Myers>out like how to do that well
+
+237
+00:17:13.560 --> 00:17:16.740
+<v Noah Labhart>as you step out on the balcony and you look across all that you've
+
+238
+00:17:16.740 --> 00:17:20.100
+<v Noah Labhart>built what are you most proud of i
+
+239
+00:17:20.100 --> 00:17:25.740
+<v John Myers>think what i'm most proud of is like the team and how motivated
+
+240
+00:17:25.740 --> 00:17:31.520
+<v John Myers>they are by the product itself and there's like these always these little things that happen where
+
+241
+00:17:31.520 --> 00:17:32.380
+<v John Myers>where you're like, oh wow,
+
+242
+00:17:32.500 --> 00:17:34.000
+<v John Myers>we're really building the right thing.
+
+243
+00:17:34.120 --> 00:17:35.980
+<v John Myers>Where like someone posts a news article
+
+244
+00:17:36.900 --> 00:17:39.140
+<v John Myers>and the news article might be about
+
+245
+00:17:39.140 --> 00:17:40.480
+<v John Myers>some type of privacy challenge.
+
+246
+00:17:40.740 --> 00:17:41.920
+<v John Myers>And then someone is like,
+
+247
+00:17:42.000 --> 00:17:43.140
+<v John Myers>this is how they could use Gretel
+
+248
+00:17:43.140 --> 00:17:44.600
+<v John Myers>to actually solve that problem.
+
+249
+00:17:44.900 --> 00:17:48.200
+<v John Myers>And they have such a deep understanding of what we've built,
+
+250
+00:17:48.280 --> 00:17:51.120
+<v John Myers>but also like how it can apply to the real world
+
+251
+00:17:51.120 --> 00:17:53.680
+<v John Myers>and all these like things that are happening with privacy.
+
+252
+00:17:54.880 --> 00:17:57.760
+<v John Myers>I mean, of course I'm proud of like the actual technology
+
+253
+00:17:57.760 --> 00:18:00.160
+<v John Myers>we built and the tools that we built,
+
+254
+00:18:01.520 --> 00:18:05.620
+<v John Myers>really about seeing how the team has come together to do this.
+
+255
+00:18:05.680 --> 00:18:07.620
+<v John Myers>And especially over the last couple of years,
+
+256
+00:18:08.200 --> 00:18:09.840
+<v John Myers>we've built the company as a remote team.
+
+257
+00:18:10.360 --> 00:18:15.120
+<v John Myers>And just to see people absorb everything that we're building
+
+258
+00:18:15.120 --> 00:18:18.040
+<v John Myers>and know how to use it.
+
+259
+00:18:18.160 --> 00:18:21.060
+<v John Myers>And everyone on this team can dive in and help a customer
+
+260
+00:18:21.590 --> 00:18:26.500
+<v John Myers>solve something because we have our documentation is designed
+
+261
+00:18:26.500 --> 00:18:29.560
+<v John Myers>for other developers to use, but we use our own documentation
+
+262
+00:18:31.520 --> 00:18:33.600
+<v John Myers>And that's something really nice to see.
+
+263
+00:18:33.820 --> 00:18:40.800
+<v John Myers>And then I think the other thing I'm most proud about is that most of our customers just come to us.
+
+264
+00:18:41.380 --> 00:18:43.420
+<v John Myers>To this day, we don't have a sales team.
+
+265
+00:18:43.520 --> 00:18:51.560
+<v John Myers>Now, of course, we're building one, but we have big enterprise customers who's emailing our high at Gretel.ai email account all the time.
+
+266
+00:18:51.640 --> 00:18:53.940
+<v John Myers>Just saying like, hey, we saw what you guys are doing.
+
+267
+00:18:54.000 --> 00:19:00.120
+<v John Myers>We saw this video demo or we heard this podcast or we saw this tutorial.
+
+268
+00:19:01.520 --> 00:19:06.920
+<v John Myers>how to run this. That's an amazing feeling when people are coming to you and you're just getting
+
+269
+00:19:06.920 --> 00:19:08.060
+<v John Myers>inbounds directly.
+
+270
+00:19:09.380 --> 00:19:13.180
+<v Noah Labhart>Well, let's flip the script a little bit. So tell me about a mistake you made
+
+271
+00:19:13.180 --> 00:19:15.400
+<v Noah Labhart>and how you and your team responded to it.
+
+272
+00:19:16.420 --> 00:19:20.180
+<v John Myers>So we had two iterations of a beta, beta one and beta
+
+273
+00:19:20.180 --> 00:19:25.240
+<v John Myers>two that we call them because we're very clever at naming things. And the first beta that we
+
+274
+00:19:25.240 --> 00:19:30.780
+<v John Myers>released, we kind of made some rough assumptions on how people wanted to send us data.
+
+275
+00:19:31.540 --> 00:19:37.120
+<v John Myers>What I mean by that is you were able to send us a couple of pieces of data and get real-time results.
+
+276
+00:19:38.160 --> 00:19:42.360
+<v John Myers>And the challenge there was it was really good to demo.
+
+277
+00:19:42.620 --> 00:19:44.380
+<v John Myers>Like, hey, I could show you real-time.
+
+278
+00:19:44.520 --> 00:19:48.580
+<v John Myers>I could take this JSON blob, you could send it to our API, and you got results back right away.
+
+279
+00:19:49.360 --> 00:19:51.720
+<v John Myers>And people were like, this is great. I'm in.
+
+280
+00:19:51.840 --> 00:19:55.380
+<v John Myers>And they're like, now I have a five-gigabyte file. How do we process that?
+
+281
+00:19:55.380 --> 00:20:02.280
+<v John Myers>that, we had to write like a bunch of kind of adapter code to kind of take that and try to
+
+282
+00:20:02.280 --> 00:20:06.540
+<v John Myers>stream it through the system. And it just, it just didn't scale very well. And I think the mistake
+
+283
+00:20:06.540 --> 00:20:13.340
+<v John Myers>there is we knew what problem we were trying to solve, but we didn't really know how people wanted
+
+284
+00:20:13.340 --> 00:20:18.460
+<v John Myers>to consume the product to do it. And so the way we rectified that, we took a step back and we said,
+
+285
+00:20:18.540 --> 00:20:24.000
+<v John Myers>well, in addition to be able to give you that like really fast, like taste of privacy engineering
+
+286
+00:20:25.600 --> 00:20:31.560
+<v John Myers>the real-time APIs, you know, we probably should have built a way for folks to run kind of those
+
+287
+00:20:31.560 --> 00:20:36.980
+<v John Myers>bigger jobs through the system so that like they could take it to the next level. And so, I mean,
+
+288
+00:20:36.980 --> 00:20:41.820
+<v John Myers>what we did was we just basically just built a second iteration of the API. So that allowed you
+
+289
+00:20:41.820 --> 00:20:48.820
+<v John Myers>to kind of like push a big data set into our workers and then they would kind of asynchronously
+
+290
+00:20:48.820 --> 00:20:54.320
+<v John Myers>process it and then you would get that output back. We solved the same problem, but we approached it
+
+291
+00:20:55.540 --> 00:21:01.380
+<v John Myers>customers can actually consume it like a little more a little more like at scale for themselves
+
+292
+00:21:02.360 --> 00:21:06.280
+<v John Myers>if i had to do things over again i probably would have fast forward to that second
+
+293
+00:21:06.280 --> 00:21:12.480
+<v John Myers>step like pretty much where we're at now with the system we have now which you know would have
+
+294
+00:21:12.480 --> 00:21:17.380
+<v John Myers>probably saved us a little bit of time but i also don't know that we would have known we made that
+
+295
+00:21:17.380 --> 00:21:21.920
+<v John Myers>mistake if we didn't go through the process we did so it's kind of like a you know catch 22 so
+
+296
+00:21:21.920 --> 00:21:25.540
+<v John Myers>So I think some mistakes like that are just kind of necessary.
+
+297
+00:21:27.680 --> 00:21:31.820
+<v Noah Labhart>What does the future look like for Gretel, for the product, and for your team?
+
+298
+00:21:32.460 --> 00:21:37.040
+<v John Myers>We're actually going to be going to general availability.
+
+299
+00:21:37.780 --> 00:21:39.380
+<v John Myers>Anyone will be able to sign up for Gretel.
+
+300
+00:21:39.480 --> 00:21:43.440
+<v John Myers>And we have a freemium model, so you'll get some amount of compute for free.
+
+301
+00:21:43.900 --> 00:21:47.540
+<v John Myers>And then there's a consumption model page you go.
+
+302
+00:21:47.680 --> 00:21:51.500
+<v John Myers>So we're turning on kind of like the billing apparatus, if you will.
+
+303
+00:21:51.920 --> 00:21:59.560
+<v John Myers>Um, and then, you know, really at this point, it's all about scaling all the ways to make
+
+304
+00:21:59.560 --> 00:22:01.960
+<v John Myers>privacy available to developers.
+
+305
+00:22:02.340 --> 00:22:05.040
+<v John Myers>So we kind of have three core workflows now.
+
+306
+00:22:05.200 --> 00:22:12.700
+<v John Myers>And what we see envisioning is making that a much bigger buffet of capabilities for,
+
+307
+00:22:12.820 --> 00:22:14.100
+<v John Myers>for developers.
+
+308
+00:22:14.360 --> 00:22:21.140
+<v John Myers>And the reason why we want to do that is there are a bunch of amazing privacy tech
+
+309
+00:22:21.920 --> 00:22:28.140
+<v John Myers>there now but each one kind of comes with its own unique api or unique way to deploy and we want to
+
+310
+00:22:28.140 --> 00:22:35.000
+<v John Myers>make all those available through like a single clean api and you know we want to go from you
+
+311
+00:22:35.000 --> 00:22:39.700
+<v John Myers>know at the you know a fourth way to process like images and another way to process like sounds and
+
+312
+00:22:39.700 --> 00:22:45.940
+<v John Myers>another one to work on on video and then back to even like text data there's like structured text
+
+313
+00:22:45.940 --> 00:22:51.720
+<v John Myers>data from databases there's unstructured text like um like freeform documents or speech to text
+
+314
+00:22:51.920 --> 00:22:56.800
+<v John Myers>So we want to be able to consume all types of data to make all types of data safe.
+
+315
+00:22:56.980 --> 00:23:06.280
+<v John Myers>And so it's really about expanding that buffet and then being able to push simultaneously into all types of industry verticals.
+
+316
+00:23:06.280 --> 00:23:08.600
+<v John Myers>We don't really target any specific vertical now.
+
+317
+00:23:09.160 --> 00:23:11.900
+<v John Myers>We have a ton of customers across a bunch of different spaces.
+
+318
+00:23:12.180 --> 00:23:20.260
+<v John Myers>And we really want to start being able to think about how we can apply some of our capabilities to make vertical specific offerings.
+
+319
+00:23:21.920 --> 00:23:26.700
+<v John Myers>yeah we can process free text but can we process free text that is you know specifically for like
+
+320
+00:23:26.700 --> 00:23:34.720
+<v John Myers>medical industry or for the scientific industry um or like process like specific financial uh data
+
+321
+00:23:34.720 --> 00:23:40.060
+<v John Myers>as well so kind of building these adapters to to plug into those different systems and then the
+
+322
+00:23:40.060 --> 00:23:46.100
+<v John Myers>third big thing is how do we kind of push into the developer ecosystem so we become baked into a lot
+
+323
+00:23:46.100 --> 00:23:52.080
+<v John Myers>of tools that developers use today. So if you're using certain CI CD products, like is Gretel just
+
+324
+00:23:52.080 --> 00:23:58.200
+<v John Myers>a step you can turn on to touch the data on the way? If using a data warehouse, is there a way
+
+325
+00:23:58.200 --> 00:24:02.960
+<v John Myers>that you can just turn on Gretel so that if you want to dump that data, it transparently goes
+
+326
+00:24:02.960 --> 00:24:07.960
+<v John Myers>through Gretel? Those are all the big things that are really going to expand. And really, it's
+
+327
+00:24:07.960 --> 00:24:15.100
+<v John Myers>building the team to do all that. We're hiring like crazy across all departments to take on
+
+328
+00:24:17.600 --> 00:24:25.620
+<v Noah Labhart>Well, let's switch to you, John. Who influences the way that you work? I'm a CEO, CTO, architect, really any person that you look up to and why?
+
+329
+00:24:27.680 --> 00:24:31.900
+<v John Myers>I think I'm really influenced first and foremost by my co-founders.
+
+330
+00:24:32.620 --> 00:24:37.440
+<v John Myers>You know, they make me think in different ways because I have such different strengths than I do.
+
+331
+00:24:38.820 --> 00:24:43.380
+<v John Myers>And just the way I approach problems, I think, has been strongly shaped by them.
+
+332
+00:24:43.380 --> 00:24:53.500
+<v John Myers>in a way I'd say I look up to them as well because they just motivate me to want to be better
+
+333
+00:24:54.360 --> 00:25:01.460
+<v John Myers>I think second would be the folks that I that I actually hire and have like working here at
+
+334
+00:25:01.460 --> 00:25:09.320
+<v John Myers>Gretel they're all better than me at something and I think I enjoy that because it makes me
+
+335
+00:25:09.320 --> 00:25:16.560
+<v John Myers>a better engineer and a better leader so I know how to like enable them to do their jobs and
+
+336
+00:25:17.360 --> 00:25:25.680
+<v John Myers>you know I think outside of Gretel we've had the we've had the benefit to talk to a lot of
+
+337
+00:25:25.680 --> 00:25:32.520
+<v John Myers>different industry leaders that are you know directors and VPs at other companies like AWS
+
+338
+00:25:32.520 --> 00:25:38.940
+<v John Myers>and GitHub and just hearing their stories about how they scale their teams from like five to four
+
+339
+00:25:39.320 --> 00:25:45.300
+<v John Myers>people is incredible. And, you know, they are great mentors and people to learn from about how
+
+340
+00:25:45.300 --> 00:25:51.080
+<v John Myers>we try to scale Gretel. And like, believe it or not, I think there's probably people I don't know
+
+341
+00:25:51.080 --> 00:25:56.900
+<v John Myers>who influenced me because I spent so much time looking through the open source community for
+
+342
+00:25:56.900 --> 00:26:02.020
+<v John Myers>really cool products and how they get built. And it's like, they're like faceless heroes because
+
+343
+00:26:02.020 --> 00:26:08.460
+<v John Myers>you can learn so many cool design patterns and like ways to build by just like absorbing open
+
+344
+00:26:09.320 --> 00:26:13.020
+<v John Myers>products, which is what motivated us to actually make a lot of our stuff open source.
+
+345
+00:26:13.880 --> 00:26:18.600
+<v John Myers>Just reading through that and seeing how they build is incredible. And that's been super valuable as
+
+346
+00:26:18.600 --> 00:26:19.100
+<v John Myers>well.
+
+347
+00:26:20.340 --> 00:26:25.220
+<v Noah Labhart>So we talked about a mistake earlier, but a little bit different spin. If you could go back
+
+348
+00:26:25.220 --> 00:26:29.000
+<v Noah Labhart>to the beginning, what would you do differently? Or where would you consider taking a different
+
+349
+00:26:29.000 --> 00:26:29.500
+<v Noah Labhart>approach?
+
+350
+00:26:31.960 --> 00:26:35.200
+<v John Myers>I'm going to take a more of a technical answer on this one, because we're going through
+
+351
+00:26:35.200 --> 00:26:42.860
+<v John Myers>through this right now, I would have built more of the business model mechanics into the product.
+
+352
+00:26:43.300 --> 00:26:49.760
+<v John Myers>So like I mentioned earlier, we're getting ready to go GA. And the way it works is that you use
+
+353
+00:26:49.760 --> 00:26:56.500
+<v John Myers>Gretel and then you accumulate usage and it calculates how much usage you have. And that
+
+354
+00:26:56.500 --> 00:27:03.540
+<v John Myers>converts into getting billed based off your usage. And the other thing that we do is instrument the
+
+355
+00:27:05.300 --> 00:27:10.400
+<v John Myers>to be able to do kind of like, you know, like retrospective kind of like billing analysis or
+
+356
+00:27:10.400 --> 00:27:20.480
+<v John Myers>just usage analysis. And I would have probably spent more time digging in on what we thought
+
+357
+00:27:20.480 --> 00:27:27.280
+<v John Myers>that business model was going to be sooner and at least built like the right hooks or the right
+
+358
+00:27:27.280 --> 00:27:33.960
+<v John Myers>data accumulation mechanisms for that earlier on. Because what happens is you end up kind of
+
+359
+00:27:35.200 --> 00:27:41.220
+<v John Myers>some of these things into the code base and it just becomes challenging that way and it's so
+
+360
+00:27:41.220 --> 00:27:50.920
+<v John Myers>easy to build an mvp or build a product that just shows like the core features off and then
+
+361
+00:27:51.440 --> 00:27:55.400
+<v John Myers>you have to remember that like on top of like the product you are building a business and like
+
+362
+00:27:55.980 --> 00:28:01.680
+<v John Myers>the engineering team has to you know operationalize those those business mechanics and
+
+363
+00:28:01.680 --> 00:28:06.180
+<v John Myers>And we just spent a lot of time kind of like rebuilding that and hooking that back in.
+
+364
+00:28:06.420 --> 00:28:09.680
+<v John Myers>And that's one thing I would have thought about differently.
+
+365
+00:28:10.500 --> 00:28:14.540
+<v John Myers>It's easy to get so excited and just build the cool features and demonstrate how everything works.
+
+366
+00:28:14.640 --> 00:28:22.400
+<v John Myers>And then you realize sometimes you just you need to kind of think about how this is actually going to be consumed from a business standpoint earlier.
+
+367
+00:28:22.460 --> 00:28:27.920
+<v John Myers>And can you kind of put some of those things in up front so you're not retrofitting so much at the end?
+
+368
+00:28:29.480 --> 00:28:30.620
+<v Noah Labhart>Well, last question, John.
+
+369
+00:28:31.680 --> 00:28:35.600
+<v Noah Labhart>you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big
+
+370
+00:28:35.600 --> 00:28:39.240
+<v Noah Labhart>thing. They're jazzed about it. They can't wait to show it off to the world. Can't wait to show
+
+371
+00:28:39.240 --> 00:28:43.560
+<v Noah Labhart>it off to you right there on the plane. What advice do you give that person having gone down
+
+372
+00:28:43.560 --> 00:28:44.180
+<v Noah Labhart>this road a bit?
+
+373
+00:28:46.980 --> 00:28:50.700
+<v John Myers>My advice would be, you know, they're so passionate about what they want to do.
+
+374
+00:28:50.780 --> 00:28:56.340
+<v John Myers>They probably have, they probably have a notion of how they want to package it, how they want to
+
+375
+00:28:56.340 --> 00:29:03.300
+<v John Myers>sell it um my advice is to stay the stay the course on what they intend to build and the reason
+
+376
+00:29:03.300 --> 00:29:10.100
+<v John Myers>why i say that is it's it's it's always really easy to kind of get your first amount of revenue
+
+377
+00:29:10.100 --> 00:29:13.940
+<v John Myers>and so it's a little easier to get your second and then your third but
+
+378
+00:29:13.940 --> 00:29:18.620
+<v John Myers>it's also easy to kind of digress off of what you want to do because you want to
+
+379
+00:29:20.380 --> 00:29:26.880
+<v John Myers>you want to accelerate so fast right i think a lot of companies will chase will chase success
+
+380
+00:29:26.880 --> 00:29:32.740
+<v John Myers>the easiest way possible versus staying the course that you want to be on and that you you
+
+381
+00:29:32.740 --> 00:29:37.240
+<v John Myers>always wanted to be on even though it feels a little harder up front and i use revenue as an
+
+382
+00:29:37.240 --> 00:29:44.340
+<v John Myers>example because it it's easy to kind of get a beta tester and then they're like cool now i want
+
+383
+00:29:44.340 --> 00:29:48.140
+<v John Myers>you to build this and you're like okay i'll build that next and then now i want you to build this
+
+384
+00:29:48.620 --> 00:29:52.320
+<v John Myers>start to feel like well they're kind of asking me to build stuff that i don't think belongs in the
+
+385
+00:29:52.320 --> 00:29:59.660
+<v John Myers>product because it's very bespoke to them and then next thing you know you kind of get in this trap
+
+386
+00:29:59.660 --> 00:30:04.640
+<v John Myers>where you maybe have you know four or five customers that are kind of driving your entire
+
+387
+00:30:04.640 --> 00:30:11.140
+<v John Myers>roadmap and then next thing you know like you've kind of lost you lost a little bit of control on
+
+388
+00:30:11.140 --> 00:30:14.740
+<v John Myers>the kind of like the product you wanted to build because it's now applicable to a much smaller
+
+389
+00:30:14.740 --> 00:30:21.200
+<v John Myers>smaller audience, but it enables you to kind of get success by way of revenue sooner. And just
+
+390
+00:30:21.200 --> 00:30:27.080
+<v John Myers>hold steady on what you want. Like no one knows their product better than you do. And no one knows
+
+391
+00:30:27.080 --> 00:30:32.940
+<v John Myers>how it should be employed better than you do. So surround yourself with people who believe in that
+
+392
+00:30:32.940 --> 00:30:37.980
+<v John Myers>as well, because they're going to amplify your ability to hold that course versus surrounding
+
+393
+00:30:37.980 --> 00:30:41.320
+<v John Myers>yourself with people who might actually take you off course.
+
+394
+00:30:42.140 --> 00:30:44.240
+<v Noah Labhart>That's great advice. Well, John,
+
+395
+00:30:44.740 --> 00:30:46.060
+<v Noah Labhart>for being on the show today.
+
+396
+00:30:46.180 --> 00:30:48.660
+<v Noah Labhart>Thank you for telling the creation story of Gretel.
+
+397
+00:30:49.400 --> 00:30:49.900
+<v John Myers>Yeah,
+
+398
+00:30:49.900 --> 00:30:50.400
+<v John Myers>for sure.
+
+399
+00:30:50.440 --> 00:30:51.620
+<v John Myers>Super happy to be here.
+
+400
+00:30:51.780 --> 00:30:52.960
+<v John Myers>And thanks so much.
+
+401
+00:30:55.900 --> 00:30:58.760
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+402
+00:31:01.120 --> 00:31:04.140
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+403
+00:31:04.260 --> 00:31:06.400
+<v Noah Labhart>Be sure to subscribe on Apple podcasts,
+
+404
+00:31:06.480 --> 00:31:07.000
+<v Noah Labhart>Spotify,
+
+405
+00:31:07.020 --> 00:31:09.060
+<v Noah Labhart>or the podcasting app of your choice.
+
+406
+00:31:09.480 --> 00:31:14.380
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to 10 bucks a
+
+407
+00:31:14.380 --> 00:31:14.880
+<v Noah Labhart>month.
+
+408
+00:31:14.740 --> 00:31:17.120
+<v Noah Labhart>and when you get a chance, leave us a review.
+
+409
+00:31:17.400 --> 00:31:19.460
+<v Noah Labhart>Both things help us out tremendously.
+
+410
+00:31:21.760 --> 00:31:23.240
+<v Noah Labhart>And thanks again for listening.

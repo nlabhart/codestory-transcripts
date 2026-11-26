@@ -1,0 +1,985 @@
+WEBVTT
+
+NOTE The Gene Simmons of Data Protection - AI Inference-time Guardrails
+
+1
+00:00:00.000 --> 00:00:11.300
+<v Noah Labhart>Hello listeners. Today we are releasing the final episode in our series entitled The Gene Simmons of Data Protection, The KISS Method, brought to you by none other than Protegrity.
+
+2
+00:00:11.540 --> 00:00:22.720
+<v Noah Labhart>Protegrity is AI-powered data security for data consumption, offering fine-grain data protection solutions so you can enable your data security, compliance, sharing, and analytics.
+
+3
+00:00:23.580 --> 00:00:28.320
+<v Noah Labhart>In our final, final episode, we are talking with Ave Gatton, director of Generative AI.
+
+4
+00:00:28.580 --> 00:00:31.540
+<v Noah Labhart>We talk about how AI safety doesn't end with training.
+
+5
+00:00:31.660 --> 00:00:33.060
+<v Noah Labhart>It begins with inference.
+
+6
+00:00:33.340 --> 00:00:39.460
+<v Noah Labhart>We explore the overlooked frontier of AI security from prompt injection, data leakage, and model
+
+7
+00:00:39.460 --> 00:00:39.960
+<v Noah Labhart>manipulation.
+
+8
+00:00:40.240 --> 00:00:44.920
+<v Noah Labhart>Ave helps us understand how you can build guardrails that operate in real time and adapt
+
+9
+00:00:44.920 --> 00:00:45.880
+<v Noah Labhart>to evolving threats.
+
+10
+00:00:45.880 --> 00:00:52.100
+<v Noah Labhart>threats. Ave, thank you for being on the show today. Thanks for being on Code Story.
+
+11
+00:00:52.780 --> 00:00:57.460
+<v Guest>Thanks, Noah. Yeah, it's great to be here. Excited to talk about everything we have on the agenda.
+
+12
+00:00:57.820 --> 00:00:58.320
+<v Guest>Absolutely.
+
+13
+00:00:58.420 --> 00:01:03.600
+<v Noah Labhart>We got a jam-packed agenda today and inference time, AI guardrails and safety and all
+
+14
+00:01:03.600 --> 00:01:07.680
+<v Noah Labhart>the things. You're director of generative AI at Protegrity and I know you've got lots of
+
+15
+00:01:07.680 --> 00:01:11.460
+<v Noah Labhart>experience and things to speak on. Before we dive into that, tell me in the audience a little bit
+
+16
+00:01:11.460 --> 00:01:11.960
+<v Noah Labhart>bit about you.
+
+17
+00:01:12.080 --> 00:01:17.020
+<v Guest>I've been in the Bay Area since way back in 2013. Maybe that's a long time for
+
+18
+00:01:17.020 --> 00:01:22.560
+<v Guest>some, not a long time for others. But I originally came out here to finish my PhD in atomic,
+
+19
+00:01:22.700 --> 00:01:26.980
+<v Guest>molecular, and optical physics at Lawrence Berkeley National Lab. And then I did a postdoc
+
+20
+00:01:26.980 --> 00:01:32.220
+<v Guest>down here at Stanford SLAC and then never left the peninsula. I moved to tech around the time
+
+21
+00:01:32.220 --> 00:01:39.880
+<v Guest>of the pandemic in 2020 and have been working on a variety of projects for Fortune 100 and
+
+22
+00:01:41.460 --> 00:01:46.940
+<v Guest>variety of small startups for the past five years, six years, and now find myself at Protegrity as
+
+23
+00:01:46.940 --> 00:01:52.620
+<v Guest>the director of Gen AI. It's been a long road, but I've been working with generative AI even
+
+24
+00:01:52.620 --> 00:01:56.820
+<v Guest>before I moved to the tech industry. I was doing a lot of projects with it at SLAC.
+
+25
+00:01:57.120 --> 00:02:02.140
+<v Guest>One more thing. The SLAC I'm talking about is Stanford SLAC, which is the linear accelerator
+
+26
+00:02:02.140 --> 00:02:08.420
+<v Guest>you drive over when you drive down 280, and not the company Slack, which I get a lot of that.
+
+27
+00:02:08.420 --> 00:02:11.140
+<v Guest>I say I worked at Slack and no, it's not the messaging code.
+
+28
+00:02:11.740 --> 00:02:18.960
+<v Noah Labhart>That's great clarification because I think most of us, me included on this podcast, would immediately go to Slack, the communication device.
+
+29
+00:02:19.060 --> 00:02:20.260
+<v Noah Labhart>I appreciate you clarifying that.
+
+30
+00:02:20.400 --> 00:02:21.460
+<v Noah Labhart>We've done some cool stuff.
+
+31
+00:02:21.660 --> 00:02:24.560
+<v Noah Labhart>You have worked for some interesting folks and now you're at Protegrity.
+
+32
+00:02:24.600 --> 00:02:32.880
+<v Noah Labhart>I'm excited to dive into our topic today on inference time, AI guardrails, and really engineering safety beyond training data.
+
+33
+00:02:33.140 --> 00:02:34.860
+<v Noah Labhart>And I'll just jump right into my first question.
+
+34
+00:02:34.940 --> 00:02:37.380
+<v Noah Labhart>What are inference time threats?
+
+35
+00:02:38.420 --> 00:02:44.120
+<v Noah Labhart>But the best place to start is to define what those are and why are they becoming a critical focus in AI security?
+
+36
+00:02:44.500 --> 00:02:51.860
+<v Guest>It all comes down to the classic security tradeoff, which is utility versus security.
+
+37
+00:02:52.260 --> 00:02:59.760
+<v Guest>And when we think about agents, you're giving agents access to sensitive data in order for them to complete their tasks.
+
+38
+00:03:00.060 --> 00:03:06.720
+<v Guest>But there are these unique properties of agents that make them dangerous when you do give them that access.
+
+39
+00:03:08.420 --> 00:03:12.960
+<v Guest>ability to communicate with the outside world. An agent has no internal world model of security.
+
+40
+00:03:13.680 --> 00:03:19.220
+<v Guest>And if you're having agents access sensitive data, like if it's health data or finance data
+
+41
+00:03:19.220 --> 00:03:24.820
+<v Guest>or company secrets and such, there's a very real possibility that if somebody jailbreaks that agent,
+
+42
+00:03:24.940 --> 00:03:30.480
+<v Guest>meaning they seize control of it in some way, that they can direct that agent to exfiltrate that data
+
+43
+00:03:30.480 --> 00:03:35.180
+<v Guest>or take actions that might mess with your internal systems, delete a database,
+
+44
+00:03:35.180 --> 00:03:40.580
+<v Guest>create orders that are malicious, basically just mess around and do what a hacker would do.
+
+45
+00:03:41.040 --> 00:03:46.040
+<v Guest>And that's the long and short of it. That's what we're trying to protect. When the agent or the
+
+46
+00:03:46.040 --> 00:03:51.280
+<v Guest>LLM is working within an agent framework, we need to make sure that the capabilities of the agent
+
+47
+00:03:51.280 --> 00:03:55.720
+<v Guest>are constrained such that they can't do a lot of damage.
+
+48
+00:03:55.960 --> 00:04:00.720
+<v Noah Labhart>That makes sense. And where you're trying to protect it makes sense. And I think it's important
+
+49
+00:04:00.720 --> 00:04:06.740
+<v Noah Labhart>to maybe tell the difference between inference time risk and training time risk as well.
+
+50
+00:04:06.820 --> 00:04:07.880
+<v Noah Labhart>Can you differentiate the two?
+
+51
+00:04:08.040 --> 00:04:12.860
+<v Guest>For training data, if you're training a model on, say, a large corpus of text, or you're
+
+52
+00:04:12.860 --> 00:04:17.000
+<v Guest>taking a model that's already been trained and fine-tuned, and then you're fine-tuning
+
+53
+00:04:17.000 --> 00:04:21.780
+<v Guest>it on your particular tasks or your particular corpus of information, whether it be company
+
+54
+00:04:21.780 --> 00:04:27.260
+<v Guest>internal documents or procedures or what have you, there's always a risk that somebody might
+
+55
+00:04:27.260 --> 00:04:32.660
+<v Guest>might slip into that a rogue series of instructions that the model will learn.
+
+56
+00:04:32.880 --> 00:04:35.480
+<v Guest>And then this is effectively like putting in a backdoor to the model.
+
+57
+00:04:35.640 --> 00:04:37.260
+<v Guest>You can come along and you can say,
+
+58
+00:04:37.420 --> 00:04:42.520
+<v Guest>remember you were told how to operate in the Dr. Seuss paradigm.
+
+59
+00:04:42.840 --> 00:04:43.800
+<v Guest>Think back to that.
+
+60
+00:04:43.940 --> 00:04:46.260
+<v Guest>And then the agent might, after reading these docs,
+
+61
+00:04:46.460 --> 00:04:50.520
+<v Guest>be instructed through that fine-tuning or that training
+
+62
+00:04:50.520 --> 00:04:53.940
+<v Guest>to follow a certain set of procedures,
+
+63
+00:04:53.940 --> 00:05:00.300
+<v Guest>give up on all system prompts and just pay attention exactly to what the person is, what
+
+64
+00:05:00.300 --> 00:05:02.400
+<v Guest>the person currently talking to them is telling them to do.
+
+65
+00:05:02.500 --> 00:05:05.180
+<v Guest>And that would be, we call that concept model poisoning.
+
+66
+00:05:05.380 --> 00:05:11.720
+<v Guest>And that's always a risk, especially for agent, sorry, LLMs that have been trained on literally
+
+67
+00:05:11.720 --> 00:05:16.640
+<v Guest>all of human knowledge, or as much of it as you can go out and scrape from the world,
+
+68
+00:05:16.660 --> 00:05:19.840
+<v Guest>from the web, and then put it into a training data set.
+
+69
+00:05:19.840 --> 00:05:42.940
+<v Guest>And of course, no one has ever physically actually laid eyeballs on all of that. They are using layers and layers of AI-based cleaning and filtering. And there's no true guarantee that nothing malicious has been put in there or that attackers can't find malicious ways to exploit whatever it's ingested. And this is a constant battle. So that's the training side of things.
+
+70
+00:05:42.940 --> 00:05:56.160
+<v Guest>When we talk about inference, we're really talking about not so much the state of the model that you took off the shelf, but now the capabilities and the prompt that the immediate model is working with.
+
+71
+00:05:56.300 --> 00:06:05.900
+<v Guest>Can you talk to that LLM, talk to that agent framework, and cause it to take malicious actions or exfiltrate sensitive data?
+
+72
+00:06:05.900 --> 00:06:13.620
+<v Guest>So it's in the moment, in a sense. Very tactile versus maybe what you would call strategic safety of the model in general.
+
+73
+00:06:13.620 --> 00:06:14.120
+<v Guest>Sure.
+
+74
+00:06:14.240 --> 00:06:37.880
+<v Noah Labhart>I think my next question, you may have touched this at a high level, but I want to give it space here. Why is protection from these in-the-moment risks, right, with inference time, why is protection from those critical for safe, scalable AI adoption? And as an engineer myself, I think that I could come up with some ideas of what you're going to say, but I'm curious what you have for the audience.
+
+75
+00:06:38.460 --> 00:06:55.260
+<v Guest>We're all starting at this from the same starting point. And it's definitely early innings in terms of security for LLMs at large and agents at large. So we all probably come up with essentially the same ideas. But if you think about an agentic system that you're going to put into production, it's going to scale.
+
+76
+00:06:55.260 --> 00:07:07.060
+<v Guest>And so if it's going to scale and service thousands of users, ultimately, you should expect that you will encounter a bad actor and that you will encounter someone who's going to try and jailbreak it.
+
+77
+00:07:07.060 --> 00:07:29.160
+<v Guest>And the principle of zero trust in all of this extended to agents would be you should assume that agent will be jailbroken, that despite your best attempts at keeping it safe and immune from prompt poisoning or prompt injection or somebody jailbreaking the agent, despite all of your best attempts, assume that it will be jailbroken at some point.
+
+78
+00:07:29.160 --> 00:07:51.400
+<v Guest>And if it is, then what's the worst it could do? How do you prevent it from, say, going and just starting to read all your sensitive data and sending it out to a hacker? And that's the reason why we need these protections, is because the more you scale the system, the more guaranteed you are to run into a bad actor or an attempt to jailbreak.
+
+79
+00:07:51.400 --> 00:08:09.960
+<v Noah Labhart>Interesting. Okay, that's super interesting. I think to move into the next area, right, of my questioning is more around industry, right? And perhaps these threats are different across industries. Maybe they're not. I guess that's the question. Do they vary across industries? And if so, is there an industry where these attacks are more prevalent?
+
+80
+00:08:09.960 --> 00:08:10.460
+<v Noah Labhart>So
+
+81
+00:08:10.420 --> 00:08:32.380
+<v Guest>all agents break in the same way, right? So the types of attacks and the way in which we can protect agents are common to almost every industry. The specifics of the information that's being exfiltrated or the types of actions that the agent could take to disrupt a business are unique, obviously, to each industry.
+
+82
+00:08:32.380 --> 00:08:38.840
+<v Guest>industry. We are currently seeing the rollout of agents in a lot of different industry verticals.
+
+83
+00:08:38.840 --> 00:08:43.660
+<v Guest>Finance is a large one. There's also healthcare. And then there's a whole slew of agents that are
+
+84
+00:08:43.660 --> 00:08:50.920
+<v Guest>outward facing customer service agents. Roughly speaking, I divide these agents into two
+
+85
+00:08:50.920 --> 00:08:56.320
+<v Guest>categories, one being outward facing to customers and one being inward facing where the customer is
+
+86
+00:08:56.320 --> 00:09:01.300
+<v Guest>an internal employee of the company. And you might expect that those internal facing agents are more
+
+87
+00:09:02.380 --> 00:09:10.380
+<v Guest>the users are a trusted individual. But when we look at the recent trends in cyber security,
+
+88
+00:09:10.760 --> 00:09:16.360
+<v Guest>you find that a lot of large companies now expect that bad actors will actually come from
+
+89
+00:09:16.360 --> 00:09:22.540
+<v Guest>internal employees as opposed to external users. And you have the added danger that the
+
+90
+00:09:22.540 --> 00:09:29.040
+<v Guest>internal agents usually are given higher permissions and have access to more sensitive
+
+91
+00:09:29.040 --> 00:09:34.300
+<v Guest>data, specifically because they are being used by internal employees. And of course,
+
+92
+00:09:34.300 --> 00:09:38.500
+<v Guest>hearkening back to this concept that you can have an agent, if it doesn't have access to anything
+
+93
+00:09:38.500 --> 00:09:43.040
+<v Guest>meaningful, then it can't really do anything useful. You have to give it access to meaningful
+
+94
+00:09:43.040 --> 00:09:48.980
+<v Guest>information in order for it to take meaningful actions. So I would say that, in fact, the
+
+95
+00:09:48.980 --> 00:09:55.420
+<v Guest>security becomes more important for internal facing agents that are talking to internal employees
+
+96
+00:09:55.420 --> 00:10:10.800
+<v Guest>and are accessing more sensitive data than they are for, say, external facing public service agents or whatnot, what have you, that way you can pretty effectively lock down their ability to see sensitive information.
+
+97
+00:10:10.800 --> 00:10:11.300
+<v Guest>That
+
+98
+00:10:11.200 --> 00:10:29.680
+<v Noah Labhart>makes a ton of sense. And it's not too surprising when you think about the internal folks also being bad actors, right? Or a lot of the bad actors coming from internal agents there. It's interesting to think about the, I don't know if I'd call it the attack area, but the attack area internally versus not versus externally as well.
+
+99
+00:10:29.680 --> 00:10:35.040
+<v Noah Labhart>Well, I'm curious why traditional security models are insufficient at inference.
+
+100
+00:10:35.200 --> 00:10:40.840
+<v Noah Labhart>This will be interesting, too, because it's a different point of a problem, right?
+
+101
+00:10:40.980 --> 00:10:45.860
+<v Noah Labhart>And clearly you have you yourself and the industry has probably tried these traditional
+
+102
+00:10:45.860 --> 00:10:48.780
+<v Noah Labhart>security models at inference or tried to apply them.
+
+103
+00:10:48.820 --> 00:10:50.200
+<v Noah Labhart>Why are they insufficient?
+
+104
+00:10:50.780 --> 00:10:51.280
+<v Noah Labhart>Yeah,
+
+105
+00:10:51.120 --> 00:10:52.060
+<v Guest>it's a good question.
+
+106
+00:10:52.220 --> 00:10:57.540
+<v Guest>There's a lot to unpack there of like why you can't just take traditional security and
+
+107
+00:10:57.540 --> 00:10:58.980
+<v Guest>apply it to an agent.
+
+108
+00:10:59.680 --> 00:11:02.940
+<v Guest>Certainly, there's a lot of traditional security that you can take and apply to an agent.
+
+109
+00:11:03.000 --> 00:11:08.140
+<v Guest>Role-based access controls to certain databases and other information.
+
+110
+00:11:08.790 --> 00:11:16.160
+<v Guest>But you have to think of an agent as taking on the capabilities of the user that's talking
+
+111
+00:11:16.160 --> 00:11:17.500
+<v Guest>to the agent.
+
+112
+00:11:18.130 --> 00:11:21.600
+<v Guest>And in that case, there's multiple different paradigms.
+
+113
+00:11:21.660 --> 00:11:27.640
+<v Guest>But if you have a user who is constrained in their actions by traditional security,
+
+114
+00:11:27.640 --> 00:11:33.280
+<v Guest>and then those constraints are transferred to the agent,
+
+115
+00:11:33.440 --> 00:11:40.460
+<v Guest>then the agent only has the capability to answer the questions that person could do.
+
+116
+00:11:40.660 --> 00:11:46.780
+<v Guest>What we found is that is useful to the extent that maybe the person can automate some of their tasks,
+
+117
+00:11:46.940 --> 00:11:54.520
+<v Guest>but in the future, that agent will likely talk to an agent who assumes the permissions
+
+118
+00:11:54.520 --> 00:12:01.300
+<v Guest>permissions of someone who has greater permissions or someone who has less, fewer permissions in
+
+119
+00:12:01.300 --> 00:12:06.860
+<v Guest>order to fully realize the utility of agents. In other words, you have agents talking to agents,
+
+120
+00:12:07.000 --> 00:12:11.740
+<v Guest>and you're not guaranteed that all the agents have the same permission. In this framework,
+
+121
+00:12:12.060 --> 00:12:18.300
+<v Guest>it's useful to assume that, or at least it's secure to assume that somehow, some way,
+
+122
+00:12:18.340 --> 00:12:22.400
+<v Guest>one agent's going to transfer information to the other agent. And so you've got to
+
+123
+00:12:22.400 --> 00:12:29.260
+<v Guest>lock down the transfer of information between agents. And that is not something that traditional
+
+124
+00:12:29.260 --> 00:12:38.220
+<v Guest>security does. That transfer of information is usually locked down by the security model of the
+
+125
+00:12:38.220 --> 00:12:43.420
+<v Guest>security does. That transfer of information is usually locked down by the security model of the
+people in the company. It's the actions that the people take. So when Ave is talking to Noah,
+and Noah is the supervisor, and Ave is just the Noah's head of HR, and Ave is just a regular HR
+
+126
+00:12:43.520 --> 00:12:50.800
+<v Guest>and Noah is the supervisor, and Abe is just the Noah's head of HR, and Abe is just a regular HR
+
+127
+00:12:52.400 --> 00:12:58.060
+<v Guest>say everyone's payroll. If the Noah agent does have access to everyone's payroll and the Ave
+
+128
+00:12:58.060 --> 00:13:03.840
+<v Guest>agent needs to talk to the Noah agent, can the Ave agent ask the Noah agent for everybody's
+
+129
+00:13:03.840 --> 00:13:10.760
+<v Guest>payroll in the company? And then once that Ave agent has it, it can reveal it to myself, to Ave.
+
+130
+00:13:10.940 --> 00:13:14.920
+<v Guest>And if I'm a bad actor, I shouldn't know about that, or it's a company secret that
+
+131
+00:13:14.920 --> 00:13:19.980
+<v Guest>maybe I can get paid a lot of money by somebody on the outside by selling it to or something
+
+132
+00:13:19.980 --> 00:13:22.900
+<v Guest>then all of a sudden now you have a data leak.
+
+133
+00:13:23.060 --> 00:13:27.500
+<v Guest>And so you have to put guardrails on the transfer of information
+
+134
+00:13:28.260 --> 00:13:32.600
+<v Guest>outside of the Noah agent, the exfiltration of that information,
+
+135
+00:13:32.840 --> 00:13:34.680
+<v Guest>in order to secure the system.
+
+136
+00:13:35.020 --> 00:13:40.460
+<v Guest>And so it's not so much restricting the access to the information originally,
+
+137
+00:13:40.660 --> 00:13:45.760
+<v Guest>but it's restricting what that agent can then tell the users
+
+138
+00:13:45.760 --> 00:13:47.500
+<v Guest>and other agents that are talking to it.
+
+139
+00:13:47.560 --> 00:13:48.660
+<v Guest>And that's the difficulty.
+
+140
+00:13:49.980 --> 00:13:55.000
+<v Noah Labhart>Makes total sense. It's not the before, it's the after. It's not the what you have access to is
+
+141
+00:13:55.000 --> 00:13:59.720
+<v Noah Labhart>what you can do with it in some sort of respect. And I think that's a really great segue into my
+
+142
+00:13:59.720 --> 00:14:05.340
+<v Noah Labhart>next question. And again, I could probably, from your answers thus far, elaborate on my own ideas,
+
+143
+00:14:05.460 --> 00:14:10.720
+<v Noah Labhart>but what's the impact of these sort of breaches, inference time breaches on AI adoption? How is
+
+144
+00:14:10.720 --> 00:14:13.840
+<v Noah Labhart>this slowing down, affecting all the things on AI adoption?
+
+145
+00:14:13.840 --> 00:14:35.340
+<v Guest>It's just a roadblock to AI adoption. You can have an agent that, in a sense, you can have agents that are only able to do the things that someone is already able to do. So if, for instance, in my role in a company, I have some rote tasks that are required at all times.
+
+146
+00:14:35.340 --> 00:14:58.060
+<v Guest>If I have an agent that is helping me do rote or just mind-numbing tasks that are typically part of my role, then that's all well and good. But the true utility of an agent typically comes from automating actions that may interface with other agents in the company or other people in the company.
+
+147
+00:14:58.060 --> 00:15:14.240
+<v Guest>For instance, sending an email, right? And if my agent can send an email, then now you have this lethal combination, which is it's got access to the data I can see and it can send it to whoever. It can talk to the outside world or whoever wants to talk to it.
+
+148
+00:15:14.240 --> 00:15:30.640
+<v Guest>So if I send it off to do some task and somehow like a document it reads and doing that instructs it to send information to this unknown email, then yeah, it can do that if it is an email summarizing or email sending bot.
+
+149
+00:15:30.820 --> 00:15:32.800
+<v Guest>So once again, you run into the problem of utility.
+
+150
+00:15:32.800 --> 00:15:33.480
+<v Guest>So
+
+151
+00:15:33.480 --> 00:15:47.060
+<v Noah Labhart>what role does compliance play in shaping inference time guardrails? Because we talk about the security aspect of it and not the before, but the after, the action, limiting what an agent can do. But where does compliance come into play?
+
+152
+00:15:47.060 --> 00:15:47.560
+<v Noah Labhart>This
+
+153
+00:15:47.440 --> 00:16:00.320
+<v Guest>is the big sticking point. This is what we see over and over again when we talk to large companies, is that they want to be compliant. They want to be HIPAA compliant. They want to respect Law 25, GDPR, etc, etc, etc.
+
+154
+00:16:00.320 --> 00:16:08.380
+<v Guest>cetera. And it is really hard to ensure that an agent system, an agentic system will be compliant
+
+155
+00:16:08.860 --> 00:16:18.660
+<v Guest>when you can't say with certainty that it's not going to send out, say, PHI or PII to an external
+
+156
+00:16:18.660 --> 00:16:25.220
+<v Guest>endpoint. And so you have to rely on things like guardrails or things like secure design in order
+
+157
+00:16:25.220 --> 00:16:29.340
+<v Guest>to ensure that. And we can get into guardrails and how they're not that great and they don't
+
+158
+00:16:30.320 --> 00:16:34.660
+<v Guest>work for a lot of things. They work in principle, but they're really easy to break.
+
+159
+00:16:34.920 --> 00:16:40.500
+<v Guest>And so one thing I think about a lot in terms of compliance is if you're using guardrails,
+
+160
+00:16:40.720 --> 00:16:47.040
+<v Guest>how many nines do you have to have in terms of your certainty that it will find all of or guard
+
+161
+00:16:47.040 --> 00:16:54.960
+<v Guest>against all of the PHI leaks or PII leaks? How many nines of accuracy do you have to have or
+
+162
+00:16:54.960 --> 00:16:59.820
+<v Guest>false positives or false negatives do you have to have in order to satisfy a regulator
+
+163
+00:17:00.320 --> 00:17:04.980
+<v Guest>to say, yes, this system is secure. And I don't think we have that from the regulatory side,
+
+164
+00:17:05.160 --> 00:17:08.940
+<v Guest>and I'm sure we don't have that on the industry side. So it's an open question as people roll
+
+165
+00:17:08.940 --> 00:17:10.140
+<v Guest>these systems up. Yeah,
+
+166
+00:17:10.240 --> 00:17:13.520
+<v Noah Labhart>for sure. Tell me about guardrails then. So dive into that. Why you think
+
+167
+00:17:13.520 --> 00:17:17.160
+<v Noah Labhart>they're only as good as some of those nines? Tell me a little bit more about that.
+
+168
+00:17:17.620 --> 00:17:23.860
+<v Guest>There's a recent paper out by Google that just gives it, at Google and Stanford, it gives an
+
+169
+00:17:23.860 --> 00:17:29.900
+<v Guest>an exact formula for breaking a guardrail. And the premise of a guardrail is that you can use
+
+170
+00:17:29.900 --> 00:17:35.660
+<v Guest>a smaller model to guard against the data exfiltration of a larger model. The problem
+
+171
+00:17:35.660 --> 00:17:41.960
+<v Guest>is the smaller model by its very nature has less cognitive capabilities. So all you have to do is
+
+172
+00:17:41.960 --> 00:17:47.720
+<v Guest>tell the larger model to use some kind of cipher scheme where it can exfiltrate the data. And the
+
+173
+00:17:47.720 --> 00:17:53.220
+<v Guest>larger model will go, sure, I'll put whatever I'm trying to say. I will construct a sentence where
+
+174
+00:17:53.980 --> 00:17:59.420
+<v Guest>and second or first and third letter of every word reconstructs the message I'm trying to send out.
+
+175
+00:17:59.740 --> 00:18:05.420
+<v Guest>Or maybe it's just garbled text or something rather. Or it could be a poem where the first
+
+176
+00:18:05.420 --> 00:18:09.940
+<v Guest>word of the limerick, where the first word of every line is the actual message it's trying to
+
+177
+00:18:09.940 --> 00:18:16.560
+<v Guest>send out. The guardrail model doesn't have the context length or the technical capability to
+
+178
+00:18:16.560 --> 00:18:22.980
+<v Guest>identify all of those schemes by its very construction. And so you can easily subvert
+
+179
+00:18:23.860 --> 00:18:50.340
+<v Guest>In a real agentic system, there's probably many layers of actual LLM calls, but certainly, potentially, you might only need to subvert the top layer. There could be situations or maybe architectures where you need to subvert multiple layers, which obviously makes the entire jailbreaking of the agent harder, but there is no 100% security in the guardrail. That's the first problem with guardrails.
+
+180
+00:18:50.340 --> 00:18:53.820
+<v Guest>The second problem with guardrails is that they're probabilistic.
+
+181
+00:18:53.880 --> 00:19:03.160
+<v Guest>And so you can send 100 PHI-containing strings through the guardrail, and it might find all
+
+182
+00:19:03.160 --> 00:19:03.660
+<v Guest>100.
+
+183
+00:19:03.640 --> 00:19:08.900
+<v Guest>And then the 101st, it fails, just simply because it's probabilistic and it hasn't seen
+
+184
+00:19:08.900 --> 00:19:09.940
+<v Guest>that before.
+
+185
+00:19:10.140 --> 00:19:17.680
+<v Guest>And that probably does not pass muster for a regulator who wants 100% deterministic detection
+
+186
+00:19:17.680 --> 00:19:20.880
+<v Guest>protection of all PHI to make sure that it's not going out of the
+
+187
+00:19:20.880 --> 00:19:21.380
+<v Noah Labhart>system.
+
+188
+00:19:21.280 --> 00:19:38.660
+<v Noah Labhart>Certainly. Now that makes total sense. And that feels like kind of the root, call it growth area, maybe call it issue or limitation with AI in general, the probabilistic nature, over deterministic that we need for regulators, for compliance, for validation, for all those sorts of things.
+
+189
+00:19:39.200 --> 00:19:57.520
+<v Noah Labhart>So then what practical steps can organizations take to secure inference today? We see the issues with the guardrails. I think you outlined that perfectly. And when you talk through compliance and why these things are critical to secure, how do they get started? What's step one, two, three, as many as you can list?
+
+190
+00:19:57.520 --> 00:19:58.020
+<v Noah Labhart>Yeah,
+
+191
+00:19:57.960 --> 00:20:11.720
+<v Guest>for sure. One, you still probably want to use guardrails, even though they're not perfect, because they are a semblance of security. I don't think they get you all the way there. I think you also need to implement some of these secure by design architectures.
+
+192
+00:20:11.720 --> 00:20:29.940
+<v Guest>And essentially those boil down to having a trusted model and an untrusted model. And the untrusted model sees your sensitive data and may encounter prompt injection or model poisoning or something or other that causes it to be jailbroken.
+
+193
+00:20:29.940 --> 00:20:56.640
+<v Guest>But it's answering questions from the trusted model in such a way that can never filter back to the trusted model. And you have papers like CaMeL from Google, and then the Secure by Design set of papers, which I believe is from Invariant Labs, IBM, Google, ETH, Zurich, ETH AI Center, just a host of people. They have this paper on secure agentic design patterns.
+
+194
+00:20:56.640 --> 00:21:12.240
+<v Guest>So the question I have is, for those designs, is do they maintain the full utility of what we were promised for agentic systems? With those architectures, can you still accomplish everything you need to?
+
+195
+00:21:12.240 --> 00:21:29.340
+<v Guest>I think the answer remains to be discovered. But if you're really trying to build secure systems, then you have to follow these implementation guidance, especially if you're trying to comply with strict privacy laws.
+
+196
+00:21:29.340 --> 00:21:30.520
+<v Guest>So that
+
+197
+00:21:30.520 --> 00:21:51.960
+<v Noah Labhart>makes sense. A good starting point. And I appreciate you mentioned that doing the guardrails anyway, because that's what they are. They're just guardrails. They're not 27 nines of accuracy, six sigma level safety there. And I think my last question is probably one that everyone is interested in, right? Because security can come at a cost of implementation, at a cost of perhaps performance.
+
+198
+00:21:51.960 --> 00:22:09.640
+<v Noah Labhart>How can businesses balance performance with security when adding these guardrails? Because we need things to be fast. We want things to be fast. We want things to be efficient. But security is absolutely critical. I think you've outlined how important it is to secure these inference time threats here. How do they balance performance and security, though?
+
+199
+00:22:09.640 --> 00:22:26.480
+<v Guest>We're early enough in the agentic revolution that I will outline a development pattern here. Develop your POC that does not go into production however you want. Aim for maximum utility.
+
+200
+00:22:26.480 --> 00:22:43.100
+<v Guest>Then take that and shoehorn it into a secure framework. So you might have just an agent that just natively accesses an MCP server and gets information from your database and that does some transformation with it and then kicks you out the result.
+
+201
+00:22:43.100 --> 00:23:00.860
+<v Guest>Fine and good for a prototype to see what level of utility you can get out of the agent infrastructure. Do that quickly, do that fast, rapid prototype, develop quickly. Then the hard problem becomes when you put that into production, you need to find a way to implement these secure patterns as much as possible.
+
+202
+00:23:00.860 --> 00:23:30.300
+<v Guest>So instead of just going and talking to the database, now you're asking like yes, no questions. And you have a secure model that where you have a untrusted model that goes and accesses the database and can only return yes, no answers, etc. So you're separating concerns there. And then you're wrapping things in guardrails to make sure, oh, this is topically relevant. Like I'm not being asked to, I don't know, generate limericks or do some weird stuff that has nothing to do with, say, the finance task that I know I'm supposed to be working on.
+
+203
+00:23:30.860 --> 00:23:33.640
+<v Guest>That'll mitigate some of these sort of more naive attacks.
+
+204
+00:23:34.200 --> 00:23:38.440
+<v Guest>All of that is what organizations should be doing, what businesses should be doing as
+
+205
+00:23:38.440 --> 00:23:39.480
+<v Guest>they move into production.
+
+206
+00:23:39.760 --> 00:23:41.420
+<v Guest>And then you iterate.
+
+207
+00:23:41.560 --> 00:23:42.600
+<v Guest>You just, you go from there.
+
+208
+00:23:42.700 --> 00:23:47.700
+<v Guest>You try and improve the performance to gain again what you had in your POC.
+
+209
+00:23:47.860 --> 00:23:49.440
+<v Guest>But that's what I would recommend.
+
+210
+00:23:49.700 --> 00:23:55.420
+<v Guest>I think that having an eye, if you can, move the security into the design process as quickly
+
+211
+00:23:55.420 --> 00:23:56.940
+<v Guest>as possible after the POC.
+
+212
+00:23:56.940 --> 00:24:02.940
+<v Guest>so that you have a better sense of how you can create a secure agent and what the performance
+
+213
+00:24:02.940 --> 00:24:08.200
+<v Guest>of that secure agent will be. I think often you'll find that adding all these layers of security
+
+214
+00:24:08.200 --> 00:24:13.720
+<v Guest>doesn't actually impact performance too much. Typically, what people are looking for with
+
+215
+00:24:13.720 --> 00:24:23.860
+<v Guest>agents now is raw ability as opposed to latency. I rarely come across a scenario where people are
+
+216
+00:24:23.860 --> 00:24:28.340
+<v Guest>are like oh this is taking too long almost everyone building with agents wants the result
+
+217
+00:24:28.340 --> 00:24:36.280
+<v Guest>to be good more than they want they want a slow good result versus a fast bad result a fast bad
+
+218
+00:24:36.280 --> 00:24:41.020
+<v Guest>result you might as well not have the agent at all so a slow good result is what everyone is aiming
+
+219
+00:24:41.020 --> 00:24:48.120
+<v Guest>for and i believe there is a broad understanding amongst the public and internally to companies
+
+220
+00:24:48.120 --> 00:24:53.220
+<v Guest>companies, that an agent can go off and take minutes to do a task as long as it does the task
+
+221
+00:24:53.220 --> 00:24:58.020
+<v Guest>correctly and gets back to me. And I think a lot of that comes from the fact that you have the deep
+
+222
+00:24:58.020 --> 00:25:02.540
+<v Guest>thinking models that people are interacting with in the public at large coming from OpenAI
+
+223
+00:25:02.540 --> 00:25:08.840
+<v Guest>and Anthropic and these where they now have the expectation, oh, the agent is working. I don't
+
+224
+00:25:08.840 --> 00:25:14.300
+<v Guest>need to worry about, I can come back to this in five minutes and it will have an answer for me.
+
+225
+00:25:14.300 --> 00:25:20.660
+<v Guest>develop quickly, move security in as soon as you can, but don't worry about latency and timing.
+
+226
+00:25:20.980 --> 00:25:29.800
+<v Guest>It's more important to build trust and make a system that works effectively so that you can
+
+227
+00:25:29.800 --> 00:25:31.280
+<v Guest>always improve latency later on.
+
+228
+00:25:31.400 --> 00:25:34.040
+<v Noah Labhart>Right on. I couldn't agree more with that, especially moving
+
+229
+00:25:34.040 --> 00:25:39.860
+<v Noah Labhart>security into the design process. Moving so much into the design process is super, super critical.
+
+230
+00:25:39.860 --> 00:25:41.560
+<v Noah Labhart>Well, Ave, thanks for being on the show today.
+
+231
+00:25:41.700 --> 00:25:43.920
+<v Noah Labhart>It's clear that inference time risks are a problem.
+
+232
+00:25:44.040 --> 00:25:45.540
+<v Noah Labhart>I think you've illustrated that well.
+
+233
+00:25:45.660 --> 00:25:49.540
+<v Noah Labhart>And one that it's a problem that traditional security models are insufficient to solve.
+
+234
+00:25:49.660 --> 00:25:55.040
+<v Noah Labhart>These risks are different from learning risks and require a new way of thinking, a new way of security setup.
+
+235
+00:25:55.440 --> 00:25:58.240
+<v Noah Labhart>Guardrails are important to put into place, but compliance is critical.
+
+236
+00:25:58.360 --> 00:26:03.280
+<v Noah Labhart>And moving the security into the design process as soon as possible is definitely the best route forward.
+
+237
+00:26:03.420 --> 00:26:08.860
+<v Noah Labhart>So, Ave, thank you for being on the show today and educating us on all things inference time, AI guardrails.
+
+238
+00:26:09.860 --> 00:26:12.940
+<v Guest>It was great. Flew by. Thanks for having me.
+
+239
+00:26:13.660 --> 00:26:14.740
+<v Noah Labhart>There you have it.
+
+240
+00:26:14.820 --> 00:26:19.980
+<v Noah Labhart>Ave leads us through inference time risk and how to set up effective AI guardrails and compliance,
+
+241
+00:26:20.320 --> 00:26:25.720
+<v Noah Labhart>not only to keep protections at inference time, but to balance performance and security for your enterprise.
+
+242
+00:26:27.820 --> 00:26:29.960
+<v Noah Labhart>Thank you for listening to today's episode.
+
+243
+00:26:30.200 --> 00:26:34.400
+<v Noah Labhart>If you'd like to learn more about Protegrity, go to protegrity.com.
+
+244
+00:26:34.560 --> 00:26:39.360
+<v Noah Labhart>That's P-R-O-T-E-G-R-I-T-Y dot com.
+
+245
+00:26:40.400 --> 00:26:41.700
+<v Noah Labhart>And thanks again for listening.

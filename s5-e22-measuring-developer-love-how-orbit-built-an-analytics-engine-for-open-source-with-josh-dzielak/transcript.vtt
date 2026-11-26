@@ -1,0 +1,1851 @@
+WEBVTT
+
+NOTE S5 E22: Measuring Developer Love: How Orbit Built an Analytics Engine for Open Source with Josh Dzielak
+
+1
+00:00:01.200 --> 00:00:08.160
+<v Josh Dzielak>One thing that the Orbit application does is it generates a score for every community member that's called the love.
+
+2
+00:00:08.480 --> 00:00:16.040
+<v Josh Dzielak>Back in May, we decided to introduce materialized views inside of Postgres in order to basically do these calculations.
+
+3
+00:00:16.360 --> 00:00:19.600
+<v Josh Dzielak>So we do them in SQL and then we would store the result in a materialized view.
+
+4
+00:00:20.220 --> 00:00:23.000
+<v Josh Dzielak>I thought it would be great. It's very simple.
+
+5
+00:00:23.000 --> 00:00:31.000
+<v Josh Dzielak>Two or three months later, it turns out that the number one consumer of I.O. on our database is the generation of these materialized views.
+
+6
+00:00:31.220 --> 00:00:38.080
+<v Josh Dzielak>It worked quite well when we were ingesting one-tenth or one-hundredth of the activity, but it is certainly an approach that has not scaled.
+
+7
+00:00:39.160 --> 00:00:42.740
+<v Josh Dzielak>My name is Josh Dzielak. I'm the co-founder and CTO at Orbit.
+
+8
+00:00:47.380 --> 00:00:54.560
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who share in the
+
+9
+00:00:54.560 --> 00:01:00.540
+<v Noah Labhart>critical moments of what it takes to change an industry and build and lead a team that has your
+
+10
+00:01:00.540 --> 00:01:08.640
+<v Noah Labhart>back. I'm your host, Noah Labhart, and today how Josh Dzielak took the Orbit model and created
+
+11
+00:01:08.640 --> 00:01:15.740
+<v Noah Labhart>mission control for your community. All this and more on Code Story.
+
+12
+00:01:20.860 --> 00:01:25.800
+<v Noah Labhart>Josh Dzielak is originally from the U.S., but lives in Paris now. And because of this,
+
+13
+00:01:25.880 --> 00:01:30.320
+<v Noah Labhart>he likes to take advantage and walk around to take in the sights. He lives close to an area
+
+14
+00:01:30.320 --> 00:01:34.700
+<v Noah Labhart>with a park featuring gardens and lots of trees, and he goes there to clear his head,
+
+15
+00:01:34.700 --> 00:01:39.800
+<v Noah Labhart>have a little bit of nature, and also to have walking meetings. Josh likes to stay active
+
+16
+00:01:39.800 --> 00:01:45.100
+<v Noah Labhart>through running, cycling, and the aforementioned walking meetings. He's married with a 13-month-old
+
+17
+00:01:45.100 --> 00:01:50.720
+<v Noah Labhart>daughter. He met his wife not in Paris or the US but in Thailand. He jokes that his young daughter
+
+18
+00:01:50.720 --> 00:01:57.720
+<v Noah Labhart>is growing up faster than his company. He avidly confirms that the food in Paris is amazing. The
+
+19
+00:01:57.720 --> 00:02:02.340
+<v Noah Labhart>simple things are fantastic and he frequents the patisserie for his favorite almond croissant.
+
+20
+00:02:02.340 --> 00:02:09.420
+<v Noah Labhart>His family loves to host people when they come to town, so they can ensure they try some of the exquisite foods and strong flavors.
+
+21
+00:02:10.260 --> 00:02:14.520
+<v Noah Labhart>At a prior company, as a developer advocate, Josh started using the Orbit model.
+
+22
+00:02:14.960 --> 00:02:19.680
+<v Noah Labhart>He compared the model to being like the funnel for sales, except the Orbit model applies to community.
+
+23
+00:02:20.280 --> 00:02:25.280
+<v Noah Labhart>After he left the company, he joined his now co-founder using the Orbit model in a consulting context.
+
+24
+00:02:26.020 --> 00:02:28.240
+<v Noah Labhart>Then, the aha moment occurred.
+
+25
+00:02:28.840 --> 00:02:31.440
+<v Noah Labhart>What if we built a product to facilitate this?
+
+26
+00:02:32.860 --> 00:02:35.560
+<v Noah Labhart>This is the creation story of Orbit.
+
+27
+00:02:39.360 --> 00:02:41.800
+<v Josh Dzielak>Orbit is mission control for your community.
+
+28
+00:02:42.040 --> 00:02:44.960
+<v Josh Dzielak>Our users and customers are community builders.
+
+29
+00:02:45.220 --> 00:02:50.380
+<v Josh Dzielak>They're people who are building a community out there on the internet, or sometimes off the internet.
+
+30
+00:02:50.520 --> 00:02:54.240
+<v Josh Dzielak>But they use tools like Slack, Discord, GitHub, Twitter.
+
+31
+00:02:54.920 --> 00:03:03.560
+<v Josh Dzielak>Orbit plugs into all those different systems to try to give those community builders a universal sense of their community across all of the different sources.
+
+32
+00:03:03.820 --> 00:03:09.940
+<v Josh Dzielak>So instead of having a community that feels fragmented because you have some activity on Discourse, some on GitHub, some on Twitter,
+
+33
+00:03:10.120 --> 00:03:15.820
+<v Josh Dzielak>Orbit tries to bring that together and give our users a complete picture of who their community members are.
+
+34
+00:03:16.020 --> 00:03:22.640
+<v Josh Dzielak>Is their community growing or shrinking? What kind of actions or steps could they be using? Could they be trying to grow their community?
+
+35
+00:03:24.240 --> 00:03:29.640
+<v Josh Dzielak>of open source projects and companies who are making tools for developers. Those are two of our
+
+36
+00:03:29.640 --> 00:03:33.960
+<v Josh Dzielak>earliest customers, earliest types of customers and our favorite people to work with.
+
+37
+00:03:34.640 --> 00:03:39.880
+<v Josh Dzielak>And the way that I got into it is I was a developer advocate working at Algolia for
+
+38
+00:03:39.880 --> 00:03:44.180
+<v Josh Dzielak>several years. And that's actually where I started to use this thing called the Orbit model,
+
+39
+00:03:44.840 --> 00:03:48.840
+<v Josh Dzielak>which we have in addition to Orbit the product, we also have this thing called the Orbit model,
+
+40
+00:03:48.840 --> 00:03:53.300
+<v Josh Dzielak>which is a really simple thing. It's a bit like the funnel where the
+
+41
+00:03:53.300 --> 00:03:57.060
+<v Josh Dzielak>funnel is a model for marketing and sales but the orbit is more of a model
+
+42
+00:03:57.060 --> 00:04:01.460
+<v Josh Dzielak>for community rather than having a cone shaped thing where everybody's you know
+
+43
+00:04:01.460 --> 00:04:03.900
+<v Josh Dzielak>flowing to the bottom and if someone falls out of the funnel you don't care
+
+44
+00:04:03.900 --> 00:04:07.820
+<v Josh Dzielak>about them. In the orbit model you care about all of your community members
+
+45
+00:04:07.820 --> 00:04:10.580
+<v Josh Dzielak>they're just some of them are at the center and some of them are closer to
+
+46
+00:04:10.580 --> 00:04:15.820
+<v Josh Dzielak>the edges. And my co-founder Patrick and I after I left Algolia I teamed up with
+
+47
+00:04:15.820 --> 00:04:19.660
+<v Josh Dzielak>with him. And we started to use the Orbit model with a bunch of different companies,
+
+48
+00:04:19.720 --> 00:04:23.900
+<v Josh Dzielak>more in just a consulting context to help them understand and visualize their community.
+
+49
+00:04:24.320 --> 00:04:30.620
+<v Josh Dzielak>And then we had this aha moment, like, oh, what if we built a product that helped people take
+
+50
+00:04:30.620 --> 00:04:34.480
+<v Josh Dzielak>the suggestions, the recommendations, the visual canvas that the Orbit model provides,
+
+51
+00:04:34.700 --> 00:04:39.700
+<v Josh Dzielak>and turn that into an actual tool where people could see their community inside of that tool.
+
+52
+00:04:39.700 --> 00:04:48.380
+<v Josh Dzielak>So that was really the process of being a developer advocate and realizing that there weren't tools out there for me or for my team.
+
+53
+00:04:48.680 --> 00:04:53.700
+<v Josh Dzielak>There weren't things that really helped me get a universal view of the community or know exactly what to do.
+
+54
+00:04:53.920 --> 00:05:07.140
+<v Josh Dzielak>And becoming a consultant to help people do that and then ultimately deciding to turn that into a product and build something that developer advocates and community managers everywhere can use to overcome a lot of the challenges of community building.
+
+55
+00:05:09.700 --> 00:05:17.340
+<v Noah Labhart>Let's dive into the MVP. So tell me about that first product you built. How long did it take you to build and what sort of tools did you use to bring it to life?
+
+56
+00:05:19.400 --> 00:05:33.900
+<v Josh Dzielak>So the very first MVP, we built a Rails backend with a Next.js frontend. We had that for about three months. We decided to do that because we wanted to try out Next.js. We'd heard a lot of great things.
+
+57
+00:05:33.900 --> 00:05:38.960
+<v Josh Dzielak>we also knew that we were going to be building something that had a pretty serious data model to it.
+
+58
+00:05:39.060 --> 00:05:45.360
+<v Josh Dzielak>And I've used Rails off and on since 2008, 2009, so for about 10 years.
+
+59
+00:05:45.660 --> 00:05:53.220
+<v Josh Dzielak>Very familiar with the power that Rails gives developers at the model level, complex domains, lots of tables.
+
+60
+00:05:53.820 --> 00:05:56.720
+<v Josh Dzielak>Rails and ActiveRecord are just so good at abstracting all of that.
+
+61
+00:05:56.840 --> 00:06:00.620
+<v Josh Dzielak>So we knew we wanted to use Rails at the application and backend layer.
+
+62
+00:06:00.860 --> 00:06:03.020
+<v Josh Dzielak>We tried Next.js on the front end.
+
+63
+00:06:03.900 --> 00:06:09.000
+<v Josh Dzielak>really good. But what we found as we were iterating with that stack, it was a little bit slower than
+
+64
+00:06:09.000 --> 00:06:13.800
+<v Josh Dzielak>we wanted to iterate because we still had to change backend APIs and then have those reflected
+
+65
+00:06:13.800 --> 00:06:19.740
+<v Josh Dzielak>in Next.js. And we were changing the product so fast early on based on what we were learning for
+
+66
+00:06:19.740 --> 00:06:25.880
+<v Josh Dzielak>customers that we eventually went back to just a Rails monolith. So the second MVP, what came
+
+67
+00:06:25.880 --> 00:06:30.020
+<v Josh Dzielak>after that, we just took the backend code that we had and said, we're going to go full Rails.
+
+68
+00:06:30.020 --> 00:06:32.240
+<v Josh Dzielak>we moved the templating and the front end stuff
+
+69
+00:06:32.240 --> 00:06:35.260
+<v Josh Dzielak>inside of Rails and that's kind of how the app is today.
+
+70
+00:06:35.600 --> 00:06:39.080
+<v Josh Dzielak>So I would kind of describe it as we over-architected
+
+71
+00:06:39.080 --> 00:06:40.560
+<v Josh Dzielak>a little bit in the beginning
+
+72
+00:06:40.560 --> 00:06:43.500
+<v Josh Dzielak>and we actually returned to something a little bit simpler
+
+73
+00:06:43.500 --> 00:06:46.300
+<v Josh Dzielak>once we had more confidence we were building the right thing
+
+74
+00:06:46.300 --> 00:06:48.260
+<v Josh Dzielak>and so that we could continue
+
+75
+00:06:48.260 --> 00:06:51.200
+<v Josh Dzielak>or so we were able to iterate even faster than we had been.
+
+76
+00:06:51.700 --> 00:06:52.200
+<v Josh Dzielak>That's
+
+77
+00:06:52.140 --> 00:06:52.640
+<v Noah Labhart>interesting.
+
+78
+00:06:52.600 --> 00:06:54.780
+<v Noah Labhart>So you over-architected first and then simplified.
+
+79
+00:06:55.100 --> 00:06:57.120
+<v Noah Labhart>I want to dig into that a little bit here in a second,
+
+80
+00:06:57.120 --> 00:07:02.580
+<v Noah Labhart>But in that first MVP, and maybe the second too, if you want to double up your answer,
+
+81
+00:07:02.820 --> 00:07:06.800
+<v Noah Labhart>you got to make certain decisions and trade-offs about what you're going to build in the short
+
+82
+00:07:06.800 --> 00:07:09.900
+<v Noah Labhart>term, how you're going to approach it, what sort of technical debt you're going to take
+
+83
+00:07:09.900 --> 00:07:10.400
+<v Noah Labhart>on.
+
+84
+00:07:10.380 --> 00:07:13.820
+<v Noah Labhart>So tell me about some of those decisions and trade-offs you had to make in a little more
+
+85
+00:07:13.820 --> 00:07:16.060
+<v Noah Labhart>detail and how you coped with them.
+
+86
+00:07:18.360 --> 00:07:25.580
+<v Josh Dzielak>One of the decisions we had to make was how much to, you know, prioritize the front end
+
+87
+00:07:27.380 --> 00:07:30.140
+<v Josh Dzielak>as we were trying to learn about what customers really wanted.
+
+88
+00:07:30.440 --> 00:07:34.840
+<v Josh Dzielak>So kind of what fidelity did we want to build with in terms of the front end?
+
+89
+00:07:34.900 --> 00:07:39.800
+<v Josh Dzielak>Would we start off by having something really beautiful, really fast,
+
+90
+00:07:39.960 --> 00:07:43.060
+<v Josh Dzielak>feeling very polished, taking a little bit longer to build,
+
+91
+00:07:43.180 --> 00:07:47.500
+<v Josh Dzielak>but ultimately having maybe more wow effect on the visual side with these users?
+
+92
+00:07:47.720 --> 00:07:50.220
+<v Josh Dzielak>Or would we keep it a little bit more bare bones,
+
+93
+00:07:50.740 --> 00:07:52.680
+<v Josh Dzielak>pages that were a little bit less interactive?
+
+94
+00:07:53.300 --> 00:07:55.020
+<v Josh Dzielak>And we went back and forth on that a bit
+
+95
+00:07:55.020 --> 00:07:59.020
+<v Josh Dzielak>because we wanted our early users to really know that we were committed to giving them something
+
+96
+00:07:59.020 --> 00:08:03.740
+<v Josh Dzielak>really nice and really great to work with. But then we also spent more than a few cycles
+
+97
+00:08:03.740 --> 00:08:08.580
+<v Josh Dzielak>trying to iterate and just kind of tweak the design and we learned that that wasn't really
+
+98
+00:08:08.580 --> 00:08:13.020
+<v Josh Dzielak>giving us the information generally about what customers really wanted at that level. They're
+
+99
+00:08:13.020 --> 00:08:16.980
+<v Josh Dzielak>like, oh it's you know it's beautiful this is really looking nicer but we're such at we're
+
+100
+00:08:16.980 --> 00:08:21.000
+<v Josh Dzielak>still such an early phase where we need more answers like yes I would use this feature,
+
+101
+00:08:21.000 --> 00:08:24.860
+<v Josh Dzielak>No, I wouldn't or I'll only use this feature if it does these other four things.
+
+102
+00:08:25.260 --> 00:08:29.680
+<v Josh Dzielak>You know, we said, wow, we should probably learn to iterate faster on the use cases and
+
+103
+00:08:29.680 --> 00:08:33.000
+<v Josh Dzielak>not try to put something so polished in front of our users.
+
+104
+00:08:33.220 --> 00:08:35.020
+<v Josh Dzielak>They don't mind if it looks a little bit rough.
+
+105
+00:08:35.280 --> 00:08:38.160
+<v Josh Dzielak>You know, there were a couple of trade-offs architecturally that went into that.
+
+106
+00:08:38.240 --> 00:08:42.140
+<v Josh Dzielak>Like should we use Tailwind CSS because it's really easy or should we build our own design
+
+107
+00:08:42.140 --> 00:08:44.500
+<v Josh Dzielak>system and then try to work from there?
+
+108
+00:08:44.720 --> 00:08:49.520
+<v Josh Dzielak>Ultimately, a lot of our choices just ended up gravitating toward what's the easiest thing
+
+109
+00:08:51.000 --> 00:08:52.400
+<v Josh Dzielak>and what lets us iterate the fastest.
+
+110
+00:08:56.060 --> 00:08:58.320
+<v Noah Labhart>I liked it that you mentioned Tailwind.
+
+111
+00:08:58.400 --> 00:09:01.400
+<v Noah Labhart>So I had Adam on the podcast a while back
+
+112
+00:09:01.400 --> 00:09:03.880
+<v Noah Labhart>and Adam weighs in to talk about Tailwind
+
+113
+00:09:03.880 --> 00:09:04.600
+<v Noah Labhart>and building that.
+
+114
+00:09:04.920 --> 00:09:06.660
+<v Noah Labhart>And that's a fantastic tool.
+
+115
+00:09:07.220 --> 00:09:09.780
+<v Josh Dzielak>Yeah, we've been really happy with it
+
+116
+00:09:09.780 --> 00:09:12.080
+<v Josh Dzielak>and it's allowed us to go fast
+
+117
+00:09:12.080 --> 00:09:14.740
+<v Josh Dzielak>and create components after the fact
+
+118
+00:09:14.740 --> 00:09:15.620
+<v Josh Dzielak>once we have them.
+
+119
+00:09:15.680 --> 00:09:19.160
+<v Josh Dzielak>What we found is Tailwind scales quite well
+
+120
+00:09:21.000 --> 00:09:23.320
+<v Josh Dzielak>In the beginning, it feels like, wow, I'm using a lot of classes.
+
+121
+00:09:23.560 --> 00:09:25.560
+<v Josh Dzielak>But then over time, you just move those into partials.
+
+122
+00:09:25.920 --> 00:09:29.640
+<v Josh Dzielak>Rails and Tailwind actually work quite well together, and you can do a lot there.
+
+123
+00:09:29.760 --> 00:09:37.000
+<v Josh Dzielak>So as you learn what is going to be a more consistent part of your UI, you can just put it into a partial with some Tailwind and use it anywhere you want.
+
+124
+00:09:37.180 --> 00:09:40.480
+<v Josh Dzielak>And that's really most of the architecture for our front end.
+
+125
+00:09:40.580 --> 00:09:41.240
+<v Josh Dzielak>It's that simple.
+
+126
+00:09:41.240 --> 00:09:41.740
+<v Josh Dzielak>simple.
+
+127
+00:09:43.340 --> 00:09:47.820
+<v Noah Labhart>From that point, let's say from the second MVP, right, where you simplified,
+
+128
+00:09:48.500 --> 00:09:53.280
+<v Noah Labhart>how did you progress the product from there? And how did you mature it? And I think, you know,
+
+129
+00:09:53.280 --> 00:09:58.340
+<v Noah Labhart>in context of that question, I'm looking for how you built your roadmap and decided, okay,
+
+130
+00:09:58.380 --> 00:10:01.480
+<v Noah Labhart>this is the next most important thing to build an orbit.
+
+131
+00:10:03.620 --> 00:10:10.520
+<v Josh Dzielak>Yeah, I'd say a lot of it was based on feedback that we were getting from two sources, a small
+
+132
+00:10:11.240 --> 00:10:17.020
+<v Josh Dzielak>partners and then a wider community that we had started to create. I think it was on a Slack
+
+133
+00:10:17.020 --> 00:10:23.160
+<v Josh Dzielak>group at that time. So we had maybe five to 10 design partners. And then we had about 100 people
+
+134
+00:10:23.160 --> 00:10:30.240
+<v Josh Dzielak>who we knew, friends, former clients, people in the industry, developer advocates, some of our
+
+135
+00:10:30.240 --> 00:10:36.240
+<v Josh Dzielak>angel investors who themselves were developer tool founders. So we had a small group that we
+
+136
+00:10:36.240 --> 00:10:41.480
+<v Josh Dzielak>we could go really deep with. And then we had a bigger group where we could take some concepts to
+
+137
+00:10:41.480 --> 00:10:48.120
+<v Josh Dzielak>the more general and see, hey, you know, let's let question here. What would you want to see on a
+
+138
+00:10:48.120 --> 00:10:52.860
+<v Josh Dzielak>profile page for your community member? Well, we can learn something from design partners who have
+
+139
+00:10:52.860 --> 00:10:57.300
+<v Josh Dzielak>a very specific sense of what that could look like. We can also just throw it out to the community for
+
+140
+00:10:57.300 --> 00:11:02.140
+<v Josh Dzielak>ideas. And they say, Oh, I want to want I want a button to watch what this person is doing, or I
+
+141
+00:11:02.140 --> 00:11:06.080
+<v Josh Dzielak>I want an ability to send them swag, stickers, a t-shirt with one click.
+
+142
+00:11:06.380 --> 00:11:09.860
+<v Josh Dzielak>So they're all kind of novel ideas coming from the community.
+
+143
+00:11:10.040 --> 00:11:11.520
+<v Josh Dzielak>And we gathered a lot of feedback there.
+
+144
+00:11:11.760 --> 00:11:16.960
+<v Josh Dzielak>But I think we also needed to have design partners who had very clear goals for our
+
+145
+00:11:16.960 --> 00:11:18.260
+<v Josh Dzielak>community program does this.
+
+146
+00:11:18.360 --> 00:11:21.040
+<v Josh Dzielak>These are the four or five things we're trying to accomplish this year.
+
+147
+00:11:21.440 --> 00:11:24.160
+<v Josh Dzielak>This is the kind of tool that we think could help us accomplish that.
+
+148
+00:11:24.300 --> 00:11:30.320
+<v Josh Dzielak>And we would do two to three hours a week with all of the design partners as a part
+
+149
+00:11:30.320 --> 00:11:30.900
+<v Josh Dzielak>of that process.
+
+150
+00:11:32.140 --> 00:11:35.000
+<v Josh Dzielak>One of them, the GraphQL people, give them a shout out
+
+151
+00:11:35.000 --> 00:11:36.940
+<v Josh Dzielak>because they were super helpful from early on
+
+152
+00:11:36.940 --> 00:11:40.940
+<v Josh Dzielak>in really helping us understand how Orbit could help the Apollo community
+
+153
+00:11:40.940 --> 00:11:43.960
+<v Josh Dzielak>and the Apollo DevRel, Dev Experience team,
+
+154
+00:11:44.140 --> 00:11:46.000
+<v Josh Dzielak>provide their members a better experience.
+
+155
+00:11:46.260 --> 00:11:50.520
+<v Josh Dzielak>So it's kind of the general answer is going broad and deep at the same time
+
+156
+00:11:50.520 --> 00:11:53.940
+<v Josh Dzielak>to kind of make sure you're not getting too boxed into what design partners say,
+
+157
+00:11:54.080 --> 00:11:57.660
+<v Josh Dzielak>but you're also not just only taking suggestions from people
+
+158
+00:11:57.660 --> 00:11:59.880
+<v Josh Dzielak>that are just throwing them out there at a high level.
+
+159
+00:11:59.880 --> 00:12:02.120
+<v Josh Dzielak>oh, wouldn't it be nice if it did that?
+
+160
+00:12:02.380 --> 00:12:05.220
+<v Noah Labhart>It's like you're reading from the list of people I've interviewed.
+
+161
+00:12:05.300 --> 00:12:09.000
+<v Noah Labhart>So I had Matt DeBergalis from Apollo on the podcast last season.
+
+162
+00:12:09.640 --> 00:12:13.300
+<v Noah Labhart>Super cool tool and fantastic community.
+
+163
+00:12:13.460 --> 00:12:15.600
+<v Noah Labhart>I'm glad you guys are hooked up and helping each other.
+
+164
+00:12:16.360 --> 00:12:20.060
+<v Josh Dzielak>Yeah, we love working with the team over there.
+
+165
+00:12:20.240 --> 00:12:22.980
+<v Josh Dzielak>And they've been, you know, even early on,
+
+166
+00:12:23.000 --> 00:12:25.000
+<v Josh Dzielak>they had a lot of confidence in us
+
+167
+00:12:25.000 --> 00:12:27.620
+<v Josh Dzielak>that we were going to be able to build something useful for them
+
+168
+00:12:27.620 --> 00:12:31.640
+<v Josh Dzielak>and for the other developer-focused companies in the space.
+
+169
+00:12:31.880 --> 00:12:37.240
+<v Josh Dzielak>And really our roots were very much in the developer tools and open source.
+
+170
+00:12:37.340 --> 00:12:41.940
+<v Josh Dzielak>Now Orbit serves different kind of communities that are not just developer-focused.
+
+171
+00:12:42.060 --> 00:12:47.580
+<v Josh Dzielak>But in terms of really making sure what we had was going to work for developer tools and open source,
+
+172
+00:12:47.720 --> 00:12:48.940
+<v Josh Dzielak>they were really helpful.
+
+173
+00:12:50.180 --> 00:12:51.320
+<v Noah Labhart>Well, let's switch to team.
+
+174
+00:12:51.520 --> 00:12:53.620
+<v Noah Labhart>So how did you go about building your team?
+
+175
+00:12:53.620 --> 00:12:59.300
+<v Noah Labhart>And what did you look for in those people to indicate, okay, they're the winning horses to join you?
+
+176
+00:13:00.440 --> 00:13:10.040
+<v Josh Dzielak>When we went to build the team, we thought a lot about culture and values, not documenting them ad nauseum or writing them down or trying to have an exact perspective.
+
+177
+00:13:10.180 --> 00:13:21.900
+<v Josh Dzielak>But just my co-founder and I started to think about what are the characteristics of the people that we think would be interested in joining this mission and we think we'd have a fun and good working relationship together.
+
+178
+00:13:23.620 --> 00:13:26.200
+<v Josh Dzielak>to a few things that are still some values we have today.
+
+179
+00:13:27.040 --> 00:13:29.100
+<v Josh Dzielak>Action-oriented is one,
+
+180
+00:13:29.280 --> 00:13:30.620
+<v Josh Dzielak>especially as we were just starting out,
+
+181
+00:13:30.700 --> 00:13:32.320
+<v Josh Dzielak>two people looking to become three
+
+182
+00:13:32.320 --> 00:13:35.220
+<v Josh Dzielak>and then three looking to become five and then up to 10.
+
+183
+00:13:35.580 --> 00:13:38.340
+<v Josh Dzielak>You know, we really needed and wanted people
+
+184
+00:13:38.340 --> 00:13:41.300
+<v Josh Dzielak>who wanted to jump in, roll up their sleeves, get dirty,
+
+185
+00:13:41.820 --> 00:13:45.280
+<v Josh Dzielak>not too opinionated about a specific task
+
+186
+00:13:45.280 --> 00:13:47.300
+<v Josh Dzielak>or a specific thing that they wanted to work on,
+
+187
+00:13:47.380 --> 00:13:49.620
+<v Josh Dzielak>but just kind of generally willing to do
+
+188
+00:13:49.620 --> 00:13:51.840
+<v Josh Dzielak>what it takes to get the company off the ground.
+
+189
+00:13:53.620 --> 00:13:58.540
+<v Josh Dzielak>that small. Things are changing all the time, trying to find product market fit. And so we
+
+190
+00:13:58.540 --> 00:14:03.600
+<v Josh Dzielak>really looked for people who were confident enough in their engineering skills to be able to
+
+191
+00:14:03.600 --> 00:14:08.780
+<v Josh Dzielak>build something fast, to understand the difference between, you know, I'm building this for the long
+
+192
+00:14:08.780 --> 00:14:13.200
+<v Josh Dzielak>part, this is going to become a part of our architecture, or this is an experiment, so we're
+
+193
+00:14:13.200 --> 00:14:18.080
+<v Josh Dzielak>going to build it in a different way that takes a lot less time. I think that kind of sense and
+
+194
+00:14:18.080 --> 00:14:23.000
+<v Josh Dzielak>sensibility that engineers have, if they've had the opportunity to work on startups or some of
+
+195
+00:14:23.620 --> 00:14:28.720
+<v Josh Dzielak>products before at the early stages is very, very valuable because you don't want to bring
+
+196
+00:14:28.720 --> 00:14:32.840
+<v Josh Dzielak>someone in who's going to treat everything as architecture from the beginning and then
+
+197
+00:14:32.840 --> 00:14:36.320
+<v Josh Dzielak>spend a lot of time in it and be very upset when it gets thrown away.
+
+198
+00:14:36.640 --> 00:14:41.160
+<v Josh Dzielak>So we look for people who are open-minded about that and had some experience.
+
+199
+00:14:43.220 --> 00:14:48.540
+<v Josh Dzielak>I'd also say the passion for the community space and for the product that we were building
+
+200
+00:14:48.540 --> 00:14:51.320
+<v Josh Dzielak>was also just such a big thing.
+
+201
+00:14:51.320 --> 00:14:55.860
+<v Josh Dzielak>There were some people from our own community that ended up joining the team early on.
+
+202
+00:14:55.940 --> 00:15:02.480
+<v Josh Dzielak>And they did just because they love the idea of serving community builders who are our customers.
+
+203
+00:15:02.660 --> 00:15:07.680
+<v Josh Dzielak>And they love the idea of getting to build a tool that doesn't exist yet.
+
+204
+00:15:07.760 --> 00:15:12.560
+<v Josh Dzielak>Like this idea of mission control for the community or the community operating system.
+
+205
+00:15:12.640 --> 00:15:16.420
+<v Josh Dzielak>It's kind of a new category that's just emerging as we're building it.
+
+206
+00:15:16.420 --> 00:15:22.660
+<v Josh Dzielak>so a lot of the people were just excited from a product and engineering standpoint that this is a
+
+207
+00:15:22.660 --> 00:15:27.320
+<v Josh Dzielak>new thing it's going to require figuring out a lot of you know a lot of how it's going to work a lot
+
+208
+00:15:27.320 --> 00:15:33.800
+<v Josh Dzielak>of decisions i think we're able to attract some people in the beginning who wanted a lot of a lot
+
+209
+00:15:33.800 --> 00:15:37.320
+<v Josh Dzielak>of challenge in terms of like we we don't know exactly where this is going to go but we're going
+
+210
+00:15:37.320 --> 00:15:43.140
+<v Josh Dzielak>to have to figure it out along the way i
+
+211
+00:15:43.140 --> 00:15:45.720
+<v Noah Labhart>like how you said you know looking for people that are okay
+
+212
+00:15:46.460 --> 00:15:51.160
+<v Noah Labhart>throwing away what they've built and starting over, kind of. I think that's really important
+
+213
+00:15:51.160 --> 00:15:56.400
+<v Noah Labhart>because you're building something to get things started, but you're going to end up either having
+
+214
+00:15:56.400 --> 00:16:02.080
+<v Noah Labhart>to rewrite or scrap things, and you can't take it personally. That's hard. That's hard for engineers.
+
+215
+00:16:02.500 --> 00:16:08.280
+<v Josh Dzielak>It is, yeah. And I would say we try to select for people who wouldn't say they don't have a big ego,
+
+216
+00:16:08.380 --> 00:16:13.600
+<v Josh Dzielak>but who are aware of the times when ego might factor into their conversations or the work that
+
+217
+00:16:13.600 --> 00:16:15.260
+<v Josh Dzielak>that they're doing or their relationships
+
+218
+00:16:15.260 --> 00:16:18.060
+<v Josh Dzielak>with their coworkers and try to hire people
+
+219
+00:16:18.060 --> 00:16:20.140
+<v Josh Dzielak>who are self-aware, but then also, you know,
+
+220
+00:16:20.140 --> 00:16:21.420
+<v Josh Dzielak>be coaching within the organization
+
+221
+00:16:21.420 --> 00:16:23.920
+<v Josh Dzielak>because anytime you have a lot of smart people
+
+222
+00:16:23.920 --> 00:16:26.120
+<v Josh Dzielak>working on something, they're all gonna have a lot of ideas
+
+223
+00:16:26.120 --> 00:16:27.840
+<v Josh Dzielak>and a lot of them and opinions
+
+224
+00:16:27.840 --> 00:16:28.920
+<v Josh Dzielak>and a lot of them will be valid.
+
+225
+00:16:29.160 --> 00:16:31.480
+<v Josh Dzielak>But we try to invest a lot in coaching
+
+226
+00:16:31.480 --> 00:16:34.120
+<v Josh Dzielak>and mentoring the team so that we can, you know,
+
+227
+00:16:34.640 --> 00:16:37.500
+<v Josh Dzielak>build amazing things and give feedback to each other,
+
+228
+00:16:37.540 --> 00:16:40.320
+<v Josh Dzielak>help each other improve, but without a lot of tension,
+
+229
+00:16:40.420 --> 00:16:42.280
+<v Josh Dzielak>I would say, or too much.
+
+230
+00:16:43.900 --> 00:16:45.460
+<v Noah Labhart>Well, let's switch to scalability.
+
+231
+00:16:45.840 --> 00:16:48.880
+<v Noah Labhart>So did you build this in the beginning to scale efficiently,
+
+232
+00:16:49.140 --> 00:16:50.160
+<v Noah Labhart>essentially from day one?
+
+233
+00:16:50.540 --> 00:16:52.440
+<v Noah Labhart>Or are you fighting this as you grow?
+
+234
+00:16:54.280 --> 00:16:56.620
+<v Josh Dzielak>So I'd say we're in the middle.
+
+235
+00:16:56.840 --> 00:17:02.620
+<v Josh Dzielak>I think that the product in our user base has grown quite quickly,
+
+236
+00:17:02.740 --> 00:17:05.740
+<v Josh Dzielak>and we didn't do anything prematurely on the scaling side.
+
+237
+00:17:06.060 --> 00:17:08.740
+<v Josh Dzielak>So we set up, we run on Heroku.
+
+238
+00:17:08.860 --> 00:17:10.200
+<v Josh Dzielak>We use Postgres.
+
+239
+00:17:10.760 --> 00:17:15.820
+<v Josh Dzielak>we don't have a Postgres setup where we've introduced you know multiple masters or
+
+240
+00:17:16.720 --> 00:17:21.940
+<v Josh Dzielak>partitioning or we're kind of approaching those decisions in our sort of infrastructure roadmap
+
+241
+00:17:21.940 --> 00:17:26.340
+<v Josh Dzielak>in the next three to six months probably but we didn't do any of that premature stuff in advance
+
+242
+00:17:26.340 --> 00:17:31.840
+<v Josh Dzielak>we certainly did not set up a Kubernetes cluster you know we didn't go with microservices up front
+
+243
+00:17:31.840 --> 00:17:37.000
+<v Josh Dzielak>assuming that we were going to need to you know chunk things into services we just said let's
+
+244
+00:17:37.000 --> 00:17:42.800
+<v Josh Dzielak>pick the stack that's very reliable and trusted and easy and great to iterate with and not not
+
+245
+00:17:42.800 --> 00:17:48.220
+<v Josh Dzielak>try to over scale on any of the parts so what we have today is is very much what most people would
+
+246
+00:17:48.220 --> 00:17:54.640
+<v Josh Dzielak>expect to see this kind of rails and heroku uh stack and that's what we have so we really we
+
+247
+00:17:54.640 --> 00:17:59.000
+<v Josh Dzielak>haven't done anything as far as premature optimization there so we're spending about
+
+248
+00:17:59.000 --> 00:18:03.120
+<v Josh Dzielak>10 of our development sprints i would say on improving the performance of the application
+
+249
+00:18:03.120 --> 00:18:06.060
+<v Josh Dzielak>on making sure that everything from a database perspective
+
+250
+00:18:06.060 --> 00:18:08.280
+<v Josh Dzielak>continues to run smooth while looking ahead
+
+251
+00:18:08.280 --> 00:18:10.680
+<v Josh Dzielak>next three to six months on that.
+
+252
+00:18:10.820 --> 00:18:12.060
+<v Josh Dzielak>But it's mostly the data.
+
+253
+00:18:12.240 --> 00:18:15.160
+<v Josh Dzielak>We don't have too many moving parts
+
+254
+00:18:15.160 --> 00:18:17.500
+<v Josh Dzielak>as far as our overall solution today
+
+255
+00:18:17.500 --> 00:18:19.160
+<v Josh Dzielak>that we have to look at scaling.
+
+256
+00:18:19.320 --> 00:18:21.520
+<v Josh Dzielak>So I think we'll kind of approach it as we get there.
+
+257
+00:18:23.120 --> 00:18:23.640
+<v Josh Dzielak>Well,
+
+258
+00:18:23.700 --> 00:18:25.540
+<v Noah Labhart>as you step out on the balcony
+
+259
+00:18:25.540 --> 00:18:27.540
+<v Noah Labhart>and you look across all that you've built,
+
+260
+00:18:27.700 --> 00:18:29.020
+<v Noah Labhart>what are you most proud of?
+
+261
+00:18:31.460 --> 00:18:37.540
+<v Josh Dzielak>I'm very proud of the team, our engineers, our product managers, our product designer,
+
+262
+00:18:37.880 --> 00:18:43.460
+<v Josh Dzielak>everyone on the community and the developer relations side. It's really been a team effort
+
+263
+00:18:43.460 --> 00:18:50.240
+<v Josh Dzielak>to build the product because getting the feedback from our customers comes from everyone and that's
+
+264
+00:18:50.240 --> 00:18:55.300
+<v Josh Dzielak>really the main thing that we use to drive what we build. So I'm really proud of the team
+
+265
+00:18:55.300 --> 00:19:03.240
+<v Josh Dzielak>team for remaining community and customer centric, even as more and more requirements
+
+266
+00:19:03.240 --> 00:19:08.360
+<v Josh Dzielak>have come in, even as we can see more in the roadmap, all the stuff that we're excited
+
+267
+00:19:08.360 --> 00:19:13.580
+<v Josh Dzielak>to build, but we still try to really stay grounded in what our users and our community
+
+268
+00:19:13.580 --> 00:19:14.460
+<v Josh Dzielak>are bringing to us.
+
+269
+00:19:15.040 --> 00:19:16.900
+<v Josh Dzielak>Proud of the team for growing.
+
+270
+00:19:17.440 --> 00:19:21.940
+<v Josh Dzielak>We've grown from three to 25 people this year since January.
+
+271
+00:19:21.940 --> 00:19:28.300
+<v Josh Dzielak>and so really excited that we've been able to do that and proud of the team for just figuring
+
+272
+00:19:28.300 --> 00:19:34.540
+<v Josh Dzielak>things out as we go and I would say being being patient with some of the things that we've needed
+
+273
+00:19:34.540 --> 00:19:41.300
+<v Josh Dzielak>to get into place and helping you know really stepping up and solving problems even when it's
+
+274
+00:19:41.300 --> 00:19:46.440
+<v Josh Dzielak>not something that everybody was able to see yet or that got assigned out so really love the the
+
+275
+00:19:46.440 --> 00:19:49.380
+<v Josh Dzielak>the autonomy and just stepping up the team has done.
+
+276
+00:19:49.660 --> 00:19:51.900
+<v Josh Dzielak>And from a code base and technology perspective,
+
+277
+00:19:52.520 --> 00:19:55.380
+<v Josh Dzielak>I'm also very proud of how well we've
+
+278
+00:19:55.380 --> 00:19:57.760
+<v Josh Dzielak>sticked to our testing strategy.
+
+279
+00:19:58.120 --> 00:20:01.100
+<v Josh Dzielak>We have almost 4,000 RSpec tests.
+
+280
+00:20:01.420 --> 00:20:04.640
+<v Josh Dzielak>We're pretty faithful about testing in general.
+
+281
+00:20:04.780 --> 00:20:07.300
+<v Josh Dzielak>As a result, we've only had a few situations
+
+282
+00:20:07.300 --> 00:20:09.760
+<v Josh Dzielak>where major bugs have entered into production.
+
+283
+00:20:09.980 --> 00:20:12.680
+<v Josh Dzielak>Our uptime this year has been very, very good.
+
+284
+00:20:12.820 --> 00:20:15.060
+<v Josh Dzielak>We fixed performance issues,
+
+285
+00:20:16.440 --> 00:20:21.120
+<v Josh Dzielak>noticing them and sometimes we can also catch those in development so i'm proud of that we've
+
+286
+00:20:21.120 --> 00:20:26.560
+<v Josh Dzielak>built a testing culture the last thing i'm proud of is that we've been able to mentor junior
+
+287
+00:20:26.560 --> 00:20:32.100
+<v Josh Dzielak>developers even on a team that's trying to move fast and is very new we have two or three junior
+
+288
+00:20:32.100 --> 00:20:37.180
+<v Josh Dzielak>developers on the team and we've seen amazing strides in what they've been able to do we have
+
+289
+00:20:37.180 --> 00:20:42.340
+<v Josh Dzielak>one junior developer who had never used ruby and rails before had only used javascript and after
+
+290
+00:20:42.340 --> 00:20:53.300
+<v Josh Dzielak>After six months, she's shipping features, doing pull request reviews, helping other developers on the team, documenting a lot of our stack and how to get onboarded.
+
+291
+00:20:53.380 --> 00:21:03.480
+<v Josh Dzielak>And it's just really gratifying and really cool to see that we're able to have developers on the team with multiple skill levels and still get work done while we're helping those other developers level up.
+
+292
+00:21:06.240 --> 00:21:08.000
+<v Noah Labhart>So let's flip the script a little bit.
+
+293
+00:21:08.000 --> 00:21:12.500
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+294
+00:21:14.260 --> 00:21:19.160
+<v Josh Dzielak>One mistake that we made, and this will be a little bit technical, but I think that's probably okay.
+
+295
+00:21:19.580 --> 00:21:20.160
+<v Josh Dzielak>That's good.
+
+296
+00:21:20.680 --> 00:21:22.580
+<v Josh Dzielak>That's good. It's better than okay. It's good.
+
+297
+00:21:23.920 --> 00:21:27.040
+<v Josh Dzielak>Yeah, we're going to talk some little bit of database stuff here.
+
+298
+00:21:27.840 --> 00:21:34.700
+<v Josh Dzielak>One thing that the Orbit application does is it generates a score for every community member that's called the love.
+
+299
+00:21:34.700 --> 00:21:39.860
+<v Josh Dzielak>This is just our word for how engaged is this member in the community.
+
+300
+00:21:40.040 --> 00:21:42.700
+<v Josh Dzielak>And we try to assign a score. It's not perfect.
+
+301
+00:21:43.000 --> 00:21:45.500
+<v Josh Dzielak>Can't exactly quantify love into a decimal.
+
+302
+00:21:45.700 --> 00:21:49.300
+<v Josh Dzielak>But we create a score so that users at a glance can see,
+
+303
+00:21:49.380 --> 00:21:52.580
+<v Josh Dzielak>oh, this is one of my most engaged members or this is not.
+
+304
+00:21:52.880 --> 00:21:58.220
+<v Josh Dzielak>And so we do this in the background as Orbit is receiving community activities.
+
+305
+00:21:58.380 --> 00:22:01.060
+<v Josh Dzielak>And today we receive over 700,000 a day.
+
+306
+00:22:01.060 --> 00:22:05.020
+<v Josh Dzielak>That's things that community members are doing in our users community, you know,
+
+307
+00:22:05.020 --> 00:22:09.980
+<v Josh Dzielak>that represents some kind of engagement. And we have to run some background processing on
+
+308
+00:22:09.980 --> 00:22:13.040
+<v Josh Dzielak>all of those activities that come in in order to be able to update this score.
+
+309
+00:22:13.540 --> 00:22:19.020
+<v Josh Dzielak>And back in May, we decided to introduce materialized views inside of Postgres in
+
+310
+00:22:19.020 --> 00:22:23.780
+<v Josh Dzielak>order to basically do these calculations. So we do them in SQL and then we would store the result
+
+311
+00:22:23.780 --> 00:22:29.020
+<v Josh Dzielak>in a materialized view. And then we could read from that view during queries. It was the first
+
+312
+00:22:29.020 --> 00:22:34.420
+<v Josh Dzielak>time we'd introduced views or materialized views into the application i am fully responsible it
+
+313
+00:22:34.420 --> 00:22:40.520
+<v Josh Dzielak>was my idea i thought it would be great it's very simple two or three months later it turns out that
+
+314
+00:22:41.040 --> 00:22:46.120
+<v Josh Dzielak>the number one consumer of io on our database is the generation of these materialized views
+
+315
+00:22:46.120 --> 00:22:53.140
+<v Josh Dzielak>that we do on a rolling basis essentially we have a Sidekiq job or a cron that just recalculates
+
+316
+00:22:53.140 --> 00:22:58.200
+<v Josh Dzielak>these it worked quite well when we were ingesting one-tenth or one-hundredth of the activities that
+
+317
+00:22:59.020 --> 00:23:02.320
+<v Josh Dzielak>we are doing today, but it is certainly approach that has not scaled.
+
+318
+00:23:02.520 --> 00:23:07.840
+<v Josh Dzielak>And our engineering team and myself right now, we are going back and re-architecting
+
+319
+00:23:07.840 --> 00:23:10.740
+<v Josh Dzielak>that to just use tables instead of materialized views.
+
+320
+00:23:11.440 --> 00:23:16.480
+<v Josh Dzielak>It's been one of the things that we as an engineering team look back on and laugh a
+
+321
+00:23:16.480 --> 00:23:20.540
+<v Josh Dzielak>little bit because it's a great example of, well, it worked at the time, but if we had
+
+322
+00:23:21.020 --> 00:23:25.100
+<v Josh Dzielak>done kind of a scalability analysis and said, is this going to scale at 10x or 100x?
+
+323
+00:23:25.100 --> 00:23:30.780
+<v Josh Dzielak>I think we all would have said, no, maybe we should find a different way before we ship this.
+
+324
+00:23:31.640 --> 00:23:33.660
+<v Josh Dzielak>But that was a bit of a mistake.
+
+325
+00:23:33.760 --> 00:23:35.580
+<v Josh Dzielak>And we have a process now to ask that question.
+
+326
+00:23:35.740 --> 00:23:37.240
+<v Josh Dzielak>So I think we learned something.
+
+327
+00:23:37.920 --> 00:23:40.400
+<v Noah Labhart>I have been in that exact same position.
+
+328
+00:23:40.520 --> 00:23:45.420
+<v Noah Labhart>And we just finished refactoring all of our materialized views at variable.
+
+329
+00:23:45.600 --> 00:23:46.640
+<v Noah Labhart>So I'm right there with you.
+
+330
+00:23:46.740 --> 00:23:47.240
+<v Noah Labhart>Oh,
+
+331
+00:23:46.980 --> 00:23:47.480
+<v Josh Dzielak>that's great.
+
+332
+00:23:47.680 --> 00:23:48.480
+<v Josh Dzielak>We're not alone.
+
+333
+00:23:49.260 --> 00:23:50.060
+<v Noah Labhart>No, no.
+
+334
+00:23:50.240 --> 00:23:51.700
+<v Noah Labhart>You know, it does work.
+
+335
+00:23:51.700 --> 00:23:56.260
+<v Noah Labhart>It does work and it's quick and its materialized views are great at small scale.
+
+336
+00:23:56.440 --> 00:24:00.080
+<v Noah Labhart>And then as soon as you hit scale, you run into problems.
+
+337
+00:24:00.160 --> 00:24:01.580
+<v Noah Labhart>So I feel you.
+
+338
+00:24:01.660 --> 00:24:02.740
+<v Noah Labhart>I totally feel you there.
+
+339
+00:24:09.260 --> 00:24:13.400
+<v Noah Labhart>Well, what does the future look like for Orbit, the product and for your team?
+
+340
+00:24:15.200 --> 00:24:18.580
+<v Josh Dzielak>We're adding a lot to the product in two directions these days.
+
+341
+00:24:18.640 --> 00:24:21.040
+<v Josh Dzielak>One, the number of integrations that we support.
+
+342
+00:24:21.700 --> 00:24:27.660
+<v Josh Dzielak>And then also how much value that we can provide to our users for helping them build the community.
+
+343
+00:24:28.180 --> 00:24:33.060
+<v Josh Dzielak>And essentially how many workflows can Orbit actually support that community builders do?
+
+344
+00:24:33.420 --> 00:24:36.560
+<v Josh Dzielak>A lot of our efforts are going in those two directions.
+
+345
+00:24:36.640 --> 00:24:41.200
+<v Josh Dzielak>And the integrations direction is really interesting because from a technical side right now,
+
+346
+00:24:41.240 --> 00:24:46.820
+<v Josh Dzielak>we're trying to figure out how are we going to support the next 20 integrations, the next 100 integrations?
+
+347
+00:24:46.900 --> 00:24:48.580
+<v Josh Dzielak>How does the architecture change?
+
+348
+00:24:48.580 --> 00:25:04.900
+<v Josh Dzielak>Today, we have five major integrations. We have those inside of our main code base. It works just fine. 25 integrations inside of the main code base might start to feel like a lot and actually, you know, have some real impact on our development velocity or just the overall health of the code base.
+
+349
+00:25:04.900 --> 00:25:11.180
+<v Josh Dzielak>so one thing we're doing on the team side is starting to create teams inside of the engineering
+
+350
+00:25:11.180 --> 00:25:16.900
+<v Josh Dzielak>organization to go after and solve specific problems and challenges like that like maybe
+
+351
+00:25:16.900 --> 00:25:20.800
+<v Josh Dzielak>you know we'll have a team in the next year take a look at how we're how we're building integrations
+
+352
+00:25:20.800 --> 00:25:25.400
+<v Josh Dzielak>and try to form a new perspective or move those integrations outside of the code base
+
+353
+00:25:25.400 --> 00:25:30.880
+<v Josh Dzielak>do something different there something that allows us to scale up to 100 or more integrations in the
+
+354
+00:25:30.880 --> 00:25:37.180
+<v Josh Dzielak>future without having to worry about any impacts on the main runtime main code base and so we're
+
+355
+00:25:37.180 --> 00:25:44.160
+<v Josh Dzielak>experimenting a lot on the design of our teams and that's been been pretty interesting because
+
+356
+00:25:44.160 --> 00:25:49.580
+<v Josh Dzielak>for a while it was totally flat we didn't have engineering managers or tech leads we just had
+
+357
+00:25:49.580 --> 00:25:56.120
+<v Josh Dzielak>developers um and and me as the cto giving some guidance that doesn't scale too far we have 15
+
+358
+00:25:56.120 --> 00:26:01.220
+<v Josh Dzielak>full-time contributors on the app today. And that's about two teams that we've created there.
+
+359
+00:26:01.360 --> 00:26:05.760
+<v Josh Dzielak>And each team has what we call an engineering organizer who is responsible for
+
+360
+00:26:08.200 --> 00:26:11.980
+<v Josh Dzielak>building with the right people, making sure that the right developers are working on the right
+
+361
+00:26:11.980 --> 00:26:15.960
+<v Josh Dzielak>things. We have a tech lead who's responsible for making sure we're building it in the right way.
+
+362
+00:26:16.080 --> 00:26:20.140
+<v Josh Dzielak>And then we have a product manager on the team who's responsible for building the right thing.
+
+363
+00:26:20.900 --> 00:26:25.800
+<v Josh Dzielak>These three people, along with five to six engineers, form the engineering teams that we
+
+364
+00:26:26.120 --> 00:26:32.660
+<v Josh Dzielak>today. And it's been cool to see our velocity go up as we've actually moved to something that's a
+
+365
+00:26:32.660 --> 00:26:36.780
+<v Josh Dzielak>little bit more structured. But that's the phase that the really the phase that we're in, we're
+
+366
+00:26:36.780 --> 00:26:41.800
+<v Josh Dzielak>kind of designing and building the organization as we build the product. And so I think we'll
+
+367
+00:26:41.800 --> 00:26:44.520
+<v Josh Dzielak>be innovating in both directions quite a bit in the next year.
+
+368
+00:26:47.620 --> 00:26:52.180
+<v Noah Labhart>Let's switch to you, Josh, who influences the way that you work? You know, I'm a CEO,
+
+369
+00:26:52.180 --> 00:26:55.940
+<v Noah Labhart>CTO, architect, really any person you look up to and why?
+
+370
+00:26:57.240 --> 00:27:02.980
+<v Josh Dzielak>One of my favorite CTOs or ex-CTO now, I guess, is Jason Warner from GitHub.
+
+371
+00:27:04.400 --> 00:27:09.660
+<v Josh Dzielak>We're very lucky to count Jason amongst our angels at Orbit.
+
+372
+00:27:10.440 --> 00:27:17.120
+<v Josh Dzielak>Got to know him early on and I was very excited about our vision to help make it easier to
+
+373
+00:27:17.120 --> 00:27:18.180
+<v Josh Dzielak>build developer communities.
+
+374
+00:27:18.560 --> 00:27:21.760
+<v Josh Dzielak>Jason was a VP engineering at Heroku and then the CTO at GitHub.
+
+375
+00:27:22.180 --> 00:27:28.160
+<v Josh Dzielak>What I love about Jason is that he's always sharing his perspective on engineering leadership.
+
+376
+00:27:28.620 --> 00:27:30.160
+<v Josh Dzielak>It can be on his Twitter.
+
+377
+00:27:30.620 --> 00:27:33.900
+<v Josh Dzielak>There's also a podcast he does now.
+
+378
+00:27:34.060 --> 00:27:44.500
+<v Josh Dzielak>And it's really very tactical solutions to a tactical perspective on challenges that startups face, like what should be the role of the CTO?
+
+379
+00:27:44.640 --> 00:27:45.780
+<v Josh Dzielak>What should be the role of the VP?
+
+380
+00:27:45.800 --> 00:27:48.680
+<v Josh Dzielak>And when is someone ready to be a director of engineering?
+
+381
+00:27:48.860 --> 00:27:50.240
+<v Josh Dzielak>What is the difference there?
+
+382
+00:27:52.180 --> 00:27:57.740
+<v Josh Dzielak>like for a series A or a series B or a bigger company that's further along. So I love that
+
+383
+00:27:57.740 --> 00:28:03.200
+<v Josh Dzielak>Jason just shares a ton of his thinking. And it's not just high level, it's actually very practical
+
+384
+00:28:03.200 --> 00:28:08.760
+<v Josh Dzielak>stuff that you feel like you need to know kind of right at that time. So big fan of Jason there.
+
+385
+00:28:08.900 --> 00:28:15.020
+<v Josh Dzielak>And I think on the developer community side, someone who's influenced me quite a bit is James
+
+386
+00:28:15.020 --> 00:28:21.300
+<v Josh Dzielak>Tamplin, the CEO and co-founder of Firebase. You know, one of the earliest examples that I saw of
+
+387
+00:28:22.180 --> 00:28:29.560
+<v Josh Dzielak>developer community well was the early Firebase back in 2012. And that really inspired me generally
+
+388
+00:28:29.560 --> 00:28:34.960
+<v Josh Dzielak>to get more involved in open source and developer community. And that kind of helped bring me to
+
+389
+00:28:34.960 --> 00:28:35.560
+<v Josh Dzielak>where I am today.
+
+390
+00:28:38.320 --> 00:28:42.920
+<v Noah Labhart>Well, we talked about a mistake, but a little bit different spin. If you could go
+
+391
+00:28:42.920 --> 00:28:47.400
+<v Noah Labhart>back to the beginning, what would you do differently? Or where would you consider taking a different
+
+392
+00:28:47.400 --> 00:28:47.900
+<v Noah Labhart>approach.
+
+393
+00:28:49.780 --> 00:28:54.700
+<v Josh Dzielak>One thing we would have done differently was be a little bit more
+
+394
+00:28:54.700 --> 00:29:00.480
+<v Josh Dzielak>use case focused and probably try to prioritize product design and product
+
+395
+00:29:00.480 --> 00:29:04.600
+<v Josh Dzielak>management thinking earlier on. For a while, for about a year and a half, we
+
+396
+00:29:04.600 --> 00:29:10.200
+<v Josh Dzielak>were just three people, two engineers and my co-founder is more on the the
+
+397
+00:29:10.200 --> 00:29:14.960
+<v Josh Dzielak>commercial side. We didn't have a very strong product management product design
+
+398
+00:29:14.960 --> 00:29:19.580
+<v Josh Dzielak>mindset and the result of that ended up being that we did build a lot of
+
+399
+00:29:19.580 --> 00:29:23.720
+<v Josh Dzielak>features that didn't end up being the right ones and we weren't always sure if
+
+400
+00:29:23.720 --> 00:29:28.800
+<v Josh Dzielak>what we were building was the the right thing. I would describe it as the kind of
+
+401
+00:29:28.800 --> 00:29:32.860
+<v Josh Dzielak>classic case where you have engineers in charge of the product roadmap and
+
+402
+00:29:32.860 --> 00:29:36.240
+<v Josh Dzielak>they're kind of biased because they're very close to the technology so they can
+
+403
+00:29:36.240 --> 00:29:39.780
+<v Josh Dzielak>really see what it's capable of but they're not exactly sure if that's going
+
+404
+00:29:39.780 --> 00:29:44.260
+<v Josh Dzielak>to be the thing that users want. We had to learn and grow up as an organization
+
+405
+00:29:44.960 --> 00:29:51.040
+<v Josh Dzielak>2021 a little bit naturally to start asking more questions and when we you know about what we had
+
+406
+00:29:51.040 --> 00:29:57.340
+<v Josh Dzielak>built about if it was truly something that users wanted and it was it was good it was hard to look
+
+407
+00:29:57.340 --> 00:30:02.160
+<v Josh Dzielak>at some of the things we'd built and say you know this was an interesting idea but it's really not
+
+408
+00:30:02.160 --> 00:30:06.760
+<v Josh Dzielak>something that we need to carry with us in the future because users might not understand it
+
+409
+00:30:06.760 --> 00:30:11.760
+<v Josh Dzielak>very well or it's not something that's very useful for them so to summarize it i would say
+
+410
+00:30:11.760 --> 00:30:17.100
+<v Josh Dzielak>you know, something I would have done differently would be to bring in either on the team or just
+
+411
+00:30:17.100 --> 00:30:23.780
+<v Josh Dzielak>as mentors or advisors in a stronger way, helping us really think as engineers, what are we building
+
+412
+00:30:23.780 --> 00:30:30.460
+<v Josh Dzielak>and why and how are we prioritizing it? And so that some of those iterations and some of what we
+
+413
+00:30:30.460 --> 00:30:35.160
+<v Josh Dzielak>ended up with and had to change in the future, we could have sort of gone directly to the right
+
+414
+00:30:35.160 --> 00:30:38.980
+<v Josh Dzielak>solution versus having to try, you know, three or four different attempts to do it.
+
+415
+00:30:40.580 --> 00:30:45.080
+<v Noah Labhart>well josh last question so you're getting on a plane and you're sitting next to a young
+
+416
+00:30:45.080 --> 00:30:48.800
+<v Noah Labhart>entrepreneur who's built the next big thing they're jazzed about it they can't wait to show
+
+417
+00:30:48.800 --> 00:30:52.900
+<v Noah Labhart>it off to the world can't wait to show it off to you right there on the plane what advice do you
+
+418
+00:30:52.900 --> 00:30:55.080
+<v Noah Labhart>give that person having gone down this road a bit
+
+419
+00:30:55.080 --> 00:31:00.100
+<v Josh Dzielak>this young entrepreneur they've built the next big
+
+420
+00:31:00.100 --> 00:31:08.760
+<v Josh Dzielak>big thing, I think my next advice right at that moment is seek help and seek a lot of opinions
+
+421
+00:31:08.760 --> 00:31:14.660
+<v Josh Dzielak>and input from people who have been at the next stage that you're trying to go to. So if this
+
+422
+00:31:14.660 --> 00:31:19.580
+<v Josh Dzielak>young entrepreneur has built the next big thing and it's just right there on his laptop, he hasn't
+
+423
+00:31:19.580 --> 00:31:24.400
+<v Josh Dzielak>really showed, he or she hasn't really showed many people, I would say, oh, the next thing that you
+
+424
+00:31:24.400 --> 00:31:29.840
+<v Josh Dzielak>need to do is get some feedback on this. Take a look, maybe talk to some other people who have
+
+425
+00:31:30.100 --> 00:31:33.580
+<v Josh Dzielak>built tools in this space or who would be potentially your customers.
+
+426
+00:31:34.000 --> 00:31:39.840
+<v Josh Dzielak>And now if this young entrepreneur had built the next big thing and maybe they had already
+
+427
+00:31:39.840 --> 00:31:43.880
+<v Josh Dzielak>raised their seed round, already have a few customers and building a team, my advice would
+
+428
+00:31:43.880 --> 00:31:48.480
+<v Josh Dzielak>be talk to people who've done their series A, ask them the questions about what that
+
+429
+00:31:48.480 --> 00:31:49.780
+<v Josh Dzielak>period was in between.
+
+430
+00:31:50.120 --> 00:31:53.260
+<v Josh Dzielak>Try to get a sense because it's all going to happen very quickly.
+
+431
+00:31:53.460 --> 00:31:58.820
+<v Josh Dzielak>And the best thing that you can do is trying to think six months or 12 months ahead and
+
+432
+00:32:00.100 --> 00:32:05.100
+<v Josh Dzielak>get a lot of other opinions into the mix so that you don't just kind of end up in an echo chamber
+
+433
+00:32:05.100 --> 00:32:09.280
+<v Josh Dzielak>in your own head. Oh, what should we do next? What am I going to do? What's the world going
+
+434
+00:32:09.280 --> 00:32:14.360
+<v Josh Dzielak>to look like in six months or 12 months? You can just find someone who's gone through those stages
+
+435
+00:32:14.360 --> 00:32:19.380
+<v Josh Dzielak>of that journey before and ask them. And every time I've done that, it's always been really
+
+436
+00:32:19.380 --> 00:32:24.120
+<v Josh Dzielak>helpful for me, whether it's talking to other founders who are further along or just subject
+
+437
+00:32:24.120 --> 00:32:29.560
+<v Josh Dzielak>matter experts in any kind of capacity. You know, people love to give their time often, at least I've
+
+438
+00:32:30.100 --> 00:32:31.700
+<v Josh Dzielak>when they know something about a topic.
+
+439
+00:32:31.840 --> 00:32:34.440
+<v Josh Dzielak>So my advice for this young entrepreneur would be,
+
+440
+00:32:34.600 --> 00:32:36.560
+<v Josh Dzielak>you know, ask for help and don't be shy
+
+441
+00:32:36.560 --> 00:32:39.240
+<v Josh Dzielak>to seek advice from experts.
+
+442
+00:32:39.580 --> 00:32:43.080
+<v Josh Dzielak>And, you know, be bold, you know,
+
+443
+00:32:43.080 --> 00:32:45.820
+<v Josh Dzielak>if try to get, you know, be so bold,
+
+444
+00:32:45.900 --> 00:32:48.500
+<v Josh Dzielak>try to get one time a day,
+
+445
+00:32:48.540 --> 00:32:49.880
+<v Josh Dzielak>at least, you know, someone tells you no.
+
+446
+00:32:51.220 --> 00:32:52.920
+<v Josh Dzielak>If everyone's always telling you yes,
+
+447
+00:32:53.020 --> 00:32:54.580
+<v Josh Dzielak>well, you probably don't know the limit
+
+448
+00:32:54.580 --> 00:32:55.400
+<v Josh Dzielak>of what you could be asking.
+
+449
+00:32:56.280 --> 00:32:57.220
+<v Noah Labhart>That's great advice.
+
+450
+00:32:57.660 --> 00:32:59.860
+<v Noah Labhart>Well, Josh, thank you for being on the show today.
+
+451
+00:33:00.100 --> 00:33:02.320
+<v Noah Labhart>thank you for telling the creation story of Orbit.
+
+452
+00:33:02.780 --> 00:33:03.880
+<v Josh Dzielak>Thanks for having me, Noah.
+
+453
+00:33:06.160 --> 00:33:06.660
+<v Josh Dzielak>And
+
+454
+00:33:06.620 --> 00:33:08.940
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+455
+00:33:12.280 --> 00:33:15.300
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+456
+00:33:15.440 --> 00:33:18.060
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+457
+00:33:18.260 --> 00:33:20.200
+<v Noah Labhart>or the podcasting app of your choice.
+
+458
+00:33:20.680 --> 00:33:23.940
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+459
+00:33:23.940 --> 00:33:25.700
+<v Noah Labhart>for just five to 10 bucks a month.
+
+460
+00:33:26.100 --> 00:33:28.280
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+461
+00:33:30.240 --> 00:33:30.800
+<v Noah Labhart>tremendously.
+
+462
+00:33:32.840 --> 00:33:34.400
+<v Noah Labhart>And thanks again for listening.

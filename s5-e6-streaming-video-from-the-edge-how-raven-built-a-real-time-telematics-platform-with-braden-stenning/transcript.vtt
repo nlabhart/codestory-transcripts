@@ -1,0 +1,1559 @@
+WEBVTT
+
+NOTE S5 E6: Streaming Video from the Edge: How Raven Built a Real-Time Telematics Platform with Braden Stenning
+
+1
+00:00:01.120 --> 00:00:21.860
+<v Braden Stenning>And so we had some UX problems with our initial product. Where we went to is we moved to having a tablet that we could attach to the process that would have a very lightweight UX. And this is where maybe one of the bigger trade-offs happened, which was just how simple we wanted to make that user experience.
+
+2
+00:00:21.860 --> 00:00:28.580
+<v Braden Stenning>experience. We use a lot from lean manufacturing, and in lean, if you're not doing something value
+
+3
+00:00:28.580 --> 00:00:35.040
+<v Braden Stenning>added, then you're losing time, and an operator typing something into a computer, you know, you
+
+4
+00:00:35.040 --> 00:00:41.500
+<v Braden Stenning>have to question whether that's value added or not. My name is Braden Stenning, and I'm the co-founder
+
+5
+00:00:41.500 --> 00:00:42.720
+<v Braden Stenning>and CTO at Raven.
+
+6
+00:00:47.580 --> 00:00:49.300
+<v Noah Labhart>This is Code Story,
+
+7
+00:00:49.560 --> 00:00:51.580
+<v Noah Labhart>the podcast bringing you interviews
+
+8
+00:00:51.580 --> 00:00:52.920
+<v Noah Labhart>with tech visionaries
+
+9
+00:00:52.920 --> 00:00:55.280
+<v Noah Labhart>who share in the critical moments
+
+10
+00:00:55.280 --> 00:00:57.120
+<v Noah Labhart>of what it takes to change an industry
+
+11
+00:00:57.120 --> 00:00:58.980
+<v Noah Labhart>and build and lead
+
+12
+00:00:58.980 --> 00:01:00.840
+<v Noah Labhart>a team that has your back.
+
+13
+00:01:02.280 --> 00:01:03.960
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+14
+00:01:04.080 --> 00:01:06.000
+<v Noah Labhart>and today, how Braden Stenning
+
+15
+00:01:06.000 --> 00:01:07.920
+<v Clip>built the best system
+
+16
+00:01:07.920 --> 00:01:10.020
+<v Noah Labhart>to account for every second
+
+17
+00:01:13.600 --> 00:01:16.020
+<v Noah Labhart>All this and more on Code Story.
+
+18
+00:01:20.420 --> 00:01:22.820
+<v Noah Labhart>Braden Stenning has always been interested in technology.
+
+19
+00:01:23.440 --> 00:01:27.060
+<v Noah Labhart>His earliest memories include the desire to be an aerospace engineer,
+
+20
+00:01:27.400 --> 00:01:29.680
+<v Noah Labhart>to be the guy to build the spaceships.
+
+21
+00:01:30.140 --> 00:01:32.220
+<v Noah Labhart>He spent a lot of time exploring computers,
+
+22
+00:01:32.520 --> 00:01:34.300
+<v Noah Labhart>being interested in math and science,
+
+23
+00:01:34.380 --> 00:01:36.480
+<v Noah Labhart>and even founded a high school robotics team.
+
+24
+00:01:36.840 --> 00:01:40.140
+<v Noah Labhart>This really opened his eyes to software development as a career
+
+25
+00:01:41.500 --> 00:01:47.180
+<v Noah Labhart>side of him. He's a curious person who often has a plan and keeps his eyes open for what is
+
+26
+00:01:47.180 --> 00:01:51.940
+<v Noah Labhart>happening around him. He did his undergrad at Carleton University studying aerospace engineering
+
+27
+00:01:51.940 --> 00:01:57.200
+<v Noah Labhart>and he realized he really loved school, so much so that he got his PhD from the University of
+
+28
+00:01:57.200 --> 00:02:01.860
+<v Noah Labhart>Toronto. At school he met his wife and they decided to stick around Ottawa. They love to
+
+29
+00:02:01.860 --> 00:02:06.560
+<v Noah Labhart>spend time outside in the green space, as he puts it, getting their two boys outside or walking the
+
+30
+00:02:06.560 --> 00:02:12.600
+<v Noah Labhart>dog. Through some project ideas he was working on and networking in the tech space of Ottawa,
+
+31
+00:02:12.800 --> 00:02:17.760
+<v Noah Labhart>he was introduced to his co-founder, Martin Cloake. Together, they combined ideas around
+
+32
+00:02:17.760 --> 00:02:21.600
+<v Noah Labhart>machine telemetry and the next level of insight into continuous improvement.
+
+33
+00:02:23.100 --> 00:02:25.440
+<v Noah Labhart>This is the creation story of Raven.
+
+34
+00:02:29.140 --> 00:02:33.300
+<v Braden Stenning>Raven, we are helping manufacturers and people that work at manufacturing
+
+35
+00:02:33.300 --> 00:02:39.240
+<v Braden Stenning>manufacturing be more productive, more efficient with their time. We help them understand what
+
+36
+00:02:39.240 --> 00:02:45.980
+<v Braden Stenning>actually happened, get a record, the truth of what it was, and then be able to understand how they can
+
+37
+00:02:45.980 --> 00:02:51.900
+<v Braden Stenning>improve or what they can do to, you know, avoid losses in the future. So if we think about
+
+38
+00:02:51.900 --> 00:02:56.260
+<v Braden Stenning>manufacturing, one of the ways we can think about it is how are you spending your time?
+
+39
+00:02:56.780 --> 00:03:02.700
+<v Braden Stenning>Time is always ticking. You know, once you've lost a second, you've lost that second. And so
+
+40
+00:03:03.300 --> 00:03:09.540
+<v Braden Stenning>manufacturing, it's often very focused on how do you build a really stable production
+
+41
+00:03:09.540 --> 00:03:14.080
+<v Braden Stenning>process, producing high quality at the target rate and how do you keep it going?
+
+42
+00:03:14.260 --> 00:03:17.340
+<v Braden Stenning>And that means understanding when it stops.
+
+43
+00:03:17.680 --> 00:03:22.920
+<v Braden Stenning>So we have a framework that we work with our customers on how they think about losses,
+
+44
+00:03:23.100 --> 00:03:30.600
+<v Braden Stenning>helping fill out those losses, helping provide that instantaneous feedback, helping do reactive
+
+45
+00:03:30.600 --> 00:03:37.220
+<v Braden Stenning>and proactive work with them so that they can make more efficiently with the same people,
+
+46
+00:03:37.500 --> 00:03:44.100
+<v Braden Stenning>same processes, or when they're looking to scale, they can maintain their productivity
+
+47
+00:03:44.100 --> 00:03:45.160
+<v Braden Stenning>that they have.
+
+48
+00:03:47.380 --> 00:03:53.540
+<v Braden Stenning>When we moved to Ottawa, I was actually still working at U of T. I was a postdoc.
+
+49
+00:03:53.600 --> 00:03:57.120
+<v Braden Stenning>I was an instructor for a fourth year space systems design course.
+
+50
+00:03:57.120 --> 00:04:02.680
+<v Braden Stenning>and I was sort of halfway between Toronto and Ottawa. I was commuting back and forth and for
+
+51
+00:04:02.680 --> 00:04:08.140
+<v Braden Stenning>those not aware it's about a four hour, four and a half hour drive. That wasn't working for me
+
+52
+00:04:08.140 --> 00:04:14.160
+<v Braden Stenning>and so I started to kind of work on some problems that I was interested in and I was doing autonomous
+
+53
+00:04:14.160 --> 00:04:19.440
+<v Braden Stenning>systems for my research and one of the things that was interesting was how do we monitor
+
+54
+00:04:19.440 --> 00:04:24.760
+<v Braden Stenning>the state of one of these things if there's nobody around or if there's nobody around who sort of is
+
+55
+00:04:24.760 --> 00:04:29.920
+<v Braden Stenning>paying really close attention to it. And so I started working on some project where I was doing
+
+56
+00:04:29.920 --> 00:04:34.980
+<v Braden Stenning>a state estimation. Is the machine or the thing that makes sound, you know, which was what I was
+
+57
+00:04:34.980 --> 00:04:41.160
+<v Braden Stenning>primarily using, operating well? Or does it have a problem? And so there are some really, you know,
+
+58
+00:04:41.160 --> 00:04:45.760
+<v Braden Stenning>challenging things about that because the idea here was that I wasn't connecting into like a
+
+59
+00:04:45.760 --> 00:04:50.220
+<v Braden Stenning>direct signal I was trying to infer. I think thought there was, you know, it was sort of a half
+
+60
+00:04:50.220 --> 00:04:54.980
+<v Braden Stenning>half kind of hobby project, half thinking, hey, this could be actually something. I started to
+
+61
+00:04:54.980 --> 00:04:58.460
+<v Braden Stenning>connect with the community here in Ottawa. There's a really great tech community,
+
+62
+00:04:59.040 --> 00:05:06.080
+<v Braden Stenning>lots of founders helping other founders. And I eventually got introduced to my co-founder,
+
+63
+00:05:06.160 --> 00:05:10.980
+<v Braden Stenning>Martin Cloake, who's our CEO here at Raven. And the person that introduced us said, hey,
+
+64
+00:05:11.020 --> 00:05:15.360
+<v Braden Stenning>you should talk to Martin. He's an old friend of mine. He sounds like, you know, sounds like you're
+
+65
+00:05:15.360 --> 00:05:18.420
+<v Braden Stenning>sort of thinking about something similar to what he's working on.
+
+66
+00:05:19.120 --> 00:05:24.840
+<v Braden Stenning>And so Martin and I met up, we chatted, we met at some, you know, we crossed paths at events
+
+67
+00:05:24.840 --> 00:05:27.960
+<v Braden Stenning>and sort of started thinking about collaborating.
+
+68
+00:05:28.160 --> 00:05:32.160
+<v Braden Stenning>And sort of in the background, I was trying to see, OK, well, if I was going to turn this thing
+
+69
+00:05:32.160 --> 00:05:36.040
+<v Braden Stenning>that I was working on into a product, I need a whole lot more than just me.
+
+70
+00:05:37.020 --> 00:05:41.600
+<v Braden Stenning>And that was one of these things that really got me excited about meeting Martin,
+
+71
+00:05:41.700 --> 00:05:44.940
+<v Braden Stenning>is that he was, you know, he was one of those complimentary people.
+
+72
+00:05:45.360 --> 00:05:51.380
+<v Braden Stenning>bunch of other complementary people in his circle. He had a few people working on what was then
+
+73
+00:05:51.380 --> 00:05:56.760
+<v Braden Stenning>called machine telemetry and it was largely just collect on off from machines and put it on a
+
+74
+00:05:56.760 --> 00:06:02.160
+<v Braden Stenning>dashboard. We started talking and he recognized the value of that next level of insight into
+
+75
+00:06:02.160 --> 00:06:08.040
+<v Braden Stenning>what was going on and we started sort of collaborating before he knew it. We were kind
+
+76
+00:06:08.040 --> 00:06:14.180
+<v Braden Stenning>of working together on on the same product and it is one of those examples of where kind of I kind
+
+77
+00:06:15.080 --> 00:06:20.420
+<v Braden Stenning>plan. But, you know, something better came along while I was working on what I thought I was,
+
+78
+00:06:20.420 --> 00:06:24.480
+<v Braden Stenning>you know, going to be working on and realized that that was what I should move to. And so
+
+79
+00:06:24.480 --> 00:06:32.380
+<v Braden Stenning>I made the decision to join up with Martin. And that was in 2014. And it's been it's been awesome.
+
+80
+00:06:34.520 --> 00:06:39.300
+<v Noah Labhart>Well, tell me about the MVP, that first version of the product you built,
+
+81
+00:06:39.340 --> 00:06:43.260
+<v Noah Labhart>how long did it take you to build? And what sort of tools did you use to bring it to life?
+
+82
+00:06:45.380 --> 00:06:50.060
+<v Braden Stenning>Martin has a background in manufacturing and he always sort of had this vision for,
+
+83
+00:06:50.160 --> 00:06:53.240
+<v Braden Stenning>he wanted to be able to see what was going on on the shop floor.
+
+84
+00:06:53.560 --> 00:07:00.400
+<v Braden Stenning>And what we found is this is something that many, many people who work in manufacturing have thought about over the time.
+
+85
+00:07:01.480 --> 00:07:09.340
+<v Braden Stenning>With us, we always have taken this approach where we want to be delivering code and new features, new functionality quickly.
+
+86
+00:07:09.340 --> 00:07:17.160
+<v Braden Stenning>quickly. Martin had actually, when I joined, hired some people to help build a little bit
+
+87
+00:07:17.160 --> 00:07:25.280
+<v Braden Stenning>of an MVP and they had sort of this dashboard built in Python that was able to collect data
+
+88
+00:07:25.280 --> 00:07:31.880
+<v Braden Stenning>from, they had these Arduino based data collection devices that they could attach to machines.
+
+89
+00:07:32.440 --> 00:07:35.600
+<v Braden Stenning>And so that was sort of the starting point, but those were sort of a couple, that was
+
+90
+00:07:35.600 --> 00:07:39.440
+<v Braden Stenning>a couple months worth of work to prototype it and try to get it into some places.
+
+91
+00:07:40.640 --> 00:07:47.900
+<v Braden Stenning>When I came in, I wasn't looking to replace that directly. My expertise was more in the
+
+92
+00:07:48.560 --> 00:07:55.460
+<v Braden Stenning>algorithms, the data side rather than the infrastructure side. So we took that Python
+
+93
+00:07:56.030 --> 00:08:01.820
+<v Braden Stenning>web server and we tried to make it work. Very quickly we ran into some scaling problem.
+
+94
+00:08:01.820 --> 00:08:07.500
+<v Braden Stenning>problem. Couldn't process the data fast enough, couldn't load the data fast enough. And it
+
+95
+00:08:07.500 --> 00:08:10.920
+<v Braden Stenning>became clear that we kind of needed to revisit that infrastructure piece.
+
+96
+00:08:11.800 --> 00:08:18.160
+<v Braden Stenning>Our attitude on this stuff is what can we do to incrementally deliver results, incrementally
+
+97
+00:08:18.160 --> 00:08:23.940
+<v Braden Stenning>improve and what do we have, what are the skills or the tools that we have ourselves
+
+98
+00:08:23.940 --> 00:08:29.140
+<v Braden Stenning>to prove out the idea. We recognize we weren't at product market fit at that time. So it
+
+99
+00:08:29.140 --> 00:08:32.140
+<v Braden Stenning>It was all about trying to find that product market fit.
+
+100
+00:08:33.460 --> 00:08:38.900
+<v Noah Labhart>With any MVP, Braden, you have to make certain decisions and trade-offs, right?
+
+101
+00:08:39.060 --> 00:08:41.980
+<v Noah Labhart>Either feature cut or technical debt.
+
+102
+00:08:42.220 --> 00:08:46.120
+<v Noah Labhart>And you kind of touched lightly on a few things in there, but I want to dive in a little more.
+
+103
+00:08:46.340 --> 00:08:52.540
+<v Noah Labhart>Tell me about some of those decisions and trade-offs you had to make in the short term and how you cope with them.
+
+104
+00:08:54.740 --> 00:08:58.400
+<v Braden Stenning>You know, I think we've had sort of several passes at the MVP here.
+
+105
+00:08:59.140 --> 00:09:01.440
+<v Braden Stenning>what I described was sort of the very, very first pass.
+
+106
+00:09:01.700 --> 00:09:04.260
+<v Braden Stenning>And the next pass, we sort of recognized where,
+
+107
+00:09:04.360 --> 00:09:06.560
+<v Braden Stenning>you know, not only were we having performance problems,
+
+108
+00:09:06.680 --> 00:09:08.100
+<v Braden Stenning>we were having engagement problems.
+
+109
+00:09:08.320 --> 00:09:10.760
+<v Braden Stenning>We always sort of envisioned our product
+
+110
+00:09:10.760 --> 00:09:13.560
+<v Braden Stenning>as being something that helped operators,
+
+111
+00:09:13.860 --> 00:09:16.140
+<v Braden Stenning>helped supervisors, helped people on the shop floor
+
+112
+00:09:16.140 --> 00:09:17.580
+<v Braden Stenning>do their job better.
+
+113
+00:09:18.420 --> 00:09:21.100
+<v Braden Stenning>And it was about lifting those people up
+
+114
+00:09:21.100 --> 00:09:25.640
+<v Braden Stenning>and, you know, this idea of what can software do well
+
+115
+00:09:26.080 --> 00:09:28.520
+<v Braden Stenning>that helps people do the thing that they do well,
+
+116
+00:09:29.140 --> 00:09:37.580
+<v Braden Stenning>better. And so we had some UX problems with our initial product. And where we went to is we moved
+
+117
+00:09:37.580 --> 00:09:43.780
+<v Braden Stenning>to having a tablet that we could attach to the process that would have a very lightweight UX.
+
+118
+00:09:44.080 --> 00:09:48.440
+<v Braden Stenning>And this is where maybe one of the bigger trade-offs happened, which was just how
+
+119
+00:09:48.980 --> 00:09:57.140
+<v Braden Stenning>simple we wanted to make that user experience for the operators. We use a lot from lean manufacturing
+
+120
+00:09:59.140 --> 00:10:03.940
+<v Braden Stenning>And in lean, if you're not doing something value added, then you're losing time.
+
+121
+00:10:04.500 --> 00:10:12.420
+<v Braden Stenning>And an operator typing something into a computer is, you know, you have to question whether that's value added or not.
+
+122
+00:10:13.600 --> 00:10:21.160
+<v Braden Stenning>If it's not something that is physically in the product or something, you know, one of the tests would be like, do your customers pay money for this?
+
+123
+00:10:21.340 --> 00:10:25.360
+<v Braden Stenning>You know, it's like, do your customers pay money for your operators typing something into the screen?
+
+124
+00:10:25.400 --> 00:10:26.660
+<v Braden Stenning>The answer is usually no.
+
+125
+00:10:26.660 --> 00:10:29.480
+<v Braden Stenning>know, they pay money for the product, right?
+
+126
+00:10:30.720 --> 00:10:37.660
+<v Braden Stenning>So we really wanted to have almost no effort on the operator's part, which meant just quick
+
+127
+00:10:37.660 --> 00:10:43.420
+<v Braden Stenning>taps and we didn't get necessarily full context, but we would try to make up for that full
+
+128
+00:10:43.420 --> 00:10:46.420
+<v Braden Stenning>context by making it really easy and getting more complete context.
+
+129
+00:10:48.100 --> 00:10:54.620
+<v Braden Stenning>The way that we dealt with that is we convinced ourselves that that was a reasonable take.
+
+130
+00:10:54.620 --> 00:11:01.740
+<v Braden Stenning>cake. We crafted that story and then we worked on making the thing that we decided to make work well.
+
+131
+00:11:02.040 --> 00:11:06.880
+<v Braden Stenning>So from
+
+132
+00:11:06.880 --> 00:11:11.760
+<v Noah Labhart>that point, you've got the product and you decided what you wanted to make work well.
+
+133
+00:11:12.500 --> 00:11:18.420
+<v Noah Labhart>And then at that point, I'm sure you started to progress the product. How did you go about that?
+
+134
+00:11:18.420 --> 00:11:20.620
+<v Noah Labhart>How did you go about maturing the product?
+
+135
+00:11:21.220 --> 00:11:29.680
+<v Noah Labhart>And I think I'm also interested in how did you build your roadmap and decide, okay, this is the next most important thing to build?
+
+136
+00:11:32.100 --> 00:11:37.400
+<v Braden Stenning>So we've always been very responsive to our customers.
+
+137
+00:11:37.740 --> 00:11:45.320
+<v Braden Stenning>And the way we've done that, we've kind of two main approaches, listening to our actual customers, working closely with them,
+
+138
+00:11:45.320 --> 00:11:50.020
+<v Braden Stenning>And also adding people to our team who would be our actual customers.
+
+139
+00:11:50.740 --> 00:11:57.980
+<v Braden Stenning>And, you know, Martin being one of these sort of like examples, you know, he would have been a customer of Raven had Raven existed before he started it.
+
+140
+00:11:58.120 --> 00:12:00.660
+<v Braden Stenning>And we've got a bunch more people like that, too.
+
+141
+00:12:00.760 --> 00:12:08.480
+<v Braden Stenning>So we, you know, we have that strategic vision inside the organization and we validate that against what our actual customers want.
+
+142
+00:12:09.300 --> 00:12:14.360
+<v Braden Stenning>So we've always had kind of a roadmap of the sort of strategic items that we want to do.
+
+143
+00:12:15.320 --> 00:12:20.460
+<v Braden Stenning>we're very kind of fluid or flexible on that to the extent possible, you know, technically,
+
+144
+00:12:20.620 --> 00:12:26.800
+<v Braden Stenning>to try to pull pieces forward for specific customers to get them kind of succeeding in
+
+145
+00:12:26.800 --> 00:12:33.960
+<v Braden Stenning>the way that they want to succeed. It's been, you know, an effective way to do it. And I think we've
+
+146
+00:12:33.960 --> 00:12:39.100
+<v Braden Stenning>learned a lot along the way. And there are some things that have not changed in all the years
+
+147
+00:12:39.100 --> 00:12:42.940
+<v Braden Stenning>that we've been working on this in terms of the vision. And then there are other parts that have
+
+148
+00:12:42.940 --> 00:12:47.840
+<v Braden Stenning>have absolutely changed. I think both of those, you know, the things that haven't changed are
+
+149
+00:12:47.840 --> 00:12:52.560
+<v Braden Stenning>proven that, you know, we got it right. And the things that changed, you know,
+
+150
+00:12:52.560 --> 00:12:55.240
+<v Braden Stenning>we want to be listening to what people actually want.
+
+151
+00:12:57.480 --> 00:13:03.060
+<v Noah Labhart>Okay, we've talked about roadmap. Tell me about team. How did you build your team?
+
+152
+00:13:03.300 --> 00:13:08.300
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to
+
+153
+00:13:08.300 --> 00:13:08.800
+<v Noah Labhart>to join you.
+
+154
+00:13:09.720 --> 00:13:14.000
+<v Braden Stenning>This is something that is one of the most important things
+
+155
+00:13:14.000 --> 00:13:16.800
+<v Braden Stenning>that we've done and the reasons why, you know,
+
+156
+00:13:16.800 --> 00:13:19.000
+<v Braden Stenning>Raven is successful right now.
+
+157
+00:13:19.140 --> 00:13:21.980
+<v Braden Stenning>And that's that getting those right people on the team.
+
+158
+00:13:23.720 --> 00:13:25.120
+<v Braden Stenning>First of all, I say like,
+
+159
+00:13:25.180 --> 00:13:28.900
+<v Braden Stenning>we have a lot of really kind people, really smart people,
+
+160
+00:13:29.040 --> 00:13:31.080
+<v Braden Stenning>really kind people, really motivated people.
+
+161
+00:13:32.440 --> 00:13:36.680
+<v Braden Stenning>We've really emphasized ownership throughout the team.
+
+162
+00:13:38.300 --> 00:13:41.940
+<v Braden Stenning>not always quick to kind of see the results of that,
+
+163
+00:13:42.020 --> 00:13:45.340
+<v Braden Stenning>but we do see the results now and it's incredible.
+
+164
+00:13:45.580 --> 00:13:48.180
+<v Braden Stenning>So when we're looking to add to our team,
+
+165
+00:13:48.360 --> 00:13:51.940
+<v Braden Stenning>we're looking for people who have that potential for leadership,
+
+166
+00:13:52.180 --> 00:13:55.980
+<v Braden Stenning>that ownership of the particular area of the technology
+
+167
+00:13:55.980 --> 00:13:58.360
+<v Braden Stenning>or the organization that they're going to be working in.
+
+168
+00:13:58.980 --> 00:14:02.220
+<v Braden Stenning>People who are motivated and curious to keep going,
+
+169
+00:14:02.440 --> 00:14:03.980
+<v Braden Stenning>people who are flexible thinkers,
+
+170
+00:14:04.360 --> 00:14:06.240
+<v Braden Stenning>people who can communicate well
+
+171
+00:14:06.240 --> 00:14:12.220
+<v Braden Stenning>and communicate in a way that lifts people up and encourages more communication.
+
+172
+00:14:12.560 --> 00:14:18.000
+<v Braden Stenning>So we want people who encourage other people to provide their input, right?
+
+173
+00:14:18.080 --> 00:14:21.320
+<v Braden Stenning>So if you're well-spoken and have great ideas, that's wonderful.
+
+174
+00:14:21.480 --> 00:14:26.680
+<v Braden Stenning>But can you help the rest of the team get their ideas out there in a way that's understood
+
+175
+00:14:26.680 --> 00:14:28.420
+<v Braden Stenning>and it's effectively contributed?
+
+176
+00:14:29.200 --> 00:14:34.520
+<v Braden Stenning>Of course, we do want to see some technical, you know, a high level of technical skill.
+
+177
+00:14:36.240 --> 00:14:38.940
+<v Braden Stenning>to have worked with the specific stack that we work with.
+
+178
+00:14:39.020 --> 00:14:42.320
+<v Braden Stenning>That's not, you know, we don't look for specific technologies
+
+179
+00:14:42.320 --> 00:14:45.860
+<v Braden Stenning>because we do figure if somebody is, you know,
+
+180
+00:14:45.860 --> 00:14:47.540
+<v Braden Stenning>effective problem solver and smart
+
+181
+00:14:47.540 --> 00:14:50.280
+<v Braden Stenning>and can be productive in one ecosystem
+
+182
+00:14:50.280 --> 00:14:52.300
+<v Braden Stenning>and they care and they're motivated,
+
+183
+00:14:52.480 --> 00:14:53.800
+<v Braden Stenning>then they're going to pick it up quickly
+
+184
+00:14:53.800 --> 00:14:56.020
+<v Braden Stenning>and work with the tools that we work with.
+
+185
+00:14:57.260 --> 00:14:59.200
+<v Noah Labhart>So in what you're talking about,
+
+186
+00:14:59.200 --> 00:15:01.820
+<v Noah Labhart>as far as bringing people in to fit your team
+
+187
+00:15:01.820 --> 00:15:03.780
+<v Noah Labhart>as a specific type of culture,
+
+188
+00:15:03.780 --> 00:15:11.240
+<v Noah Labhart>How are you going about protecting that team culture and ensuring that people that come in the door adhere to that?
+
+189
+00:15:12.220 --> 00:15:23.800
+<v Braden Stenning>You know, the last years have been, I think, really good from a perspective of organizations and societies talking about culture and values.
+
+190
+00:15:24.080 --> 00:15:30.040
+<v Braden Stenning>And how do we, you know, how do we mold an organization that we're proud of?
+
+191
+00:15:30.640 --> 00:15:36.820
+<v Braden Stenning>We are proud of our organization and how our team works and we are also constantly trying to improve
+
+192
+00:15:36.820 --> 00:15:42.560
+<v Braden Stenning>it. You know we look hard at our values and when we look to somebody joining the team you know we
+
+193
+00:15:42.560 --> 00:15:49.340
+<v Braden Stenning>used to use the kind of the phrase is it a cultural fit and now we don't use that one we kind of think
+
+194
+00:15:49.340 --> 00:15:54.500
+<v Braden Stenning>of it as a cultural add. You know we're always looking to grow the culture in a way that
+
+195
+00:15:54.500 --> 00:15:59.420
+<v Braden Stenning>everybody wins you know we're not looking for people who think exactly like the way we already
+
+196
+00:16:00.040 --> 00:16:02.220
+<v Braden Stenning>needs to be, you know, a certain amount of overlap.
+
+197
+00:16:02.720 --> 00:16:05.940
+<v Braden Stenning>But it's really exciting when we bring in people
+
+198
+00:16:05.940 --> 00:16:09.140
+<v Braden Stenning>who kind of share those common values of respect
+
+199
+00:16:09.140 --> 00:16:11.140
+<v Braden Stenning>and continuous improvement,
+
+200
+00:16:11.340 --> 00:16:14.220
+<v Braden Stenning>who come in with some different perspectives
+
+201
+00:16:14.220 --> 00:16:18.480
+<v Braden Stenning>on other things and challenge the rest of the team
+
+202
+00:16:18.480 --> 00:16:20.500
+<v Braden Stenning>in an effective way to improve.
+
+203
+00:16:20.760 --> 00:16:23.960
+<v Braden Stenning>So, you know, we are looking to push our culture
+
+204
+00:16:23.960 --> 00:16:27.800
+<v Braden Stenning>to grow it, to evolve it from that common core.
+
+205
+00:16:27.800 --> 00:16:43.380
+<v Braden Stenning>And part of that is that we talk about culture. We talk about the things that are effective or that are not effective, both in general terms and in our specific teams. And we continuously work on it. It is a conscious, deliberate practice.
+
+206
+00:16:46.880 --> 00:16:56.000
+<v Noah Labhart>Let's flip to scalability. Did you build this to scale efficiently from day one? Or were you fighting this as you grew and gained traction?
+
+207
+00:16:58.120 --> 00:17:02.220
+<v Braden Stenning>One of the things that we wanted to prove was that we had a product that was worth building.
+
+208
+00:17:03.580 --> 00:17:09.680
+<v Braden Stenning>And from a technology perspective, I think it's a very large stack that we try to do.
+
+209
+00:17:09.720 --> 00:17:15.520
+<v Braden Stenning>We try to do the end-to-end thing from data collection to data cleaning to get to the truth,
+
+210
+00:17:15.600 --> 00:17:18.460
+<v Braden Stenning>to the analytics, to the insights, to the feedback, to operators.
+
+211
+00:17:18.740 --> 00:17:21.120
+<v Braden Stenning>And so there's just a very large technology stack.
+
+212
+00:17:22.020 --> 00:17:29.200
+<v Braden Stenning>So when we build our technology, we would try to pick an architecture that is extendable or extensible and that is flexible.
+
+213
+00:17:29.380 --> 00:17:35.180
+<v Braden Stenning>And we wouldn't necessarily build all the scalability into start, but we would try to leave ourselves the options.
+
+214
+00:17:36.160 --> 00:17:41.680
+<v Braden Stenning>From a product perspective, when we built our product, we did think about scalability absolutely from the beginning.
+
+215
+00:17:41.760 --> 00:17:44.720
+<v Braden Stenning>We wanted to be able to help operators at an individual process.
+
+216
+00:17:44.720 --> 00:17:53.520
+<v Braden Stenning>We wanted to be able to help the corporate executives overseeing 100 plants that might have hundreds of production processes each.
+
+217
+00:17:53.780 --> 00:17:59.040
+<v Braden Stenning>And so thinking about that product scale was something that we did from the beginning.
+
+218
+00:17:59.200 --> 00:18:04.320
+<v Braden Stenning>Thinking about the technical scale was something that we considered but didn't necessarily always implement.
+
+219
+00:18:04.920 --> 00:18:11.840
+<v Braden Stenning>When we'd hit the limits, and that was through continuously monitoring the performance of the system, we would go back and we would adjust.
+
+220
+00:18:12.480 --> 00:18:16.520
+<v Braden Stenning>For our particular case, it's an appropriate way to build it.
+
+221
+00:18:16.620 --> 00:18:20.380
+<v Braden Stenning>You know, small team looking to move quickly, deliver quickly.
+
+222
+00:18:20.540 --> 00:18:24.240
+<v Braden Stenning>And it's about that speed of providing value to our customers.
+
+223
+00:18:24.740 --> 00:18:25.260
+<v Braden Stenning>So
+
+224
+00:18:25.260 --> 00:18:31.520
+<v Noah Labhart>it sounds like you started out building in such a way that you could prove out the product,
+
+225
+00:18:31.600 --> 00:18:37.020
+<v Noah Labhart>but you architected it to where you could scale easier later on down the line.
+
+226
+00:18:37.080 --> 00:18:37.580
+<v Noah Labhart>Is that right?
+
+227
+00:18:37.720 --> 00:18:38.240
+<v Noah Labhart>Yeah,
+
+228
+00:18:38.340 --> 00:18:40.200
+<v Braden Stenning>and we're continuing to do that.
+
+229
+00:18:42.360 --> 00:18:47.620
+<v Braden Stenning>changes and we're continuing to make those changes. In the last couple years
+
+230
+00:18:47.620 --> 00:18:52.720
+<v Braden Stenning>here we've really found a lot of great product market fit where our customers
+
+231
+00:18:52.720 --> 00:18:56.940
+<v Braden Stenning>are you know they want they want things they want them they want them quickly
+
+232
+00:18:56.940 --> 00:19:03.020
+<v Braden Stenning>and building in that flexibility into the technology is something that we you
+
+233
+00:19:03.020 --> 00:19:06.880
+<v Braden Stenning>know we now architect in that flexibility and that quick you know that
+
+234
+00:19:06.880 --> 00:19:10.260
+<v Braden Stenning>speed of being able to adapt and tailor it to them you know we're building a
+
+235
+00:19:11.840 --> 00:19:18.600
+<v Braden Stenning>build the product that's flexible because that's what we need in this market.
+
+236
+00:19:19.300 --> 00:19:23.820
+<v Noah Labhart>Well, as you step out on the balcony and you look across what you've built,
+
+237
+00:19:24.000 --> 00:19:25.280
+<v Noah Labhart>what are you most proud of?
+
+238
+00:19:26.960 --> 00:19:28.600
+<v Braden Stenning>So I think there's two things.
+
+239
+00:19:28.740 --> 00:19:31.180
+<v Braden Stenning>And the first is absolutely the team.
+
+240
+00:19:32.140 --> 00:19:36.580
+<v Braden Stenning>I think the growth of the team has been amazing and seeing the individuals,
+
+241
+00:19:36.580 --> 00:19:44.700
+<v Braden Stenning>how they've taken on new responsibilities and how the organization itself, the culture,
+
+242
+00:19:44.860 --> 00:19:53.580
+<v Braden Stenning>that kindness, that curiosity, that drive to be better people, better engineers is really amazing.
+
+243
+00:19:54.120 --> 00:19:58.240
+<v Braden Stenning>And also, our president likes to post these things.
+
+244
+00:19:58.300 --> 00:20:03.720
+<v Braden Stenning>He gets text messages from some of our bigger customers talking about when they hit records
+
+245
+00:20:03.720 --> 00:20:05.780
+<v Braden Stenning>in terms of their productivity for a day.
+
+246
+00:20:06.580 --> 00:20:11.120
+<v Braden Stenning>you know, their effectiveness going from single digits to high 70s in the course of, you know,
+
+247
+00:20:11.120 --> 00:20:16.700
+<v Braden Stenning>less than 18 months, which is amazing, right? And so seeing those cases where our customers
+
+248
+00:20:16.700 --> 00:20:23.900
+<v Braden Stenning>are so excited that they call our president and say, Max, look at this, what a day we've had,
+
+249
+00:20:24.000 --> 00:20:27.760
+<v Braden Stenning>that's pretty exciting. Because that's the other thing, which is like, we're making
+
+250
+00:20:27.760 --> 00:20:31.980
+<v Braden Stenning>those people's days better, right? When we help them produce like that.
+
+251
+00:20:33.340 --> 00:20:39.920
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+252
+00:20:40.740 --> 00:20:44.760
+<v Braden Stenning>So this is one of these things that we specifically talk about in our culture.
+
+253
+00:20:44.960 --> 00:20:55.220
+<v Braden Stenning>We've all made mistakes of varying degrees and I can think of cases where we've accidentally deployed wrong pieces of software
+
+254
+00:20:55.220 --> 00:21:04.520
+<v Braden Stenning>or deleting a node where we intended to upgrade a single pod or something like that.
+
+255
+00:21:04.780 --> 00:21:10.260
+<v Braden Stenning>The amazing thing, whenever we have one of these issues that comes up,
+
+256
+00:21:10.500 --> 00:21:14.960
+<v Braden Stenning>I love jumping in, whether it's a Discord room or a Slack call or whatever,
+
+257
+00:21:15.180 --> 00:21:17.820
+<v Braden Stenning>or back when we could, it was over the shoulder.
+
+258
+00:21:18.000 --> 00:21:23.780
+<v Braden Stenning>The team is just very focused on solving the problem in a non-judgmental way.
+
+259
+00:21:25.220 --> 00:21:31.480
+<v Braden Stenning>after the fact we do failure causes inquiry where we go through what happened and realizing
+
+260
+00:21:31.480 --> 00:21:36.020
+<v Braden Stenning>that we're part of a system here and it's not the individuals, it is the system.
+
+261
+00:21:36.700 --> 00:21:44.000
+<v Braden Stenning>You know, when you mess up, your heart starts beating and you feel that anxiety, but you've
+
+262
+00:21:44.000 --> 00:21:48.140
+<v Braden Stenning>got a whole bunch of people who are there with you trying to help get the system back
+
+263
+00:21:48.140 --> 00:21:54.040
+<v Braden Stenning>up and then support you as we all learn from it and try to make the system more robust
+
+264
+00:21:55.220 --> 00:21:55.900
+<v Braden Stenning>doesn't happen again.
+
+265
+00:21:56.140 --> 00:21:56.640
+<v Braden Stenning>I
+
+266
+00:21:56.540 --> 00:21:58.320
+<v Noah Labhart>like what you said there about, you know,
+
+267
+00:21:58.340 --> 00:21:58.960
+<v Noah Labhart>it's the system.
+
+268
+00:21:59.200 --> 00:22:01.120
+<v Noah Labhart>We're a system, we're not an individual,
+
+269
+00:22:01.320 --> 00:22:02.780
+<v Noah Labhart>so how do we fix the system?
+
+270
+00:22:02.920 --> 00:22:04.700
+<v Noah Labhart>That's a good way to scope it
+
+271
+00:22:04.700 --> 00:22:06.520
+<v Noah Labhart>when you have to have hard conversations
+
+272
+00:22:06.980 --> 00:22:09.340
+<v Noah Labhart>or, you know, retros on an issue.
+
+273
+00:22:13.100 --> 00:22:15.240
+<v Noah Labhart>So what does the future look like for Raven,
+
+274
+00:22:15.380 --> 00:22:16.980
+<v Noah Labhart>the product and for your team?
+
+275
+00:22:18.520 --> 00:22:20.420
+<v Braden Stenning>Well, I think it's really bright.
+
+276
+00:22:20.580 --> 00:22:22.920
+<v Braden Stenning>It's at a really exciting time for us right now.
+
+277
+00:22:22.920 --> 00:22:28.400
+<v Braden Stenning>So we've grown about 30% in terms of the team in the last six months.
+
+278
+00:22:29.120 --> 00:22:36.160
+<v Braden Stenning>And we're delivering features, functionality improvements at a faster pace than we've ever done before.
+
+279
+00:22:37.060 --> 00:22:40.600
+<v Braden Stenning>The potential is enormous in this industry.
+
+280
+00:22:41.120 --> 00:22:47.020
+<v Braden Stenning>There are, and I forget the number here off the top of my head, there are hundreds of thousands of manufacturers in the world.
+
+281
+00:22:47.020 --> 00:22:55.640
+<v Braden Stenning>it's a it's a huge part of the economy and there is huge potential for improvement so we see a lot
+
+282
+00:22:55.640 --> 00:23:02.500
+<v Braden Stenning>of a lot of great things happening here in addition neat story here at the beginning of the pandemic
+
+283
+00:23:02.500 --> 00:23:08.040
+<v Braden Stenning>one of our first employees or i think he was technically the first employee gave us a call
+
+284
+00:23:08.040 --> 00:23:14.000
+<v Braden Stenning>and he's now a surgeon and he said hey i think i think raven could be you know useful in our
+
+285
+00:23:14.000 --> 00:23:20.640
+<v Braden Stenning>our operating rooms, at our hospital to help us with our, you know, COVID protections to keep our
+
+286
+00:23:20.640 --> 00:23:26.680
+<v Braden Stenning>staff safe and also to just help us be more productive or, you know, use this sort of
+
+287
+00:23:26.680 --> 00:23:31.600
+<v Braden Stenning>scarce resource more effectively. And so we've been, you know, looking at how that works and we
+
+288
+00:23:31.600 --> 00:23:36.500
+<v Braden Stenning>now have sort of a variation of our product installed in an operating room, which is pretty
+
+289
+00:23:36.500 --> 00:23:41.120
+<v Braden Stenning>neat. And we do see, you know, at its core, we're trying to help people use their time better,
+
+290
+00:23:41.120 --> 00:23:46.540
+<v Braden Stenning>They use their resources better, and that's not just manufacturing, but it's also a lot of other areas.
+
+291
+00:23:47.300 --> 00:23:56.080
+<v Braden Stenning>Manufacturing stuff is super exciting, and that's our core, but we do see this potential for growth and expansion into these other areas as well.
+
+292
+00:23:56.080 --> 00:24:15.060
+<v Noah Labhart>With the product, you're surfacing a lot of really important information for manufacturers or medical places to understand their equipment and understand what's going on in their environment.
+
+293
+00:24:15.060 --> 00:24:28.900
+<v Noah Labhart>Do you see a part of your product hooking into an ecosystem that could automatically trigger other, you know, systematic operations based on that feedback?
+
+294
+00:24:29.820 --> 00:24:32.300
+<v Braden Stenning>You know, it's something that we're curious about.
+
+295
+00:24:32.400 --> 00:24:44.040
+<v Braden Stenning>So we, you know, coming back to trade-offs and deliberate choices, you know, we've to date not done a lot of direct feedback into the manufacturing systems.
+
+296
+00:24:45.060 --> 00:24:49.260
+<v Braden Stenning>control machines directly, that helps us with our,
+
+297
+00:24:49.420 --> 00:24:51.180
+<v Braden Stenning>keep the architecture simpler
+
+298
+00:24:51.180 --> 00:24:53.760
+<v Braden Stenning>and reduces certain types of risks.
+
+299
+00:24:54.620 --> 00:24:57.820
+<v Braden Stenning>That said, that's something that is always been
+
+300
+00:24:57.820 --> 00:25:00.540
+<v Braden Stenning>sort of this eventual endpoint, that deeper integration,
+
+301
+00:25:00.760 --> 00:25:03.480
+<v Braden Stenning>because there's just so much information
+
+302
+00:25:03.480 --> 00:25:06.120
+<v Braden Stenning>that is available on the shop floor
+
+303
+00:25:06.120 --> 00:25:08.140
+<v Braden Stenning>that feeds into other parts of the business,
+
+304
+00:25:08.260 --> 00:25:10.580
+<v Braden Stenning>whether it's planning and scheduling or supply chain
+
+305
+00:25:10.580 --> 00:25:15.160
+<v Braden Stenning>or the broader financial perspective of a business, right?
+
+306
+00:25:15.240 --> 00:25:19.240
+<v Braden Stenning>These are all obvious extensions of what's happening on the shop floor.
+
+307
+00:25:19.400 --> 00:25:21.460
+<v Braden Stenning>So we do see it.
+
+308
+00:25:21.480 --> 00:25:23.320
+<v Braden Stenning>It's exciting, exciting potential.
+
+309
+00:25:24.920 --> 00:25:26.340
+<v Noah Labhart>Let's switch to you, Braden.
+
+310
+00:25:26.420 --> 00:25:28.560
+<v Noah Labhart>Who influences the way that you work?
+
+311
+00:25:28.720 --> 00:25:32.140
+<v Noah Labhart>You know, CEO, CTO, architect, really any person.
+
+312
+00:25:32.360 --> 00:25:34.460
+<v Noah Labhart>Name a person you look up to and why.
+
+313
+00:25:36.320 --> 00:25:40.000
+<v Braden Stenning>Well, I think that, you know, like one of the people that really does it
+
+314
+00:25:40.580 --> 00:25:45.240
+<v Braden Stenning>a lot of influence on me is Martin Cloake, so our CEO here.
+
+315
+00:25:45.880 --> 00:25:50.920
+<v Braden Stenning>You know, Martin and I didn't know each other before we started working together,
+
+316
+00:25:51.120 --> 00:25:56.660
+<v Braden Stenning>which I think is an unusual or maybe not the typical advice for co-founders where,
+
+317
+00:25:56.860 --> 00:26:00.540
+<v Braden Stenning>you know, you sort of say, make sure, you know, you know this person and you can work with them.
+
+318
+00:26:00.680 --> 00:26:02.480
+<v Braden Stenning>Starting a business is hard and stressful.
+
+319
+00:26:02.640 --> 00:26:09.880
+<v Braden Stenning>But Martin and I have found a really fantastic way of working together and, you know,
+
+320
+00:26:10.580 --> 00:26:16.600
+<v Braden Stenning>those core values of wanting to make something that's excellent
+
+321
+00:26:16.600 --> 00:26:21.980
+<v Braden Stenning>and really respecting the people that we're working for, working with.
+
+322
+00:26:24.180 --> 00:26:29.100
+<v Braden Stenning>I also think we've sort of established some really neat ways of communicating
+
+323
+00:26:29.100 --> 00:26:34.740
+<v Braden Stenning>and I appreciate when Martin presents me with or challenges a view that I have
+
+324
+00:26:34.740 --> 00:26:37.520
+<v Braden Stenning>and lets me shift gears in my brain.
+
+325
+00:26:38.480 --> 00:26:43.200
+<v Braden Stenning>I think there was a time I remember recently here where he kind of challenged me on a particular thing.
+
+326
+00:26:44.280 --> 00:26:50.000
+<v Braden Stenning>And, you know, it's not always easy to change your mind on something that you're sure about.
+
+327
+00:26:50.140 --> 00:26:53.080
+<v Braden Stenning>But, you know, we can do that with each other.
+
+328
+00:26:53.200 --> 00:26:54.200
+<v Braden Stenning>I appreciate that.
+
+329
+00:26:55.640 --> 00:26:58.760
+<v Noah Labhart>Well, we talked about mistakes, but a little bit different spin.
+
+330
+00:26:59.180 --> 00:27:02.200
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+331
+00:27:02.260 --> 00:27:05.140
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+332
+00:27:06.420 --> 00:27:10.100
+<v Braden Stenning>I think there's some technology decisions that we made.
+
+333
+00:27:10.620 --> 00:27:16.600
+<v Braden Stenning>In hindsight, we had more time in those early stages than perhaps it felt like we did.
+
+334
+00:27:17.060 --> 00:27:23.680
+<v Braden Stenning>And so some of our technology shift over the last couple of years, we've moved away from Python.
+
+335
+00:27:24.500 --> 00:27:30.160
+<v Braden Stenning>It's still a big part of our back end, but we've moved a lot of our data pipeline to Elixir
+
+336
+00:27:30.160 --> 00:27:31.920
+<v Braden Stenning>and saw some of these performance issues,
+
+337
+00:27:32.700 --> 00:27:34.520
+<v Braden Stenning>optimizing for developer joy,
+
+338
+00:27:34.880 --> 00:27:38.940
+<v Braden Stenning>which is also a good way to get more productive.
+
+339
+00:27:39.720 --> 00:27:40.880
+<v Braden Stenning>Things like that,
+
+340
+00:27:40.900 --> 00:27:45.480
+<v Braden Stenning>that I actually recall somebody suggesting Elixir to me
+
+341
+00:27:45.480 --> 00:27:47.440
+<v Braden Stenning>a long, long time ago,
+
+342
+00:27:47.500 --> 00:27:49.860
+<v Braden Stenning>and I kind of didn't get it at the time.
+
+343
+00:27:51.160 --> 00:27:54.220
+<v Braden Stenning>And I regret maybe not digging deeper
+
+344
+00:27:54.220 --> 00:27:56.400
+<v Braden Stenning>to understand why they were suggesting it.
+
+345
+00:27:56.600 --> 00:27:58.140
+<v Braden Stenning>As a consequence too,
+
+346
+00:27:58.140 --> 00:28:05.420
+<v Braden Stenning>too, we've sort of drifted to more microservices that I think are necessary. And we've been over
+
+347
+00:28:05.420 --> 00:28:09.640
+<v Braden Stenning>the last couple of years sort of cleaning up some of that to make it simpler. Again,
+
+348
+00:28:09.720 --> 00:28:13.940
+<v Braden Stenning>coming back to the small team, when you have a small team and a whole bunch of services,
+
+349
+00:28:14.040 --> 00:28:19.000
+<v Braden Stenning>you end up not having necessarily a lot of coverage, a lot of people that are really
+
+350
+00:28:19.000 --> 00:28:24.900
+<v Braden Stenning>familiar with each part, which makes it more difficult to be productive and share that load.
+
+351
+00:28:24.900 --> 00:28:39.200
+<v Braden Stenning>And so we've been moving to more, you know, still keeping these loosely coupled elements of the system as much as possible for flexibility and sort of ease of changing one piece, but also pulling things into fewer repos.
+
+352
+00:28:39.200 --> 00:28:55.240
+<v Braden Stenning>And I think we, you know, coming back again, we didn't deliberately make the emphasis on ownership until, you know, a couple of years in. And it was there and we definitely had it happening, but we weren't consciously working on it.
+
+353
+00:28:55.240 --> 00:29:09.860
+<v Braden Stenning>And I think that's sort of this like, well, I wish I could be the person I am today, you know, a long time ago, right? With those insights and experience and maybe even more so, I wish I could be the person that I am, will be 10 years from now.
+
+354
+00:29:12.580 --> 00:29:17.680
+<v Noah Labhart>Well, last question, Braden. So you're getting on a plane and you're sitting next to a young
+
+355
+00:29:17.680 --> 00:29:22.560
+<v Noah Labhart>entrepreneur who's built the next big thing they're jazzed about it they can't wait to show
+
+356
+00:29:22.560 --> 00:29:27.000
+<v Noah Labhart>it off to the world can't wait to show it off to you right there on the plane what advice do you
+
+357
+00:29:27.000 --> 00:29:29.280
+<v Noah Labhart>give that person having gone down this road a bit
+
+358
+00:29:29.280 --> 00:29:33.520
+<v Braden Stenning>first i would i'd like to listen i always you know
+
+359
+00:29:33.520 --> 00:29:39.520
+<v Braden Stenning>like to i there's there's like seeing that when somebody is excited about something that they're
+
+360
+00:29:39.860 --> 00:29:45.500
+<v Braden Stenning>on, then I just, I like to, I like to see that excitement and hear about it. You know, I'm also
+
+361
+00:29:45.500 --> 00:29:54.540
+<v Braden Stenning>cautious about giving too much advice. I think I tend to prefer kind of relating my experience
+
+362
+00:29:54.540 --> 00:30:00.500
+<v Braden Stenning>and recognizing that, you know, it doesn't necessarily apply to, to everybody. And in fact,
+
+363
+00:30:00.500 --> 00:30:06.020
+<v Braden Stenning>the exact opposite may be better for an individual, but, you know, I think kind of recognize that for
+
+364
+00:30:06.020 --> 00:30:11.380
+<v Braden Stenning>for me, some of those most impactful things that have happened in my life and in my career have
+
+365
+00:30:11.380 --> 00:30:18.140
+<v Braden Stenning>happened while I was working, you know, towards one goal and then a new opportunity came up. And
+
+366
+00:30:18.140 --> 00:30:23.760
+<v Braden Stenning>yeah, at the balance of, you know, I would want to make sure that that person who's built that
+
+367
+00:30:23.760 --> 00:30:28.260
+<v Braden Stenning>next big thing, if they are building it and going forward and they are committed, that is great.
+
+368
+00:30:28.540 --> 00:30:33.380
+<v Braden Stenning>If they are building something great and there's other new things that come up along that are more
+
+369
+00:30:33.380 --> 00:30:38.100
+<v Braden Stenning>more important, whether that's career-wise or life-wise,
+
+370
+00:30:38.240 --> 00:30:40.660
+<v Braden Stenning>don't miss out on those elements.
+
+371
+00:30:41.700 --> 00:30:44.820
+<v Braden Stenning>That said, there is also the time where, you know,
+
+372
+00:30:44.820 --> 00:30:46.220
+<v Braden Stenning>you stop looking around.
+
+373
+00:30:46.280 --> 00:30:49.340
+<v Braden Stenning>You just got to focus on the thing that you want to get done.
+
+374
+00:30:49.520 --> 00:30:52.300
+<v Braden Stenning>More generally, keep growing as a person.
+
+375
+00:30:52.420 --> 00:30:53.420
+<v Braden Stenning>Keep building empathy.
+
+376
+00:30:54.160 --> 00:30:55.160
+<v Braden Stenning>Stay curious.
+
+377
+00:30:56.260 --> 00:30:57.080
+<v Braden Stenning>Keep learning.
+
+378
+00:30:58.080 --> 00:30:59.060
+<v Noah Labhart>That's great advice.
+
+379
+00:30:59.600 --> 00:31:01.940
+<v Noah Labhart>Well, Braden, thank you for being on the show today.
+
+380
+00:31:03.380 --> 00:31:05.660
+<v Noah Labhart>creation story of Raven Telemetry.
+
+381
+00:31:06.900 --> 00:31:08.500
+<v Braden Stenning>Thank you, Noah. It's been my pleasure.
+
+382
+00:31:09.560 --> 00:31:12.660
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+383
+00:31:17.640 --> 00:31:20.740
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+384
+00:31:20.940 --> 00:31:23.580
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+385
+00:31:23.760 --> 00:31:25.720
+<v Noah Labhart>or the podcasting app of your choice.
+
+386
+00:31:26.040 --> 00:31:29.440
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+387
+00:31:29.440 --> 00:31:31.200
+<v Noah Labhart>for just five to 10 bucks a month.
+
+388
+00:31:31.200 --> 00:31:36.100
+<v Noah Labhart>And when you get a chance, leave us a review. Both things help us out tremendously.
+
+389
+00:31:38.420 --> 00:31:39.900
+<v Noah Labhart>And thanks again for listening.

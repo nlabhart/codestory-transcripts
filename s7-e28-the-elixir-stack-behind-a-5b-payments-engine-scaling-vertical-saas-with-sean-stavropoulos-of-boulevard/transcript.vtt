@@ -1,0 +1,1075 @@
+WEBVTT
+
+NOTE S7 E28: The Elixir Stack Behind a $5B Payments Engine: Scaling Vertical SaaS with Sean Stavropoulos of Boulevard
+
+1
+00:00:00.780 --> 00:00:05.280
+<v Sean Stavropoulos>You know, we hit the pavement, so to speak, on fleshing out that MVP.
+
+2
+00:00:05.660 --> 00:00:11.780
+<v Sean Stavropoulos>And what's kind of fascinating is that the initial approach we thought we were taking
+
+3
+00:00:11.780 --> 00:00:15.600
+<v Sean Stavropoulos>towards building this company was fixing that consumer problem.
+
+4
+00:00:15.760 --> 00:00:18.760
+<v Sean Stavropoulos>Me as a consumer, I wanted a much easier way to book appointments.
+
+5
+00:00:18.940 --> 00:00:21.960
+<v Sean Stavropoulos>And so that was day one, what we started focusing on.
+
+6
+00:00:22.480 --> 00:00:28.760
+<v Sean Stavropoulos>And quickly, we realized that it's actually not possible for that customer app to exist
+
+7
+00:00:28.760 --> 00:00:31.560
+<v Sean Stavropoulos>in today's world because none of the backend solutions
+
+8
+00:00:31.560 --> 00:00:34.920
+<v Sean Stavropoulos>that salons and spas use is powerful enough
+
+9
+00:00:34.920 --> 00:00:36.700
+<v Sean Stavropoulos>to power that type of experience.
+
+10
+00:00:37.420 --> 00:00:42.300
+<v Sean Stavropoulos>Sean Stavropoulos, CTO at Boulevard.
+
+11
+00:00:47.360 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+12
+00:00:52.920 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+13
+00:00:57.100 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+14
+00:01:02.180 --> 00:01:06.160
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Sean Stavropoulos
+
+15
+00:01:06.160 --> 00:01:10.280
+<v Noah Labhart>built the platform for you to manage your appointment-based,
+
+16
+00:01:10.280 --> 00:01:15.720
+<v Noah Labhart>self-care based business. All this and more on Code Story.
+
+17
+00:01:19.380 --> 00:01:24.320
+<v Noah Labhart>Sean Stavropoulos grew up in Southern California. His journey to technology started in seventh
+
+18
+00:01:24.320 --> 00:01:28.300
+<v Noah Labhart>grade when he started programming for fun in Visual Studio, breaking his friend's computers
+
+19
+00:01:28.300 --> 00:01:33.240
+<v Noah Labhart>along the way. He studied aerospace engineering in college, but enjoyed tech and programming way
+
+20
+00:01:33.240 --> 00:01:38.240
+<v Noah Labhart>more and joined the LA development community 12 years ago. Outside of tech, he plays beach
+
+21
+00:01:38.240 --> 00:01:43.920
+<v Noah Labhart>volleyball, hikes, and enjoys little vacations here and there. Sean and his co-founder had an
+
+22
+00:01:43.920 --> 00:01:49.180
+<v Noah Labhart>idea to build a modern appointment scheduling solution specifically for salons and spas,
+
+23
+00:01:49.180 --> 00:01:54.940
+<v Noah Labhart>so-called self-care businesses, traditionally underserved. They interviewed owners and built
+
+24
+00:01:54.940 --> 00:02:02.320
+<v Noah Labhart>and built until they had a solution to power a six-person salon. This is the creation story
+
+25
+00:02:02.320 --> 00:02:03.560
+<v Noah Labhart>of Boulevard.
+
+26
+00:02:06.800 --> 00:02:12.620
+<v Sean Stavropoulos>So Boulevard, we describe as a client experience platform built for appointment-based
+
+27
+00:02:12.620 --> 00:02:17.360
+<v Sean Stavropoulos>self-care businesses. You know, really at the end of the day, we provide all types of technology
+
+28
+00:02:17.360 --> 00:02:23.320
+<v Sean Stavropoulos>solutions to business owners and professionals so that they can run an appointment-based business.
+
+29
+00:02:23.440 --> 00:02:28.220
+<v Sean Stavropoulos>So that includes things like online scheduling, text messaging, credit card processing,
+
+30
+00:02:28.220 --> 00:02:33.460
+<v Sean Stavropoulos>commission calculation for your stylists, inventory management for your products that
+
+31
+00:02:33.460 --> 00:02:38.180
+<v Sean Stavropoulos>you sell. The list goes on and on, but really it's all the tooling that you would need to
+
+32
+00:02:38.180 --> 00:02:44.340
+<v Sean Stavropoulos>effectively run an appointment-based business all wrapped up into one nice package called Boulevard.
+
+33
+00:02:44.700 --> 00:02:50.280
+<v Sean Stavropoulos>And why did we start this? That's a really fascinating story. It all started from my
+
+34
+00:02:50.280 --> 00:02:54.560
+<v Sean Stavropoulos>own frustrations as a consumer having to call my hair salon to book an appointment
+
+35
+00:02:55.100 --> 00:02:59.060
+<v Sean Stavropoulos>right around the time when Uber came out and Postmates was blowing up.
+
+36
+00:02:59.300 --> 00:03:04.620
+<v Sean Stavropoulos>Everything in my life is trending towards more convenient experiences for me as a consumer.
+
+37
+00:03:04.860 --> 00:03:08.320
+<v Sean Stavropoulos>And yet when I wanted to book a haircut, I still had to call my hair salon.
+
+38
+00:03:08.500 --> 00:03:12.180
+<v Sean Stavropoulos>And that fundamentally was a, you know, hashtag first world problem.
+
+39
+00:03:12.260 --> 00:03:16.380
+<v Sean Stavropoulos>But it was something that stood out to me as different than what most of these other
+
+40
+00:03:16.380 --> 00:03:19.920
+<v Sean Stavropoulos>industries are moving towards and wanted to figure out why.
+
+41
+00:03:19.920 --> 00:03:29.000
+<v Sean Stavropoulos>And then conveniently, when my last software company that I was working at went through an acquisition, things were a little slower.
+
+42
+00:03:29.080 --> 00:03:38.060
+<v Sean Stavropoulos>And timing wise, this problem that I had been discussing with my co-founder presented an opportunity for us to really go in and dive in and solve it.
+
+43
+00:03:38.060 --> 00:03:51.320
+<v Sean Stavropoulos>And the more we learned, the more we met with business owners, the more we convinced ourselves that, hey, there's a real opportunity here to provide modern technology to solve this, what is not a new problem.
+
+44
+00:03:51.720 --> 00:03:55.280
+<v Sean Stavropoulos>But we felt like we had the skills to actually make a difference here.
+
+45
+00:03:55.420 --> 00:03:56.780
+<v Sean Stavropoulos>And that was about seven years ago.
+
+46
+00:03:58.540 --> 00:03:59.920
+<v Noah Labhart>Tell me about the MVP.
+
+47
+00:04:00.200 --> 00:04:05.720
+<v Noah Labhart>So that first product you built, how long did it take you to build and what sort of tools did you use to bring it to life?
+
+48
+00:04:08.960 --> 00:04:16.820
+<v Sean Stavropoulos>So about 2015 was when we hit the pavement, so to speak, on fleshing out that MVP.
+
+49
+00:04:17.240 --> 00:04:27.940
+<v Sean Stavropoulos>And what's kind of fascinating is that the initial approach we thought we were taking towards building this company was fixing that consumer problem that I mentioned.
+
+50
+00:04:28.040 --> 00:04:31.300
+<v Sean Stavropoulos>It's like me as a consumer, I wanted a much easier way to book appointments.
+
+51
+00:04:31.480 --> 00:04:36.500
+<v Sean Stavropoulos>And so that was day one, what we started focusing on and figuring out how are we going to solve it?
+
+52
+00:04:38.060 --> 00:04:44.120
+<v Sean Stavropoulos>we realized that it's actually not possible for that customer app to exist in today's world
+
+53
+00:04:44.120 --> 00:04:50.480
+<v Sean Stavropoulos>because none of the backend solutions that salons and spas use is powerful enough to power that type
+
+54
+00:04:50.480 --> 00:04:55.540
+<v Sean Stavropoulos>of experience. And so we came to the conclusion that if we want a greater customer experience to
+
+55
+00:04:55.540 --> 00:05:02.580
+<v Sean Stavropoulos>exist, we had to begin by providing better software directly to the businesses. And then
+
+56
+00:05:02.580 --> 00:05:09.080
+<v Sean Stavropoulos>And MVP shifted immediately to, all right, let's provide technology for salons and spas to use.
+
+57
+00:05:09.320 --> 00:05:14.580
+<v Sean Stavropoulos>And then we quickly realized that what we thought was an MVP was far insufficient.
+
+58
+00:05:15.100 --> 00:05:21.840
+<v Sean Stavropoulos>We tried as hard as we could to avoid building credit card processing and avoid building shift management.
+
+59
+00:05:22.060 --> 00:05:27.680
+<v Sean Stavropoulos>We wanted to be laser focused on how do we just provide the best scheduling experience?
+
+60
+00:05:28.160 --> 00:05:29.180
+<v Sean Stavropoulos>Nothing else matters.
+
+61
+00:05:29.700 --> 00:05:40.220
+<v Sean Stavropoulos>But after talking to more and more businesses and discussing how this would work in reality, we convinced ourselves that it's not possible for that tool to exist in isolation.
+
+62
+00:05:40.440 --> 00:05:51.720
+<v Sean Stavropoulos>And that if we wanted to be the best at scheduling, we necessarily had to also be the best at everything else or include baseline levels of functionality so that they can do a time clock.
+
+63
+00:05:51.880 --> 00:05:52.780
+<v Sean Stavropoulos>They can do payments.
+
+64
+00:05:53.040 --> 00:05:57.660
+<v Sean Stavropoulos>If your credit card processor was separate from your schedule, nothing added up at the end of the day.
+
+65
+00:05:59.180 --> 00:06:02.260
+<v Sean Stavropoulos>said you make would be different than what your credit card machine told you you made.
+
+66
+00:06:02.420 --> 00:06:07.880
+<v Sean Stavropoulos>And the MVP for Boulevard was essentially managing all of the operations of a small
+
+67
+00:06:07.880 --> 00:06:12.140
+<v Sean Stavropoulos>six-person hair salon here in Santa Monica, California, where we started.
+
+68
+00:06:12.520 --> 00:06:18.960
+<v Sean Stavropoulos>I said we started in about 2015, and we had our first paying customer in about early 2017.
+
+69
+00:06:19.080 --> 00:06:25.920
+<v Sean Stavropoulos>So it took a good year and a half for us to get to a place where Boulevard was full-featured
+
+70
+00:06:25.920 --> 00:06:28.700
+<v Sean Stavropoulos>enough to actually run a six-person hair salon.
+
+71
+00:06:29.180 --> 00:06:41.220
+<v Sean Stavropoulos>And from then, we just kept setting our eyes and focus on that next target customer and how are we going to get bigger and bigger and work closely with that next customer to bring their challenges to reality.
+
+72
+00:06:45.140 --> 00:06:47.920
+<v Noah Labhart>When you're building an MVP, let's stick on that for a minute.
+
+73
+00:06:48.020 --> 00:06:56.900
+<v Noah Labhart>When you're building an MVP, you've got to make decisions and tradeoffs about feature cut or feature focus, tech debt, the tools you're using, those things.
+
+74
+00:06:56.900 --> 00:07:02.620
+<v Noah Labhart>Tell me about some of those you had to work through, or maybe the biggest one you had to work through, and how you coped with those decisions.
+
+75
+00:07:03.960 --> 00:07:07.780
+<v Sean Stavropoulos>I mean, there's no denying that software development is all about trade-offs.
+
+76
+00:07:08.180 --> 00:07:13.720
+<v Sean Stavropoulos>We want to build a massive city, but we only have enough money or time or resources to build one house.
+
+77
+00:07:14.520 --> 00:07:21.540
+<v Sean Stavropoulos>I mentioned that even the entire idea and premise of Boulevard as a company changed from consumer to business early on.
+
+78
+00:07:21.540 --> 00:07:28.140
+<v Sean Stavropoulos>But on the tech side, I think one of the driving factors early on is to embrace nimbleness in our development cycle.
+
+79
+00:07:28.660 --> 00:07:32.820
+<v Sean Stavropoulos>I'm a firm believer that the only certainty in building a product is that things will change.
+
+80
+00:07:33.000 --> 00:07:34.500
+<v Sean Stavropoulos>Change is the only certainty.
+
+81
+00:07:34.720 --> 00:07:48.140
+<v Sean Stavropoulos>Where I think we excelled and did well early on is taking small, bite-sized changes, iterating rapidly, getting something out there, getting feedback, without working through making it perfect on day one.
+
+82
+00:07:48.140 --> 00:07:52.300
+<v Sean Stavropoulos>and learn, and then you can reinvest and solidify and make things sound.
+
+83
+00:07:52.560 --> 00:07:56.820
+<v Sean Stavropoulos>And so I think we just had a really nimble approach in the early days that enabled us
+
+84
+00:07:56.820 --> 00:08:03.140
+<v Sean Stavropoulos>to gather feedback quickly and iterate rather than making big bets and hoping they pay off.
+
+85
+00:08:03.640 --> 00:08:08.420
+<v Sean Stavropoulos>Second, I'd say for us in particular, in the early days, any appointment-based business
+
+86
+00:08:08.420 --> 00:08:11.020
+<v Sean Stavropoulos>that made eye contact with us, we'd try to sell.
+
+87
+00:08:11.020 --> 00:08:19.260
+<v Sean Stavropoulos>And really over time, having us hone in on who the ideal customer is that we're building for was really important.
+
+88
+00:08:19.500 --> 00:08:24.760
+<v Sean Stavropoulos>I'd say that there were some really difficult decisions early on on, is this really the right customer?
+
+89
+00:08:25.000 --> 00:08:28.400
+<v Sean Stavropoulos>Some of their challenges align with what we're solving, but not all of them.
+
+90
+00:08:28.580 --> 00:08:33.080
+<v Sean Stavropoulos>And some partners I think we chose prematurely or maybe shouldn't have chosen at all.
+
+91
+00:08:33.360 --> 00:08:38.920
+<v Sean Stavropoulos>That could have detracted us from achieving our complete vision as a company earlier.
+
+92
+00:08:38.920 --> 00:08:50.100
+<v Sean Stavropoulos>But I'd say the tradeoffs we made around which partners do we really want to work with, which ones should we avoid, was something that, to this day, is still a work in progress on honing.
+
+93
+00:08:52.120 --> 00:08:56.460
+<v Noah Labhart>So you got your MVP. It's working. It's powering that six-person salon.
+
+94
+00:08:57.020 --> 00:08:59.960
+<v Noah Labhart>How did you progress the product and mature it from there?
+
+95
+00:08:59.960 --> 00:09:09.020
+<v Noah Labhart>And I'm curious about that process and how you went about building your roadmap and deciding, OK, this is the next most important thing to build with Boulevard.
+
+96
+00:09:10.200 --> 00:09:15.980
+<v Sean Stavropoulos>You know, I feel like in many ways the product has been pulled from our hands by our customers in the industry.
+
+97
+00:09:16.500 --> 00:09:20.740
+<v Sean Stavropoulos>This is a very established industry that has been around for a very long time.
+
+98
+00:09:21.000 --> 00:09:27.060
+<v Sean Stavropoulos>And they know generally what's holding them back, where they're spent a lot of time, what's going to make the biggest impact.
+
+99
+00:09:27.060 --> 00:09:30.300
+<v Sean Stavropoulos>and for us to sell into an established industry,
+
+100
+00:09:30.620 --> 00:09:34.160
+<v Sean Stavropoulos>we had to have compelling reasons why they should switch.
+
+101
+00:09:34.960 --> 00:09:37.580
+<v Sean Stavropoulos>Certainly the breadth and complexity of our customers
+
+102
+00:09:37.580 --> 00:09:40.020
+<v Sean Stavropoulos>and really listening to them has driven the roadmap.
+
+103
+00:09:40.860 --> 00:09:43.260
+<v Sean Stavropoulos>But since we started in hair salons,
+
+104
+00:09:43.400 --> 00:09:47.020
+<v Sean Stavropoulos>I'd say that the focus of expanding and building the product
+
+105
+00:09:47.020 --> 00:09:49.260
+<v Sean Stavropoulos>has been to threefold.
+
+106
+00:09:49.400 --> 00:09:53.320
+<v Sean Stavropoulos>It's one, how can we go deeper within the customers that we serve today?
+
+107
+00:09:53.320 --> 00:09:57.960
+<v Sean Stavropoulos>So how can we be undoubtedly the best platform for hair salons?
+
+108
+00:09:58.040 --> 00:09:58.700
+<v Sean Stavropoulos>Number one.
+
+109
+00:09:58.820 --> 00:10:05.180
+<v Sean Stavropoulos>Number two is how can we expand the types of customers that we become best in class for?
+
+110
+00:10:05.480 --> 00:10:09.180
+<v Sean Stavropoulos>So as an example, we're not great for hotel spas today.
+
+111
+00:10:09.320 --> 00:10:14.380
+<v Sean Stavropoulos>If you are a spa in a hotel, you often need to be able to do room charges back to the customer.
+
+112
+00:10:14.500 --> 00:10:16.660
+<v Sean Stavropoulos>You need to integrate with the hotel's PMS software.
+
+113
+00:10:17.000 --> 00:10:22.660
+<v Sean Stavropoulos>And we recognize that it's not the best use of our time today to go really hard at that market
+
+114
+00:10:23.320 --> 00:10:30.220
+<v Sean Stavropoulos>going to excel. Expanding that ideal customer profile over time is second to our roadmap and
+
+115
+00:10:30.220 --> 00:10:35.300
+<v Sean Stavropoulos>how we can drive the most value. And then third would be expansion into new products.
+
+116
+00:10:35.560 --> 00:10:40.460
+<v Sean Stavropoulos>So we've proven that we can build really great scheduling tools, business management tools,
+
+117
+00:10:41.200 --> 00:10:47.740
+<v Sean Stavropoulos>and we have now released up to this point a few new add-ons and new things that our customers can
+
+118
+00:10:47.740 --> 00:10:53.700
+<v Sean Stavropoulos>can buy and get value from. So more marketing tools, more commission calculation and payroll
+
+119
+00:10:53.700 --> 00:10:59.720
+<v Sean Stavropoulos>offerings. And so the product today has really progressed to what are those biggest pain points
+
+120
+00:10:59.720 --> 00:11:05.420
+<v Sean Stavropoulos>that this type of appointment-based customer has on a day-to-day basis? And how can we make their
+
+121
+00:11:05.420 --> 00:11:10.500
+<v Sean Stavropoulos>lives easier and be that central hub that can integrate with all these other software tooling
+
+122
+00:11:10.500 --> 00:11:12.660
+<v Sean Stavropoulos>that they need to run their operations effectively?
+
+123
+00:11:14.460 --> 00:11:16.860
+<v Noah Labhart>Okay, let's switch to team. So how did you go
+
+124
+00:11:17.740 --> 00:11:22.040
+<v Noah Labhart>team and what did you look for in those people to indicate that they are the winning horses to join
+
+125
+00:11:22.040 --> 00:11:22.540
+<v Noah Labhart>you?
+
+126
+00:11:23.360 --> 00:11:27.860
+<v Sean Stavropoulos>I'm proud to say our leadership team today is built squarely with people who've done the job
+
+127
+00:11:27.860 --> 00:11:32.380
+<v Sean Stavropoulos>before. You know, there are certain roles and positions within the company that hiring really
+
+128
+00:11:32.380 --> 00:11:38.800
+<v Sean Stavropoulos>strong candidates who we have confidence can learn and do the job will be okay. But in the early roles
+
+129
+00:11:38.800 --> 00:11:44.320
+<v Sean Stavropoulos>and leadership positions at Boulevard, we certainly over-indexed the people with direct and relevant
+
+130
+00:11:44.320 --> 00:11:48.760
+<v Sean Stavropoulos>of an experience. Like it's, it's not a leap of creativity to see, can they apply the skills they
+
+131
+00:11:48.760 --> 00:11:54.200
+<v Sean Stavropoulos>had in their previous job and learn how to do it here? It was more, we want to bring someone in
+
+132
+00:11:54.200 --> 00:12:01.280
+<v Sean Stavropoulos>who has undoubtedly done this before, whether it's senior engineering roles or head of sales roles
+
+133
+00:12:01.280 --> 00:12:07.180
+<v Sean Stavropoulos>or marketing roles. It's, you know, it's over-indexing on people that have with certainty
+
+134
+00:12:07.180 --> 00:12:12.500
+<v Sean Stavropoulos>done that type of job before. I'd say what the driving force, we didn't want to have too much
+
+135
+00:12:14.320 --> 00:12:17.780
+<v Sean Stavropoulos>in the early days. It's like, we wanted to bring people in that could just make it happen and,
+
+136
+00:12:17.780 --> 00:12:23.460
+<v Sean Stavropoulos>and pulled from direct experience at their prior role. So bringing talent acquisition in-house
+
+137
+00:12:23.460 --> 00:12:30.300
+<v Sean Stavropoulos>early, you know, and this is a fun story where our investors at the time questioned whether we
+
+138
+00:12:30.300 --> 00:12:35.560
+<v Sean Stavropoulos>needed in-house talent acquisition so early in our company's lifetime. And after seeing the value
+
+139
+00:12:35.560 --> 00:12:42.140
+<v Sean Stavropoulos>and seeing how much focus that brings to our team and the benefits of hiring such a strong team
+
+140
+00:12:42.140 --> 00:12:48.780
+<v Sean Stavropoulos>early, they now recommend that style of talent acquisition in-house early to many of their
+
+141
+00:12:48.780 --> 00:12:49.660
+<v Sean Stavropoulos>other portfolio companies.
+
+142
+00:12:50.140 --> 00:12:51.920
+<v Sean Stavropoulos>Our team is also wildly humble.
+
+143
+00:12:52.060 --> 00:12:57.060
+<v Sean Stavropoulos>We look for people who genuinely treat our customers with respect and enthusiasm and
+
+144
+00:12:57.060 --> 00:13:01.960
+<v Sean Stavropoulos>align as much as possible with our customers and the struggles that they have.
+
+145
+00:13:02.120 --> 00:13:08.380
+<v Sean Stavropoulos>So I'm happy that our leadership team and our company as a whole looks up and respects
+
+146
+00:13:08.380 --> 00:13:11.820
+<v Sean Stavropoulos>the community that we build software for more than anything.
+
+147
+00:13:15.560 --> 00:13:21.820
+<v Noah Labhart>let's dive into scalability then so was this built to scale efficiently from day one so that
+
+148
+00:13:21.820 --> 00:13:27.840
+<v Noah Labhart>six-person salon you were supporting or have you been finding this as you grow in any capacity
+
+149
+00:13:27.840 --> 00:13:30.800
+<v Noah Labhart>and scaling could be technology or it could be people
+
+150
+00:13:30.800 --> 00:13:35.420
+<v Sean Stavropoulos>i'd say both some areas we built for scale
+
+151
+00:13:35.420 --> 00:13:41.520
+<v Sean Stavropoulos>out of the gate some areas we've learned as we've grown and and certainly hit some some challenging
+
+152
+00:13:42.140 --> 00:13:48.420
+<v Sean Stavropoulos>blocks. The few things that we decided to focus on early were things that we felt would be really
+
+153
+00:13:48.420 --> 00:13:54.080
+<v Sean Stavropoulos>hard to change down the road. So for example, even though our MVP customer was a single location,
+
+154
+00:13:54.260 --> 00:13:59.580
+<v Sean Stavropoulos>small salon in Santa Monica, all of the underpinnings of the software we built for
+
+155
+00:13:59.580 --> 00:14:04.940
+<v Sean Stavropoulos>multi-location national chains out of the gate. So on day one of our product, for example,
+
+156
+00:14:04.940 --> 00:14:12.000
+<v Sean Stavropoulos>we supported the notion and the data modeling for what a national 100 plus location chain would need.
+
+157
+00:14:12.140 --> 00:14:27.800
+<v Sean Stavropoulos>And so that type of example of jumping up in complexity in your product from like a small location, single location to a large national chain, that was something that I didn't feel confident we'd be able to make down the road without spending an exorbitant amount of time on.
+
+158
+00:14:27.880 --> 00:14:34.940
+<v Sean Stavropoulos>It's easier to make some of those early data model changes at the beginning rather than having to iterate on some of those over time.
+
+159
+00:14:34.940 --> 00:14:49.080
+<v Sean Stavropoulos>And so, you know, I think that when it came to proper data modeling to help our product represent the real world in as effective a way as possible, we tried not to make too many sacrifices on data model in the early days.
+
+160
+00:14:49.220 --> 00:14:51.100
+<v Sean Stavropoulos>And I think those paid off dramatically.
+
+161
+00:14:52.360 --> 00:15:02.380
+<v Sean Stavropoulos>Some of the areas that I would say on the flip side have presented scaling challenges have more often than not been areas where we made concessions on those data models early on.
+
+162
+00:15:02.380 --> 00:15:09.480
+<v Sean Stavropoulos>So, for example, I mentioned at the beginning of Boulevard, it wasn't the goal of us to be a full point of sale system.
+
+163
+00:15:09.680 --> 00:15:11.280
+<v Sean Stavropoulos>Again, we were trying to focus on scheduling.
+
+164
+00:15:11.460 --> 00:15:20.160
+<v Sean Stavropoulos>And so not all of the point of sale and checkout experiences were as thoughtfully designed from the outset as I wish they would have been.
+
+165
+00:15:20.380 --> 00:15:28.180
+<v Sean Stavropoulos>Because that was something that we backed into over time, not necessarily had the intention from the beginning to get there.
+
+166
+00:15:28.300 --> 00:15:30.040
+<v Sean Stavropoulos>And so that would be one area.
+
+167
+00:15:30.040 --> 00:15:45.100
+<v Sean Stavropoulos>Everything related to point of sale experience is something that we've now had to spend more time and energy refactoring and overhauling rather than had we had that foresight early on that we are going to become a full blown point of sale system.
+
+168
+00:15:45.180 --> 00:15:47.720
+<v Sean Stavropoulos>We would have approached some things quite differently, I'm sure.
+
+169
+00:15:48.820 --> 00:15:54.160
+<v Noah Labhart>OK, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+170
+00:15:55.620 --> 00:16:01.760
+<v Sean Stavropoulos>We have a product here that now makes the lives of over 20,000 professionals and service providers
+
+171
+00:16:01.760 --> 00:16:07.980
+<v Sean Stavropoulos>and business owners easier. It's harder and harder these days to run an appointment-based
+
+172
+00:16:07.980 --> 00:16:12.800
+<v Sean Stavropoulos>business. You have to be efficient. You have to be investing in technology. You can't have an army
+
+173
+00:16:12.800 --> 00:16:19.300
+<v Sean Stavropoulos>of front desk receptionists managing everything. It's just not economical to do so. We are helping
+
+174
+00:16:19.300 --> 00:16:22.540
+<v Sean Stavropoulos>business owners modernize and run more efficiently.
+
+175
+00:16:22.760 --> 00:16:23.720
+<v Sean Stavropoulos>And I love that.
+
+176
+00:16:23.860 --> 00:16:28.260
+<v Sean Stavropoulos>And then the execution against that mission, I'm so proud of.
+
+177
+00:16:28.420 --> 00:16:33.240
+<v Sean Stavropoulos>Boulevard in its current state is now a living, breathing company that's bigger than any one
+
+178
+00:16:33.240 --> 00:16:33.740
+<v Sean Stavropoulos>person.
+
+179
+00:16:33.660 --> 00:16:40.000
+<v Sean Stavropoulos>To know that this company, which began as an idea seven years ago, has grown to over
+
+180
+00:16:40.000 --> 00:16:45.920
+<v Sean Stavropoulos>200 employees and will continue to exist and grow without any one person, I think is really
+
+181
+00:16:45.920 --> 00:16:47.060
+<v Sean Stavropoulos>incredible to see.
+
+182
+00:16:47.140 --> 00:16:48.540
+<v Sean Stavropoulos>And what more could you ask for?
+
+183
+00:16:49.560 --> 00:16:55.100
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+184
+00:16:56.020 --> 00:17:09.460
+<v Sean Stavropoulos>Going back to that customer profile, you know, in the early days, we signed up businesses, exotic race car driving studios, nationwide float tank franchises and everything in between.
+
+185
+00:17:09.600 --> 00:17:16.660
+<v Sean Stavropoulos>And at the time, it wasn't as obvious to us. What are really the differences and nuances between these industries?
+
+186
+00:17:16.660 --> 00:17:22.840
+<v Sean Stavropoulos>Why is a schedule for one industry not exactly the same as scheduling for another?
+
+187
+00:17:23.200 --> 00:17:30.160
+<v Sean Stavropoulos>As we learned more, I think we certainly signed up some customers that we didn't do the best service to.
+
+188
+00:17:30.360 --> 00:17:34.420
+<v Sean Stavropoulos>And likewise, they were often a distraction for our team.
+
+189
+00:17:34.980 --> 00:17:42.240
+<v Sean Stavropoulos>It took us a while to recognize that and have the courage to break up with a partner or customer that you have.
+
+190
+00:17:42.240 --> 00:17:54.200
+<v Sean Stavropoulos>But I think every time that our team came to the conclusion that, hey, this customer might not be the best for us and we might not be the best for them, I think is a really humbling and growth oriented mindset to have.
+
+191
+00:17:54.400 --> 00:18:00.920
+<v Sean Stavropoulos>And so the times and some of the decisions that were really hard at the time, in hindsight, have always been the right ones.
+
+192
+00:18:01.240 --> 00:18:11.220
+<v Sean Stavropoulos>And so don't be afraid to break up with customers that you learn you might not be the best fit for over time, as long as you feel like that's going to give you the focus that you need to continue to grow.
+
+193
+00:18:15.100 --> 00:18:18.100
+<v Noah Labhart>So what does the future look like for the product and for your team?
+
+194
+00:18:19.840 --> 00:18:26.220
+<v Sean Stavropoulos>Since our product is that operating system of the salon and spa, we're fully embracing that.
+
+195
+00:18:26.700 --> 00:18:33.720
+<v Sean Stavropoulos>Very much I look up to companies like Shopify, as an example, that have become integral to the e-commerce experience.
+
+196
+00:18:33.900 --> 00:18:37.760
+<v Sean Stavropoulos>If you're going to start an e-commerce brand today, you'll probably use Shopify.
+
+197
+00:18:37.760 --> 00:18:43.920
+<v Sean Stavropoulos>They've made it incredibly simple to customize your own business's nuance.
+
+198
+00:18:44.180 --> 00:18:48.220
+<v Sean Stavropoulos>And that's sort of the parallel that we look for in the appointment-based space.
+
+199
+00:18:48.560 --> 00:18:53.020
+<v Sean Stavropoulos>We are expanding our developer centers, our APIs.
+
+200
+00:18:53.220 --> 00:18:54.620
+<v Sean Stavropoulos>We're integrating with more solutions.
+
+201
+00:18:54.940 --> 00:19:00.540
+<v Sean Stavropoulos>For us to really be that central operating system is core to our mission.
+
+202
+00:19:00.540 --> 00:19:15.220
+<v Sean Stavropoulos>And so lots of ancillary products from better phone systems and caller ID tracking all the way through to making payroll really, really straightforward are all areas that I'm excited to be able to solve for our customers.
+
+203
+00:19:15.740 --> 00:19:22.260
+<v Sean Stavropoulos>And for our team, we've got a world-class engineering, product, design, sales team.
+
+204
+00:19:22.360 --> 00:19:30.060
+<v Sean Stavropoulos>Our entire team is incredible, and I'm excited to be able to continue to grow all of them and make Boulevard a really exciting place to work.
+
+205
+00:19:31.160 --> 00:19:33.780
+<v Noah Labhart>Okay, Sean, who influences the way that you work?
+
+206
+00:19:33.960 --> 00:19:37.000
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+207
+00:19:37.680 --> 00:19:43.860
+<v Sean Stavropoulos>You know, one thing that has always resonated with me a little bit is a quote that went something along the lines of,
+
+208
+00:19:43.880 --> 00:19:46.020
+<v Sean Stavropoulos>you're the average of all the people who surround you.
+
+209
+00:19:47.160 --> 00:19:54.460
+<v Sean Stavropoulos>Everyone I spend time with on a regular basis, in and out of work, bring joy and positive influence to my life in some way or another.
+
+210
+00:19:54.800 --> 00:19:59.460
+<v Sean Stavropoulos>I look up to the people I surround myself with, and I don't think that's a coincidence.
+
+211
+00:20:00.540 --> 00:20:01.180
+<v Sean Stavropoulos>That drives me.
+
+212
+00:20:01.320 --> 00:20:06.980
+<v Sean Stavropoulos>And I couldn't be more thrilled to have such positive influences all around my life.
+
+213
+00:20:07.200 --> 00:20:09.080
+<v Sean Stavropoulos>I do look up to our CEO.
+
+214
+00:20:09.340 --> 00:20:11.960
+<v Sean Stavropoulos>I think he's incredibly smart and wildly diverse.
+
+215
+00:20:12.340 --> 00:20:17.040
+<v Sean Stavropoulos>He'll build a sales commission plan in one meeting, iterate on the financial plan in the next,
+
+216
+00:20:17.840 --> 00:20:21.760
+<v Sean Stavropoulos>wordsmith a press release, and then do product designs in the evening.
+
+217
+00:20:21.900 --> 00:20:26.360
+<v Sean Stavropoulos>The guy is a jack of all trades and somehow has mastered many of them.
+
+218
+00:20:27.360 --> 00:20:32.680
+<v Sean Stavropoulos>In the early days, the thought of, well, I wonder which one of us, two co-founders, is going to be the CEO.
+
+219
+00:20:32.760 --> 00:20:40.120
+<v Sean Stavropoulos>That thought maybe crossed my mind for five seconds before I fully accepted and knew that he would be a far better candidate for that role.
+
+220
+00:20:40.400 --> 00:20:43.440
+<v Sean Stavropoulos>So more than anything, I look up to the people I spend a lot of time with.
+
+221
+00:20:44.680 --> 00:20:47.840
+<v Noah Labhart>Okay, we talked about a mistake earlier, but this is a little different spin.
+
+222
+00:20:48.020 --> 00:20:50.040
+<v Noah Labhart>Maybe it applies, but let's see where you go with it.
+
+223
+00:20:50.140 --> 00:20:52.620
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+224
+00:20:52.820 --> 00:20:55.100
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+225
+00:20:56.360 --> 00:20:58.620
+<v Noah Labhart>that be something that went wrong, but maybe you tweak it.
+
+226
+00:20:59.720 --> 00:21:01.500
+<v Sean Stavropoulos>I believe that we've had very little
+
+227
+00:21:01.500 --> 00:21:08.100
+<v Sean Stavropoulos>waste in software development for the most part. I'm proud that we haven't released any major
+
+228
+00:21:08.100 --> 00:21:12.920
+<v Sean Stavropoulos>products that flopped, that people didn't use, that we threw away or completely changed course
+
+229
+00:21:12.920 --> 00:21:19.960
+<v Sean Stavropoulos>on. For the most part, we've had little waste. But I'd say areas today where I do see the most
+
+230
+00:21:19.960 --> 00:21:25.020
+<v Sean Stavropoulos>tech debt or I do see the most investments still needed to bring them up to par are those areas
+
+231
+00:21:26.360 --> 00:21:32.920
+<v Sean Stavropoulos>well enough in the early days. Things like our commerce engine is probably the biggest example
+
+232
+00:21:32.920 --> 00:21:39.300
+<v Sean Stavropoulos>internally of somewhere that really needs some upkeep. So as an example, everything from,
+
+233
+00:21:39.500 --> 00:21:44.100
+<v Sean Stavropoulos>you know, I wasn't a retail point of sale expert in the early days. I thought I knew how to
+
+234
+00:21:44.100 --> 00:21:50.680
+<v Sean Stavropoulos>calculate sales tax properly. Turns out I didn't. As we learned and as things grew and we found all
+
+235
+00:21:50.680 --> 00:21:55.440
+<v Sean Stavropoulos>all these edge cases with a lot of surcharges and certain discounts factor into taxes,
+
+236
+00:21:55.660 --> 00:21:57.460
+<v Sean Stavropoulos>it became quite messy.
+
+237
+00:21:57.700 --> 00:22:01.000
+<v Sean Stavropoulos>And so that's an area that we had to spend a lot of time overhauling
+
+238
+00:22:01.000 --> 00:22:05.340
+<v Sean Stavropoulos>rather than bringing in an expert or vetting some of the early decisions we're making
+
+239
+00:22:05.340 --> 00:22:09.640
+<v Sean Stavropoulos>with those who have the expertise to give you a proper answer, I think is important.
+
+240
+00:22:10.620 --> 00:22:15.200
+<v Sean Stavropoulos>Another example is our reporting infrastructure has turned out to be wildly complex.
+
+241
+00:22:15.200 --> 00:22:23.840
+<v Sean Stavropoulos>I think we underestimated just how nuanced being able to provide full business operational reporting on would be in the early days.
+
+242
+00:22:24.000 --> 00:22:28.500
+<v Sean Stavropoulos>And as a result, that's another area that I wish I had approached a little bit differently in the early days.
+
+243
+00:22:28.940 --> 00:22:33.460
+<v Sean Stavropoulos>You live and learn, and none of these are going to take Boulevard down, that's for sure.
+
+244
+00:22:34.880 --> 00:22:35.900
+<v Noah Labhart>Last question, Sean.
+
+245
+00:22:36.020 --> 00:22:40.320
+<v Noah Labhart>So you're getting on a plane, and you're sitting next to a young entrepreneur who's built the next big thing.
+
+246
+00:22:40.320 --> 00:22:41.580
+<v Noah Labhart>They're jazzed about it.
+
+247
+00:22:41.620 --> 00:22:42.780
+<v Noah Labhart>They can't wait to show it off to the world
+
+248
+00:22:42.780 --> 00:22:45.120
+<v Noah Labhart>and can't wait to show it off to you right there on the plane.
+
+249
+00:22:45.420 --> 00:22:48.320
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+250
+00:22:49.400 --> 00:22:53.320
+<v Sean Stavropoulos>First and foremost, don't try to go down that journey alone.
+
+251
+00:22:53.600 --> 00:22:56.480
+<v Sean Stavropoulos>Surround yourself with people you respect, people you look up to,
+
+252
+00:22:56.580 --> 00:22:58.460
+<v Sean Stavropoulos>people you'll learn from along the way.
+
+253
+00:22:59.400 --> 00:23:02.520
+<v Sean Stavropoulos>Building Boulevard has been long and arduous.
+
+254
+00:23:02.580 --> 00:23:06.120
+<v Sean Stavropoulos>If you were to have asked us in the early days how long we thought it would take
+
+255
+00:23:06.120 --> 00:23:08.960
+<v Sean Stavropoulos>to get to our first million dollars of credit cards processed
+
+256
+00:23:10.760 --> 00:23:16.800
+<v Sean Stavropoulos>customers, we would have underestimated those timelines over and over again. So really more
+
+257
+00:23:16.800 --> 00:23:21.180
+<v Sean Stavropoulos>than anything, find a way to enjoy the journey because that journey is almost certainly going
+
+258
+00:23:21.180 --> 00:23:25.600
+<v Sean Stavropoulos>to take a little bit longer than you initially expect. So don't fixate too much on the end goal.
+
+259
+00:23:25.680 --> 00:23:28.660
+<v Sean Stavropoulos>Just enjoy the journey and surround yourself with incredible people.
+
+260
+00:23:28.880 --> 00:23:30.640
+<v Noah Labhart>That's fantastic advice. Well,
+
+261
+00:23:30.660 --> 00:23:34.760
+<v Noah Labhart>Sean, thank you for being on the show today and thank you for telling the creation story of
+
+262
+00:23:34.760 --> 00:23:35.360
+<v Noah Labhart>Boulevard.
+
+263
+00:23:35.480 --> 00:23:37.080
+<v Sean Stavropoulos>My pleasure. Thank you for having me.
+
+264
+00:23:38.560 --> 00:23:41.360
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+265
+00:23:44.460 --> 00:23:50.300
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+266
+00:23:50.480 --> 00:23:55.260
+<v Noah Labhart>or the podcasting app of your choice. And when you get a chance, leave us a review.
+
+267
+00:23:55.520 --> 00:24:01.380
+<v Noah Labhart>Both things help us out tremendously. And thanks again for listening.
+
+268
+00:24:09.380 --> 00:24:10.580
+<v Sean Stavropoulos>Thank you.

@@ -1,0 +1,1639 @@
+WEBVTT
+
+NOTE S4 E17: Engineering High-Performance API Query Engines: Schema Federation at Scale with Matt DeBergalis of Apollo GraphQL
+
+1
+00:00:01.960 --> 00:00:08.200
+<v Matt DeBergalis>And so we actually designed Apollo Client first and foremost, in some sense its key
+
+2
+00:00:08.200 --> 00:00:14.200
+<v Matt DeBergalis>feature was that we welcomed contributions from developers across the ecosystem.
+
+3
+00:00:16.100 --> 00:00:20.120
+<v Matt DeBergalis>Open source is great because of the community it creates.
+
+4
+00:00:21.040 --> 00:00:27.220
+<v Matt DeBergalis>And it's powerful because it empowers developers to improve the product itself.
+
+5
+00:00:28.020 --> 00:00:32.420
+<v Matt DeBergalis>It's not a closed system that comes to you from an outside vendor.
+
+6
+00:00:33.120 --> 00:00:36.100
+<v Matt DeBergalis>It's a living, breathing product itself that everybody can improve.
+
+7
+00:00:36.680 --> 00:00:42.240
+<v Matt DeBergalis>Matt DeBergalis, CTO, Apollo GraphQL
+
+8
+00:00:47.460 --> 00:00:54.260
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share
+
+9
+00:00:54.260 --> 00:00:59.820
+<v Noah Labhart>in the critical moments of what it takes to change an industry and build and lead a team
+
+10
+00:00:59.820 --> 00:01:00.800
+<v Noah Labhart>that has your back.
+
+11
+00:01:02.300 --> 00:01:08.500
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Matt DeBergalis built the tool set to help
+
+12
+00:01:08.500 --> 00:01:10.740
+<v Noah Labhart>developers write apps faster.
+
+13
+00:01:13.580 --> 00:01:15.960
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:21.040 --> 00:01:29.860
+<v Noah Labhart>Matt DeBergalis has been into tech since he was a boy, playing games like Flight Simulator on his Commodore 64 and reviewing the schematics in the handbook.
+
+15
+00:01:30.220 --> 00:01:35.960
+<v Noah Labhart>To Matt, computers are tools to make things possible and enable people to build things quickly.
+
+16
+00:01:36.500 --> 00:01:41.640
+<v Noah Labhart>He loves community building, with his background in politics, and he loves the open source world.
+
+17
+00:01:43.240 --> 00:01:47.760
+<v Noah Labhart>It's a powerful force for organizing people to create what wasn't possible before.
+
+18
+00:01:48.840 --> 00:01:54.560
+<v Noah Labhart>He lives in San Francisco with his wife and six-year-old, and he's a private pilot owning his own plane.
+
+19
+00:01:55.020 --> 00:02:02.460
+<v Noah Labhart>When asked how he balances all he has going on, he quickly replies that anything worth doing is going to require hard work.
+
+20
+00:02:02.580 --> 00:02:05.780
+<v Noah Labhart>For him, this is his family, flights, and code adventures.
+
+21
+00:02:05.780 --> 00:02:12.600
+<v Noah Labhart>Previously, Matt co-wrote an open source product called Meteor, attempting to make it
+
+22
+00:02:12.600 --> 00:02:18.480
+<v Noah Labhart>simpler and faster to write JavaScript applications. At the core of the tool, there was a capability to
+
+23
+00:02:18.480 --> 00:02:24.460
+<v Noah Labhart>write a query to move data around instead of writing the code. He and his team took that
+
+24
+00:02:24.460 --> 00:02:32.300
+<v Noah Labhart>capability and formed what they're focused on now. This is the creation story of Apollo GraphQL.
+
+25
+00:02:37.840 --> 00:02:39.360
+<v Matt DeBergalis>Apollo is an open source company.
+
+26
+00:02:39.500 --> 00:02:41.880
+<v Matt DeBergalis>We make tools for application developers.
+
+27
+00:02:42.100 --> 00:02:51.500
+<v Matt DeBergalis>And in particular, GraphQL is a technology that dramatically accelerates how quickly a developer can build a great product.
+
+28
+00:02:51.760 --> 00:02:57.860
+<v Matt DeBergalis>And the way I would think about it is when you think of an app, turns out there's two pieces to writing an app.
+
+29
+00:02:58.360 --> 00:03:01.120
+<v Matt DeBergalis>Part of it is designing the screen.
+
+30
+00:03:01.120 --> 00:03:06.920
+<v Matt DeBergalis>and if you're familiar with software development, you would know technologies like React or Angular
+
+31
+00:03:06.920 --> 00:03:12.820
+<v Matt DeBergalis>as tools that developers use on the web, or you would think about Cocoa as something you might
+
+32
+00:03:12.820 --> 00:03:17.680
+<v Matt DeBergalis>use to build an iOS app. So that's the interface. You're actually making boxes, you're figuring out
+
+33
+00:03:17.680 --> 00:03:21.740
+<v Matt DeBergalis>what the screen layout is going to be, how you navigate through the app, everything that makes
+
+34
+00:03:21.740 --> 00:03:28.360
+<v Matt DeBergalis>a really rich modern experience. That's the fun part. The other part of making an app is all the
+
+35
+00:03:28.360 --> 00:03:34.220
+<v Matt DeBergalis>the code you have to write to connect the UI you built to all of the data that you want to put on
+
+36
+00:03:34.220 --> 00:03:38.900
+<v Matt DeBergalis>the screen. If you think about building an application for an e-commerce store, right,
+
+37
+00:03:38.960 --> 00:03:44.600
+<v Matt DeBergalis>you've got to go fetch data about your products, reviews, maybe pricing, maybe a recommendation,
+
+38
+00:03:44.940 --> 00:03:51.780
+<v Matt DeBergalis>all kinds of different pieces of data. And it turns out the bulk of the time spent making
+
+39
+00:03:51.780 --> 00:03:57.840
+<v Matt DeBergalis>applications is actually that plumbing. And what Apollo does is help you replace the plumbing that
+
+40
+00:03:58.360 --> 00:04:01.260
+<v Matt DeBergalis>write by hand, think of it as running a bunch of wires
+
+41
+00:04:01.260 --> 00:04:04.400
+<v Matt DeBergalis>or connections between your APIs and your UI.
+
+42
+00:04:04.640 --> 00:04:07.460
+<v Matt DeBergalis>You can replace all that with a database query,
+
+43
+00:04:07.660 --> 00:04:10.280
+<v Matt DeBergalis>something that looks much more like a description
+
+44
+00:04:10.280 --> 00:04:12.500
+<v Matt DeBergalis>of the data that you wanna put on the screen.
+
+45
+00:04:12.980 --> 00:04:15.960
+<v Matt DeBergalis>And Apollo is a system that handles all the details for you.
+
+46
+00:04:17.080 --> 00:04:20.260
+<v Matt DeBergalis>So we came to this by way of an open source project
+
+47
+00:04:20.260 --> 00:04:23.240
+<v Matt DeBergalis>called Meteor that I co-wrote with my co-founders here.
+
+48
+00:04:23.480 --> 00:04:26.820
+<v Matt DeBergalis>Meteor was an effort to make it dramatically easier
+
+49
+00:04:28.360 --> 00:04:34.640
+<v Matt DeBergalis>write modern applications in JavaScript. And it included a lot of ideas, but really at the core
+
+50
+00:04:34.640 --> 00:04:41.500
+<v Matt DeBergalis>of Meteor was this capability that let you write a query instead of having to write all the code
+
+51
+00:04:41.500 --> 00:04:47.180
+<v Matt DeBergalis>to move data around. And Apollo is really just an outgrowth of that. We realized how valuable this
+
+52
+00:04:47.180 --> 00:04:51.980
+<v Matt DeBergalis>was not just for Meteor developers, but really for any developer, any team, any company trying
+
+53
+00:04:51.980 --> 00:04:53.540
+<v Matt DeBergalis>trying to build modern applications.
+
+54
+00:04:54.360 --> 00:04:55.720
+<v Matt DeBergalis>That's basically everybody.
+
+55
+00:04:56.400 --> 00:04:59.940
+<v Matt DeBergalis>And we found a way to craft this
+
+56
+00:04:59.940 --> 00:05:03.780
+<v Matt DeBergalis>so that any team could adopt it piece by piece
+
+57
+00:05:03.780 --> 00:05:07.020
+<v Matt DeBergalis>and bring it into the UI and the services
+
+58
+00:05:07.020 --> 00:05:08.540
+<v Matt DeBergalis>that they already had in the organization.
+
+59
+00:05:09.280 --> 00:05:11.340
+<v Matt DeBergalis>So our bread and butter business
+
+60
+00:05:11.340 --> 00:05:13.820
+<v Matt DeBergalis>is helping developers build great apps,
+
+61
+00:05:13.980 --> 00:05:16.600
+<v Matt DeBergalis>build them quickly, build them with larger teams.
+
+62
+00:05:16.740 --> 00:05:19.440
+<v Matt DeBergalis>And ultimately, that means helping companies
+
+63
+00:05:19.440 --> 00:05:24.580
+<v Matt DeBergalis>companies put better experiences in front of their customers, in front of their users,
+
+64
+00:05:24.820 --> 00:05:27.100
+<v Matt DeBergalis>anybody that's interacting with the data they have.
+
+65
+00:05:29.360 --> 00:05:32.980
+<v Noah Labhart>Well, tell me about the MVP. So that first product you created,
+
+66
+00:05:33.480 --> 00:05:37.200
+<v Noah Labhart>how long did it take to build and what sort of tools did you use to bring it to life?
+
+67
+00:05:39.000 --> 00:05:45.240
+<v Matt DeBergalis>Well, the foundation of our business is open source. I suppose the most M, most V, most P
+
+68
+00:05:45.240 --> 00:05:51.540
+<v Matt DeBergalis>was a library that we wrote called Apollo Client. This is something written in JavaScript.
+
+69
+00:05:52.140 --> 00:05:57.720
+<v Matt DeBergalis>JavaScript, by the way, is a fascinating language, I think. It's the industry standard for how
+
+70
+00:05:57.720 --> 00:06:02.940
+<v Matt DeBergalis>anything on the web gets written, anything that you're interacting with that runs inside a browser.
+
+71
+00:06:04.480 --> 00:06:08.040
+<v Matt DeBergalis>Little side story, JavaScript got written originally in about 10 days.
+
+72
+00:06:08.040 --> 00:06:18.720
+<v Matt DeBergalis>It was a frantic attempt to create enough of a language that would let people do more with this new web technology that was coming about.
+
+73
+00:06:19.140 --> 00:06:28.460
+<v Matt DeBergalis>And it was really a toy. I mean, if you want to talk about MVP, the first versions of JavaScript were in many ways too simple, too slow, too buggy.
+
+74
+00:06:28.460 --> 00:06:35.300
+<v Matt DeBergalis>what's so interesting is how over the years and decades that followed, so many web developers
+
+75
+00:06:35.300 --> 00:06:40.300
+<v Matt DeBergalis>started building applications with JavaScript. The early days of JavaScript, it was about
+
+76
+00:06:40.300 --> 00:06:44.540
+<v Matt DeBergalis>disabling a button so you didn't accidentally click it twice and buy a product two times,
+
+77
+00:06:44.660 --> 00:06:52.400
+<v Matt DeBergalis>right? But it's grown into an incredibly capable language with a vast ecosystem of libraries,
+
+78
+00:06:52.400 --> 00:06:58.120
+<v Matt DeBergalis>subsidiaries, developers, companies. And I think that's kind of an interesting story in its own
+
+79
+00:06:58.120 --> 00:07:05.860
+<v Matt DeBergalis>right, that MVPs can flourish when they solve a real need and when they're easy to adopt,
+
+80
+00:07:06.140 --> 00:07:11.060
+<v Matt DeBergalis>because that creates this virtuous cycle. The more people that work on any technology,
+
+81
+00:07:11.740 --> 00:07:16.300
+<v Matt DeBergalis>the more time people spend improving it, which attracts yet more people, which attracts yet
+
+82
+00:07:16.300 --> 00:07:20.840
+<v Matt DeBergalis>more capital to improve it and so on. One of the things I've learned in my career is
+
+83
+00:07:22.400 --> 00:07:29.380
+<v Matt DeBergalis>about the core technology or the design or the perfect system that determines what really
+
+84
+00:07:29.380 --> 00:07:35.360
+<v Matt DeBergalis>succeeds in the market. And it's more about what's easy to use, what has a really rewarding
+
+85
+00:07:35.360 --> 00:07:40.840
+<v Matt DeBergalis>first experience for anybody that chooses to use it, what creates a sense of confidence that if I
+
+86
+00:07:40.840 --> 00:07:45.220
+<v Matt DeBergalis>use this technology, I'm not going to be the last person to choose it, but rather I'm going to be at
+
+87
+00:07:45.220 --> 00:07:50.520
+<v Matt DeBergalis>the forefront of a growing movement. That's job security. That makes me an expert at a valuable
+
+88
+00:07:52.400 --> 00:08:06.960
+<v Matt DeBergalis>And so I've thought more and more about how do we make Apollo, how do we just generally make technologies that are attractive to adopt and that have a really nice cycle where the more we use them, the more they serve us and the more they help us serve other people.
+
+89
+00:08:08.160 --> 00:08:13.580
+<v Matt DeBergalis>So yeah, the MVP for Apollo was this library in JavaScript called Apollo Client.
+
+90
+00:08:14.100 --> 00:08:15.940
+<v Matt DeBergalis>It was really designed to do two things.
+
+91
+00:08:16.040 --> 00:08:18.140
+<v Matt DeBergalis>One is it solved this problem I was talking about.
+
+92
+00:08:18.140 --> 00:08:26.400
+<v Matt DeBergalis>If I'm a web developer using JavaScript, instead of writing all that plumbing code I talked about earlier, it let me start trying out this GraphQL idea.
+
+93
+00:08:26.640 --> 00:08:39.140
+<v Matt DeBergalis>And the other thing it did was, from an open source community perspective, Apollo Client served another need in the ecosystem, which is it gave these developers that wanted to go down this path with us a place to collaborate.
+
+94
+00:08:39.460 --> 00:08:45.860
+<v Matt DeBergalis>And I think one of the most important things about any open source project is that it have a welcoming front door.
+
+95
+00:08:45.860 --> 00:08:55.560
+<v Matt DeBergalis>Open source is great because of the community it creates, and it's powerful because it empowers developers to improve the product itself.
+
+96
+00:08:55.840 --> 00:08:59.880
+<v Matt DeBergalis>It's not a closed system that comes to you from an outside vendor.
+
+97
+00:09:00.060 --> 00:09:02.800
+<v Matt DeBergalis>It's a living, breathing product itself that everybody can improve.
+
+98
+00:09:03.560 --> 00:09:06.500
+<v Matt DeBergalis>And so we actually designed Apollo Client first and foremost.
+
+99
+00:09:06.920 --> 00:09:13.660
+<v Matt DeBergalis>In some sense, its key feature was that we welcomed contributions from developers across the ecosystem.
+
+100
+00:09:13.660 --> 00:09:18.280
+<v Matt DeBergalis>system. And that let us start to build not just a piece of technology that solved the problem,
+
+101
+00:09:18.380 --> 00:09:23.840
+<v Matt DeBergalis>but a movement of developers that were eager to help us solve that problem. And out of that came
+
+102
+00:09:23.840 --> 00:09:27.520
+<v Matt DeBergalis>many of the people that work at the company today, many of the companies that have adopted
+
+103
+00:09:27.520 --> 00:09:35.100
+<v Matt DeBergalis>Apollo since an early time. It's all downstream of that focus on inclusion and community and
+
+104
+00:09:35.100 --> 00:09:37.020
+<v Matt DeBergalis>giving people a place to contribute.
+
+105
+00:09:38.860 --> 00:09:41.260
+<v Noah Labhart>So, you know, with any MVP, right,
+
+106
+00:09:41.260 --> 00:09:45.880
+<v Noah Labhart>there's decisions and trade-offs that you have to make, right? Feature cut, technical debt.
+
+107
+00:09:45.940 --> 00:09:52.380
+<v Noah Labhart>Technical debt may be interesting with the open source nature. What sort of decisions and trade-offs
+
+108
+00:09:52.380 --> 00:09:57.520
+<v Noah Labhart>did you have to make in the short term with Apollo GraphQL? And then how did you cope with
+
+109
+00:09:57.520 --> 00:09:58.080
+<v Noah Labhart>those decisions?
+
+110
+00:09:58.900 --> 00:10:04.480
+<v Matt DeBergalis>Yeah, tech debt and open source is interesting because of that nature I was
+
+111
+00:10:04.480 --> 00:10:11.380
+<v Matt DeBergalis>is describing earlier, if you build a product, a closed commercial product, and you put it into
+
+112
+00:10:11.380 --> 00:10:16.940
+<v Matt DeBergalis>the market, customers have certain expectations of it, right? I mean, you can ship a minimum viable
+
+113
+00:10:16.940 --> 00:10:21.960
+<v Matt DeBergalis>product that has lots of bugs and issues. But if you're building a developer tool, if you're
+
+114
+00:10:21.960 --> 00:10:25.740
+<v Matt DeBergalis>building something that developers have to count on as a building block for their own applications,
+
+115
+00:10:26.040 --> 00:10:31.340
+<v Matt DeBergalis>there's a certain quality that's necessary for them to be able to depend on it. With open source,
+
+116
+00:10:31.340 --> 00:10:37.200
+<v Matt DeBergalis>the equation changes a bit because when they run into a limitation or a flaw or a bug in your open
+
+117
+00:10:37.200 --> 00:10:41.660
+<v Matt DeBergalis>source product, there's an opportunity. It's actually a prompt for a conversation about,
+
+118
+00:10:41.740 --> 00:10:48.440
+<v Matt DeBergalis>well, how can we improve this? So the MVP that we built made use of this. The first versions of
+
+119
+00:10:48.440 --> 00:10:53.460
+<v Matt DeBergalis>Apollo Client were slow. They didn't have features that people thought were important.
+
+120
+00:10:53.660 --> 00:10:57.920
+<v Matt DeBergalis>There were lots of limitations, but sort of the killer feature in some sense, the thing that made
+
+121
+00:10:57.920 --> 00:11:03.660
+<v Matt DeBergalis>all of that acceptable was the fact that it was a living breathing product that could change and we
+
+122
+00:11:03.660 --> 00:11:08.800
+<v Matt DeBergalis>took frequent updates and we evolved it. The other thing that gives you is it's it's much more
+
+123
+00:11:08.800 --> 00:11:13.880
+<v Matt DeBergalis>important to find a small number of people that really love what you've built and that would be
+
+124
+00:11:14.520 --> 00:11:20.060
+<v Matt DeBergalis>in a tough spot if you took it away from them than it is to find a shallower, broader base of
+
+125
+00:11:20.060 --> 00:11:24.240
+<v Matt DeBergalis>people that kind of sort of like it and use it, but if it went away they wouldn't really mind
+
+126
+00:11:24.240 --> 00:11:31.720
+<v Matt DeBergalis>too much, they would find an alternative. Those first users of Apollo Client are people that
+
+127
+00:11:31.720 --> 00:11:37.420
+<v Matt DeBergalis>did bring it into their applications. They saw extraordinary benefit. And while they had to do
+
+128
+00:11:37.420 --> 00:11:42.900
+<v Matt DeBergalis>a lot of work on their side to complete the picture, they were excited about that work
+
+129
+00:11:42.900 --> 00:11:46.680
+<v Matt DeBergalis>because it was the kind of work they wanted to be doing. And we were able to leverage that first
+
+130
+00:11:46.680 --> 00:11:51.280
+<v Matt DeBergalis>set of adoption companies into more and more momentum around this.
+
+131
+00:11:53.000 --> 00:11:58.640
+<v Noah Labhart>Then how did you progress the product from there? How did you mature the product? And I think I'm
+
+132
+00:11:58.640 --> 00:12:05.160
+<v Noah Labhart>interested too, like, how did you decide what was the next most important thing to build, and in
+
+133
+00:12:05.160 --> 00:12:09.780
+<v Noah Labhart>doing that, you know, build your roadmap? You
+
+134
+00:12:09.780 --> 00:12:12.940
+<v Matt DeBergalis>know, one of the benefits of any growing user base
+
+135
+00:12:12.940 --> 00:12:18.780
+<v Matt DeBergalis>or a community is you can often just ask what would you like next and they'll tell you you know
+
+136
+00:12:18.780 --> 00:12:26.100
+<v Matt DeBergalis>The classic cycle that you want to create is you have clarity about maybe a strategic direction,
+
+137
+00:12:26.320 --> 00:12:30.040
+<v Matt DeBergalis>and then you use that to identify a set of users that you want to serve.
+
+138
+00:12:30.200 --> 00:12:33.980
+<v Matt DeBergalis>And then you just ask them, what would you like to see that comes next?
+
+139
+00:12:34.100 --> 00:12:38.740
+<v Matt DeBergalis>So for example, GraphQL, like any API, really has two pieces.
+
+140
+00:12:38.980 --> 00:12:44.800
+<v Matt DeBergalis>There's the side of the system that produces the data, and there's the side that consumes the data.
+
+141
+00:12:44.920 --> 00:12:48.160
+<v Matt DeBergalis>You can think of an API like a connection between two things.
+
+142
+00:12:48.780 --> 00:12:53.740
+<v Matt DeBergalis>you have both sides of that connection agreeing, you haven't yet solved the problem.
+
+143
+00:12:54.980 --> 00:12:57.600
+<v Matt DeBergalis>So Apollo Client is one side of the equation.
+
+144
+00:12:57.820 --> 00:13:04.040
+<v Matt DeBergalis>It explains how a team with a GraphQL API can connect that API to their user interface.
+
+145
+00:13:04.320 --> 00:13:06.960
+<v Matt DeBergalis>And it's got all these benefits we talked about.
+
+146
+00:13:07.440 --> 00:13:10.940
+<v Matt DeBergalis>The challenge is, how do you solve the chicken and egg problem?
+
+147
+00:13:11.100 --> 00:13:16.160
+<v Matt DeBergalis>How do you also make sure that the data is available in GraphQL form?
+
+148
+00:13:16.160 --> 00:13:23.160
+<v Matt DeBergalis>And so pretty quickly after Apollo Client, we found ourselves building what we now call Apollo Server, which is the other half of the picture.
+
+149
+00:13:23.320 --> 00:13:33.560
+<v Matt DeBergalis>And I think if you look inside almost any rapidly growing piece of technology, you'll find one of the problems that had to get solved is you don't just need an MVP.
+
+150
+00:13:33.960 --> 00:13:44.460
+<v Matt DeBergalis>You need a whole answer, kind of an end-to-end answer that creates the incentive for a team to adopt it enough to see value.
+
+151
+00:13:46.160 --> 00:13:49.140
+<v Matt DeBergalis>And some products benefit from having a very short time to value.
+
+152
+00:13:49.540 --> 00:13:55.000
+<v Matt DeBergalis>Something Slack did very well, for example, is that in one minute, right, you could get
+
+153
+00:13:55.000 --> 00:13:58.000
+<v Matt DeBergalis>a team of two or three or four people up and running on Slack.
+
+154
+00:13:58.160 --> 00:13:59.440
+<v Matt DeBergalis>You could send each other a message.
+
+155
+00:13:59.600 --> 00:14:02.580
+<v Matt DeBergalis>It's probably got a cool reaction or emoji or something in there.
+
+156
+00:14:02.640 --> 00:14:03.380
+<v Matt DeBergalis>And at that point, you're hooked.
+
+157
+00:14:03.460 --> 00:14:04.140
+<v Matt DeBergalis>You get it.
+
+158
+00:14:04.160 --> 00:14:04.840
+<v Matt DeBergalis>You see the value.
+
+159
+00:14:05.120 --> 00:14:06.720
+<v Matt DeBergalis>It's better than the thing you had before.
+
+160
+00:14:07.540 --> 00:14:11.160
+<v Matt DeBergalis>But with developer tools, it's a more complex journey.
+
+161
+00:14:11.160 --> 00:14:26.120
+<v Matt DeBergalis>I mean, the reality is most of the technology that we rely on that's actually mature enough to build a real application with needs more than a couple of minutes before you're proficient with it, before you've rolled it out at sufficient scale to see its benefit.
+
+162
+00:14:26.660 --> 00:14:29.400
+<v Matt DeBergalis>Right. You can't learn a language generally in two or three minutes.
+
+163
+00:14:30.220 --> 00:14:50.180
+<v Matt DeBergalis>So with Apollo, a big part of the challenge is how do you walk that fine line where you want to make sure that initial experience is delightful, it's simple, it's approachable, without in any way undermining the technical sophistication or quality that's so important.
+
+164
+00:14:50.360 --> 00:14:52.280
+<v Matt DeBergalis>Because developers are wicked savvy, right?
+
+165
+00:14:52.340 --> 00:14:57.420
+<v Matt DeBergalis>They're not going to adopt a piece of technology if it smells like something that's going to lead them to a dead end.
+
+166
+00:14:59.400 --> 00:15:05.640
+<v Matt DeBergalis>all the time, right? We see lots of really intriguing libraries, tools, SaaS products
+
+167
+00:15:05.640 --> 00:15:12.320
+<v Matt DeBergalis>that I think over-rotate around simplicity, around ease of onboarding. And then you get there and you
+
+168
+00:15:12.320 --> 00:15:16.920
+<v Matt DeBergalis>think, wait a second, like, I love this. This is fun. It might be a good choice for my hobby
+
+169
+00:15:16.920 --> 00:15:25.280
+<v Matt DeBergalis>project. Am I really going to transition sort of a key piece of my whole technology strategy at my
+
+170
+00:15:25.280 --> 00:15:31.180
+<v Matt DeBergalis>my business onto this thing? Eh, maybe not. And then you see other technologies that are
+
+171
+00:15:31.180 --> 00:15:36.800
+<v Matt DeBergalis>incredibly sophisticated, incredibly capable. And the problem is the on-ramp is just too daunting.
+
+172
+00:15:37.460 --> 00:15:43.560
+<v Matt DeBergalis>And they end up being a little bit esoteric. If you really, really need them and somehow you've
+
+173
+00:15:43.560 --> 00:15:48.000
+<v Matt DeBergalis>taken the time to reason about the problem long enough to feel confident in your judgment,
+
+174
+00:15:48.120 --> 00:15:53.040
+<v Matt DeBergalis>then you can adopt them even at high cost. But your typical team, they're too busy. They're not
+
+175
+00:15:53.040 --> 00:15:55.520
+<v Matt DeBergalis>They're not going to have the time and the space for that.
+
+176
+00:15:55.700 --> 00:16:19.540
+<v Matt DeBergalis>And I think one of the trends in software development over the last 10 years with Agile, with modern DevOps and the tools that support that is savvy leaders in the software development industry no longer buy any kind of argument that starts with our team's going to need a year or two to go do a big rewrite or to transition to a new piece of technology.
+
+177
+00:16:20.040 --> 00:16:25.340
+<v Matt DeBergalis>that's too risky and it doesn't show value and it's just hard to justify these days.
+
+178
+00:16:25.460 --> 00:16:31.020
+<v Matt DeBergalis>So we're finding kind of this sweet spot of this Goldilocks where you've got both and you've got
+
+179
+00:16:31.020 --> 00:16:37.300
+<v Matt DeBergalis>them in balance. There's a journey or a path where each step of the way you're in good hands,
+
+180
+00:16:37.420 --> 00:16:41.660
+<v Matt DeBergalis>you see the value, it's worth taking the next step and you have the confidence to take that
+
+181
+00:16:41.660 --> 00:16:45.520
+<v Matt DeBergalis>next step and learn what you need to learn because you can see the benefit you're going
+
+182
+00:16:45.520 --> 00:16:47.860
+<v Matt DeBergalis>going to get from there. And you can bring your team along with you.
+
+183
+00:16:48.500 --> 00:16:51.000
+<v Noah Labhart>Perfect segue into team. So
+
+184
+00:16:51.000 --> 00:16:57.160
+<v Noah Labhart>how did you build your team? And what did you look for in those people to indicate that they
+
+185
+00:16:57.160 --> 00:16:59.120
+<v Noah Labhart>were the winning horses to join you?
+
+186
+00:16:59.860 --> 00:17:03.540
+<v Matt DeBergalis>The answer is inside the question. The answer to how you
+
+187
+00:17:03.540 --> 00:17:11.000
+<v Matt DeBergalis>build a team is to zero in on who's great at building teams. At least at Apollo, the leaders
+
+188
+00:17:11.000 --> 00:17:23.520
+<v Matt DeBergalis>Leaders that have emerged across the organization in engineering, in product, in design, in marketing and sales everywhere are people that, you know, I start with who's the ambassador for our values?
+
+189
+00:17:23.560 --> 00:17:26.160
+<v Matt DeBergalis>Who's great at recruiting people to the cause?
+
+190
+00:17:26.360 --> 00:17:28.820
+<v Matt DeBergalis>Who thinks carefully about team building and development?
+
+191
+00:17:29.180 --> 00:17:33.940
+<v Matt DeBergalis>Who's interested in aligning others to a common purpose?
+
+192
+00:17:34.900 --> 00:17:35.580
+<v Matt DeBergalis>You know, I don't know.
+
+193
+00:17:35.620 --> 00:17:36.380
+<v Matt DeBergalis>There's that quote, right?
+
+194
+00:17:36.440 --> 00:17:37.880
+<v Matt DeBergalis>Culture eats strategy for breakfast.
+
+195
+00:17:38.220 --> 00:17:38.980
+<v Matt DeBergalis>It's true.
+
+196
+00:17:38.980 --> 00:17:49.640
+<v Matt DeBergalis>It's, in my experience, a lot more important to have leaders whose core strength is culture than it is to have any other particular characteristic or optimize for anything else.
+
+197
+00:17:51.040 --> 00:18:02.280
+<v Matt DeBergalis>In an open source company, I think you can embrace that early on, even when your team is small and when you're not necessarily hiring new people every week.
+
+198
+00:18:02.880 --> 00:18:07.660
+<v Matt DeBergalis>Because the whole act of building an open source community is just like hiring.
+
+199
+00:18:08.980 --> 00:18:13.200
+<v Matt DeBergalis>the developers aren't on payroll, but you're still recruiting people. You're still organizing
+
+200
+00:18:13.200 --> 00:18:18.500
+<v Matt DeBergalis>them to contribute different ways to the project. You're still creating teams that are aligned to a
+
+201
+00:18:18.500 --> 00:18:23.700
+<v Matt DeBergalis>common purpose that share a common vision of what the thing can be. And I just think a lot of these
+
+202
+00:18:23.700 --> 00:18:30.860
+<v Matt DeBergalis>are skills that I've learned to appreciate. And as Apollo grows, and now we're in the position
+
+203
+00:18:30.860 --> 00:18:37.220
+<v Matt DeBergalis>where we do have teams of people that are growing very quickly, the place we focus is who can best
+
+204
+00:18:38.980 --> 00:18:44.700
+<v Matt DeBergalis>to the next generation of developers and others who are going to join the company and who can
+
+205
+00:18:44.700 --> 00:18:48.860
+<v Matt DeBergalis>help them grow into the future leaders of that cohort and on from there.
+
+206
+00:18:52.040 --> 00:18:57.100
+<v Noah Labhart>Well, this will be interesting. This is always interesting with an open source solution, but
+
+207
+00:18:57.100 --> 00:19:02.520
+<v Noah Labhart>Apollo GraphQL is a large open source solution. So I'm interested to hear what you have to say
+
+208
+00:19:02.520 --> 00:19:08.860
+<v Noah Labhart>in this topic. Let's talk about scalability. Did you build this to scale efficiently, either
+
+209
+00:19:08.860 --> 00:19:15.180
+<v Noah Labhart>technology-wise or team-wise in the beginning, or were you fighting this as you grew?
+
+210
+00:19:15.960 --> 00:19:16.640
+<v Noah Labhart>For
+
+211
+00:19:16.640 --> 00:19:23.740
+<v Matt DeBergalis>us, scalability in every sense. Is Apollo going to scale inside of a company that adopts
+
+212
+00:19:23.740 --> 00:19:29.820
+<v Matt DeBergalis>it? Is Apollo the company going to be able to scale? That was, for me, the foundation of
+
+213
+00:19:29.820 --> 00:19:30.940
+<v Matt DeBergalis>of everything we were trying to do.
+
+214
+00:19:31.060 --> 00:19:32.640
+<v Matt DeBergalis>This stuff's only interesting
+
+215
+00:19:32.640 --> 00:19:36.280
+<v Matt DeBergalis>if it can serve the most sophisticated companies
+
+216
+00:19:36.280 --> 00:19:38.060
+<v Matt DeBergalis>that are building the most complex products.
+
+217
+00:19:38.480 --> 00:19:41.580
+<v Matt DeBergalis>And GraphQL in particular is, in my view,
+
+218
+00:19:41.700 --> 00:19:44.020
+<v Matt DeBergalis>especially valuable in the largest companies.
+
+219
+00:19:44.160 --> 00:19:47.020
+<v Matt DeBergalis>So this is a technology that was first explored at Facebook.
+
+220
+00:19:47.240 --> 00:19:50.720
+<v Matt DeBergalis>Their fundamental challenge was we have, I don't know,
+
+221
+00:19:50.740 --> 00:19:53.260
+<v Matt DeBergalis>probably on the order of a thousand developers at the time.
+
+222
+00:19:53.380 --> 00:19:56.300
+<v Matt DeBergalis>We need a way, we Facebook, need a way for those developers
+
+223
+00:19:56.300 --> 00:19:59.860
+<v Matt DeBergalis>to all collaborate effectively on an application.
+
+224
+00:20:00.080 --> 00:20:03.160
+<v Matt DeBergalis>We want them shipping as quickly as possible.
+
+225
+00:20:03.240 --> 00:20:06.500
+<v Matt DeBergalis>This is the whole Facebook ethos around software development.
+
+226
+00:20:06.740 --> 00:20:09.800
+<v Matt DeBergalis>And I have my reservations about Facebook
+
+227
+00:20:09.800 --> 00:20:11.960
+<v Matt DeBergalis>in certain respects as a company and a product.
+
+228
+00:20:12.020 --> 00:20:13.700
+<v Matt DeBergalis>But one thing unquestionably,
+
+229
+00:20:13.720 --> 00:20:15.020
+<v Matt DeBergalis>I think Facebook's done well
+
+230
+00:20:15.020 --> 00:20:17.020
+<v Matt DeBergalis>and has shown the world how to do better
+
+231
+00:20:17.020 --> 00:20:20.240
+<v Matt DeBergalis>is orienting the software practice
+
+232
+00:20:20.240 --> 00:20:23.040
+<v Matt DeBergalis>around creating value for their users.
+
+233
+00:20:23.460 --> 00:20:25.900
+<v Matt DeBergalis>And GraphQL is a key piece of that strategy.
+
+234
+00:20:26.300 --> 00:20:33.460
+<v Matt DeBergalis>It lets large teams of developers actually solve user problems by letting them ship the capabilities and the features that those users want.
+
+235
+00:20:33.680 --> 00:20:38.920
+<v Matt DeBergalis>In the past, too much of IT, I think, has been driven by these internal considerations, right?
+
+236
+00:20:39.020 --> 00:20:46.020
+<v Matt DeBergalis>Let's re-architect our database so that we have some sort of better cost structure or some other back-end consideration.
+
+237
+00:20:46.020 --> 00:20:57.440
+<v Matt DeBergalis>And the trend of the last decade has been toward empowering the developers that create business value, that add to the top line by shipping a new feature, by rolling out to a new kind of platform.
+
+238
+00:20:57.660 --> 00:21:08.640
+<v Matt DeBergalis>Think about the companies that quickly got onto mobile when mobile first came out or quickly got onto Alexa and the other voice platforms when those came out and how successful they've been.
+
+239
+00:21:08.720 --> 00:21:11.020
+<v Matt DeBergalis>Or I think about one of our customers is Peloton.
+
+240
+00:21:11.280 --> 00:21:13.020
+<v Matt DeBergalis>I mean, it's just a bike, right?
+
+241
+00:21:13.020 --> 00:21:16.620
+<v Matt DeBergalis>But they figured out how to take a bike and create it into a whole digital experience.
+
+242
+00:21:16.780 --> 00:21:21.420
+<v Matt DeBergalis>And the way they did that was by empowering their teams to write really great software.
+
+243
+00:21:21.500 --> 00:21:29.140
+<v Matt DeBergalis>Not just software on the web like we're used to, but a really integrated software experience that includes a bike that has a digital interface.
+
+244
+00:21:30.100 --> 00:21:33.440
+<v Matt DeBergalis>My point is, this stuff's all about how do we scale?
+
+245
+00:21:33.640 --> 00:21:42.480
+<v Matt DeBergalis>How do we get to the point where we're able to create more and more software and do it faster and faster?
+
+246
+00:21:43.020 --> 00:21:48.280
+<v Matt DeBergalis>the pressure every company is under. And for us, that was always at the heart of
+
+247
+00:21:48.800 --> 00:21:53.700
+<v Matt DeBergalis>the technical architecture that we pursued, the way we thought about structuring our teams,
+
+248
+00:21:54.300 --> 00:21:58.360
+<v Matt DeBergalis>the kinds of developers and the companies that we most wanted to spend our time with,
+
+249
+00:21:58.440 --> 00:22:03.960
+<v Matt DeBergalis>because we knew that they would be the acid test for how this really succeeds in market
+
+250
+00:22:03.960 --> 00:22:07.160
+<v Matt DeBergalis>over the long term. And that's worked, I'd say, pretty well for us.
+
+251
+00:22:08.240 --> 00:22:14.420
+<v Noah Labhart>So as you step out on the balcony and you look across all you've built with Apollo GraphQL,
+
+252
+00:22:14.420 --> 00:22:15.920
+<v Noah Labhart>what are you most proud of?
+
+253
+00:22:15.920 --> 00:22:22.760
+<v Matt DeBergalis>The honest truth is I love the work we do, and I tend to stay humble
+
+254
+00:22:22.760 --> 00:22:26.940
+<v Matt DeBergalis>and just focus on what needs to be done next. I think we've barely scratched the surface.
+
+255
+00:22:28.100 --> 00:22:35.720
+<v Matt DeBergalis>I suppose the thing I would think about is I think it's important that any endeavor like this
+
+256
+00:22:37.160 --> 00:22:39.500
+<v Matt DeBergalis>Our mission is to help application developers.
+
+257
+00:22:39.740 --> 00:22:44.080
+<v Matt DeBergalis>And in particular, we want to help them make the world a better place.
+
+258
+00:22:44.540 --> 00:22:47.800
+<v Matt DeBergalis>Part of what's inside that is you've got to reach a lot of people.
+
+259
+00:22:48.240 --> 00:22:55.300
+<v Matt DeBergalis>Apollo wouldn't be a success in my view through any lens if we only enabled a handful of people to do better work.
+
+260
+00:22:55.640 --> 00:22:57.440
+<v Matt DeBergalis>It's got to be a broad technology.
+
+261
+00:22:57.440 --> 00:23:10.020
+<v Matt DeBergalis>It's got to be technology that a large company can be confident in at the same time as any student going down the path of being a professional application developer or even a hobbyist can approach and can make use of.
+
+262
+00:23:10.760 --> 00:23:13.520
+<v Matt DeBergalis>And I'm proud that we're very early in this.
+
+263
+00:23:13.620 --> 00:23:21.360
+<v Matt DeBergalis>I think the stage is set for Apollo being something that does reach all those different audiences.
+
+264
+00:23:21.720 --> 00:23:26.260
+<v Matt DeBergalis>We've found a way to create something that's valuable for a hobbyist.
+
+265
+00:23:27.720 --> 00:23:30.220
+<v Matt DeBergalis>valuable for a large enterprise.
+
+266
+00:23:30.740 --> 00:23:32.620
+<v Matt DeBergalis>And valuable for a hobbyist means
+
+267
+00:23:32.620 --> 00:23:34.300
+<v Matt DeBergalis>it's easy to get started with
+
+268
+00:23:34.300 --> 00:23:35.520
+<v Matt DeBergalis>and it solves a real problem.
+
+269
+00:23:36.060 --> 00:23:37.940
+<v Matt DeBergalis>Valuable for a large enterprise means
+
+270
+00:23:37.940 --> 00:23:40.880
+<v Matt DeBergalis>it has a business impact that you can measure
+
+271
+00:23:40.880 --> 00:23:43.460
+<v Matt DeBergalis>and it's something that they'll pay for.
+
+272
+00:23:44.780 --> 00:23:47.900
+<v Matt DeBergalis>That economic property is what funds the whole thing.
+
+273
+00:23:48.020 --> 00:23:49.320
+<v Matt DeBergalis>So we've had to solve,
+
+274
+00:23:49.420 --> 00:23:50.660
+<v Matt DeBergalis>and I think open source businesses
+
+275
+00:23:50.660 --> 00:23:52.720
+<v Matt DeBergalis>are just kind of complicated on the inside
+
+276
+00:23:52.720 --> 00:23:53.300
+<v Matt DeBergalis>because of this,
+
+277
+00:23:53.340 --> 00:23:54.180
+<v Matt DeBergalis>because you're really serving
+
+278
+00:23:54.180 --> 00:23:56.480
+<v Matt DeBergalis>so many different needs and use cases.
+
+279
+00:23:57.440 --> 00:24:01.780
+<v Matt DeBergalis>find a way to bring all that together so that you've got a flourishing business, a flourishing
+
+280
+00:24:01.780 --> 00:24:06.640
+<v Matt DeBergalis>ecosystem, a solid piece of technology, all the things we've been talking about. And I'd say I'm
+
+281
+00:24:06.640 --> 00:24:11.380
+<v Matt DeBergalis>just proud that the team has found a way to do all those things. It's not the easiest thing to create.
+
+282
+00:24:12.080 --> 00:24:14.500
+<v Matt DeBergalis>Couldn't be happier with how far we've gotten so far.
+
+283
+00:24:15.900 --> 00:24:21.280
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made and how you and your
+
+284
+00:24:21.280 --> 00:24:22.740
+<v Noah Labhart>your team responded to it?
+
+285
+00:24:23.260 --> 00:24:27.620
+<v Matt DeBergalis>Oh gosh, I don't know if we have that kind of time. It's mistake after
+
+286
+00:24:27.620 --> 00:24:33.500
+<v Matt DeBergalis>mistake like any business. Apollo is interesting to me precisely because it's a technology that
+
+287
+00:24:33.500 --> 00:24:40.100
+<v Matt DeBergalis>large companies can put into their IT strategy. It's not something that you use on the margins.
+
+288
+00:24:40.300 --> 00:24:45.040
+<v Matt DeBergalis>It's not something for hobby projects. And that's really pushed us as a company because what's
+
+289
+00:24:45.040 --> 00:24:52.780
+<v Matt DeBergalis>happened many times is a team that trusts us has adopted Apollo and they've run into an issue.
+
+290
+00:24:52.920 --> 00:25:02.020
+<v Matt DeBergalis>And at this setting, an issue is a way of saying like their website went down or they lost time,
+
+291
+00:25:02.260 --> 00:25:08.660
+<v Matt DeBergalis>something that they planned to ship had to slip because of confusion about Apollo or because of
+
+292
+00:25:08.660 --> 00:25:14.540
+<v Matt DeBergalis>a bug inside Apollo. We've had this happen many times and, you know, candidly, it's going to
+
+293
+00:25:15.040 --> 00:25:20.900
+<v Matt DeBergalis>And I think part of learning how to navigate that is to start by recognizing that you're going to make mistakes.
+
+294
+00:25:21.200 --> 00:25:25.160
+<v Matt DeBergalis>You're going to make commitments based on what you learned when you made those mistakes.
+
+295
+00:25:25.280 --> 00:25:27.220
+<v Matt DeBergalis>And sometimes you're going to break those commitments.
+
+296
+00:25:27.480 --> 00:25:28.740
+<v Matt DeBergalis>So you need to be resilient.
+
+297
+00:25:29.040 --> 00:25:30.220
+<v Matt DeBergalis>You need to have a culture.
+
+298
+00:25:30.460 --> 00:25:36.080
+<v Matt DeBergalis>You need to have a genuine relationship with your customers that can survive that.
+
+299
+00:25:36.140 --> 00:25:39.100
+<v Matt DeBergalis>In fact, where those sorts of mistakes actually make you stronger.
+
+300
+00:25:39.640 --> 00:25:42.860
+<v Matt DeBergalis>And I think about on paper, some of the worst things we've done.
+
+301
+00:25:42.860 --> 00:25:51.300
+<v Matt DeBergalis>I mean, there was a particular customer, one of the largest customers that we had at the time that had really trusted their whole core product to Apollo.
+
+302
+00:25:51.560 --> 00:25:53.060
+<v Matt DeBergalis>And we made a technical error.
+
+303
+00:25:53.160 --> 00:25:59.140
+<v Matt DeBergalis>And like a lot of these mistakes, it's the confluence of three or four factors that all came together and their site went down.
+
+304
+00:25:59.260 --> 00:26:01.280
+<v Matt DeBergalis>That could have been the lowest moment for us.
+
+305
+00:26:01.420 --> 00:26:02.960
+<v Matt DeBergalis>I got to tell you, we did a retro.
+
+306
+00:26:03.120 --> 00:26:05.420
+<v Matt DeBergalis>We did it jointly with the customer.
+
+307
+00:26:05.700 --> 00:26:08.500
+<v Matt DeBergalis>That's a healthy exercise that I would recommend to anybody.
+
+308
+00:26:08.500 --> 00:26:14.000
+<v Matt DeBergalis>Out of that, we emerged far stronger collaborators than we were before. And I learned
+
+309
+00:26:14.000 --> 00:26:19.780
+<v Matt DeBergalis>a lot about what's really important in these relationships, especially enterprise software
+
+310
+00:26:19.780 --> 00:26:25.440
+<v Matt DeBergalis>relationships. Companies are making big long-term bets on you. And one of the values we have here
+
+311
+00:26:25.440 --> 00:26:29.840
+<v Matt DeBergalis>at Apollo is stewardship. And we talk about how it's really great that so many companies have
+
+312
+00:26:29.840 --> 00:26:36.580
+<v Matt DeBergalis>adopted what we've built, but with that comes a real responsibility. It means we've got to
+
+313
+00:26:38.500 --> 00:26:46.160
+<v Matt DeBergalis>are built on Apollo. Careers have been bet on Apollo. Our ideas have persuaded people to make
+
+314
+00:26:46.160 --> 00:26:52.480
+<v Matt DeBergalis>decisions and we owe it to them and to ourselves to make good on those decisions that they've made,
+
+315
+00:26:52.520 --> 00:26:57.880
+<v Matt DeBergalis>to make those bets pay off. And they all went in eyes wide open. We didn't fool them, but we've
+
+316
+00:26:57.880 --> 00:27:02.340
+<v Matt DeBergalis>still, I think, very much created an obligation for ourselves. And that's really core to our
+
+317
+00:27:02.340 --> 00:27:07.940
+<v Matt DeBergalis>culture, is we just ask every day, what is actually the thing we do that can best serve
+
+318
+00:27:08.500 --> 00:27:09.640
+<v Matt DeBergalis>And we're not perfect.
+
+319
+00:27:09.720 --> 00:27:10.340
+<v Matt DeBergalis>Nobody's perfect.
+
+320
+00:27:10.420 --> 00:27:11.340
+<v Matt DeBergalis>So we're going to make mistakes.
+
+321
+00:27:11.580 --> 00:27:23.180
+<v Matt DeBergalis>But I think if you build on that kind of a foundation of genuine partnership, it leaves a lot of room actually to grow and be stronger because of those missteps.
+
+322
+00:27:25.080 --> 00:27:29.320
+<v Noah Labhart>Well, what does the future look like for your product and for your team?
+
+323
+00:27:30.560 --> 00:27:40.520
+<v Matt DeBergalis>Well, it's my view that every company that has software, every company that wants to build a modern digital experience, which is virtually everybody out there, should be using Apollo.
+
+324
+00:27:40.840 --> 00:27:48.960
+<v Matt DeBergalis>It's a technology that really enables teams large and small to make better products and make them more quickly.
+
+325
+00:27:49.800 --> 00:27:53.740
+<v Matt DeBergalis>We're in an era of everything going digital.
+
+326
+00:27:53.740 --> 00:27:57.400
+<v Matt DeBergalis>and the pandemic only accelerated that,
+
+327
+00:27:57.460 --> 00:27:58.400
+<v Matt DeBergalis>but it was already happening
+
+328
+00:27:58.400 --> 00:27:59.780
+<v Matt DeBergalis>and it will continue to happen.
+
+329
+00:28:00.200 --> 00:28:02.640
+<v Matt DeBergalis>So we're very much thinking long-term.
+
+330
+00:28:02.700 --> 00:28:04.860
+<v Matt DeBergalis>We're planning for the long haul.
+
+331
+00:28:05.260 --> 00:28:10.080
+<v Matt DeBergalis>I think platforms are things that get built
+
+332
+00:28:10.080 --> 00:28:11.400
+<v Matt DeBergalis>over the course of a decade
+
+333
+00:28:11.400 --> 00:28:13.000
+<v Matt DeBergalis>and they last for many decades.
+
+334
+00:28:13.380 --> 00:28:16.140
+<v Matt DeBergalis>So we're still, I think I said earlier,
+
+335
+00:28:16.400 --> 00:28:18.260
+<v Matt DeBergalis>we're really just scratching the surface
+
+336
+00:28:18.260 --> 00:28:19.360
+<v Matt DeBergalis>and at the start of this
+
+337
+00:28:19.360 --> 00:28:21.340
+<v Matt DeBergalis>and the future is going to look like
+
+338
+00:28:21.340 --> 00:28:23.360
+<v Matt DeBergalis>a larger and larger team here at Apollo
+
+339
+00:28:23.740 --> 00:28:32.580
+<v Matt DeBergalis>serving a larger and larger community of developers that value what we build and have used it to improve their own craft and accelerate their own efforts.
+
+340
+00:28:34.880 --> 00:28:38.980
+<v Noah Labhart>Let's switch to you, Matt. Who influences the way that you work?
+
+341
+00:28:39.220 --> 00:28:45.240
+<v Noah Labhart>CEO, CTO, architect, name any person really that you look up to and why.
+
+342
+00:28:46.440 --> 00:28:50.060
+<v Matt DeBergalis>Well, my co-founder and our CEO is a good friend of mine.
+
+343
+00:28:50.060 --> 00:28:57.660
+<v Matt DeBergalis>We have worked together for coming up on 20 years now on this and that and the other thing, going all the way back to college.
+
+344
+00:28:57.840 --> 00:29:00.300
+<v Matt DeBergalis>And we really enjoy working together.
+
+345
+00:29:00.620 --> 00:29:05.160
+<v Matt DeBergalis>I think any startup in some sense is an irrational exercise.
+
+346
+00:29:06.120 --> 00:29:10.400
+<v Matt DeBergalis>You cannot pencil out on paper sometimes why these things make sense.
+
+347
+00:29:10.600 --> 00:29:14.720
+<v Matt DeBergalis>And the honest truth is we started the company because we wanted to work together.
+
+348
+00:29:14.720 --> 00:29:33.000
+<v Matt DeBergalis>And, you know, we've got some complementary skills and we've got different ways of holding each other up. Geoff's a brilliant visionary. I don't know anyone as smart or as far thinking as he is. And it's been just a privilege to have a chance to work together on this over these years.
+
+349
+00:29:33.820 --> 00:29:39.640
+<v Matt DeBergalis>you'll hear from a lot of people in the early stage startup community how important the founder
+
+350
+00:29:39.640 --> 00:29:44.720
+<v Matt DeBergalis>relationship is, the co-founder relationship. And we've been through enough bad days that I'm
+
+351
+00:29:44.720 --> 00:29:50.440
+<v Matt DeBergalis>confident nothing's going to really test that relationship. We trust each other 100%. And that's
+
+352
+00:29:50.440 --> 00:29:57.140
+<v Matt DeBergalis>let us, I think, model that trust for our team. And that in turn is really why we have gotten to
+
+353
+00:29:57.140 --> 00:29:57.640
+<v Matt DeBergalis>of the place we have.
+
+354
+00:29:59.220 --> 00:30:03.020
+<v Noah Labhart>Well, if you could go back to the beginning, what would you do differently?
+
+355
+00:30:03.120 --> 00:30:05.560
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+356
+00:30:06.600 --> 00:30:12.080
+<v Matt DeBergalis>Well, there's a thousand things with hindsight we've learned and would do differently, but
+
+357
+00:30:13.040 --> 00:30:19.940
+<v Matt DeBergalis>I don't know. I'm proud of the way we've navigated building the business. I also think
+
+358
+00:30:19.940 --> 00:30:24.560
+<v Matt DeBergalis>I think modern open source is a rapidly evolving discipline.
+
+359
+00:30:24.960 --> 00:30:30.680
+<v Matt DeBergalis>And a lot of what's now clear in the open source community, questions around, for example,
+
+360
+00:30:30.780 --> 00:30:33.840
+<v Matt DeBergalis>how do you license your software or just what's the business model for open source?
+
+361
+00:30:33.940 --> 00:30:38.780
+<v Matt DeBergalis>We haven't talked about that much, but just to be clear, when we say open source, the
+
+362
+00:30:38.780 --> 00:30:40.660
+<v Matt DeBergalis>code we write is free to use.
+
+363
+00:30:40.800 --> 00:30:45.240
+<v Matt DeBergalis>So people have thought about different ways over the course of the last 20 years.
+
+364
+00:30:45.440 --> 00:30:46.760
+<v Matt DeBergalis>How do you make money on open source?
+
+365
+00:30:46.960 --> 00:30:48.340
+<v Matt DeBergalis>Do you make money by supporting it?
+
+366
+00:30:49.940 --> 00:30:54.300
+<v Matt DeBergalis>complementary commercial product? Do you make money by running it in the cloud? Do you make money by
+
+367
+00:30:54.300 --> 00:30:59.260
+<v Matt DeBergalis>doing implementation on top of the core that you've built? There's all kinds of models. And
+
+368
+00:30:59.920 --> 00:31:05.200
+<v Matt DeBergalis>it's easy to forget how quickly those models have evolved and how much we've all learned from each
+
+369
+00:31:05.200 --> 00:31:10.340
+<v Matt DeBergalis>other as we've done this. But look, I wouldn't do it differently. I think the key is always going to
+
+370
+00:31:10.340 --> 00:31:14.660
+<v Matt DeBergalis>be the same. Find good people you want to work with. Build a business model where your interests
+
+371
+00:31:14.660 --> 00:31:19.060
+<v Matt DeBergalis>are aligned with your customers so that you're working as common partners instead of trying to
+
+372
+00:31:19.940 --> 00:31:23.560
+<v Matt DeBergalis>something from them and keep it for yourself and, you know, be thoughtful and curious and listen.
+
+373
+00:31:23.740 --> 00:31:27.740
+<v Matt DeBergalis>And like I said, you're going to make lots of mistakes. The key is what you do after you make
+
+374
+00:31:27.740 --> 00:31:30.420
+<v Matt DeBergalis>those mistakes and how do you respond to them and how do you learn from them and
+
+375
+00:31:31.080 --> 00:31:34.380
+<v Matt DeBergalis>how do you live those values? So I wouldn't touch a thing in that.
+
+376
+00:31:35.540 --> 00:31:40.740
+<v Noah Labhart>Well, last question, Matt. So you're getting on a plane and you're sitting next to a young
+
+377
+00:31:41.200 --> 00:31:45.000
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+378
+00:31:45.000 --> 00:31:48.540
+<v Noah Labhart>show it off to the world. They can't wait to show it off to you right there on the plane.
+
+379
+00:31:49.940 --> 00:31:52.360
+<v Noah Labhart>do you give that person having gone down this road a bit?
+
+380
+00:31:53.000 --> 00:31:56.160
+<v Matt DeBergalis>Well, I'm a pilot, right? So the first
+
+381
+00:31:56.160 --> 00:32:00.780
+<v Matt DeBergalis>thing is we're not going to talk about this until the plane is safely off the ground.
+
+382
+00:32:02.080 --> 00:32:06.260
+<v Matt DeBergalis>We have this thing we call the sterile cockpit. So when you're on the runway, you're not
+
+383
+00:32:06.860 --> 00:32:12.280
+<v Matt DeBergalis>chit-chatting about the next big idea. You're focused on what you got to do to fly and be safe.
+
+384
+00:32:13.800 --> 00:32:18.320
+<v Matt DeBergalis>World's full of advice for startup founders. I'm not going to pretend to know anything that
+
+385
+00:32:19.940 --> 00:32:25.640
+<v Matt DeBergalis>been reading and talking to people wouldn't know from anyone else. I think for me, the thing that
+
+386
+00:32:25.640 --> 00:32:30.740
+<v Matt DeBergalis>I come back to is people talk about doing what you love, and I think that's important,
+
+387
+00:32:30.980 --> 00:32:35.920
+<v Matt DeBergalis>but I would take it maybe a step further. I think something that the startup ecosystem could
+
+388
+00:32:35.920 --> 00:32:40.900
+<v Matt DeBergalis>be a little bit more thoughtful about, something the venture community could be maybe more thoughtful
+
+389
+00:32:40.900 --> 00:32:47.060
+<v Matt DeBergalis>about is do something that's helpful. Do something that improves the world. And I think almost any
+
+390
+00:32:47.060 --> 00:32:52.060
+<v Matt DeBergalis>Any idea could be shaped in different directions that have different kinds of impact on the world.
+
+391
+00:32:52.180 --> 00:32:58.520
+<v Matt DeBergalis>I just think it's good for people to be a little bit more curious about that, maybe a little bit more self-critical about that.
+
+392
+00:32:58.640 --> 00:33:11.260
+<v Matt DeBergalis>And the lingering question I think a lot of people have about technology, especially if they don't spend their day in the technical ecosystem the way we do, is, I mean, it really kind of boils down to like, has this stuff made anything better?
+
+393
+00:33:11.620 --> 00:33:12.500
+<v Matt DeBergalis>Has it really?
+
+394
+00:33:13.400 --> 00:33:15.560
+<v Matt DeBergalis>And the jury's out on that, to be honest.
+
+395
+00:33:17.060 --> 00:33:20.980
+<v Matt DeBergalis>them to think carefully about no one's going to care about any of this stuff in 100 years,
+
+396
+00:33:21.120 --> 00:33:25.960
+<v Matt DeBergalis>but what they're going to care a lot about is the impact it had on them and on their families.
+
+397
+00:33:26.220 --> 00:33:29.300
+<v Matt DeBergalis>And I think we could all do maybe with just a little bit more
+
+398
+00:33:30.100 --> 00:33:33.080
+<v Matt DeBergalis>thought and care on the mark we leave on the world.
+
+399
+00:33:34.340 --> 00:33:39.440
+<v Noah Labhart>Completely celebrate that answer. Well, Matt, appreciate you being on the show today. Thank
+
+400
+00:33:39.440 --> 00:33:42.700
+<v Noah Labhart>you for telling the creation story of Apollo GraphQL.
+
+401
+00:33:43.700 --> 00:33:44.620
+<v Matt DeBergalis>Thanks. I enjoyed it.
+
+402
+00:33:45.820 --> 00:33:48.980
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+403
+00:33:52.660 --> 00:33:55.720
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+404
+00:33:56.080 --> 00:34:00.880
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+405
+00:34:01.320 --> 00:34:06.360
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+406
+00:34:06.740 --> 00:34:08.940
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+407
+00:34:09.240 --> 00:34:11.260
+<v Noah Labhart>Both things help us out tremendously.
+
+408
+00:34:13.820 --> 00:34:14.620
+<v Noah Labhart>And thanks
+
+409
+00:34:14.620 --> 00:34:15.320
+<v Noah Labhart>again for listening.

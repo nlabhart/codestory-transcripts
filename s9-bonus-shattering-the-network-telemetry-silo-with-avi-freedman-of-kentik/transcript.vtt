@@ -1,0 +1,1503 @@
+WEBVTT
+
+NOTE S9 Bonus: Shattering the Network Telemetry Silo, with Avi Freedman of Kentik
+
+1
+00:00:00.780 --> 00:00:06.840
+<v Avi Freedman>I knew from the very beginning, running always on infrastructure in cloud is a sucker's bet.
+
+2
+00:00:06.980 --> 00:00:11.420
+<v Avi Freedman>And you cannot build a good business doing that. And ultimately we need to build a good
+
+3
+00:00:11.420 --> 00:00:17.780
+<v Avi Freedman>business. We run net booted bare metal. Started before Kubernetes was really a thing. So our
+
+4
+00:00:17.780 --> 00:00:23.900
+<v Avi Freedman>own orchestration system with containers, our database was designed to scale and be
+
+5
+00:00:23.900 --> 00:00:28.460
+<v Avi Freedman>fast in a multi-tenant environment, not let any customer slow down the infrastructure.
+
+6
+00:00:30.200 --> 00:00:37.840
+<v Avi Freedman>I run Usenet as a hobby. 30 gigabits a second, hundreds of terabytes a day, big distributed system. It's relaxing for me.
+
+7
+00:00:38.960 --> 00:00:43.360
+<v Avi Freedman>My name is Avi Freedman, and I'm a co-founder and the CEO at Kentik.
+
+8
+00:00:46.520 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:52.320 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+10
+00:00:53.760 --> 00:00:55.180
+<v Clip>There's nothing like the bedcams.
+
+11
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+12
+00:00:58.300 --> 00:00:59.840
+<v Clip>I don't exactly know what to do.
+
+13
+00:01:00.000 --> 00:01:02.520
+<v Clip>Who built
+
+14
+00:01:02.520 --> 00:01:04.560
+<v Noah Labhart>the teams that have their back.
+
+15
+00:01:08.720 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+16
+00:01:14.880 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+17
+00:01:18.260 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+18
+00:01:22.260 --> 00:01:25.840
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+19
+00:01:26.960 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+20
+00:01:30.000 --> 00:01:37.140
+<v Noah Labhart>on Code Story. I'm your host Noah Labhart and today how Avi Freedman is giving you everything
+
+21
+00:01:37.140 --> 00:01:43.240
+<v Noah Labhart>you wanted to know about your network from data center to container to cloud.
+
+22
+00:01:48.420 --> 00:01:54.340
+<v Noah Labhart>Avi Freedman became obsessed with tech at age eight. He was given a basic programming book by
+
+23
+00:01:54.340 --> 00:01:57.500
+<v Noah Labhart>by his uncle in 1978, and at that point, he was hooked.
+
+24
+00:01:58.140 --> 00:02:00.380
+<v Noah Labhart>But outside of tech, he's been married for 30 years
+
+25
+00:02:00.380 --> 00:02:03.400
+<v Noah Labhart>and likes to play pot limit Omaha, which is poker,
+
+26
+00:02:03.560 --> 00:02:06.320
+<v Noah Labhart>and to do taekwondo to keep his body healthy.
+
+27
+00:02:07.800 --> 00:02:10.020
+<v Noah Labhart>Avi ran the network group at Akamai
+
+28
+00:02:10.020 --> 00:02:12.120
+<v Noah Labhart>and thought that networking observability
+
+29
+00:02:12.120 --> 00:02:13.160
+<v Noah Labhart>was a solved problem.
+
+30
+00:02:13.820 --> 00:02:17.000
+<v Noah Labhart>After he left Akamai, he noticed that in fact, it was not.
+
+31
+00:02:17.460 --> 00:02:19.940
+<v Noah Labhart>He moved to the Bay Area and got started building
+
+32
+00:02:19.940 --> 00:02:21.840
+<v Noah Labhart>a solution to solve just that.
+
+33
+00:02:23.540 --> 00:02:26.600
+<v Noah Labhart>This is the creation story of Kentik.
+
+34
+00:02:31.840 --> 00:02:40.720
+<v Avi Freedman>So Kentik is a SaaS company that helps people who run the infrastructure that connects us all to make it fast and secure.
+
+35
+00:02:40.900 --> 00:02:51.840
+<v Avi Freedman>So specifically, we started down at the network level, which connects everything, selling to engineers, architects, operations, sometimes into business and
+
+36
+00:02:51.840 --> 00:02:59.060
+<v Avi Freedman>security, taking telemetry from all those devices, both physical and virtual. So that telemetry is
+
+37
+00:02:59.060 --> 00:03:06.500
+<v Avi Freedman>traffic data, which is NetFlow, sFlow, VPC flow logs in the cloud, eBPF instrumentation on servers
+
+38
+00:03:06.500 --> 00:03:13.860
+<v Avi Freedman>and containers. It's metrics, which is SNMP, streaming telemetry, cloud metrics. It's performance
+
+39
+00:03:13.860 --> 00:03:19.220
+<v Avi Freedman>testing where we can't get traffic data with performance, which is synthetic tests from the
+
+40
+00:03:19.220 --> 00:03:25.240
+<v Avi Freedman>the network layer up to the application and into the browser testing. It's routing protocols that
+
+41
+00:03:25.240 --> 00:03:29.960
+<v Avi Freedman>connect everything. So specifically the border gateway protocol that connects all the networks
+
+42
+00:03:29.960 --> 00:03:35.260
+<v Avi Freedman>together and looking at performance security, hijacks, things like that. And it's a modern
+
+43
+00:03:35.260 --> 00:03:41.780
+<v Avi Freedman>SaaS platform. We are big fans of how the Honeycomb markets, we started before them,
+
+44
+00:03:41.800 --> 00:03:47.080
+<v Avi Freedman>but focused on the network, but violent agreement that you need to be able to answer any questions.
+
+45
+00:03:47.080 --> 00:03:51.420
+<v Avi Freedman>We don't want our platform to be like preparing for the SAT where you have to give it all
+
+46
+00:03:51.420 --> 00:03:53.680
+<v Avi Freedman>the test questions and then it can like build up.
+
+47
+00:03:53.780 --> 00:03:58.960
+<v Avi Freedman>We keep everything, APIs integrate pretty widely and integrate across the observability
+
+48
+00:03:58.960 --> 00:03:59.680
+<v Avi Freedman>ecosystem too.
+
+49
+00:04:00.980 --> 00:04:03.540
+<v Avi Freedman>So I have been in networking.
+
+50
+00:04:03.680 --> 00:04:08.320
+<v Avi Freedman>I started the first ISP in Philadelphia back in 92 because there was no way to get dial
+
+51
+00:04:08.320 --> 00:04:10.360
+<v Avi Freedman>up internet access when I was leaving university.
+
+52
+00:04:10.720 --> 00:04:15.520
+<v Avi Freedman>And I always wanted to run a multi-line bulletin board system and sold that and then went to
+
+53
+00:04:17.260 --> 00:04:20.840
+<v Avi Freedman>where I ran the network group Akamai's big global CDN.
+
+54
+00:04:21.000 --> 00:04:24.800
+<v Avi Freedman>And one of the first things I did was solve the traffic understanding problem
+
+55
+00:04:24.800 --> 00:04:27.260
+<v Avi Freedman>so we could figure out where we needed to deploy servers.
+
+56
+00:04:28.380 --> 00:04:32.220
+<v Avi Freedman>After leaving Akamai, I discovered that this was not a solved problem.
+
+57
+00:04:32.400 --> 00:04:34.620
+<v Avi Freedman>I actually started with boxes.
+
+58
+00:04:34.640 --> 00:04:37.460
+<v Avi Freedman>If you've seen the show Silicon Valley, the box,
+
+59
+00:04:37.580 --> 00:04:39.280
+<v Avi Freedman>and everyone that deployed it said,
+
+60
+00:04:39.340 --> 00:04:41.280
+<v Avi Freedman>what do we do with all this traffic we can now generate?
+
+61
+00:04:41.600 --> 00:04:44.060
+<v Avi Freedman>So I talked to a bunch of people that ran,
+
+62
+00:04:44.060 --> 00:04:49.520
+<v Avi Freedman>And whether it was service provider or big web companies or enterprise infrastructure, they said, yeah, that's a huge problem for us.
+
+63
+00:04:49.580 --> 00:04:54.400
+<v Avi Freedman>We're stuck in a land of crappy appliances and Windows software and someone needs to modernize this.
+
+64
+00:04:54.600 --> 00:04:57.060
+<v Avi Freedman>It's always been a huge scale problem.
+
+65
+00:04:57.620 --> 00:04:58.980
+<v Avi Freedman>Looked like an interesting space.
+
+66
+00:04:59.560 --> 00:05:04.440
+<v Avi Freedman>Decided to move from Philadelphia out to the Bay Area where I was the first seven years of Kentik.
+
+67
+00:05:05.040 --> 00:05:08.020
+<v Avi Freedman>Bootstrapped the company inside of a Usenet company that I had.
+
+68
+00:05:08.100 --> 00:05:12.220
+<v Avi Freedman>So it was doing traffic and I had servers and infrastructure to test with.
+
+69
+00:05:15.920 --> 00:05:22.060
+<v Noah Labhart>2014. So let's dive into the MVP, that first version of Kentik that you built. Maybe that
+
+70
+00:05:22.060 --> 00:05:29.020
+<v Noah Labhart>was the 2014 version, or maybe it's got remnants from things that you set up at Akamai. Tell me
+
+71
+00:05:29.020 --> 00:05:33.560
+<v Noah Labhart>about that version and how long it took you to build it and what sort of tools you used to bring
+
+72
+00:05:33.560 --> 00:05:34.060
+<v Noah Labhart>it to life.
+
+73
+00:05:34.500 --> 00:05:38.500
+<v Avi Freedman>The main challenge in the first version that we were solving was the database
+
+74
+00:05:38.500 --> 00:05:44.700
+<v Avi Freedman>challenge. In 2013, ClickHouse wasn't around. Time series databases were still like storing files
+
+75
+00:05:44.700 --> 00:05:53.340
+<v Avi Freedman>like Graphite or RRD tool. Databases, except for very multi tens of millions of dollars,
+
+76
+00:05:54.000 --> 00:06:00.540
+<v Avi Freedman>specialized data warehouse databases had no multi tenancy. And Hadoop was ruling the land.
+
+77
+00:06:00.700 --> 00:06:05.740
+<v Avi Freedman>Java for infrastructure, by the way, in my opinion, is one of the most ungreen things one can do.
+
+78
+00:06:05.740 --> 00:06:09.140
+<v Avi Freedman>So every ESG group should be looking at that in a company software-wise.
+
+79
+00:06:09.640 --> 00:06:12.620
+<v Avi Freedman>People were trying to use Hadoop at the time and struggling with this stuff.
+
+80
+00:06:12.960 --> 00:06:15.080
+<v Avi Freedman>I had been running a Usenet company.
+
+81
+00:06:15.600 --> 00:06:21.340
+<v Avi Freedman>I am an old dinosaur, so I write C code and Perl for prototyping.
+
+82
+00:06:21.820 --> 00:06:26.760
+<v Avi Freedman>Decided to try to solve the database problem of it, because I had put traffic data from
+
+83
+00:06:26.760 --> 00:06:31.260
+<v Avi Freedman>networks into time series databases, relational databases, and they just fall over.
+
+84
+00:06:31.260 --> 00:06:45.020
+<v Avi Freedman>Even today, the cardinality problem, the things considered to be time series databases, all fall over when the number of unique values, the cardinality, how many cardinal elements are in a set, is too high.
+
+85
+00:06:45.120 --> 00:06:46.220
+<v Avi Freedman>They just don't deal with that well.
+
+86
+00:06:46.760 --> 00:06:48.080
+<v Avi Freedman>But think about network traffic.
+
+87
+00:06:48.240 --> 00:06:49.920
+<v Avi Freedman>How many IPv4 addresses are there?
+
+88
+00:06:50.020 --> 00:06:50.940
+<v Avi Freedman>There's 4 billion.
+
+89
+00:06:51.160 --> 00:06:52.960
+<v Avi Freedman>How many IPv6s are there?
+
+90
+00:06:53.420 --> 00:06:54.680
+<v Avi Freedman>Two to the 64th.
+
+91
+00:06:54.800 --> 00:06:58.280
+<v Avi Freedman>When you combine all that together, you get huge amounts of cardinality.
+
+92
+00:06:58.280 --> 00:07:07.560
+<v Avi Freedman>The people we talked to were using one particular appliance, a thing called Arbor, which had these things called managed objects, which are basically roll-ups.
+
+93
+00:07:07.800 --> 00:07:11.360
+<v Avi Freedman>And what people wanted, which we still focus on, is ask any question.
+
+94
+00:07:11.820 --> 00:07:17.620
+<v Avi Freedman>So the appliance solution was take all this traffic, aggregate it, and make metric streams.
+
+95
+00:07:18.020 --> 00:07:22.620
+<v Avi Freedman>And so our challenge was how can we keep it all and do fast querying over it all?
+
+96
+00:07:22.760 --> 00:07:24.220
+<v Avi Freedman>The first challenge was build a database.
+
+97
+00:07:24.220 --> 00:07:28.220
+<v Avi Freedman>So we built a multi-tenant column store database.
+
+98
+00:07:28.720 --> 00:07:34.740
+<v Avi Freedman>And the first UI, because CSS makes me angry and I just get confused by DOMs and browser stuff,
+
+99
+00:07:34.940 --> 00:07:43.520
+<v Avi Freedman>it was a daemon written in Perl to modify JavaScript files in a directory with some auto-reload stuff
+
+100
+00:07:43.520 --> 00:07:49.460
+<v Avi Freedman>to do some dashboards and let people drop down, do queries, and then have it auto-update.
+
+101
+00:07:50.040 --> 00:07:53.460
+<v Avi Freedman>The gentleman, Sergio, who worked with me on that, who now works at Kentik,
+
+102
+00:07:54.220 --> 00:07:56.040
+<v Avi Freedman>We're more back-end people playing with front-end.
+
+103
+00:07:56.080 --> 00:07:57.400
+<v Avi Freedman>But it was enough to show the concept.
+
+104
+00:07:57.920 --> 00:08:01.700
+<v Avi Freedman>When we started showing it to people, 80% of the time we got two questions.
+
+105
+00:08:02.080 --> 00:08:03.460
+<v Avi Freedman>How much does this cost?
+
+106
+00:08:03.760 --> 00:08:06.160
+<v Avi Freedman>And the second question was, when can we play with it?
+
+107
+00:08:06.320 --> 00:08:07.860
+<v Avi Freedman>And this is a very horrible user interface.
+
+108
+00:08:08.180 --> 00:08:10.460
+<v Avi Freedman>We went to people that were living the problem,
+
+109
+00:08:10.660 --> 00:08:13.440
+<v Avi Freedman>many of whom had tried to build their own version of it,
+
+110
+00:08:13.480 --> 00:08:15.400
+<v Avi Freedman>so they knew how hard it was.
+
+111
+00:08:15.560 --> 00:08:18.380
+<v Avi Freedman>And that gave us confidence to raise venture capital money
+
+112
+00:08:18.380 --> 00:08:20.060
+<v Avi Freedman>and build out the team and get going.
+
+113
+00:08:21.780 --> 00:08:23.520
+<v Noah Labhart>So then you've got that MVP.
+
+114
+00:08:24.220 --> 00:08:25.180
+<v Noah Labhart>You raised capital.
+
+115
+00:08:25.620 --> 00:08:27.040
+<v Noah Labhart>You're about to take off.
+
+116
+00:08:27.080 --> 00:08:29.880
+<v Noah Labhart>Tell me about how you progressed the product and matured it.
+
+117
+00:08:29.980 --> 00:08:33.860
+<v Noah Labhart>And I think to wrap that in a box a little bit, what I'm looking for is how did you go about building your roadmap?
+
+118
+00:08:34.060 --> 00:08:40.100
+<v Noah Labhart>And how did you go about deciding, okay, this is the next most important thing to build or to address with Kentik?
+
+119
+00:08:41.600 --> 00:08:42.540
+<v Avi Freedman>I've run networks.
+
+120
+00:08:43.300 --> 00:08:52.600
+<v Avi Freedman>Our first CTO helped convince me to build the product because he was a user of, he was ran networks since me, since 1992.
+
+121
+00:08:54.220 --> 00:08:55.900
+<v Avi Freedman>He lived the problem as well.
+
+122
+00:08:56.520 --> 00:09:03.180
+<v Avi Freedman>So early on, we certainly had customers and prospects asking for endless streams of features.
+
+123
+00:09:03.560 --> 00:09:05.140
+<v Avi Freedman>But we also had thesis.
+
+124
+00:09:05.580 --> 00:09:08.240
+<v Avi Freedman>So as we've gotten more mature, and I won't go there,
+
+125
+00:09:08.380 --> 00:09:14.400
+<v Avi Freedman>we try to be very careful to limit how much energy we put in product-wise to our thesis.
+
+126
+00:09:14.580 --> 00:09:17.440
+<v Avi Freedman>Like we know this is what people want in the Henry Ford sense.
+
+127
+00:09:18.760 --> 00:09:22.640
+<v Avi Freedman>But early on, there was just a ton of features that people wanted.
+
+128
+00:09:24.300 --> 00:09:29.380
+<v Avi Freedman>Akamai. I missed the building 10 features per customer, and we were only building one feature
+
+129
+00:09:29.380 --> 00:09:33.420
+<v Avi Freedman>per customer. And then eventually we got to the point where we were only building one feature
+
+130
+00:09:33.420 --> 00:09:38.180
+<v Avi Freedman>per 10 customers. But early on, we knew we had to build a bunch of stuff. Customers were also
+
+131
+00:09:38.180 --> 00:09:44.600
+<v Avi Freedman>resonating with it, and we were just whacking away. My co-founder, Ian Pye, is an implementation
+
+132
+00:09:44.600 --> 00:09:51.440
+<v Avi Freedman>madman. I was organizing and prioritizing by what I thought was important. And in fact, until
+
+133
+00:09:51.440 --> 00:09:53.120
+<v Avi Freedman>until before we raised capital,
+
+134
+00:09:53.340 --> 00:09:55.700
+<v Avi Freedman>we built a whole version one framework.
+
+135
+00:09:56.160 --> 00:09:58.200
+<v Avi Freedman>And I was also very sensitive last point
+
+136
+00:09:58.200 --> 00:10:00.380
+<v Avi Freedman>because there was a company that had started
+
+137
+00:10:00.380 --> 00:10:01.320
+<v Avi Freedman>in the networking space
+
+138
+00:10:02.500 --> 00:10:05.040
+<v Avi Freedman>that every single customer was a snowflake.
+
+139
+00:10:05.180 --> 00:10:07.780
+<v Avi Freedman>They were using Hadoop and Flash as a front end
+
+140
+00:10:07.780 --> 00:10:08.960
+<v Avi Freedman>and they just went in and said,
+
+141
+00:10:09.000 --> 00:10:09.940
+<v Avi Freedman>we'll build whatever you want.
+
+142
+00:10:10.520 --> 00:10:12.320
+<v Avi Freedman>And I really didn't want to do that.
+
+143
+00:10:12.440 --> 00:10:13.620
+<v Avi Freedman>We really, I really knew,
+
+144
+00:10:13.740 --> 00:10:14.840
+<v Avi Freedman>we're not trying to build a law firm,
+
+145
+00:10:14.940 --> 00:10:17.040
+<v Avi Freedman>we're trying to build a SaaS company with repeatability.
+
+146
+00:10:17.740 --> 00:10:19.120
+<v Avi Freedman>There was no science to it.
+
+147
+00:10:19.220 --> 00:10:21.040
+<v Avi Freedman>I don't have a professional product background.
+
+148
+00:10:21.440 --> 00:10:23.920
+<v Avi Freedman>And it was organized by a lot of what I would call thesis.
+
+149
+00:10:24.120 --> 00:10:26.660
+<v Avi Freedman>Like we think we know what people will need.
+
+150
+00:10:26.760 --> 00:10:27.920
+<v Avi Freedman>People are asking for it.
+
+151
+00:10:27.980 --> 00:10:30.260
+<v Avi Freedman>And let's just prioritize and get as much done as we can.
+
+152
+00:10:31.660 --> 00:10:32.300
+<v Noah Labhart>Good stuff.
+
+153
+00:10:32.420 --> 00:10:33.760
+<v Noah Labhart>Okay, let's switch to team then.
+
+154
+00:10:33.840 --> 00:10:35.640
+<v Noah Labhart>So you mentioned that team and I hear you saying we.
+
+155
+00:10:35.740 --> 00:10:36.900
+<v Noah Labhart>How did you build your team?
+
+156
+00:10:37.020 --> 00:10:41.180
+<v Noah Labhart>And what do you look for in those people to indicate that they're the winning horses to join you?
+
+157
+00:10:42.480 --> 00:10:49.740
+<v Avi Freedman>We had a CTO who joined basically as soon as we got funding because it was just three and then four of us until then.
+
+158
+00:10:51.440 --> 00:10:56.240
+<v Avi Freedman>out a team. It was very flat initially and he ran product as well. We've always really looked for
+
+159
+00:10:56.240 --> 00:11:03.060
+<v Avi Freedman>people that are intellectually curious. The gentleman who runs engineering now happened to
+
+160
+00:11:03.060 --> 00:11:09.100
+<v Avi Freedman>have been our first external user back when PostgreSQL was our API because the backend
+
+161
+00:11:09.100 --> 00:11:13.360
+<v Avi Freedman>system that we built uses Postgres as an API basically via foreign data wrappers.
+
+162
+00:11:14.360 --> 00:11:20.100
+<v Avi Freedman>And we built out an eight-person team. It was split half, split into front end and back end.
+
+163
+00:11:21.440 --> 00:11:27.520
+<v Avi Freedman>that organization a little bit, but in some sense, we still mirror that. Again, went to town. It's a
+
+164
+00:11:27.520 --> 00:11:33.820
+<v Avi Freedman>SaaS product, so we ship all the time. And we do run disconnected, sorry, non-disconnect. We do
+
+165
+00:11:33.820 --> 00:11:38.440
+<v Avi Freedman>run infrastructures that are copies of Kentik for customers that don't want to be multi-tenanted,
+
+166
+00:11:38.600 --> 00:11:42.920
+<v Avi Freedman>but they're all SaaS. We've matured some in terms of how we ship and staging environments,
+
+167
+00:11:43.300 --> 00:11:48.620
+<v Avi Freedman>and of course, the CI/CD. But basically, when we have features to ship, we can ship them in preview,
+
+168
+00:11:48.620 --> 00:11:52.600
+<v Avi Freedman>we can ship them in production. And that's obviously a very different software engineering
+
+169
+00:11:52.600 --> 00:11:56.620
+<v Avi Freedman>organization than in the old model of shipping software that people install and upgrade themselves.
+
+170
+00:11:59.400 --> 00:12:04.180
+<v Noah Labhart>Let's flip to scalability. And this will be interesting how you approach this from day one,
+
+171
+00:12:04.200 --> 00:12:10.040
+<v Noah Labhart>or, you know, as you went. So was this built to scale efficiently from day one,
+
+172
+00:12:10.040 --> 00:12:13.540
+<v Noah Labhart>or with scale in mind, maybe thinking abstraction or things like that?
+
+173
+00:12:13.620 --> 00:12:16.720
+<v Noah Labhart>Or have there been areas where you've had to fight this as you grow?
+
+174
+00:12:18.620 --> 00:12:35.540
+<v Avi Freedman>We've been fortunate that where we fought as we grow is less on the technology side and more on the what features are we doing, how and when and how do we do that and how do we communicate all this to customers and how do we make onboarding easier?
+
+175
+00:12:35.760 --> 00:12:42.300
+<v Avi Freedman>Because early on, we had fewer customers that were bigger and we could have people handhold them through some of that stuff.
+
+176
+00:12:42.300 --> 00:12:49.440
+<v Avi Freedman>On the technology side, I knew from the very beginning, running always on infrastructure in cloud is a sucker's bet.
+
+177
+00:12:49.600 --> 00:12:52.040
+<v Avi Freedman>And you cannot build a good business doing that.
+
+178
+00:12:52.260 --> 00:12:54.300
+<v Avi Freedman>And ultimately, we need to build a good business.
+
+179
+00:12:54.700 --> 00:12:56.960
+<v Avi Freedman>So we run net booted bare metal.
+
+180
+00:12:57.080 --> 00:12:59.440
+<v Avi Freedman>We started before Kubernetes was really a thing.
+
+181
+00:12:59.620 --> 00:13:04.040
+<v Avi Freedman>So our own orchestration system with containers, not all, but mostly.
+
+182
+00:13:04.040 --> 00:13:14.160
+<v Avi Freedman>Our database was designed to scale and be fast in a multi-tenant environment, not let any user, query, customer slow down the infrastructure.
+
+183
+00:13:14.540 --> 00:13:16.220
+<v Avi Freedman>But that's been a big focus of mine.
+
+184
+00:13:16.440 --> 00:13:19.620
+<v Avi Freedman>Data technology, networking, doing things at scale.
+
+185
+00:13:19.920 --> 00:13:27.780
+<v Avi Freedman>I run Usenet as a hobby, which is 30 gigabits a second, hundreds of terabytes a day, big distributed system.
+
+186
+00:13:27.860 --> 00:13:28.800
+<v Avi Freedman>It's relaxing for me.
+
+187
+00:13:28.920 --> 00:13:30.500
+<v Avi Freedman>That's the kind of stuff that I enjoy.
+
+188
+00:13:30.500 --> 00:13:39.220
+<v Avi Freedman>So our scale challenges have been organization, feature velocity, communicating to customers, onboarding, and then, of course, a bunch of stuff.
+
+189
+00:13:39.360 --> 00:13:40.800
+<v Avi Freedman>Organization is a whole separate topic.
+
+190
+00:13:41.000 --> 00:13:42.940
+<v Avi Freedman>How do you grow an organization and keep them happy?
+
+191
+00:13:43.140 --> 00:13:47.500
+<v Avi Freedman>So, no, we've been very fortunate that we designed for efficiency and for scaling out.
+
+192
+00:13:47.620 --> 00:13:55.640
+<v Avi Freedman>We've had issues, but not the chronic, oh, my God, we have weeks of we're in a bad place and we need to madly rewrite everything.
+
+193
+00:13:55.980 --> 00:13:56.980
+<v Avi Freedman>That's never happened.
+
+194
+00:13:58.080 --> 00:14:03.080
+<v Noah Labhart>Avi, as you step out on the balcony, look across all that you've built, what are you most proud of?
+
+195
+00:14:04.640 --> 00:14:09.860
+<v Avi Freedman>What I do when I get frustrated is, one, go talk to customers.
+
+196
+00:14:10.480 --> 00:14:13.320
+<v Avi Freedman>We have a great team, but ultimately we're here for the customers.
+
+197
+00:14:13.540 --> 00:14:22.360
+<v Avi Freedman>And see them love the product, even when they're spitting mad that they can't do this RBAC feature, role-based access control.
+
+198
+00:14:22.360 --> 00:14:26.900
+<v Avi Freedman>control. What it means is that we're solving a real problem for them and we're helping them
+
+199
+00:14:26.900 --> 00:14:33.900
+<v Avi Freedman>hugely. If only we would be 2% better, their life would be better. That's great. The second is I go
+
+200
+00:14:33.900 --> 00:14:39.940
+<v Avi Freedman>back to my time in college when I was, I had done database consulting from a very young age and I
+
+201
+00:14:39.940 --> 00:14:45.540
+<v Avi Freedman>had the money to buy computer toys and I ran public access Unix machines. And someone had
+
+202
+00:14:45.540 --> 00:14:51.680
+<v Avi Freedman>showed up at the door and said in 1991 and said, I will pay you $100,000 a year inflation adjusted
+
+203
+00:14:52.500 --> 00:14:56.760
+<v Avi Freedman>write software and do sysadmin for the rest of your life, I would have said, I sign up.
+
+204
+00:14:56.900 --> 00:15:03.900
+<v Avi Freedman>That sounds good. So when just frustrations in business or whatever, I just look at it and try
+
+205
+00:15:03.900 --> 00:15:07.340
+<v Avi Freedman>to have gratitude and say, we're in a pretty good place that the things that I enjoy doing
+
+206
+00:15:07.340 --> 00:15:12.460
+<v Avi Freedman>have been, are valuable and well compensated. When I step back, I look at what we've done for
+
+207
+00:15:12.460 --> 00:15:18.540
+<v Avi Freedman>customers here at Akamai and my internet provider. And that's why I'm on the business side too,
+
+208
+00:15:18.540 --> 00:15:21.680
+<v Avi Freedman>is because just building it without people using it
+
+209
+00:15:21.680 --> 00:15:23.020
+<v Avi Freedman>doesn't get you that kind of validation.
+
+210
+00:15:24.920 --> 00:15:26.420
+<v Noah Labhart>Let's flip the script a little bit.
+
+211
+00:15:26.480 --> 00:15:28.440
+<v Noah Labhart>Tell me about a mistake you made
+
+212
+00:15:28.440 --> 00:15:30.800
+<v Noah Labhart>and how you and your team responded to it.
+
+213
+00:15:32.580 --> 00:15:36.660
+<v Avi Freedman>One of the mistakes I think we made was a strategic mistake.
+
+214
+00:15:37.080 --> 00:15:38.400
+<v Avi Freedman>We started the company.
+
+215
+00:15:38.560 --> 00:15:42.440
+<v Avi Freedman>I was probably a little bit too enamored with the idea
+
+216
+00:15:43.480 --> 00:15:46.220
+<v Avi Freedman>of raising venture capital, which I had never done before.
+
+217
+00:15:46.220 --> 00:15:51.580
+<v Avi Freedman>board. Now, I had worked for the CEO at two companies that went public and joined both of
+
+218
+00:15:51.580 --> 00:15:56.460
+<v Avi Freedman>them just before they went public. So I had missed all those first stages, but I dealt with venture
+
+219
+00:15:56.460 --> 00:16:01.940
+<v Avi Freedman>capitalists on the board. And I thought it's a big problem space. And I have some experience.
+
+220
+00:16:01.980 --> 00:16:09.060
+<v Avi Freedman>I had done and sold a couple smaller companies and worked in large public companies. And I think
+
+221
+00:16:09.060 --> 00:16:14.800
+<v Avi Freedman>that we can grow faster with capital. It's a big enough market to address. But we baked into the
+
+222
+00:16:16.220 --> 00:16:23.440
+<v Avi Freedman>and the product. The idea that we could help people update with regular expressions. For
+
+223
+00:16:23.440 --> 00:16:28.140
+<v Avi Freedman>example, every interface on their routers and what it means. People, and people were,
+
+224
+00:16:28.240 --> 00:16:32.060
+<v Avi Freedman>if they're motivated enough and they understand infrastructure, they can onboard to Kentik and
+
+225
+00:16:32.060 --> 00:16:36.980
+<v Avi Freedman>always have been able to. But we spent probably the last four years, and it's a continuous journey,
+
+226
+00:16:37.120 --> 00:16:41.940
+<v Avi Freedman>and our new product's even more focused, trying to help people onboard better, using the lessons
+
+227
+00:16:41.940 --> 00:16:44.120
+<v Avi Freedman>from product-led growth to say,
+
+228
+00:16:44.220 --> 00:16:46.220
+<v Avi Freedman>how can we help people discover and onboard?
+
+229
+00:16:46.580 --> 00:16:48.580
+<v Avi Freedman>And that wasn't a lot in our DNA
+
+230
+00:16:48.580 --> 00:16:52.080
+<v Avi Freedman>because we raised capital and dealt with larger customers.
+
+231
+00:16:52.300 --> 00:16:54.380
+<v Avi Freedman>If fast, immediately.
+
+232
+00:16:54.720 --> 00:16:57.640
+<v Avi Freedman>Multi, multi, multi $100,000 customers
+
+233
+00:16:57.640 --> 00:16:59.500
+<v Avi Freedman>as our first customers.
+
+234
+00:16:59.720 --> 00:17:02.840
+<v Avi Freedman>And so if we had bootstrapped inside my
+
+235
+00:17:02.840 --> 00:17:04.840
+<v Avi Freedman>using that infrastructure in Virginia
+
+236
+00:17:04.840 --> 00:17:08.380
+<v Avi Freedman>and gotten 100 customers,
+
+237
+00:17:08.700 --> 00:17:10.940
+<v Avi Freedman>it would have forced some of that DNA
+
+238
+00:17:12.660 --> 00:17:16.320
+<v Avi Freedman>simplify. It's not the technical side. It's more, how do we build the product and how do people
+
+239
+00:17:16.320 --> 00:17:21.060
+<v Avi Freedman>discover it and how do we explain it to people? So we have a self-driving demo now and synthesize
+
+240
+00:17:21.060 --> 00:17:26.620
+<v Avi Freedman>traffic, but there's some areas where we probably like that the product from a, how you have to
+
+241
+00:17:26.620 --> 00:17:32.000
+<v Avi Freedman>understand it, get a little bit broader than a little bit more optimized. And so I would go back
+
+242
+00:17:32.000 --> 00:17:36.520
+<v Avi Freedman>and I would bootstrap the first couple of years, not from an economic perspective to own more
+
+243
+00:17:36.520 --> 00:17:42.780
+<v Avi Freedman>more equity, but to force us, to have forced us to think about making that whole process easier.
+
+244
+00:17:43.960 --> 00:17:48.320
+<v Avi Freedman>We decided to cheat when I started. Actually, we really cheated in other ways when we started,
+
+245
+00:17:48.400 --> 00:17:54.240
+<v Avi Freedman>because I consider laziness to be a sign of a great architect. But we used Postgres,
+
+246
+00:17:54.340 --> 00:18:00.340
+<v Avi Freedman>as I mentioned, to do two things. One, to parse SQL, because SQL was our original API. It turns
+
+247
+00:18:00.340 --> 00:18:05.000
+<v Avi Freedman>out people don't really want that, but that was how we started. Now it's all RESTful API and
+
+248
+00:18:06.520 --> 00:18:11.020
+<v Avi Freedman>And we also used it to combine all the results from our distributed system.
+
+249
+00:18:11.300 --> 00:18:16.620
+<v Avi Freedman>So Postgres has a capability called foreign data wrappers where you can basically write your own data engine.
+
+250
+00:18:17.280 --> 00:18:21.820
+<v Avi Freedman>So imagine Postgres parses SQL, gives us the representation of that.
+
+251
+00:18:21.900 --> 00:18:29.340
+<v Avi Freedman>We do all the planning, dispatch and sub queries to get this data, send all the parts of the response back.
+
+252
+00:18:29.420 --> 00:18:32.480
+<v Avi Freedman>And then Postgres folds it all together to give the answer back.
+
+253
+00:18:33.560 --> 00:18:39.260
+<v Avi Freedman>we've started having issues at our scale with that where we can scale it out but it's not the
+
+254
+00:18:39.260 --> 00:18:45.160
+<v Avi Freedman>most efficient so we're now in a change the wheels on the bus move more and more out of postgres
+
+255
+00:18:45.160 --> 00:18:50.520
+<v Avi Freedman>until eventually postgres won't be in the middle of that in hindsight was it a big mistake no it
+
+256
+00:18:50.520 --> 00:18:55.280
+<v Avi Freedman>got us to eight years and still the system is running and we're throwing a little bit more
+
+257
+00:18:55.280 --> 00:18:59.660
+<v Avi Freedman>resource at it but that's one of four or five technical designs that we probably could have
+
+258
+00:18:59.660 --> 00:19:00.160
+<v Avi Freedman>gotten better.
+
+259
+00:19:01.300 --> 00:19:05.880
+<v Noah Labhart>Well, okay, so this will be fun to ask. Tell me what the future looks like for
+
+260
+00:19:05.880 --> 00:19:07.480
+<v Noah Labhart>the product and for your team.
+
+261
+00:19:09.080 --> 00:19:15.040
+<v Avi Freedman>So we've declared pretty firmly that our focus is observability
+
+262
+00:19:15.040 --> 00:19:23.620
+<v Avi Freedman>for infrastructure and then more, not networking in an observability way. We already see up into
+
+263
+00:19:23.620 --> 00:19:28.320
+<v Avi Freedman>the application layer doing performance tests. And when we take telemetry from service meshes
+
+264
+00:19:29.660 --> 00:19:34.800
+<v Avi Freedman>load balancers and CDN type things, as well as the, yeah, as I mentioned, the performance testing,
+
+265
+00:19:35.000 --> 00:19:41.060
+<v Avi Freedman>we're a pretty broad platform with a lot of data advantages. For right now, we're very focused on
+
+266
+00:19:41.060 --> 00:19:45.620
+<v Avi Freedman>those infrastructure running professionals, people that run that network and clusters.
+
+267
+00:19:46.140 --> 00:19:50.860
+<v Avi Freedman>But we have a lot of capabilities. And as we add metrics and events and things like that,
+
+268
+00:19:50.980 --> 00:19:57.720
+<v Avi Freedman>we think broadly that there needs to be a leader at giant scale in the observability space that
+
+269
+00:19:59.660 --> 00:20:00.580
+<v Avi Freedman>and there really isn't one.
+
+270
+00:20:00.800 --> 00:20:02.620
+<v Avi Freedman>There's people that came from the developer side.
+
+271
+00:20:02.860 --> 00:20:04.280
+<v Avi Freedman>There's people that came from the security side.
+
+272
+00:20:04.400 --> 00:20:06.560
+<v Avi Freedman>There's people that came more from the system side.
+
+273
+00:20:07.540 --> 00:20:09.280
+<v Avi Freedman>Our focus the next couple of years
+
+274
+00:20:09.280 --> 00:20:10.900
+<v Avi Freedman>as a couple hundred person company
+
+275
+00:20:10.900 --> 00:20:13.060
+<v Avi Freedman>is on those workflows
+
+276
+00:20:13.060 --> 00:20:14.720
+<v Avi Freedman>and telemetry, the network,
+
+277
+00:20:14.800 --> 00:20:17.720
+<v Avi Freedman>but future Kentik is a broader observability company.
+
+278
+00:20:17.980 --> 00:20:21.160
+<v Avi Freedman>Team-wise, there's pluses and minuses to being remote.
+
+279
+00:20:21.380 --> 00:20:24.360
+<v Avi Freedman>We were almost half remote before COVID hit
+
+280
+00:20:24.940 --> 00:20:27.100
+<v Avi Freedman>just because we would hire good people anywhere.
+
+281
+00:20:27.460 --> 00:20:29.260
+<v Avi Freedman>We're still thinking about some of that
+
+282
+00:20:29.660 --> 00:20:35.160
+<v Avi Freedman>say the jury's out. We don't have any offices right now. We're starting to see people want
+
+283
+00:20:35.160 --> 00:20:39.540
+<v Avi Freedman>some more connection. Right now, we're making that do with travel. But people-wise, I think,
+
+284
+00:20:39.560 --> 00:20:44.580
+<v Avi Freedman>likely we'll continue remote, continue growing carefully. In this economy, you want to make sure
+
+285
+00:20:44.580 --> 00:20:49.660
+<v Avi Freedman>that you're not getting too aggressive. You've got a good business underneath because that's
+
+286
+00:20:49.660 --> 00:20:54.400
+<v Avi Freedman>what's being rewarded if you look at the public company. We call them comps, the comparables.
+
+287
+00:20:54.620 --> 00:20:58.800
+<v Avi Freedman>In the public world, people are rewarding in the middle. So that's the path that we're taking is
+
+288
+00:21:00.660 --> 00:21:01.840
+<v Noah Labhart>Let's switch to you, Avi.
+
+289
+00:21:01.880 --> 00:21:03.780
+<v Noah Labhart>Who influences the way that you work?
+
+290
+00:21:03.940 --> 00:21:07.100
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+291
+00:21:08.320 --> 00:21:13.600
+<v Avi Freedman>Danny Lewin was one of the co-founders at Akamai.
+
+292
+00:21:13.720 --> 00:21:17.440
+<v Avi Freedman>It was really a very intense time of my life when I joined.
+
+293
+00:21:17.480 --> 00:21:19.080
+<v Avi Freedman>They were experiencing hyper growth.
+
+294
+00:21:20.460 --> 00:21:24.320
+<v Avi Freedman>Danny was the technical co-founder, technologist, CTO.
+
+295
+00:21:24.700 --> 00:21:28.320
+<v Avi Freedman>Now, Tom Leighton, who's the CEO, I have huge respect for,
+
+296
+00:21:29.660 --> 00:21:35.780
+<v Avi Freedman>less on the customer-facing side at the time, but a brilliant man. But Danny, I got to see and work
+
+297
+00:21:35.780 --> 00:21:43.760
+<v Avi Freedman>with when he was at that intersection of technology and customer, and just his energy, passion, drive,
+
+298
+00:21:43.860 --> 00:21:49.600
+<v Avi Freedman>creativity, just strategy. You could drop him in anywhere, and he would figure it out and lead and
+
+299
+00:21:49.600 --> 00:21:57.040
+<v Avi Freedman>muster, and really leading in the very Israeli way. He was American and Israeli. He split his
+
+300
+00:21:57.040 --> 00:22:02.300
+<v Avi Freedman>his time growing up of not go there, but follow me. Like, here's where we're going. Really
+
+301
+00:22:02.300 --> 00:22:08.020
+<v Avi Freedman>articulating the vision. Unfortunately, he was the first person murdered by the terrorists on 9-11.
+
+302
+00:22:08.300 --> 00:22:13.380
+<v Avi Freedman>So that was a huge blow to Akamai, which has thrived and grown and honored his legacy.
+
+303
+00:22:13.560 --> 00:22:19.340
+<v Avi Freedman>But just the customer passion and leading from the front, not asking people to do things that
+
+304
+00:22:19.340 --> 00:22:26.040
+<v Avi Freedman>you wouldn't do are areas that I hugely respect. I try to hold Danny in my mind.
+
+305
+00:22:27.180 --> 00:22:49.160
+<v Avi Freedman>Another gentleman from Akamai, George Conrades, was the CEO. He was very good at building a team, setting the mission, delegating, and really setting the context so people understood where to go. In the business context, they teach CEOs in CEO school. You got to say it until you're sick of saying it and then say it again because you can't over-communicate.
+
+306
+00:22:50.060 --> 00:23:07.520
+<v Avi Freedman>And as someone with ADD who's passionate and curious about very widely setting the focus, communicating clearly, those are things which I still work on improving because I see the possibility space of everything and want to go for it all and don't want to limit where we are and what we're doing.
+
+307
+00:23:08.120 --> 00:23:22.000
+<v Avi Freedman>And I will tell you, I applied to Y Combinator. One of my friends who is a co-founder of Akamai, Jonathan Seelig, had worked on the business side and actually formed the nucleus and structure of a group that I wound up working with.
+
+308
+00:23:22.000 --> 00:23:26.580
+<v Avi Freedman>And he said, I just fell out of my chair laughing when I told him I was applying to Y Combinator.
+
+309
+00:23:26.680 --> 00:23:27.660
+<v Avi Freedman>And I was like, I don't know.
+
+310
+00:23:27.680 --> 00:23:28.800
+<v Avi Freedman>It seems like there's a lot to learn.
+
+311
+00:23:29.920 --> 00:23:34.520
+<v Avi Freedman>And I try to go into things thinking that I'm here to learn.
+
+312
+00:23:34.980 --> 00:23:40.720
+<v Avi Freedman>But it really has been truly amazing how much I suck and need to improve constantly running a company.
+
+313
+00:23:42.780 --> 00:23:45.540
+<v Noah Labhart>We talked about a mistake earlier, but this is a little different spin.
+
+314
+00:23:45.640 --> 00:23:47.980
+<v Noah Labhart>If you could go back to the beginning, what would you do different?
+
+315
+00:23:48.040 --> 00:23:49.920
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+316
+00:23:49.920 --> 00:23:53.940
+<v Noah Labhart>It doesn't have to be something that, you know, didn't work, could have worked well, but maybe you tweak it a little bit.
+
+317
+00:23:55.180 --> 00:23:55.900
+<v Avi Freedman>Bootstrap longer.
+
+318
+00:23:56.580 --> 00:24:00.200
+<v Avi Freedman>Separate conversation about what should you try to build, what do you want to build.
+
+319
+00:24:00.860 --> 00:24:10.520
+<v Avi Freedman>I would still go for the path of trying to build the larger company, an enduring technology company to address observability for people.
+
+320
+00:24:10.520 --> 00:24:20.920
+<v Avi Freedman>But I think that bootstrapping a little longer can help influence the DNA in ways that are harder to do once you're at a larger scale.
+
+321
+00:24:21.040 --> 00:24:21.800
+<v Avi Freedman>The DNA of the company.
+
+322
+00:24:21.940 --> 00:24:28.220
+<v Avi Freedman>There's probably also some product areas probably would have gotten into some cloud stuff more sooner, made some different people decisions.
+
+323
+00:24:28.420 --> 00:24:33.060
+<v Avi Freedman>But I think really just from a direction perspective, there were an infinite number of possibilities.
+
+324
+00:24:33.380 --> 00:24:34.360
+<v Avi Freedman>It was a real problem space.
+
+325
+00:24:34.600 --> 00:24:37.960
+<v Avi Freedman>Probably would have been able to build something no matter which direction we went.
+
+326
+00:24:37.960 --> 00:24:41.440
+<v Avi Freedman>but that's probably the thing I would whisper to myself most
+
+327
+00:24:41.440 --> 00:24:44.500
+<v Avi Freedman>if I could send a whisper message back in time.
+
+328
+00:24:45.660 --> 00:24:46.380
+<v Noah Labhart>Last question.
+
+329
+00:24:46.660 --> 00:24:47.780
+<v Noah Labhart>So you're getting on a plane
+
+330
+00:24:47.780 --> 00:24:49.340
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+331
+00:24:49.340 --> 00:24:50.880
+<v Noah Labhart>who's built the next big thing.
+
+332
+00:24:51.160 --> 00:24:52.260
+<v Noah Labhart>They're jazzed about it.
+
+333
+00:24:52.280 --> 00:24:53.460
+<v Noah Labhart>They can't wait to show it off to the world.
+
+334
+00:24:53.540 --> 00:24:54.200
+<v Noah Labhart>They can't wait to show it off to you
+
+335
+00:24:54.200 --> 00:24:54.980
+<v Noah Labhart>right there on the plane.
+
+336
+00:24:55.220 --> 00:24:56.740
+<v Noah Labhart>What advice do you give that person
+
+337
+00:24:56.740 --> 00:24:58.240
+<v Noah Labhart>having gone down this road a bit?
+
+338
+00:24:59.520 --> 00:25:01.300
+<v Avi Freedman>I would say it would be situational.
+
+339
+00:25:01.620 --> 00:25:03.360
+<v Avi Freedman>It's like I do in customer discovery.
+
+340
+00:25:03.580 --> 00:25:05.260
+<v Avi Freedman>I would try to talk to them a little bit more.
+
+341
+00:25:06.220 --> 00:25:07.400
+<v Avi Freedman>I'm a pretty firm believer
+
+342
+00:25:07.960 --> 00:25:08.820
+<v Avi Freedman>It's all situational.
+
+343
+00:25:09.020 --> 00:25:10.480
+<v Avi Freedman>What do you want to do?
+
+344
+00:25:10.760 --> 00:25:14.080
+<v Avi Freedman>I'm not going to go lecture to someone about what to do with their company if I don't know
+
+345
+00:25:14.080 --> 00:25:15.560
+<v Avi Freedman>what they want to do with their company.
+
+346
+00:25:16.520 --> 00:25:20.080
+<v Avi Freedman>Read the gentleman I call the great Lemkin, Jason Lemkin.
+
+347
+00:25:20.240 --> 00:25:21.140
+<v Avi Freedman>He was a VC.
+
+348
+00:25:21.220 --> 00:25:22.200
+<v Avi Freedman>I don't think he's a VC anymore.
+
+349
+00:25:22.780 --> 00:25:25.580
+<v Avi Freedman>Created something called SaaStr, S-A-A-S-T-R.
+
+350
+00:25:25.760 --> 00:25:28.300
+<v Avi Freedman>He's written blogs in a very circular way.
+
+351
+00:25:29.240 --> 00:25:30.380
+<v Avi Freedman>It's content marketing.
+
+352
+00:25:30.960 --> 00:25:36.420
+<v Avi Freedman>Even the ways in which I disagree with what he's written about how to hire marketing people
+
+353
+00:25:37.960 --> 00:25:42.980
+<v Avi Freedman>the company are instructive, interesting conversations. They're thoughtful. Even when
+
+354
+00:25:42.980 --> 00:25:46.600
+<v Avi Freedman>you say, I just read another blog that was like that. It's repetitive. It teaches you,
+
+355
+00:25:46.640 --> 00:25:53.740
+<v Avi Freedman>you need to repeat yourself as a CEO. That's number one. And number two, go read Enterprise
+
+356
+00:25:53.740 --> 00:25:58.780
+<v Avi Freedman>Ready. I think it's .org or .io. It's put out by, it's content marketing from the folks at
+
+357
+00:25:58.780 --> 00:26:02.600
+<v Avi Freedman>WorkOS, and it's the best content marketing I've ever seen. And it's the things you should
+
+358
+00:26:02.600 --> 00:26:07.020
+<v Avi Freedman>think about before you start trying to build, not just technology side, but like what enterprise
+
+359
+00:26:07.960 --> 00:26:13.100
+<v Avi Freedman>SaaS that you should at least have a position on, even if you're not building. RBAC, enterprise
+
+360
+00:26:14.020 --> 00:26:19.700
+<v Avi Freedman>logging, auditing, and preparing for the certifications, multi-tenancy. When you're
+
+361
+00:26:19.700 --> 00:26:25.220
+<v Avi Freedman>starting is a really great time to be thinking, as I said, even if you're not building it, how to not
+
+362
+00:26:25.220 --> 00:26:29.280
+<v Avi Freedman>build inconsistent with those things that enterprise will want at some point.
+
+363
+00:26:29.620 --> 00:26:34.040
+<v Noah Labhart>Well, that's fantastic. Well, Avi, thank you for being on the show today. Thank you for telling
+
+364
+00:26:34.040 --> 00:26:35.500
+<v Noah Labhart>on the creation story of Kentik.
+
+365
+00:26:35.600 --> 00:26:36.500
+<v Avi Freedman>Thank you very much.
+
+366
+00:26:36.500 --> 00:26:37.400
+<v Avi Freedman>Thanks for the invite
+
+367
+00:26:37.400 --> 00:26:39.960
+<v Avi Freedman>and look forward to listening to
+
+368
+00:26:39.960 --> 00:26:41.580
+<v Avi Freedman>and learning from your other guests as well.
+
+369
+00:26:42.860 --> 00:26:45.500
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+370
+00:26:49.720 --> 00:26:52.740
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+371
+00:26:52.860 --> 00:26:55.240
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts,
+
+372
+00:26:55.240 --> 00:26:57.660
+<v Noah Labhart>Spotify, or the podcasting app of your choice.
+
+373
+00:26:58.280 --> 00:27:00.460
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+374
+00:27:00.780 --> 00:27:02.660
+<v Noah Labhart>Both things help us out tremendously.
+
+375
+00:27:05.660 --> 00:27:07.080
+<v Noah Labhart>and thanks again for listening.

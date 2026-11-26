@@ -1,0 +1,963 @@
+WEBVTT
+
+NOTE The New Notification Stack for Developers - Seth Carney & Ben Link
+
+1
+00:00:02.200 --> 00:00:07.700
+<v Noah Labhart>Welcome back listeners. Today we are continuing our series entitled The New Notification
+
+2
+00:00:07.700 --> 00:00:12.400
+<v Noah Labhart>Stack for Developers, brought to you by our longtime friends and sponsors of the Code Story
+
+3
+00:00:12.400 --> 00:00:18.640
+<v Noah Labhart>podcast, Courier. As a reminder, Courier is developer infrastructure for product notifications,
+
+4
+00:00:18.840 --> 00:00:24.480
+<v Noah Labhart>making it easier to deliver the notification experience that your customers expect. Check
+
+5
+00:00:24.480 --> 00:00:27.360
+<v Noah Labhart>out their product to learn more at courier.com.
+
+6
+00:00:28.060 --> 00:00:35.020
+<v Noah Labhart>Well, today I have two special guests on the Code Story podcast, Seth Carney, CTO at Courier,
+
+7
+00:00:35.180 --> 00:00:41.300
+<v Noah Labhart>and Ben Link, the developer advocate at Twilio Segment. Gentlemen, thank you for being on the
+
+8
+00:00:41.300 --> 00:00:48.180
+<v Noah Labhart>show today. Yeah, great to be here. Yeah, good to be here. Before we jump into Segment and Courier
+
+9
+00:00:48.180 --> 00:00:53.960
+<v Noah Labhart>and today's topic, I'd love for you guys to tell me a little bit more about yourselves. Give my
+
+10
+00:00:53.960 --> 00:00:57.860
+<v Noah Labhart>my audience a little bit of context about who you are. Seth, why don't you kick us off?
+
+11
+00:00:58.360 --> 00:01:03.120
+<v Seth Carney>As you mentioned in the intro there, I'm the CTO here at Courier. I've been an engineer,
+
+12
+00:01:03.340 --> 00:01:10.140
+<v Seth Carney>developer for more than 20 years now. I really found my home in startups years ago. I just love
+
+13
+00:01:10.140 --> 00:01:14.980
+<v Seth Carney>building product and love building something that people use. So I feel right at home at Courier,
+
+14
+00:01:15.140 --> 00:01:19.360
+<v Seth Carney>building a dev tool, interacting with people that I feel like are part of my tribe.
+
+15
+00:01:19.760 --> 00:01:21.000
+<v Noah Labhart>Awesome. Ben, how about you?
+
+16
+00:01:21.820 --> 00:01:29.140
+<v Ben Link>I've been in the industry for about 20 years now. The majority of those roles were with one
+
+17
+00:01:29.140 --> 00:01:34.300
+<v Ben Link>company and I sort of hopped around to see how things look from different seats on the bus.
+
+18
+00:01:34.840 --> 00:01:40.380
+<v Ben Link>So I've done like application support and then I've done development and then I did some
+
+19
+00:01:40.380 --> 00:01:46.220
+<v Ben Link>infrastructure design, lots of different hats that I've worn along the way. One of the things
+
+20
+00:01:46.220 --> 00:01:51.200
+<v Ben Link>that I fell in love with throughout that experience was just working with the engineering
+
+21
+00:01:51.200 --> 00:01:57.180
+<v Ben Link>community. I love hanging out with people who build cool stuff and helping them clear obstacles
+
+22
+00:01:57.180 --> 00:02:03.780
+<v Ben Link>so that they can continue to build that cool stuff. Most recently at Twilio Segment, I've
+
+23
+00:02:03.780 --> 00:02:10.060
+<v Ben Link>started into the developer advocacy role, the evangelism role, where I get to hang out with
+
+24
+00:02:10.060 --> 00:02:14.740
+<v Ben Link>people and do exactly that for a full-time job. So that's kind of my story in a nutshell.
+
+25
+00:02:16.220 --> 00:02:21.280
+<v Noah Labhart>really cool jobs, really cool roles. And as you describe them, I want to go build something with
+
+26
+00:02:21.280 --> 00:02:27.100
+<v Noah Labhart>you both. Before we go into that, though, let's get an overview of Segment and Courier. Ben,
+
+27
+00:02:27.300 --> 00:02:33.320
+<v Noah Labhart>tell me what Segment is. And Seth, tell me what Courier is. And then how do you two work together?
+
+28
+00:02:33.460 --> 00:02:34.940
+<v Noah Labhart>Ben, let's start with you. Sure.
+
+29
+00:02:35.100 --> 00:02:39.260
+<v Ben Link>So Segment is what's called a CDP, a customer data platform.
+
+30
+00:02:39.260 --> 00:02:46.320
+<v Ben Link>form. And the general gist of how it works, what it does, is that you've got all these different
+
+31
+00:02:46.320 --> 00:02:51.060
+<v Ben Link>ways that you interact with your customer base. You probably have a website and you have a mobile
+
+32
+00:02:51.060 --> 00:02:54.840
+<v Ben Link>app. And if you have one mobile app, you have two because you got to have it in both app stores.
+
+33
+00:02:55.320 --> 00:03:00.380
+<v Ben Link>Maybe some of my buddies over at Twilio have hooked you up with some messaging components or
+
+34
+00:03:00.380 --> 00:03:07.180
+<v Ben Link>other engagement tools that Twilio is well known for. You've got all this data that's collected
+
+35
+00:03:07.180 --> 00:03:12.700
+<v Ben Link>about the experience of your customer, right? You start to learn about them. You learn about
+
+36
+00:03:12.700 --> 00:03:18.900
+<v Ben Link>their preferences. What products do they view? What things do they like and dislike? What are
+
+37
+00:03:18.900 --> 00:03:22.600
+<v Ben Link>the buying signals when you know they're going to get really excited about something? And so that
+
+38
+00:03:22.600 --> 00:03:28.920
+<v Ben Link>data has lived in lots of different places. And it's the job of engineering to integrate that
+
+39
+00:03:28.920 --> 00:03:34.960
+<v Ben Link>data into a profile of some sort that they can share with people so that your marketing team
+
+40
+00:03:34.960 --> 00:03:38.860
+<v Ben Link>knows how to reach them better so that your salespeople know when it's time to engage.
+
+41
+00:03:39.120 --> 00:03:44.700
+<v Ben Link>All those different seats on the bus along the way that are really important to making the
+
+42
+00:03:44.700 --> 00:03:50.380
+<v Ben Link>business money. They need data that's accurate and it's well thought out and it's cleaned up.
+
+43
+00:03:50.560 --> 00:03:58.020
+<v Ben Link>And so Segment gives you a way to connect to all of those data source locations and centralize the
+
+44
+00:03:58.020 --> 00:04:04.040
+<v Ben Link>information, synthesize a profile for your customer, and then share it out to hundreds
+
+45
+00:04:04.960 --> 00:04:06.620
+<v Ben Link>that you could have in your stack.
+
+46
+00:04:06.840 --> 00:04:10.300
+<v Ben Link>So whatever tools you have for your marketing team
+
+47
+00:04:10.300 --> 00:04:12.620
+<v Ben Link>or your product teams to look at
+
+48
+00:04:12.620 --> 00:04:13.480
+<v Ben Link>to use
+
+49
+00:04:13.480 --> 00:04:14.640
+<v Ben Link>that data in
+
+50
+00:04:14.640 --> 00:04:16.940
+<v Ben Link>their intelligence gathering processes,
+
+51
+00:04:17.360 --> 00:04:20.280
+<v Ben Link>it's the central point to connect all those things.
+
+52
+00:04:21.180 --> 00:04:24.000
+<v Seth Carney>Courier is your notification infrastructure.
+
+53
+00:04:24.580 --> 00:04:28.820
+<v Seth Carney>We provide an API and a web studio for development teams,
+
+54
+00:04:29.220 --> 00:04:30.500
+<v Seth Carney>product teams to manage
+
+55
+00:04:30.500 --> 00:04:32.720
+<v Seth Carney>all of their product-triggered communications,
+
+56
+00:04:32.720 --> 00:04:39.080
+<v Seth Carney>communications, email, SMS, push, chat, those types of things. And, you know, Ben really talked a lot
+
+57
+00:04:39.080 --> 00:04:44.960
+<v Seth Carney>about great profile data, getting all these events in around behaviors and triggers and things like
+
+58
+00:04:44.960 --> 00:04:50.280
+<v Seth Carney>that, that lets you know interesting things that people are doing in your application that might
+
+59
+00:04:50.280 --> 00:04:54.340
+<v Seth Carney>lead to further engagement. They might lead to deeper integration, those types of things.
+
+60
+00:04:54.840 --> 00:05:01.780
+<v Seth Carney>And Courier provides the API to help engage with all of those folks. We are a dev tool. And so
+
+61
+00:05:02.720 --> 00:05:09.380
+<v Seth Carney>A single API, you can deliver this messaging through any channel that we mentioned above and many, many more.
+
+62
+00:05:09.620 --> 00:05:17.340
+<v Seth Carney>But with Segment, what's really interesting is a lot of engineering teams have already done the work to plumb the capture of all these events, the capture of this profile data.
+
+63
+00:05:17.960 --> 00:05:25.040
+<v Seth Carney>Segment provides a lot of really great capabilities around pulling profile data from different sources and really enriching it.
+
+64
+00:05:25.180 --> 00:05:30.320
+<v Seth Carney>Courier can really make use of all of that fantastic data that's being pumped through there.
+
+65
+00:05:30.980 --> 00:05:33.500
+<v Seth Carney>So we can listen to events that are occurring.
+
+66
+00:05:33.640 --> 00:05:41.300
+<v Seth Carney>We can trigger all kinds of workflows that happen, notifications, profile updates, subscriptions, all kinds of other interesting things.
+
+67
+00:05:41.440 --> 00:05:46.680
+<v Seth Carney>And in addition to that, provide a full circle integration, providing a lot of information back to Segment.
+
+68
+00:05:47.060 --> 00:05:47.620
+<v Noah Labhart>Rock
+
+69
+00:05:47.620 --> 00:05:48.120
+<v Noah Labhart>and roll.
+
+70
+00:05:48.140 --> 00:05:59.580
+<v Noah Labhart>Okay, so in my next question, this is one of the things I really enjoy when I get to talk about this topic is hearing the value of product notification.
+
+71
+00:06:00.320 --> 00:06:01.380
+<v Noah Labhart>What is the value?
+
+72
+00:06:01.560 --> 00:06:04.340
+<v Noah Labhart>And I just want to ask that generally to both of you.
+
+73
+00:06:04.380 --> 00:06:10.240
+<v Noah Labhart>Why are product notifications such an important part of the overall product experience?
+
+74
+00:06:11.200 --> 00:06:11.760
+<v Ben Link>So
+
+75
+00:06:11.760 --> 00:06:18.040
+<v Ben Link>product notifications are becoming more and more important because technology has taken over.
+
+76
+00:06:18.220 --> 00:06:28.620
+<v Ben Link>If you look back 20, 30 years, whatever it was, the way we engaged with companies for pretty much anything was to get on a telephone and dial them up and talk to a person.
+
+77
+00:06:30.320 --> 00:06:35.440
+<v Ben Link>would be something like, I use the Sears catalog. I do my shopping and then I call up and I order
+
+78
+00:06:35.440 --> 00:06:40.280
+<v Ben Link>and they ship it to my house. And that was a big deal back then because we didn't have the
+
+79
+00:06:40.280 --> 00:06:45.620
+<v Ben Link>technology that we live in today. And particularly over the last couple of years with the way that
+
+80
+00:06:45.620 --> 00:06:46.420
+<v Ben Link>COVID
+
+81
+00:06:46.420 --> 00:06:52.600
+<v Ben Link>changed the landscape of things, people are relying on those remote connections a lot
+
+82
+00:06:52.600 --> 00:06:58.480
+<v Ben Link>more than they do the in-store experience. And personalization of those online experiences was
+
+83
+00:07:00.320 --> 00:07:07.840
+<v Ben Link>I mean, it kind of mattered, but it really became important over the last couple of years because it was the only way that we engaged with each other.
+
+84
+00:07:08.200 --> 00:07:12.760
+<v Ben Link>If you don't offer a personalized experience, that's no longer a differentiator.
+
+85
+00:07:12.860 --> 00:07:13.860
+<v Ben Link>That's table stakes.
+
+86
+00:07:14.240 --> 00:07:14.740
+<v Seth Carney>Absolutely.
+
+87
+00:07:14.940 --> 00:07:21.760
+<v Seth Carney>And there's also been, I would say, an explosion in terms of, you know, I use the word channels in which people are communicated with.
+
+88
+00:07:21.880 --> 00:07:27.060
+<v Seth Carney>But the way people push information to us has really, I think, exploded is the right word.
+
+89
+00:07:27.160 --> 00:07:29.440
+<v Seth Carney>You have your email, your SMS, you have push messaging.
+
+90
+00:07:30.320 --> 00:07:35.520
+<v Seth Carney>Slack or Teams for your work messaging. You have all kinds of different vectors this messaging is
+
+91
+00:07:35.520 --> 00:07:41.020
+<v Seth Carney>coming in and it can be overwhelming, right? Trying to manage it. I think Ben brought up a
+
+92
+00:07:41.020 --> 00:07:45.460
+<v Seth Carney>really great term in personalization, right? Expressing your preferences, expressing how you
+
+93
+00:07:45.460 --> 00:07:51.720
+<v Seth Carney>want to receive messages, get information, making sure it fits how you consume things, I think has
+
+94
+00:07:51.720 --> 00:07:56.020
+<v Seth Carney>become really important. I think that has become table stakes. People expect that level of
+
+95
+00:07:56.020 --> 00:08:00.440
+<v Seth Carney>personalization, being able to say how they want something, when they want something.
+
+96
+00:08:00.580 --> 00:08:05.020
+<v Seth Carney>It's no longer a game changer, right? It's what they expect when they come to the table.
+
+97
+00:08:05.300 --> 00:08:05.800
+<v Seth Carney / Ben Link>Okay.
+
+98
+00:08:05.720 --> 00:08:09.380
+<v Noah Labhart>So this one's for you, Seth. So what does it take to build product notifications
+
+99
+00:08:09.380 --> 00:08:13.820
+<v Noah Labhart>in-house, embedding it into an application platform? What does it take?
+
+100
+00:08:14.960 --> 00:08:18.640
+<v Seth Carney>There's a difference between building in-house notifications and building
+
+101
+00:08:18.640 --> 00:08:25.000
+<v Seth Carney>a great notification experience for your customers. I think when you look at
+
+102
+00:08:26.020 --> 00:08:31.660
+<v Seth Carney>Things like, hey, I want to sign up for Twilio and I want to send an SMS to my customers.
+
+103
+00:08:32.100 --> 00:08:36.060
+<v Seth Carney>Well, there's actually not that much that goes into that actual call, right?
+
+104
+00:08:36.160 --> 00:08:39.040
+<v Seth Carney>But you do have to do phone number capture and things like that.
+
+105
+00:08:39.660 --> 00:08:51.760
+<v Seth Carney>Realistically, though, when we talk about the explosion of channels that you can communicate with, when you talk about preferences and being able to support those things, offering different capabilities to your users, it becomes important.
+
+106
+00:08:51.980 --> 00:08:53.340
+<v Seth Carney>How do they want to receive that message?
+
+107
+00:08:53.500 --> 00:08:55.120
+<v Seth Carney>So now you need multi-channel notifications.
+
+108
+00:08:56.140 --> 00:09:00.200
+<v Seth Carney>tracking. You need to understand when they opened it, clicked on links that are within it. You need
+
+109
+00:09:00.200 --> 00:09:05.360
+<v Seth Carney>to understand when you have problems. You need to understand whether you've got delivery issues with
+
+110
+00:09:05.360 --> 00:09:11.200
+<v Seth Carney>a given provider. You need to do a failover when you have issues and outages. You need to do
+
+111
+00:09:11.200 --> 00:09:16.300
+<v Seth Carney>template design when you're larger than a team of a single engineer who's fine pushing all of the
+
+112
+00:09:16.300 --> 00:09:22.040
+<v Seth Carney>code to a GitHub repository. The list kind of starts going on. Depending on your business and
+
+113
+00:09:22.040 --> 00:09:25.920
+<v Seth Carney>what you're trying to achieve, you need branding or white labeling. You know, I haven't even started
+
+114
+00:09:26.020 --> 00:09:30.220
+<v Seth Carney>touching on workflows and automations and things like that when you want to run a sequence or a
+
+115
+00:09:30.220 --> 00:09:35.620
+<v Seth Carney>campaign. I think you can look at notifications and say, it's an iceberg. And to build very simple
+
+116
+00:09:35.620 --> 00:09:40.480
+<v Seth Carney>notifications probably isn't the hardest thing in the world, but to build a great experience and
+
+117
+00:09:40.480 --> 00:09:44.480
+<v Seth Carney>something that's reliable and that you can drive engagement off of is definitely a significant
+
+118
+00:09:44.480 --> 00:09:44.980
+<v Seth Carney>undertaking.
+
+119
+00:09:45.240 --> 00:09:49.340
+<v Noah Labhart>Yeah, it sounds like there's a lot to it. Okay, so over to you, Ben. Why are product
+
+120
+00:09:49.340 --> 00:09:53.900
+<v Noah Labhart>driven notifications in particular so difficult to implement, scale, manage, things like that?
+
+121
+00:09:54.520 --> 00:09:58.240
+<v Ben Link>It's hard enough to build a notification system, right?
+
+122
+00:09:58.340 --> 00:10:01.020
+<v Ben Link>You've got all the channels and things that Seth was talking about.
+
+123
+00:10:01.360 --> 00:10:06.520
+<v Ben Link>But when you want to make it product driven, you now have to capture data from all over the place.
+
+124
+00:10:06.820 --> 00:10:11.040
+<v Ben Link>And as I sort of alluded to in the opening, the data is spread out.
+
+125
+00:10:11.100 --> 00:10:12.500
+<v Ben Link>It's in lots of different places.
+
+126
+00:10:12.580 --> 00:10:21.040
+<v Ben Link>And pulling all that together to know that, for instance, Ben was shopping on the website, but then you didn't realize this.
+
+127
+00:10:21.100 --> 00:10:22.660
+<v Ben Link>He got called away from his desk.
+
+128
+00:10:23.900 --> 00:10:31.020
+<v Ben Link>Finishing up there, he just popped on his phone and opened the site there and finished the shopping experience while he was waiting in line.
+
+129
+00:10:31.380 --> 00:10:40.580
+<v Ben Link>Being able to track those things and know that they happened with the same person over the same shopping experience, even though it was in two different channels.
+
+130
+00:10:40.740 --> 00:10:44.380
+<v Ben Link>That's the challenge here is being able to stitch it all together.
+
+131
+00:10:44.940 --> 00:10:46.600
+<v Noah Labhart>Okay, that makes sense.
+
+132
+00:10:46.720 --> 00:10:51.000
+<v Noah Labhart>So Seth, how does this new integration approach simplify this?
+
+133
+00:10:51.840 --> 00:10:56.520
+<v Seth Carney>Candidly speaking, Segment is probably the fastest way to get up and running with Courier.
+
+134
+00:10:56.640 --> 00:11:01.120
+<v Seth Carney>If you've already got Segment installed and are collecting events and data without doing any work.
+
+135
+00:11:01.680 --> 00:11:04.620
+<v Seth Carney>Courier was already acting as a destination for Segment events.
+
+136
+00:11:05.060 --> 00:11:08.700
+<v Seth Carney>So we were already doing things like automatic profile capture for Identify.
+
+137
+00:11:08.800 --> 00:11:14.180
+<v Seth Carney>And you can run automations against events that are flowing through Segment and being piped to Courier.
+
+138
+00:11:14.800 --> 00:11:17.940
+<v Seth Carney>What we've newly released is Courier as a source.
+
+139
+00:11:18.120 --> 00:11:19.260
+<v Seth Carney>So we've completed that circle.
+
+140
+00:11:21.000 --> 00:11:26.520
+<v Seth Carney>a source of events and will pipe all the interesting things that are happening within the
+
+141
+00:11:26.520 --> 00:11:30.940
+<v Seth Carney>Courier ecosystem back into Segment. And that, of course, allows you to take advantage of those
+
+142
+00:11:30.940 --> 00:11:35.420
+<v Seth Carney>hundreds of destinations that Ben mentioned earlier. You can pump it into your BI tools.
+
+143
+00:11:36.020 --> 00:11:41.880
+<v Seth Carney>You can use them for journeys. You can do all of the great things that are part of this Segment
+
+144
+00:11:41.880 --> 00:11:42.380
+<v Seth Carney>platform.
+
+145
+00:11:43.200 --> 00:11:48.360
+<v Noah Labhart>Okay. So, Seth, let's stay with you for a minute. What were the first steps of building
+
+146
+00:11:48.360 --> 00:11:53.960
+<v Noah Labhart>this integration? You know, tell me about the beginning of the integration and how it has evolved.
+
+147
+00:11:54.780 --> 00:12:00.140
+<v Seth Carney>Primarily, this integration has been more customer driven. When we first built Courier
+
+148
+00:12:00.140 --> 00:12:05.220
+<v Seth Carney>as a destination, it was because we were seeing folks coming through who were interested in
+
+149
+00:12:05.220 --> 00:12:08.980
+<v Seth Carney>driving their notifications based on Segment events that they had already wired up, specifically
+
+150
+00:12:08.980 --> 00:12:16.140
+<v Seth Carney>because the pain to adopting was basically zero. And it's actually really easy to adopt Courier
+
+151
+00:12:16.140 --> 00:12:20.560
+<v Seth Carney>already, but they were literally already a Segment customer. They were already pumping events through
+
+152
+00:12:20.560 --> 00:12:25.740
+<v Seth Carney>capturing profile data, those types of things. So all they had to do was wire the two systems
+
+153
+00:12:25.740 --> 00:12:30.700
+<v Seth Carney>together with a couple of keys and start sending notifications, which was great for them.
+
+154
+00:12:30.800 --> 00:12:36.020
+<v Seth Carney>And honestly, our source integration has been driven much in the same way, right? So we've
+
+155
+00:12:36.020 --> 00:12:41.320
+<v Seth Carney>gotten feedback along the way that not only is the destination useful, but so is the source.
+
+156
+00:12:41.320 --> 00:12:45.620
+<v Seth Carney>and so we followed up and started sending that information back through.
+
+157
+00:12:45.780 --> 00:12:49.240
+<v Seth Carney>Honestly, we've just let the customer drive the product change here.
+
+158
+00:12:49.520 --> 00:12:50.220
+<v Noah Labhart>Good stuff.
+
+159
+00:12:50.420 --> 00:12:55.860
+<v Noah Labhart>Okay, we've spoken about Courier as a Segment source and a destination.
+
+160
+00:12:56.260 --> 00:13:00.580
+<v Noah Labhart>So for Courier, what are some of the common use cases that you've seen
+
+161
+00:13:00.580 --> 00:13:04.560
+<v Noah Labhart>when setting Courier as a destination for Segment?
+
+162
+00:13:04.700 --> 00:13:06.740
+<v Noah Labhart>Give me a little bit of some stories there.
+
+163
+00:13:07.000 --> 00:13:08.360
+<v Seth Carney>We actually use it.
+
+164
+00:13:08.360 --> 00:13:13.960
+<v Seth Carney>when you sign up for Courier, we actually have a sequence that we run. And it's where we send you
+
+165
+00:13:13.960 --> 00:13:18.680
+<v Seth Carney>a welcome to Courier message and thank you for signing up, of course. We follow up with some
+
+166
+00:13:18.680 --> 00:13:23.080
+<v Seth Carney>tips and tricks and things like that. But they're basically a set of messages that we then run as a
+
+167
+00:13:23.080 --> 00:13:28.360
+<v Seth Carney>result of your signup. Ben and I were on a live stream just about a week back. We implemented a
+
+168
+00:13:28.360 --> 00:13:33.100
+<v Seth Carney>come back and check out notification set pretty quickly. I think we've all seen this, right? Where
+
+169
+00:13:33.100 --> 00:13:34.960
+<v Seth Carney>where you go add a bunch of items to your cart,
+
+170
+00:13:35.080 --> 00:13:37.740
+<v Seth Carney>you get anxiety and pre-buyers remorse
+
+171
+00:13:37.740 --> 00:13:39.520
+<v Seth Carney>and don't check out, you leave the site.
+
+172
+00:13:39.720 --> 00:13:41.160
+<v Seth Carney>And then of course you get the reminders
+
+173
+00:13:41.160 --> 00:13:43.260
+<v Seth Carney>that we'd love for you to come back and check out
+
+174
+00:13:43.260 --> 00:13:44.700
+<v Seth Carney>and hey, maybe here's a coupon code.
+
+175
+00:13:45.260 --> 00:13:47.460
+<v Seth Carney>And we were able to wire that up,
+
+176
+00:13:47.500 --> 00:13:49.820
+<v Seth Carney>honestly, probably in about 10 or 15 minutes
+
+177
+00:13:49.820 --> 00:13:51.060
+<v Seth Carney>using Segment and Courier.
+
+178
+00:13:51.480 --> 00:13:53.400
+<v Seth Carney>Gosh, we see tons and tons of use cases.
+
+179
+00:13:53.580 --> 00:13:56.140
+<v Seth Carney>We have one customer who does scheduling
+
+180
+00:13:56.140 --> 00:13:57.820
+<v Seth Carney>and once the events are scheduled,
+
+181
+00:13:57.980 --> 00:13:59.760
+<v Seth Carney>they trigger events through Segment
+
+182
+00:13:59.760 --> 00:14:01.480
+<v Seth Carney>that are received by Courier,
+
+183
+00:14:03.100 --> 00:14:06.660
+<v Seth Carney>notification processes, reminders, things like that. So lots of different things.
+
+184
+00:14:07.020 --> 00:14:12.060
+<v Noah Labhart>It's a testament to the product integration being that you guys are using it yourself.
+
+185
+00:14:12.320 --> 00:14:17.320
+<v Noah Labhart>So, okay, switch over to Ben. What does it mean for Segment to now have access to this
+
+186
+00:14:17.320 --> 00:14:21.620
+<v Noah Labhart>notification data from Courier? What can Segment users do that they couldn't before?
+
+187
+00:14:22.020 --> 00:14:26.720
+<v Ben Link>I think this is the most exciting part for me. Given my engineering background,
+
+188
+00:14:26.720 --> 00:14:38.680
+<v Ben Link>The time that I spent being a developer was about making cool things and trying to add on to something that someone else had done and the ability to create feedback loops.
+
+189
+00:14:39.120 --> 00:14:47.780
+<v Ben Link>So we hear a lot of this, you know, like particularly the DevOps community will be on the soapbox about DevOps feedback loops being developed throughout the organization.
+
+190
+00:14:48.100 --> 00:14:49.840
+<v Ben Link>This is one of those feedback loops.
+
+191
+00:14:49.840 --> 00:15:16.060
+<v Ben Link>For a customer of Segment, having Courier as a destination is a really cool feature because I can now communicate with my customers. But there's always that nagging question left in the back of your mind. Did my communication land properly? Was it successful? What do I know about that? Where's my feedback as the person sending the communication as to whether it was effective or not?
+
+192
+00:15:16.060 --> 00:15:29.680
+<v Ben Link>Being able to wire up Courier on the other end to say, hey, Courier saw that the message went out and they saw the person open the message and they saw they engaged with it and all the events that we can then pull back in to enrich that story further.
+
+193
+00:15:29.960 --> 00:15:38.880
+<v Ben Link>I would say it's curing the blindness that you can have in a marketing organization to not know whether I was effective at communicating.
+
+194
+00:15:38.880 --> 00:15:53.040
+<v Ben Link>But now I can see that information come back into play and now I can make decisions based on whether they did. A common example here might be how long is it before someone rage unsubscribes from your service?
+
+195
+00:15:53.040 --> 00:16:05.740
+<v Ben Link>You know, if you think about that, that it only takes a couple of emails where I'm like, I am tired of getting the ding on my phone and realizing that it's another junk message from those people and unsubscribe.
+
+196
+00:16:05.800 --> 00:16:06.480
+<v Ben Link>But if you
+
+197
+00:16:06.480 --> 00:16:07.160
+<v Ben Link>look at that,
+
+198
+00:16:07.280 --> 00:16:16.280
+<v Ben Link>you can probably find behavior patterns in that data that will help you as the person sending the emails not to ever trigger that rage.
+
+199
+00:16:16.500 --> 00:16:20.800
+<v Noah Labhart>I am definitely going to make a T-shirt that says rage unsubscribe.
+
+200
+00:16:20.800 --> 00:16:23.100
+<v Noah Labhart>If there's not one out there, there should be.
+
+201
+00:16:23.700 --> 00:16:25.540
+<v Noah Labhart>Guys, this is really exciting.
+
+202
+00:16:25.840 --> 00:16:26.980
+<v Noah Labhart>It's a rich integration.
+
+203
+00:16:27.340 --> 00:16:33.200
+<v Noah Labhart>It's a rich set of tools that are enabling developers and builders of platforms to do a lot.
+
+204
+00:16:33.340 --> 00:16:35.840
+<v Noah Labhart>Where is this integration going over time?
+
+205
+00:16:36.000 --> 00:16:39.080
+<v Noah Labhart>Give me a little bit of the future vision there.
+
+206
+00:16:39.500 --> 00:16:41.940
+<v Seth Carney>Realistically, it's going to be customer driven, right?
+
+207
+00:16:42.020 --> 00:16:45.140
+<v Seth Carney>Just like I think the evolution of the product thus far has been.
+
+208
+00:16:45.140 --> 00:16:51.580
+<v Seth Carney>been. What we really hope is that folks get out there and they use the product. They use Courier
+
+209
+00:16:51.580 --> 00:16:56.320
+<v Seth Carney>as both a source and a destination. They provide us a bunch of great feedback, feedback that we
+
+210
+00:16:56.320 --> 00:17:01.240
+<v Seth Carney>can learn from and that we can make the product better from. That's really the way we'd like to
+
+211
+00:17:01.240 --> 00:17:02.060
+<v Seth Carney>evolve the integration.
+
+212
+00:17:02.460 --> 00:17:06.540
+<v Noah Labhart>Guys, this is an easy sell, right? I'm sold. I'm an engineer. I'm going
+
+213
+00:17:06.540 --> 00:17:12.000
+<v Noah Labhart>to build something. I'm sold. This has got everything I want and need, and it's going to
+
+214
+00:17:12.000 --> 00:17:16.860
+<v Noah Labhart>help my team understand what these notifications are doing and cure the blindness. Like Ben said,
+
+215
+00:17:17.000 --> 00:17:19.660
+<v Noah Labhart>how can I get started today? Yeah,
+
+216
+00:17:19.700 --> 00:17:22.880
+<v Seth Carney>with Courier, it's super easy. You can go sign up for a free
+
+217
+00:17:22.880 --> 00:17:27.860
+<v Seth Carney>account today. If you already have a provider, great. If not, you can hook up your Gmail account.
+
+218
+00:17:28.420 --> 00:17:32.340
+<v Seth Carney>Courier provides a few other out of the box providers that you can get up and running
+
+219
+00:17:32.340 --> 00:17:36.780
+<v Seth Carney>easily with, but it's as simple as signing up and getting your API key on our side.
+
+220
+00:17:37.180 --> 00:17:41.720
+<v Ben Link>And the Segment side is pretty much the same experience. If you go to segment.com,
+
+221
+00:17:42.000 --> 00:17:46.280
+<v Ben Link>It's possible to create a free workspace and never have to talk to anybody.
+
+222
+00:17:46.540 --> 00:17:48.760
+<v Ben Link>You can do a whole bunch of stuff for free.
+
+223
+00:17:48.880 --> 00:17:53.360
+<v Ben Link>Obviously, there are some features that are behind the subscription wall there,
+
+224
+00:17:53.780 --> 00:17:56.640
+<v Ben Link>but there's enough to get started with to build the proof of concept.
+
+225
+00:17:56.920 --> 00:18:02.720
+<v Ben Link>And I think that's probably the best first step, you know, for anybody who's used to
+
+226
+00:18:02.720 --> 00:18:05.660
+<v Ben Link>tinkering, who plays in code, who wants to build something.
+
+227
+00:18:05.840 --> 00:18:10.960
+<v Ben Link>You can do enough to get started and then grow it from there as you
+
+228
+00:18:10.960 --> 00:18:11.460
+<v Ben Link>need.
+
+229
+00:18:12.000 --> 00:18:16.140
+<v Noah Labhart>Fantastic. Well, gentlemen, I really appreciate you being on the show today. I've learned a lot.
+
+230
+00:18:16.320 --> 00:18:22.280
+<v Noah Labhart>This is a rich integration between two powerhouse tools that are enabling the ease of implementation
+
+231
+00:18:22.280 --> 00:18:26.940
+<v Noah Labhart>of notifications, the measurement, the visibility, and the power of notifications,
+
+232
+00:18:27.160 --> 00:18:32.480
+<v Noah Labhart>and making it fast and quick to get up and running with two power tools. Really appreciate
+
+233
+00:18:32.480 --> 00:18:34.040
+<v Noah Labhart>you both being on the show. Thank
+
+234
+00:18:34.040 --> 00:18:35.240
+<v Seth Carney>you, Noah. Appreciate it. Thanks, Noah.
+
+235
+00:18:36.140 --> 00:18:41.560
+<v Noah Labhart>I'm blown away at how powerful the Courier and Segment integration is. By bi-directionally
+
+236
+00:18:42.000 --> 00:18:46.700
+<v Noah Labhart>your notification infrastructure and your customer data platform, you can easily get
+
+237
+00:18:46.700 --> 00:18:54.860
+<v Noah Labhart>started building smart, relevant notifications for your product or platform. As a reminder,
+
+238
+00:18:55.080 --> 00:18:59.700
+<v Noah Labhart>Courier makes it easier for you to deliver a world-class notification experience that your
+
+239
+00:18:59.700 --> 00:19:05.980
+<v Noah Labhart>customers expect. To learn more about their product and get started today, check out courier.com.
+
+240
+00:19:07.060 --> 00:19:08.600
+<v Noah Labhart>And thanks again for listening.

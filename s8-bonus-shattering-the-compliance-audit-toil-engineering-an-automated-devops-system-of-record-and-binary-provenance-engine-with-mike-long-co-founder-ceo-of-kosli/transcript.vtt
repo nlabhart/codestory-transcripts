@@ -1,0 +1,1455 @@
+WEBVTT
+
+NOTE S8 Bonus: Shattering the Compliance Audit Toil: Engineering an Automated DevOps System of Record and Binary Provenance Engine with Mike Long, Co-Founder & CEO of Kosli
+
+1
+00:00:04.380 --> 00:00:07.800
+<v Mike Long>You ask for coffee, you pay for your coffee, you walk out with your coffee, and that's great.
+
+2
+00:00:07.880 --> 00:00:10.080
+<v Mike Long>You don't need a receipt because you got what you wanted.
+
+3
+00:00:10.620 --> 00:00:15.120
+<v Mike Long>But if you were to buy coffee for the office, then it's suddenly something you're going to expense.
+
+4
+00:00:15.420 --> 00:00:18.720
+<v Mike Long>There needs to be some kind of proof that you spent the money.
+
+5
+00:00:18.840 --> 00:00:21.340
+<v Mike Long>And then it goes into the official accounts for the company.
+
+6
+00:00:21.400 --> 00:00:25.340
+<v Mike Long>And that receipt needs to have a life cycle because it's got tax implications.
+
+7
+00:00:25.780 --> 00:00:27.020
+<v Mike Long>There's a whole story around it.
+
+8
+00:00:27.040 --> 00:00:32.600
+<v Mike Long>So not everybody drinking coffee needs receipts, just like not everyone making software needs receipts.
+
+9
+00:00:34.380 --> 00:00:39.800
+<v Mike Long>need it to prove something in a legal context later, then absolutely the receipts are essential.
+
+10
+00:00:41.000 --> 00:00:43.500
+<v Mike Long>Hi, I'm Mike Long. I'm the CEO of Kosli.
+
+11
+00:00:46.600 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+12
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+13
+00:00:53.780 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+14
+00:00:55.460 --> 00:00:58.080
+<v Noah Labhart>Who share what it takes to change an industry.
+
+15
+00:00:58.280 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+16
+00:01:00.240 --> 00:01:01.220
+<v Clip>It took many goes to get right.
+
+17
+00:01:01.840 --> 00:01:04.540
+<v Noah Labhart>who built the teams that have their back.
+
+18
+00:01:04.700 --> 00:01:06.120
+<v Clip>The company is its people.
+
+19
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+20
+00:01:07.440 --> 00:01:08.560
+<v Clip>Most proud of our team.
+
+21
+00:01:08.920 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+22
+00:01:11.460 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+23
+00:01:12.880 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+24
+00:01:14.400 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+25
+00:01:15.560 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+26
+00:01:18.280 --> 00:01:20.040
+<v Clip>It's not an easy thing to achieve, my dear.
+
+27
+00:01:20.040 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+28
+00:01:22.900 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+29
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+30
+00:01:27.640 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+31
+00:01:28.940 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+32
+00:01:32.560 --> 00:01:43.160
+<v Noah Labhart>I'm your host, Noah Labhart, and today I'll help Mike Long create a way for you to deliver secure software changes at scale, compliant, and fast.
+
+33
+00:01:47.960 --> 00:01:51.180
+<v Noah Labhart>Mike Long describes himself as never really sitting still.
+
+34
+00:01:51.400 --> 00:01:55.020
+<v Noah Labhart>He was born in Australia, but when he was nine years old, he moved to Scotland.
+
+35
+00:01:55.020 --> 00:01:59.860
+<v Noah Labhart>Post-school, he worked in England, then Norway, then China, and now back to Norway.
+
+36
+00:02:00.280 --> 00:02:05.420
+<v Noah Labhart>Early on in his career, he worked in oil and gas, building larger robots for the industry.
+
+37
+00:02:05.860 --> 00:02:10.400
+<v Noah Labhart>Outside of tech, he enjoys spending time with his family and taking long walks in the forest
+
+38
+00:02:10.400 --> 00:02:11.020
+<v Noah Labhart>with his dog.
+
+39
+00:02:12.200 --> 00:02:17.120
+<v Noah Labhart>At his previous company, Mike was the CTO of a DevOps consultancy.
+
+40
+00:02:17.540 --> 00:02:22.600
+<v Noah Labhart>He realized that they would see the same problem over and over again in regulated environments.
+
+41
+00:02:23.760 --> 00:02:32.160
+<v Noah Labhart>Businesses needed a process to follow to ensure changes were tracked, and they could in turn keep the receipts, quote unquote, for proof of changes.
+
+42
+00:02:34.480 --> 00:02:37.140
+<v Noah Labhart>This is the creation story of Kosli.
+
+43
+00:02:41.280 --> 00:02:46.720
+<v Mike Long>Essentially, what Kosli is, it's a DevOps tool to help companies in regulated industries like
+
+44
+00:02:46.720 --> 00:02:53.580
+<v Mike Long>financial services, banking, or health care, or medical device manufacturer, safety-critical
+
+45
+00:02:53.580 --> 00:02:59.120
+<v Mike Long>systems. What we see is that DevOps teams, especially in these organizations, have a lot of
+
+46
+00:02:59.120 --> 00:03:06.000
+<v Mike Long>manual work and toil around audit, compliance, security, these aspects of their work. People
+
+47
+00:03:07.140 --> 00:03:11.940
+<v Mike Long>I have a lot of rules because their software comes associated with a lot of risk as well.
+
+48
+00:03:12.060 --> 00:03:15.160
+<v Mike Long>You know, money can disappear or even lives can be in danger.
+
+49
+00:03:15.320 --> 00:03:20.320
+<v Mike Long>So the level of scrutiny and risk management you need to do is actually quite high.
+
+50
+00:03:20.900 --> 00:03:24.520
+<v Mike Long>So all these teams need is they need to have a software delivery process.
+
+51
+00:03:24.800 --> 00:03:30.040
+<v Mike Long>They need to follow that process and they need the proof that they follow the process when the auditors come.
+
+52
+00:03:30.160 --> 00:03:31.680
+<v Mike Long>Essentially, they need to keep the receipts.
+
+53
+00:03:32.000 --> 00:03:33.580
+<v Mike Long>So that's what Kosli is for.
+
+54
+00:03:33.580 --> 00:03:36.120
+<v Mike Long>where we record what's running in your environment,
+
+55
+00:03:36.200 --> 00:03:37.720
+<v Mike Long>in your production systems and so on.
+
+56
+00:03:37.900 --> 00:03:41.540
+<v Mike Long>We connect that back to the code, commits,
+
+57
+00:03:41.820 --> 00:03:44.480
+<v Mike Long>the tool requests, the approvals, the builds,
+
+58
+00:03:44.640 --> 00:03:46.300
+<v Mike Long>the tests, the security scans and so on,
+
+59
+00:03:46.340 --> 00:03:47.760
+<v Mike Long>the proof that you followed your process.
+
+60
+00:03:48.180 --> 00:03:49.580
+<v Mike Long>And we make it all searchable.
+
+61
+00:03:49.720 --> 00:03:51.620
+<v Mike Long>So say the auditors come by,
+
+62
+00:03:51.780 --> 00:03:53.560
+<v Mike Long>you've got all the receipts they need.
+
+63
+00:03:53.900 --> 00:03:55.720
+<v Mike Long>Means that the developers in these companies
+
+64
+00:03:55.720 --> 00:03:57.840
+<v Mike Long>don't need to slow down to document their work.
+
+65
+00:03:58.460 --> 00:04:00.460
+<v Mike Long>The reason why I started the company
+
+66
+00:04:00.460 --> 00:04:03.620
+<v Mike Long>was actually to do with my previous company.
+
+67
+00:04:03.800 --> 00:04:06.460
+<v Mike Long>I was part of a DevOps consulting business.
+
+68
+00:04:06.560 --> 00:04:07.900
+<v Mike Long>I was the CTO in a company called Print.
+
+69
+00:04:09.180 --> 00:04:11.920
+<v Mike Long>As a kind of a niche DevOps consulting business,
+
+70
+00:04:12.060 --> 00:04:13.800
+<v Mike Long>we tended to get cool into places
+
+71
+00:04:13.800 --> 00:04:16.420
+<v Mike Long>where DevOps was more challenging.
+
+72
+00:04:16.600 --> 00:04:18.660
+<v Mike Long>It was more requirements than just the standard
+
+73
+00:04:18.660 --> 00:04:20.060
+<v Mike Long>of a pipeline and so on.
+
+74
+00:04:20.580 --> 00:04:23.360
+<v Mike Long>You know, see the same problem over and over again,
+
+75
+00:04:23.460 --> 00:04:26.380
+<v Mike Long>whether it was an automotive, you know, car manufacturing
+
+76
+00:04:26.740 --> 00:04:29.840
+<v Mike Long>or medical devices or even healthcare records
+
+77
+00:04:30.480 --> 00:04:35.460
+<v Mike Long>banking. It was the same problem. Everybody described it slightly differently. Some said
+
+78
+00:04:35.460 --> 00:04:39.940
+<v Mike Long>they needed traceability. Some said they needed to meet their change management needs. Some
+
+79
+00:04:39.940 --> 00:04:45.260
+<v Mike Long>talked about the regulators. But, you know, like I said, zooming out, it was all the same thing.
+
+80
+00:04:45.400 --> 00:04:50.620
+<v Mike Long>We just need to follow a process that manages our risk and have the proof. And, you know,
+
+81
+00:04:50.620 --> 00:04:55.860
+<v Mike Long>after our company was acquired in 2019, I thought, okay, this is definitely the thing I want to spend
+
+82
+00:04:55.860 --> 00:04:56.360
+<v Mike Long>time.
+
+83
+00:04:58.800 --> 00:05:03.780
+<v Noah Labhart>Tell me about the MVP. So that first version of the product you built, how long did it take to
+
+84
+00:05:03.780 --> 00:05:08.660
+<v Noah Labhart>build and what sort of tools did you use to bring it to life? It'd be interesting because in the
+
+85
+00:05:09.300 --> 00:05:15.480
+<v Noah Labhart>industries that you're serving, I'm sure that an MVP, quote unquote, maybe might not be, you know,
+
+86
+00:05:15.480 --> 00:05:19.320
+<v Noah Labhart>minimum. Maybe it might be, you know, I don't know. I don't know where you're going to go with
+
+87
+00:05:19.320 --> 00:05:21.480
+<v Noah Labhart>them and i'm curious well
+
+88
+00:05:21.480 --> 00:05:26.360
+<v Mike Long>I mean, it was very, very minimal. There was a big M in MVP for sure.
+
+89
+00:05:26.360 --> 00:05:32.300
+<v Mike Long>What gave us the courage to start the company, James, my co-founder, and I, was that we'd
+
+90
+00:05:32.300 --> 00:05:38.140
+<v Mike Long>actually pitched this idea to a bank in Norway, so we'd like to build this thing, it's a sound like
+
+91
+00:05:38.140 --> 00:05:42.840
+<v Mike Long>something you would like, and I said, yeah, sure, how about we fund a proof of concept over the summer.
+
+92
+00:05:42.840 --> 00:05:48.380
+<v Mike Long>So we had, we had quite good funding to spend the summer, like three months, to build out a proof
+
+93
+00:05:49.320 --> 00:05:50.140
+<v Mike Long>which is great.
+
+94
+00:05:50.280 --> 00:05:51.600
+<v Mike Long>You know, we closed our first company
+
+95
+00:05:51.600 --> 00:05:54.720
+<v Mike Long>based on a two-page white paper, essentially.
+
+96
+00:05:55.140 --> 00:05:57.540
+<v Mike Long>So that was the real minimum viable product
+
+97
+00:05:57.540 --> 00:05:58.260
+<v Mike Long>to get us started.
+
+98
+00:05:59.240 --> 00:06:02.440
+<v Mike Long>You know, I knew kind of what I wanted this system to be,
+
+99
+00:06:02.540 --> 00:06:04.880
+<v Mike Long>but basically every technical choice
+
+100
+00:06:04.880 --> 00:06:06.260
+<v Mike Long>I made in the start was wrong.
+
+101
+00:06:08.160 --> 00:06:10.560
+<v Mike Long>I wanted to have an append-only journal
+
+102
+00:06:10.560 --> 00:06:13.040
+<v Mike Long>of the documentation trail.
+
+103
+00:06:13.340 --> 00:06:15.940
+<v Mike Long>And, you know, back then, blockchain was all the rage,
+
+104
+00:06:16.020 --> 00:06:18.820
+<v Mike Long>but I was sure blockchain wasn't the right solution for this
+
+105
+00:06:19.320 --> 00:06:24.920
+<v Mike Long>was distributed in trustless, whereas this needed to be centralized and based on trust.
+
+106
+00:06:25.700 --> 00:06:31.500
+<v Mike Long>Basically, I wanted to avoid anything where there could be mutation of data. So I thought, well,
+
+107
+00:06:31.640 --> 00:06:36.900
+<v Mike Long>I've got a lot of experience with the internals of Git. Maybe Git could be the storage mechanism
+
+108
+00:06:36.900 --> 00:06:44.020
+<v Mike Long>for this tool. That was like the first disastrous choice I made. The second disastrous choice I made
+
+109
+00:06:44.020 --> 00:06:46.300
+<v Mike Long>was, well, I knew that I needed to get information
+
+110
+00:06:46.300 --> 00:06:49.340
+<v Mike Long>from the CI pipelines into our system.
+
+111
+00:06:49.560 --> 00:06:50.840
+<v Mike Long>And I thought, well, okay, well,
+
+112
+00:06:51.060 --> 00:06:52.820
+<v Mike Long>the system's going to have a front end
+
+113
+00:06:52.820 --> 00:06:56.700
+<v Mike Long>and it's going to, so the front end and the back end,
+
+114
+00:06:56.800 --> 00:06:58.340
+<v Mike Long>why not just do it in JavaScript?
+
+115
+00:06:58.460 --> 00:07:00.720
+<v Mike Long>Then you've got kind of one holistic language
+
+116
+00:07:00.720 --> 00:07:02.340
+<v Mike Long>across the whole stack.
+
+117
+00:07:02.560 --> 00:07:03.460
+<v Mike Long>So that was really clever.
+
+118
+00:07:03.620 --> 00:07:06.000
+<v Mike Long>And then the third mistake I made was that, okay,
+
+119
+00:07:06.080 --> 00:07:08.280
+<v Mike Long>and then the client tools that ran in the pipeline
+
+120
+00:07:08.280 --> 00:07:09.320
+<v Mike Long>would be written in Python.
+
+121
+00:07:10.060 --> 00:07:12.160
+<v Mike Long>Happy to dig into why all those choices
+
+122
+00:07:14.020 --> 00:07:18.420
+<v Mike Long>of the time, but actually ended up throwing out JavaScript before we even demoed to to the customer.
+
+123
+00:07:18.420 --> 00:07:25.180
+<v Mike Long>Basically replaced six weeks of JavaScript coding with one week of Python coding. It was just so much
+
+124
+00:07:25.180 --> 00:07:31.320
+<v Mike Long>more, shall we say, productive to work in Python for the problem I was solving. So that was good, that
+
+125
+00:07:31.320 --> 00:07:36.780
+<v Mike Long>kind of solved that quickly. And yeah, it took another year before we swapped out Git and the
+
+126
+00:07:36.780 --> 00:07:42.180
+<v Mike Long>Python client tools, but all in all the decisions early on were not great, but they were enough to
+
+127
+00:07:44.020 --> 00:07:48.120
+<v Mike Long>demo something and to start towards our early customers.
+
+128
+00:07:49.620 --> 00:07:55.640
+<v Noah Labhart>You have your MVP. It's working. You've proven the point. You've worked through all of your
+
+129
+00:07:55.640 --> 00:08:00.740
+<v Noah Labhart>technological decisions. How did you progress the product from that point and mature it?
+
+130
+00:08:00.820 --> 00:08:03.900
+<v Noah Labhart>And I think to wrap that question in a box a little bit, what I'm looking for is,
+
+131
+00:08:03.940 --> 00:08:07.480
+<v Noah Labhart>how did you go about building your roadmap? And how did you decide,
+
+132
+00:08:07.840 --> 00:08:12.220
+<v Noah Labhart>okay, this is the next most important thing to build or to address with Kosli?
+
+133
+00:08:14.020 --> 00:08:28.500
+<v Mike Long>What kind of happened coincidentally was I built an MVP of a product and we'd always kind of assumed it would be, because our customer base was quite risk adverse, we thought it would be an on-prem solution to begin with.
+
+134
+00:08:28.600 --> 00:08:35.980
+<v Mike Long>And that was really where our focus was. Let's try and get four or five big financial institutions who want this thing and have them fund the development.
+
+135
+00:08:35.980 --> 00:08:40.720
+<v Mike Long>development. And what happened at the same time was the thing called COVID-19. And that
+
+136
+00:08:40.720 --> 00:08:46.460
+<v Mike Long>became as a business plan became the wrong choice because all of the big financial institutions
+
+137
+00:08:46.460 --> 00:08:52.600
+<v Mike Long>were they were not doing innovation projects in 2020, even in 2021. This was the time to
+
+138
+00:08:52.600 --> 00:08:58.280
+<v Mike Long>figure out how to use Zoom and run your bank remotely without office space. Into that period,
+
+139
+00:08:58.280 --> 00:09:00.000
+<v Mike Long>it was time to reevaluate.
+
+140
+00:09:00.420 --> 00:09:03.940
+<v Mike Long>We're too early to sell this at scale.
+
+141
+00:09:04.420 --> 00:09:08.340
+<v Mike Long>Our early design customers are busy with other things at the moment.
+
+142
+00:09:08.400 --> 00:09:10.640
+<v Mike Long>So what do we do as the next step?
+
+143
+00:09:10.820 --> 00:09:12.360
+<v Mike Long>And what James and I really decided was,
+
+144
+00:09:12.440 --> 00:09:15.000
+<v Mike Long>okay, let's take this thing and turn it into a SaaS product.
+
+145
+00:09:15.280 --> 00:09:18.360
+<v Mike Long>Make it easy to use, no operational overhead,
+
+146
+00:09:18.480 --> 00:09:20.920
+<v Mike Long>and see if we can get some smaller customers on board.
+
+147
+00:09:21.120 --> 00:09:24.040
+<v Mike Long>Because we realized that rather than funding it through innovation projects
+
+148
+00:09:24.040 --> 00:09:27.020
+<v Mike Long>and big companies, we'd have to get early adopters
+
+149
+00:09:28.280 --> 00:09:32.960
+<v Mike Long>VC funded route. So that's what we did in 2020, built the SaaS basic functionality,
+
+150
+00:09:33.240 --> 00:09:38.240
+<v Mike Long>made it self-serve to an extent. And towards the end of the year, we picked up four or five
+
+151
+00:09:38.240 --> 00:09:43.220
+<v Mike Long>fintechs. And that was great because that was enough proof. We had usage, we had people that
+
+152
+00:09:43.220 --> 00:09:49.140
+<v Mike Long>believed in the idea. That was also enough for us to raise a pre-seed. And then step by step,
+
+153
+00:09:49.140 --> 00:09:56.040
+<v Mike Long>as we had customers, it was a bit easier to drive roadmapping. We had customers with real needs that
+
+154
+00:09:56.040 --> 00:09:58.280
+<v Mike Long>that we could iterate and use as design partners.
+
+155
+00:09:59.560 --> 00:10:04.440
+<v Noah Labhart>Okay, you mentioned you raised your pre-seed and you have enough money to build a team.
+
+156
+00:10:04.580 --> 00:10:06.180
+<v Noah Labhart>Let's talk about that team.
+
+157
+00:10:06.440 --> 00:10:09.240
+<v Noah Labhart>How did you go about that process of building your team,
+
+158
+00:10:09.340 --> 00:10:13.680
+<v Noah Labhart>and what did you look for in those people to indicate that they were the winning horses to join you?
+
+159
+00:10:14.580 --> 00:10:18.440
+<v Mike Long>I guess the unfair advantage that I had is that I have a lot of friends
+
+160
+00:10:18.440 --> 00:10:22.680
+<v Mike Long>that are excellent technologists I've worked with in the past.
+
+161
+00:10:22.680 --> 00:10:30.580
+<v Mike Long>So nearly all the early employees, I would say, yes, nearly all of the first 10 employees were part of my existing network.
+
+162
+00:10:30.700 --> 00:10:35.500
+<v Mike Long>I'd either worked with for years or collaborated in open source or in conference circuit.
+
+163
+00:10:35.980 --> 00:10:40.000
+<v Mike Long>So it was all people that I knew I would really want to work with if I ever had a chance.
+
+164
+00:10:40.460 --> 00:10:43.220
+<v Mike Long>I was very happy that they wanted to work with me as well.
+
+165
+00:10:43.300 --> 00:10:45.460
+<v Mike Long>So that was kind of the hack, I would say.
+
+166
+00:10:45.800 --> 00:10:52.100
+<v Mike Long>And then, you know, as we've gone further, the net has been cast wider and it's just grown from step to step.
+
+167
+00:10:52.680 --> 00:11:00.000
+<v Mike Long>What's always been interesting is the further along my career, it's less important what I work on, but more important who I do it with.
+
+168
+00:11:00.160 --> 00:11:05.220
+<v Mike Long>So figuring out who's in the team is actually one of the biggest decisions you can make as a founder.
+
+169
+00:11:09.220 --> 00:11:11.760
+<v Noah Labhart>Okay, let's flip to scalability then.
+
+170
+00:11:11.820 --> 00:11:12.760
+<v Noah Labhart>This will be interesting.
+
+171
+00:11:12.920 --> 00:11:19.460
+<v Noah Labhart>I know the iterations of technology may have made this something that wasn't thought of in the beginning.
+
+172
+00:11:19.460 --> 00:11:23.840
+<v Noah Labhart>but I'm curious if Kosli was built with scale in mind from day one,
+
+173
+00:11:23.960 --> 00:11:27.700
+<v Noah Labhart>or is this something you're having to fight and adjust as you grow?
+
+174
+00:11:29.000 --> 00:11:29.700
+<v Mike Long>We did.
+
+175
+00:11:29.840 --> 00:11:33.400
+<v Mike Long>We kind of definitely had our battle with scalability.
+
+176
+00:11:33.800 --> 00:11:35.420
+<v Mike Long>I wouldn't say it's behind us,
+
+177
+00:11:35.480 --> 00:11:40.400
+<v Mike Long>but at least we've tamed the beast to the level of scale that we need for the short term.
+
+178
+00:11:40.520 --> 00:11:43.560
+<v Mike Long>So as a startup, I think that's the right level of investment.
+
+179
+00:11:44.140 --> 00:11:47.060
+<v Mike Long>As I hinted at before, we started as Git as the database,
+
+180
+00:11:47.320 --> 00:11:48.820
+<v Mike Long>and that was fine.
+
+181
+00:11:49.460 --> 00:11:51.840
+<v Mike Long>until volumes got quite large.
+
+182
+00:11:52.100 --> 00:11:58.000
+<v Mike Long>Then you start to realize that if you want to look at the history of a file in a Git repository,
+
+183
+00:11:58.200 --> 00:12:01.260
+<v Mike Long>you actually have to traverse the entire repo's history.
+
+184
+00:12:01.480 --> 00:12:03.520
+<v Mike Long>And that becomes extremely slow.
+
+185
+00:12:03.700 --> 00:12:06.500
+<v Mike Long>That was the big scaling challenge that we had to face.
+
+186
+00:12:06.960 --> 00:12:12.680
+<v Mike Long>So we did a lot of work last year to move towards an append-only document database last year.
+
+187
+00:12:12.740 --> 00:12:14.780
+<v Mike Long>And that really made a big difference.
+
+188
+00:12:15.060 --> 00:12:18.680
+<v Mike Long>Obviously, there'll be more and more scaling issues as we get more and more customers.
+
+189
+00:12:19.460 --> 00:12:25.120
+<v Mike Long>The customers we're onboarding now, we're looking at 100,000 changes a month, you know, millions of changes a year.
+
+190
+00:12:25.240 --> 00:12:30.700
+<v Mike Long>And then being able to navigate that volume of data is going to be really interesting to solve.
+
+191
+00:12:30.880 --> 00:12:35.220
+<v Mike Long>But then we come in, many of us in the tech team are coming from real-time systems.
+
+192
+00:12:35.460 --> 00:12:40.420
+<v Mike Long>I don't think the technology risk is so big in our business, more about the go-to-market risk.
+
+193
+00:12:40.960 --> 00:12:44.520
+<v Noah Labhart>You piqued my interest with the append-only document-based database.
+
+194
+00:12:44.940 --> 00:12:47.960
+<v Noah Labhart>Can you tell me a little bit more about that solution and how you came about it?
+
+195
+00:12:49.460 --> 00:12:55.800
+<v Mike Long>real magic sauce. We looked at a lot of different options here. Should we use a Merkle chain or
+
+196
+00:12:55.800 --> 00:13:02.340
+<v Mike Long>what's the right format for this? Where we ended up in the end was to use DocumentDB or MongoDB
+
+197
+00:13:02.340 --> 00:13:08.060
+<v Mike Long>as the backing database and then write a transparency log on the side if we need it.
+
+198
+00:13:08.180 --> 00:13:13.320
+<v Mike Long>We haven't so far had a lot of pull. What's quite interesting actually is that the guarantees for
+
+199
+00:13:13.320 --> 00:13:19.580
+<v Mike Long>for append only, the mutability are on our side in the application rather than as a technical limitation.
+
+200
+00:13:19.960 --> 00:13:27.320
+<v Mike Long>But because of this, we can fingerprint every transaction into the system and create a transparency log for it.
+
+201
+00:13:27.380 --> 00:13:29.960
+<v Mike Long>So I think that's where we're headed towards going forward.
+
+202
+00:13:31.680 --> 00:13:38.240
+<v Noah Labhart>Okay, so as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+203
+00:13:39.420 --> 00:13:45.220
+<v Mike Long>I mean obviously the team is the the engine that drives the whole thing I'm very very pleased with
+
+204
+00:13:45.220 --> 00:13:50.520
+<v Mike Long>the team that we have we're 15 people everyone has earned their seat in the team and it's
+
+205
+00:13:50.520 --> 00:13:55.540
+<v Mike Long>it's great because we're all extremely motivated for what we're doing we're having a lot of fun
+
+206
+00:13:55.540 --> 00:14:00.080
+<v Mike Long>while we do it and that kind of shines through when we go into conversations with our customers
+
+207
+00:14:00.080 --> 00:14:05.460
+<v Mike Long>and work together on solving problems it just makes the day so much better every problem's
+
+208
+00:14:05.460 --> 00:14:11.560
+<v Mike Long>a lot smaller. And I feel like going forward with this team, we're in a good spot.
+
+209
+00:14:12.960 --> 00:14:17.780
+<v Noah Labhart>Let's flip the script a little bit then. So tell me about a mistake you made and how
+
+210
+00:14:17.780 --> 00:14:19.800
+<v Noah Labhart>you and your team responded to it.
+
+211
+00:14:20.620 --> 00:14:22.980
+<v Mike Long>There's not been any big mistakes,
+
+212
+00:14:23.140 --> 00:14:28.220
+<v Mike Long>but there's a lot of learnings that we've had that maybe would have shortened the cycles
+
+213
+00:14:28.220 --> 00:14:34.540
+<v Mike Long>and what we're doing. I think as a company, it took too long to address the American market and
+
+214
+00:14:35.460 --> 00:14:43.240
+<v Mike Long>active in the American market. If I was to do it again, I would not start a company selling to
+
+215
+00:14:43.240 --> 00:14:50.720
+<v Mike Long>banks during a global pandemic either. I don't know if they're mistakes, but they're definitely
+
+216
+00:14:50.720 --> 00:14:55.420
+<v Mike Long>learning. I think that what I've learned over the period of building this business is that
+
+217
+00:14:55.420 --> 00:15:02.940
+<v Mike Long>the U.S. is a really great place to build companies. We were two and a half years into it
+
+218
+00:15:02.940 --> 00:15:05.080
+<v Mike Long>before we had our attention set over here.
+
+219
+00:15:05.200 --> 00:15:08.120
+<v Mike Long>I think that was a little bit of a culture challenge
+
+220
+00:15:08.120 --> 00:15:10.940
+<v Mike Long>with Scandinavian startups in general,
+
+221
+00:15:11.020 --> 00:15:13.540
+<v Mike Long>is that there's a lot of support locally,
+
+222
+00:15:13.620 --> 00:15:14.600
+<v Mike Long>there's a lot of talent locally.
+
+223
+00:15:14.840 --> 00:15:16.760
+<v Mike Long>You can even get funding locally.
+
+224
+00:15:17.240 --> 00:15:18.620
+<v Mike Long>There's a little bit of a mentality.
+
+225
+00:15:18.920 --> 00:15:20.260
+<v Mike Long>First, you win your local market,
+
+226
+00:15:20.340 --> 00:15:21.600
+<v Mike Long>then you win Scandinavia,
+
+227
+00:15:21.700 --> 00:15:22.460
+<v Mike Long>then you win Europe,
+
+228
+00:15:22.520 --> 00:15:23.440
+<v Mike Long>then you win the US.
+
+229
+00:15:23.960 --> 00:15:25.120
+<v Mike Long>I don't agree with that.
+
+230
+00:15:25.240 --> 00:15:26.900
+<v Mike Long>I haven't seen what I've seen so far,
+
+231
+00:15:26.960 --> 00:15:29.940
+<v Mike Long>is that get to the US as early as possible
+
+232
+00:15:29.940 --> 00:15:31.240
+<v Mike Long>and learn as much as you can
+
+233
+00:15:32.940 --> 00:15:34.840
+<v Mike Long>you're attempting to work in.
+
+234
+00:15:35.520 --> 00:15:37.580
+<v Noah Labhart>You mentioned a little bit of this earlier,
+
+235
+00:15:37.760 --> 00:15:39.780
+<v Noah Labhart>but I'm going to ask it as if you didn't answer,
+
+236
+00:15:39.940 --> 00:15:41.700
+<v Noah Labhart>or maybe it seeds my question a little bit,
+
+237
+00:15:41.740 --> 00:15:44.560
+<v Noah Labhart>but I'm excited about what the future looks like
+
+238
+00:15:44.560 --> 00:15:46.500
+<v Noah Labhart>for the product and for your team.
+
+239
+00:15:47.380 --> 00:15:50.600
+<v Mike Long>From a technology perspective, we're super ambitious.
+
+240
+00:15:50.900 --> 00:15:53.300
+<v Mike Long>So we have a way to turn your environments,
+
+241
+00:15:53.420 --> 00:15:55.580
+<v Mike Long>you know, Kubernetes clusters, Docker containers,
+
+242
+00:15:56.460 --> 00:15:59.720
+<v Mike Long>S3 buckets into version control, essentially,
+
+243
+00:15:59.920 --> 00:16:01.120
+<v Mike Long>without like just automatically,
+
+244
+00:16:02.940 --> 00:16:05.680
+<v Mike Long>we serialize it in a way that just looks like version control.
+
+245
+00:16:05.860 --> 00:16:10.340
+<v Mike Long>So you can have the change log of a Kubernetes environment,
+
+246
+00:16:10.580 --> 00:16:11.860
+<v Mike Long>how it actually changes.
+
+247
+00:16:12.200 --> 00:16:15.080
+<v Mike Long>And that means you can check out older versions,
+
+248
+00:16:15.140 --> 00:16:18.260
+<v Mike Long>like what was running on Christmas Day is a question we can answer.
+
+249
+00:16:18.460 --> 00:16:21.900
+<v Mike Long>We can say, you know, how has this environment changed this morning?
+
+250
+00:16:22.100 --> 00:16:24.500
+<v Mike Long>Like what is its evolution over time?
+
+251
+00:16:24.700 --> 00:16:28.460
+<v Mike Long>Or what is the difference between these two points in time?
+
+252
+00:16:28.500 --> 00:16:30.440
+<v Mike Long>Or even these two systems, like what's the difference
+
+253
+00:16:30.440 --> 00:16:34.820
+<v Mike Long>between staging and production is a really interesting question to ask oftentimes.
+
+254
+00:16:35.860 --> 00:16:39.980
+<v Mike Long>What we've found is that we've kind of built a very general purpose tool,
+
+255
+00:16:40.080 --> 00:16:44.840
+<v Mike Long>but we've only focused on a very specific niche around compliance, audit, and security.
+
+256
+00:16:45.340 --> 00:16:50.000
+<v Mike Long>And what I'm really excited to see is what happens when we open this up to folks
+
+257
+00:16:50.000 --> 00:16:52.780
+<v Mike Long>that are not thinking about this from an audit perspective,
+
+258
+00:16:52.880 --> 00:16:55.840
+<v Mike Long>but from a I-just-need-to-know-what's-going-on perspective.
+
+259
+00:16:56.640 --> 00:17:03.260
+<v Mike Long>We're starting to realize that we're sitting on a lot of extremely valuable data, how your systems are changing, where those changes are coming from.
+
+260
+00:17:03.620 --> 00:17:08.120
+<v Mike Long>Being able to query and search and report on this stuff has got a lot of value.
+
+261
+00:17:08.200 --> 00:17:12.880
+<v Mike Long>But we're starting to realize, well, how do we get this information out to people?
+
+262
+00:17:13.000 --> 00:17:16.160
+<v Mike Long>Is it through chat integrations, Slack?
+
+263
+00:17:16.520 --> 00:17:18.620
+<v Mike Long>Where else should this data be showing up?
+
+264
+00:17:18.720 --> 00:17:21.100
+<v Mike Long>How else should we be integrating with other systems?
+
+265
+00:17:22.420 --> 00:17:27.900
+<v Mike Long>What I love about this problem is that the more we pull on the thread, the more we find.
+
+266
+00:17:28.120 --> 00:17:30.040
+<v Mike Long>It seems like an endless possibility.
+
+267
+00:17:30.580 --> 00:17:32.760
+<v Mike Long>Again, it's kind of like an ERP system.
+
+268
+00:17:33.040 --> 00:17:36.520
+<v Mike Long>You think about your DevOps as being like the factory floor.
+
+269
+00:17:36.600 --> 00:17:39.460
+<v Mike Long>This is how your software changes get made.
+
+270
+00:17:39.640 --> 00:17:40.840
+<v Mike Long>We're like the ERP system.
+
+271
+00:17:41.180 --> 00:17:46.660
+<v Mike Long>And as an ERP system, we haven't really gotten to the bottom of what we could do with that power.
+
+272
+00:17:47.220 --> 00:17:47.720
+<v Mike Long>As
+
+273
+00:17:47.720 --> 00:17:52.820
+<v Noah Labhart>you were describing, and I was thinking about that, opening it up to other people,
+
+274
+00:17:53.040 --> 00:17:56.160
+<v Noah Labhart>does that change the product or the product approach?
+
+275
+00:17:56.580 --> 00:18:01.940
+<v Noah Labhart>Because I imagine the people or the entities that you're targeting now that are a little
+
+276
+00:18:01.940 --> 00:18:08.240
+<v Noah Labhart>more regulated, perhaps, or maybe more enterprise-leaning, I could be wrong there, but that's where
+
+277
+00:18:08.240 --> 00:18:09.020
+<v Noah Labhart>my head goes.
+
+278
+00:18:09.160 --> 00:18:14.260
+<v Noah Labhart>And does that change how you build the product moving forward?
+
+279
+00:18:14.300 --> 00:18:15.040
+<v Noah Labhart>Does that split it?
+
+280
+00:18:16.660 --> 00:18:21.280
+<v Mike Long>change the product very much because regardless of what the use case is, you want to record the
+
+281
+00:18:21.280 --> 00:18:27.400
+<v Mike Long>facts. So what you need to make sure is that, you know, this is a true record of the deployment,
+
+282
+00:18:27.400 --> 00:18:31.520
+<v Mike Long>so this is a true record of what's running in this system, or this is a true record of this
+
+283
+00:18:31.520 --> 00:18:37.620
+<v Mike Long>security scan. That all stays the same whether you're using it for security or audit, or if you're
+
+284
+00:18:37.620 --> 00:18:42.680
+<v Mike Long>just using it to find out, hey, I've had an incident, what changed? You know, imagine your alerts are
+
+285
+00:18:42.680 --> 00:18:48.180
+<v Mike Long>of firing, you go and look at your dashboards and your monitoring tool, you see, okay, something's
+
+286
+00:18:48.180 --> 00:18:52.680
+<v Mike Long>going wrong. Really, the first thing you want to know is what changed. That doesn't change our
+
+287
+00:18:52.680 --> 00:18:57.920
+<v Mike Long>system, but it brings new challenges in terms of messaging. How do we describe our tool to the
+
+288
+00:18:57.920 --> 00:19:02.500
+<v Mike Long>market? How do we find our customers? How do we let them understand that this is also for them?
+
+289
+00:19:04.300 --> 00:19:10.260
+<v Noah Labhart>Tell me who influences the way that you work. Name a person or many persons or something you
+
+290
+00:19:10.260 --> 00:19:11.100
+<v Noah Labhart>you look up to and why?
+
+291
+00:19:11.640 --> 00:19:14.460
+<v Mike Long>I mean, the great thing about working in the software industry
+
+292
+00:19:14.460 --> 00:19:17.000
+<v Mike Long>is there's so many people to be inspired by.
+
+293
+00:19:17.120 --> 00:19:19.440
+<v Mike Long>I mean, we're just surrounded by great role models.
+
+294
+00:19:19.480 --> 00:19:21.680
+<v Mike Long>And I think the ones that are closest to the home,
+
+295
+00:19:21.780 --> 00:19:24.480
+<v Mike Long>the ones that I work the most with are actually our investors.
+
+296
+00:19:24.780 --> 00:19:27.860
+<v Mike Long>We're lucky enough to be backed by a venture capital company
+
+297
+00:19:27.860 --> 00:19:30.300
+<v Mike Long>called Heavybit in Silicon Valley.
+
+298
+00:19:30.480 --> 00:19:33.620
+<v Mike Long>And they're all dev tool founders in the past,
+
+299
+00:19:33.620 --> 00:19:34.480
+<v Mike Long>the partners in the firm.
+
+300
+00:19:34.540 --> 00:19:36.260
+<v Mike Long>So Jesse was a founder at Chef.
+
+301
+00:19:36.680 --> 00:19:38.480
+<v Mike Long>James was a founder of Heroku.
+
+302
+00:19:40.260 --> 00:19:42.880
+<v Mike Long>Labrato, they've all walked the walk in this space.
+
+303
+00:19:43.020 --> 00:19:44.240
+<v Mike Long>They've all built tool companies.
+
+304
+00:19:44.480 --> 00:19:45.720
+<v Mike Long>They understand the market.
+
+305
+00:19:45.780 --> 00:19:49.380
+<v Mike Long>And they only invest in DevOps companies, essentially.
+
+306
+00:19:49.540 --> 00:19:53.380
+<v Mike Long>So it's been PagerDuty, Stripe, LaunchDarkly, these kind of companies.
+
+307
+00:19:53.560 --> 00:19:57.840
+<v Mike Long>So the whole network around the ecosystem is just fantastic.
+
+308
+00:19:58.400 --> 00:20:01.880
+<v Mike Long>Constantly being introduced to people that I'm just in awe of.
+
+309
+00:20:02.040 --> 00:20:06.720
+<v Mike Long>I couldn't list them all, but there are a lot of people, especially in these circles,
+
+310
+00:20:06.820 --> 00:20:09.960
+<v Mike Long>that have a wealth of experience and are very generous with their time,
+
+311
+00:20:10.260 --> 00:20:11.540
+<v Mike Long>forever thankful for.
+
+312
+00:20:13.280 --> 00:20:14.840
+<v Noah Labhart>We talked about a mistake earlier,
+
+313
+00:20:14.920 --> 00:20:16.920
+<v Noah Labhart>but this is a little different spin, Mike.
+
+314
+00:20:17.080 --> 00:20:18.560
+<v Noah Labhart>If you could go back to the beginning,
+
+315
+00:20:18.680 --> 00:20:19.480
+<v Noah Labhart>what would you do different?
+
+316
+00:20:19.600 --> 00:20:20.360
+<v Noah Labhart>Or where would you consider
+
+317
+00:20:20.360 --> 00:20:21.320
+<v Noah Labhart>taking a different approach?
+
+318
+00:20:21.480 --> 00:20:22.820
+<v Noah Labhart>It doesn't have to be something
+
+319
+00:20:22.820 --> 00:20:23.760
+<v Noah Labhart>that was a mistake
+
+320
+00:20:23.760 --> 00:20:24.820
+<v Noah Labhart>or it doesn't have to be something
+
+321
+00:20:24.820 --> 00:20:26.100
+<v Noah Labhart>that even didn't work.
+
+322
+00:20:26.160 --> 00:20:26.760
+<v Noah Labhart>It could have worked well,
+
+323
+00:20:26.880 --> 00:20:28.960
+<v Noah Labhart>but maybe you tweak it a little bit.
+
+324
+00:20:29.880 --> 00:20:31.460
+<v Mike Long>I touched on it a bit earlier.
+
+325
+00:20:31.600 --> 00:20:33.440
+<v Mike Long>I think that all things being equal,
+
+326
+00:20:33.600 --> 00:20:36.560
+<v Mike Long>I wish we'd come to the U.S. earlier.
+
+327
+00:20:37.940 --> 00:20:40.040
+<v Mike Long>Maybe this is just my experience from now.
+
+328
+00:20:40.260 --> 00:20:47.560
+<v Mike Long>but in Scandinavia, where our home is, it's very conservative. People are comfortable, very comfortable,
+
+329
+00:20:47.560 --> 00:20:52.840
+<v Mike Long>but it doesn't lead to an awful lot of innovation and risk-taking, especially in the types of
+
+330
+00:20:52.840 --> 00:20:59.100
+<v Mike Long>customers that we're, we're targeting. So it was quite a hard place to start. I think if I was,
+
+331
+00:20:59.100 --> 00:21:04.840
+<v Mike Long>honestly, if I had another chance, I would find a way to get to the U.S. or find U.S. customers.
+
+332
+00:21:04.840 --> 00:21:10.780
+<v Mike Long>Find the U.S. market earlier because there's so much to learn from the U.S. market.
+
+333
+00:21:10.900 --> 00:21:12.300
+<v Mike Long>And just it's easier.
+
+334
+00:21:12.480 --> 00:21:17.620
+<v Mike Long>It seems like the risk appetite and the competition is much, much stronger.
+
+335
+00:21:17.840 --> 00:21:21.900
+<v Mike Long>So there's always a desire to find a new edge to try something new.
+
+336
+00:21:23.360 --> 00:21:24.880
+<v Noah Labhart>Okay, Mike, last question.
+
+337
+00:21:25.120 --> 00:21:30.040
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+338
+00:21:30.220 --> 00:21:31.400
+<v Noah Labhart>They're jazzed about it.
+
+339
+00:21:31.400 --> 00:21:34.800
+<v Noah Labhart>They can't wait to show it off to the world and can't wait to show it off to you right there on the plane.
+
+340
+00:21:35.220 --> 00:21:38.220
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+341
+00:21:39.060 --> 00:21:44.720
+<v Mike Long>So I would definitely encourage them to turn their idea into reality and to do it as quickly as possible.
+
+342
+00:21:45.100 --> 00:21:49.620
+<v Mike Long>Social media is full of armchair generals and, you know, armchair generals don't win the war.
+
+343
+00:21:49.720 --> 00:21:57.320
+<v Mike Long>The way you actually succeed in life is to go out and do it and make the product, market it, find customers, do all the hard work.
+
+344
+00:21:57.420 --> 00:22:01.120
+<v Mike Long>It's not easy. For sure, you're going to make lots of mistakes.
+
+345
+00:22:01.400 --> 00:22:05.100
+<v Mike Long>never get it right because this isn't what you've done. Especially if you're a technologist,
+
+346
+00:22:05.160 --> 00:22:09.740
+<v Mike Long>you spent your time writing code and getting good at that and maybe building products as well.
+
+347
+00:22:09.920 --> 00:22:17.300
+<v Mike Long>But taking an idea and turning it into a business is a hard problem. But the only way to do it is to
+
+348
+00:22:17.300 --> 00:22:23.300
+<v Mike Long>actually do it. You can't go off and do an MBA and do it. There's no prerequisite. No one's going to
+
+349
+00:22:23.300 --> 00:22:27.480
+<v Mike Long>pick you. You just have to go and do it. So that would be my encouragement. Do it. Absolutely do
+
+350
+00:22:27.480 --> 00:22:29.640
+<v Mike Long>do it and do it as quickly as you can because time is flying.
+
+351
+00:22:30.220 --> 00:22:31.060
+<v Noah Labhart>Couldn't agree more.
+
+352
+00:22:31.360 --> 00:22:33.760
+<v Noah Labhart>Well, Mike, thank you for being on the show today.
+
+353
+00:22:33.840 --> 00:22:36.560
+<v Noah Labhart>And thank you for telling the creation story of Kosli.
+
+354
+00:22:36.700 --> 00:22:37.200
+<v Noah Labhart>It's been
+
+355
+00:22:36.980 --> 00:22:37.640
+<v Mike Long>an absolute pleasure.
+
+356
+00:22:37.680 --> 00:22:38.180
+<v Mike Long>Thanks Noah.
+
+357
+00:22:39.580 --> 00:22:42.400
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+358
+00:22:45.140 --> 00:22:48.080
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+359
+00:22:48.300 --> 00:22:50.940
+<v Noah Labhart>Be sure to subscribe on Apple podcasts, Spotify,
+
+360
+00:22:51.000 --> 00:22:53.040
+<v Noah Labhart>or the podcasting app of your choice.
+
+361
+00:22:53.700 --> 00:22:55.820
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+362
+00:22:57.480 --> 00:22:58.040
+<v Noah Labhart>out tremendously.
+
+363
+00:23:00.820 --> 00:23:02.460
+<v Noah Labhart>And thanks again for listening.

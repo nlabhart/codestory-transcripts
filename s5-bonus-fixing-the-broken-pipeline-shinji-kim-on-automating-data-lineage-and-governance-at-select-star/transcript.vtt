@@ -1,0 +1,1319 @@
+WEBVTT
+
+NOTE S5 Bonus: Fixing the Broken Pipeline: Shinji Kim on Automating Data Lineage and Governance at Select Star
+
+1
+00:00:00.000 --> 00:00:07.800
+<v Shinji Kim>The main part of the design is really initially about the documentation of
+
+2
+00:00:07.800 --> 00:00:12.920
+<v Shinji Kim>data warehouse tables and columns and then the what I would call context
+
+3
+00:00:12.920 --> 00:00:18.920
+<v Shinji Kim>information. Who is the owner? Like what are the other tables that are that look
+
+4
+00:00:18.920 --> 00:00:26.320
+<v Shinji Kim>similar? So there were what I regarded as the fundamental features of the product
+
+5
+00:00:26.320 --> 00:00:27.360
+<v Shinji Kim>that we needed to have.
+
+6
+00:00:27.660 --> 00:00:30.360
+<v Shinji Kim>At the same time, for the design perspective,
+
+7
+00:00:30.640 --> 00:00:32.560
+<v Shinji Kim>we did have other features too.
+
+8
+00:00:32.860 --> 00:00:34.460
+<v Shinji Kim>I would say even now,
+
+9
+00:00:34.620 --> 00:00:37.360
+<v Shinji Kim>some of these features are not implemented yet.
+
+10
+00:00:38.780 --> 00:00:40.280
+<v Shinji Kim>My name is Shinji Kim.
+
+11
+00:00:40.420 --> 00:00:42.580
+<v Shinji Kim>I'm the founder and CEO of Select Star.
+
+12
+00:00:47.500 --> 00:00:49.320
+<v Noah Labhart>This is Code Story,
+
+13
+00:00:49.600 --> 00:00:52.940
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+14
+00:00:52.940 --> 00:00:55.280
+<v Noah Labhart>who share in the critical moments
+
+15
+00:00:56.320 --> 00:01:00.840
+<v Noah Labhart>change an industry, and build and lead a team that has your back.
+
+16
+00:01:02.280 --> 00:01:08.460
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Shinji Kim built the tool that takes you beyond
+
+17
+00:01:08.460 --> 00:01:12.060
+<v Noah Labhart>the data catalog and makes discovery easy.
+
+18
+00:01:13.380 --> 00:01:15.760
+<v Noah Labhart>All this and more on Code Story.
+
+19
+00:01:21.760 --> 00:01:23.440
+<v Noah Labhart>Shinji Kim was born in Korea.
+
+20
+00:01:23.440 --> 00:01:26.360
+<v Noah Labhart>Her family moved to Canada when she was 13 years old.
+
+21
+00:01:26.620 --> 00:01:30.400
+<v Noah Labhart>She likes to hang out with her friends, watch movies, and likes to be outdoors, skiing,
+
+22
+00:01:30.620 --> 00:01:31.600
+<v Noah Labhart>hiking, or doing yoga.
+
+23
+00:01:31.920 --> 00:01:35.560
+<v Noah Labhart>She recently tore her ACL though, which has put a damper on her physical activity.
+
+24
+00:01:36.360 --> 00:01:40.480
+<v Noah Labhart>While she studied at the University of Waterloo, she was able to work with many different well-known
+
+25
+00:01:40.480 --> 00:01:43.580
+<v Noah Labhart>companies, Facebook, Sun Microsystems, and Barclays.
+
+26
+00:01:44.040 --> 00:01:49.120
+<v Noah Labhart>In 2014, she started her first company called Concord Systems, focusing on distributed stream
+
+27
+00:01:49.120 --> 00:01:49.620
+<v Noah Labhart>processing.
+
+28
+00:01:50.180 --> 00:01:54.200
+<v Noah Labhart>This was eventually acquired by Akamai, the largest CDN network in the world.
+
+29
+00:01:54.360 --> 00:01:57.960
+<v Noah Labhart>We joked about the day it went down because it felt like the digital world went dark.
+
+30
+00:01:58.760 --> 00:02:03.540
+<v Noah Labhart>At Akamai, she worked with large enterprises and saw that there was a problem around data discovery.
+
+31
+00:02:04.400 --> 00:02:08.240
+<v Noah Labhart>And that it was growing in the middle market as more companies migrated to the cloud.
+
+32
+00:02:08.840 --> 00:02:14.320
+<v Noah Labhart>She decided to build an automated way for users to discover and understand their data.
+
+33
+00:02:14.320 --> 00:02:14.820
+<v Noah Labhart>data.
+
+34
+00:02:16.380 --> 00:02:19.300
+<v Noah Labhart>This is the creation story of Select Star.
+
+35
+00:02:22.780 --> 00:02:29.080
+<v Shinji Kim>So Select Star is an automated data discovery tool that helps everyone to find and understand
+
+36
+00:02:29.080 --> 00:02:30.120
+<v Shinji Kim>their own data.
+
+37
+00:02:30.440 --> 00:02:36.020
+<v Shinji Kim>This is a company I decided to start about a year and a half ago, actually March 2020
+
+38
+00:02:36.020 --> 00:02:38.260
+<v Shinji Kim>is our incorporation.
+
+39
+00:02:38.260 --> 00:02:46.540
+<v Shinji Kim>Coming from the experience of first being a data engineer, software engineer, analyst,
+
+40
+00:02:46.900 --> 00:02:53.700
+<v Shinji Kim>product manager, working with data, it was always important to me to have the right context.
+
+41
+00:02:53.980 --> 00:03:00.900
+<v Shinji Kim>I noticed that a lot of companies, as they are growing and as they are starting to expand
+
+42
+00:03:00.900 --> 00:03:06.140
+<v Shinji Kim>their businesses, they get to a point where they have so many data sets in their data
+
+43
+00:03:06.140 --> 00:03:13.180
+<v Shinji Kim>warehouses and BI tools or visualization tools, it's very hard to understand the real true context
+
+44
+00:03:13.180 --> 00:03:21.760
+<v Shinji Kim>of data. On top of that, a lot of teams like data teams are starting to have their own, not just the
+
+45
+00:03:22.260 --> 00:03:28.700
+<v Shinji Kim>data analysts as a centralized function, but different operation teams like sales, marketing,
+
+46
+00:03:28.820 --> 00:03:34.160
+<v Shinji Kim>customer support, having their own analysts creating their own models and visualization,
+
+47
+00:03:36.140 --> 00:03:39.640
+<v Shinji Kim>to manage and organize data internally.
+
+48
+00:03:40.340 --> 00:03:44.000
+<v Shinji Kim>I thought this is a problem that enterprises used to have
+
+49
+00:03:44.440 --> 00:03:47.840
+<v Shinji Kim>because at Akamai, I worked with larger enterprises,
+
+50
+00:03:48.000 --> 00:03:51.160
+<v Shinji Kim>mostly focused on consumer electronics companies.
+
+51
+00:03:51.920 --> 00:03:53.800
+<v Shinji Kim>I saw that this problem is something
+
+52
+00:03:53.800 --> 00:03:56.220
+<v Shinji Kim>that's starting to grow in mid-market
+
+53
+00:03:56.220 --> 00:03:58.600
+<v Shinji Kim>and a lot of tech companies,
+
+54
+00:03:58.840 --> 00:04:01.520
+<v Shinji Kim>as more companies are moving to cloud data warehouses
+
+55
+00:04:01.520 --> 00:04:04.640
+<v Shinji Kim>and decentralized model of managing data.
+
+56
+00:04:06.140 --> 00:04:13.160
+<v Shinji Kim>to start Select Star and it's been a good ride so far. We've been working with companies like
+
+57
+00:04:13.160 --> 00:04:20.360
+<v Shinji Kim>Pitney Bowes, Opendoor and Handshake where they have accumulated tens of thousands of tables and
+
+58
+00:04:20.360 --> 00:04:26.640
+<v Shinji Kim>thousands of dashboards. So being able to help their data analysts, data team and ops people
+
+59
+00:04:26.640 --> 00:04:32.520
+<v Shinji Kim>to be able to find what they're looking for faster and also finding the right information
+
+60
+00:04:32.520 --> 00:04:37.040
+<v Shinji Kim>information, without having to ask other people all the time has been very interesting.
+
+61
+00:04:38.620 --> 00:04:42.060
+<v Noah Labhart>Well, tell me about the MVP. So that first product you built,
+
+62
+00:04:42.120 --> 00:04:45.720
+<v Noah Labhart>tell me how long it took you to build and what sort of tools you use to bring it to life.
+
+63
+00:04:47.300 --> 00:04:50.900
+<v Shinji Kim>When I started my quote, unquote, like customer discovery,
+
+64
+00:04:51.160 --> 00:04:54.720
+<v Shinji Kim>Select Star was just one of three ideas that I had in the data space.
+
+65
+00:04:55.920 --> 00:04:59.940
+<v Shinji Kim>And I initially talked to a lot of different companies, target user,
+
+66
+00:04:59.940 --> 00:05:03.960
+<v Shinji Kim>meaning like the data platform managers to understand what may be the most
+
+67
+00:05:03.960 --> 00:05:09.260
+<v Shinji Kim>challenging area for them day to day. Data Discovery definitely came out
+
+68
+00:05:09.260 --> 00:05:15.880
+<v Shinji Kim>multiple times so what I actually initially did was creating a design mock
+
+69
+00:05:15.880 --> 00:05:20.840
+<v Shinji Kim>of how this product would look like and would act and I just started getting
+
+70
+00:05:20.840 --> 00:05:28.600
+<v Shinji Kim>feedback from that design from the potential users of the product and
+
+71
+00:05:29.940 --> 00:05:33.480
+<v Shinji Kim>I recruited my first 10, I guess, beta customers.
+
+72
+00:05:34.300 --> 00:05:38.160
+<v Shinji Kim>After that, you know, so once I kind of validated
+
+73
+00:05:38.160 --> 00:05:40.620
+<v Shinji Kim>that this is needed in the market
+
+74
+00:05:40.620 --> 00:05:43.660
+<v Shinji Kim>and then the way that I'm approaching it makes sense
+
+75
+00:05:44.140 --> 00:05:49.020
+<v Shinji Kim>to the target users, that's when I raised our seat round
+
+76
+00:05:49.020 --> 00:05:51.460
+<v Shinji Kim>and then started building the actual product.
+
+77
+00:05:51.680 --> 00:05:53.940
+<v Shinji Kim>Even now, the product that we have
+
+78
+00:05:53.940 --> 00:05:56.840
+<v Shinji Kim>that our customers are using looks very similar
+
+79
+00:05:56.840 --> 00:05:58.900
+<v Shinji Kim>to the very first mock that I had.
+
+80
+00:05:59.940 --> 00:06:02.280
+<v Shinji Kim>I should call that the MVP, the design mock.
+
+81
+00:06:02.460 --> 00:06:05.480
+<v Shinji Kim>But basically the V0 version of the product,
+
+82
+00:06:05.520 --> 00:06:09.820
+<v Shinji Kim>I think have taken probably like two, three months from there.
+
+83
+00:06:10.180 --> 00:06:12.240
+<v Shinji Kim>Very basic version of the product.
+
+84
+00:06:12.300 --> 00:06:14.520
+<v Shinji Kim>And then we just started iterating from there.
+
+85
+00:06:14.980 --> 00:06:18.600
+<v Noah Labhart>So you built a design mock to essentially get your feedback
+
+86
+00:06:18.600 --> 00:06:20.520
+<v Noah Labhart>and gauge interest, right?
+
+87
+00:06:20.620 --> 00:06:21.540
+<v Noah Labhart>Which is faster.
+
+88
+00:06:21.640 --> 00:06:22.660
+<v Noah Labhart>You're not coding.
+
+89
+00:06:22.840 --> 00:06:25.940
+<v Noah Labhart>You're slinging paint on a screen, right?
+
+90
+00:06:26.040 --> 00:06:27.600
+<v Noah Labhart>And then you built your MVP.
+
+91
+00:06:27.980 --> 00:06:29.240
+<v Noah Labhart>So that makes total sense.
+
+92
+00:06:29.940 --> 00:06:34.180
+<v Noah Labhart>I hear you saying your MVP kind of reflected a lot of what was in the design mock as well.
+
+93
+00:06:34.420 --> 00:06:38.220
+<v Shinji Kim>Yeah, the design mock was a very high fidelity mock.
+
+94
+00:06:38.700 --> 00:06:48.040
+<v Shinji Kim>I could have just put some click part to make it as a prototype as well, but it wasn't super necessary.
+
+95
+00:06:48.400 --> 00:06:53.820
+<v Shinji Kim>And the MVP itself was exactly just the design to a real product.
+
+96
+00:06:55.300 --> 00:07:09.920
+<v Noah Labhart>With the design mock and the MVP, the V0, you have to make certain decisions and trade-offs about what sort of features you're going to limit yourself to or with the MVP portion of it and what sort of technical debt you're going to accept.
+
+97
+00:07:10.100 --> 00:07:14.540
+<v Noah Labhart>So tell me about some of those decisions you went through or you had to make and how you cope with them.
+
+98
+00:07:15.440 --> 00:07:25.780
+<v Shinji Kim>The main part of the design is really initially about the documentation of data warehouse tables and columns.
+
+99
+00:07:25.840 --> 00:07:37.000
+<v Shinji Kim>And then what I would call context information, like who is the owner, like what are the other tables that look similar, lineage, things like that.
+
+100
+00:07:37.000 --> 00:07:45.540
+<v Shinji Kim>So there were basically kind of like what I regarded as the fundamental features of the product that we needed to have.
+
+101
+00:07:45.920 --> 00:07:54.720
+<v Shinji Kim>At the same time, for the design perspective, we did have other features too, like, you know, internal analytics or business glossary.
+
+102
+00:07:55.900 --> 00:08:00.860
+<v Shinji Kim>So I would say even now, some of these features are not implemented yet.
+
+103
+00:08:00.860 --> 00:08:09.420
+<v Shinji Kim>Because what we did was I decided that we're going to focus on first building the very initial fundamental features.
+
+104
+00:08:09.600 --> 00:08:18.580
+<v Shinji Kim>And then as people start using our v0, we will either add new features or improve the ones that we have.
+
+105
+00:08:18.820 --> 00:08:21.100
+<v Shinji Kim>And that's kind of like the path we took.
+
+106
+00:08:21.520 --> 00:08:28.920
+<v Shinji Kim>So for instance, data lineage is a feature that we had at a very bare bone version in the beginning.
+
+107
+00:08:30.860 --> 00:08:38.320
+<v Shinji Kim>that the customers kept asking for or we saw a lot of usage from.
+
+108
+00:08:38.600 --> 00:08:42.800
+<v Shinji Kim>So that is a feature that we continuously improved over time
+
+109
+00:08:43.600 --> 00:08:50.840
+<v Shinji Kim>so that now it looks a lot more advanced than my design mock that I started with.
+
+110
+00:08:52.500 --> 00:08:58.180
+<v Shinji Kim>So I would say these are some of the trade-offs that you make along the way
+
+111
+00:08:58.180 --> 00:08:59.840
+<v Shinji Kim>as you work with different customers.
+
+112
+00:09:02.020 --> 00:09:08.960
+<v Shinji Kim>And obviously there are features that like metrics, something that we wanted to have
+
+113
+00:09:08.960 --> 00:09:12.800
+<v Shinji Kim>from before it got delayed, but now we have like an initial version of.
+
+114
+00:09:15.520 --> 00:09:20.200
+<v Noah Labhart>So next steps then, and you're, you're kind of starting to starting to tee up the question
+
+115
+00:09:20.200 --> 00:09:20.700
+<v Noah Labhart>already.
+
+116
+00:09:20.880 --> 00:09:22.860
+<v Noah Labhart>How did you progress the product?
+
+117
+00:09:23.020 --> 00:09:24.080
+<v Noah Labhart>How did you mature it?
+
+118
+00:09:24.100 --> 00:09:27.140
+<v Noah Labhart>You talked about getting feedback on the features and making them better, right?
+
+119
+00:09:27.140 --> 00:09:34.240
+<v Noah Labhart>How did you build your roadmap and figure out, okay, this is the next most important thing to build with all that feedback?
+
+120
+00:09:35.640 --> 00:09:42.020
+<v Shinji Kim>I think one of the hardest part of a startup is that you have so much to do and you have to pick and choose.
+
+121
+00:09:42.200 --> 00:09:45.420
+<v Shinji Kim>You have to rank sort your priority eventually.
+
+122
+00:09:47.620 --> 00:09:52.680
+<v Shinji Kim>So we do this based on kind of like both top-down and bottoms-up model.
+
+123
+00:09:52.680 --> 00:10:10.920
+<v Shinji Kim>So top-down meaning I have a set goals of types of features or integrations that we want to achieve during the year, the quarter, the month, the week in general, like the type of goals that we want to get to.
+
+124
+00:10:10.920 --> 00:10:29.280
+<v Shinji Kim>But then these things are changeable based on like an important customer deal we want to close or a specific bug that is affecting multiple customers or better improvement that we can make easily from where we are today.
+
+125
+00:10:29.540 --> 00:10:36.940
+<v Shinji Kim>So those two things need to be combined together in order for us to decide what are we working on next week.
+
+126
+00:10:38.620 --> 00:10:44.680
+<v Noah Labhart>So how did you go about building your team? And you know, what did you look for in those
+
+127
+00:10:44.680 --> 00:10:47.540
+<v Noah Labhart>people to indicate that they were the winning horses to join you?
+
+128
+00:10:49.400 --> 00:10:56.400
+<v Shinji Kim>So I've worked with many different types of people and teams in the past. So when I was
+
+129
+00:10:56.400 --> 00:11:00.780
+<v Shinji Kim>working in tech companies as an intern, like I've worked with like five different companies.
+
+130
+00:11:00.920 --> 00:11:05.820
+<v Shinji Kim>I also when I was working as a management consultant, you know, many different projects,
+
+131
+00:11:07.000 --> 00:11:13.680
+<v Shinji Kim>working in a startup and starting my own company and also running a team of engineers when I was
+
+132
+00:11:13.680 --> 00:11:20.400
+<v Shinji Kim>at Akamai were all in different areas so I think I kind of started to develop the type of people
+
+133
+00:11:20.400 --> 00:11:28.340
+<v Shinji Kim>that I like working with and it also is coming from like knowing what I value from working with
+
+134
+00:11:28.340 --> 00:11:37.060
+<v Shinji Kim>with others. In general, I very much value being open and transparent. Also, I prefer having people
+
+135
+00:11:37.060 --> 00:11:44.840
+<v Shinji Kim>that have a common goal as the main driver. So I think these are just some of the things that
+
+136
+00:11:44.840 --> 00:11:50.600
+<v Shinji Kim>kind of got ingrained in our culture because that's kind of how I work. But the way that we
+
+137
+00:11:50.600 --> 00:11:57.620
+<v Shinji Kim>started in the beginning, like a lot of other, you know, startups, I was introduced to an engineer
+
+138
+00:11:58.340 --> 00:12:04.440
+<v Shinji Kim>was working on a different startup with a friend of mine and he was looking to basically thinking
+
+139
+00:12:04.440 --> 00:12:12.200
+<v Shinji Kim>about what he needs to do next as they were winding down their company so I had him join in
+
+140
+00:12:12.200 --> 00:12:20.180
+<v Shinji Kim>the beginning and then the second engineer that joined me I found him on Hacker News. It's very
+
+141
+00:12:20.180 --> 00:12:26.780
+<v Shinji Kim>random but I was looking for a very specific skill set of a person that can
+
+142
+00:12:26.780 --> 00:12:34.620
+<v Shinji Kim>build a SQL query parser and while I was looking through the job board on
+
+143
+00:12:34.620 --> 00:12:40.080
+<v Shinji Kim>Hacker News I decided to contact him and you know we hit it off from there
+
+144
+00:12:40.080 --> 00:12:46.700
+<v Shinji Kim>but both cases there was a like a coding challenge so right now and this is the
+
+145
+00:12:46.700 --> 00:12:53.260
+<v Shinji Kim>the same as before and now like slightly changed but in general our hiring process is that after
+
+146
+00:12:53.260 --> 00:12:59.520
+<v Shinji Kim>the initial interview you have to do a quote-unquote like take-home assignment and then we do references
+
+147
+00:12:59.520 --> 00:13:05.680
+<v Shinji Kim>after so we don't do like a full day interviews with like bunch of people because like we're a
+
+148
+00:13:05.680 --> 00:13:12.820
+<v Shinji Kim>fully remote team and we want each person to be independent and can execute and also communicate
+
+149
+00:13:12.820 --> 00:13:19.940
+<v Shinji Kim>be able to communicate asynchronously and work with others asynchronously without having to be in the same room all the time.
+
+150
+00:13:20.320 --> 00:13:27.720
+<v Shinji Kim>Both of the engineers have gone through those challenges to basically kind of initially prove that they had these skills
+
+151
+00:13:27.720 --> 00:13:32.660
+<v Shinji Kim>and then the rest of it was going to be more on the reference interviews.
+
+152
+00:13:33.720 --> 00:13:38.840
+<v Shinji Kim>In the very beginning, I had another engineer, a very senior engineer that I was working with,
+
+153
+00:13:38.900 --> 00:13:42.000
+<v Shinji Kim>that came through a very high regarded referral.
+
+154
+00:13:44.300 --> 00:14:00.620
+<v Shinji Kim>And him and a few other friends of mine also have helped out on the side on vetting some of the engineering skills or reviewing our coded examples or not examples, but more like exercise that they've done.
+
+155
+00:14:01.040 --> 00:14:09.540
+<v Shinji Kim>So that's kind of how we find it. It's like both skill sets, but also we take the references pretty seriously.
+
+156
+00:14:09.540 --> 00:14:25.120
+<v Shinji Kim>So I think being able to understand how that person works with others, what they are motivated by, and what are the areas that we can support them to grow are some of the things that I try to find out during the reference call.
+
+157
+00:14:29.360 --> 00:14:32.260
+<v Noah Labhart>Well, let's switch from team then to scalability.
+
+158
+00:14:32.680 --> 00:14:35.820
+<v Noah Labhart>So did you build this to scale efficiently?
+
+159
+00:14:36.170 --> 00:14:38.680
+<v Noah Labhart>And this is post-design prototype, right?
+
+160
+00:14:39.540 --> 00:14:43.820
+<v Noah Labhart>this to scale efficiently from day one or are you finding this kind of as you grow?
+
+161
+00:14:45.440 --> 00:14:51.560
+<v Shinji Kim>I think it's a little bit of both. When we first designed or when we were first building the MVP,
+
+162
+00:14:51.920 --> 00:14:59.480
+<v Shinji Kim>because I had a very high fidelity design of this product, when my first engineers were
+
+163
+00:14:59.480 --> 00:15:05.820
+<v Shinji Kim>building the product, they knew that there was a lot of parts that needs to be decoupled from
+
+164
+00:15:05.820 --> 00:15:08.380
+<v Shinji Kim>from like a traditional application model.
+
+165
+00:15:08.740 --> 00:15:14.040
+<v Shinji Kim>We look at metadata and we also parse out metadata
+
+166
+00:15:14.040 --> 00:15:18.160
+<v Shinji Kim>from SQL queries to attach and build relationships
+
+167
+00:15:18.660 --> 00:15:19.320
+<v Shinji Kim>between those.
+
+168
+00:15:19.740 --> 00:15:22.540
+<v Shinji Kim>So every time you're looking at a table,
+
+169
+00:15:22.700 --> 00:15:25.460
+<v Shinji Kim>we can tell you where did the data come from?
+
+170
+00:15:25.600 --> 00:15:27.940
+<v Shinji Kim>Who are the top users of this inside the company?
+
+171
+00:15:28.220 --> 00:15:30.640
+<v Shinji Kim>What are the dashboards that were built on top of this?
+
+172
+00:15:30.800 --> 00:15:34.240
+<v Shinji Kim>And how are people actually utilizing this data set
+
+173
+00:15:35.820 --> 00:15:46.600
+<v Shinji Kim>That all comes from having our own mental models of, you know, if there is a table, there are also queries and then there are also kind of like data sources where it belongs.
+
+174
+00:15:46.900 --> 00:15:49.340
+<v Shinji Kim>There will be also users and user activities.
+
+175
+00:15:49.760 --> 00:16:00.400
+<v Shinji Kim>So a lot of that, it had to be built like a kind of architected in the right way in the beginning for all of those features to run.
+
+176
+00:16:00.400 --> 00:16:06.320
+<v Shinji Kim>Hence, it's not like we build only one feature and you're trying to modify the model.
+
+177
+00:16:06.500 --> 00:16:11.880
+<v Shinji Kim>We already had that map of most of the features in plan.
+
+178
+00:16:12.240 --> 00:16:19.320
+<v Shinji Kim>So when our first engineers were designing the product, they kind of had to build it
+
+179
+00:16:19.320 --> 00:16:23.800
+<v Shinji Kim>in order to scale it as an application.
+
+180
+00:16:24.260 --> 00:16:27.120
+<v Shinji Kim>At the same time, it was a monolith model.
+
+181
+00:16:27.120 --> 00:16:32.060
+<v Shinji Kim>So I'm not saying that this is scalable to millions and millions of customers today.
+
+182
+00:16:33.280 --> 00:16:38.980
+<v Shinji Kim>That part is also something that you can move towards more like a microservices approach
+
+183
+00:16:38.980 --> 00:16:41.460
+<v Shinji Kim>that we can do a little bit later.
+
+184
+00:16:41.760 --> 00:16:48.940
+<v Shinji Kim>Today, we already have a move to running everything on EKS with Terraform.
+
+185
+00:16:49.180 --> 00:16:50.380
+<v Shinji Kim>So it's all programmatic.
+
+186
+00:16:50.380 --> 00:16:58.860
+<v Shinji Kim>And, you know, we are starting to scale different parts of the systems so that like ingestion can run more smoothly.
+
+187
+00:16:58.900 --> 00:17:03.080
+<v Shinji Kim>And, you know, Elasticsearch can be also decoupled, like things like that.
+
+188
+00:17:03.180 --> 00:17:09.320
+<v Shinji Kim>So the data model itself was designed so that it can scale easily.
+
+189
+00:17:09.520 --> 00:17:18.360
+<v Shinji Kim>For the scaling out the infrastructure side is something that we are starting to now work on so that we can process more information faster.
+
+190
+00:17:18.360 --> 00:17:19.440
+<v Shinji Kim>faster.
+
+191
+00:17:19.440 --> 00:17:25.820
+<v Shinji Kim>I would say one of the things that also helped is one of our first customers was Opendoor
+
+192
+00:17:25.820 --> 00:17:32.420
+<v Shinji Kim>and they have a lot of metadata and a lot of SQL queries like they run close to a million
+
+193
+00:17:32.420 --> 00:17:33.080
+<v Shinji Kim>every day.
+
+194
+00:17:33.480 --> 00:17:40.280
+<v Shinji Kim>That really stress tested our system both on front end, back end and our data model
+
+195
+00:17:40.280 --> 00:17:45.800
+<v Shinji Kim>really and to end everything because when for instance like your data lineage model
+
+196
+00:17:45.800 --> 00:17:51.840
+<v Shinji Kim>model run and it's trying to load up hundreds of tables all at the same time.
+
+197
+00:17:51.980 --> 00:17:59.540
+<v Shinji Kim>It's just not feasible for any user to wait or sift through just because they have too
+
+198
+00:17:59.540 --> 00:18:00.040
+<v Shinji Kim>much data.
+
+199
+00:18:00.220 --> 00:18:08.820
+<v Shinji Kim>So we had to basically iterate different ways of displaying lots of data and how to make
+
+200
+00:18:08.820 --> 00:18:16.400
+<v Shinji Kim>it more interactive to also making the performance to be faster on both front-end and back-end.
+
+201
+00:18:16.580 --> 00:18:19.940
+<v Shinji Kim>So yeah, I mean, it's still an ongoing effort, I would say.
+
+202
+00:18:20.640 --> 00:18:25.260
+<v Shinji Kim>We are trying to get it to a point where it can scale further.
+
+203
+00:18:26.060 --> 00:18:29.160
+<v Noah Labhart>I don't want to dig into anything proprietary, but I'm curious.
+
+204
+00:18:29.300 --> 00:18:35.160
+<v Noah Labhart>When I think of SQL, accessing SQL and running queries, writing queries, things like that,
+
+205
+00:18:35.160 --> 00:18:38.920
+<v Noah Labhart>that I'm trying in my head to find where the metadata is.
+
+206
+00:18:39.100 --> 00:18:40.440
+<v Noah Labhart>Is that some trace logs?
+
+207
+00:18:40.660 --> 00:18:42.380
+<v Noah Labhart>Is there some logging that you're mining?
+
+208
+00:18:42.640 --> 00:18:43.460
+<v Noah Labhart>Where does that sit?
+
+209
+00:18:44.060 --> 00:18:45.940
+<v Shinji Kim>Every data warehouse is different,
+
+210
+00:18:46.120 --> 00:18:49.700
+<v Shinji Kim>but most data warehouses first have an information schema
+
+211
+00:18:49.700 --> 00:18:54.720
+<v Shinji Kim>or a system table that contains all the database names,
+
+212
+00:18:54.880 --> 00:18:56.880
+<v Shinji Kim>schema names, table names, column names,
+
+213
+00:18:56.960 --> 00:19:00.280
+<v Shinji Kim>where they belong, what the descriptions look like, things like that.
+
+214
+00:19:00.560 --> 00:19:04.760
+<v Shinji Kim>So that's the main metadata tables that we use.
+
+215
+00:19:05.160 --> 00:19:17.440
+<v Shinji Kim>Data warehouses like Snowflake has a query history view that has the log of all the queries that have gotten executed inside the Snowflake instance.
+
+216
+00:19:18.330 --> 00:19:23.780
+<v Shinji Kim>For a database like Postgres, it is a setup that you need to run.
+
+217
+00:19:24.040 --> 00:19:29.680
+<v Shinji Kim>Otherwise, because you just generally don't have as much data for some logs.
+
+218
+00:19:30.180 --> 00:19:34.880
+<v Shinji Kim>So you have to create your own ways to log that on your own.
+
+219
+00:19:35.660 --> 00:19:43.100
+<v Shinji Kim>Same with something like Redshift, you have to enable your activity logs in order to start seeing those data.
+
+220
+00:19:43.280 --> 00:19:45.720
+<v Shinji Kim>So yeah, each data warehouse is like.
+
+221
+00:19:46.820 --> 00:19:53.120
+<v Noah Labhart>Well, as you step out on the balcony and you look across all you've built with Select Star, what are you most proud of?
+
+222
+00:19:55.580 --> 00:20:01.300
+<v Shinji Kim>Just everything about the progress that I've made with my team.
+
+223
+00:20:01.300 --> 00:20:06.100
+<v Shinji Kim>primarily it's the you know team's work because I it's not like I'm quoting
+
+224
+00:20:06.100 --> 00:20:12.880
+<v Shinji Kim>every day. Every team member that we have in Select Star today have all joined us
+
+225
+00:20:12.880 --> 00:20:18.820
+<v Shinji Kim>from many different paths which I think is unusual compared to a lot of Silicon
+
+226
+00:20:18.820 --> 00:20:23.500
+<v Shinji Kim>Valley companies but they are all working fully remote they are all very
+
+227
+00:20:23.500 --> 00:20:28.280
+<v Shinji Kim>reliable very independent and they all love working together and I think that's
+
+228
+00:20:28.280 --> 00:20:30.320
+<v Shinji Kim>That's really something that I'm very proud of.
+
+229
+00:20:30.460 --> 00:20:34.680
+<v Shinji Kim>And I really just, it's a fun, it's a joy to work with them all.
+
+230
+00:20:36.040 --> 00:20:37.960
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+231
+00:20:38.100 --> 00:20:41.920
+<v Noah Labhart>Tell me about a mistake you made and how you and your team respond to it.
+
+232
+00:20:42.860 --> 00:20:45.120
+<v Shinji Kim>I mean, there are so many mistakes that are made.
+
+233
+00:20:46.880 --> 00:20:50.140
+<v Shinji Kim>But at the same time, I think it's like inevitable, right?
+
+234
+00:20:50.220 --> 00:20:51.320
+<v Shinji Kim>When you're running a company.
+
+235
+00:20:52.520 --> 00:20:56.260
+<v Shinji Kim>So I guess if it's something related to the team,
+
+236
+00:20:57.980 --> 00:21:03.720
+<v Shinji Kim>For instance, I can talk about small features that we built because this was something that
+
+237
+00:21:03.720 --> 00:21:10.740
+<v Shinji Kim>customers have asked for, but I decided to shut it down later because I didn't think
+
+238
+00:21:10.740 --> 00:21:11.720
+<v Shinji Kim>it made sense.
+
+239
+00:21:12.080 --> 00:21:16.280
+<v Shinji Kim>The very specific example of this is that we have a big search bar on top.
+
+240
+00:21:16.560 --> 00:21:21.440
+<v Shinji Kim>Some of our very early customers really wanted to have a search bar on the sidebar as well
+
+241
+00:21:21.440 --> 00:21:23.200
+<v Shinji Kim>to filter out what they see.
+
+242
+00:21:23.200 --> 00:21:29.160
+<v Shinji Kim>But I felt like this was like, you know, really going against the user flow because like,
+
+243
+00:21:29.240 --> 00:21:31.220
+<v Shinji Kim>which search bar then do you use?
+
+244
+00:21:31.780 --> 00:21:34.220
+<v Shinji Kim>We ended up getting rid of it at the end of the day.
+
+245
+00:21:34.340 --> 00:21:38.660
+<v Shinji Kim>And I felt bad about it, especially for the engineers that have worked on this because
+
+246
+00:21:38.660 --> 00:21:40.760
+<v Shinji Kim>this was not an easy feature to build.
+
+247
+00:21:41.220 --> 00:21:47.620
+<v Shinji Kim>But the fact that this overall long term wasn't a fit, you know, was the main reason and like
+
+248
+00:21:47.620 --> 00:21:49.080
+<v Shinji Kim>they completely understood that.
+
+249
+00:21:49.080 --> 00:21:55.100
+<v Shinji Kim>that. Other mistakes that I think happens and also will probably also happen is sometimes
+
+250
+00:21:55.970 --> 00:22:02.880
+<v Shinji Kim>we realize that some people that join us may not be a fit. I had to part ways with a couple
+
+251
+00:22:02.880 --> 00:22:09.020
+<v Shinji Kim>people in the past that were a part of our team before delivering that news and for the
+
+252
+00:22:09.020 --> 00:22:15.000
+<v Shinji Kim>team to take that is really hard. One is that they built some relationship with them and
+
+253
+00:22:15.000 --> 00:22:18.940
+<v Shinji Kim>And if anyone's leaving, then it still has a lot of impact.
+
+254
+00:22:20.020 --> 00:22:21.820
+<v Shinji Kim>And also, we have so much to do.
+
+255
+00:22:21.940 --> 00:22:24.540
+<v Shinji Kim>So what am I going to do now?
+
+256
+00:22:24.720 --> 00:22:27.580
+<v Shinji Kim>The other person can't take care of this anymore.
+
+257
+00:22:29.340 --> 00:22:39.100
+<v Shinji Kim>I take that responsibility of not being able to find or knowing that it wasn't going to be a fit early on.
+
+258
+00:22:39.100 --> 00:22:44.920
+<v Shinji Kim>We do as much as we can to try to understand whether this candidate is the right fit.
+
+259
+00:22:45.100 --> 00:22:53.220
+<v Shinji Kim>And also once they join, we really try to give them all the support so that they can be successful in our company.
+
+260
+00:22:53.540 --> 00:22:56.800
+<v Shinji Kim>But sometimes that may not happen.
+
+261
+00:22:57.160 --> 00:23:02.280
+<v Shinji Kim>Sometimes we are not the best team for them or they may and vice versa.
+
+262
+00:23:02.700 --> 00:23:07.020
+<v Shinji Kim>So I think those are some of the hard things that we go through.
+
+263
+00:23:07.020 --> 00:23:22.280
+<v Shinji Kim>But overall, I think my team has been very supportive of the decisions that I have made in the past on both hiring and also other people that might have to leave the team.
+
+264
+00:23:23.640 --> 00:23:28.220
+<v Noah Labhart>So what does the future look like for Select Star, the product and for your team?
+
+265
+00:23:30.000 --> 00:23:39.400
+<v Shinji Kim>We are planning a self-service launch at the end of the year so that more customers can try out Select Star without having to go through the demo cycle all the time.
+
+266
+00:23:39.900 --> 00:23:53.280
+<v Shinji Kim>And that's going to be a very exciting launch for us and also a new path of growth of expanding our team as well as product capabilities afterwards.
+
+267
+00:23:54.040 --> 00:23:57.940
+<v Shinji Kim>So, yeah, that's the near-term future of what it will look like.
+
+268
+00:23:59.060 --> 00:24:10.320
+<v Noah Labhart>Let's switch to you, Shinji. Who influences the way that you work? Name a builder, a CTO, a CEO, really any person. Name a person you look up to and why.
+
+269
+00:24:10.320 --> 00:24:10.820
+<v Noah Labhart>Why?
+
+270
+00:24:12.000 --> 00:24:16.820
+<v Shinji Kim>Anyone that has really influenced the way that I work is my mother.
+
+271
+00:24:17.480 --> 00:24:23.460
+<v Shinji Kim>So my mom used to be a vice principal of a preschool in Korea.
+
+272
+00:24:23.720 --> 00:24:29.320
+<v Shinji Kim>And after she immigrated to Canada, she's done many different jobs that is not office work at all.
+
+273
+00:24:30.080 --> 00:24:38.360
+<v Shinji Kim>Seeing her going through that change at an early age, it's kind of like a very, I think it has definitely made a lot of impact on me.
+
+274
+00:24:40.320 --> 00:24:43.740
+<v Shinji Kim>has a big work ethic, very hard worker, has high standards.
+
+275
+00:24:44.100 --> 00:24:48.840
+<v Shinji Kim>On top of that, she's also very much of a giving person to others.
+
+276
+00:24:49.120 --> 00:24:53.740
+<v Shinji Kim>And I think that has definitely influenced the way I work today.
+
+277
+00:24:55.260 --> 00:24:58.560
+<v Noah Labhart>Well, we talked about a mistake, but a little bit different spin.
+
+278
+00:24:58.780 --> 00:25:01.620
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+279
+00:25:01.660 --> 00:25:04.240
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+280
+00:25:06.240 --> 00:25:09.340
+<v Shinji Kim>I actually don't really have an answer to this question.
+
+281
+00:25:10.320 --> 00:25:14.280
+<v Shinji Kim>I think I've always tried to find the best way possible.
+
+282
+00:25:14.900 --> 00:25:20.920
+<v Shinji Kim>And sometimes I feel like, oh, I should have done this or I should have said this.
+
+283
+00:25:21.200 --> 00:25:25.240
+<v Shinji Kim>But those are small things that I don't have anything that I can remember.
+
+284
+00:25:26.180 --> 00:25:29.140
+<v Shinji Kim>But there is always small things, I'm sure.
+
+285
+00:25:31.200 --> 00:25:35.880
+<v Shinji Kim>But how do you know if that was going to actually happen that way?
+
+286
+00:25:36.220 --> 00:25:38.120
+<v Shinji Kim>Even if you made that other decision?
+
+287
+00:25:38.120 --> 00:25:39.500
+<v Shinji Kim>decision. Well,
+
+288
+00:25:39.600 --> 00:25:43.140
+<v Noah Labhart>last question. You're getting on a plane and you're sitting next to a young
+
+289
+00:25:43.140 --> 00:25:46.940
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show
+
+290
+00:25:46.940 --> 00:25:50.740
+<v Noah Labhart>it off to the world. Can't wait to show it off to you right there on the plane. What advice do you
+
+291
+00:25:50.740 --> 00:25:52.740
+<v Noah Labhart>give that person having gone down this road a bit?
+
+292
+00:25:54.780 --> 00:25:57.600
+<v Shinji Kim>Yeah, I think the advice that I give to a lot of
+
+293
+00:25:57.600 --> 00:26:06.260
+<v Shinji Kim>young founders and first-time founders usually tends to come back to things like focus is like
+
+294
+00:26:08.120 --> 00:26:14.960
+<v Shinji Kim>There's always so much to do and it's really easy to get overwhelmed, especially if you're coming
+
+295
+00:26:14.960 --> 00:26:22.120
+<v Shinji Kim>from an engineering background. I think a lot of people tend to feel like they need to make
+
+296
+00:26:22.120 --> 00:26:28.040
+<v Shinji Kim>all every single little decision right, but a lot of the times there's like
+
+297
+00:26:30.260 --> 00:26:36.240
+<v Shinji Kim>something like let's say like incorporation or getting an advisor or a lot of things that
+
+298
+00:26:38.120 --> 00:26:43.800
+<v Shinji Kim>this is already enabled so you kind of just have to like follow the traits instead of trying to
+
+299
+00:26:43.800 --> 00:26:53.980
+<v Shinji Kim>rebuild the wheel all the time. Um, I think trying to really focus on what's like what should be the
+
+300
+00:26:53.980 --> 00:27:00.560
+<v Shinji Kim>first step is more important. Uh, and kind of taking it step by step because otherwise you get
+
+301
+00:27:00.560 --> 00:27:07.700
+<v Shinji Kim>overwhelmed with so many other things that you have to take care of. Um, and I think that kind of
+
+302
+00:27:08.120 --> 00:27:15.720
+<v Shinji Kim>into, uh, also like try to like, one thing that I would want to tell a lot of other founders is that
+
+303
+00:27:15.720 --> 00:27:21.820
+<v Shinji Kim>you know, you kind of have to be realistic about where you are and being honest about like, uh, how
+
+304
+00:27:21.820 --> 00:27:28.860
+<v Shinji Kim>things are going down in order for you to find the, like, a core issue that needs to get get solved.
+
+305
+00:27:28.860 --> 00:27:35.460
+<v Shinji Kim>I mean, this is just, like, I guess the way that I operate the business because I'm generally very
+
+306
+00:27:35.460 --> 00:27:40.560
+<v Shinji Kim>very direct, and that if, if something bothers me, then I really need to get, get it through,
+
+307
+00:27:40.560 --> 00:27:47.800
+<v Shinji Kim>otherwise it's like, it's very hard for me to ignore these things. Um, yeah, and I guess otherwise
+
+308
+00:27:47.800 --> 00:27:54.020
+<v Shinji Kim>you know, life is short, so help each other and, you know, have fun. That's, I think, another important
+
+309
+00:27:54.020 --> 00:28:00.260
+<v Shinji Kim>thing, you know. It's already hard, so try to have fun, try to work on something that you are, uh,
+
+310
+00:28:00.260 --> 00:28:07.360
+<v Shinji Kim>excited to work on, like, every day. I think these are the things that I want
+
+311
+00:28:07.360 --> 00:28:11.420
+<v Shinji Kim>young founders to know and it's okay like you know I think a lot of people
+
+312
+00:28:11.420 --> 00:28:18.340
+<v Shinji Kim>end up at attaching their personal values to the company values and that
+
+313
+00:28:18.340 --> 00:28:28.800
+<v Shinji Kim>that may deteriorate or put an unnecessary burden on their mindset.
+
+314
+00:28:30.200 --> 00:28:35.280
+<v Shinji Kim>But I think just trying to take it more lightly is also important
+
+315
+00:28:35.280 --> 00:28:40.280
+<v Shinji Kim>in order for them to be at their best.
+
+316
+00:28:40.480 --> 00:28:43.400
+<v Shinji Kim>Because I truly believe that people will be at their best
+
+317
+00:28:43.400 --> 00:28:51.000
+<v Shinji Kim>if they are comfortable and they are not afraid of anything
+
+318
+00:28:51.000 --> 00:28:57.640
+<v Shinji Kim>and for them to actually continue making decisions with confidence.
+
+319
+00:28:58.480 --> 00:29:01.220
+<v Noah Labhart>Well, Shinji, thank you for being on the show today.
+
+320
+00:29:01.320 --> 00:29:04.360
+<v Noah Labhart>Thank you for telling the creation story of Select Star.
+
+321
+00:29:05.120 --> 00:29:07.300
+<v Shinji Kim>Thanks a lot for having me. This was fun.
+
+322
+00:29:09.540 --> 00:29:10.100
+<v Shinji Kim>And
+
+323
+00:29:10.100 --> 00:29:12.500
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+324
+00:29:15.260 --> 00:29:18.300
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+325
+00:29:18.400 --> 00:29:23.200
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+326
+00:29:23.620 --> 00:29:28.700
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+327
+00:29:29.040 --> 00:29:31.280
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+328
+00:29:31.540 --> 00:29:33.600
+<v Noah Labhart>Both things help us out tremendously.
+
+329
+00:29:35.860 --> 00:29:37.380
+<v Noah Labhart>And thanks again for listening.

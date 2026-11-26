@@ -1,0 +1,1155 @@
+WEBVTT
+
+NOTE S9 E31: The Dynamic Configuration Era: Overthrowing Feature Flag Tech Debt and Replicating FAANG-Class Release Agility with Konrad Niemiec, Founder of Lekko
+
+1
+00:00:00.500 --> 00:00:08.220
+<v Konrad Niemiec>We were just really focused on, oh, what is the best parts of these solutions that we can take and put together into a product most easily and deliver it to customers?
+
+2
+00:00:08.620 --> 00:00:13.180
+<v Konrad Niemiec>But what we didn't have a great understanding about was what problems are we solving?
+
+3
+00:00:13.700 --> 00:00:19.820
+<v Konrad Niemiec>Are we solving the problem of getting untested code out to production and being able to roll that back quickly?
+
+4
+00:00:19.940 --> 00:00:28.100
+<v Konrad Niemiec>Are we solving the problem of a product manager or a customer success person or a sales person or an ops person making a change to software safely?
+
+5
+00:00:30.000 --> 00:00:36.340
+<v Konrad Niemiec>are we actually solving with this tool? And who needs this the most? And who is that initial user
+
+6
+00:00:36.340 --> 00:00:41.420
+<v Konrad Niemiec>base? My name is Konrad Niemiec. I'm the founder and CEO of Lekko.
+
+7
+00:00:45.040 --> 00:00:50.600
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+8
+00:00:50.720 --> 00:00:53.560
+<v Clip>It's six months moonlighting. There's nothing like the bedcams.
+
+9
+00:00:53.840 --> 00:00:57.020
+<v Noah Labhart>Who share what it takes to change an industry. I don't
+
+10
+00:00:57.020 --> 00:00:58.220
+<v Konrad Niemiec>exactly know what to do next.
+
+11
+00:01:00.260 --> 00:01:00.760
+<v Konrad Niemiec>who
+
+12
+00:01:00.700 --> 00:01:02.940
+<v Noah Labhart>built the teams that have their back.
+
+13
+00:01:03.080 --> 00:01:04.500
+<v Clip>The company is its people.
+
+14
+00:01:04.500 --> 00:01:05.780
+<v Clip>The teams help each other achieve.
+
+15
+00:01:05.820 --> 00:01:06.940
+<v Clip>Most proud of our team.
+
+16
+00:01:07.300 --> 00:01:07.800
+<v Clip>Keeping
+
+17
+00:01:07.660 --> 00:01:09.580
+<v Noah Labhart>scalability top of mind.
+
+18
+00:01:09.860 --> 00:01:11.240
+<v Clip>All that infrastructure was a pain.
+
+19
+00:01:11.240 --> 00:01:12.680
+<v Clip>Yes, we've been fighting it as we've grown.
+
+20
+00:01:12.840 --> 00:01:13.660
+<v Clip>Total waste of time.
+
+21
+00:01:13.940 --> 00:01:16.200
+<v Noah Labhart>The stories you don't read in the headlines.
+
+22
+00:01:16.660 --> 00:01:18.400
+<v Clip>It's not an easy thing to achieve, Mike.
+
+23
+00:01:18.400 --> 00:01:20.480
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+24
+00:01:21.280 --> 00:01:24.220
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+25
+00:01:24.420 --> 00:01:25.940
+<v Clip>You need to really want it.
+
+26
+00:01:25.940 --> 00:01:27.320
+<v Clip>It's not just about technology.
+
+27
+00:01:27.440 --> 00:01:29.420
+<v Noah Labhart>All this and more on Code Story.
+
+28
+00:01:30.820 --> 00:01:36.980
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Konrad Niemiec built Lekko, a way to ship faster
+
+29
+00:01:36.980 --> 00:01:40.200
+<v Noah Labhart>with no redeploys and no mistakes.
+
+30
+00:01:47.720 --> 00:01:50.100
+<v Noah Labhart>Konrad Niemiec lives in San Francisco.
+
+31
+00:01:50.200 --> 00:01:53.960
+<v Noah Labhart>He's very close to his family, of which his parents are Polish immigrants.
+
+32
+00:01:54.220 --> 00:01:57.300
+<v Noah Labhart>He started coding when he was 11 while working for his dad.
+
+33
+00:01:57.300 --> 00:02:03.160
+<v Noah Labhart>His core values are curiosity and community, which drives a lot of what he does outside of tech.
+
+34
+00:02:03.340 --> 00:02:10.880
+<v Noah Labhart>He likes to learn other things, and his current hobby set includes surfing and spikeball, of which he's working on perfecting his spin serve.
+
+35
+00:02:12.600 --> 00:02:15.160
+<v Noah Labhart>Konrad worked at Uber on the self-driving team.
+
+36
+00:02:15.460 --> 00:02:19.780
+<v Noah Labhart>After a few years, he wanted to be less of a cog in the machine and joined a small startup.
+
+37
+00:02:19.780 --> 00:02:27.300
+<v Noah Labhart>He introduced a feature flagging platform and quickly realized how fast configuration bloat appeared in the platform.
+
+38
+00:02:27.560 --> 00:02:33.960
+<v Noah Labhart>He also realized how dynamic configuration could take the platform beyond the limits of feature flags.
+
+39
+00:02:35.940 --> 00:02:38.680
+<v Noah Labhart>This is the creation story of Lekko.
+
+40
+00:02:43.700 --> 00:02:51.340
+<v Konrad Niemiec>So, Lekko is a different take on the problems that feature flagging tools are trying to solve.
+
+41
+00:02:51.520 --> 00:02:56.900
+<v Konrad Niemiec>And we're basing a lot of what we're doing on some implementations at big tech companies.
+
+42
+00:02:57.200 --> 00:03:00.820
+<v Konrad Niemiec>Those systems are called dynamic configuration systems.
+
+43
+00:03:00.820 --> 00:03:06.780
+<v Konrad Niemiec>systems. And we're hoping to apply that to let engineers and teams that build software build
+
+44
+00:03:06.780 --> 00:03:13.680
+<v Konrad Niemiec>their features in a way that gets out to customers as fast as possible without the complexity and the
+
+45
+00:03:13.680 --> 00:03:20.080
+<v Konrad Niemiec>risk, these downsides that traditional feature flagging tools do. And frankly, let engineers
+
+46
+00:03:20.080 --> 00:03:24.580
+<v Konrad Niemiec>ship features in an imperfect world where things are changing all the time, deadlines are shifting,
+
+47
+00:03:24.800 --> 00:03:27.860
+<v Konrad Niemiec>requirements are shifting, you don't have the right test data, you don't have the right integration
+
+48
+00:03:27.860 --> 00:03:34.320
+<v Konrad Niemiec>tests. We really hope that engineers can ship these features as correctly and safely, but also
+
+49
+00:03:34.320 --> 00:03:40.320
+<v Konrad Niemiec>as quickly as possible. So I was at Uber for a few years working on the self-driving team. We were
+
+50
+00:03:40.320 --> 00:03:45.080
+<v Konrad Niemiec>trying to figure out how do we connect self-driving cars to Uber's network. And that was really
+
+51
+00:03:45.080 --> 00:03:49.940
+<v Konrad Niemiec>exciting. But after a few years, I learned a lot and I wanted to be less of a cog in the machine
+
+52
+00:03:49.940 --> 00:03:55.100
+<v Konrad Niemiec>and really make some impact. So I joined a small startup called Sisu. There, I was the 18th
+
+53
+00:03:55.100 --> 00:04:00.980
+<v Konrad Niemiec>engineer. And when I arrived, I was super surprised at how little of what I had at Uber was actually
+
+54
+00:04:00.980 --> 00:04:06.240
+<v Konrad Niemiec>available to me as a regular software engineer. At Uber, I could click a button and things would
+
+55
+00:04:06.240 --> 00:04:11.220
+<v Konrad Niemiec>just deploy. I didn't have to learn about Kubernetes or anything like that. But the one big thing that
+
+56
+00:04:11.220 --> 00:04:15.560
+<v Konrad Niemiec>really jumped out to me was around feature flagging tooling, around dynamic configuration tooling.
+
+57
+00:04:15.900 --> 00:04:21.520
+<v Konrad Niemiec>At Uber, we had this system called Flipper. Engineers used this tooling to feature flag,
+
+58
+00:04:21.520 --> 00:04:27.420
+<v Konrad Niemiec>but we used it for pretty much anything we needed to get out there because we
+
+59
+00:04:27.420 --> 00:04:31.800
+<v Konrad Niemiec>needed things to be really safe at Uber but we also wanted to hand off the
+
+60
+00:04:31.800 --> 00:04:36.520
+<v Konrad Niemiec>definition of Uber the product to individual operations teams in each city.
+
+61
+00:04:37.060 --> 00:04:42.460
+<v Konrad Niemiec>Uber scaled to at this point over 10,000 cities and if you think about it if Uber
+
+62
+00:04:42.460 --> 00:04:46.360
+<v Konrad Niemiec>needs to be slightly different in all those different cities there's no way
+
+63
+00:04:46.360 --> 00:04:50.380
+<v Konrad Niemiec>engineers can field all the different change requests. Oh I need to change the
+
+64
+00:04:51.520 --> 00:04:58.900
+<v Konrad Niemiec>the pricing. This tooling was a way to let other folks in the business who are making decisions
+
+65
+00:04:58.900 --> 00:05:03.480
+<v Konrad Niemiec>around how the product looks around what the business needs and actually apply that directly
+
+66
+00:05:03.480 --> 00:05:10.460
+<v Konrad Niemiec>to the software. And I think that's where Flipper really shined. When I came to Sisu, we had nothing
+
+67
+00:05:10.460 --> 00:05:15.760
+<v Konrad Niemiec>like it at first. And we had these really terrible deploys that took a long time. We were fielding
+
+68
+00:05:15.760 --> 00:05:21.240
+<v Konrad Niemiec>requests from products left and right. And so we introduced a feature flagging tool, one of the
+
+69
+00:05:21.520 --> 00:05:26.680
+<v Konrad Niemiec>ones on the market. And after implementing it, I realized that it both didn't solve all the
+
+70
+00:05:26.680 --> 00:05:32.680
+<v Konrad Niemiec>problems I wanted it to, but also came with its own problems. After six months or so, a team of
+
+71
+00:05:32.680 --> 00:05:38.280
+<v Konrad Niemiec>20 engineers had over a hundred flags. We had no clue what any of them did. And the reality was we
+
+72
+00:05:38.280 --> 00:05:42.740
+<v Konrad Niemiec>were just trying to move fast. And in doing our job, we ended up creating a very risky situation.
+
+73
+00:05:42.900 --> 00:05:49.820
+<v Konrad Niemiec>We ended up taking down the system for some of our biggest customers. And we also had our teammates
+
+74
+00:05:51.520 --> 00:05:56.840
+<v Konrad Niemiec>and customer success and solutions architects also causing issues, which is not something we
+
+75
+00:05:56.840 --> 00:06:02.380
+<v Konrad Niemiec>really wanted to. So I was looking back at the tooling at Uber and I was thinking, why don't I
+
+76
+00:06:02.380 --> 00:06:06.800
+<v Konrad Niemiec>have something like that? Like, why don't I have a dynamic configuration system like we had at Uber?
+
+77
+00:06:06.920 --> 00:06:13.040
+<v Konrad Niemiec>And it turns out also is that Google and Facebook and DoorDash and a few of these other really large
+
+78
+00:06:13.040 --> 00:06:18.620
+<v Konrad Niemiec>tech companies with a lot of engineering resources. So that was the kernel of the idea for Lekko.
+
+79
+00:06:18.620 --> 00:06:24.420
+<v Konrad Niemiec>and that's how I got started. A little over two years ago, decided to venture out on my own at
+
+80
+00:06:24.420 --> 00:06:26.200
+<v Konrad Niemiec>the time and try to solve this problem.
+
+81
+00:06:28.620 --> 00:06:32.700
+<v Noah Labhart>Let's dive into the MVP of Lekko, that first version
+
+82
+00:06:32.700 --> 00:06:36.300
+<v Noah Labhart>of the product you built. How long did it take to build and what sort of tools were you using
+
+83
+00:06:36.300 --> 00:06:37.040
+<v Noah Labhart>to bring it to life?
+
+84
+00:06:39.300 --> 00:06:44.360
+<v Konrad Niemiec>So we actually built two MVPs. So the thing we're launching right now,
+
+85
+00:06:44.380 --> 00:06:47.960
+<v Konrad Niemiec>our free forever plan is actually the second iteration of our product. So first I'll talk
+
+86
+00:06:48.620 --> 00:06:53.660
+<v Konrad Niemiec>It took us around maybe six to nine months to build the initial iteration of the product.
+
+87
+00:06:54.140 --> 00:06:56.820
+<v Konrad Niemiec>And we hosted most of the things on AWS.
+
+88
+00:06:57.360 --> 00:06:59.020
+<v Konrad Niemiec>We used GitHub, of course.
+
+89
+00:06:59.240 --> 00:07:05.440
+<v Konrad Niemiec>And we were focused on a bunch of different problems and trying to figure out which framework should we focus on.
+
+90
+00:07:05.520 --> 00:07:07.840
+<v Konrad Niemiec>Which languages should people use?
+
+91
+00:07:08.240 --> 00:07:10.780
+<v Konrad Niemiec>We first started with Go because that's what we were doing locally.
+
+92
+00:07:10.960 --> 00:07:15.960
+<v Konrad Niemiec>But then we also wanted some front-end SDKs because we had a full-stack app.
+
+93
+00:07:15.960 --> 00:07:20.860
+<v Konrad Niemiec>app. So we were really trying to figure out the breadth of things. We ended up writing a component
+
+94
+00:07:20.860 --> 00:07:26.060
+<v Konrad Niemiec>in Rust that helps users deploy things in their own infrastructure if they want some additional
+
+95
+00:07:26.060 --> 00:07:30.860
+<v Konrad Niemiec>backup, which users can use now. And it took us around six to nine months for that first iteration
+
+96
+00:07:30.860 --> 00:07:32.100
+<v Konrad Niemiec>of the product. Let's
+
+97
+00:07:32.100 --> 00:07:36.940
+<v Noah Labhart>stay on that version or that MVP, the first one. Those decisions and
+
+98
+00:07:36.940 --> 00:07:41.700
+<v Noah Labhart>trade-offs you had to make when you were building those, right? They're hard. You got to really dig
+
+99
+00:07:41.700 --> 00:07:45.400
+<v Noah Labhart>in and figure out what you're going to focus on, how you're going to approach the problem,
+
+100
+00:07:45.960 --> 00:07:49.080
+<v Noah Labhart>those sorts of things. So tell me about some of those you had to work through in this first
+
+101
+00:07:49.080 --> 00:07:50.380
+<v Noah Labhart>version and how you coped with them.
+
+102
+00:07:51.580 --> 00:07:54.980
+<v Konrad Niemiec>Yeah, so at first, we were really trying to figure out,
+
+103
+00:07:55.000 --> 00:08:06.340
+<v Konrad Niemiec>hey, how do we build a really scalable and usable system, trying to unlock what is a good developer
+
+104
+00:08:06.340 --> 00:08:13.320
+<v Konrad Niemiec>experience? And what is something that appears simple, appears very intuitive, but is also
+
+105
+00:08:13.320 --> 00:08:18.460
+<v Konrad Niemiec>also obviously very difficult to build yourself and contains a lot of complexity under the hood
+
+106
+00:08:18.460 --> 00:08:23.860
+<v Konrad Niemiec>was I think the biggest thing that we were struggling with. How do you make something
+
+107
+00:08:23.860 --> 00:08:28.500
+<v Konrad Niemiec>that checks all the boxes, has the features that a user expects, especially since we're
+
+108
+00:08:28.500 --> 00:08:33.960
+<v Konrad Niemiec>coming in adjacent to an existing space? Feature flagging tools and experimentation tools out there
+
+109
+00:08:33.960 --> 00:08:38.120
+<v Konrad Niemiec>exist. So we needed to figure out which one of those existing requirements to pull into our
+
+110
+00:08:38.120 --> 00:08:43.780
+<v Konrad Niemiec>our current system, but then really focusing on how do we make this system simple and really easy
+
+111
+00:08:43.780 --> 00:08:44.520
+<v Konrad Niemiec>to use for engineers.
+
+112
+00:08:46.140 --> 00:08:50.160
+<v Noah Labhart>So then from that point, right, you start to progress forward. And I think
+
+113
+00:08:50.160 --> 00:08:55.620
+<v Noah Labhart>this is where the next MVP sort of introduces itself. And I think that's part of the progression
+
+114
+00:08:55.620 --> 00:09:01.960
+<v Noah Labhart>of the product. So tell me about that MVP version two, and also how you went about deciding that
+
+115
+00:09:01.960 --> 00:09:06.400
+<v Noah Labhart>this was the most appropriate thing to do next. And, you know, to wrap in a box a little bit,
+
+116
+00:09:08.120 --> 00:09:13.460
+<v Noah Labhart>How do you go about deciding as a company that this is the next most important thing to build or to address for Lekko?
+
+117
+00:09:14.960 --> 00:09:24.300
+<v Konrad Niemiec>I think the thing we were trying to do is how can we figure out the minimum thing that we can get users to use and to actually solve problems with?
+
+118
+00:09:24.860 --> 00:09:31.060
+<v Konrad Niemiec>And I think that is the toughest piece, especially coming from large tech companies to a small organization.
+
+119
+00:09:31.580 --> 00:09:37.880
+<v Konrad Niemiec>I was coming from Uber. We have one of the tech leads of Configurator, Facebook's dynamic configuration system on the team.
+
+120
+00:09:38.120 --> 00:09:41.940
+<v Konrad Niemiec>We have an angel investor, Tom, who was the creator of Flipper at Uber.
+
+121
+00:09:42.140 --> 00:09:49.920
+<v Konrad Niemiec>And if you take a big tech mindset of a roadmap, you're just thinking about lists of requirements and what you might like in the system.
+
+122
+00:09:50.320 --> 00:10:01.940
+<v Konrad Niemiec>But really how we thought about it was what is the minimum thing that is going to solve the problems for our users and trying to be as ruthless as possible when it comes to the prioritization.
+
+123
+00:10:03.200 --> 00:10:07.960
+<v Konrad Niemiec>Christina Naren, who's our product advisor, famously says there's no such thing as roadmaps.
+
+124
+00:10:08.200 --> 00:10:13.680
+<v Konrad Niemiec>So I won't exactly use that as my answer to your question, but I do think that we need to be just
+
+125
+00:10:13.680 --> 00:10:18.300
+<v Konrad Niemiec>constantly reprioritizing and trying to figure out what problems are we solving? How can we get
+
+126
+00:10:18.300 --> 00:10:24.360
+<v Konrad Niemiec>the simplest thing into users' hands as possible? And then once you have users, then you can triage,
+
+127
+00:10:24.420 --> 00:10:28.860
+<v Konrad Niemiec>okay, are we actually solving those problems? And what are they telling us they need? What problems
+
+128
+00:10:28.860 --> 00:10:32.800
+<v Konrad Niemiec>Is that solving? Are those feature requests solving? And then trying to prioritize there.
+
+129
+00:10:32.900 --> 00:10:38.560
+<v Konrad Niemiec>So at this point, we have a forward-looking idea of a roadmap where we have a vision of the company.
+
+130
+00:10:38.660 --> 00:10:43.800
+<v Konrad Niemiec>We really think Lekko is going to change the way people build software, and it's going to be much more dynamic and much safer.
+
+131
+00:10:43.940 --> 00:10:49.380
+<v Konrad Niemiec>And it's going to be integrated across the business, taking into account the business needs and defining the product at a high level.
+
+132
+00:10:49.480 --> 00:10:55.480
+<v Konrad Niemiec>But there's some medium level of a roadmap that I think doesn't really exist for us right now just because we're constantly reprioritizing.
+
+133
+00:10:56.220 --> 00:11:00.460
+<v Noah Labhart>You know, I hear you talking about, or I hear you saying we, right?
+
+134
+00:11:00.520 --> 00:11:02.440
+<v Noah Labhart>Tell me about how you built your team.
+
+135
+00:11:02.580 --> 00:11:06.840
+<v Noah Labhart>And what do you look for in those people to indicate that they are the winning horses to join you?
+
+136
+00:11:07.780 --> 00:11:15.380
+<v Konrad Niemiec>Getting people who had actually experienced this and have both either felt the problems of missing this kind of tool
+
+137
+00:11:15.380 --> 00:11:20.060
+<v Konrad Niemiec>or folks who have built this kind of thing and solved these problems internally at big tech companies was great.
+
+138
+00:11:20.140 --> 00:11:21.860
+<v Konrad Niemiec>Like relevant experience, I think was important.
+
+139
+00:11:22.160 --> 00:11:23.600
+<v Konrad Niemiec>But that's not the entire team.
+
+140
+00:11:25.480 --> 00:11:31.120
+<v Konrad Niemiec>focus on, especially when interviewing and looking for team members, is motivation is the first piece.
+
+141
+00:11:31.800 --> 00:11:35.360
+<v Konrad Niemiec>You can tell by talking to somebody and asking them what they're proud about,
+
+142
+00:11:35.500 --> 00:11:41.160
+<v Konrad Niemiec>how they're motivated. And if someone is motivated by really solving problems and
+
+143
+00:11:41.160 --> 00:11:45.280
+<v Konrad Niemiec>building something that's really helpful for people, that's a huge part of what I look for.
+
+144
+00:11:45.760 --> 00:11:50.260
+<v Konrad Niemiec>And then the second thing is something that I think is not usually looked at a ton in early
+
+145
+00:11:50.260 --> 00:11:55.000
+<v Konrad Niemiec>stage startups, but how people work interpersonally, like how they interact with each other.
+
+146
+00:11:55.480 --> 00:11:58.260
+<v Konrad Niemiec>And when it comes to interviewing, that's obviously tough.
+
+147
+00:11:58.440 --> 00:12:03.180
+<v Konrad Niemiec>One thing we do is we've instituted a trial system, which you've heard, I think, Linear
+
+148
+00:12:03.180 --> 00:12:08.000
+<v Konrad Niemiec>and a few other smaller startups also institute this, where someone comes in for a week or
+
+149
+00:12:08.000 --> 00:12:10.400
+<v Konrad Niemiec>a few days and tries to ship a feature.
+
+150
+00:12:10.480 --> 00:12:13.240
+<v Konrad Niemiec>And you can really get a sense of how they are to work with.
+
+151
+00:12:13.420 --> 00:12:17.440
+<v Konrad Niemiec>But even when you ask about past conflicts, you can tell, does somebody have some nuance?
+
+152
+00:12:17.700 --> 00:12:20.200
+<v Konrad Niemiec>Are they trying to consider other people's opinions?
+
+153
+00:12:20.320 --> 00:12:23.000
+<v Konrad Niemiec>Or do they have a very black and white opinion of things?
+
+154
+00:12:23.000 --> 00:12:25.940
+<v Konrad Niemiec>and they bucket you into either right or wrong.
+
+155
+00:12:26.840 --> 00:12:29.100
+<v Konrad Niemiec>Unfortunately, you see that a lot with software engineers.
+
+156
+00:12:29.180 --> 00:12:32.320
+<v Konrad Niemiec>Sometimes we try to reduce humans into a program.
+
+157
+00:12:32.540 --> 00:12:35.340
+<v Konrad Niemiec>And so trying to find folks who are really thinking about
+
+158
+00:12:35.340 --> 00:12:37.580
+<v Konrad Niemiec>what effect do I have on the other people on the team,
+
+159
+00:12:37.660 --> 00:12:39.260
+<v Konrad Niemiec>I think is very important for me as a leader
+
+160
+00:12:39.260 --> 00:12:41.420
+<v Konrad Niemiec>and to cultivate that kind of culture on the team.
+
+161
+00:12:43.280 --> 00:12:44.860
+<v Noah Labhart>So this will be super interesting.
+
+162
+00:12:45.000 --> 00:12:47.660
+<v Noah Labhart>Given what you've built and who you're building it for,
+
+163
+00:12:47.700 --> 00:12:49.720
+<v Noah Labhart>I'm curious about scalability, right?
+
+164
+00:12:49.720 --> 00:12:55.980
+<v Noah Labhart>Right. You know, obviously you build for scale the best you can in the beginning with abstractions and things.
+
+165
+00:12:56.100 --> 00:13:02.340
+<v Noah Labhart>And I'm curious, did you approach it that way from day one or have there been interesting areas where you've had to fight it as you've grown?
+
+166
+00:13:04.200 --> 00:13:10.400
+<v Konrad Niemiec>So I think this is actually one of the mistakes we made where we were a little too worried about scalability at first.
+
+167
+00:13:10.800 --> 00:13:19.980
+<v Konrad Niemiec>I think we were trying to get something out there that we thought was going to be the best system possible from day one, which I think, frankly, is pretty much almost never going to happen.
+
+168
+00:13:20.060 --> 00:13:23.360
+<v Konrad Niemiec>Like you're going to have to iterate. You're going to have to put a first version out there.
+
+169
+00:13:23.560 --> 00:13:26.860
+<v Konrad Niemiec>So I think initially we focused a little too much on scalability.
+
+170
+00:13:27.040 --> 00:13:29.780
+<v Konrad Niemiec>And I think that may have slowed us down a little bit in the long run.
+
+171
+00:13:30.420 --> 00:13:32.820
+<v Konrad Niemiec>You never really expect everything.
+
+172
+00:13:33.020 --> 00:13:36.640
+<v Konrad Niemiec>You can't anticipate everything once you get out there and launch.
+
+173
+00:13:36.640 --> 00:13:41.820
+<v Konrad Niemiec>launch so I do think that there are things we've learned that we didn't quite anticipate for in
+
+174
+00:13:41.820 --> 00:13:46.420
+<v Konrad Niemiec>terms of certain aspects of scale but I think in general an engineer has to especially an engineer
+
+175
+00:13:46.420 --> 00:13:51.320
+<v Konrad Niemiec>who has worked at a big tech company who has been taught to build for scale I think you actually
+
+176
+00:13:51.320 --> 00:13:55.400
+<v Konrad Niemiec>need to fight that if you're at an early stage startup and try to say we don't actually need
+
+177
+00:13:55.400 --> 00:14:00.500
+<v Konrad Niemiec>to make this super rounded because users might not even want that or this might not even be what
+
+178
+00:14:00.500 --> 00:14:04.860
+<v Konrad Niemiec>we end up building on in the future we might rewrite this in a few months anyways so I think
+
+179
+00:14:06.640 --> 00:14:09.300
+<v Konrad Niemiec>a priority of mine and something that we're trying to push with the team.
+
+180
+00:14:11.180 --> 00:14:15.920
+<v Noah Labhart>So as you step out on the balcony, you look across all that you've built thus far,
+
+181
+00:14:16.080 --> 00:14:17.220
+<v Noah Labhart>what are you most proud of?
+
+182
+00:14:19.280 --> 00:14:27.120
+<v Konrad Niemiec>So I'm most proud of the fact that I think we're approaching this problem, which I think has been
+
+183
+00:14:27.120 --> 00:14:32.120
+<v Konrad Niemiec>solved in a very similar way. If you look out across the ecosystem, I think in a fairly novel
+
+184
+00:14:32.120 --> 00:14:36.000
+<v Konrad Niemiec>way. And I'm very excited about that. And I'm hoping that listeners of this podcast will get
+
+185
+00:14:36.640 --> 00:14:42.240
+<v Konrad Niemiec>look at our website and try out our free forever tier that's launching this week. And we can see
+
+186
+00:14:42.240 --> 00:14:47.260
+<v Konrad Niemiec>that instead of having an external source of truth and some system, which is difficult to debug,
+
+187
+00:14:47.480 --> 00:14:53.080
+<v Konrad Niemiec>we've really met engineers where they are and given them a novel editing experience and
+
+188
+00:14:53.080 --> 00:14:57.940
+<v Konrad Niemiec>interaction experience with a dynamic configuration or a feature flagging tool.
+
+189
+00:14:58.060 --> 00:15:02.360
+<v Konrad Niemiec>And that's what I'm really proud of is I think we've found something that our initial users are
+
+190
+00:15:02.360 --> 00:15:06.900
+<v Konrad Niemiec>really excited about. And even I think similar ideas popping up in surrounding spaces, which
+
+191
+00:15:06.900 --> 00:15:07.700
+<v Konrad Niemiec>I'm really excited about.
+
+192
+00:15:09.520 --> 00:15:12.900
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made
+
+193
+00:15:12.900 --> 00:15:16.540
+<v Noah Labhart>and how you and your team responded to it. And I know you mentioned the scalability
+
+194
+00:15:17.020 --> 00:15:20.500
+<v Noah Labhart>mistake, and maybe it's that one and you want to dig in more, or maybe it's a different one.
+
+195
+00:15:21.860 --> 00:15:25.480
+<v Konrad Niemiec>So I think one of the biggest mistakes we made from our first MVP to the second
+
+196
+00:15:25.480 --> 00:15:30.600
+<v Konrad Niemiec>was we weren't really focused on what problems we're solving through our tool.
+
+197
+00:15:32.420 --> 00:15:37.640
+<v Konrad Niemiec>seen dynamic configuration tools work really well internally at big tech companies. And we were just
+
+198
+00:15:37.640 --> 00:15:42.080
+<v Konrad Niemiec>really focused on, oh, what is the best parts of these solutions that we can take and put together
+
+199
+00:15:42.080 --> 00:15:47.220
+<v Konrad Niemiec>into a product most easily and deliver it to customers? But what we didn't have a great
+
+200
+00:15:47.220 --> 00:15:52.780
+<v Konrad Niemiec>understanding about was what problems are we solving? Are we solving the problem of getting
+
+201
+00:15:52.780 --> 00:15:57.380
+<v Konrad Niemiec>untested code out to production and being able to roll that back quickly? Are we solving the problem
+
+202
+00:15:57.380 --> 00:16:00.300
+<v Konrad Niemiec>of a product manager or a customer success person
+
+203
+00:16:00.300 --> 00:16:02.280
+<v Konrad Niemiec>or a sales person or an ops person
+
+204
+00:16:02.280 --> 00:16:04.400
+<v Konrad Niemiec>making a change to software safely.
+
+205
+00:16:04.620 --> 00:16:07.960
+<v Konrad Niemiec>Like what problems are we actually solving with this tool
+
+206
+00:16:07.960 --> 00:16:10.140
+<v Konrad Niemiec>and who needs this the most
+
+207
+00:16:10.140 --> 00:16:12.940
+<v Konrad Niemiec>and who is that initial user base?
+
+208
+00:16:13.140 --> 00:16:14.900
+<v Konrad Niemiec>That was our biggest mistake
+
+209
+00:16:14.900 --> 00:16:17.000
+<v Konrad Niemiec>was we were really focused on the solution
+
+210
+00:16:17.000 --> 00:16:18.840
+<v Konrad Niemiec>instead of the problems that we were solving.
+
+211
+00:16:19.000 --> 00:16:21.240
+<v Konrad Niemiec>I think frankly, the feature flagging space
+
+212
+00:16:21.240 --> 00:16:23.640
+<v Konrad Niemiec>solves a ton of different problems
+
+213
+00:16:23.640 --> 00:16:25.780
+<v Konrad Niemiec>and even just listing them out takes a while.
+
+214
+00:16:27.380 --> 00:16:32.280
+<v Konrad Niemiec>shift, I think that was when we were really focused on our second version of the product.
+
+215
+00:16:32.700 --> 00:16:38.220
+<v Konrad Niemiec>We focused on simplicity and easy to debug and great developer experience, which we were focused
+
+216
+00:16:38.220 --> 00:16:42.140
+<v Konrad Niemiec>on the whole time, but really through the lens of simplicity, because one thing we realized is
+
+217
+00:16:42.140 --> 00:16:46.480
+<v Konrad Niemiec>we built a product that was a great solution, but it was actually very complicated and hard
+
+218
+00:16:46.480 --> 00:16:51.120
+<v Konrad Niemiec>to get started. I think that was our biggest mistake with the first MVP. An approach in
+
+219
+00:16:51.120 --> 00:16:55.240
+<v Konrad Niemiec>general, I think, which led to a very complicated product that was tough to onboard to and tough to
+
+220
+00:16:55.240 --> 00:16:59.620
+<v Konrad Niemiec>use. So we're really excited to hopefully have people see that it's very straightforward to get
+
+221
+00:16:59.620 --> 00:17:02.080
+<v Konrad Niemiec>started with Lekko and they can feel that benefit right away.
+
+222
+00:17:03.740 --> 00:17:06.440
+<v Noah Labhart>So this will be fun, Konrad. What does
+
+223
+00:17:06.440 --> 00:17:09.240
+<v Noah Labhart>the future look like for the product and for your team?
+
+224
+00:17:11.000 --> 00:17:13.880
+<v Konrad Niemiec>The future, maybe in the medium term, I'm
+
+225
+00:17:13.880 --> 00:17:18.820
+<v Konrad Niemiec>super excited about. After we launch our free forever tier, we're looking forward to launching
+
+226
+00:17:18.820 --> 00:17:24.260
+<v Konrad Niemiec>our team plan later this year. And with that, we're going to take a bunch of our learnings from
+
+227
+00:17:25.240 --> 00:17:30.980
+<v Konrad Niemiec>our early guide customers and really help businesses organize the configuration of their
+
+228
+00:17:30.980 --> 00:17:35.220
+<v Konrad Niemiec>product at a high level. So right now with this launch, we're focused on the developer tool and
+
+229
+00:17:35.220 --> 00:17:40.840
+<v Konrad Niemiec>obviously handing off control of software to other teammates across the business. But how can we
+
+230
+00:17:40.840 --> 00:17:44.440
+<v Konrad Niemiec>actually use this to define the high level configuration of our product? What are the
+
+231
+00:17:44.440 --> 00:17:51.200
+<v Konrad Niemiec>allowable configurations? Is it having these five features and a limit of 10,000 reads a month? Is
+
+232
+00:17:51.200 --> 00:17:53.980
+<v Konrad Niemiec>is that the team plan and then the enterprise plan has a scalable one.
+
+233
+00:17:54.120 --> 00:17:57.620
+<v Konrad Niemiec>You can basically use Lekko to define that at a high level.
+
+234
+00:17:57.740 --> 00:18:02.600
+<v Konrad Niemiec>And what that lets you do is it lets teams avoid untested code slipping to customers.
+
+235
+00:18:02.800 --> 00:18:05.840
+<v Konrad Niemiec>You can really scope down what you can test and integration test.
+
+236
+00:18:06.060 --> 00:18:08.520
+<v Konrad Niemiec>And we think it'll really have benefits across the business
+
+237
+00:18:08.520 --> 00:18:11.620
+<v Konrad Niemiec>all the way to kind of retention and revenue and things like that.
+
+238
+00:18:12.160 --> 00:18:15.880
+<v Konrad Niemiec>And we're also going to be launching more AI features that we're working on currently,
+
+239
+00:18:16.040 --> 00:18:18.940
+<v Konrad Niemiec>which I think will help engineers interact with the tool
+
+240
+00:18:18.940 --> 00:18:21.960
+<v Konrad Niemiec>and help folks outside of the engineering organization as well,
+
+241
+00:18:22.000 --> 00:18:24.380
+<v Konrad Niemiec>who will be able to understand, hey, when I'm making a change,
+
+242
+00:18:24.560 --> 00:18:27.020
+<v Konrad Niemiec>what is the estimated impact of my change?
+
+243
+00:18:27.180 --> 00:18:28.780
+<v Konrad Niemiec>What is this actually going to do in my code?
+
+244
+00:18:28.880 --> 00:18:30.900
+<v Konrad Niemiec>Can I preview that? Can I easily reproduce that?
+
+245
+00:18:31.120 --> 00:18:33.600
+<v Konrad Niemiec>Can I capture this intent of what I'm trying to do,
+
+246
+00:18:33.640 --> 00:18:34.640
+<v Konrad Niemiec>what change I'm trying to make?
+
+247
+00:18:34.780 --> 00:18:37.660
+<v Konrad Niemiec>So we're really excited about both the high-level product configuration
+
+248
+00:18:37.660 --> 00:18:40.760
+<v Konrad Niemiec>that we're launching as well as more AI features that are going to come soon.
+
+249
+00:18:41.100 --> 00:18:42.220
+<v Noah Labhart>Let's switch to you, Konrad.
+
+250
+00:18:42.280 --> 00:18:44.180
+<v Noah Labhart>Who influences the way that you work?
+
+251
+00:18:44.360 --> 00:18:47.720
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+252
+00:18:49.180 --> 00:18:55.180
+<v Konrad Niemiec>So I have a few folks that I was thinking of, one of which is one of my mentors, Peter Edge.
+
+253
+00:18:55.620 --> 00:19:01.360
+<v Konrad Niemiec>He's the founder of a company called Buf, and he's been a mentor of mine for many years,
+
+254
+00:19:01.520 --> 00:19:06.620
+<v Konrad Niemiec>initially when we met at Uber before he left to start Buf. And I really look up to him in terms
+
+255
+00:19:06.620 --> 00:19:11.500
+<v Konrad Niemiec>of taking a tool that he's very excited about and very passionate about and has delivered value
+
+256
+00:19:11.500 --> 00:19:17.280
+<v Konrad Niemiec>internally and being able to deliver that in the market and really find a place where developers
+
+257
+00:19:18.940 --> 00:19:22.600
+<v Konrad Niemiec>about it, but also able to build a community around this open source project that he's done
+
+258
+00:19:22.600 --> 00:19:27.420
+<v Konrad Niemiec>a great job with Buf. I really look up to him. My founder coach, John Zimmerman, is a great
+
+259
+00:19:27.420 --> 00:19:32.560
+<v Konrad Niemiec>influence on me. And I think the introduction to the conscious leadership framework and the way
+
+260
+00:19:32.560 --> 00:19:38.000
+<v Konrad Niemiec>that he approaches things, not trying to approach every situation from fear and wanting to be right,
+
+261
+00:19:38.100 --> 00:19:43.200
+<v Konrad Niemiec>but actually from growth and curiosity, which are two of my biggest values, I think has been a huge
+
+262
+00:19:43.200 --> 00:19:49.460
+<v Konrad Niemiec>influence on me. And then also somebody like Tom Chen, who originally wrote this tooling at Uber,
+
+263
+00:19:49.580 --> 00:19:55.040
+<v Konrad Niemiec>and I think has been a great help for me over the last few years as an angel investor in our
+
+264
+00:19:55.040 --> 00:19:56.400
+<v Konrad Niemiec>company, but also a mentor to me.
+
+265
+00:19:57.440 --> 00:20:00.940
+<v Noah Labhart>Last question, Konrad. So you're getting on a plane and you're
+
+266
+00:20:00.940 --> 00:20:05.300
+<v Noah Labhart>sitting next to a young entrepreneur who's built the next big thing. They're jazzed about it. They
+
+267
+00:20:05.300 --> 00:20:08.720
+<v Noah Labhart>can't wait to show it off to the world. And can we show it off to you right there on the plane?
+
+268
+00:20:09.100 --> 00:20:12.040
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+269
+00:20:13.480 --> 00:20:16.920
+<v Konrad Niemiec>really focus on your user and their problems.
+
+270
+00:20:17.440 --> 00:20:21.680
+<v Konrad Niemiec>If you fall in love with the problem that you're trying to solve
+
+271
+00:20:21.680 --> 00:20:23.840
+<v Konrad Niemiec>and really know it in and out,
+
+272
+00:20:24.570 --> 00:20:28.500
+<v Konrad Niemiec>then you will obviously be more likely to solve that for your user.
+
+273
+00:20:28.640 --> 00:20:32.280
+<v Konrad Niemiec>But you'll also be able to approach everything with a clear lens
+
+274
+00:20:32.280 --> 00:20:33.420
+<v Konrad Niemiec>because you're just trying to help.
+
+275
+00:20:33.640 --> 00:20:36.700
+<v Konrad Niemiec>And I think for a lot of technical founders like myself,
+
+276
+00:20:37.020 --> 00:20:40.500
+<v Konrad Niemiec>resisting that urge to build, resisting that urge to build for scale,
+
+277
+00:20:40.600 --> 00:20:42.860
+<v Konrad Niemiec>and instead just truly understand that problem
+
+278
+00:20:43.200 --> 00:20:45.940
+<v Konrad Niemiec>I think that is the biggest advice I would give to that young entrepreneur.
+
+279
+00:20:46.000 --> 00:20:54.340
+<v Konrad Niemiec>And I think I would give to myself to really just focus on that problem and make sure that you're approaching everything with just trying to solve that problem for your current or future customers.
+
+280
+00:20:54.600 --> 00:20:56.180
+<v Noah Labhart>I think that's fantastic advice.
+
+281
+00:20:56.360 --> 00:20:58.500
+<v Noah Labhart>Well, Konrad, thank you for being on the show today.
+
+282
+00:20:58.700 --> 00:21:01.100
+<v Noah Labhart>And thank you for telling the creation story of Lekko.
+
+283
+00:21:04.260 --> 00:21:07.080
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+284
+00:21:10.300 --> 00:21:13.360
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+285
+00:21:13.460 --> 00:21:18.260
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+286
+00:21:18.860 --> 00:21:21.080
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+287
+00:21:21.360 --> 00:21:23.400
+<v Noah Labhart>Both things help us out tremendously.
+
+288
+00:21:26.200 --> 00:21:27.700
+<v Noah Labhart>And thanks again for listening.

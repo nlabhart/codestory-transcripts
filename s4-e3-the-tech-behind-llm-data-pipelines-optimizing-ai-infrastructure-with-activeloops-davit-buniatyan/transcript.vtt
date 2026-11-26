@@ -1,0 +1,1463 @@
+WEBVTT
+
+NOTE S4 E3: The Tech Behind LLM Data Pipelines: Optimizing AI Infrastructure with Activeloop’s Davit Buniatyan
+
+1
+00:00:00.600 --> 00:00:06.060
+<v Davit Buniatyan>We started building the team actually when COVID started. So I don't know, fortunately or
+
+2
+00:00:06.060 --> 00:00:11.540
+<v Davit Buniatyan>unfortunately, I guess our team is remote and it's all over the world. It's great in the sense that
+
+3
+00:00:11.540 --> 00:00:17.260
+<v Davit Buniatyan>we can provide customer support 24 hours around. And it's bad because it's also like additional
+
+4
+00:00:17.260 --> 00:00:23.580
+<v Davit Buniatyan>friction to synchronize with the team. Not only as a startup, we have to figure out how to grow and
+
+5
+00:00:23.580 --> 00:00:28.520
+<v Davit Buniatyan>how to build the business on top of it, but we also like should figure out and explore the technology
+
+6
+00:00:30.000 --> 00:00:36.740
+<v Davit Buniatyan>How do you imagine people are going to store all this unstructured data that's generated today and in the future?
+
+7
+00:00:37.720 --> 00:00:42.140
+<v Davit Buniatyan>My name is Davit Buniatyan, and I'm the founding CEO of Activeloop.
+
+8
+00:00:47.620 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+9
+00:00:52.920 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+10
+00:00:57.120 --> 00:01:00.880
+<v Noah Labhart>and build and lead a team that has your back.
+
+11
+00:01:02.220 --> 00:01:06.120
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Davit Buniatyan
+
+12
+00:01:06.120 --> 00:01:11.760
+<v Noah Labhart>decided to stop fighting large datasets and make machine learning companies more efficient.
+
+13
+00:01:13.400 --> 00:01:15.960
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:20.200 --> 00:01:23.100
+<v Noah Labhart>Davit Buniatyan is originally from Armenia.
+
+15
+00:01:23.600 --> 00:01:30.460
+<v Noah Labhart>He completed his high school years there until he was 17 when he started to pursue his undergrad in the UK at UCL.
+
+16
+00:01:30.900 --> 00:01:35.580
+<v Noah Labhart>He entered into his college years excited about animation from seeing Pixar movies.
+
+17
+00:01:36.060 --> 00:01:44.140
+<v Noah Labhart>He learned all about 3D models, graphics, and rendering, but then found out there was no course or curriculum specifically for animation.
+
+18
+00:01:45.960 --> 00:01:51.500
+<v Noah Labhart>Comp Sci, which actually ended up being perfect. He's into swimming, tennis, and Shotokan,
+
+19
+00:01:51.600 --> 00:01:56.860
+<v Noah Labhart>I think I'm saying that right, which is traditional Japanese karate. Along with these,
+
+20
+00:01:56.920 --> 00:02:00.800
+<v Noah Labhart>he's been playing chess since he was five years old and is an avid fan of the show
+
+21
+00:02:00.800 --> 00:02:06.800
+<v Noah Labhart>Queen's Gambit on Netflix. When he started in on his PhD at Princeton, he started working with
+
+22
+00:02:06.800 --> 00:02:12.380
+<v Noah Labhart>large data sets to recreate neural networks. In doing so, he realized how much computational
+
+23
+00:02:12.380 --> 00:02:19.060
+<v Noah Labhart>power was required to learn from even a small large-scale data set. With this he
+
+24
+00:02:19.060 --> 00:02:22.140
+<v Noah Labhart>set out to build a tool to make companies more efficient at learning
+
+25
+00:02:22.140 --> 00:02:26.700
+<v Noah Labhart>from their data. This is the creation story of Activeloop.
+
+26
+00:02:32.260 --> 00:02:36.720
+<v Davit Buniatyan>So Activeloop helps machine learning companies to be more efficient when they
+
+27
+00:02:36.720 --> 00:02:41.760
+<v Davit Buniatyan>have a lot of data. The product currently we open sourced a data set management
+
+28
+00:02:42.380 --> 00:02:46.260
+<v Davit Buniatyan>that helps to represent any data, especially when it's unstructured,
+
+29
+00:02:46.440 --> 00:02:50.100
+<v Davit Buniatyan>into a unified format that helps to do efficient machine learning.
+
+30
+00:02:50.360 --> 00:02:53.180
+<v Davit Buniatyan>To give some motivation, when I got into my PhD,
+
+31
+00:02:53.360 --> 00:02:56.820
+<v Davit Buniatyan>I got into Princeton University Lab at Neuroscience Department,
+
+32
+00:02:57.180 --> 00:02:59.380
+<v Davit Buniatyan>led by my advisor Sebastian Seung.
+
+33
+00:02:59.800 --> 00:03:03.320
+<v Davit Buniatyan>What they were working on is a field called connectomics,
+
+34
+00:03:03.580 --> 00:03:06.740
+<v Davit Buniatyan>where the goal is to take a piece of a mouse brain
+
+35
+00:03:06.740 --> 00:03:10.440
+<v Davit Buniatyan>and reconstruct the connectivity of the neural networks.
+
+36
+00:03:12.380 --> 00:03:16.760
+<v Davit Buniatyan>artificial neural networks to be able to reconstruct the real neural network graph
+
+37
+00:03:16.760 --> 00:03:22.740
+<v Davit Buniatyan>inside a small part of the mouse brain. But if you look into this small part, it's actually the
+
+38
+00:03:22.740 --> 00:03:27.840
+<v Davit Buniatyan>data to represent that small part is huge. We have been storing up to petabyte scale datasets
+
+39
+00:03:27.840 --> 00:03:33.100
+<v Davit Buniatyan>on the cloud and use deep learning on top to be able to reconstruct the connectivity of those
+
+40
+00:03:33.100 --> 00:03:38.660
+<v Davit Buniatyan>neurons. And it was costing a lot of computational and storage effort to do that. And that inspired
+
+41
+00:03:38.660 --> 00:03:43.980
+<v Davit Buniatyan>inspired us to start the company, basically thinking how we can help other machine learning
+
+42
+00:03:43.980 --> 00:03:49.300
+<v Davit Buniatyan>companies to be more efficient. And one of the initial considerations that we had to rethink
+
+43
+00:03:49.300 --> 00:03:54.580
+<v Davit Buniatyan>is actually how do you store the data? We had very good software engineers at our lab,
+
+44
+00:03:54.720 --> 00:03:59.220
+<v Davit Buniatyan>William and Ignacio, who were working on this project called Cloud Volume, which was basically
+
+45
+00:03:59.220 --> 00:04:06.240
+<v Davit Buniatyan>helping to represent biomedical data as chunked arrays on the cloud. So when data scientist was
+
+46
+00:04:06.240 --> 00:04:12.500
+<v Davit Buniatyan>interfacing this data set they were feeling is like a local variable or local array they can
+
+47
+00:04:12.500 --> 00:04:17.640
+<v Davit Buniatyan>work with. We thought that we can actually bring this to not only to biomedical imaging but also
+
+48
+00:04:17.640 --> 00:04:23.140
+<v Davit Buniatyan>to other domains like self-driving cars or aerial images like satellite imagery. Like why not to go
+
+49
+00:04:23.140 --> 00:04:29.560
+<v Davit Buniatyan>into video, audio, text and so on. So that's how we kind of came up with bringing this to the full
+
+50
+00:04:29.560 --> 00:04:34.560
+<v Davit Buniatyan>extent where we can represent any data in the new format where you don't have to worry anymore about
+
+51
+00:04:36.240 --> 00:04:41.520
+<v Davit Buniatyan>it's stored versioned and we call it like data 2.0. The kind of inspiration is coming from
+
+52
+00:04:41.520 --> 00:04:46.040
+<v Davit Buniatyan>software 2.0. I guess you have heard about when machine learning models or deep learning models
+
+53
+00:04:46.040 --> 00:04:51.600
+<v Davit Buniatyan>are taking over the usual code when instead before programmers have to write all these instructions
+
+54
+00:04:51.600 --> 00:04:57.100
+<v Davit Buniatyan>now they actually are preparing the data but they're training those models so they're training
+
+55
+00:04:57.100 --> 00:05:01.380
+<v Davit Buniatyan>those models to build the instruction set and that's what's called software 2.0 but one of the
+
+56
+00:05:01.380 --> 00:05:03.820
+<v Davit Buniatyan>The missing components that we saw is actually the data.
+
+57
+00:05:04.140 --> 00:05:11.080
+<v Davit Buniatyan>So how to prepare this data, how to version it, clean it, basically build it so that you can have an efficient software 2.0.
+
+58
+00:05:13.380 --> 00:05:14.700
+<v Noah Labhart>Well, tell me about the MVP.
+
+59
+00:05:15.020 --> 00:05:19.600
+<v Noah Labhart>Tell me about how long it took to build and what sort of tools you used to bring it to life.
+
+60
+00:05:20.540 --> 00:05:24.000
+<v Davit Buniatyan>When we started the company, we got into Y Combinator.
+
+61
+00:05:24.200 --> 00:05:28.840
+<v Davit Buniatyan>And one of the initial ideas, of course, we learned is that we have to launch as soon as possible.
+
+62
+00:05:28.840 --> 00:05:34.680
+<v Davit Buniatyan>the initial idea that we had in the beginning was actually less about the storage and more about the
+
+63
+00:05:34.680 --> 00:05:41.800
+<v Davit Buniatyan>compute. And that time we were thinking about, okay, so cool, we can take and distribute the machine
+
+64
+00:05:41.800 --> 00:05:46.620
+<v Davit Buniatyan>learning compute to this crypto mining GPUs that we're doing just wasteful computation, and they can
+
+65
+00:05:46.620 --> 00:05:51.600
+<v Davit Buniatyan>do a useful computation here for the users to train their or deploy their models. And the tech
+
+66
+00:05:51.600 --> 00:05:56.960
+<v Davit Buniatyan>stack that we have been using for that MVP was, like, obviously we were using Python. Python is the
+
+67
+00:05:58.840 --> 00:06:02.120
+<v Davit Buniatyan>even though it's not so efficient when you're doing high-performance computing.
+
+68
+00:06:02.440 --> 00:06:05.720
+<v Davit Buniatyan>On the other hand, we also had to bring this whole kind of environment
+
+69
+00:06:05.720 --> 00:06:08.420
+<v Davit Buniatyan>that the users decided to the remote computer.
+
+70
+00:06:08.780 --> 00:06:11.300
+<v Davit Buniatyan>And of course, we were using Docker technology to do that.
+
+71
+00:06:11.580 --> 00:06:13.900
+<v Davit Buniatyan>One of the things that we learned from this iteration
+
+72
+00:06:13.900 --> 00:06:17.700
+<v Davit Buniatyan>is that this missing component is actually not the tech stack
+
+73
+00:06:17.700 --> 00:06:19.540
+<v Davit Buniatyan>or the tools that are missing.
+
+74
+00:06:19.620 --> 00:06:20.760
+<v Davit Buniatyan>It's more about the data.
+
+75
+00:06:20.840 --> 00:06:24.160
+<v Davit Buniatyan>How do you transfer huge data from one location to the other location?
+
+76
+00:06:24.460 --> 00:06:27.440
+<v Davit Buniatyan>And that's how our second MVP had been born,
+
+77
+00:06:28.540 --> 00:06:34.360
+<v Davit Buniatyan>Hub. It helps data scientists basically to represent any data anywhere in any location.
+
+78
+00:06:34.620 --> 00:06:40.240
+<v Davit Buniatyan>And behind the scenes, it sits on top of clouds, or it can also sit on top of the file system and
+
+79
+00:06:40.240 --> 00:06:44.940
+<v Davit Buniatyan>helps to basically chunk the data set you have and store it on a local machine.
+
+80
+00:06:46.020 --> 00:06:53.620
+<v Noah Labhart>So with an MVP, and you mentioned two MVPs, with any MVP, you've got to make certain decisions and
+
+81
+00:06:53.620 --> 00:06:57.800
+<v Noah Labhart>trade-offs when you're building them in the short term to essentially get it out there.
+
+82
+00:06:58.840 --> 00:07:03.600
+<v Noah Labhart>What decisions and trade-offs did you have to make as you're building Activeloop and both of these MVPs?
+
+83
+00:07:03.920 --> 00:07:05.700
+<v Noah Labhart>And how did you cope with those decisions?
+
+84
+00:07:06.800 --> 00:07:16.940
+<v Davit Buniatyan>One of the challenges is to cut down the vision that we have into a set of features that are very well optimized and performant to build an infrastructure there.
+
+85
+00:07:17.220 --> 00:07:18.900
+<v Davit Buniatyan>This is like an infrastructure tool.
+
+86
+00:07:19.020 --> 00:07:21.260
+<v Davit Buniatyan>You have to be very careful what you're pushing forward.
+
+87
+00:07:21.260 --> 00:07:30.460
+<v Davit Buniatyan>One of the things that we cared more is actually can we come up with a good API or good interface that the data scientists can enjoy working with.
+
+88
+00:07:30.600 --> 00:07:38.340
+<v Davit Buniatyan>We always knew that we can do optimizations and quick performance checks behind the scenes because our initial prototypes had all those like ticks there.
+
+89
+00:07:38.500 --> 00:07:46.800
+<v Davit Buniatyan>But we decided to sacrifice in the beginning the speed and performance versus getting the product out, getting it to the user hands.
+
+90
+00:07:46.800 --> 00:07:50.420
+<v Davit Buniatyan>because one of the reasons that, hey, actually we can build the most
+
+91
+00:07:50.420 --> 00:07:54.880
+<v Davit Buniatyan>performant data transfer or data storage service, but will the users need it, or
+
+92
+00:07:54.880 --> 00:08:00.140
+<v Davit Buniatyan>will the users use it? So I think we just prioritized. The first hypothesis is, given
+
+93
+00:08:00.140 --> 00:08:05.840
+<v Davit Buniatyan>the abstraction that we have about the data, can we make sure that users will
+
+94
+00:08:05.840 --> 00:08:11.660
+<v Davit Buniatyan>enjoy and like the interface they're using to store and unify their data
+
+95
+00:08:11.660 --> 00:08:15.740
+<v Davit Buniatyan>format. In the beginning we got a lot of traction on Reddit and a lot of feedback.
+
+96
+00:08:16.800 --> 00:08:20.960
+<v Davit Buniatyan>Community as well, that people decided to join our Slack channel and ask a bunch of questions,
+
+97
+00:08:20.960 --> 00:08:26.560
+<v Davit Buniatyan>and then we felt, okay, now is the time to actually go and focus on optimizations and benchmarking to
+
+98
+00:08:26.560 --> 00:08:31.840
+<v Davit Buniatyan>make sure that the code is performant and robust. So
+
+99
+00:08:31.840 --> 00:08:35.340
+<v Noah Labhart>how are you planning to progress the product?
+
+100
+00:08:35.340 --> 00:08:43.160
+<v Noah Labhart>And what I'm looking for in that question is, is how do you build your roadmap? What
+
+101
+00:08:43.160 --> 00:08:54.300
+<v Noah Labhart>What are the factors you're using to decide this is the next most important thing to build, to optimize, to form fit to our market's needs?
+
+102
+00:08:54.420 --> 00:08:55.920
+<v Noah Labhart>How are you building that roadmap?
+
+103
+00:08:57.140 --> 00:09:00.840
+<v Davit Buniatyan>Well, the basic answer is the community or the users.
+
+104
+00:09:01.500 --> 00:09:10.820
+<v Davit Buniatyan>If you look into the companies who have open core go-to-market strategy, meaning they open source their core technology, and they might have various goals.
+
+105
+00:09:10.820 --> 00:09:15.820
+<v Davit Buniatyan>like one of the goals that we had initially is to get more users and traction to be able to use the
+
+106
+00:09:15.820 --> 00:09:21.600
+<v Davit Buniatyan>piece of tool that we have been very passionate about and we're developing in the beginning.
+
+107
+00:09:21.600 --> 00:09:24.960
+<v Davit Buniatyan>You have your own kind of biases to be able to get a direction
+
+108
+00:09:24.960 --> 00:09:30.880
+<v Davit Buniatyan>Let's say one of the biases that we had is that there is a lot of open source computing machine learning based
+
+109
+00:09:30.880 --> 00:09:32.880
+<v Davit Buniatyan>frameworks like TensorFlow, PyTorch
+
+110
+00:09:32.880 --> 00:09:36.240
+<v Davit Buniatyan>There are a lot of companies who are doing let's say annotations
+
+111
+00:09:36.240 --> 00:09:43.980
+<v Davit Buniatyan>But there is a missing component, missing gap between, which is the, okay, we annotate the data, and then we also can train very well.
+
+112
+00:09:44.080 --> 00:09:45.980
+<v Davit Buniatyan>But what are we doing between those steps?
+
+113
+00:09:46.200 --> 00:09:52.700
+<v Davit Buniatyan>And that includes building the data, storing it, like building the data pipelines, and then streaming this to the training process.
+
+114
+00:09:53.000 --> 00:09:55.340
+<v Davit Buniatyan>So we thought, okay, we have this kind of an initial idea.
+
+115
+00:09:55.440 --> 00:09:57.200
+<v Davit Buniatyan>Okay, we are going to this direction.
+
+116
+00:09:57.340 --> 00:09:58.720
+<v Davit Buniatyan>We are trying to be the best here.
+
+117
+00:09:58.960 --> 00:09:59.640
+<v Davit Buniatyan>And then what?
+
+118
+00:10:00.340 --> 00:10:04.760
+<v Davit Buniatyan>So we built the initial kind of ideas that we had in our mind that might be useful for the users.
+
+119
+00:10:06.240 --> 00:10:12.060
+<v Davit Buniatyan>it. With launching, I don't mean like do a like a press release or a big launch, we just like
+
+120
+00:10:12.060 --> 00:10:16.320
+<v Davit Buniatyan>collected 20 people into a webinar and then demonstrated what we are working on and see their
+
+121
+00:10:16.320 --> 00:10:21.940
+<v Davit Buniatyan>feedback and people got excited and the same happened to we did couple webinars over the last
+
+122
+00:10:21.940 --> 00:10:27.700
+<v Davit Buniatyan>period of three months, both our own, both like we got also invites for some other co-webinars
+
+123
+00:10:27.700 --> 00:10:31.840
+<v Davit Buniatyan>in data science communities. Gathering all this feedback and iterating over the product,
+
+124
+00:10:31.840 --> 00:10:36.520
+<v Davit Buniatyan>We actually came to a release version one and we launched it on Reddit and we got a huge growth.
+
+125
+00:10:36.660 --> 00:10:42.700
+<v Davit Buniatyan>I think we ended up second in machine learning community that day, which has like around 1.5 million members.
+
+126
+00:10:42.980 --> 00:10:48.300
+<v Davit Buniatyan>And then starting from there, what we are focusing really is harnessing the user feedback,
+
+127
+00:10:48.520 --> 00:10:52.520
+<v Davit Buniatyan>learning what are the user needs from the way they use the product.
+
+128
+00:10:52.660 --> 00:10:57.420
+<v Davit Buniatyan>And the best way is actually talking to them and getting their feedback on things like,
+
+129
+00:10:57.420 --> 00:11:01.540
+<v Davit Buniatyan>well this part is slow okay we get it back to them like let's say in a day or
+
+130
+00:11:01.540 --> 00:11:06.100
+<v Davit Buniatyan>two with a fix and say this is done one of the core things that we learned is
+
+131
+00:11:06.100 --> 00:11:10.080
+<v Davit Buniatyan>very important and we learned in a hard way is actually you should be very
+
+132
+00:11:10.700 --> 00:11:15.660
+<v Davit Buniatyan>speedy in terms of reply rate to your users so maximum let's say if you can
+
+133
+00:11:15.660 --> 00:11:19.560
+<v Davit Buniatyan>reply to five to ten minutes and then get with a solution that you can't solve
+
+134
+00:11:19.560 --> 00:11:25.200
+<v Davit Buniatyan>it in place again a day or two and that's really differentiates you from
+
+135
+00:11:25.200 --> 00:11:27.280
+<v Davit Buniatyan>from others and the community really recognize this.
+
+136
+00:11:27.720 --> 00:11:30.300
+<v Davit Buniatyan>In return, they are happy to give you the feedback.
+
+137
+00:11:30.480 --> 00:11:33.500
+<v Davit Buniatyan>And what you're looking for is you want to add your biases
+
+138
+00:11:33.500 --> 00:11:36.580
+<v Davit Buniatyan>or your vision, the user feedback that's is kind of priceless.
+
+139
+00:11:38.160 --> 00:11:40.180
+<v Noah Labhart>Let's switch over a bit to team.
+
+140
+00:11:40.380 --> 00:11:42.800
+<v Noah Labhart>Tell me about how you built your team
+
+141
+00:11:42.800 --> 00:11:45.580
+<v Noah Labhart>and what you looked for in those people
+
+142
+00:11:45.580 --> 00:11:49.180
+<v Noah Labhart>to indicate that they were the winning horses to join you.
+
+143
+00:11:49.580 --> 00:11:50.080
+<v Davit Buniatyan>Well,
+
+144
+00:11:50.260 --> 00:11:53.480
+<v Davit Buniatyan>we started building the team actually
+
+145
+00:11:55.200 --> 00:12:00.060
+<v Davit Buniatyan>So I don't know, fortunately or unfortunately, I guess our team is remote and it's all over the world.
+
+146
+00:12:00.200 --> 00:12:04.880
+<v Davit Buniatyan>We have people in Czech Republic, in India, also in Armenia, in Taiwan, in US.
+
+147
+00:12:05.420 --> 00:12:08.100
+<v Davit Buniatyan>And we have a team that works 24 hours.
+
+148
+00:12:08.460 --> 00:12:14.740
+<v Davit Buniatyan>It's great in the sense that we can provide customer support or user support 24 hours around.
+
+149
+00:12:15.180 --> 00:12:19.880
+<v Davit Buniatyan>And it's bad because it's also like additional friction to synchronize with the team.
+
+150
+00:12:19.880 --> 00:12:31.740
+<v Davit Buniatyan>To get to the answer, since we are building the team remotely at this point, and we all would love to actually go back to like into a single office where all of us are together.
+
+151
+00:12:31.900 --> 00:12:38.900
+<v Davit Buniatyan>I think one of the important things is we should see that if there's a culture fit in terms of the vision we are working with.
+
+152
+00:12:38.900 --> 00:12:56.760
+<v Davit Buniatyan>This number one thing that me and Mikhail, who is heading the marketing and hiring efforts and also growth efforts, especially on the open source side, is that if we can actually be working on the same vision together, despite there is not that much of a good way to have an in-person interview.
+
+153
+00:12:56.760 --> 00:13:04.760
+<v Davit Buniatyan>interview. Then another issue we are looking for is the technological capabilities. If
+
+154
+00:13:04.760 --> 00:13:11.060
+<v Davit Buniatyan>this person can actually independently solve the problem, which you might not find on the
+
+155
+00:13:11.060 --> 00:13:17.920
+<v Davit Buniatyan>internet or not find any clear solution. Because we are working on some stuff that only very
+
+156
+00:13:17.920 --> 00:13:23.340
+<v Davit Buniatyan>few people are working on, and it's good and bad on both sides, you can argue. But the challenge
+
+157
+00:13:23.340 --> 00:13:27.760
+<v Davit Buniatyan>here is that there is not, if you get stuck on a single problem, it's not like you can go into
+
+158
+00:13:27.760 --> 00:13:32.500
+<v Davit Buniatyan>Stack Overflow and find the solution to this problem. Sometimes you are looking for creative
+
+159
+00:13:32.500 --> 00:13:40.020
+<v Davit Buniatyan>and independent people who can try various experiments to identify what's the solution
+
+160
+00:13:40.020 --> 00:13:45.020
+<v Davit Buniatyan>for the current problem. And sometimes you might not find the solution, so you need to figure out
+
+161
+00:13:45.020 --> 00:13:49.360
+<v Davit Buniatyan>what is the best way to overcome this temporarily until a solution can be found out.
+
+162
+00:13:49.360 --> 00:13:51.220
+<v Noah Labhart>So it
+
+163
+00:13:51.220 --> 00:14:01.320
+<v Noah Labhart>sounds like, you know, with the solution you're building, you're pioneering the way. You can't just, you know, Google it or Stack Overflow it to find the answer.
+
+164
+00:14:01.460 --> 00:14:06.100
+<v Noah Labhart>So you need people that are willing to essentially go on that expedition with you.
+
+165
+00:14:06.160 --> 00:14:06.660
+<v Noah Labhart>Is that right?
+
+166
+00:14:06.680 --> 00:14:07.180
+<v Davit Buniatyan>Yeah,
+
+167
+00:14:07.100 --> 00:14:07.600
+<v Davit Buniatyan>exactly.
+
+168
+00:14:07.740 --> 00:14:10.880
+<v Davit Buniatyan>And in some sense, it becomes also kind of a research problem.
+
+169
+00:14:10.880 --> 00:14:17.060
+<v Davit Buniatyan>them. Not only as a startup we have to figure out kind of how to grow and how to build the
+
+170
+00:14:17.060 --> 00:14:21.460
+<v Davit Buniatyan>business on top of it, but we also like you should figure out and explore the technology itself
+
+171
+00:14:21.960 --> 00:14:28.920
+<v Davit Buniatyan>and do a kind of a technical innovation. How do you imagine people are going to store all this
+
+172
+00:14:28.920 --> 00:14:33.960
+<v Davit Buniatyan>like unstructured data that generated today and in future, when you have 5G, you'll have a lot of
+
+173
+00:14:33.960 --> 00:14:38.760
+<v Davit Buniatyan>IoT devices, a lot of camera and sensors collecting all this various information and storing it
+
+174
+00:14:38.760 --> 00:14:45.760
+<v Davit Buniatyan>somewhere. You have all this legacy you're getting from 20 or 30 years ago, but that's not enough and
+
+175
+00:14:45.760 --> 00:14:51.480
+<v Davit Buniatyan>not optimized, not good for the current trends for doing machine learning on top. And sometimes
+
+176
+00:14:51.480 --> 00:14:56.640
+<v Davit Buniatyan>those answers are also not trivial as well, neither for the data scientists or like developers who are
+
+177
+00:14:56.640 --> 00:15:02.400
+<v Davit Buniatyan>working on it and nor for us. Yeah, there's a lot of kind of exploration is required. So curiosity
+
+178
+00:15:02.400 --> 00:15:07.640
+<v Davit Buniatyan>is number one thing. Besides of everything else, I'll say the standard thing is that user.
+
+179
+00:15:08.760 --> 00:15:13.620
+<v Davit Buniatyan>So if we come up with the best technology but nobody uses it, I think it's a big failure. So
+
+180
+00:15:13.620 --> 00:15:19.840
+<v Davit Buniatyan>we should be user obsessed, then technology obsessed, meaning like have this curiosity
+
+181
+00:15:19.840 --> 00:15:26.260
+<v Davit Buniatyan>component. And the third is to be able to independently be responsible to manage
+
+182
+00:15:26.260 --> 00:15:31.920
+<v Davit Buniatyan>themselves and others and take care of them, to, since given the remote settings that we are at,
+
+183
+00:15:31.920 --> 00:15:36.580
+<v Davit Buniatyan>to be able to be efficient. And we haven't been efficient from day zero, so we are learning this,
+
+184
+00:15:36.580 --> 00:15:40.760
+<v Davit Buniatyan>how to be more efficient over the whole COVID period.
+
+185
+00:15:41.600 --> 00:15:42.240
+<v Noah Labhart>Did
+
+186
+00:15:42.240 --> 00:15:46.460
+<v Noah Labhart>you build this to scale efficiently out of the gate?
+
+187
+00:15:46.640 --> 00:15:50.120
+<v Noah Labhart>Or are you going to be fighting this as you grow?
+
+188
+00:15:50.340 --> 00:15:51.960
+<v Noah Labhart>And it's going to be interesting to think about that
+
+189
+00:15:51.960 --> 00:15:57.160
+<v Noah Labhart>from a machine learning related tool like you've built.
+
+190
+00:15:58.040 --> 00:16:01.600
+<v Noah Labhart>How have you approached that problem of scalability?
+
+191
+00:16:04.120 --> 00:16:09.720
+<v Davit Buniatyan>scalability boils down to the basic assumptions you have about the product and how it is going to
+
+192
+00:16:09.720 --> 00:16:16.980
+<v Davit Buniatyan>work and we feel that the assumptions that we initially took are pretty good one for working
+
+193
+00:16:16.980 --> 00:16:22.720
+<v Davit Buniatyan>with petabyte scale data sets. Let's say you have a lot of images and you have files, I don't know,
+
+194
+00:16:22.720 --> 00:16:27.500
+<v Davit Buniatyan>have you ever experienced let's say you want to send like let's say 100 images to your friend
+
+195
+00:16:27.500 --> 00:16:34.140
+<v Davit Buniatyan>using messenger. Isn't it quite slow? And this is a fundamental problem. Like if you look into 100
+
+196
+00:16:34.140 --> 00:16:38.780
+<v Davit Buniatyan>images and each of them are one megabyte then just transferring 100 megabytes should not be a problem
+
+197
+00:16:38.780 --> 00:16:43.960
+<v Davit Buniatyan>with today's wi-fi and internet connectivity and so on. Sometimes the bottleneck is not actually on
+
+198
+00:16:43.960 --> 00:16:50.080
+<v Davit Buniatyan>the network or the physical laws. It's actually the way we pack the data and stream to other places.
+
+199
+00:16:50.460 --> 00:16:55.100
+<v Davit Buniatyan>What we do if you take this, like let's say you have 100 images. Instead of storing them and
+
+200
+00:16:55.100 --> 00:17:00.580
+<v Davit Buniatyan>treating them as a single image, we actually combine them into a single tensor, we call it,
+
+201
+00:17:00.580 --> 00:17:07.840
+<v Davit Buniatyan>which is has 100 samples, and each of, like, you say your images are full HD, so representing this as a
+
+202
+00:17:07.840 --> 00:17:12.340
+<v Davit Buniatyan>single tensor, when the user interacts with it, it doesn't care. It's like it's actually the first
+
+203
+00:17:12.340 --> 00:17:17.380
+<v Davit Buniatyan>image or the last image or the first file or the last file. It's actually for him, it's like a single
+
+204
+00:17:17.380 --> 00:17:23.640
+<v Davit Buniatyan>variable inside the code, like a NumPy array that he can interact with. Behind the scenes what we do,
+
+205
+00:17:25.100 --> 00:17:30.140
+<v Davit Buniatyan>hundred images, we chunk them into small pieces. Let's say each chunk could be like 10 images,
+
+206
+00:17:30.720 --> 00:17:37.220
+<v Davit Buniatyan>and we can store it in any location, on your local cache inside the memory. We can store it on the
+
+207
+00:17:37.780 --> 00:17:43.320
+<v Davit Buniatyan>fast system or we can store it on a remote object storage. The way we chunk this data and the way we
+
+208
+00:17:43.320 --> 00:17:48.360
+<v Davit Buniatyan>treat data is like all the unstructured data sets and not only unstructured but also like one of the
+
+209
+00:17:48.360 --> 00:17:52.940
+<v Davit Buniatyan>advances we need compared to other open source tools like we are not the only one.
+
+210
+00:17:53.540 --> 00:17:57.240
+<v Davit Buniatyan>that we can also represent semi-structured datasets into this
+
+211
+00:17:57.240 --> 00:18:01.140
+<v Davit Buniatyan>tensorial form which helps you basically go like structured storing structured
+
+212
+00:18:01.140 --> 00:18:04.880
+<v Davit Buniatyan>data as tensors is like pretty trivial and the unstructured data is also like
+
+213
+00:18:04.880 --> 00:18:07.860
+<v Davit Buniatyan>sort of fine and once we also additionally have the semi-structured
+
+214
+00:18:07.860 --> 00:18:13.280
+<v Davit Buniatyan>datasets we are able to represent petabyte scale datasets on any location
+
+215
+00:18:13.280 --> 00:18:17.860
+<v Davit Buniatyan>and when I say here petabyte scale what I mean here is that you have let's say
+
+216
+00:18:17.860 --> 00:18:25.020
+<v Davit Buniatyan>hundred thousand or million or ten million of images treating them as a single object which
+
+217
+00:18:25.020 --> 00:18:29.620
+<v Davit Buniatyan>you can access any chunk of it or any part of it and then stream this to the computer machine to
+
+218
+00:18:29.620 --> 00:18:37.180
+<v Davit Buniatyan>be able to do the processing there so before that you had the hadoop ecosystem or map reduce based
+
+219
+00:18:37.180 --> 00:18:43.500
+<v Davit Buniatyan>systems where you have this assumption saying that okay the network is the bottleneck and
+
+220
+00:18:43.500 --> 00:18:50.220
+<v Davit Buniatyan>And what we want actually, we want pieces of the data to each compute machine and then keep there and then move the compute there to run the compute.
+
+221
+00:18:50.940 --> 00:19:00.000
+<v Davit Buniatyan>But now, since the network connectivity got a huge boost, now you can actually, instead of pre-setting the data to the machines, you can actually store it in a centralized location.
+
+222
+00:19:00.080 --> 00:19:09.120
+<v Davit Buniatyan>But still, this location should be physically near to the compute machines and give an access to all those virtual machines to have access to it.
+
+223
+00:19:09.120 --> 00:19:14.700
+<v Davit Buniatyan>So what we allow to the virtual machine be able to do is like instead of storing
+
+224
+00:19:14.700 --> 00:19:19.360
+<v Davit Buniatyan>let's say 100 gigabyte data locally on the machine it can have a view of
+
+225
+00:19:19.360 --> 00:19:24.360
+<v Davit Buniatyan>petabyte scale data set from an object storage and stream any part of it to the
+
+226
+00:19:24.360 --> 00:19:29.560
+<v Davit Buniatyan>GPU as fast as if the data was local to the machine. Given the object storage
+
+227
+00:19:29.560 --> 00:19:33.620
+<v Davit Buniatyan>capabilities here is that you know that there's some latency issue there's a
+
+228
+00:19:33.620 --> 00:19:38.220
+<v Davit Buniatyan>network overhead as well the way we chunk the data the way we compress the
+
+229
+00:19:39.120 --> 00:19:44.980
+<v Davit Buniatyan>store this data on a centralized storage basically fine-tunes the like the current network infrastructure
+
+230
+00:19:44.980 --> 00:19:52.980
+<v Davit Buniatyan>to be able to utilize at maximum speed the connectivity and bring this data to any machine
+
+231
+00:19:52.980 --> 00:20:00.080
+<v Davit Buniatyan>on demand as if it was local and there's one nuance there as well is that we have to kind of
+
+232
+00:20:00.080 --> 00:20:05.260
+<v Davit Buniatyan>know the pattern how you are going to access the data and when you're doing the training or you're
+
+233
+00:20:05.260 --> 00:20:12.320
+<v Davit Buniatyan>doing inference using deep learning models it's pretty standard and you fetch the data one by one
+
+234
+00:20:12.800 --> 00:20:16.840
+<v Davit Buniatyan>and you know the pattern how you're doing that and it could be randomized access but you still
+
+235
+00:20:16.840 --> 00:20:22.640
+<v Davit Buniatyan>have the locations and having this kind of assumptions and given a data infrastructure plus
+
+236
+00:20:22.640 --> 00:20:27.460
+<v Davit Buniatyan>that the connectivity is getting very speedy compared to the compute and also the compute
+
+237
+00:20:27.460 --> 00:20:33.740
+<v Davit Buniatyan>is also changing as well with recent innovations we have been able to disrupt this notion of okay
+
+238
+00:20:35.480 --> 00:20:37.420
+<v Davit Buniatyan>to compute machines to run the compute.
+
+239
+00:20:37.580 --> 00:20:40.220
+<v Davit Buniatyan>And now it can be stored in a centralized location
+
+240
+00:20:40.220 --> 00:20:43.720
+<v Davit Buniatyan>and streamed on demand to run the compute in real time.
+
+241
+00:20:45.260 --> 00:20:47.500
+<v Noah Labhart>Well, as you step out on the balcony
+
+242
+00:20:47.500 --> 00:20:49.720
+<v Noah Labhart>and look across all that you've built,
+
+243
+00:20:49.900 --> 00:20:51.180
+<v Noah Labhart>what are you most proud of?
+
+244
+00:20:52.040 --> 00:20:57.080
+<v Davit Buniatyan>I think what we eventually care is that users adopt
+
+245
+00:20:57.080 --> 00:20:59.080
+<v Davit Buniatyan>the, I'll say, new way of thinking,
+
+246
+00:20:59.200 --> 00:21:01.020
+<v Davit Buniatyan>but it's based on others' work as well,
+
+247
+00:21:01.020 --> 00:21:05.100
+<v Davit Buniatyan>to make it like industry standard.
+
+248
+00:21:05.340 --> 00:21:08.020
+<v Davit Buniatyan>So if one day we can make such that
+
+249
+00:21:08.020 --> 00:21:11.960
+<v Davit Buniatyan>you no longer treat the data you store on a computer
+
+250
+00:21:11.960 --> 00:21:16.240
+<v Davit Buniatyan>or anywhere as files or as objects, let's call it,
+
+251
+00:21:16.280 --> 00:21:18.240
+<v Davit Buniatyan>or when you send images to your friend,
+
+252
+00:21:18.460 --> 00:21:20.580
+<v Davit Buniatyan>like you don't have this long space
+
+253
+00:21:20.580 --> 00:21:23.440
+<v Davit Buniatyan>where you have to wait how each image by each image
+
+254
+00:21:23.440 --> 00:21:24.960
+<v Davit Buniatyan>gets uploaded to Facebook servers
+
+255
+00:21:24.960 --> 00:21:26.800
+<v Davit Buniatyan>and then gets downloaded to the other,
+
+256
+00:21:27.460 --> 00:21:28.560
+<v Davit Buniatyan>then we can be proud of.
+
+257
+00:21:28.560 --> 00:21:42.440
+<v Davit Buniatyan>So if we can make sure that the way we think about the data, it becomes industry standard and call it data 2.0, if everyone starts using data 2.0, then I think at that point we can call it, we did our job well and we will be proud of it.
+
+258
+00:21:43.300 --> 00:21:49.440
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+259
+00:21:49.440 --> 00:21:50.180
+<v Davit Buniatyan>Well,
+
+260
+00:21:50.320 --> 00:21:54.060
+<v Davit Buniatyan>of course, as any startup, we do a lot of mistakes.
+
+261
+00:21:54.340 --> 00:22:06.520
+<v Davit Buniatyan>And one of the initial mistakes is that all kind of dilemmas that we had to balance is how we treat open source users versus the customers who are paying us.
+
+262
+00:22:06.680 --> 00:22:15.140
+<v Davit Buniatyan>And initially, we were struggling with this question, okay, open source users have different needs than the enterprise users.
+
+263
+00:22:15.140 --> 00:22:20.600
+<v Davit Buniatyan>users and how we can keep the balance that of course the enterprise users should be happy
+
+264
+00:22:20.600 --> 00:22:24.920
+<v Davit Buniatyan>so that we can have the business going forward but also we want to get adoption and long-term
+
+265
+00:22:24.920 --> 00:22:27.380
+<v Davit Buniatyan>game that's why we need open source users.
+
+266
+00:22:28.140 --> 00:22:35.040
+<v Davit Buniatyan>One of the insights I'll say like the learnings that we learned is the speed to get back to
+
+267
+00:22:35.040 --> 00:22:38.720
+<v Davit Buniatyan>the users doesn't matter if they are free or they are paying.
+
+268
+00:22:39.100 --> 00:22:43.120
+<v Davit Buniatyan>Initially we were not doing that and we got a lot of deactivations some people tried the
+
+269
+00:22:43.120 --> 00:22:48.480
+<v Davit Buniatyan>product and they didn't leave any feedback so we didn't learn anything new there. But once we
+
+270
+00:22:48.480 --> 00:22:54.780
+<v Davit Buniatyan>changed this behavior internally in our team we got a lot of demand. If you go into our Slack channel
+
+271
+00:22:54.780 --> 00:23:01.260
+<v Davit Buniatyan>our users post issues and feedback and feature requests 24 hours around. I mean because they are
+
+272
+00:23:01.260 --> 00:23:06.660
+<v Davit Buniatyan>all like different locations it also like brings a lot of responsibility as well to be able to
+
+273
+00:23:06.660 --> 00:23:12.200
+<v Davit Buniatyan>accommodate this demand and be able to reply the issues. And what we all started to notice is that
+
+274
+00:23:13.120 --> 00:23:18.320
+<v Davit Buniatyan>pause an issue and the other user replies with a solution. So building the
+
+275
+00:23:18.320 --> 00:23:21.560
+<v Davit Buniatyan>engine for the community is very important and that's like one learning
+
+276
+00:23:21.560 --> 00:23:25.980
+<v Davit Buniatyan>that we learn from the mistakes that we did. We are in a very early and embryonic
+
+277
+00:23:25.980 --> 00:23:30.860
+<v Davit Buniatyan>phase where we had to actually work on the community and help the community to
+
+278
+00:23:30.860 --> 00:23:35.680
+<v Davit Buniatyan>grow to be able to sustain and enforce everything and that's that's one of our
+
+279
+00:23:35.680 --> 00:23:39.620
+<v Davit Buniatyan>next challenges is we got a great kickstart but we have to make sure that
+
+280
+00:23:39.620 --> 00:23:43.920
+<v Davit Buniatyan>that the users are satisfied and happy, and in the long term, they will be with us.
+
+281
+00:23:44.520 --> 00:23:47.960
+<v Noah Labhart>As you look forward to those next challenges,
+
+282
+00:23:48.220 --> 00:23:51.900
+<v Noah Labhart>what does the future look like for your product and for your team?
+
+283
+00:23:52.540 --> 00:23:57.820
+<v Davit Buniatyan>The short-term step is basically we build a community, grow the open source,
+
+284
+00:23:58.060 --> 00:24:03.520
+<v Davit Buniatyan>and make sure that we become the standard for storing and managing large datasets.
+
+285
+00:24:03.780 --> 00:24:06.600
+<v Davit Buniatyan>On the product side, in terms of the enterprise features,
+
+286
+00:24:06.600 --> 00:24:09.440
+<v Davit Buniatyan>which is we are focusing on active learning tool.
+
+287
+00:24:09.600 --> 00:24:12.000
+<v Davit Buniatyan>So leveraging the open source that we have built
+
+288
+00:24:12.000 --> 00:24:14.900
+<v Davit Buniatyan>and the active learning tool is not only storing
+
+289
+00:24:14.900 --> 00:24:15.760
+<v Davit Buniatyan>and managing the dataset,
+
+290
+00:24:15.900 --> 00:24:17.480
+<v Davit Buniatyan>but also training and deploying those models
+
+291
+00:24:17.480 --> 00:24:19.000
+<v Davit Buniatyan>into production for customers
+
+292
+00:24:19.000 --> 00:24:21.800
+<v Davit Buniatyan>who have plenty of unstructured data.
+
+293
+00:24:22.180 --> 00:24:24.380
+<v Davit Buniatyan>We want to build the operating system
+
+294
+00:24:24.380 --> 00:24:26.240
+<v Davit Buniatyan>for machine learning and deep learning.
+
+295
+00:24:26.620 --> 00:24:29.040
+<v Davit Buniatyan>And you can think of it as like cloud for AI,
+
+296
+00:24:29.560 --> 00:24:31.480
+<v Davit Buniatyan>but that's like long term vision.
+
+297
+00:24:31.520 --> 00:24:32.940
+<v Davit Buniatyan>And we are getting there step by step
+
+298
+00:24:32.940 --> 00:24:34.760
+<v Davit Buniatyan>with the resources that are available.
+
+299
+00:24:36.600 --> 00:24:43.660
+<v Noah Labhart>Who influences the way that you work? Can be it a CTO, CEO, architect, really any person.
+
+300
+00:24:43.920 --> 00:24:46.460
+<v Noah Labhart>Name a person that you look up to and why.
+
+301
+00:24:47.560 --> 00:24:50.160
+<v Davit Buniatyan>Yeah, it's difficult to come up with a single person.
+
+302
+00:24:51.260 --> 00:24:55.040
+<v Davit Buniatyan>Of course, our team. There are so many things I also learned from the team.
+
+303
+00:24:55.100 --> 00:25:02.480
+<v Davit Buniatyan>The team members include like Mikhail, Eduard, Abhinav, David, Christina, and other also team members as well.
+
+304
+00:25:02.480 --> 00:25:09.680
+<v Davit Buniatyan>We also have investors and advisors who are helping us a lot, especially Charles and someone and also like SmartGateVC.
+
+305
+00:25:10.420 --> 00:25:24.560
+<v Davit Buniatyan>I'm also thankful to the YC team and YC, especially YC open source team that we are having meetups with open source developers to be able to figure out what are the issues and challenges.
+
+306
+00:25:24.980 --> 00:25:31.060
+<v Davit Buniatyan>But it's very hard to me come up and say, OK, here's the person I really admire him and I'm like trying to copy.
+
+307
+00:25:32.480 --> 00:25:38.520
+<v Davit Buniatyan>also a lot of kind of competitors and call them as little friends that are important to gain their
+
+308
+00:25:38.520 --> 00:25:42.940
+<v Davit Buniatyan>knowledge and gain their insights about the market and how the trends are moving forward.
+
+309
+00:25:43.120 --> 00:25:48.360
+<v Davit Buniatyan>And of course, my advisor as well, Sebastian Seung, who is currently the president of AI at Samsung.
+
+310
+00:25:48.660 --> 00:25:51.940
+<v Davit Buniatyan>I learned a lot while I was working at Princeton from him.
+
+311
+00:25:53.600 --> 00:25:58.980
+<v Noah Labhart>So, you know, we talked about mistakes, but this next question is less about mistakes and more
+
+312
+00:25:58.980 --> 00:26:03.080
+<v Noah Labhart>about things that you might do differently. So if you could go back to the beginning,
+
+313
+00:26:03.280 --> 00:26:06.940
+<v Noah Labhart>what would you do differently or where would you consider taking a different approach?
+
+314
+00:26:08.780 --> 00:26:15.880
+<v Davit Buniatyan>Yeah, that's a pretty tough question. So this is given like, okay, you have done all these mistakes
+
+315
+00:26:16.420 --> 00:26:20.480
+<v Davit Buniatyan>given the information and given the insights that you gathered, where would you start from
+
+316
+00:26:20.480 --> 00:26:27.680
+<v Davit Buniatyan>in the beginning? I think we, when we started, we were very tech focused and thinking about the
+
+317
+00:26:28.980 --> 00:26:32.460
+<v Davit Buniatyan>and less about the users, and maybe we are still doing that.
+
+318
+00:26:32.780 --> 00:26:38.980
+<v Davit Buniatyan>So at the very, very beginning, while I was at Princeton and doing the PhD,
+
+319
+00:26:39.600 --> 00:26:45.140
+<v Davit Buniatyan>before even applying to YC, I will definitely try to get more user validation
+
+320
+00:26:45.140 --> 00:26:48.540
+<v Davit Buniatyan>of the product that we are building, and not only user validation,
+
+321
+00:26:48.620 --> 00:26:50.420
+<v Davit Buniatyan>but also business validation.
+
+322
+00:26:50.440 --> 00:26:55.700
+<v Davit Buniatyan>Basically, this is something that companies will pay for, or users will pay for.
+
+323
+00:26:56.760 --> 00:27:01.560
+<v Davit Buniatyan>though sometimes it's very tricky especially when you have a deep tech company and you need to get
+
+324
+00:27:01.560 --> 00:27:06.220
+<v Davit Buniatyan>a technological innovation to be able to prove that but then you also have to minimize the
+
+325
+00:27:06.220 --> 00:27:11.520
+<v Davit Buniatyan>business risk once you have this product will the users or with the customers will get that
+
+326
+00:27:11.520 --> 00:27:16.740
+<v Davit Buniatyan>and buy that i think that was one of the initial things that i wish i had more knowledge or
+
+327
+00:27:16.740 --> 00:27:21.860
+<v Davit Buniatyan>experience with before jumping into the startup journey there are multiple ways of startup
+
+328
+00:27:21.860 --> 00:27:25.680
+<v Davit Buniatyan>success is the first one is that you figured out the product and you get a
+
+329
+00:27:25.680 --> 00:27:29.520
+<v Davit Buniatyan>PMF and then you are scaling their company and that's the best location you
+
+330
+00:27:29.520 --> 00:27:34.080
+<v Davit Buniatyan>want to be and on the other hand it's like it's kind of a journey you try a
+
+331
+00:27:34.080 --> 00:27:37.500
+<v Davit Buniatyan>lot of stuff you do a lot of learnings and then you come up with a product
+
+332
+00:27:37.500 --> 00:27:42.840
+<v Davit Buniatyan>iteratively and get to the PMF I think that's the case with the second the
+
+333
+00:27:42.840 --> 00:27:48.080
+<v Davit Buniatyan>second is the case with us. So we are still in the journey basically to get to
+
+334
+00:27:48.080 --> 00:27:52.420
+<v Davit Buniatyan>the product market, though we have so many already assumptions validated and there are
+
+335
+00:27:52.420 --> 00:27:57.460
+<v Davit Buniatyan>plus pieces left to validate and grow the company to the next stage.
+
+336
+00:27:58.500 --> 00:27:59.720
+<v Noah Labhart>Well, last question, Davit.
+
+337
+00:28:00.140 --> 00:28:05.140
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's just built
+
+338
+00:28:05.140 --> 00:28:06.200
+<v Noah Labhart>the next big thing.
+
+339
+00:28:06.460 --> 00:28:07.580
+<v Noah Labhart>They're jazzed about it.
+
+340
+00:28:07.660 --> 00:28:09.360
+<v Noah Labhart>They can't wait to show it off to the world.
+
+341
+00:28:09.460 --> 00:28:11.580
+<v Noah Labhart>They can't wait to show it off to you right there on the plane.
+
+342
+00:28:12.180 --> 00:28:15.900
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+343
+00:28:17.000 --> 00:28:25.020
+<v Davit Buniatyan>There are three things that I would like to know about it. First of all, is this something that this
+
+344
+00:28:25.020 --> 00:28:31.300
+<v Davit Buniatyan>person is really patient about it? Even if it works, it, a lot of people are using it, is this person
+
+345
+00:28:31.300 --> 00:28:37.720
+<v Davit Buniatyan>like really passionate about it? Second thing, if this person can be the best at it in the whole
+
+346
+00:28:37.720 --> 00:28:44.340
+<v Davit Buniatyan>world. And third thing, even though it could be the most innovative technology, is it something other
+
+347
+00:28:45.940 --> 00:28:51.980
+<v Davit Buniatyan>use? So if I get a satisfied answer for three of those problems, then
+
+348
+00:28:51.980 --> 00:28:57.000
+<v Davit Buniatyan>unfortunately I don't have anything to add there. But if I feel like basically
+
+349
+00:28:57.000 --> 00:29:02.200
+<v Davit Buniatyan>there's like less passion involved, or maybe it's just like it's
+
+350
+00:29:02.200 --> 00:29:06.040
+<v Davit Buniatyan>very difficult to figure out the business model for the product that he
+
+351
+00:29:06.040 --> 00:29:10.880
+<v Davit Buniatyan>has spent so much time on, I will just basically advise what YC tells us:
+
+352
+00:29:10.880 --> 00:29:14.780
+<v Davit Buniatyan>just launch it as soon as possible and see if the users need it. Instead of
+
+353
+00:29:15.900 --> 00:29:19.660
+<v Davit Buniatyan>and building this internally inside backyard of your house.
+
+354
+00:29:19.940 --> 00:29:20.920
+<v Noah Labhart>That's great advice.
+
+355
+00:29:21.480 --> 00:29:24.060
+<v Noah Labhart>Well, Davit, thank you for being on the show today.
+
+356
+00:29:24.140 --> 00:29:28.000
+<v Noah Labhart>Thank you for telling the product creation story of Activeloop.
+
+357
+00:29:28.720 --> 00:29:31.460
+<v Davit Buniatyan>Thank you very much, Noah, for inviting and having me here.
+
+358
+00:29:31.880 --> 00:29:35.100
+<v Davit Buniatyan>And really thanks for the nice conversation.
+
+359
+00:29:36.060 --> 00:29:38.940
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+360
+00:29:41.380 --> 00:29:44.080
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+361
+00:29:45.900 --> 00:29:49.220
+<v Noah Labhart>on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+362
+00:29:49.660 --> 00:29:54.700
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just $5 to $10 a month.
+
+363
+00:29:55.060 --> 00:29:57.320
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+364
+00:29:57.600 --> 00:29:59.540
+<v Noah Labhart>Both things help us out tremendously.
+
+365
+00:30:02.160 --> 00:30:03.660
+<v Noah Labhart>And thanks again for listening.

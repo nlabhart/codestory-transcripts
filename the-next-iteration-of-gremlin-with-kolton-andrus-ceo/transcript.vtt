@@ -1,0 +1,1195 @@
+WEBVTT
+
+NOTE The Next Iteration of Gremlin – with Kolton Andrus, CEO
+
+1
+00:00:00.000 --> 00:00:29.380
+<v Noah Labhart>Hello, listeners. Welcome back to the Code Story podcast. In this episode, I'm talking with Kolton Andrus, CEO and founder of Gremlin. You may remember previously when we spoke with Matt, the prior CTO of the company. Since that timeframe, a lot has changed. Gremlin has gone through several arcs and foundational changes that are leading to not only assessing weaknesses in your infrastructure through chaos engineering, but walking you through how to fix them, and eventually fixing them for you.
+
+2
+00:00:30.000 --> 00:00:38.100
+<v Noah Labhart>Kolton is going to take us through those arcs, including leadership transitions, product changes, and how AI may or may not fit in the world of SRE.
+
+3
+00:00:39.760 --> 00:00:43.880
+<v Noah Labhart>Well, Kolton, thank you for being on Code Story. Thanks for being on the show today.
+
+4
+00:00:44.100 --> 00:00:44.600
+<v Kolton Andrus>My
+
+5
+00:00:44.420 --> 00:00:45.520
+<v Kolton Andrus>pleasure. Thanks for having
+
+6
+00:00:45.520 --> 00:00:46.020
+<v Kolton Andrus>me.
+
+7
+00:00:45.880 --> 00:00:55.660
+<v Noah Labhart>Absolutely. Really excited to dive into Gremlin and all of the latest updates, latest iterations of the platform and of the team at large.
+
+8
+00:00:55.660 --> 00:01:01.140
+<v Noah Labhart>You know, we've talked to Matt before on this podcast, but I'm very curious to learn more about you.
+
+9
+00:01:01.200 --> 00:01:05.160
+<v Noah Labhart>But so before we dive into things, tell me a little bit more about you.
+
+10
+00:01:05.220 --> 00:01:08.160
+<v Noah Labhart>You know, technology, yes, but also who you are as a person.
+
+11
+00:01:08.260 --> 00:01:08.760
+<v Kolton Andrus>Yeah,
+
+12
+00:01:08.620 --> 00:01:10.640
+<v Kolton Andrus>well, I'm a father of five.
+
+13
+00:01:10.680 --> 00:01:13.740
+<v Kolton Andrus>That's usually remarkable in today's day and age.
+
+14
+00:01:13.980 --> 00:01:18.560
+<v Kolton Andrus>I got married young, so I have kids in college down through kids in high school.
+
+15
+00:01:18.720 --> 00:01:20.220
+<v Kolton Andrus>Bit of an outdoor family.
+
+16
+00:01:20.380 --> 00:01:21.200
+<v Kolton Andrus>Grew up in the West.
+
+17
+00:01:21.420 --> 00:01:22.280
+<v Kolton Andrus>We love the mountains.
+
+18
+00:01:22.700 --> 00:01:25.460
+<v Kolton Andrus>Just got back from a trip driving all around the West.
+
+19
+00:01:25.660 --> 00:01:32.020
+<v Kolton Andrus>doing some hikes and hanging out in Moab at 100 degree weather, enjoying following the Colorado
+
+20
+00:01:32.020 --> 00:01:37.500
+<v Kolton Andrus>River down through the state and into Utah. When you've had enough kids, you'll get a couple of
+
+21
+00:01:37.500 --> 00:01:43.540
+<v Kolton Andrus>dogs to throw on the end. My two oldest kids have moved out and now we have two golden doodles that
+
+22
+00:01:43.540 --> 00:01:48.260
+<v Kolton Andrus>have been with us eight and four years. And they're basically the next two in line. So we've
+
+23
+00:01:48.260 --> 00:01:50.540
+<v Kolton Andrus>got to keep the whole caravan running.
+
+24
+00:01:50.720 --> 00:01:52.700
+<v Noah Labhart>That's awesome. Okay. Let's dive in the
+
+25
+00:01:52.700 --> 00:02:00.880
+<v Noah Labhart>So we're going to talk about the next iteration of Gremlin, but I want to set the stage here a bit because your time at Amazon and Netflix, they were big influences.
+
+26
+00:02:01.060 --> 00:02:05.320
+<v Noah Labhart>And what got you started in chaos engineering and reliability testing?
+
+27
+00:02:05.360 --> 00:02:08.820
+<v Noah Labhart>What actually got you started down this path of chaos engineering?
+
+28
+00:02:08.960 --> 00:02:12.300
+<v Noah Labhart>Can you tell me what was so foundational about your time there?
+
+29
+00:02:12.460 --> 00:02:20.520
+<v Kolton Andrus>Going back 16, 17 years now, you know, early in my career, I'd worked for a couple of startups, but I had the opportunity to join Amazon.
+
+30
+00:02:20.520 --> 00:02:27.420
+<v Kolton Andrus>on. And the team I was on was the retail website availability team. So it was our job to make sure
+
+31
+00:02:27.420 --> 00:02:33.100
+<v Kolton Andrus>the website didn't go down. And we did a lot of things to prevent that. We did a lot of postmortems
+
+32
+00:02:33.100 --> 00:02:37.860
+<v Kolton Andrus>and incident reviews. We own what's called the call leader program at Amazon, which are the set
+
+33
+00:02:37.860 --> 00:02:42.820
+<v Kolton Andrus>of individuals who respond on behalf of the company when there's a large scale incident.
+
+34
+00:02:43.440 --> 00:02:48.580
+<v Kolton Andrus>But that wasn't enough is what I learned when I joined. We needed more and we really needed
+
+35
+00:02:50.520 --> 00:03:12.220
+<v Kolton Andrus>And so everything we were doing was fundamentally reactive. And some great people I was with, you know, came up with the idea, hey, we should be proactively testing this idea. And so in Amazon fashion, we wrote up a one pager, you know, hey, we want to release the gremlins out, we want to see how people respond, we want to go find the issues in the system and make them better.
+
+36
+00:03:12.700 --> 00:03:31.180
+<v Kolton Andrus>And it was my job as an engineer to go build that platform. So I built something very similar to what we have today at Gremlin, a service, a web interface, an API, a set of fault injections, a set of safety mechanisms to allow people to run it, a set of reporting to be able to track it and know what happened.
+
+37
+00:03:31.180 --> 00:03:34.620
+<v Kolton Andrus>And we had a lot of success with that at Amazon.
+
+38
+00:03:34.860 --> 00:03:36.420
+<v Kolton Andrus>We had hundreds of teams used it.
+
+39
+00:03:36.480 --> 00:03:38.360
+<v Kolton Andrus>We saw a lot of value in the approach.
+
+40
+00:03:39.160 --> 00:03:42.760
+<v Kolton Andrus>And so that was really, you know, my taste of this at Amazon.
+
+41
+00:03:43.400 --> 00:03:45.880
+<v Kolton Andrus>People always ask me, oh, you worked at Netflix.
+
+42
+00:03:45.980 --> 00:03:47.360
+<v Kolton Andrus>Did you write Chaos Monkey?
+
+43
+00:03:47.540 --> 00:03:49.860
+<v Kolton Andrus>And the answer is no, I did not write Chaos Monkey.
+
+44
+00:03:50.060 --> 00:04:00.820
+<v Kolton Andrus>While we were building our, you know, software at Amazon, Netflix had come up with the idea of Chaos Monkey and were really taking their first steps implementing it and publicizing it.
+
+45
+00:04:01.180 --> 00:04:02.360
+<v Kolton Andrus>And I was aware of that.
+
+46
+00:04:02.440 --> 00:04:06.180
+<v Kolton Andrus>I thought it was super cool that they were pushing the envelope with that.
+
+47
+00:04:06.520 --> 00:04:13.500
+<v Kolton Andrus>And so after my four years and a week at Amazon, after my tour of duty was done, I went and
+
+48
+00:04:13.500 --> 00:04:17.280
+<v Kolton Andrus>interviewed and I went and found the team at Netflix that was really innovating around
+
+49
+00:04:17.280 --> 00:04:19.760
+<v Kolton Andrus>fault injection and chaos engineering.
+
+50
+00:04:20.140 --> 00:04:23.460
+<v Kolton Andrus>And I joined that team and good news.
+
+51
+00:04:23.580 --> 00:04:24.880
+<v Kolton Andrus>They were doing a great job.
+
+52
+00:04:25.000 --> 00:04:25.880
+<v Kolton Andrus>Good news for me.
+
+53
+00:04:25.940 --> 00:04:26.960
+<v Kolton Andrus>There was more to be done.
+
+54
+00:04:26.960 --> 00:04:41.660
+<v Kolton Andrus>So I had the opportunity to come in and help the next generation fault injection platform be built for Netflix. I went through and helped all of the API, the proxy, all of the mid-tier services do a bunch of failure testing.
+
+55
+00:04:41.660 --> 00:05:00.240
+<v Kolton Andrus>And ultimately, we saw pretty big gains. When I joined, Netflix was at about four nines of uptime or about eight hours of outage a year. And after we completed this work, we had gotten to the four nines mark of under an hour, about under 45 minutes of outage time in the course of the year.
+
+56
+00:05:00.880 --> 00:05:16.540
+<v Kolton Andrus>And so, yeah, those two, you know, examples of, you know, really sharp companies with really sharp engineers needing something more, needing better tooling and guidance to really go out and get in front of this really complex problem really set the stage for, you know, what was to come for me.
+
+57
+00:05:16.700 --> 00:05:17.440
+<v Noah Labhart>That's so cool.
+
+58
+00:05:17.560 --> 00:05:21.680
+<v Noah Labhart>And down from eight hours to 45 minutes is radical change.
+
+59
+00:05:21.900 --> 00:05:27.640
+<v Noah Labhart>Even, I mean, eight hours in a year is tiny, but down to 45 minutes is, I mean, is incredible.
+
+60
+00:05:27.640 --> 00:05:28.280
+<v Noah Labhart>Yeah.
+
+61
+00:05:28.400 --> 00:05:48.860
+<v Kolton Andrus>In the three nines world, you get several 20 to 30 minute outages throughout the year. Not one a month, but close. In the four nines world, you get a few five minute outages in the year. And the system really needs to be able to self heal and quickly recuperate or else you're going to blow that SLA.
+
+62
+00:05:48.860 --> 00:05:49.520
+<v Noah Labhart>For
+
+63
+00:05:49.520 --> 00:06:14.320
+<v Noah Labhart>sure. Okay. So I think it's important before we move into what, you know, the next iteration of Gremlin is, give my audience a reminder of what Gremlin is. Coming from what you just described as foundational into, you know, into who you are as an engineer and the experiences you have, I think defining what Gremlin is, is going to be helpful for us to move into the next iteration. So just give me, give the audience a bit of the, you know, the bit of the pitch.
+
+64
+00:06:14.320 --> 00:06:15.100
+<v Kolton Andrus>Yeah, so
+
+65
+00:06:15.100 --> 00:06:39.780
+<v Kolton Andrus>I would say, you know, let's start with what is chaos engineering? Chaos engineering is we want to go out and purposely inject failure in order to understand how the system responds in order to make sure it responds correctly. It's a bit like distributed system testing. We want to make sure the distributed system works correctly. And Gremlin is a tool that's built to enable, you know, safe, secure, simple to use fault injection.
+
+66
+00:06:39.780 --> 00:06:44.700
+<v Kolton Andrus>injection. The first iteration of the product, we really took what we had learned, what I'd learned
+
+67
+00:06:44.700 --> 00:06:51.160
+<v Kolton Andrus>from Amazon and Netflix, and built that. Oh, this is V3. Let's take what worked at these other two
+
+68
+00:06:51.160 --> 00:06:55.740
+<v Kolton Andrus>companies, and let's go build that product and put it in the hands of customers. That took us a
+
+69
+00:06:55.740 --> 00:07:00.900
+<v Kolton Andrus>couple of years. We had a lot of things to learn. We had to go build it. When you build something
+
+70
+00:07:00.900 --> 00:07:05.600
+<v Kolton Andrus>internal to a company, you get to cheat a little bit when it comes to some of the security, some
+
+71
+00:07:05.600 --> 00:07:06.560
+<v Kolton Andrus>some of the mechanisms.
+
+72
+00:07:06.860 --> 00:07:08.440
+<v Kolton Andrus>You have a lot of internal infrastructure
+
+73
+00:07:08.440 --> 00:07:09.600
+<v Kolton Andrus>you can build toward.
+
+74
+00:07:09.860 --> 00:07:10.920
+<v Kolton Andrus>When you build for the world,
+
+75
+00:07:11.040 --> 00:07:12.600
+<v Kolton Andrus>you have to handle all the edge cases.
+
+76
+00:07:12.880 --> 00:07:14.880
+<v Kolton Andrus>And so, you know, we went out,
+
+77
+00:07:14.960 --> 00:07:16.480
+<v Kolton Andrus>we built our Gremlin agents.
+
+78
+00:07:16.760 --> 00:07:18.460
+<v Kolton Andrus>Those are the things that inject the failure.
+
+79
+00:07:18.700 --> 00:07:20.980
+<v Kolton Andrus>We're able to inject all manner of failures,
+
+80
+00:07:21.140 --> 00:07:25.020
+<v Kolton Andrus>CPU, memory, disk, IO, network level failures,
+
+81
+00:07:25.160 --> 00:07:27.820
+<v Kolton Andrus>really to simulate any kind of failure
+
+82
+00:07:27.820 --> 00:07:30.300
+<v Kolton Andrus>that a customer might experience in production.
+
+83
+00:07:30.600 --> 00:07:32.280
+<v Kolton Andrus>We had to build a set of, you know,
+
+84
+00:07:32.280 --> 00:07:34.660
+<v Kolton Andrus>workflow engines and things like scenarios
+
+85
+00:07:35.600 --> 00:07:39.940
+<v Kolton Andrus>that really allow people to compose them and create more interesting failure modes.
+
+86
+00:07:40.240 --> 00:07:48.160
+<v Kolton Andrus>And a lot of specifics around permissions and making sure the failure behaves as the customer expects and as it would in the real world.
+
+87
+00:07:48.380 --> 00:07:52.040
+<v Kolton Andrus>And so that in a nutshell was kind of, you know, the first iteration of Gremlin.
+
+88
+00:07:52.180 --> 00:07:54.180
+<v Kolton Andrus>I would call it the chaos engineering platform.
+
+89
+00:07:54.880 --> 00:07:58.580
+<v Noah Labhart>So then, you know, when we were talking before, you mentioned a few arcs.
+
+90
+00:07:58.580 --> 00:08:00.960
+<v Noah Labhart>That's probably the first arc of the company.
+
+91
+00:08:01.160 --> 00:08:02.720
+<v Noah Labhart>You know, I think there are a couple more.
+
+92
+00:08:02.820 --> 00:08:04.840
+<v Noah Labhart>There's one in between and then there's one now.
+
+93
+00:08:05.600 --> 00:08:08.680
+<v Noah Labhart>Can you kind of talk to me about those, about the company arcs?
+
+94
+00:08:08.680 --> 00:08:12.760
+<v Noah Labhart>And then I think that'll bring us into what the next iteration of Gremlin is today.
+
+95
+00:08:13.420 --> 00:08:18.080
+<v Kolton Andrus>You know, I think the first arc is really characterized by what I would call field of
+
+96
+00:08:18.080 --> 00:08:18.800
+<v Kolton Andrus>dreams DevOps.
+
+97
+00:08:19.180 --> 00:08:21.020
+<v Kolton Andrus>You know, if you build it, they will come.
+
+98
+00:08:21.200 --> 00:08:22.860
+<v Kolton Andrus>And that's what we saw at Amazon.
+
+99
+00:08:23.080 --> 00:08:24.180
+<v Kolton Andrus>That's what we saw at Netflix.
+
+100
+00:08:24.460 --> 00:08:25.900
+<v Kolton Andrus>People were culturally aligned.
+
+101
+00:08:26.140 --> 00:08:29.600
+<v Kolton Andrus>If you build the right tools, you know, in general, you could get the right behavior.
+
+102
+00:08:29.600 --> 00:08:54.540
+<v Kolton Andrus>And so we saw a lot of our customers try this in kind of the late 20 teens where they went out, they brought in a tool, they brought in an enablement center and they said, hey, this is a great idea. You should do this. And then they just kind of hoped that the right thing would happen. And I say this, you know, I guess I'm a little jaded because I've been through it. That's what we had thought what might work. That's what we'd hoped would work.
+
+103
+00:08:54.540 --> 00:09:23.240
+<v Kolton Andrus>But really, what we found is that that was a little spotty. Customers would apply it on this team, but not on that team. The SRE team might be experts and they know exactly what kind of failure modes they want to create and how to do them. But, you know, two levels down on an engineering team that's, you know, barely on call or hasn't had to do a lot, you know, that the SRE team has done, they struggled. They weren't really sure what tests to run. They weren't really sure if their system responded correctly.
+
+104
+00:09:24.540 --> 00:09:29.500
+<v Kolton Andrus>We saw at the company level, teams really struggled to coordinate and to scale these efforts.
+
+105
+00:09:29.940 --> 00:09:37.160
+<v Kolton Andrus>There was a bit of, you know, everybody kind of did what they wanted and results, you know, were kind of wildly varied as a result.
+
+106
+00:09:37.300 --> 00:09:40.520
+<v Kolton Andrus>And so that really led to, you know, the second arc of the company.
+
+107
+00:09:40.620 --> 00:09:42.700
+<v Kolton Andrus>We built this great chaos engineering platform.
+
+108
+00:09:43.000 --> 00:09:44.160
+<v Kolton Andrus>We built this great tool.
+
+109
+00:09:44.380 --> 00:09:51.580
+<v Kolton Andrus>We had a lot of capabilities, but sometimes customers were just struggling to use it, struggling to get the value that they expected.
+
+110
+00:09:51.580 --> 00:09:54.640
+<v Kolton Andrus>or they did a lot of work and they weren't really seeing the results.
+
+111
+00:09:54.940 --> 00:09:59.140
+<v Kolton Andrus>And so what we learned is, you know, and I wrote a blog post about this.
+
+112
+00:09:59.200 --> 00:10:02.000
+<v Kolton Andrus>It's chaos engineering, necessary, but not sufficient.
+
+113
+00:10:02.260 --> 00:10:03.560
+<v Kolton Andrus>You need the chaos engineering.
+
+114
+00:10:03.780 --> 00:10:04.380
+<v Kolton Andrus>It's important.
+
+115
+00:10:04.600 --> 00:10:09.200
+<v Kolton Andrus>It's a valuable tool, but you need some process and structure around it.
+
+116
+00:10:09.260 --> 00:10:12.560
+<v Kolton Andrus>And so we, you know, we went back into the lab.
+
+117
+00:10:12.760 --> 00:10:14.100
+<v Kolton Andrus>We thought hard about it.
+
+118
+00:10:14.160 --> 00:10:18.660
+<v Kolton Andrus>We thought hard about how we use Gremlin and what we would like to see and what we'd learn
+
+119
+00:10:18.660 --> 00:10:19.500
+<v Kolton Andrus>from our customers.
+
+120
+00:10:19.500 --> 00:10:45.220
+<v Kolton Andrus>We built something that's really an extension of the original Chaos Engineering tooling that we call Reliability Management. And what we did with Reliability Management is we layered on top of the Chaos Engineering, you know, a concept of services, a concept of how reliable those services were. So we added a reliability score. We came up with a default test suite. If you're not sure where to begin, you should run these tests.
+
+121
+00:10:45.220 --> 00:10:50.680
+<v Kolton Andrus>tests and we did a lot of work to integrate with the customers systems to be able to measure the
+
+122
+00:10:50.680 --> 00:10:55.480
+<v Kolton Andrus>health of their systems so that we would know whether or not they were passing the tests or
+
+123
+00:10:55.480 --> 00:11:00.140
+<v Kolton Andrus>whether the system was struggling when we were running the tests and we did a bunch of work
+
+124
+00:11:00.140 --> 00:11:05.780
+<v Kolton Andrus>there's some nice side effects that came out of that one is um dependency discovery uh originally
+
+125
+00:11:05.780 --> 00:11:10.200
+<v Kolton Andrus>we thought oh everyone's gonna have tracing we just need to tie into their tracing systems and
+
+126
+00:11:10.200 --> 00:11:13.980
+<v Kolton Andrus>we'll have full knowledge of the system we'll be able to do all these great experiments and
+
+127
+00:11:15.220 --> 00:11:36.960
+<v Kolton Andrus>Truth is, no tracing tool is really one. Most companies don't have a ubiquitous solution here. And so we did something kind of hacky, engineering, where we went and we built our own dependency discovery. We look at the network traffic, we look at the ports, we understand what people are talking to. Pretty tricky when you get into the service mesh world.
+
+128
+00:11:36.960 --> 00:11:50.780
+<v Kolton Andrus>But that allowed us to show people, hey, your software depends on this other service. And that's actually one of those important aha moments is you can test your software and then somebody else's software fails and brings you down and you get surprised.
+
+129
+00:11:50.780 --> 00:12:14.080
+<v Kolton Andrus>So we wrap this all up, the test score, the test suite, you know, the guided tests with a set of reporting. Because the other thing we learned is that if leadership doesn't have a way to measure, a way to see improvement, a way to hold people accountable, you really don't see, you know, the effort put into it. You don't see the resources provided to it.
+
+130
+00:12:14.080 --> 00:12:39.740
+<v Kolton Andrus>And so this is something that I think a lot of SRE and teams doing this work have learned over time. You know, it's great to do a lot of work, but if you can't show the value of your work, you're going to struggle when budgets get cut or when headcount gets laid off. Or even when it comes to time to promotion, if you can't show that you've made the system more reliable, you know, it's hard to raise your hand and say, look, we should really be promoted for the good work we've done.
+
+131
+00:12:39.740 --> 00:12:45.000
+<v Kolton Andrus>on. So those scoring and that visibility really helped close the loop on that.
+
+132
+00:12:45.180 --> 00:12:50.280
+<v Noah Labhart>It's really interesting to hear about some of the side effects that came from, I say side effects,
+
+133
+00:12:50.300 --> 00:12:54.440
+<v Noah Labhart>side effects sounds negative, but like the sideline benefit of dependency discovery.
+
+134
+00:12:54.760 --> 00:13:01.060
+<v Noah Labhart>That's interesting. Okay. In 2022, there was a leadership transition, right? And you increased
+
+135
+00:13:01.060 --> 00:13:06.560
+<v Noah Labhart>your focus on the product itself. What are some of the most exciting developments that have come
+
+136
+00:13:06.560 --> 00:13:10.560
+<v Noah Labhart>from the last three years from your standpoint and digging into the product?
+
+137
+00:13:10.740 --> 00:13:14.460
+<v Kolton Andrus>Yeah. So this is, we're really talking about the second arc here. So first arc,
+
+138
+00:13:14.600 --> 00:13:20.020
+<v Kolton Andrus>I was CEO, had Matt, who's been on your show prior as my CTO. We went out and built the
+
+139
+00:13:20.020 --> 00:13:26.080
+<v Kolton Andrus>original company, the original Chaos Engineering product. 2022, I brought in a CEO so that I could
+
+140
+00:13:26.080 --> 00:13:31.700
+<v Kolton Andrus>go focus on the product and engineering side. And that's where I took over as CTO. And I really went
+
+141
+00:13:31.700 --> 00:13:33.380
+<v Kolton Andrus>deep into product and engineering.
+
+142
+00:13:33.720 --> 00:13:39.380
+<v Kolton Andrus>And that's where a lot of reliability management, the test suites, the scoring, the dependency
+
+143
+00:13:39.380 --> 00:13:45.380
+<v Kolton Andrus>discovery, the monitoring integrations, all of that is really what we built the last couple
+
+144
+00:13:45.380 --> 00:13:50.860
+<v Kolton Andrus>of years that we have conviction in, that we felt was the right move and have seen be
+
+145
+00:13:50.860 --> 00:13:53.380
+<v Kolton Andrus>the right move over the last year or two in market.
+
+146
+00:13:53.700 --> 00:13:57.340
+<v Kolton Andrus>And then, yeah, we're really just wrapping up that arc recently.
+
+147
+00:13:57.340 --> 00:14:22.440
+<v Kolton Andrus>I just took back over as CEO about a month, month and a half ago. We have Sam Rossoff, who's actually a coworker of mine at Amazon, who then went on and worked at Snapchat and was an early engineer there while I was at Netflix, who is in the CTO role. And that's, yeah, we've kind of finished this reliability management product arc. And now we're looking at the next set of objectives for Gremlin.
+
+148
+00:14:22.440 --> 00:14:27.660
+<v Noah Labhart>one. Awesome. That's a perfect segue into where I want to go. So what is that? What is the next
+
+149
+00:14:27.660 --> 00:14:32.380
+<v Noah Labhart>arc for the company? And I think we're calling it Gremlin 3.0, right? When we were talking offline,
+
+150
+00:14:33.080 --> 00:14:36.100
+<v Noah Labhart>but the next iteration that you see moving forward.
+
+151
+00:14:36.520 --> 00:14:41.340
+<v Kolton Andrus>One of the things we've always tried to do at Gremlin is make it easy to do the right thing.
+
+152
+00:14:41.460 --> 00:14:47.160
+<v Kolton Andrus>And that sounds simple, but it's actually really hard because you really have to find things that
+
+153
+00:14:47.160 --> 00:14:51.020
+<v Kolton Andrus>that are easy to use, easy to understand, and incentivize the right.
+
+154
+00:14:51.160 --> 00:14:54.960
+<v Kolton Andrus>And so the way we describe it internally is the first version of the product,
+
+155
+00:14:55.220 --> 00:14:58.160
+<v Kolton Andrus>you know, we inject the failure, you, the engineer,
+
+156
+00:14:58.360 --> 00:15:01.420
+<v Kolton Andrus>you go do the homework to see if your system responded correctly.
+
+157
+00:15:01.740 --> 00:15:04.440
+<v Kolton Andrus>And then you, the engineer, you go fix the problem.
+
+158
+00:15:04.600 --> 00:15:08.900
+<v Kolton Andrus>And, you know, that's Gremlin's not doing as much as we could in that scenario.
+
+159
+00:15:09.120 --> 00:15:13.160
+<v Kolton Andrus>So in the second version, Gremlin 2.0, okay, we'll inject the failure.
+
+160
+00:15:13.380 --> 00:15:16.860
+<v Kolton Andrus>But because we have access to your monitoring and your system,
+
+161
+00:15:17.160 --> 00:15:20.100
+<v Kolton Andrus>We'll tell you if the system responded well or not.
+
+162
+00:15:20.220 --> 00:15:25.240
+<v Kolton Andrus>But if there's a problem, you, the engineer, you still need to go figure it out and fix it.
+
+163
+00:15:25.680 --> 00:15:27.520
+<v Kolton Andrus>So the third arc is very simple.
+
+164
+00:15:27.600 --> 00:15:30.200
+<v Kolton Andrus>We want to go help them fix it now.
+
+165
+00:15:30.360 --> 00:15:33.520
+<v Kolton Andrus>So we want to inject the failure safely and securely.
+
+166
+00:15:33.720 --> 00:15:36.620
+<v Kolton Andrus>We want to tell you, did your system respond correctly?
+
+167
+00:15:36.740 --> 00:15:39.060
+<v Kolton Andrus>And if not, how did it respond incorrectly?
+
+168
+00:15:39.580 --> 00:15:41.100
+<v Kolton Andrus>But then we want to give guidance.
+
+169
+00:15:41.280 --> 00:15:45.340
+<v Kolton Andrus>We want to tell people concretely, hey, here's how to go fix this problem.
+
+170
+00:15:47.160 --> 00:15:52.520
+<v Kolton Andrus>fun conversation because this could go anywhere from, hey, we saw this Java exception in your
+
+171
+00:15:52.520 --> 00:15:58.380
+<v Kolton Andrus>log lines. We can stack overflow, et cetera, give you some guidance on how to go fix that exception.
+
+172
+00:15:58.700 --> 00:16:04.360
+<v Kolton Andrus>But we can also derive patterns. And we have a lot of customer data around testing various failures.
+
+173
+00:16:04.600 --> 00:16:09.260
+<v Kolton Andrus>So we can be pretty confident, oh, you need a circuit breaker around this dependency because
+
+174
+00:16:09.260 --> 00:16:14.460
+<v Kolton Andrus>this dependency fails often. Or you need a better timeout when you're talking to this dependency
+
+175
+00:16:14.460 --> 00:16:19.400
+<v Kolton Andrus>because your requests are timing out because latency grows too high.
+
+176
+00:16:19.540 --> 00:16:21.820
+<v Kolton Andrus>So in a nutshell, that's what we want to do.
+
+177
+00:16:21.880 --> 00:16:26.380
+<v Kolton Andrus>We want to give people actionable, credible advice on how to go fix their system,
+
+178
+00:16:26.520 --> 00:16:29.100
+<v Kolton Andrus>not to just uncover the weaknesses within it.
+
+179
+00:16:29.680 --> 00:16:32.900
+<v Noah Labhart>That's super exciting and also really valuable,
+
+180
+00:16:33.060 --> 00:16:37.120
+<v Noah Labhart>having the insight, seeing what is broken or what is needing addressing,
+
+181
+00:16:37.460 --> 00:16:40.100
+<v Noah Labhart>and then being able to go do that work itself.
+
+182
+00:16:40.400 --> 00:16:42.920
+<v Noah Labhart>And, you know, okay, in the industry at large, right,
+
+183
+00:16:44.460 --> 00:16:48.920
+<v Noah Labhart>you know, open a browser without seeing the buzzword AI and a million articles about it,
+
+184
+00:16:48.960 --> 00:16:55.280
+<v Noah Labhart>right? So where does AI fit into Gremlin's world, right? Where does it fit into chaos
+
+185
+00:16:55.280 --> 00:16:59.740
+<v Noah Labhart>engineering in general? I'm curious about your viewpoint there and wondering if you can,
+
+186
+00:16:59.760 --> 00:17:03.000
+<v Noah Labhart>you know, unpack where it fits and where it doesn't and how you see things there.
+
+187
+00:17:03.260 --> 00:17:10.000
+<v Kolton Andrus>Yeah. So I'm probably on the spectrum, you know, cautiously optimistic or a bit skeptical when it
+
+188
+00:17:10.000 --> 00:17:15.120
+<v Kolton Andrus>it comes to AI. And I'll tell you why. The reason for that is when you're dealing with distributed
+
+189
+00:17:15.120 --> 00:17:21.040
+<v Kolton Andrus>systems and you're dealing with the kind of issues we run into in operating an Amazon or Netflix
+
+190
+00:17:21.040 --> 00:17:27.200
+<v Kolton Andrus>scale system, you really want deterministic results. You really want to trust your result.
+
+191
+00:17:27.400 --> 00:17:32.060
+<v Kolton Andrus>I mean, so much of what we do in distributed systems is around consistency and ensuring that
+
+192
+00:17:32.060 --> 00:17:38.720
+<v Kolton Andrus>things are consistent when they should be. And so introducing the current flavor of AI, the LLM
+
+193
+00:17:40.200 --> 00:17:44.920
+<v Kolton Andrus>version, that's probabilistic by nature. You might get two different answers to the same question.
+
+194
+00:17:45.140 --> 00:17:51.300
+<v Kolton Andrus>You know, you might get varied results based on the context. So I don't think it's great at,
+
+195
+00:17:51.500 --> 00:17:56.620
+<v Kolton Andrus>you know, debugging and testing distributed systems because we want very precise results.
+
+196
+00:17:57.200 --> 00:18:03.460
+<v Kolton Andrus>When it comes to a lot of folks are super excited about maybe the AI SRE. Hey, we'll just let AI be
+
+197
+00:18:03.460 --> 00:18:07.400
+<v Kolton Andrus>our SRE. We don't have to wake up people in the middle of the night. They'll take care of things.
+
+198
+00:18:07.400 --> 00:18:22.480
+<v Kolton Andrus>And that one always reminds me of a quote that I'll paraphrase from the IBM days, which said, the computer can never be held accountable, so it must not make a choice, must not make decisions where accountability is required.
+
+199
+00:18:22.480 --> 00:18:40.520
+<v Kolton Andrus>And I think that's very fitting because, you know, how many customers today are willing to turn on AI in production to go take actions that, if done correctly, could bring their entire system down? I think people aren't quite ready for that and that we need a bit more maturity before we're willing to jump into those.
+
+200
+00:18:40.520 --> 00:18:41.280
+<v Kolton Andrus>I
+
+201
+00:18:41.280 --> 00:18:42.020
+<v Noah Labhart>couldn't agree more.
+
+202
+00:18:42.220 --> 00:18:47.040
+<v Noah Labhart>That quote is really interesting because they can't be held accountable for the decisions.
+
+203
+00:18:47.140 --> 00:18:49.620
+<v Noah Labhart>They can't be held accountable for the results, right?
+
+204
+00:18:49.700 --> 00:18:52.260
+<v Noah Labhart>We are held accountable for those results themselves.
+
+205
+00:18:52.780 --> 00:18:58.740
+<v Noah Labhart>There's also just not enough reliability for something like SRE type of work, which the
+
+206
+00:18:58.740 --> 00:19:00.840
+<v Noah Labhart>core of the acronym is reliability.
+
+207
+00:19:01.260 --> 00:19:04.160
+<v Noah Labhart>What do you think needs to happen with AI?
+
+208
+00:19:04.160 --> 00:19:18.900
+<v Noah Labhart>Where does AI need to go or needs to establish or something like that in the models and things like that that could make it more reliable, more useful, have a place in chaos engineering or in the industry at large?
+
+209
+00:19:19.200 --> 00:19:20.480
+<v Noah Labhart>Where do you think it needs to go?
+
+210
+00:19:20.680 --> 00:19:21.180
+<v Kolton Andrus>Yeah,
+
+211
+00:19:21.060 --> 00:19:29.700
+<v Kolton Andrus>I mean, to be fair, I think AI today has a place and it's, you know, that it's a better way to interact with computers.
+
+212
+00:19:29.700 --> 00:19:52.200
+<v Kolton Andrus>I think the natural language processing, the ability to talk to computers like people is super useful. So I think there's a bunch of applications of AI within Gremlin or within the industry as a whole that are valid and will be useful and will, you know, people will come to find to be quite, quite impactful. I'm just not convinced we're willing to give it the reins and let it go. Wow.
+
+213
+00:19:52.200 --> 00:19:59.960
+<v Kolton Andrus>And so, yeah, I think, you know, to me, you know, on one hand, AI has been trained by a lot of docs on the Internet, a lot of our content.
+
+214
+00:20:00.320 --> 00:20:03.980
+<v Kolton Andrus>So if you ask AI chaos engineering, how should I do this?
+
+215
+00:20:04.000 --> 00:20:04.660
+<v Kolton Andrus>What should I do here?
+
+216
+00:20:04.740 --> 00:20:06.120
+<v Kolton Andrus>You get pretty good answers.
+
+217
+00:20:06.420 --> 00:20:10.580
+<v Kolton Andrus>But are you going to get answers that you would, you know, automatically take action on?
+
+218
+00:20:10.800 --> 00:20:14.540
+<v Kolton Andrus>So I think it's it's the it's the reasoning executive function.
+
+219
+00:20:14.580 --> 00:20:17.660
+<v Kolton Andrus>You know, there's a lot of critical thinking when you're going through outages.
+
+220
+00:20:18.000 --> 00:20:18.980
+<v Kolton Andrus>What changed?
+
+221
+00:20:19.040 --> 00:20:20.720
+<v Kolton Andrus>There's a bit of a feel you develop.
+
+222
+00:20:22.200 --> 00:20:26.540
+<v Kolton Andrus>that helps us with pattern matching that gets applied when you're debugging these kind of
+
+223
+00:20:26.540 --> 00:20:31.280
+<v Kolton Andrus>issues. And so, you know, some of that will certainly come to fruition, but I don't know.
+
+224
+00:20:31.380 --> 00:20:36.140
+<v Kolton Andrus>Yeah. I think, you know, I need, I need credible deterministic results when it comes to
+
+225
+00:20:36.140 --> 00:20:41.480
+<v Kolton Andrus>distributed systems for me to want to trust it, to take actions on my behalf. I think Skynet,
+
+226
+00:20:41.560 --> 00:20:46.320
+<v Kolton Andrus>if it took over tomorrow would be in power about three days before an outage took it down.
+
+227
+00:20:46.320 --> 00:20:59.860
+<v Kolton Andrus>And I think all the AI generated code is just work for my team and my customers to go do for the next decade while things become more of a black box and are going to require more testing and validation to ensure we trust it.
+
+228
+00:20:59.920 --> 00:21:09.740
+<v Kolton Andrus>So I'm optimistic that we'll have plenty of work to do for the next 10 or 20 years until things get really good or scary, depending on your perspective.
+
+229
+00:21:10.540 --> 00:21:11.100
+<v Kolton Andrus>Yeah,
+
+230
+00:21:11.100 --> 00:21:14.820
+<v Noah Labhart>no, I think that's the critical term there, deterministic results.
+
+231
+00:21:16.320 --> 00:21:19.560
+<v Noah Labhart>then, you know, talking about that and talking about all that we've talked about with the,
+
+232
+00:21:19.560 --> 00:21:24.640
+<v Noah Labhart>you know, the ARC-1, ARC-2, and now looking forward into ARC-3 and, you know, where the
+
+233
+00:21:24.640 --> 00:21:28.600
+<v Noah Labhart>state of AI is and where the state of the industry is, what are you most excited about
+
+234
+00:21:28.600 --> 00:21:33.080
+<v Noah Labhart>in the next chapter for Gremlin? You know, you've touched on several things and, you know,
+
+235
+00:21:33.080 --> 00:21:37.240
+<v Noah Labhart>I could probably cherry pick from some of the answers you gave, but what are you most excited
+
+236
+00:21:37.240 --> 00:21:41.460
+<v Noah Labhart>about for this next chapter for Gremlin and for also the broader SRE space?
+
+237
+00:21:41.460 --> 00:21:41.960
+<v Noah Labhart>base?
+
+238
+00:21:42.040 --> 00:21:49.100
+<v Kolton Andrus>I'm excited about a lot of things, honestly. We've got a great team and we're working well
+
+239
+00:21:49.100 --> 00:21:54.680
+<v Kolton Andrus>together. Everything's humming. So you just enjoy your day job, enjoy the people you work with.
+
+240
+00:21:54.820 --> 00:22:00.400
+<v Kolton Andrus>That's a big quality of life for me. Product-wise, we've got a couple of things my sales team is
+
+241
+00:22:00.400 --> 00:22:05.160
+<v Kolton Andrus>pretty excited about because they're things that customers need. Region evacuation, zone evacuation,
+
+242
+00:22:05.660 --> 00:22:09.720
+<v Kolton Andrus>data center failover is something that's traditionally been a business continuity
+
+243
+00:22:11.460 --> 00:22:41.200
+<v Kolton Andrus>I think in today's world, you know, the expectations have changed and we expect that systems are able to fail over live and that people are able to show that they fail over. And so you go back five years, you know, everyone has a failover plan. Maybe they run it once a year in some limited fashion. You know, I want to help teams and companies get to the level that Netflix is at where they can do an active, active failover in five minutes. And they do it every couple of weeks just to make sure everything still works and works the way they expect.
+
+244
+00:22:41.460 --> 00:22:59.840
+<v Kolton Andrus>Beyond that, you know, I think there's the next thing that is less technologically exciting but important is just we have a lot of customers that are financial customers or government customers where privacy, data access, you know, access to the Internet are all important dimensions to weigh.
+
+245
+00:23:00.140 --> 00:23:06.900
+<v Kolton Andrus>So we built a, you know, an on-premise version of Gremlin for customers that are a little more wary to have a bit more control.
+
+246
+00:23:06.900 --> 00:23:11.000
+<v Kolton Andrus>control. And as I mentioned, you know, if you're working for someone like the government, you want
+
+247
+00:23:11.000 --> 00:23:15.500
+<v Kolton Andrus>them to have, you know, a very secure way to do this testing. We want all of our, you know,
+
+248
+00:23:15.560 --> 00:23:20.280
+<v Kolton Andrus>government software to be reliable and to work when it's needed. We also don't want to introduce,
+
+249
+00:23:20.500 --> 00:23:25.220
+<v Kolton Andrus>you know, new vulnerabilities or attack vectors. So it's important for us to do that private
+
+250
+00:23:25.220 --> 00:23:29.940
+<v Kolton Andrus>edition, which we've recently completed. But yeah, I think the exciting one is, you know,
+
+251
+00:23:29.980 --> 00:23:35.340
+<v Kolton Andrus>hey, we want to take the current developments around LLMs and AI, and we want to fold them
+
+252
+00:23:36.900 --> 00:23:40.320
+<v Kolton Andrus>That makes it easier for customers to get the value that they expect.
+
+253
+00:23:40.620 --> 00:23:44.480
+<v Kolton Andrus>And so that's much more as I was describing with that third arc.
+
+254
+00:23:44.660 --> 00:23:47.940
+<v Kolton Andrus>Hey, you've run the test and the test failed.
+
+255
+00:23:48.160 --> 00:23:50.380
+<v Kolton Andrus>Now we want to tell you why the test failed.
+
+256
+00:23:50.500 --> 00:23:54.560
+<v Kolton Andrus>We want to give you a set of actions that you could go take to correct that failure.
+
+257
+00:23:54.740 --> 00:24:03.340
+<v Kolton Andrus>And maybe someday when I trust the computers enough, we'll let the computer, you know, we'll let Gremlin go fix those failures on behalf of the customer.
+
+258
+00:24:03.340 --> 00:24:07.400
+<v Kolton Andrus>them. But for now, we'll just guide them, tell them how to do it, make sure they're able to get
+
+259
+00:24:07.400 --> 00:24:08.740
+<v Kolton Andrus>to the outcome that they desire.
+
+260
+00:24:09.080 --> 00:24:12.080
+<v Noah Labhart>That's super exciting. I'm ready for that day. I'm ready for
+
+261
+00:24:12.080 --> 00:24:17.780
+<v Noah Labhart>that guidance. And I think it's a fantastic approach moving forward and a killer platform
+
+262
+00:24:17.780 --> 00:24:22.780
+<v Noah Labhart>just in general. So it's really interesting to hear the three arcs, the future of Gremlin,
+
+263
+00:24:23.000 --> 00:24:27.880
+<v Noah Labhart>as it runs alongside all of the changes in the industry. I've got one more question for you,
+
+264
+00:24:27.920 --> 00:24:32.900
+<v Noah Labhart>Kolton. And it's kind of a question I ask most of the guests. I'm really curious,
+
+265
+00:24:33.340 --> 00:24:57.060
+<v Noah Labhart>What advice you'd give someone who's about to take on building the next big thing, or maybe they've built it and they want to show it to you and they're excited about maybe stepping into the startup world. You've been through, you know, obviously several arcs, right? You've seen a lot, you've gone through a lot. You've had many roles within your, you know, journey at Gremlin. What advice would you give that person having gone down this road a bit?
+
+266
+00:24:57.060 --> 00:24:57.700
+<v Kolton Andrus>I
+
+267
+00:24:57.700 --> 00:25:07.820
+<v Kolton Andrus>think probably the biggest thing I've learned over the last almost 10 years that I've been doing this is, you know, if you are smart and you work hard, you can figure out a lot of the details.
+
+268
+00:25:08.260 --> 00:25:17.100
+<v Kolton Andrus>And what's hard is in the startup world, you get a ton of advice from every angle, investors, employees, advisors, you know, the market.
+
+269
+00:25:17.680 --> 00:25:19.480
+<v Kolton Andrus>Twitter's got a million things to say.
+
+270
+00:25:19.800 --> 00:25:25.020
+<v Kolton Andrus>Everybody's an expert and they want to tell you why you're doing it wrong or one simple trick to do it right.
+
+271
+00:25:25.020 --> 00:25:34.280
+<v Kolton Andrus>Right. And, you know, what I came back to and I went through this, I went and brought, you know, sought it out and brought other people into the company that had more experience in different areas than I had.
+
+272
+00:25:34.340 --> 00:25:39.220
+<v Kolton Andrus>So I could learn from them and so I could see where I was falling short or where I could do better.
+
+273
+00:25:39.640 --> 00:25:45.460
+<v Kolton Andrus>And in the end, you know, I feel pretty comfortable being back in the seat because I've seen a lot of approaches.
+
+274
+00:25:45.660 --> 00:25:50.100
+<v Kolton Andrus>I've seen a lot of people try it, but, you know, no one has the magic answer.
+
+275
+00:25:50.260 --> 00:25:51.700
+<v Kolton Andrus>No one has the silver bullet.
+
+276
+00:25:51.700 --> 00:25:54.840
+<v Kolton Andrus>No one's going to just figure it out for you and it's going to be done.
+
+277
+00:25:55.040 --> 00:25:56.260
+<v Kolton Andrus>So good news, bad news.
+
+278
+00:25:56.460 --> 00:26:02.940
+<v Kolton Andrus>But the flip side is you as the founder, you as the person who really cares, who is deeply
+
+279
+00:26:02.940 --> 00:26:09.620
+<v Kolton Andrus>invested and who wants to see this idea be as successful as it can, is often the best
+
+280
+00:26:09.620 --> 00:26:15.400
+<v Kolton Andrus>qualified person to really drive that vision and all of the pieces that are attached to
+
+281
+00:26:15.400 --> 00:26:15.900
+<v Kolton Andrus>it.
+
+282
+00:26:15.780 --> 00:26:18.680
+<v Kolton Andrus>And so there's a bit of the imposter syndrome.
+
+283
+00:26:18.860 --> 00:26:19.940
+<v Kolton Andrus>You just got to go out there.
+
+284
+00:26:21.700 --> 00:26:27.980
+<v Kolton Andrus>Know that, you know, know that your efforts and your hard work are going to, you know, teach you a lot.
+
+285
+00:26:28.120 --> 00:26:30.540
+<v Kolton Andrus>You're going to get better and you're going to be in a good place.
+
+286
+00:26:30.640 --> 00:26:33.820
+<v Kolton Andrus>You know, you're going to, you have learned a lot on the journey by the end.
+
+287
+00:26:33.900 --> 00:26:38.820
+<v Kolton Andrus>So, yeah, trust in yourself, you know, listen to advice, but don't take as much of it as you think you should.
+
+288
+00:26:39.740 --> 00:26:42.040
+<v Kolton Andrus>And you'll figure a lot of it out along the way.
+
+289
+00:26:42.160 --> 00:26:43.420
+<v Noah Labhart>Well, that's fantastic advice.
+
+290
+00:26:43.420 --> 00:26:49.240
+<v Noah Labhart>Well, Kolton, I appreciate you being on the show today telling the stories, the arcs of Gremlin.
+
+291
+00:26:49.520 --> 00:26:56.180
+<v Noah Labhart>Get a new, fresh perspective on where the company is, where the platform is, where you're taking it and all the things that have gone along.
+
+292
+00:26:56.360 --> 00:27:03.280
+<v Noah Labhart>I really appreciate you outlining your perspective on AI and where it fits and where it doesn't and really excited about the future of the product.
+
+293
+00:27:03.420 --> 00:27:04.960
+<v Noah Labhart>Well, again, thank you for being on the show, Kolton.
+
+294
+00:27:05.280 --> 00:27:06.480
+<v Kolton Andrus>Thank you very much, Noah.
+
+295
+00:27:07.880 --> 00:27:10.880
+<v Noah Labhart>I couldn't be more excited about the future of Gremlin.
+
+296
+00:27:10.880 --> 00:27:22.840
+<v Noah Labhart>Given the arcs the company has gone through, it's evident that Kolton has built foundational layers into the platform, and is steering the ship towards responsible chaos engineering, reliability, automation, and much more.
+
+297
+00:27:24.480 --> 00:27:30.700
+<v Noah Labhart>Thank you for listening to today's episode. If you'd like to learn more about Gremlin, please visit gremlin.com.
+
+298
+00:27:31.780 --> 00:27:33.300
+<v Noah Labhart>And thanks again for listening.

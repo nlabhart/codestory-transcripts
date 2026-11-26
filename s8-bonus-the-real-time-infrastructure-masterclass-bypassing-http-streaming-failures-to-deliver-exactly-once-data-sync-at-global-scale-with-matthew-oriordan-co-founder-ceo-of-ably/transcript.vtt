@@ -1,0 +1,1935 @@
+WEBVTT
+
+NOTE S8 Bonus: The Real-Time Infrastructure Masterclass: Bypassing HTTP Streaming Failures to Deliver Exactly-Once Data Sync at Global Scale with Matthew O'Riordan, Co-Founder & CEO of Ably
+
+1
+00:00:00.400 --> 00:00:03.720
+<v Matthew O'Riordan>So we weren't actually building for scale. We were building to have a very small team
+
+2
+00:00:03.720 --> 00:00:08.900
+<v Matthew O'Riordan>with a very scalable platform. So not scale of the organization, but scale of the platform.
+
+3
+00:00:09.540 --> 00:00:14.940
+<v Matthew O'Riordan>It was very naive. I mean, it was very idealistic. You know, as soon as you start to sell to
+
+4
+00:00:14.940 --> 00:00:19.580
+<v Matthew O'Riordan>a developer in an organization who has to sign up a budget, you're going to go through
+
+5
+00:00:19.580 --> 00:00:23.000
+<v Matthew O'Riordan>a procurement process. And even though the developer is the person who's buying the technology,
+
+6
+00:00:23.240 --> 00:00:26.320
+<v Matthew O'Riordan>you know, there's other people with the budgets and you need salespeople. And then you need
+
+7
+00:00:26.320 --> 00:00:28.980
+<v Matthew O'Riordan>people on support because developers have problems and they want to speak to a human
+
+8
+00:00:30.000 --> 00:00:33.700
+<v Matthew O'Riordan>need to look after customers. We need customer success people. And so it's all of the things
+
+9
+00:00:33.700 --> 00:00:38.660
+<v Matthew O'Riordan>that we thought we were designing to avoid, you know, very quickly came back into the organization.
+
+10
+00:00:39.460 --> 00:00:43.840
+<v Matthew O'Riordan>I am Matthew O'Riordan. I'm the co-founder and CEO of Ably Realtime.
+
+11
+00:00:46.700 --> 00:00:52.140
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+12
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+13
+00:00:53.760 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+14
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+15
+00:00:58.280 --> 00:00:59.660
+<v Clip>I don't exactly know what to do.
+
+16
+00:01:00.000 --> 00:01:04.540
+<v Noah Labhart>Who built the teams that have their back.
+
+17
+00:01:08.800 --> 00:01:11.200
+<v Noah Labhart>Keeping scalability top of mind.
+
+18
+00:01:14.980 --> 00:01:16.220
+<v Noah Labhart>The stories
+
+19
+00:01:16.220 --> 00:01:17.820
+<v Noah Labhart>you don't read in the headlines.
+
+20
+00:01:22.720 --> 00:01:25.860
+<v Noah Labhart>Ride the ups and downs of the startup life.
+
+21
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+22
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+23
+00:01:29.060 --> 00:01:29.680
+<v Clip>All this and more.
+
+24
+00:01:30.000 --> 00:01:36.620
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today how Matthew O'Riordan is bringing
+
+25
+00:01:36.620 --> 00:01:42.280
+<v Noah Labhart>real-time to your experience through infrastructure that works at any scale.
+
+26
+00:01:48.140 --> 00:01:52.600
+<v Noah Labhart>Matthew O'Riordan is originally from South Africa. He left school and sort of fell into
+
+27
+00:01:52.600 --> 00:01:57.480
+<v Noah Labhart>engineering because he just loved it. In fact, the craft brought him to the UK where he saw
+
+28
+00:01:57.480 --> 00:02:02.920
+<v Noah Labhart>saw more opportunity. Outside of tech, he likes adrenaline sports. He was a competitive skydiver.
+
+29
+00:02:03.020 --> 00:02:06.620
+<v Noah Labhart>He pointed out that it's a great way to clear your head because you can't think about anything
+
+30
+00:02:06.620 --> 00:02:12.220
+<v Noah Labhart>else when you're skydiving. Matt unearthed interesting things as he was building prototype
+
+31
+00:02:12.220 --> 00:02:17.920
+<v Noah Labhart>after prototype to solve real-time experiences. He wanted to build a new generation of real-time
+
+32
+00:02:17.920 --> 00:02:23.320
+<v Noah Labhart>communication developer tools that provide collaboration opportunity and that just work.
+
+33
+00:02:25.200 --> 00:02:28.060
+<v Noah Labhart>This is the creation story of Ably.
+
+34
+00:02:31.920 --> 00:02:34.320
+<v Matthew O'Riordan>We are a real-time experience platform.
+
+35
+00:02:34.720 --> 00:02:39.500
+<v Matthew O'Riordan>What that means is we provide APIs that power live and collaborative experiences.
+
+36
+00:02:39.800 --> 00:02:41.860
+<v Matthew O'Riordan>Right now, we do that for hundreds of millions of devices.
+
+37
+00:02:42.180 --> 00:02:48.160
+<v Matthew O'Riordan>And we deliver features like live chat, food ordering, delivery tracking, document collaboration,
+
+38
+00:02:48.840 --> 00:02:51.500
+<v Matthew O'Riordan>multiplayer games, commentary, sports events.
+
+39
+00:02:53.320 --> 00:02:58.260
+<v Matthew O'Riordan>seeing live data or you're collaborating with other users, we provide APIs to help make that happen.
+
+40
+00:02:58.560 --> 00:03:02.600
+<v Matthew O'Riordan>And so our customers are developers. We give them the APIs to kind of build these features.
+
+41
+00:03:02.840 --> 00:03:07.200
+<v Matthew O'Riordan>And that's what we do as a business. You know, we identified a common problem that developers have
+
+42
+00:03:07.200 --> 00:03:10.740
+<v Matthew O'Riordan>and how they deliver these experiences and made it easy for them to do that.
+
+43
+00:03:11.320 --> 00:03:16.300
+<v Matthew O'Riordan>The first things I started playing around with on the web back then, it was very limited what
+
+44
+00:03:16.300 --> 00:03:20.100
+<v Matthew O'Riordan>you could do with the web. You could bring some interactivity into applications using
+
+45
+00:03:20.100 --> 00:03:24.020
+<v Matthew O'Riordan>using Java back then. So Java was one of the first things you can embed to kind of create these richer
+
+46
+00:03:24.020 --> 00:03:29.020
+<v Matthew O'Riordan>applications, and that always fascinated me, like, because you could do more than just a static web
+
+47
+00:03:29.020 --> 00:03:33.420
+<v Matthew O'Riordan>page. Then there were technologies like Flash that came about, and I always kind of had this interest
+
+48
+00:03:33.420 --> 00:03:38.520
+<v Matthew O'Riordan>of how do you turn static loading a web page into things that people can interact with, but I never
+
+49
+00:03:38.520 --> 00:03:43.220
+<v Matthew O'Riordan>I never dived into it in terms of a business. I started looking at various different business
+
+50
+00:03:43.220 --> 00:03:49.060
+<v Matthew O'Riordan>ideas, and they were really quite diverse. I mean, from a dating application and the B2C space to
+
+51
+00:03:50.120 --> 00:03:54.840
+<v Matthew O'Riordan>management tool in the B2B space, really just playing around with things. And what I found was
+
+52
+00:03:54.840 --> 00:03:59.100
+<v Matthew O'Riordan>that everything I was building, my belief, my hypothesis was the more you can make it collaborative
+
+53
+00:03:59.100 --> 00:04:03.180
+<v Matthew O'Riordan>or shared, you know, share the experience with other people, the more impact it would have.
+
+54
+00:04:03.680 --> 00:04:07.820
+<v Matthew O'Riordan>And, you know, and again, we've seen this, you know, more recently with Figma being acquired
+
+55
+00:04:07.820 --> 00:04:12.480
+<v Matthew O'Riordan>by Adobe for 20 billion, because, you know, compared to Adobe's products was quite immature,
+
+56
+00:04:12.660 --> 00:04:16.800
+<v Matthew O'Riordan>but it was collaborative first. And that was the thing that kind of scared Adobe into having to
+
+57
+00:04:16.800 --> 00:04:17.740
+<v Matthew O'Riordan>actually even acquired it.
+
+58
+00:04:18.020 --> 00:04:18.980
+<v Matthew O'Riordan>But what I found was
+
+59
+00:04:18.980 --> 00:04:20.260
+<v Matthew O'Riordan>in all these prototypes I was building,
+
+60
+00:04:20.380 --> 00:04:21.520
+<v Matthew O'Riordan>I kept solving the same problem
+
+61
+00:04:21.520 --> 00:04:22.180
+<v Matthew O'Riordan>over and over again.
+
+62
+00:04:22.400 --> 00:04:24.560
+<v Matthew O'Riordan>And there's two things I unearthed.
+
+63
+00:04:24.680 --> 00:04:25.740
+<v Matthew O'Riordan>One was, you know,
+
+64
+00:04:25.760 --> 00:04:26.380
+<v Matthew O'Riordan>the first generation
+
+65
+00:04:26.380 --> 00:04:28.580
+<v Matthew O'Riordan>of real-time experiences on the web
+
+66
+00:04:28.580 --> 00:04:30.600
+<v Matthew O'Riordan>goes all the way back to maybe Gmail.
+
+67
+00:04:30.740 --> 00:04:31.420
+<v Matthew O'Riordan>So Gmail is probably
+
+68
+00:04:31.420 --> 00:04:32.060
+<v Matthew O'Riordan>the first application
+
+69
+00:04:32.060 --> 00:04:32.820
+<v Matthew O'Riordan>you would have noticed
+
+70
+00:04:32.820 --> 00:04:34.220
+<v Matthew O'Riordan>that it was the first app
+
+71
+00:04:34.220 --> 00:04:35.300
+<v Matthew O'Riordan>where you'd suddenly need to refer,
+
+72
+00:04:35.360 --> 00:04:36.240
+<v Matthew O'Riordan>keep refreshing your page
+
+73
+00:04:36.240 --> 00:04:37.400
+<v Matthew O'Riordan>to kind of find out
+
+74
+00:04:37.400 --> 00:04:38.020
+<v Matthew O'Riordan>when an email arrived.
+
+75
+00:04:38.680 --> 00:04:39.460
+<v Matthew O'Riordan>There wasn't really
+
+76
+00:04:39.460 --> 00:04:40.300
+<v Matthew O'Riordan>a sophisticated way
+
+77
+00:04:40.300 --> 00:04:41.460
+<v Matthew O'Riordan>of delivering real-time experiences,
+
+78
+00:04:41.520 --> 00:04:42.500
+<v Matthew O'Riordan>but they hacked web protocols.
+
+79
+00:04:42.960 --> 00:04:44.380
+<v Matthew O'Riordan>All the products that were out there,
+
+80
+00:04:44.440 --> 00:04:45.400
+<v Matthew O'Riordan>all these open source products
+
+81
+00:04:45.400 --> 00:04:46.620
+<v Matthew O'Riordan>and even some cloud products
+
+82
+00:04:46.800 --> 00:04:51.260
+<v Matthew O'Riordan>that helped you do this. We're really building on that first generation idea. Let's hack some
+
+83
+00:04:51.260 --> 00:04:56.140
+<v Matthew O'Riordan>web protocols to deliver notifications. You know, the things that I was working on was more like
+
+84
+00:04:56.140 --> 00:05:00.720
+<v Matthew O'Riordan>Google Docs, right? If you're editing a document together and, you know, I make a change and the
+
+85
+00:05:00.720 --> 00:05:06.100
+<v Matthew O'Riordan>change isn't replicated in your document, then fundamentally we diverge, right? We start to have
+
+86
+00:05:06.100 --> 00:05:10.680
+<v Matthew O'Riordan>a problem that you can't converge them back again. Are we editing different documents? And so, you
+
+87
+00:05:10.680 --> 00:05:15.520
+<v Matthew O'Riordan>know, what I focused on was, no, let's do the second generation. Let's give developers a transport
+
+88
+00:05:16.800 --> 00:05:20.500
+<v Matthew O'Riordan>service that they could build any real-time experience on and just know that it works right
+
+89
+00:05:20.500 --> 00:05:24.500
+<v Matthew O'Riordan>and you know especially for developers they understand this it's got to be very binary
+
+90
+00:05:25.040 --> 00:05:30.200
+<v Matthew O'Riordan>it's got to either work or not work but nothing in between and you know we identified really four
+
+91
+00:05:30.200 --> 00:05:35.440
+<v Matthew O'Riordan>things which is it needs to be low latency real-time experiences once things go beyond 100
+
+92
+00:05:35.440 --> 00:05:40.480
+<v Matthew O'Riordan>milliseconds if you had two things side by side you would start to perceive that latency so you
+
+93
+00:05:40.480 --> 00:05:44.760
+<v Matthew O'Riordan>have to keep things under 100 milliseconds so performance of the system matters and that led
+
+94
+00:05:44.760 --> 00:05:48.960
+<v Matthew O'Riordan>they led us into some pretty complex problems, which is you can't defy the laws of physics.
+
+95
+00:05:49.100 --> 00:05:54.880
+<v Matthew O'Riordan>The time it takes light to travel from Australia to the US is more than 100 milliseconds. So you
+
+96
+00:05:54.880 --> 00:05:59.160
+<v Matthew O'Riordan>can't have the service in a single region. It's got to be globally distributed. You've got to
+
+97
+00:05:59.160 --> 00:06:03.180
+<v Matthew O'Riordan>have infrastructure all over. And I mean, of course, we built edge infrastructure, which now
+
+98
+00:06:03.180 --> 00:06:06.620
+<v Matthew O'Riordan>is, you know, everything, everyone's a bit more trendy that everyone's kind of delivering edge
+
+99
+00:06:06.620 --> 00:06:10.680
+<v Matthew O'Riordan>services. But at the time, that was just necessary for us to kind of deliver that low latency.
+
+100
+00:06:10.980 --> 00:06:14.580
+<v Matthew O'Riordan>And the next thing was really just integrity. So kind of going back to that idea of it,
+
+101
+00:06:14.760 --> 00:06:17.680
+<v Matthew O'Riordan>needs to work or fail completely, but nothing in between.
+
+102
+00:06:18.200 --> 00:06:19.880
+<v Matthew O'Riordan>And then the next two things are really about,
+
+103
+00:06:19.900 --> 00:06:21.300
+<v Matthew O'Riordan>you know, availability of the system
+
+104
+00:06:21.300 --> 00:06:23.180
+<v Matthew O'Riordan>and dependability of the system.
+
+105
+00:06:23.240 --> 00:06:25.060
+<v Matthew O'Riordan>And I think the thing that we identified was that
+
+106
+00:06:25.060 --> 00:06:27.460
+<v Matthew O'Riordan>if you're watching a live football match
+
+107
+00:06:27.460 --> 00:06:29.460
+<v Matthew O'Riordan>and you're getting live scores sent to you,
+
+108
+00:06:29.560 --> 00:06:32.380
+<v Matthew O'Riordan>you know, if the scores stop working for some reason,
+
+109
+00:06:32.420 --> 00:06:34.280
+<v Matthew O'Riordan>because the real-time system that's powering it
+
+110
+00:06:34.280 --> 00:06:37.540
+<v Matthew O'Riordan>is not working, your experience is seriously undermined
+
+111
+00:06:37.540 --> 00:06:38.720
+<v Matthew O'Riordan>because you think it's working.
+
+112
+00:06:38.780 --> 00:06:39.940
+<v Matthew O'Riordan>You don't know that it's not working
+
+113
+00:06:39.940 --> 00:06:41.900
+<v Matthew O'Riordan>because there's no way of knowing
+
+114
+00:06:41.900 --> 00:06:44.840
+<v Matthew O'Riordan>that the real-time stream of data is no longer happening.
+
+115
+00:06:45.180 --> 00:06:46.840
+<v Matthew O'Riordan>So it really undermines the experience.
+
+116
+00:06:47.060 --> 00:06:49.360
+<v Matthew O'Riordan>Whereas if you didn't add any real-time feature
+
+117
+00:06:49.360 --> 00:06:52.140
+<v Matthew O'Riordan>and you expected people to refresh the page every five seconds,
+
+118
+00:06:52.380 --> 00:06:55.300
+<v Matthew O'Riordan>which a lot of live sites still do that.
+
+119
+00:06:55.360 --> 00:06:56.980
+<v Matthew O'Riordan>They just kind of say, just keep refreshing the page.
+
+120
+00:06:57.360 --> 00:07:00.840
+<v Matthew O'Riordan>In some ways, that's a better experience because it works, right?
+
+121
+00:07:00.960 --> 00:07:02.080
+<v Matthew O'Riordan>And you know what you're dealing with.
+
+122
+00:07:02.260 --> 00:07:04.720
+<v Matthew O'Riordan>And so our belief was that if you deliver real-time
+
+123
+00:07:04.720 --> 00:07:06.720
+<v Matthew O'Riordan>and it's not dependable and it doesn't always work,
+
+124
+00:07:07.020 --> 00:07:09.640
+<v Matthew O'Riordan>you actually risk, by adding these real-time features
+
+125
+00:07:09.640 --> 00:07:10.720
+<v Matthew O'Riordan>to make the experience better,
+
+126
+00:07:11.900 --> 00:07:15.740
+<v Matthew O'Riordan>even worse than not offering the real-time features. So that's kind of how we came about
+
+127
+00:07:15.740 --> 00:07:20.540
+<v Matthew O'Riordan>building Ably, which was give developers infrastructure and APIs to build these
+
+128
+00:07:20.540 --> 00:07:22.520
+<v Matthew O'Riordan>experiences so they don't have to solve all these hard problems.
+
+129
+00:07:24.760 --> 00:07:29.020
+<v Noah Labhart>Let's dive into the MVP, so that first version of the product you built.
+
+130
+00:07:29.160 --> 00:07:32.780
+<v Noah Labhart>How long did it take to build and what sort of tools did you use to bring it to life?
+
+131
+00:07:34.040 --> 00:07:37.260
+<v Matthew O'Riordan>We are probably the worst example of what a lean startup should be.
+
+132
+00:07:37.260 --> 00:07:41.880
+<v Matthew O'Riordan>you know, it's kind of, with hindsight, I think we made the right decisions, but it would be hard
+
+133
+00:07:41.880 --> 00:07:45.560
+<v Matthew O'Riordan>to recommend anyone else follow the similar path. You know, when we came into the market, there were
+
+134
+00:07:45.560 --> 00:07:50.280
+<v Matthew O'Riordan>other solutions, I was saying there were other real-time solutions that existed. They didn't
+
+135
+00:07:50.280 --> 00:07:53.100
+<v Matthew O'Riordan>kind of meet those needs of those four pillars I was talking about, that sort of integrity,
+
+136
+00:07:53.100 --> 00:07:58.600
+<v Matthew O'Riordan>dependability, latency and all those sort of things. So, you know, I met my co-founder Paddy,
+
+137
+00:07:58.600 --> 00:08:03.740
+<v Matthew O'Riordan>and, you know, with him we realized that we needed to build something that was novel, something unique,
+
+138
+00:08:03.740 --> 00:08:07.300
+<v Matthew O'Riordan>something that was true innovation that allowed us to build this distributed system.
+
+139
+00:08:07.560 --> 00:08:09.360
+<v Matthew O'Riordan>And, you know, distributed systems are hard.
+
+140
+00:08:09.400 --> 00:08:12.880
+<v Matthew O'Riordan>Like there's not many companies, a lot of companies use distributed systems,
+
+141
+00:08:12.940 --> 00:08:14.880
+<v Matthew O'Riordan>but not many companies design distributed systems.
+
+142
+00:08:15.880 --> 00:08:17.040
+<v Matthew O'Riordan>I think back to my deck.
+
+143
+00:08:17.160 --> 00:08:21.160
+<v Matthew O'Riordan>I think when I met my co-founder, I had a deck to kind of sell him in on the idea.
+
+144
+00:08:21.280 --> 00:08:23.460
+<v Matthew O'Riordan>And I'd suggested we would get something to market in nine months.
+
+145
+00:08:23.500 --> 00:08:24.400
+<v Matthew O'Riordan>It took us three years.
+
+146
+00:08:25.300 --> 00:08:28.220
+<v Matthew O'Riordan>You know, it was stressful in that, you know, when are we ever going to launch, right?
+
+147
+00:08:28.280 --> 00:08:31.180
+<v Matthew O'Riordan>But, you know, we had this kind of vision of, well, we need to be different.
+
+148
+00:08:31.300 --> 00:08:32.820
+<v Matthew O'Riordan>We need to differentiate from the market.
+
+149
+00:08:33.740 --> 00:08:38.460
+<v Matthew O'Riordan>actually deliver enduring innovation. And I kind of think about it like railway, right? I mean,
+
+150
+00:08:38.500 --> 00:08:43.060
+<v Matthew O'Riordan>you can't launch railway infrastructure half-baked. You have to kind of do it properly.
+
+151
+00:08:43.500 --> 00:08:47.640
+<v Matthew O'Riordan>We had to build the underlying infrastructure that really worked. Otherwise, we had no
+
+152
+00:08:47.640 --> 00:08:52.600
+<v Matthew O'Riordan>differentiation in the market. But it was very painful, really underestimating how complex this
+
+153
+00:08:52.600 --> 00:08:59.500
+<v Matthew O'Riordan>would be. The flip side is, it was incredibly fun. Like solving novel hard problems with my
+
+154
+00:08:59.500 --> 00:09:03.600
+<v Matthew O'Riordan>co-founder and a few other people in the team. Every day was an interesting challenge. It was
+
+155
+00:09:03.740 --> 00:09:05.340
+<v Matthew O'Riordan>Like it wasn't when we were doing something that had been done before.
+
+156
+00:09:05.460 --> 00:09:08.300
+<v Matthew O'Riordan>Every time was, it might be an academic paper on how to solve the problem,
+
+157
+00:09:08.400 --> 00:09:11.840
+<v Matthew O'Riordan>but there was no playbook on how to apply that academic paper
+
+158
+00:09:11.840 --> 00:09:13.380
+<v Matthew O'Riordan>on how to solve that problem internally.
+
+159
+00:09:14.220 --> 00:09:16.900
+<v Matthew O'Riordan>And then when we finally launched, what we discovered was that,
+
+160
+00:09:16.960 --> 00:09:19.360
+<v Matthew O'Riordan>to our dismay, a lot of developers,
+
+161
+00:09:19.600 --> 00:09:21.600
+<v Matthew O'Riordan>although they recognized we had built better tech,
+
+162
+00:09:21.820 --> 00:09:25.660
+<v Matthew O'Riordan>still stuck with what they used because it was convenient or it was familiar.
+
+163
+00:09:25.880 --> 00:09:27.860
+<v Matthew O'Riordan>So we were like, wow, that's not what we expected.
+
+164
+00:09:28.040 --> 00:09:30.380
+<v Matthew O'Riordan>We really thought better tech that developers would understand
+
+165
+00:09:30.380 --> 00:09:32.800
+<v Matthew O'Riordan>and measurably be able to see they would choose the better tech.
+
+166
+00:09:33.740 --> 00:09:38.500
+<v Matthew O'Riordan>The point, and it's also why we've been succeeding, is that as the criticality of what we provide
+
+167
+00:09:38.500 --> 00:09:42.700
+<v Matthew O'Riordan>increases and criticality comes in. You know, if you're a large organization like HubSpot, you've
+
+168
+00:09:42.700 --> 00:09:45.860
+<v Matthew O'Riordan>got hundreds of thousands of people concurrently using your product. If you're going to bake in
+
+169
+00:09:45.860 --> 00:09:49.860
+<v Matthew O'Riordan>something like Ably, you are depending on Ably. If Ably goes down, a core part of your product
+
+170
+00:09:49.860 --> 00:09:53.920
+<v Matthew O'Riordan>stops working. So that's one kind of criticality. Then there's other companies who, like Australia
+
+171
+00:09:53.920 --> 00:09:59.220
+<v Matthew O'Riordan>Open, where, you know, millions of fans arrive within minutes and they need to get live updates. It's
+
+172
+00:09:59.220 --> 00:10:00.140
+<v Matthew O'Riordan>It's quite a hard problem to solve.
+
+173
+00:10:00.180 --> 00:10:09.100
+<v Matthew O'Riordan>And so what we found was that engineers who realized that they needed to do things that are critical or high scale or just an integral part of their stack, they valued what we did.
+
+174
+00:10:09.220 --> 00:10:13.000
+<v Matthew O'Riordan>And they were the ones who kind of made the more informed decisions around which tech to integrate in.
+
+175
+00:10:13.100 --> 00:10:16.120
+<v Matthew O'Riordan>Because once you're integrated, you stay, you know, stay integrated.
+
+176
+00:10:16.400 --> 00:10:21.700
+<v Matthew O'Riordan>And, you know, we basically had an incredible track record of companies integrating us and moving on.
+
+177
+00:10:21.940 --> 00:10:25.060
+<v Matthew O'Riordan>And it is what has set us up to have a business that is differentiated.
+
+178
+00:10:27.220 --> 00:10:32.920
+<v Noah Labhart>So you've got your MVP, you've built it. You said it took three years, and it's working, right?
+
+179
+00:10:32.920 --> 00:10:38.060
+<v Noah Labhart>You're differentiating yourself. How did you progress the product from there and mature it? I
+
+180
+00:10:38.060 --> 00:10:41.920
+<v Noah Labhart>think, to wrap that in a box a little bit, what I'm looking for is how you built your roadmap and how
+
+181
+00:10:41.920 --> 00:10:47.120
+<v Noah Labhart>you went about deciding, okay, this is the next most important thing to build or to address with Ably.
+
+182
+00:10:48.040 --> 00:10:51.920
+<v Matthew O'Riordan>We were fortunate in some ways, firstly, because of our first generation products out there. We
+
+183
+00:10:51.920 --> 00:10:54.780
+<v Matthew O'Riordan>We didn't need to discover what features customers needed.
+
+184
+00:10:55.300 --> 00:10:58.040
+<v Matthew O'Riordan>We needed to work out how we could do that better than our competitors.
+
+185
+00:10:58.380 --> 00:11:03.820
+<v Matthew O'Riordan>So we were really just looking at what feature sets they had and building around that.
+
+186
+00:11:03.940 --> 00:11:05.640
+<v Matthew O'Riordan>So we didn't have to do much customer validation.
+
+187
+00:11:05.920 --> 00:11:09.020
+<v Matthew O'Riordan>Again, I wouldn't advocate doing that, but it was what we were doing.
+
+188
+00:11:09.080 --> 00:11:11.940
+<v Matthew O'Riordan>We're saying there's nothing fundamentally wrong with the problem they're trying to solve.
+
+189
+00:11:12.320 --> 00:11:13.660
+<v Matthew O'Riordan>It's just not fit for purpose.
+
+190
+00:11:13.740 --> 00:11:14.840
+<v Matthew O'Riordan>So we're just going to do that better.
+
+191
+00:11:15.280 --> 00:11:21.020
+<v Matthew O'Riordan>So that helped us a lot in the early days because we were really just designing around what other people had done and the problems they had solved.
+
+192
+00:11:21.920 --> 00:11:28.160
+<v Matthew O'Riordan>When you think about it, the problems they had solved are because customers have told them they need to solve this problem and therefore they've built APIs to solve this problem.
+
+193
+00:11:28.300 --> 00:11:31.820
+<v Matthew O'Riordan>It's based on actual customer need, really, when it comes down to it.
+
+194
+00:11:31.960 --> 00:11:34.280
+<v Matthew O'Riordan>I think what then happened is two things happened in the business.
+
+195
+00:11:34.420 --> 00:11:36.900
+<v Matthew O'Riordan>We responded to customer insight.
+
+196
+00:11:37.200 --> 00:11:43.740
+<v Matthew O'Riordan>And what I mean by that is, you know, we feel very strongly that you should not ask your customer what API you should build.
+
+197
+00:11:43.980 --> 00:11:50.700
+<v Matthew O'Riordan>You know, if we constantly respond to every customer request about modifying the API, we'll get a, you know, end up with a real Frankenstein of APIs.
+
+198
+00:11:51.920 --> 00:11:59.760
+<v Matthew O'Riordan>The most drive we get from expanding the APIs is when we're on calls with customers and you see them doing something and you're like, oh, wow, that's crazy.
+
+199
+00:11:59.860 --> 00:12:02.760
+<v Matthew O'Riordan>I didn't think you would solve the problem in that way.
+
+200
+00:12:02.980 --> 00:12:06.080
+<v Matthew O'Riordan>And there's a lot of that, just talking to customers and seeing what they're doing.
+
+201
+00:12:06.780 --> 00:12:11.380
+<v Matthew O'Riordan>The other one, which I think we failed at the beginning, the other side of it was a bit more visionary, right?
+
+202
+00:12:11.420 --> 00:12:14.280
+<v Matthew O'Riordan>Where you think, where's the industry going and what do we need to build next?
+
+203
+00:12:14.680 --> 00:12:21.420
+<v Matthew O'Riordan>And so we did build a product that was about how companies can exchange real-time data and share real-time data with each other.
+
+204
+00:12:21.920 --> 00:12:27.460
+<v Matthew O'Riordan>on. Now you can consume crypto prices and things like that through our platform. We provide
+
+205
+00:12:27.460 --> 00:12:31.800
+<v Matthew O'Riordan>that sort of data for free, and our idea was that, you know, organizations increasingly will need to
+
+206
+00:12:31.800 --> 00:12:36.580
+<v Matthew O'Riordan>share data, and that is true. Like, that statement is correct, but the way we went about it
+
+207
+00:12:36.580 --> 00:12:41.000
+<v Matthew O'Riordan>was wrong. I think we trusted a bit too much and, well, we're developers, we know what developers need.
+
+208
+00:12:41.000 --> 00:12:45.040
+<v Matthew O'Riordan>We know there's a problem there. We validated the problem. We didn't actually get customers engaged
+
+209
+00:12:45.040 --> 00:12:49.720
+<v Matthew O'Riordan>and what does the product look like. We had no product people in the organization that might we
+
+210
+00:12:49.720 --> 00:12:51.380
+<v Matthew O'Riordan>We had no product function.
+
+211
+00:12:51.540 --> 00:12:58.800
+<v Matthew O'Riordan>You know, now we have discipline around how we validate things and how you look at the market size and talk to customers and validate APIs before you release them.
+
+212
+00:12:59.000 --> 00:13:01.160
+<v Matthew O'Riordan>And so it's a completely different beast where we are today.
+
+213
+00:13:01.340 --> 00:13:05.640
+<v Matthew O'Riordan>But, you know, in the early days, it was a lot of instinct looking at what problems people are solving.
+
+214
+00:13:05.720 --> 00:13:10.660
+<v Matthew O'Riordan>And then this big bet on vision of where the future is going to go that we just really didn't validate.
+
+215
+00:13:12.320 --> 00:13:12.820
+<v Noah Labhart>Okay.
+
+216
+00:13:13.020 --> 00:13:14.660
+<v Noah Labhart>So I'm interested about team.
+
+217
+00:13:14.840 --> 00:13:16.800
+<v Noah Labhart>So how did you go about building your team?
+
+218
+00:13:16.800 --> 00:13:21.500
+<v Noah Labhart>What did you look for in those people to indicate that they were the winning horses to join you?
+
+219
+00:13:22.640 --> 00:13:24.960
+<v Matthew O'Riordan>I think it's changed a lot.
+
+220
+00:13:25.040 --> 00:13:29.860
+<v Matthew O'Riordan>I mean, in the early days, it was almost entirely an engineering business, right?
+
+221
+00:13:29.920 --> 00:13:31.200
+<v Matthew O'Riordan>So everyone was a software engineer.
+
+222
+00:13:31.520 --> 00:13:34.920
+<v Matthew O'Riordan>I remember doing a lot of the recruitment myself on the basis of,
+
+223
+00:13:35.060 --> 00:13:40.560
+<v Matthew O'Riordan>let's go find people in the community who are solving hard systems-level problems
+
+224
+00:13:40.560 --> 00:13:45.220
+<v Matthew O'Riordan>and approach them because at Ably, you can do that for a living, right?
+
+225
+00:13:46.800 --> 00:13:52.040
+<v Matthew O'Riordan>Someone works at some organization and on the side, they've got a side project and something that interests them in the distributed system space.
+
+226
+00:13:52.340 --> 00:13:59.240
+<v Matthew O'Riordan>You know, we are very unique in that we are genuinely building distributed systems that operate at Internet scale.
+
+227
+00:13:59.640 --> 00:14:01.160
+<v Matthew O'Riordan>But we're not an Internet scale business.
+
+228
+00:14:01.320 --> 00:14:01.860
+<v Matthew O'Riordan>We're not a Google.
+
+229
+00:14:01.960 --> 00:14:02.460
+<v Matthew O'Riordan>We're not that.
+
+230
+00:14:02.380 --> 00:14:06.560
+<v Matthew O'Riordan>So you kind of get to work in a small organization, but get to work on very big, hard problems.
+
+231
+00:14:06.720 --> 00:14:13.080
+<v Matthew O'Riordan>And, you know, if you go to a Google, you probably work on one tiny piece of the algorithm, whereas on Ably, you'd work on a much broader set.
+
+232
+00:14:13.080 --> 00:14:19.320
+<v Matthew O'Riordan>So in the early days, it was very much about finding people who shared a common interest around solving these hard problems.
+
+233
+00:14:19.900 --> 00:14:22.640
+<v Matthew O'Riordan>And then, of course, the organization starts to scale, right?
+
+234
+00:14:22.740 --> 00:14:24.340
+<v Matthew O'Riordan>And it's not, it can't all just be engineers.
+
+235
+00:14:24.600 --> 00:14:27.160
+<v Matthew O'Riordan>You know, I think in the early days, we were quite cash strapped.
+
+236
+00:14:27.260 --> 00:14:31.300
+<v Matthew O'Riordan>So we sort of brought on quite a lot of junior people that we mentored and helped, you know, help them along.
+
+237
+00:14:31.460 --> 00:14:33.660
+<v Matthew O'Riordan>You know, we've got some people still in the organization.
+
+238
+00:14:33.860 --> 00:14:40.480
+<v Matthew O'Riordan>You know, our first salesperson who joined is now an absolute superstar salesperson, you know, who joined with no experience of tech even.
+
+239
+00:14:40.540 --> 00:14:42.560
+<v Matthew O'Riordan>And, you know, we brought them through that journey.
+
+240
+00:14:43.080 --> 00:14:47.980
+<v Matthew O'Riordan>You know, once we did our Series B funding round, I think the way we approached hiring has changed
+
+241
+00:14:47.980 --> 00:14:52.400
+<v Matthew O'Riordan>dramatically. It's not really so much organic hiring anymore. You really have to be more structured and
+
+242
+00:14:52.400 --> 00:14:57.520
+<v Matthew O'Riordan>think about it. So, you know, we hire around things like sort of values internally. We really do try
+
+243
+00:14:57.520 --> 00:15:01.420
+<v Matthew O'Riordan>and live and breathe it. They're not something that lives on the wall. And, you know, I mean, just to give
+
+244
+00:15:01.420 --> 00:15:04.580
+<v Matthew O'Riordan>you a sort of sense of them, we've got things like bias for action. So, you know, what does that mean?
+
+245
+00:15:04.580 --> 00:15:10.660
+<v Matthew O'Riordan>It's like, you know, don't get paralyzed by analysis. Like, take action. Like, take thoughtful action, but
+
+246
+00:15:10.660 --> 00:15:11.260
+<v Matthew O'Riordan>but take action.
+
+247
+00:15:11.320 --> 00:15:12.680
+<v Matthew O'Riordan>You know, bold creativity wins
+
+248
+00:15:12.680 --> 00:15:13.840
+<v Matthew O'Riordan>of people who kind of have that,
+
+249
+00:15:13.840 --> 00:15:15.380
+<v Matthew O'Riordan>who are brave and able to make decisions.
+
+250
+00:15:15.800 --> 00:15:17.860
+<v Matthew O'Riordan>You know, we made that part of our hiring process
+
+251
+00:15:17.860 --> 00:15:19.500
+<v Matthew O'Riordan>and I think it really helps, right?
+
+252
+00:15:19.560 --> 00:15:20.640
+<v Matthew O'Riordan>It's like getting people who,
+
+253
+00:15:20.760 --> 00:15:22.400
+<v Matthew O'Riordan>you know, finding people who are going to survive
+
+254
+00:15:22.400 --> 00:15:23.280
+<v Matthew O'Riordan>in a startup environment.
+
+255
+00:15:23.900 --> 00:15:25.320
+<v Matthew O'Riordan>I think the things that we found is
+
+256
+00:15:25.320 --> 00:15:26.920
+<v Matthew O'Riordan>actually the values we have internally
+
+257
+00:15:26.920 --> 00:15:28.820
+<v Matthew O'Riordan>and there are some other characteristics
+
+258
+00:15:28.820 --> 00:15:31.040
+<v Matthew O'Riordan>that also tell you a person is going to be right.
+
+259
+00:15:31.200 --> 00:15:32.420
+<v Matthew O'Riordan>And, you know, what we found is
+
+260
+00:15:32.420 --> 00:15:34.640
+<v Matthew O'Riordan>there's this sort of self-starter,
+
+261
+00:15:34.740 --> 00:15:36.340
+<v Matthew O'Riordan>entrepreneurial type mindset
+
+262
+00:15:36.340 --> 00:15:39.740
+<v Matthew O'Riordan>that we find people that ably succeed more
+
+263
+00:15:39.740 --> 00:15:40.240
+<v Matthew O'Riordan>if they do that.
+
+264
+00:15:40.660 --> 00:15:46.300
+<v Matthew O'Riordan>think about the tech, but also think about customer need and driving an outcome. You know,
+
+265
+00:15:46.300 --> 00:15:50.540
+<v Matthew O'Riordan>a lot of developers kind of don't really want to embrace, I mean, I'm saying a negative way. They,
+
+266
+00:15:50.600 --> 00:15:54.780
+<v Matthew O'Riordan>you know, they're like, yeah, I know I'm building stuff for other people, but I just kind of want
+
+267
+00:15:54.780 --> 00:15:58.000
+<v Matthew O'Riordan>to write the best software I can. And there's nothing wrong with that. But, you know, in a
+
+268
+00:15:58.000 --> 00:16:01.920
+<v Matthew O'Riordan>small organization, as we ship more products, like we have to be shipping things that, you know,
+
+269
+00:16:01.920 --> 00:16:06.040
+<v Matthew O'Riordan>customers are going to use. And what's beautiful about Ably is that we're developers building
+
+270
+00:16:06.040 --> 00:16:09.960
+<v Matthew O'Riordan>software for developers. So we can't have, you know, we have that empathy. We understand what
+
+271
+00:16:10.660 --> 00:16:11.560
+<v Matthew O'Riordan>We know what developers like.
+
+272
+00:16:12.220 --> 00:16:15.440
+<v Matthew O'Riordan>And that's amazing because a lot of organizations, you get developers building things.
+
+273
+00:16:15.580 --> 00:16:19.020
+<v Matthew O'Riordan>You know, you go work at Google and really you're working on an advertising company, right?
+
+274
+00:16:19.120 --> 00:16:24.340
+<v Matthew O'Riordan>And you're probably not that passionate about software for an advertising company, but you are passionate about the domain problem.
+
+275
+00:16:24.640 --> 00:16:28.540
+<v Matthew O'Riordan>Whereas at Ably, you're building software for other developers to build cool stuff.
+
+276
+00:16:29.240 --> 00:16:34.680
+<v Matthew O'Riordan>So, yeah, so we try and look for that sort of entrepreneurial type spirit in people and generally curiosity, right?
+
+277
+00:16:34.720 --> 00:16:36.540
+<v Matthew O'Riordan>Curiosity in the tech goes a long way, right?
+
+278
+00:16:36.580 --> 00:16:40.300
+<v Matthew O'Riordan>Because then the thing I enjoy most is having discussions about how are we going to solve a problem?
+
+279
+00:16:40.660 --> 00:16:41.880
+<v Matthew O'Riordan>going to build the next tech feature.
+
+280
+00:16:45.500 --> 00:16:49.900
+<v Noah Labhart>This will be interesting. Given your focus on real-time
+
+281
+00:16:49.900 --> 00:16:56.780
+<v Noah Labhart>experience and how much attention you put into the MVP, I'm really curious about how you approached
+
+282
+00:16:57.260 --> 00:17:02.240
+<v Noah Labhart>scalability in the early days. So was this built to scale efficiently from that first MVP from day
+
+283
+00:17:02.240 --> 00:17:07.140
+<v Noah Labhart>one, or have you been fighting this as you grow in any sort of capacity or any sort of area?
+
+284
+00:17:08.320 --> 00:17:13.740
+<v Matthew O'Riordan>You know, when we built Ably, I do laugh because I look, again, I was thinking back to the deck before
+
+285
+00:17:13.740 --> 00:17:19.480
+<v Matthew O'Riordan>this call, the original deck. I had said to Paddy, my co-founder, that we're developers, we know
+
+286
+00:17:19.480 --> 00:17:23.720
+<v Matthew O'Riordan>developers don't want to talk to other developers, so let's build a business that never really
+
+287
+00:17:23.720 --> 00:17:28.640
+<v Matthew O'Riordan>requires us to hire many people, and, you know, we'll be completely self-service and develop, and as long
+
+288
+00:17:28.640 --> 00:17:32.920
+<v Matthew O'Riordan>as we create great documentation, great APIs and the whole product, then we won't need a big team.
+
+289
+00:17:32.920 --> 00:17:56.880
+<v Matthew O'Riordan>So we weren't actually building for scale. We were building to have a very small team with a very scalable platform. So not scale of the organization, but scale of the platform. And of course, it was very naive. I mean, it was very idealistic, but it was also kind of naive in that, you know, as soon as you start to sell to a developer in an organization who has to sign up a budget, you're going to go through a procurement process.
+
+290
+00:17:56.880 --> 00:18:02.540
+<v Matthew O'Riordan>And even though the developer is the person who's buying the technology, there's other people with the budgets and you need salespeople.
+
+291
+00:18:02.760 --> 00:18:07.160
+<v Matthew O'Riordan>And then you need people on support because developers have problems and they want to speak to a human being.
+
+292
+00:18:07.400 --> 00:18:08.940
+<v Matthew O'Riordan>And then we need to look after customers.
+
+293
+00:18:09.020 --> 00:18:10.180
+<v Matthew O'Riordan>So we need customer success people.
+
+294
+00:18:10.520 --> 00:18:16.760
+<v Matthew O'Riordan>So all of the things that we thought we were designing to avoid very quickly came back into the organization.
+
+295
+00:18:16.860 --> 00:18:23.240
+<v Matthew O'Riordan>But we did build something which was, at the time, PLG was certainly not as much of a buzzword.
+
+296
+00:18:23.740 --> 00:18:26.440
+<v Matthew O'Riordan>Product-led growth and even dev-first as an organization.
+
+297
+00:18:26.880 --> 00:18:30.660
+<v Matthew O'Riordan>But that's what we were doing. We were building a product-led growth business that was developer first.
+
+298
+00:18:30.840 --> 00:18:33.680
+<v Matthew O'Riordan>And now, you know, there's a whole category of businesses like us.
+
+299
+00:18:34.340 --> 00:18:39.080
+<v Matthew O'Riordan>I remember the moment we signed the term sheet and it just kind of hit me.
+
+300
+00:18:39.240 --> 00:18:43.000
+<v Matthew O'Riordan>I mean, it really just hit me that I'm like, I have to change modes as a CEO.
+
+301
+00:18:43.200 --> 00:18:50.160
+<v Matthew O'Riordan>I have to completely rethink what I do because now we need to scale an organization of people as opposed to scaling a platform.
+
+302
+00:18:50.320 --> 00:18:56.180
+<v Matthew O'Riordan>And it used to always be for me, the thing that I would always say was, you know, the things that would keep me up prior to Series B was
+
+303
+00:18:56.940 --> 00:19:01.480
+<v Matthew O'Riordan>build the best product, then worry about the people, and then worry about the pounds. So the PVP, but
+
+304
+00:19:01.480 --> 00:19:05.760
+<v Matthew O'Riordan>obviously in the US dollars. And literally the day I signed a term sheet, I'm like, no, no, that's
+
+305
+00:19:05.760 --> 00:19:09.960
+<v Matthew O'Riordan>completely wrong. It's people first. It's just people, then it's product, and then it's revenue.
+
+306
+00:19:10.620 --> 00:19:16.140
+<v Matthew O'Riordan>Now we are more strategic around how we're designing for scale. I think what we did do is we
+
+307
+00:19:16.140 --> 00:19:21.500
+<v Matthew O'Riordan>over rotated a bit on preparing for scale. Take, as an example, you know, we might think, well, we're
+
+308
+00:19:21.500 --> 00:19:24.720
+<v Matthew O'Riordan>going to need this new function that we didn't have before so we'll hire three or four people
+
+309
+00:19:24.720 --> 00:19:29.780
+<v Matthew O'Riordan>into that. That was a mistake because you kind of first have to learn what to do before you scale it.
+
+310
+00:19:29.900 --> 00:19:33.280
+<v Matthew O'Riordan>And so we did that. We did a bit of that where we sort of made teams a little bigger than they
+
+311
+00:19:33.280 --> 00:19:36.660
+<v Matthew O'Riordan>needed to be. And that actually then becomes now you're trying to manage a team of people and give
+
+312
+00:19:36.660 --> 00:19:41.000
+<v Matthew O'Riordan>them clarity on what to do, as opposed to if you put one person in to say, here's a new thing we
+
+313
+00:19:41.000 --> 00:19:44.240
+<v Matthew O'Riordan>need to do, go figure out how to do it. They know that their job is to go figure out how to do it.
+
+314
+00:19:44.280 --> 00:19:48.380
+<v Matthew O'Riordan>And then we learn from that and then we start to repeat it. So we did kind of, you know, we
+
+315
+00:19:48.380 --> 00:19:52.440
+<v Matthew O'Riordan>definitely kind of over-rotated a bit, but you know, I'm afraid a year and a half in the market,
+
+316
+00:19:52.440 --> 00:19:55.760
+<v Matthew O'Riordan>it. That's kind of, you know, a lot of what the industry did, right? I mean, the whole industry
+
+317
+00:19:55.760 --> 00:19:59.880
+<v Matthew O'Riordan>is sort of stripping back down again, and I would say becoming just more capital efficient.
+
+318
+00:20:00.840 --> 00:20:04.600
+<v Matthew O'Riordan>I'm thinking more about how do I put the right people into the exec team? How do I give them
+
+319
+00:20:04.600 --> 00:20:09.520
+<v Matthew O'Riordan>direction? How do they scale their teams? What do they need as opposed to how do we build the
+
+320
+00:20:09.520 --> 00:20:10.020
+<v Matthew O'Riordan>best product?
+
+321
+00:20:12.000 --> 00:20:16.680
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built,
+
+322
+00:20:16.680 --> 00:20:17.660
+<v Noah Labhart>What are you most proud of?
+
+323
+00:20:18.940 --> 00:20:20.720
+<v Matthew O'Riordan>You know, this is my third business.
+
+324
+00:20:21.280 --> 00:20:27.640
+<v Matthew O'Riordan>And I think the thing that really just makes me happy when I sort of wake up in the morning
+
+325
+00:20:27.640 --> 00:20:30.780
+<v Matthew O'Riordan>is thinking that we're reaching almost half a billion people a month now.
+
+326
+00:20:30.900 --> 00:20:35.360
+<v Matthew O'Riordan>You know, that's like 10% of the world who have access to the internet are possibly touching
+
+327
+00:20:35.360 --> 00:20:35.940
+<v Matthew O'Riordan>our servers.
+
+328
+00:20:36.500 --> 00:20:39.920
+<v Matthew O'Riordan>And I'm going to say that that metric is with a slight pinch of salt because it measures
+
+329
+00:20:39.920 --> 00:20:41.060
+<v Matthew O'Riordan>devices, not people.
+
+330
+00:20:41.300 --> 00:20:45.300
+<v Matthew O'Riordan>So it's not quite that accurate, but it's a big number.
+
+331
+00:20:46.680 --> 00:20:50.320
+<v Matthew O'Riordan>what it's all about for me. It's like, I enjoy writing. We did it because we love the tech.
+
+332
+00:20:50.440 --> 00:20:55.720
+<v Matthew O'Riordan>And now what we're doing is our tech is having an impact and it's improving people's lives.
+
+333
+00:20:56.060 --> 00:21:01.120
+<v Matthew O'Riordan>And I know I'm not trying to make out like we're altruistic and philanthropic in that regard,
+
+334
+00:21:01.200 --> 00:21:05.720
+<v Matthew O'Riordan>but actually you want to feel like you're having an impact. And I think we can. I think that's
+
+335
+00:21:05.720 --> 00:21:10.540
+<v Matthew O'Riordan>the thing that makes me happy and excited and I'm most proud of.
+
+336
+00:21:12.240 --> 00:21:17.480
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team
+
+337
+00:21:17.480 --> 00:21:18.600
+<v Noah Labhart>responded to it.
+
+338
+00:21:18.600 --> 00:21:23.760
+<v Matthew O'Riordan>Probably, looking back, you know, the biggest sort of mistake that we've made, and
+
+339
+00:21:23.760 --> 00:21:28.060
+<v Matthew O'Riordan>we've, you know, really kind of addressed very quickly at the moment, is when we did our Series
+
+340
+00:21:28.060 --> 00:21:33.380
+<v Matthew O'Riordan>B funding, there was a lot of excitement about how quickly we can grow. And it wasn't just us, it was
+
+341
+00:21:33.380 --> 00:21:39.400
+<v Matthew O'Riordan>the whole market, and we had tremendous growth at the time, so it felt like, yes, I mean, you know,
+
+342
+00:21:40.540 --> 00:21:45.720
+<v Matthew O'Riordan>can grow even faster. We started off as a developer first organization. That was the DNA of our
+
+343
+00:21:45.720 --> 00:21:49.420
+<v Matthew O'Riordan>business. You know, we believe that developers will find our product because they have a problem.
+
+344
+00:21:49.620 --> 00:21:55.640
+<v Matthew O'Riordan>We deal with them with empathy. We are honest and authentic with them and they will evaluate the
+
+345
+00:21:55.640 --> 00:21:58.980
+<v Matthew O'Riordan>product and choose us because we're the best product. And that's how we're going to win,
+
+346
+00:21:59.040 --> 00:22:02.960
+<v Matthew O'Riordan>because we create a great developer experience. And then when we got our funding round,
+
+347
+00:22:03.140 --> 00:22:08.340
+<v Matthew O'Riordan>we started to think, hold on, like maybe we need to accelerate by, instead of kind of doubling down
+
+348
+00:22:08.340 --> 00:22:10.820
+<v Matthew O'Riordan>down on that route, let's create a second motion, right?
+
+349
+00:22:10.880 --> 00:22:13.800
+<v Matthew O'Riordan>So we were PLG up until that point,
+
+350
+00:22:13.920 --> 00:22:15.780
+<v Matthew O'Riordan>and we also then created a sales led motion.
+
+351
+00:22:15.900 --> 00:22:17.500
+<v Matthew O'Riordan>And we try to run these two side by side.
+
+352
+00:22:18.220 --> 00:22:19.860
+<v Matthew O'Riordan>There were actually two problems with this.
+
+353
+00:22:19.920 --> 00:22:24.080
+<v Matthew O'Riordan>One is our developer audience is not really that compatible
+
+354
+00:22:24.080 --> 00:22:25.220
+<v Matthew O'Riordan>with sales led approaches.
+
+355
+00:22:25.560 --> 00:22:27.420
+<v Matthew O'Riordan>They don't wanna be sold to, they wanna buy.
+
+356
+00:22:27.660 --> 00:22:29.160
+<v Matthew O'Riordan>And they're happy to talk to salespeople,
+
+357
+00:22:29.300 --> 00:22:31.700
+<v Matthew O'Riordan>but when they're ready to buy, not when we go out to them.
+
+358
+00:22:31.800 --> 00:22:33.980
+<v Matthew O'Riordan>So it was kind of incompatible anyway,
+
+359
+00:22:34.660 --> 00:22:35.620
+<v Matthew O'Riordan>but that's fine,
+
+360
+00:22:35.720 --> 00:22:37.020
+<v Matthew O'Riordan>because that was meant to be the experiment.
+
+361
+00:22:38.340 --> 00:22:43.240
+<v Matthew O'Riordan>function that goes and finds business rather than waiting for marketing and developers to find us.
+
+362
+00:22:43.560 --> 00:22:48.380
+<v Matthew O'Riordan>That experiment, I still back and say we should have done. What we missed was that it created
+
+363
+00:22:48.980 --> 00:22:55.260
+<v Matthew O'Riordan>conflict in the organization of if someone signs up, do you try and sell to them or do you try and
+
+364
+00:22:55.260 --> 00:23:00.040
+<v Matthew O'Riordan>take them to a developer motion of making them successful at building their app? You had people
+
+365
+00:23:00.040 --> 00:23:04.760
+<v Matthew O'Riordan>with different interests within the organization because we had two different motions. And I think
+
+366
+00:23:04.760 --> 00:23:19.180
+<v Matthew O'Riordan>I think the moment I realized that there was really a fundamental problem was when I heard a comment in one of our all staff meetings where they said, the reason we lost the customer was because the customer went to our self-service product and signed up and used it directly.
+
+367
+00:23:20.320 --> 00:23:21.920
+<v Matthew O'Riordan>And I'm like, hold on a minute.
+
+368
+00:23:22.480 --> 00:23:23.180
+<v Matthew O'Riordan>That's a win.
+
+369
+00:23:23.360 --> 00:23:26.520
+<v Matthew O'Riordan>That's just a different avenue of how you buy the product.
+
+370
+00:23:26.640 --> 00:23:29.300
+<v Matthew O'Riordan>You come in and you buy it yourself or you go through a sales motion.
+
+371
+00:23:29.580 --> 00:23:31.160
+<v Matthew O'Riordan>And so that was the mistake.
+
+372
+00:23:31.500 --> 00:23:33.100
+<v Matthew O'Riordan>It was not that we tried a new motion.
+
+373
+00:23:33.200 --> 00:23:34.080
+<v Matthew O'Riordan>Of course, we could do that.
+
+374
+00:23:34.760 --> 00:23:36.600
+<v Matthew O'Riordan>And it actually created misalignments in the organization.
+
+375
+00:23:36.860 --> 00:23:40.420
+<v Matthew O'Riordan>No one knew, should we be selling hard or should we be trying to make customers succeed?
+
+376
+00:23:40.600 --> 00:23:43.880
+<v Matthew O'Riordan>And quite frankly, it's always make customers succeed when it comes to developers.
+
+377
+00:23:44.100 --> 00:23:46.920
+<v Matthew O'Riordan>Let them see the value in the product and everything else follows.
+
+378
+00:23:47.160 --> 00:23:48.840
+<v Matthew O'Riordan>It all flows very, very well.
+
+379
+00:23:48.960 --> 00:23:50.160
+<v Matthew O'Riordan>And it's what we built the business on.
+
+380
+00:23:52.300 --> 00:23:55.560
+<v Noah Labhart>This will be interesting, always interesting and fun to ask this question.
+
+381
+00:23:55.780 --> 00:23:59.120
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+382
+00:24:00.260 --> 00:24:04.620
+<v Matthew O'Riordan>No one's going to Auth0 because you need to add a login box to your web page, right?
+
+383
+00:24:04.760 --> 00:24:05.320
+<v Matthew O'Riordan>You can do that.
+
+384
+00:24:05.360 --> 00:24:05.860
+<v Matthew O'Riordan>That's easy.
+
+385
+00:24:06.100 --> 00:24:10.280
+<v Matthew O'Riordan>You're going to Auth0 because you know that they are experts in identity and authentication.
+
+386
+00:24:10.900 --> 00:24:18.480
+<v Matthew O'Riordan>You know that they will think of everything that you will need to do in your sort of identity and authentication systems way before you do.
+
+387
+00:24:18.660 --> 00:24:24.340
+<v Matthew O'Riordan>And you know that they sort of got to really be experts in the space so that you can trust them and you can get on with building your own application.
+
+388
+00:24:25.540 --> 00:24:27.140
+<v Matthew O'Riordan>And so really, what have they done?
+
+389
+00:24:27.260 --> 00:24:31.580
+<v Matthew O'Riordan>They've kind of given you this complete solution for identity and authentication.
+
+390
+00:24:31.580 --> 00:24:37.280
+<v Matthew O'Riordan>authentication. And I think that's kind of how I see Ably is that, you know, the future is that
+
+391
+00:24:37.280 --> 00:24:43.220
+<v Matthew O'Riordan>you come to Ably to solve one problem. I mean, so the Auth0 example, people might go to Auth0
+
+392
+00:24:43.220 --> 00:24:46.460
+<v Matthew O'Riordan>because they're thinking I need to do two-factor authentication. I don't quite know how to do it.
+
+393
+00:24:46.920 --> 00:24:50.760
+<v Matthew O'Riordan>But then you buy into the fact that it's a complete platform to solve that problem.
+
+394
+00:24:51.140 --> 00:24:56.420
+<v Matthew O'Riordan>And for us, real-time experiences is what we are seeing as a sort of maturity curve that
+
+395
+00:24:56.420 --> 00:24:57.600
+<v Matthew O'Riordan>that organizations are adopting.
+
+396
+00:24:58.760 --> 00:25:01.060
+<v Matthew O'Riordan>You know, I think right now, if you think about consumers,
+
+397
+00:25:01.300 --> 00:25:03.520
+<v Matthew O'Riordan>people just expect everything now to be in real time.
+
+398
+00:25:03.660 --> 00:25:05.540
+<v Matthew O'Riordan>It's actually technically quite hard to do that.
+
+399
+00:25:05.640 --> 00:25:08.640
+<v Matthew O'Riordan>Like consumers think that because you are using Uber
+
+400
+00:25:08.640 --> 00:25:10.320
+<v Matthew O'Riordan>and you see your driver driving around
+
+401
+00:25:10.320 --> 00:25:11.700
+<v Matthew O'Riordan>and you're using your chat apps
+
+402
+00:25:11.700 --> 00:25:13.340
+<v Matthew O'Riordan>and you're using kind of social media
+
+403
+00:25:13.340 --> 00:25:14.400
+<v Matthew O'Riordan>and it's all live and updated.
+
+404
+00:25:14.760 --> 00:25:16.380
+<v Matthew O'Riordan>And so there's an expectation now
+
+405
+00:25:16.380 --> 00:25:18.360
+<v Matthew O'Riordan>that everything is just live and up to date.
+
+406
+00:25:18.500 --> 00:25:20.680
+<v Matthew O'Riordan>And what we see probably quite uniquely
+
+407
+00:25:20.680 --> 00:25:21.940
+<v Matthew O'Riordan>that other people don't see
+
+408
+00:25:21.940 --> 00:25:24.680
+<v Matthew O'Riordan>is that organizations typically come for one thing.
+
+409
+00:25:26.420 --> 00:25:28.200
+<v Matthew O'Riordan>our customers are expecting us to have live chat.
+
+410
+00:25:28.340 --> 00:25:29.980
+<v Matthew O'Riordan>So we need to add chat.
+
+411
+00:25:30.180 --> 00:25:32.580
+<v Matthew O'Riordan>And for us, it's like you dip your toe in real time
+
+412
+00:25:33.440 --> 00:25:35.920
+<v Matthew O'Riordan>and your customers are going to expect more.
+
+413
+00:25:36.040 --> 00:25:37.680
+<v Matthew O'Riordan>Then they're going to go, well, I want to chat,
+
+414
+00:25:37.720 --> 00:25:39.700
+<v Matthew O'Riordan>but I also want to collaborate with my other users.
+
+415
+00:25:40.540 --> 00:25:42.100
+<v Matthew O'Riordan>And when I'm chatting to you,
+
+416
+00:25:42.220 --> 00:25:43.840
+<v Matthew O'Riordan>you just reverse that transaction,
+
+417
+00:25:43.980 --> 00:25:46.700
+<v Matthew O'Riordan>but I'm not seeing it come up live in my banking app.
+
+418
+00:25:46.800 --> 00:25:47.780
+<v Matthew O'Riordan>So why is that not happening?
+
+419
+00:25:48.020 --> 00:25:51.080
+<v Matthew O'Riordan>It's a transition from the sort of static application
+
+420
+00:25:51.080 --> 00:25:53.180
+<v Matthew O'Riordan>to this real-time collaborative applications.
+
+421
+00:25:53.600 --> 00:25:56.140
+<v Matthew O'Riordan>And our belief is, you know, you'll come for one thing
+
+422
+00:25:56.420 --> 00:25:58.920
+<v Matthew O'Riordan>And we're a complete platform for the whole real-time experience.
+
+423
+00:25:59.220 --> 00:26:01.020
+<v Matthew O'Riordan>And that's the direction we're taking, right?
+
+424
+00:26:01.080 --> 00:26:12.980
+<v Matthew O'Riordan>Which is, and we don't necessarily have to have every feature, but what we need to be is a credible platform that enables you as a developer to kind of help your organization through that journey of what comes next and having set of APIs to do that.
+
+425
+00:26:13.120 --> 00:26:14.900
+<v Matthew O'Riordan>And that's really the direction we're headed.
+
+426
+00:26:16.360 --> 00:26:17.540
+<v Noah Labhart>Okay, last question.
+
+427
+00:26:17.780 --> 00:26:22.980
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+428
+00:26:23.200 --> 00:26:24.260
+<v Noah Labhart>They're jazzed about it.
+
+429
+00:26:24.300 --> 00:26:25.240
+<v Noah Labhart>They can't wait to show it off to the world.
+
+430
+00:26:25.360 --> 00:26:26.280
+<v Noah Labhart>Can't wait to show it off to you.
+
+431
+00:26:26.420 --> 00:26:30.920
+<v Noah Labhart>right there on the plane. What advice do you give that person having gone down this road a bit?
+
+432
+00:26:32.220 --> 00:26:40.480
+<v Matthew O'Riordan>There are three things I would say. The first one for me is I genuinely did not start Ably
+
+433
+00:26:40.480 --> 00:26:45.080
+<v Matthew O'Riordan>or e-consultancy, my previous business or the other business. I didn't start them because
+
+434
+00:26:45.080 --> 00:26:48.980
+<v Matthew O'Riordan>I did it to make money. I did it because I was doing something I was really interested in doing.
+
+435
+00:26:49.140 --> 00:26:54.540
+<v Matthew O'Riordan>So the real-time space fascinated me. I enjoyed building the tech. Those three years with Paddy
+
+436
+00:26:56.420 --> 00:27:02.120
+<v Matthew O'Riordan>just incredible. And so I think if you have the genuine interest in the domain, then everything
+
+437
+00:27:02.120 --> 00:27:07.120
+<v Matthew O'Riordan>else becomes easy because you have the passion. You know, I think a lot of people are trying to,
+
+438
+00:27:07.220 --> 00:27:10.640
+<v Matthew O'Riordan>it's great. They've got the spirit of, I want to be an entrepreneur and I want to find something
+
+439
+00:27:10.640 --> 00:27:13.840
+<v Matthew O'Riordan>and build a business. But I think you have to be careful to make sure you build a business
+
+440
+00:27:13.840 --> 00:27:18.720
+<v Matthew O'Riordan>that's something you care about, not something that you see as an opportunity. And so I think
+
+441
+00:27:18.720 --> 00:27:22.200
+<v Matthew O'Riordan>that's the first thing. I think the second thing is you need to find the right co-founders.
+
+442
+00:27:22.200 --> 00:27:28.420
+<v Matthew O'Riordan>I spend more time with my co-founder than than you know most people and I wouldn't want to do it
+
+443
+00:27:28.420 --> 00:27:32.300
+<v Matthew O'Riordan>alone I did run one business alone I wouldn't want to do it alone again I think it's great
+
+444
+00:27:32.300 --> 00:27:36.480
+<v Matthew O'Riordan>having co-founders you can bounce ideas off different perspectives you know we're so comfortable
+
+445
+00:27:36.480 --> 00:27:39.820
+<v Matthew O'Riordan>with each other now that we can have quite difficult conversations that I think other
+
+446
+00:27:39.820 --> 00:27:43.120
+<v Matthew O'Riordan>people would almost feel uncomfortable being in a room with the conversations we're having
+
+447
+00:27:43.120 --> 00:27:47.620
+<v Matthew O'Riordan>but we're not because they just you know we're so familiar with each other and understand and so
+
+448
+00:27:47.620 --> 00:27:51.800
+<v Matthew O'Riordan>So that just allows us to really sort of make progress and depend on each other.
+
+449
+00:27:51.880 --> 00:27:55.080
+<v Matthew O'Riordan>So I need that other perspective and he needs my perspective on shit.
+
+450
+00:27:55.980 --> 00:28:00.260
+<v Matthew O'Riordan>The other one that I think I would recommend is you really have to choose your investors wisely.
+
+451
+00:28:00.520 --> 00:28:01.780
+<v Matthew O'Riordan>Less your small investors.
+
+452
+00:28:02.020 --> 00:28:07.760
+<v Matthew O'Riordan>You know, small investors you do not have to deal with every day, but your large investors will probably have a position on your board.
+
+453
+00:28:07.900 --> 00:28:13.200
+<v Matthew O'Riordan>And you want to know that you like them and you trust them and they have your interests at heart.
+
+454
+00:28:13.400 --> 00:28:14.860
+<v Matthew O'Riordan>You know, I think we've been very lucky.
+
+455
+00:28:14.860 --> 00:28:17.340
+<v Matthew O'Riordan>I respect, I really respect all of our investors.
+
+456
+00:28:17.540 --> 00:28:19.340
+<v Matthew O'Riordan>I respect the input they give us.
+
+457
+00:28:19.400 --> 00:28:21.060
+<v Matthew O'Riordan>They all come from very different perspectives.
+
+458
+00:28:21.320 --> 00:28:22.720
+<v Matthew O'Riordan>You know, some are more technical,
+
+459
+00:28:22.880 --> 00:28:25.040
+<v Matthew O'Riordan>some are sort of more, I suppose, investors.
+
+460
+00:28:25.140 --> 00:28:26.340
+<v Matthew O'Riordan>And they look at the, you know,
+
+461
+00:28:26.340 --> 00:28:27.600
+<v Matthew O'Riordan>so they're coming up with different approaches.
+
+462
+00:28:27.820 --> 00:28:29.300
+<v Matthew O'Riordan>But it's great.
+
+463
+00:28:29.580 --> 00:28:31.340
+<v Matthew O'Riordan>I mean, I can't tell you how many board meetings
+
+464
+00:28:31.340 --> 00:28:33.200
+<v Matthew O'Riordan>I've been in where, you know,
+
+465
+00:28:33.220 --> 00:28:35.220
+<v Matthew O'Riordan>they kind of say something that makes me step back
+
+466
+00:28:35.220 --> 00:28:36.760
+<v Matthew O'Riordan>and go, wow, okay, I didn't think of it like that.
+
+467
+00:28:36.880 --> 00:28:38.320
+<v Matthew O'Riordan>And you need that,
+
+468
+00:28:38.340 --> 00:28:40.100
+<v Matthew O'Riordan>but you need people that you get on with
+
+469
+00:28:40.100 --> 00:28:41.340
+<v Matthew O'Riordan>and you can trust.
+
+470
+00:28:41.560 --> 00:28:42.940
+<v Matthew O'Riordan>So, you know, you got to choose your investors,
+
+471
+00:28:43.100 --> 00:28:44.220
+<v Matthew O'Riordan>you got to choose your co-founders correctly,
+
+472
+00:28:44.860 --> 00:28:48.040
+<v Matthew O'Riordan>something that you genuinely interested in. And then those three things come together,
+
+473
+00:28:48.180 --> 00:28:52.380
+<v Matthew O'Riordan>you're going to enjoy what you do every day. And that's that makes it all worth it. So I'd say
+
+474
+00:28:52.380 --> 00:28:53.140
+<v Matthew O'Riordan>those are the three things.
+
+475
+00:28:53.580 --> 00:28:56.800
+<v Noah Labhart>That's fantastic. Well, Matt, thank you for being on the show today.
+
+476
+00:28:56.980 --> 00:28:59.520
+<v Noah Labhart>Thank you for telling the creation story of Ably.
+
+477
+00:28:59.820 --> 00:29:01.380
+<v Matthew O'Riordan>Great. Thank you. Thanks for having me on.
+
+478
+00:29:03.340 --> 00:29:05.980
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+479
+00:29:09.100 --> 00:29:14.580
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts,
+
+480
+00:29:14.860 --> 00:29:16.960
+<v Noah Labhart>or the podcasting app of your choice.
+
+481
+00:29:17.580 --> 00:29:19.780
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+482
+00:29:20.080 --> 00:29:21.980
+<v Noah Labhart>Both things help us out tremendously.
+
+483
+00:29:24.940 --> 00:29:26.420
+<v Noah Labhart>And thanks again for listening.

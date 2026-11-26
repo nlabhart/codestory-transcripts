@@ -1,0 +1,1183 @@
+WEBVTT
+
+NOTE S7 Bonus: The Death of Static Credentials: Architecting Hardware-Attested Device Identity with Mike Malone, Founder & CEO of Smallstep
+
+1
+00:00:00.720 --> 00:00:15.880
+<v Mike Malone>There's a lot of stuff that still just isn't exposed, like a lot of capability that the underlying technology has that just isn't exposed in the UI. Partly due to resource constraints and partly due to the complexity of exposing functionality in a UI.
+
+2
+00:00:16.100 --> 00:00:22.680
+<v Mike Malone>One of our goals is always simplicity and intuitiveness. In some cases, making things an option is like a cop-out.
+
+3
+00:00:23.100 --> 00:00:24.940
+<v Mike Malone>Our MVP, we didn't have billing implemented.
+
+4
+00:00:25.360 --> 00:00:27.700
+<v Mike Malone>We had a free trial period.
+
+5
+00:00:27.920 --> 00:00:33.000
+<v Mike Malone>So we figured, hey, we don't need billing implemented to launch because we have a 30-day free trial period.
+
+6
+00:00:33.080 --> 00:00:36.900
+<v Mike Malone>So we can just launch and we'll just get billing done before 30 days is up.
+
+7
+00:00:36.980 --> 00:00:37.480
+<v Mike Malone>We'll be good.
+
+8
+00:00:38.140 --> 00:00:42.520
+<v Mike Malone>My name is Mike Malone, and I'm the founder and CEO at Smallstep.
+
+9
+00:00:47.620 --> 00:00:49.280
+<v Noah Labhart>This is Code Story.
+
+10
+00:00:49.280 --> 00:01:00.820
+<v Noah Labhart>The podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+11
+00:01:02.180 --> 00:01:12.780
+<v Noah Labhart>I'm your host, Noah Labhart, and today I help Mike Malone create a platform to automate your certificates and make security easy for all developers.
+
+12
+00:01:13.300 --> 00:01:15.820
+<v Noah Labhart>All this and more on Code Story.
+
+13
+00:01:21.180 --> 00:01:23.360
+<v Noah Labhart>Mike Malone is a nerd from way back.
+
+14
+00:01:23.540 --> 00:01:24.660
+<v Noah Labhart>His words, not mine.
+
+15
+00:01:25.080 --> 00:01:28.600
+<v Noah Labhart>In the sixth grade, he bought a Borland C book and learned how to code.
+
+16
+00:01:28.700 --> 00:01:34.440
+<v Noah Labhart>Back when Napster was around, he hosted an open Nap server in his basement and ran a few things on IRC.
+
+17
+00:01:34.620 --> 00:01:41.260
+<v Noah Labhart>He graduated from Virginia Tech with a business information systems degree and worked for Accenture for a hot second.
+
+18
+00:01:41.440 --> 00:01:44.440
+<v Noah Labhart>Then joined a three-person startup and hasn't looked back since.
+
+19
+00:01:45.000 --> 00:01:48.480
+<v Noah Labhart>He's married with two kids and a dog, and he claims he collects hobbies,
+
+20
+00:01:48.680 --> 00:01:51.600
+<v Noah Labhart>which is another way of saying he likes to try new things.
+
+21
+00:01:52.520 --> 00:01:55.660
+<v Noah Labhart>Mike's career has tracked alongside the development of the cloud.
+
+22
+00:01:56.540 --> 00:02:00.460
+<v Noah Labhart>He witnessed the security problems alongside distributed systems
+
+23
+00:02:00.460 --> 00:02:03.240
+<v Noah Labhart>and felt the pains of having to manage sensitive information.
+
+24
+00:02:04.460 --> 00:02:07.220
+<v Noah Labhart>This is the creation story of Smallstep.
+
+25
+00:02:07.220 --> 00:02:07.720
+<v Noah Labhart>that.
+
+26
+00:02:09.980 --> 00:02:16.560
+<v Mike Malone>Smallstep solves security problems for large distributed systems. We position ourselves
+
+27
+00:02:16.560 --> 00:02:23.720
+<v Mike Malone>as production identity for DevOps and cloud native infrastructure. More concretely though,
+
+28
+00:02:23.920 --> 00:02:32.400
+<v Mike Malone>our core technology does certificate management. This is a corner inside of a corner of software
+
+29
+00:02:32.400 --> 00:02:38.580
+<v Mike Malone>and computer science, but it's a really important one, increasingly important as security and
+
+30
+00:02:38.580 --> 00:02:44.940
+<v Mike Malone>cybersecurity, software security increases in importance. So certificates are a variety of
+
+31
+00:02:44.940 --> 00:02:51.260
+<v Mike Malone>credential, like a password, but very much unlike a password that have characteristics that make
+
+32
+00:02:51.260 --> 00:02:56.640
+<v Mike Malone>them really amenable to large scale distributed system security. You know, as the software
+
+33
+00:02:56.640 --> 00:03:03.640
+<v Mike Malone>ecosystem evolves, DevOps, cloud native, microservices, containerization, the trend
+
+34
+00:03:03.640 --> 00:03:09.380
+<v Mike Malone>is more stuff changing more frequently. You know, there's a pace and scale issue that has
+
+35
+00:03:09.380 --> 00:03:14.200
+<v Mike Malone>necessitated a lot of change. And in this certificate management space, like a lot of
+
+36
+00:03:14.200 --> 00:03:18.680
+<v Mike Malone>other spaces, the new requirements are all around addressing that pace and scale with
+
+37
+00:03:18.680 --> 00:03:25.180
+<v Mike Malone>automation, operability tools, audit visibility. So that's what we do. We help large organizations
+
+38
+00:03:26.640 --> 00:03:34.220
+<v Mike Malone>businesses manage certificates for their internal infrastructure. My career has sort of tracked
+
+39
+00:03:34.220 --> 00:03:40.660
+<v Mike Malone>alongside cloud stuff and microservices and all these things before we had names for them,
+
+40
+00:03:40.700 --> 00:03:45.020
+<v Mike Malone>before they were cool and had a billion dollar marketing budget behind them, which was, you know,
+
+41
+00:03:45.020 --> 00:03:52.820
+<v Mike Malone>luck, right? Like, you know, it just happened to be how it worked out. I've grown up alongside of
+
+42
+00:03:52.820 --> 00:03:54.860
+<v Mike Malone>of these new technologies and new techniques
+
+43
+00:03:55.180 --> 00:03:58.780
+<v Mike Malone>and sort of witnessed the security problems.
+
+44
+00:03:59.060 --> 00:04:00.700
+<v Mike Malone>I'm not a security guy, right?
+
+45
+00:04:00.780 --> 00:04:03.160
+<v Mike Malone>Like I would say I'm a distributed systems guy.
+
+46
+00:04:03.340 --> 00:04:04.720
+<v Mike Malone>Like distributed systems are,
+
+47
+00:04:05.240 --> 00:04:07.540
+<v Mike Malone>distributed systems architecture is like my happy place.
+
+48
+00:04:07.620 --> 00:04:08.940
+<v Mike Malone>I like building large scale systems.
+
+49
+00:04:09.460 --> 00:04:11.460
+<v Mike Malone>My immediate last gig,
+
+50
+00:04:11.560 --> 00:04:13.360
+<v Mike Malone>I was CTO at this company called Betable.
+
+51
+00:04:13.560 --> 00:04:15.000
+<v Mike Malone>It was a platform for online gambling.
+
+52
+00:04:15.580 --> 00:04:17.380
+<v Mike Malone>We used to joke that we were regulated
+
+53
+00:04:17.760 --> 00:04:19.300
+<v Mike Malone>like a bank that sold liquor.
+
+54
+00:04:19.560 --> 00:04:21.780
+<v Mike Malone>We had customer funds, right?
+
+55
+00:04:22.820 --> 00:04:28.360
+<v Mike Malone>around, but it's also a vice industry. So there's a lot of regulatory scrutiny and a lot of real
+
+56
+00:04:28.360 --> 00:04:35.420
+<v Mike Malone>security sensitive stuff that we were managing. And I saw that there was a real gap in security
+
+57
+00:04:35.420 --> 00:04:41.180
+<v Mike Malone>infrastructure for folks who were adopting these new techniques, using these new technologies.
+
+58
+00:04:42.240 --> 00:04:47.720
+<v Mike Malone>That was the origin story. And we actually started out with an authorization product.
+
+59
+00:04:47.720 --> 00:04:53.560
+<v Mike Malone>We started out, we built a programming language, which is crazy if it's not clear yet that
+
+60
+00:04:53.560 --> 00:04:56.420
+<v Mike Malone>we're a deeply technical team.
+
+61
+00:04:56.620 --> 00:05:04.340
+<v Mike Malone>We wrote a programming language from first principles, and it was solving for confinement
+
+62
+00:05:04.340 --> 00:05:05.580
+<v Mike Malone>and termination, right?
+
+63
+00:05:05.700 --> 00:05:11.560
+<v Mike Malone>We wanted to make sure that these little programs that you're writing didn't run in an infinite
+
+64
+00:05:11.560 --> 00:05:12.060
+<v Mike Malone>loop.
+
+65
+00:05:11.840 --> 00:05:17.420
+<v Mike Malone>they terminated, and that they didn't do, you know, write to disk or read from disk or make
+
+66
+00:05:17.420 --> 00:05:21.860
+<v Mike Malone>network calls inappropriately. Those aren't things that are typically solved by normal
+
+67
+00:05:21.860 --> 00:05:26.420
+<v Mike Malone>programming languages. But this is a programming language that was meant as a policy authorization
+
+68
+00:05:26.420 --> 00:05:32.880
+<v Mike Malone>language that could run embedded in, say, like microservices at the edge of a microservice to
+
+69
+00:05:32.880 --> 00:05:38.840
+<v Mike Malone>enforce organizational policies on service to service interactions. So we started bringing
+
+70
+00:05:38.840 --> 00:05:42.340
+<v Mike Malone>Bringing that to market, and there were a few issues with it.
+
+71
+00:05:42.380 --> 00:05:44.200
+<v Mike Malone>One was the unit of value was too big.
+
+72
+00:05:44.260 --> 00:05:48.800
+<v Mike Malone>We were breaking their brains with adopt this new language, everyone learn it, and then
+
+73
+00:05:48.800 --> 00:05:52.760
+<v Mike Malone>implement it everywhere, and then you get some benefit on the other side of that.
+
+74
+00:05:52.900 --> 00:05:57.840
+<v Mike Malone>But the more concrete response we got was cool authorization product, but we don't have
+
+75
+00:05:57.840 --> 00:05:58.720
+<v Mike Malone>authentication yet.
+
+76
+00:05:58.960 --> 00:06:03.640
+<v Mike Malone>In other words, you have this thing that service A makes a call to service B, and service B
+
+77
+00:06:03.640 --> 00:06:08.360
+<v Mike Malone>We run some authorization policy to see whether that call should be processed.
+
+78
+00:06:08.440 --> 00:06:14.620
+<v Mike Malone>But in our infrastructure, service B doesn't know that the caller is service A.
+
+79
+00:06:14.700 --> 00:06:17.680
+<v Mike Malone>There is no authentication layer that's consistent throughout our infrastructure.
+
+80
+00:06:17.880 --> 00:06:25.720
+<v Mike Malone>So any policy on top of that inter-service communication is sort of useless because we don't know who's making the call.
+
+81
+00:06:26.580 --> 00:06:28.400
+<v Mike Malone>So go solve authentication for us.
+
+82
+00:06:28.480 --> 00:06:30.460
+<v Mike Malone>Then maybe we'll buy your authorization product.
+
+83
+00:06:30.860 --> 00:06:33.360
+<v Mike Malone>So that's how we got into certificate management.
+
+84
+00:06:35.420 --> 00:06:41.020
+<v Noah Labhart>tell me about the MVP then so you know how long did it take you to build that first product you
+
+85
+00:06:41.020 --> 00:06:44.320
+<v Noah Labhart>build how long did it take you to build and what sort of tools did you use to bring it to life
+
+86
+00:06:45.820 --> 00:06:51.740
+<v Mike Malone>well it depends on where you start counting we're open core so our core technology is open source
+
+87
+00:06:51.740 --> 00:06:57.020
+<v Mike Malone>and we started by building that open source community and releasing an open source project
+
+88
+00:06:57.020 --> 00:07:03.100
+<v Mike Malone>not a product which is a little bit unusual I'd say in in startup land usually an open core
+
+89
+00:07:03.640 --> 00:07:09.360
+<v Mike Malone>is founded around an open source project that already exists that is maybe spun out of another
+
+90
+00:07:09.360 --> 00:07:13.140
+<v Mike Malone>company or something. So we built this from scratch and built the community from scratch.
+
+91
+00:07:13.560 --> 00:07:20.620
+<v Mike Malone>So that was, man, a few years ago now, like two or three years ago that we released the first
+
+92
+00:07:20.620 --> 00:07:26.400
+<v Mike Malone>open source version. And the open source MVP, I'd say, didn't take too terribly long. I'd say
+
+93
+00:07:26.400 --> 00:07:31.580
+<v Mike Malone>less than a quarter, I'd say we spent from start to finish on just getting something out there
+
+94
+00:07:31.580 --> 00:07:36.460
+<v Mike Malone>as an open source project, but the barrier is pretty low on open sourcing a Git repo.
+
+95
+00:07:37.020 --> 00:07:42.320
+<v Mike Malone>It wasn't until about a year ago, a little over a year ago, that we really started thinking about
+
+96
+00:07:42.320 --> 00:07:47.740
+<v Mike Malone>commercializing that open source project. The commercial MVP, that took, I'd say,
+
+97
+00:07:47.880 --> 00:07:53.500
+<v Mike Malone>three to six months to go from, hey, we have this project and we want a hosted product-led
+
+98
+00:07:53.500 --> 00:07:58.900
+<v Mike Malone>SaaS version of it to actually having that delivered in a signup flow and MVP of that
+
+99
+00:07:58.900 --> 00:08:05.120
+<v Mike Malone>out on the website. Tons of technologies involved there. I mean, we're a Golang shop. We use some
+
+100
+00:08:05.120 --> 00:08:12.220
+<v Mike Malone>Node for front-end stuff, React, I believe. Lots of Golang, though. Golang's a great programming
+
+101
+00:08:12.220 --> 00:08:13.580
+<v Mike Malone>environment and great language.
+
+102
+00:08:14.540 --> 00:08:18.500
+<v Noah Labhart>Let's stay on the MVP for a minute then. So, and specifically the
+
+103
+00:08:18.500 --> 00:08:23.000
+<v Noah Labhart>commercial MVP. So when you're building that, you got to make certain decisions and trade-offs around,
+
+104
+00:08:23.000 --> 00:08:30.600
+<v Noah Labhart>around language selection, like you mentioned, a handful of languages you're using, or feature cut,
+
+105
+00:08:30.740 --> 00:08:36.420
+<v Noah Labhart>or tech debt acceptance, all that stuff, all the things we all know and love. But tell me about
+
+106
+00:08:36.420 --> 00:08:41.360
+<v Noah Labhart>some of your decisions and trade-offs you had to make in a little more detail and how you coped
+
+107
+00:08:41.360 --> 00:08:42.100
+<v Noah Labhart>with those decisions.
+
+108
+00:08:43.340 --> 00:08:48.620
+<v Mike Malone>Oh man, it's hard to even pick a handful. There are so many. There's a lot
+
+109
+00:08:48.620 --> 00:08:53.580
+<v Mike Malone>of stuff that still just isn't exposed, like a lot of capability that are under the underlying
+
+110
+00:08:53.580 --> 00:08:59.460
+<v Mike Malone>technology has that just isn't exposed in the UI. Partly due to resource constraints and partly due
+
+111
+00:08:59.460 --> 00:09:05.600
+<v Mike Malone>to the complexity of exposing functionality in a UI, and one of our goals is always simplicity and
+
+112
+00:09:05.600 --> 00:09:11.380
+<v Mike Malone>intuitiveness. In some cases, making things an option is like a cop-out. Our MVP, we didn't have
+
+113
+00:09:11.380 --> 00:09:17.160
+<v Mike Malone>billing implemented. We had a free trial period, so we figured, hey, we don't, we don't need billing and
+
+114
+00:09:18.620 --> 00:09:20.060
+<v Mike Malone>because we have a 30-day free trial period.
+
+115
+00:09:20.180 --> 00:09:22.440
+<v Mike Malone>So we can just launch and we'll just get billing done
+
+116
+00:09:22.440 --> 00:09:23.980
+<v Mike Malone>before 30 days is up.
+
+117
+00:09:24.040 --> 00:09:24.540
+<v Mike Malone>We'll be good.
+
+118
+00:09:24.840 --> 00:09:26.700
+<v Mike Malone>If you're not embarrassed by your MVP,
+
+119
+00:09:26.980 --> 00:09:28.420
+<v Mike Malone>you waited too long to launch.
+
+120
+00:09:28.560 --> 00:09:32.420
+<v Mike Malone>And certainly we were embarrassed by our MVP.
+
+121
+00:09:32.960 --> 00:09:34.320
+<v Mike Malone>How do I cope with that?
+
+122
+00:09:34.580 --> 00:09:35.780
+<v Mike Malone>It is what it is.
+
+123
+00:09:35.900 --> 00:09:37.760
+<v Mike Malone>You know, I've been in the startup game
+
+124
+00:09:37.760 --> 00:09:40.760
+<v Mike Malone>long enough to understand what it looks like.
+
+125
+00:09:40.900 --> 00:09:42.340
+<v Mike Malone>You need to get something out there
+
+126
+00:09:42.340 --> 00:09:44.140
+<v Mike Malone>in front of customers, in front of users.
+
+127
+00:09:44.340 --> 00:09:45.520
+<v Mike Malone>You need to start getting that feedback
+
+128
+00:09:45.520 --> 00:09:46.460
+<v Mike Malone>as soon as possible.
+
+129
+00:09:46.620 --> 00:09:47.800
+<v Mike Malone>And ultimately they understand
+
+130
+00:09:48.620 --> 00:09:54.980
+<v Mike Malone>that as well. That's how you grow a product that is actually valuable. It doesn't bother me too much.
+
+131
+00:09:57.020 --> 00:10:02.480
+<v Noah Labhart>From that point, you've got your commercial MVP done. How did you progress and mature the product?
+
+132
+00:10:02.680 --> 00:10:07.180
+<v Noah Labhart>And I think to wrap that question in a box, what I'm looking for is how you built your roadmap and
+
+133
+00:10:07.180 --> 00:10:11.720
+<v Noah Labhart>how you went about deciding, okay, this is the next most important thing to build.
+
+134
+00:10:13.420 --> 00:10:17.460
+<v Mike Malone>That's very hard. I think if you're an expert at that, you can make a lot of money.
+
+135
+00:10:18.620 --> 00:10:23.980
+<v Mike Malone>The best way in my experience to develop roadmap is to experience a pain yourself,
+
+136
+00:10:24.180 --> 00:10:31.760
+<v Mike Malone>intimately understand some painful process or some sharp edge in a workflow or something like that,
+
+137
+00:10:31.800 --> 00:10:38.180
+<v Mike Malone>that you can improve upon. The second best way is to listen to other people who may be
+
+138
+00:10:38.180 --> 00:10:44.740
+<v Mike Malone>experiencing those pains. So that's what we do to develop our roadmap is try to dog food,
+
+139
+00:10:44.740 --> 00:10:49.100
+<v Mike Malone>adopt technologies that maybe our customers are using so we can, you know, experience the pains
+
+140
+00:10:49.100 --> 00:10:55.400
+<v Mike Malone>that they're experiencing and really relate, or at least just talk to folks, read and try to
+
+141
+00:10:55.400 --> 00:11:01.000
+<v Mike Malone>understand and empathize with the pain that they're experiencing because those painkillers are really,
+
+142
+00:11:01.060 --> 00:11:02.380
+<v Mike Malone>you know, what drive value.
+
+143
+00:11:04.180 --> 00:11:07.500
+<v Noah Labhart>Let's switch to team then. So how'd you go about building your team
+
+144
+00:11:07.500 --> 00:11:12.560
+<v Noah Labhart>and what do you look for in those people to indicate that they're the winning horses to join
+
+145
+00:11:12.560 --> 00:11:13.060
+<v Noah Labhart>you?
+
+146
+00:11:13.840 --> 00:11:23.580
+<v Mike Malone>Team is the most important thing. A company is its people. I have a really sort of high level,
+
+147
+00:11:23.620 --> 00:11:31.940
+<v Mike Malone>broad hiring strategy. I kind of have two tests. The biggest one is, is this person smart and
+
+148
+00:11:31.940 --> 00:11:38.300
+<v Mike Malone>are they passionate? Drilling in on that second point a little bit, are the things that they're
+
+149
+00:11:38.300 --> 00:11:42.180
+<v Mike Malone>passionate about, you know, in the Venn diagram of things that are important to the business,
+
+150
+00:11:42.560 --> 00:11:47.380
+<v Mike Malone>and things that this individual is passionate about, is there overlap?
+
+151
+00:11:47.740 --> 00:11:50.100
+<v Mike Malone>Are they passionate about the things that they're going to have to do?
+
+152
+00:11:50.160 --> 00:11:52.440
+<v Mike Malone>And that's just alignment, right?
+
+153
+00:11:52.660 --> 00:11:57.360
+<v Mike Malone>I found that if you have those two things, everything else works itself out.
+
+154
+00:11:57.500 --> 00:12:05.340
+<v Mike Malone>So, for example, it matters less to me that somebody has experience with a programming language that we use
+
+155
+00:12:05.340 --> 00:12:10.020
+<v Mike Malone>than it does that they have desire to work with that programming language,
+
+156
+00:12:10.020 --> 00:12:13.600
+<v Mike Malone>and they have the capacity, you know, the intelligence to learn it.
+
+157
+00:12:14.180 --> 00:12:18.260
+<v Mike Malone>If those two things are there, then the level of experience matters a lot less.
+
+158
+00:12:18.860 --> 00:12:23.060
+<v Mike Malone>That's what's going to make somebody sort of objectively good in a role.
+
+159
+00:12:23.300 --> 00:12:28.360
+<v Mike Malone>Then the other thing I look for is sort of the culture fit dimension.
+
+160
+00:12:28.880 --> 00:12:39.080
+<v Mike Malone>The way I summarize that is just a gut check on if this person is working for the company come Monday
+
+161
+00:12:40.020 --> 00:12:47.500
+<v Mike Malone>I going to be more or less excited to go to work? Those are really the two big things that I look
+
+162
+00:12:47.500 --> 00:12:53.940
+<v Mike Malone>for. You know, it's pretty nebulous, but I really truly believe that's what's important.
+
+163
+00:12:54.960 --> 00:13:01.080
+<v Noah Labhart>I'm curious about, you know, starting out open core and having that, you know, open source aspect.
+
+164
+00:13:01.120 --> 00:13:05.940
+<v Noah Labhart>Did that help your recruiting at all? Did that help you kind of establish a community
+
+165
+00:13:05.940 --> 00:13:09.880
+<v Noah Labhart>and then therefore be able to pick from team-wise?
+
+166
+00:13:09.960 --> 00:13:11.000
+<v Noah Labhart>Did that integrate at all?
+
+167
+00:13:11.610 --> 00:13:14.400
+<v Mike Malone>It has absolutely helped with recruiting.
+
+168
+00:13:14.680 --> 00:13:17.640
+<v Mike Malone>There are a lot of pros and cons with open source,
+
+169
+00:13:17.920 --> 00:13:22.200
+<v Mike Malone>but recruiting, particularly for technical folks,
+
+170
+00:13:22.280 --> 00:13:24.940
+<v Mike Malone>for software engineers and dev advocates,
+
+171
+00:13:25.260 --> 00:13:27.880
+<v Mike Malone>folks who can connect with the developer
+
+172
+00:13:27.880 --> 00:13:30.440
+<v Mike Malone>and DevOps and DevSecOps audience,
+
+173
+00:13:31.070 --> 00:13:33.460
+<v Mike Malone>being open source is a huge advantage.
+
+174
+00:13:33.460 --> 00:14:03.440
+<v Mike Malone>So we have hired, we've recruited and hired from our community. We also have a number of engineers who I think count the open source aspect, you know, being able to work on an open source project and contribute to an open source community as a benefit, sort of a perk of working at Smallstep, both because they feel like it's sort of a moral good and because their work gets some, a portion of their work anyways is done in the public, which is great for their work.
+
+175
+00:14:03.460 --> 00:14:03.960
+<v Mike Malone>careers.
+
+176
+00:14:07.960 --> 00:14:13.000
+<v Noah Labhart>Let's flip to scalability. This will be interesting with the, you know, the open core and
+
+177
+00:14:13.000 --> 00:14:17.280
+<v Noah Labhart>then, you know, also the problems that you're solving and the combination of your story so far,
+
+178
+00:14:17.360 --> 00:14:22.000
+<v Noah Labhart>but I'm going to ask it generically. Did you build this to scale efficiently from day one,
+
+179
+00:14:22.080 --> 00:14:23.460
+<v Noah Labhart>or are you fighting this as you grow?
+
+180
+00:14:24.780 --> 00:14:26.600
+<v Mike Malone>Yes, we built it to scale efficiently,
+
+181
+00:14:26.600 --> 00:14:32.620
+<v Mike Malone>and yes, we've been fighting it as we grow. I am a distributed systems guy, but also as CEO,
+
+182
+00:14:33.460 --> 00:14:39.640
+<v Mike Malone>I have to put my sort of like pragmatic business value hat on maybe more often than I'd prefer.
+
+183
+00:14:40.100 --> 00:14:44.200
+<v Mike Malone>You know, sometimes one of the compromises you make is around scale.
+
+184
+00:14:44.420 --> 00:14:52.640
+<v Mike Malone>You know, to get to market faster, maybe you build something that you know isn't going to support a million users or a million requests per second.
+
+185
+00:14:52.800 --> 00:14:57.940
+<v Mike Malone>But I think one of the big advantages that we have is with my background as a distributed systems guy,
+
+186
+00:14:57.940 --> 00:15:05.320
+<v Mike Malone>And the team also has a lot of experience and competence around building large-scale distributed systems.
+
+187
+00:15:05.580 --> 00:15:14.780
+<v Mike Malone>We've been successful for the most part in at least architecting, if not implementing for scale, which I think is the more important piece of it.
+
+188
+00:15:14.780 --> 00:15:31.140
+<v Mike Malone>You know, it's less existential to have an implementation that can't support like potential hypothetical full scale operations than it is to have an API or an interface or a feature that just will not inherently will not scale.
+
+189
+00:15:31.940 --> 00:15:35.840
+<v Mike Malone>So I think we've been pretty good about avoiding the latter.
+
+190
+00:15:35.840 --> 00:15:42.380
+<v Mike Malone>matter we have certainly implemented things in knowing that they won't scale and then had to
+
+191
+00:15:42.380 --> 00:15:48.220
+<v Mike Malone>go back and iterate on that implementation to improve scalability well
+
+192
+00:15:48.220 --> 00:15:49.280
+<v Noah Labhart>mike as you step out
+
+193
+00:15:49.280 --> 00:15:53.140
+<v Noah Labhart>on the balcony and you look across all that you've built what are you most proud of
+
+194
+00:15:54.600 --> 00:15:59.580
+<v Mike Malone>well first the team i think there's a group of people at the company that i just really enjoy
+
+195
+00:15:59.580 --> 00:16:07.020
+<v Mike Malone>working with. Second, just the core technology that we've built. We had a thesis that we've now
+
+196
+00:16:07.020 --> 00:16:13.320
+<v Mike Malone>proven out that there's a need for this security infrastructure, an unmet need for the certificate
+
+197
+00:16:13.320 --> 00:16:17.920
+<v Mike Malone>management infrastructure as people implement, you know, I hate to use the phrase zero trust,
+
+198
+00:16:18.100 --> 00:16:23.480
+<v Mike Malone>but it's a good enough way of sort of putting what we're doing in a box. We're seeing people
+
+199
+00:16:23.480 --> 00:16:28.280
+<v Mike Malone>adopt and use that in really big ways, which feels good. You know, we've built something that
+
+200
+00:16:29.620 --> 00:16:35.540
+<v Mike Malone>that is solving real problems at scale for a lot of folks.
+
+201
+00:16:37.180 --> 00:16:38.620
+<v Noah Labhart>Let's flip the script a little bit, Mike.
+
+202
+00:16:39.060 --> 00:16:43.500
+<v Noah Labhart>So tell me about a mistake you made and how you and your team responded to it.
+
+203
+00:16:44.740 --> 00:16:46.760
+<v Mike Malone>This is a hard one for me, honestly.
+
+204
+00:16:47.120 --> 00:16:49.600
+<v Mike Malone>I almost don't think in terms of mistakes.
+
+205
+00:16:49.740 --> 00:16:51.940
+<v Mike Malone>I'm more of a happy accidents kind of guy.
+
+206
+00:16:52.280 --> 00:16:58.200
+<v Mike Malone>I think as long as you learn from something, like, was it really a mistake?
+
+207
+00:16:59.580 --> 00:17:04.740
+<v Mike Malone>I'd say there are some decisions that we made that are still unfolding.
+
+208
+00:17:04.820 --> 00:17:08.280
+<v Mike Malone>And in retrospect, we may consider mistakes.
+
+209
+00:17:08.580 --> 00:17:13.460
+<v Mike Malone>We're using Kubernetes and have a very service-oriented architecture.
+
+210
+00:17:14.500 --> 00:17:19.440
+<v Mike Malone>That's been problematic as we've tried to deploy on-premise.
+
+211
+00:17:19.500 --> 00:17:26.140
+<v Mike Malone>It complicates on-prem deploys running a microservice architecture that has a Kubernetes dependency.
+
+212
+00:17:26.140 --> 00:17:32.540
+<v Mike Malone>dependency. So there have been challenges like that. Maybe one thing looking back, our first
+
+213
+00:17:32.540 --> 00:17:38.420
+<v Mike Malone>iteration of our technology we wrote in Haskell, that was a mistake. From any sort of pragmatic
+
+214
+00:17:39.340 --> 00:17:45.200
+<v Mike Malone>perspective, that was a mistake. I can't pinpoint something that I would really call a major
+
+215
+00:17:45.200 --> 00:17:52.500
+<v Mike Malone>mistake. I don't know if that's just my own blind spots or just that I don't like to think that way.
+
+216
+00:17:52.500 --> 00:17:57.400
+<v Mike Malone>way. That's the thing I always loved about venture too, by the way, venture capital and
+
+217
+00:17:57.400 --> 00:18:04.460
+<v Mike Malone>venture-backed startups is this appetite for risk and, you know, embracing failure as long
+
+218
+00:18:04.460 --> 00:18:05.780
+<v Mike Malone>as you learn and make progress.
+
+219
+00:18:07.900 --> 00:18:12.120
+<v Noah Labhart>So what does the future look like for Smallstep, the product and
+
+220
+00:18:12.120 --> 00:18:12.860
+<v Noah Labhart>for your team?
+
+221
+00:18:14.500 --> 00:18:18.660
+<v Mike Malone>We're experiencing a lot of growth, a lot of growing interest and usage with our
+
+222
+00:18:18.660 --> 00:18:26.260
+<v Mike Malone>product. I think the architectural philosophies that we're catering to and addressing, they're
+
+223
+00:18:26.260 --> 00:18:31.540
+<v Mike Malone>still proliferating. Really excited about that. And then there's a lot of new innovative stuff
+
+224
+00:18:31.540 --> 00:18:38.540
+<v Mike Malone>going on in the ecosystem. Apple just announced a new zero-touch secure enrollment technology
+
+225
+00:18:38.540 --> 00:18:45.520
+<v Mike Malone>that's an implementation of an open standard called ACME device attestation that is replacing
+
+226
+00:18:45.520 --> 00:18:53.600
+<v Mike Malone>seeing an older school, really insecure, crappy protocol called SCEP, S-C-E-P, that enrolls,
+
+227
+00:18:53.600 --> 00:18:59.580
+<v Mike Malone>you know, iPhones and laptops in enterprise IT environments. So that's a new and interesting
+
+228
+00:18:59.580 --> 00:19:04.240
+<v Mike Malone>opportunity for us. We're the, as far as I know, we're the only solution there. We're the only
+
+229
+00:19:04.240 --> 00:19:08.320
+<v Mike Malone>ones who have implemented ACME device attestation on the server side. So we're seeing a lot of
+
+230
+00:19:08.320 --> 00:19:14.140
+<v Mike Malone>interest there and a lot of opportunity there. But ultimately, you know, we want to build valuable
+
+231
+00:19:15.520 --> 00:19:19.900
+<v Mike Malone>sell it to people that can build even more valuable things with it. So I think beyond
+
+232
+00:19:19.900 --> 00:19:24.420
+<v Mike Malone>the certificate management business, there are tons of adjacencies there. We'd love to get back to
+
+233
+00:19:24.420 --> 00:19:31.180
+<v Mike Malone>our authorization technology and brush the dust off of those repos and get those fully productized.
+
+234
+00:19:31.700 --> 00:19:38.880
+<v Mike Malone>Yeah, we want to build a big, valuable, important business in the enterprise IT space.
+
+235
+00:19:40.200 --> 00:19:45.280
+<v Noah Labhart>Let's switch to you, Mike. Who influences the way that you work? You know, name someone or
+
+236
+00:19:45.520 --> 00:19:48.160
+<v Noah Labhart>someone's or something you look up to and why?
+
+237
+00:19:49.000 --> 00:19:52.180
+<v Mike Malone>My dad is probably my biggest influence.
+
+238
+00:19:52.600 --> 00:19:58.960
+<v Mike Malone>He was a forensic engineer when I was growing up. He actually was born in Yuba City, California,
+
+239
+00:19:59.240 --> 00:20:06.420
+<v Mike Malone>in a one-room house that literally had a dirt floor and made his way to UC Berkeley and then
+
+240
+00:20:06.420 --> 00:20:13.960
+<v Mike Malone>full scholarship, got his PhD at MIT. So super, super smart guy. The company name is actually
+
+241
+00:20:15.520 --> 00:20:23.840
+<v Mike Malone>homage or connection back to my dad because he worked on the Apollo program. He did some work on
+
+242
+00:20:23.840 --> 00:20:31.980
+<v Mike Malone>the lunar lander landing gear. So the Smallstep name is obviously a tie-in to one small step for
+
+243
+00:20:31.980 --> 00:20:40.400
+<v Mike Malone>mankind. So he was a big influence, really smart, really good person and encouraged, nurtured my
+
+244
+00:20:40.400 --> 00:20:46.580
+<v Mike Malone>my software engineering sort of passion and entrepreneurship and provided a lot of really
+
+245
+00:20:46.580 --> 00:20:50.660
+<v Mike Malone>good insights there. He was entrepreneurial himself, as well as being an engineer.
+
+246
+00:20:51.260 --> 00:20:54.640
+<v Mike Malone>I had a really good mentor growing up that helped me a lot.
+
+247
+00:20:56.620 --> 00:21:00.960
+<v Noah Labhart>Okay, we talked about a mistake, but a little bit different spin. If you could go back to the
+
+248
+00:21:00.960 --> 00:21:04.600
+<v Noah Labhart>beginning, what would you do different? Or where would you consider taking a different approach?
+
+249
+00:21:05.340 --> 00:21:09.600
+<v Noah Labhart>Maybe the happy accidents are still apply here, but I'm curious what you're going to say.
+
+250
+00:21:10.400 --> 00:21:23.300
+<v Mike Malone>Look, if I had a crystal ball, there are probably some things that we wasted time on or didn't do quickly enough or overengineered or what have you that I would do differently.
+
+251
+00:21:23.720 --> 00:21:29.840
+<v Mike Malone>But I'd say largely I focus a lot on regret minimization, so I don't have a ton of regrets.
+
+252
+00:21:30.020 --> 00:21:39.600
+<v Mike Malone>You know, I focus my energy on irreversible decisions and try not to spend too much time on reversible decisions and then try not to be too broken up if I have to reverse them.
+
+253
+00:21:40.400 --> 00:21:43.940
+<v Mike Malone>For my own mental health, it would have been nice if I had a co-founder.
+
+254
+00:21:44.080 --> 00:21:46.400
+<v Mike Malone>It's maybe a big macro decision there.
+
+255
+00:21:47.020 --> 00:21:49.520
+<v Mike Malone>Overall, you know, I feel like I can't complain.
+
+256
+00:21:49.680 --> 00:21:53.820
+<v Mike Malone>I get to do what I love every day and make a decent living off of it.
+
+257
+00:21:53.900 --> 00:21:57.320
+<v Mike Malone>So I don't think I have any, you know, I'm happy about what we've built.
+
+258
+00:21:59.180 --> 00:22:00.240
+<v Noah Labhart>Well, Mike, last question.
+
+259
+00:22:00.600 --> 00:22:05.140
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+260
+00:22:05.320 --> 00:22:06.380
+<v Noah Labhart>They're jazzed about it.
+
+261
+00:22:06.400 --> 00:22:07.360
+<v Noah Labhart>Can't wait to show it off to the world.
+
+262
+00:22:07.480 --> 00:22:09.480
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+263
+00:22:10.400 --> 00:22:12.960
+<v Noah Labhart>advice do you give that person having gone down this road a bit?
+
+264
+00:22:13.500 --> 00:22:16.780
+<v Mike Malone>I think there's a long list of
+
+265
+00:22:16.780 --> 00:22:21.780
+<v Mike Malone>advice I might give somebody like that. I mean, first of all, I would be excited for them.
+
+266
+00:22:22.480 --> 00:22:27.640
+<v Mike Malone>If they're passionate and they're, you know, this is what they want to do, I would encourage that,
+
+267
+00:22:27.700 --> 00:22:34.920
+<v Mike Malone>I'd encourage them to not listen to the haters and pursue that passion. I do think you need
+
+268
+00:22:34.920 --> 00:22:37.460
+<v Mike Malone>You need to really want it, though.
+
+269
+00:22:38.380 --> 00:22:41.080
+<v Mike Malone>Running a business, it's a roller coaster.
+
+270
+00:22:41.300 --> 00:22:42.580
+<v Mike Malone>It's an emotional roller coaster.
+
+271
+00:22:42.740 --> 00:22:47.920
+<v Mike Malone>There are ups and downs and highs and lows that are very extreme, not just quarter to
+
+272
+00:22:47.920 --> 00:22:50.380
+<v Mike Malone>quarter, but sometimes minute to minute.
+
+273
+00:22:50.540 --> 00:22:51.620
+<v Mike Malone>And that's a lot.
+
+274
+00:22:52.220 --> 00:22:57.280
+<v Mike Malone>People say or assume that if you're CEO, you don't have a boss.
+
+275
+00:22:57.480 --> 00:23:00.820
+<v Mike Malone>And that's definitely not the case.
+
+276
+00:23:00.840 --> 00:23:04.340
+<v Mike Malone>I think it's more like you have 100 bosses.
+
+277
+00:23:04.920 --> 00:23:10.600
+<v Mike Malone>You know, you have 100 people who have a valid reason to demand your time and attention at any given moment,
+
+278
+00:23:10.780 --> 00:23:20.540
+<v Mike Malone>whether it's because they gave you a bunch of money and need some response to some inquiry that they need to report up to, you know, their stakeholders or their LPs or whatever.
+
+279
+00:23:20.680 --> 00:23:26.480
+<v Mike Malone>Or it's somebody who works for you who didn't get reimbursed for expenses and is freaking out, right?
+
+280
+00:23:26.860 --> 00:23:29.600
+<v Mike Malone>Like people say, don't bring your laptop on vacation.
+
+281
+00:23:29.600 --> 00:23:37.040
+<v Mike Malone>Well, like, I can't not bring my laptop on vacation because if somebody needs to be paid and hasn't been, I need to handle that.
+
+282
+00:23:37.140 --> 00:23:38.900
+<v Mike Malone>Like, that's non-negotiable.
+
+283
+00:23:39.680 --> 00:23:41.000
+<v Mike Malone>So it's a lot of responsibility.
+
+284
+00:23:41.360 --> 00:23:43.140
+<v Mike Malone>Be careful what you wish for sometimes.
+
+285
+00:23:43.360 --> 00:23:46.020
+<v Mike Malone>You know, make sure that you know what you're getting yourself into.
+
+286
+00:23:46.480 --> 00:23:48.200
+<v Noah Labhart>Oh, that's fantastic advice.
+
+287
+00:23:48.500 --> 00:23:53.220
+<v Noah Labhart>Well, Mike, thank you for being on the show today and telling the creation story of Smallstep.
+
+288
+00:23:53.480 --> 00:23:54.480
+<v Mike Malone>Thanks, Noah. It was fun.
+
+289
+00:23:56.480 --> 00:23:57.080
+<v Mike Malone>and
+
+290
+00:23:57.080 --> 00:23:59.600
+<v Noah Labhart>this concludes another chapter of Code Story
+
+291
+00:24:02.600 --> 00:24:08.960
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or
+
+292
+00:24:08.960 --> 00:24:14.860
+<v Noah Labhart>the podcasting app of your choice and when you get a chance leave us a review both things help
+
+293
+00:24:14.860 --> 00:24:15.720
+<v Noah Labhart>us out tremendously
+
+294
+00:24:15.720 --> 00:24:18.000
+<v Mike Malone>and
+
+295
+00:24:18.000 --> 00:24:19.620
+<v Noah Labhart>thanks again for listening

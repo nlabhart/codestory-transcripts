@@ -1,0 +1,1571 @@
+WEBVTT
+
+NOTE S12 Bonus: The App Is Dead, Long Live the Outcome: Why Autonomous AI Agents Are Rewriting Data Infrastructure and Transforming PostgreSQL Into a Dynamic Scratch Pad with Ajay Kulkarni, Founder & CEO of Tiger Data
+
+1
+00:00:00.820 --> 00:00:09.560
+<v Ajay Kulkarni>2015, we were building an IoT platform. We needed a database to store all the sensor data we were collecting from our customers, over 100,000 devices.
+
+2
+00:00:10.000 --> 00:00:20.960
+<v Ajay Kulkarni>One of my engineers, who's still at the company, 12 years later, was like, hey, I think I could build this and it'll take me a month. And I'm like, cool, you're an optimistic engineer, it'll probably take three months.
+
+3
+00:00:20.960 --> 00:00:22.360
+<v Ajay Kulkarni>12 months later,
+
+4
+00:00:22.520 --> 00:00:24.660
+<v Noah Labhart>12
+
+5
+00:00:24.660 --> 00:00:29.760
+<v Ajay Kulkarni>months later, we had this database and that was the MVP. It was really
+
+6
+00:00:29.760 --> 00:00:36.820
+<v Ajay Kulkarni>a Postgres extension. And as soon as we launched, as soon as we launched it, we had more press in
+
+7
+00:00:36.820 --> 00:00:39.980
+<v Ajay Kulkarni>the first three weeks than we had in the last year and a half of the IoT platform.
+
+8
+00:00:40.900 --> 00:00:43.520
+<v Ajay Kulkarni>Hey, I'm Ajay, co-founder, CEO of Tiger Data.
+
+9
+00:00:46.440 --> 00:00:52.280
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+10
+00:00:52.320 --> 00:00:53.720
+<v Clip>Six months moonlighting.
+
+11
+00:00:53.740 --> 00:00:55.260
+<v Clip>There's nothing on the back end.
+
+12
+00:00:55.500 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+13
+00:00:58.280 --> 00:01:00.240
+<v Clip>I don't exactly know what to do next.
+
+14
+00:01:00.260 --> 00:01:01.240
+<v Clip>It took many guys to get right.
+
+15
+00:01:01.800 --> 00:01:04.480
+<v Noah Labhart>Who built the teams that have their back.
+
+16
+00:01:04.560 --> 00:01:06.140
+<v Clip>A company is its people.
+
+17
+00:01:06.140 --> 00:01:07.520
+<v Clip>The teams help each other achieve more.
+
+18
+00:01:07.520 --> 00:01:08.600
+<v Clip>Most proud of our team.
+
+19
+00:01:08.880 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+20
+00:01:11.500 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+21
+00:01:13.520 --> 00:01:14.300
+<v Clip>Writing it as we grow.
+
+22
+00:01:14.480 --> 00:01:15.320
+<v Clip>Total waste of time.
+
+23
+00:01:15.520 --> 00:01:17.840
+<v Noah Labhart>The stories you don't read in the headlines.
+
+24
+00:01:18.260 --> 00:01:20.040
+<v Clip>It's not an easy thing to achieve, mind you.
+
+25
+00:01:20.060 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+26
+00:01:22.520 --> 00:01:25.820
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+27
+00:01:26.060 --> 00:01:27.580
+<v Clip>You need to really want it.
+
+28
+00:01:27.600 --> 00:01:28.960
+<v Clip>It's not just about technology.
+
+29
+00:01:29.080 --> 00:01:30.980
+<v Noah Labhart>All this and more on Code Story.
+
+30
+00:01:32.480 --> 00:01:33.920
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+31
+00:01:34.260 --> 00:01:39.700
+<v Noah Labhart>And today, how Ajay Kulkarni created Postgres for sensor and machine data.
+
+32
+00:01:39.700 --> 00:01:43.720
+<v Noah Labhart>Data, built for industrial energy and robotics systems.
+
+33
+00:01:49.100 --> 00:01:54.020
+<v Noah Labhart>Ajay Kulkarni grew up in tech, as his father was a tech entrepreneur selling PCs in the
+
+34
+00:01:54.020 --> 00:01:59.280
+<v Noah Labhart>early 80s. He went to college at MIT and eventually founded a startup that was acquired by GroupMe,
+
+35
+00:01:59.380 --> 00:02:03.940
+<v Noah Labhart>while it was being acquired by Skype, while they were being acquired by Microsoft. He's
+
+36
+00:02:03.940 --> 00:02:08.140
+<v Noah Labhart>always been attracted to building things, so startups are right up his alley. But outside
+
+37
+00:02:09.700 --> 00:02:15.300
+<v Noah Labhart>kids. He is a big exercise guy. He loves to run, swim, and track his steps. Additionally,
+
+38
+00:02:15.480 --> 00:02:19.260
+<v Noah Labhart>he loves music, to listen, and to play guitar, piano, and drums.
+
+39
+00:02:22.120 --> 00:02:27.720
+<v Noah Labhart>Ajay and his co-founder met 30 years ago at MIT. They reconnected after years of doing their own
+
+40
+00:02:27.720 --> 00:02:33.580
+<v Noah Labhart>thing, starting to dig into the IoT world. In doing this, they built a database because they
+
+41
+00:02:33.580 --> 00:02:38.880
+<v Noah Labhart>needed the best solution to store this type of data. And in doing so, they unlocked their next
+
+42
+00:02:39.700 --> 00:02:45.440
+<v Noah Labhart>out of this necessity. This is the creation story of Tiger Data.
+
+43
+00:02:49.540 --> 00:02:53.100
+<v Ajay Kulkarni>The story of Tiger Data actually starts in September 1997.
+
+44
+00:02:53.860 --> 00:02:59.920
+<v Ajay Kulkarni>First week of college at MIT, when I was sitting across the table at lunch from my co-founder,
+
+45
+00:02:59.940 --> 00:03:05.300
+<v Ajay Kulkarni>Mike, and that's where we met. We actually met, that's almost 30 years ago. And back then,
+
+46
+00:03:05.300 --> 00:03:07.260
+<v Ajay Kulkarni>We were both computer science majors.
+
+47
+00:03:07.340 --> 00:03:08.820
+<v Ajay Kulkarni>We took the same test at the same time.
+
+48
+00:03:08.980 --> 00:03:11.560
+<v Ajay Kulkarni>I always did okay, but Mike always did better.
+
+49
+00:03:11.680 --> 00:03:13.220
+<v Ajay Kulkarni>He always got better grades than I did.
+
+50
+00:03:13.720 --> 00:03:15.800
+<v Ajay Kulkarni>I think it's very rare that you have
+
+51
+00:03:15.800 --> 00:03:19.620
+<v Ajay Kulkarni>a pretty scientific measurement of who is smarter,
+
+52
+00:03:19.840 --> 00:03:22.140
+<v Ajay Kulkarni>but I kind of know definitively
+
+53
+00:03:22.140 --> 00:03:24.440
+<v Ajay Kulkarni>that Mike is academically smarter than me
+
+54
+00:03:24.440 --> 00:03:25.540
+<v Ajay Kulkarni>because he always got better grades.
+
+55
+00:03:25.840 --> 00:03:27.180
+<v Ajay Kulkarni>But that's where the story started.
+
+56
+00:03:27.420 --> 00:03:28.520
+<v Ajay Kulkarni>We kind of went our separate paths
+
+57
+00:03:28.520 --> 00:03:30.760
+<v Ajay Kulkarni>and then stayed in touch, regrouped to start,
+
+58
+00:03:30.960 --> 00:03:32.160
+<v Ajay Kulkarni>went on to becoming Tiger Data.
+
+59
+00:03:33.320 --> 00:03:39.680
+<v Ajay Kulkarni>We actually started off in IoT, which was this big wave everyone was talking about maybe 10,
+
+60
+00:03:39.820 --> 00:03:47.640
+<v Ajay Kulkarni>12 years ago, Internet of Things. We built the product to store sensor data for devices. As a
+
+61
+00:03:47.640 --> 00:03:52.100
+<v Ajay Kulkarni>result, they needed to build their own database for that behind the platform. We realized that
+
+62
+00:03:52.100 --> 00:03:57.140
+<v Ajay Kulkarni>the database was solving a bigger problem than the platform itself. And then we kind of relaunched
+
+63
+00:03:57.140 --> 00:04:01.500
+<v Ajay Kulkarni>this as Timescale. And that's when things really took off. So it's a classic example of we built
+
+64
+00:04:02.160 --> 00:04:03.680
+<v Ajay Kulkarni>a better mousetrap because we needed it.
+
+65
+00:04:03.720 --> 00:04:05.140
+<v Ajay Kulkarni>We scratched our own itch, so to speak.
+
+66
+00:04:05.400 --> 00:04:06.480
+<v Ajay Kulkarni>And when we did that,
+
+67
+00:04:06.520 --> 00:04:08.000
+<v Ajay Kulkarni>we realized a lot of people had the same problem.
+
+68
+00:04:08.160 --> 00:04:08.880
+<v Ajay Kulkarni>And that really,
+
+69
+00:04:08.900 --> 00:04:11.240
+<v Ajay Kulkarni>that's really unlocked the story of Tiger Data.
+
+70
+00:04:11.560 --> 00:04:12.980
+<v Ajay Kulkarni>Company was called Timescale.
+
+71
+00:04:13.240 --> 00:04:15.080
+<v Ajay Kulkarni>Our mascot was always a tiger.
+
+72
+00:04:15.220 --> 00:04:15.880
+<v Ajay Kulkarni>Why a tiger?
+
+73
+00:04:16.700 --> 00:04:18.820
+<v Ajay Kulkarni>We wanted to make the database feel approachable.
+
+74
+00:04:18.960 --> 00:04:20.620
+<v Ajay Kulkarni>And a lot of people pick different animals.
+
+75
+00:04:20.900 --> 00:04:21.760
+<v Ajay Kulkarni>Postgres is an elephant.
+
+76
+00:04:22.300 --> 00:04:23.300
+<v Ajay Kulkarni>MySQL is a dolphin.
+
+77
+00:04:23.780 --> 00:04:26.400
+<v Ajay Kulkarni>We like Tiger because tigers are powerful and fast.
+
+78
+00:04:26.840 --> 00:04:27.800
+<v Ajay Kulkarni>Like our database,
+
+79
+00:04:28.300 --> 00:04:30.780
+<v Ajay Kulkarni>we like the Tiger Timescale alliteration.
+
+80
+00:04:32.160 --> 00:04:37.340
+<v Ajay Kulkarni>we realized that I think four of the first six people on the team all had Princeton connections.
+
+81
+00:04:37.840 --> 00:04:41.340
+<v Ajay Kulkarni>Mike's a professor there. Some of the folks were PhDs and postdocs at Princeton.
+
+82
+00:04:41.500 --> 00:04:47.460
+<v Ajay Kulkarni>And the Princeton mascot is the tiger. And so that kind of sealed it. And over the years,
+
+83
+00:04:47.540 --> 00:04:52.020
+<v Ajay Kulkarni>we became more than a time series database. We're doing a lot more than what the name
+
+84
+00:04:52.020 --> 00:04:58.080
+<v Ajay Kulkarni>timescale indicated. And we decided we needed to change our name, not to change who we were,
+
+85
+00:04:58.080 --> 00:05:03.640
+<v Ajay Kulkarni>but to properly reflect who we had become. Tiger is always our mascot company was called Timescale
+
+86
+00:05:03.640 --> 00:05:08.260
+<v Ajay Kulkarni>and then we just made our name Tiger Data. TimescaleDB still exists as a sub-brand,
+
+87
+00:05:08.420 --> 00:05:11.800
+<v Ajay Kulkarni>but we didn't change our, we don't have to change our logo. We didn't change any colors.
+
+88
+00:05:12.300 --> 00:05:15.540
+<v Ajay Kulkarni>This was a pretty smooth transition, but that's where the Tiger comes from. And you know what,
+
+89
+00:05:15.540 --> 00:05:20.100
+<v Ajay Kulkarni>like internally we've always described ourselves as Tigers. Like our weekly all hands, it's called
+
+90
+00:05:20.100 --> 00:05:24.980
+<v Ajay Kulkarni>Tiger Time. When new people join the company, they're called Tiger Cubs. When people join the
+
+91
+00:05:24.980 --> 00:05:30.780
+<v Ajay Kulkarni>company we say welcome to the jungle i think the tiger was always a theme internally and
+
+92
+00:05:31.370 --> 00:05:33.340
+<v Ajay Kulkarni>making it our official name was like the most natural
+
+93
+00:05:35.700 --> 00:05:41.520
+<v Noah Labhart>i'm curious then about what you would consider the mvp and perhaps this is this is time scale
+
+94
+00:05:41.940 --> 00:05:45.900
+<v Noah Labhart>but i'm curious how you're going to shape this story but i want to know about the mvp the first
+
+95
+00:05:45.900 --> 00:05:50.560
+<v Noah Labhart>version of you know what is now tiger data that you built how long it take to build and
+
+96
+00:05:50.560 --> 00:05:53.080
+<v Noah Labhart>And what sort of tools were you using to bring it to life?
+
+97
+00:05:55.420 --> 00:05:58.760
+<v Ajay Kulkarni>So 2015, we were building an IoT platform.
+
+98
+00:05:59.360 --> 00:06:04.760
+<v Ajay Kulkarni>We needed a database to store all the sensor data we were collecting from our customers, over 100,000 devices.
+
+99
+00:06:06.460 --> 00:06:09.460
+<v Ajay Kulkarni>And we used a few off-the-shelf databases and it didn't work.
+
+100
+00:06:09.580 --> 00:06:10.740
+<v Ajay Kulkarni>Like the databases didn't work.
+
+101
+00:06:10.920 --> 00:06:20.240
+<v Ajay Kulkarni>And at this point, one of my engineers, who's still at the company 12 years later, was like, hey, I think I could build this and it'll take me a month.
+
+102
+00:06:20.560 --> 00:06:22.500
+<v Ajay Kulkarni>And I'm like, cool, you're an optimistic engineer.
+
+103
+00:06:22.760 --> 00:06:23.720
+<v Ajay Kulkarni>It'll probably take three months.
+
+104
+00:06:23.860 --> 00:06:31.660
+<v Ajay Kulkarni>12 months later, 12 months later, we had this database and that was the MVP.
+
+105
+00:06:31.920 --> 00:06:33.960
+<v Ajay Kulkarni>It was really a Postgres extension.
+
+106
+00:06:34.360 --> 00:06:38.140
+<v Ajay Kulkarni>Postgres, really popular database platform, has a framework called extensions.
+
+107
+00:06:38.380 --> 00:06:40.560
+<v Ajay Kulkarni>You can think of them almost as super powerful plugins.
+
+108
+00:06:41.120 --> 00:06:43.420
+<v Ajay Kulkarni>And it was an open source Postgres extension.
+
+109
+00:06:43.420 --> 00:06:48.640
+<v Ajay Kulkarni>extension. And as soon as we launched, as soon as we launched it, we had more press
+
+110
+00:06:48.640 --> 00:06:52.420
+<v Ajay Kulkarni>in the first three weeks than we had in the last year and a half of the IoT platform.
+
+111
+00:06:52.840 --> 00:06:56.960
+<v Ajay Kulkarni>And I remember thinking like, I don't know, this is a big idea, but it's definitely better
+
+112
+00:06:56.960 --> 00:07:02.760
+<v Ajay Kulkarni>than our previous idea. So let's do it. And so that was the MVP, Postgres extension to
+
+113
+00:07:02.760 --> 00:07:05.360
+<v Ajay Kulkarni>make the database scale for sensor data, time series data.
+
+114
+00:07:06.280 --> 00:07:11.420
+<v Noah Labhart>Okay. Let's stay on that for just a minute. In building this, I know you and the team
+
+115
+00:07:13.420 --> 00:07:16.660
+<v Noah Labhart>trade-off. Tell me about one of those you had to work through and how you went about
+
+116
+00:07:16.660 --> 00:07:20.080
+<v Noah Labhart>building that first version and how you coped with the decision.
+
+117
+00:07:21.360 --> 00:07:27.560
+<v Ajay Kulkarni>Anytime you're solving a problem, whether it's in tech or otherwise, it is very tempting to say,
+
+118
+00:07:27.760 --> 00:07:33.220
+<v Ajay Kulkarni>hey, let's just throw everything out and start from scratch. And at that point, especially,
+
+119
+00:07:33.340 --> 00:07:37.300
+<v Ajay Kulkarni>a lot of the leading databases were NoSQL databases, and that's what they had done. Mongo,
+
+120
+00:07:38.540 --> 00:07:42.140
+<v Ajay Kulkarni>Cassandra, other folks, other database companies, they essentially said, you know what,
+
+121
+00:07:43.740 --> 00:07:49.940
+<v Ajay Kulkarni>scale. Let's totally throw it out and start from scratch. And the insight we had was actually the
+
+122
+00:07:49.940 --> 00:07:57.100
+<v Ajay Kulkarni>relational database model does scale if you do it right. And while it is tempting to throw everything
+
+123
+00:07:57.100 --> 00:08:01.380
+<v Ajay Kulkarni>out, maybe we shouldn't throw out the baby with the bathwater, so to speak. What if we actually
+
+124
+00:08:01.380 --> 00:08:05.580
+<v Ajay Kulkarni>took the time to improve Postgres to make it scale? And a lot of people were like, it's not
+
+125
+00:08:05.580 --> 00:08:10.180
+<v Ajay Kulkarni>worth it. You couldn't do it. It can't be done. But we knew that if we did this, if we did the
+
+126
+00:08:10.180 --> 00:08:15.160
+<v Ajay Kulkarni>the hard work of actually building on Postgres and making it really scale and really having
+
+127
+00:08:15.160 --> 00:08:20.460
+<v Ajay Kulkarni>to work around this old but evolving code base that it would be an easier experience
+
+128
+00:08:20.460 --> 00:08:22.000
+<v Ajay Kulkarni>and a better experience for our customers.
+
+129
+00:08:22.120 --> 00:08:25.380
+<v Ajay Kulkarni>So I think that was probably the key thing is to say, you know what, we're building this
+
+130
+00:08:25.380 --> 00:08:26.180
+<v Ajay Kulkarni>on top of Postgres.
+
+131
+00:08:26.300 --> 00:08:27.200
+<v Ajay Kulkarni>We're not building from scratch.
+
+132
+00:08:27.660 --> 00:08:31.780
+<v Ajay Kulkarni>Yes, there's some effort required, but at the same time you build on Postgres, you benefit
+
+133
+00:08:31.780 --> 00:08:39.020
+<v Ajay Kulkarni>benefit from the 25, now kind of 35 years of development, reliability, stability, ecosystem,
+
+134
+00:08:40.300 --> 00:08:45.220
+<v Ajay Kulkarni>versatility, and Postgres now I think is accepted as the developer's favorite database.
+
+135
+00:08:45.540 --> 00:08:48.420
+<v Ajay Kulkarni>10 years ago, that was not the case, and we made the right bet.
+
+136
+00:08:49.980 --> 00:08:54.580
+<v Noah Labhart>So then from that point, I'm curious about how you've progressed and matured it, right?
+
+137
+00:08:54.660 --> 00:08:56.360
+<v Noah Labhart>And there's lots of stories there, I'm certain.
+
+138
+00:08:56.460 --> 00:08:59.720
+<v Noah Labhart>I'm maturing timescale and then moving into what is now Tiger Data.
+
+139
+00:08:59.720 --> 00:09:03.720
+<v Noah Labhart>data. Tell me about that process. And I think to wrap it in a box a little bit and look for it,
+
+140
+00:09:03.740 --> 00:09:07.680
+<v Noah Labhart>how do you build your roadmap? How do you go about deciding that, okay, this is the next most
+
+141
+00:09:07.680 --> 00:09:10.320
+<v Noah Labhart>important thing to build or to address?
+
+142
+00:09:11.260 --> 00:09:14.520
+<v Ajay Kulkarni>I think there are two ways. And the first is how we built
+
+143
+00:09:14.940 --> 00:09:19.260
+<v Ajay Kulkarni>Timescale in the first place, which is you kind of scratch your own itch. You say, hey, this thing is
+
+144
+00:09:19.260 --> 00:09:25.540
+<v Ajay Kulkarni>really bugging me and no one else is solving it. And what if we solve it? I think the second thing
+
+145
+00:09:25.540 --> 00:09:31.460
+<v Ajay Kulkarni>you do is you just listen to the market you just listen and you say huh like when we launched
+
+146
+00:09:31.460 --> 00:09:37.340
+<v Ajay Kulkarni>TimescaleDB, we thought 2017 we thought this was a thing for IoT and we saw all these users using us
+
+147
+00:09:37.340 --> 00:09:44.320
+<v Ajay Kulkarni>in fintech and crypto and other areas and we were like oh this is much bigger than just iot and
+
+148
+00:09:44.320 --> 00:09:49.600
+<v Ajay Kulkarni>again more recently as we continue to build on our database platform a lot of us are actually
+
+149
+00:09:49.600 --> 00:09:51.920
+<v Ajay Kulkarni>using coding agents or building with agents.
+
+150
+00:09:53.480 --> 00:09:57.000
+<v Ajay Kulkarni>And I firmly believe agents are the new developer.
+
+151
+00:09:57.180 --> 00:09:58.300
+<v Ajay Kulkarni>They're the new coworker.
+
+152
+00:09:58.620 --> 00:10:00.020
+<v Ajay Kulkarni>They're the new assistant.
+
+153
+00:10:00.900 --> 00:10:02.200
+<v Ajay Kulkarni>And we're like, you know what?
+
+154
+00:10:02.260 --> 00:10:05.420
+<v Ajay Kulkarni>Postgres is great, but it doesn't feel like it's really designed for this modern world.
+
+155
+00:10:05.540 --> 00:10:07.620
+<v Ajay Kulkarni>What would it look like if we could modernize Postgres
+
+156
+00:10:07.620 --> 00:10:09.440
+<v Ajay Kulkarni>just so even we could use it with our agents?
+
+157
+00:10:09.720 --> 00:10:11.640
+<v Ajay Kulkarni>And that's where some of our newer things came out of,
+
+158
+00:10:11.660 --> 00:10:13.980
+<v Ajay Kulkarni>like Ghost, which we officially launched this week.
+
+159
+00:10:14.200 --> 00:10:17.300
+<v Ajay Kulkarni>And so I think in my mind, I think there's two ways to do it.
+
+160
+00:10:17.300 --> 00:10:20.580
+<v Ajay Kulkarni>at first is you kind of look at your own needs, scratch your own itch. And then the second is you
+
+161
+00:10:20.580 --> 00:10:24.980
+<v Ajay Kulkarni>listen to the market. Now, the problem is the market will never tell you what it needs, but
+
+162
+00:10:24.980 --> 00:10:30.720
+<v Ajay Kulkarni>it'll tell you what their problem is. And then it's your job as the entrepreneur, founder, whatever,
+
+163
+00:10:31.960 --> 00:10:36.020
+<v Ajay Kulkarni>to listen to that and be like, oh, but what if we could solve that? What would that look like?
+
+164
+00:10:36.340 --> 00:10:37.880
+<v Ajay Kulkarni>So that's been our philosophy.
+
+165
+00:10:40.200 --> 00:10:43.320
+<v Noah Labhart>Let's flip over to team then, right? To accomplish something like
+
+166
+00:10:43.320 --> 00:10:46.980
+<v Noah Labhart>this, you got to have the right team. Tell me about how you built that team and what'd you
+
+167
+00:10:47.300 --> 00:10:50.440
+<v Noah Labhart>those people to indicate that they were the winning horses to join you.
+
+168
+00:10:51.640 --> 00:10:56.600
+<v Ajay Kulkarni>Team, it really is everything. And it's a cliche, but I think it's a cliche for a reason.
+
+169
+00:10:57.240 --> 00:11:03.760
+<v Ajay Kulkarni>I have found that success comes from getting the right people on the bus or getting the right
+
+170
+00:11:03.760 --> 00:11:08.180
+<v Ajay Kulkarni>people on board, pointing them in the right direction, and then just letting them run,
+
+171
+00:11:08.240 --> 00:11:13.620
+<v Ajay Kulkarni>let them run and take any obstacle out of their way. And I've learned this the hard way. You get
+
+172
+00:11:13.620 --> 00:11:18.560
+<v Ajay Kulkarni>and people who seem talented who maybe aren't as successful you say why how can i get them more
+
+173
+00:11:18.560 --> 00:11:23.500
+<v Ajay Kulkarni>successful and the reality is you can't i think people you need to find people who are intrinsically
+
+174
+00:11:23.500 --> 00:11:28.200
+<v Ajay Kulkarni>motivated who are hungry scrappy get stuff done and so i think that's what we've that's what we've
+
+175
+00:11:28.200 --> 00:11:32.620
+<v Ajay Kulkarni>done and i think it's something that when i think in the beginning we had a really interview for
+
+176
+00:11:32.620 --> 00:11:39.820
+<v Ajay Kulkarni>that and you know weed out people who thought would not be able to fit that but over time the
+
+177
+00:11:39.820 --> 00:11:46.320
+<v Ajay Kulkarni>The culture ends up developing its own immune system, so to speak, where at some point someone comes in, but it feels they can't.
+
+178
+00:11:46.340 --> 00:11:47.600
+<v Ajay Kulkarni>Number one value is get shit done.
+
+179
+00:11:47.700 --> 00:11:51.420
+<v Ajay Kulkarni>If they can't get shit done, then the company will say, wait, they're not a good fit.
+
+180
+00:11:51.500 --> 00:11:56.080
+<v Ajay Kulkarni>So I think it's you get the right people on board and then the culture then forms around that.
+
+181
+00:11:59.300 --> 00:12:01.120
+<v Noah Labhart>Let's move into scalability.
+
+182
+00:12:01.340 --> 00:12:04.100
+<v Noah Labhart>And this is obviously baked into your bread and butter.
+
+183
+00:12:04.220 --> 00:12:06.660
+<v Noah Labhart>I'm curious about how you approached that in the beginning.
+
+184
+00:12:06.660 --> 00:12:11.120
+<v Noah Labhart>and if there's been interesting areas where you've had to fight scale as you've grown.
+
+185
+00:12:13.560 --> 00:12:15.940
+<v Ajay Kulkarni>I think organizational scale is interesting.
+
+186
+00:12:16.880 --> 00:12:23.180
+<v Ajay Kulkarni>One thing I have found as a founder is that, and as a CEO, is that your job changes every six months.
+
+187
+00:12:24.060 --> 00:12:30.020
+<v Ajay Kulkarni>And in fact, the thing that was the right thing to do six months ago might be the exact wrong thing to do today.
+
+188
+00:12:30.440 --> 00:12:35.820
+<v Ajay Kulkarni>There are situations where six months ago, maybe I had to get super involved in solving certain types of problems.
+
+189
+00:12:36.660 --> 00:12:43.580
+<v Ajay Kulkarni>But now, because the company has grown and scaled and hired some people or hired some teams, if I get involved, I'm actually going to get in the way.
+
+190
+00:12:44.020 --> 00:12:50.200
+<v Ajay Kulkarni>And so I think that is a challenge about scaling is that as you scale, things will break.
+
+191
+00:12:50.340 --> 00:12:55.320
+<v Ajay Kulkarni>And sometimes it's some of the things that you thought were your best policies or behaviors or even systems.
+
+192
+00:12:55.780 --> 00:12:59.260
+<v Ajay Kulkarni>But you need to be OK with that and be aware and then evolve.
+
+193
+00:12:59.620 --> 00:13:04.480
+<v Ajay Kulkarni>I think it's you have to constantly ask yourself and constantly ask your team like, hey, what's not working?
+
+194
+00:13:04.540 --> 00:13:05.160
+<v Ajay Kulkarni>What could be better?
+
+195
+00:13:06.660 --> 00:13:11.400
+<v Ajay Kulkarni>want what would you fix and then you try to fix it and then maybe that works for six months and
+
+196
+00:13:11.400 --> 00:13:16.180
+<v Ajay Kulkarni>then you do it again and so I guess I guess when you're in a process of scaling I think you just
+
+197
+00:13:16.180 --> 00:13:21.040
+<v Ajay Kulkarni>have to be okay with things constantly breaking because that's a sign that you're growing.
+
+198
+00:13:22.920 --> 00:13:27.020
+<v Noah Labhart>Ajay as you step out on the balcony and you look across all that you've built
+
+199
+00:13:27.020 --> 00:13:29.880
+<v Noah Labhart>thus far with Tiger Data what are you most proud of?
+
+200
+00:13:31.480 --> 00:13:41.400
+<v Ajay Kulkarni>The thing that I'm most proud of is our resilience. I think it is easy to do well when times are good,
+
+201
+00:13:42.000 --> 00:13:48.400
+<v Ajay Kulkarni>but there's some ancient proverb, I forget where it's from, but smooth seas don't make strong
+
+202
+00:13:48.400 --> 00:13:53.860
+<v Ajay Kulkarni>sailors. It's easy to be a sailor when seas are smooth, but when they're choppy, that's when you
+
+203
+00:13:53.860 --> 00:13:59.140
+<v Ajay Kulkarni>really become strong. And as a company, we've gone through ups and downs. The industry has gone
+
+204
+00:13:59.980 --> 00:14:04.120
+<v Ajay Kulkarni>We're in upswing right now, which is nice, but we've seen this before and we know that
+
+205
+00:14:04.120 --> 00:14:04.960
+<v Ajay Kulkarni>it doesn't always last.
+
+206
+00:14:05.140 --> 00:14:12.820
+<v Ajay Kulkarni>And I think I've been most proud by our resilience as a company and our ability to stay motivated,
+
+207
+00:14:14.040 --> 00:14:14.840
+<v Ajay Kulkarni>excited, optimistic.
+
+208
+00:14:15.820 --> 00:14:19.200
+<v Ajay Kulkarni>Of course, when times are good, but man, when times are not good.
+
+209
+00:14:19.440 --> 00:14:21.600
+<v Ajay Kulkarni>And I think that's the only way to build a company.
+
+210
+00:14:21.720 --> 00:14:23.980
+<v Ajay Kulkarni>You can't run at the first sight of trouble.
+
+211
+00:14:24.100 --> 00:14:26.700
+<v Ajay Kulkarni>You can't lay down at the first sign of trouble.
+
+212
+00:14:26.820 --> 00:14:27.800
+<v Ajay Kulkarni>You got to keep fighting.
+
+213
+00:14:27.800 --> 00:14:31.280
+<v Ajay Kulkarni>and I think we're a company built of fighters.
+
+214
+00:14:31.400 --> 00:14:32.660
+<v Ajay Kulkarni>I'm very proud of that.
+
+215
+00:14:35.920 --> 00:14:37.280
+<v Noah Labhart>Let's flip the script a little bit.
+
+216
+00:14:37.340 --> 00:14:39.020
+<v Noah Labhart>Tell me about a mistake you made
+
+217
+00:14:39.020 --> 00:14:41.040
+<v Noah Labhart>and how you and your team responded to it.
+
+218
+00:14:42.640 --> 00:14:44.920
+<v Ajay Kulkarni>First is, dude, when we started,
+
+219
+00:14:45.140 --> 00:14:46.720
+<v Ajay Kulkarni>yeah, we thought we knew what we were doing.
+
+220
+00:14:47.420 --> 00:14:48.300
+<v Ajay Kulkarni>Obviously we didn't.
+
+221
+00:14:48.680 --> 00:14:51.440
+<v Ajay Kulkarni>And this is my first time really building
+
+222
+00:14:51.440 --> 00:14:52.500
+<v Ajay Kulkarni>an open source database company
+
+223
+00:14:53.020 --> 00:14:55.380
+<v Ajay Kulkarni>and I had never done open source database sales.
+
+224
+00:14:55.540 --> 00:14:57.280
+<v Ajay Kulkarni>And so we brought in these advisors
+
+225
+00:14:57.800 --> 00:14:59.260
+<v Ajay Kulkarni>and had people help us.
+
+226
+00:14:59.440 --> 00:15:00.780
+<v Ajay Kulkarni>And oftentimes they'd be like,
+
+227
+00:15:00.880 --> 00:15:02.740
+<v Ajay Kulkarni>why that way?
+
+228
+00:15:02.860 --> 00:15:04.220
+<v Ajay Kulkarni>And they'd be like, no, that's the way it's done.
+
+229
+00:15:04.480 --> 00:15:04.980
+<v Ajay Kulkarni>Okay, cool.
+
+230
+00:15:05.000 --> 00:15:05.680
+<v Ajay Kulkarni>What do I know?
+
+231
+00:15:05.980 --> 00:15:09.060
+<v Ajay Kulkarni>And my mistake was not to trust my instinct
+
+232
+00:15:09.700 --> 00:15:13.300
+<v Ajay Kulkarni>because it turns out that in rapidly changing industries
+
+233
+00:15:13.300 --> 00:15:15.500
+<v Ajay Kulkarni>like database, like software, like AI,
+
+234
+00:15:16.100 --> 00:15:17.900
+<v Ajay Kulkarni>experience can become a liability.
+
+235
+00:15:18.960 --> 00:15:22.760
+<v Ajay Kulkarni>And my mistake was not early on trusting my instinct
+
+236
+00:15:23.420 --> 00:15:25.420
+<v Ajay Kulkarni>versus being like, oh, they're an expert
+
+237
+00:15:25.420 --> 00:15:26.860
+<v Ajay Kulkarni>and deferring to experts.
+
+238
+00:15:27.800 --> 00:15:35.220
+<v Ajay Kulkarni>Now, I think there is value in experience, but as long as you temper it with, hey, which of my priors, which of my assumptions might be different now?
+
+239
+00:15:35.420 --> 00:15:36.520
+<v Ajay Kulkarni>I'd say that's number one.
+
+240
+00:15:36.600 --> 00:15:40.360
+<v Ajay Kulkarni>And I've gone through a lot of bad hires on my part for that reason.
+
+241
+00:15:40.880 --> 00:15:45.500
+<v Ajay Kulkarni>I think a second mistake, and we've gotten better at this, but of course, we get better.
+
+242
+00:15:45.900 --> 00:15:52.020
+<v Ajay Kulkarni>Any company, any founder, it's always tempting to go after the next shiny thing.
+
+243
+00:15:52.200 --> 00:15:53.580
+<v Ajay Kulkarni>Oh, it's crypto.
+
+244
+00:15:53.780 --> 00:15:56.160
+<v Ajay Kulkarni>Oh, it's vector databases.
+
+245
+00:15:56.360 --> 00:15:57.100
+<v Ajay Kulkarni>Oh, it's AI.
+
+246
+00:15:57.800 --> 00:16:02.840
+<v Ajay Kulkarni>it's this, oh, it's that. And the reality and the thing, what we've learned is that
+
+247
+00:16:03.360 --> 00:16:08.900
+<v Ajay Kulkarni>you don't get successful by chasing the next shiny thing. You're successful by believing in
+
+248
+00:16:08.900 --> 00:16:13.240
+<v Ajay Kulkarni>something, having conviction when it's not shiny and then being right. So that when it becomes
+
+249
+00:16:13.240 --> 00:16:18.760
+<v Ajay Kulkarni>shiny, you're already there and you're already growing. So I think, I think those are the two
+
+250
+00:16:18.760 --> 00:16:23.040
+<v Ajay Kulkarni>lessons is that, Hey, experience isn't always a good thing. And oftentimes in fast moving
+
+251
+00:16:23.040 --> 00:16:28.660
+<v Ajay Kulkarni>industry is it going to be a liability? And the second is, yeah, like it's not about chasing the
+
+252
+00:16:28.660 --> 00:16:33.780
+<v Ajay Kulkarni>shiny thing. It's about having conviction. And it's even better if your conviction is in something
+
+253
+00:16:33.780 --> 00:16:38.940
+<v Ajay Kulkarni>that is not shiny today, because that means that when it does become shiny, you'll be in the
+
+254
+00:16:38.940 --> 00:16:44.100
+<v Ajay Kulkarni>forefront. The way you sold databases back then was like, you sold on-prem software, you sold top
+
+255
+00:16:44.100 --> 00:16:49.940
+<v Ajay Kulkarni>down. It was all about a real enterprise sales led motion with nine to 18 month sales cycles.
+
+256
+00:16:51.560 --> 00:16:55.680
+<v Ajay Kulkarni>And we had a kind of a nascent cloud business at that time.
+
+257
+00:16:55.760 --> 00:17:00.940
+<v Ajay Kulkarni>And I remember I had a sales leader, great individual, great human being, but came from the old world.
+
+258
+00:17:01.900 --> 00:17:06.180
+<v Ajay Kulkarni>Every weekly update, he would ignore the cloud business and just focus on his legacy.
+
+259
+00:17:06.360 --> 00:17:09.040
+<v Ajay Kulkarni>And I remember thinking, I think the cloud business is going to be bigger.
+
+260
+00:17:09.440 --> 00:17:10.560
+<v Ajay Kulkarni>That's where the future is.
+
+261
+00:17:10.600 --> 00:17:12.220
+<v Ajay Kulkarni>It might sound crazy.
+
+262
+00:17:12.400 --> 00:17:15.340
+<v Ajay Kulkarni>Yeah, man, like a year later, we went all in on cloud.
+
+263
+00:17:15.460 --> 00:17:17.840
+<v Ajay Kulkarni>And that was the vast majority of our revenue.
+
+264
+00:17:18.140 --> 00:17:19.580
+<v Ajay Kulkarni>And so, dude, it's real, man.
+
+265
+00:17:19.940 --> 00:17:22.040
+<v Ajay Kulkarni>real and as a founder, you're going to make mistakes.
+
+266
+00:17:22.620 --> 00:17:25.260
+<v Ajay Kulkarni>But if you have a voice in your head, that's telling you something, I think
+
+267
+00:17:25.260 --> 00:17:26.940
+<v Ajay Kulkarni>it behooves you to listen to that voice.
+
+268
+00:17:33.240 --> 00:17:33.740
+<v Noah Labhart>Okay.
+
+269
+00:17:34.000 --> 00:17:35.140
+<v Noah Labhart>Let's move forward then.
+
+270
+00:17:35.360 --> 00:17:37.820
+<v Noah Labhart>Tell me what the future looks like for Tiger Data.
+
+271
+00:17:37.960 --> 00:17:41.680
+<v Noah Labhart>So now you've come to this point, the industry is, is moving and shaking.
+
+272
+00:17:41.800 --> 00:17:44.140
+<v Noah Labhart>Tell me about what the future looks like when, where you're taking
+
+273
+00:17:44.140 --> 00:17:45.140
+<v Noah Labhart>the company and the product.
+
+274
+00:17:46.120 --> 00:17:47.520
+<v Ajay Kulkarni>Obviously being a database company.
+
+275
+00:17:47.520 --> 00:17:51.060
+<v Ajay Kulkarni>We feel very good about that where we are in the market.
+
+276
+00:17:51.180 --> 00:17:52.020
+<v Ajay Kulkarni>Data is everywhere.
+
+277
+00:17:52.160 --> 00:17:52.660
+<v Ajay Kulkarni>It's only compounding.
+
+278
+00:17:53.740 --> 00:18:00.260
+<v Ajay Kulkarni>And even if the SaaSpocalypse happens or agents take over, data is still going to be underlying all that.
+
+279
+00:18:00.520 --> 00:18:01.720
+<v Ajay Kulkarni>So I feel good about that.
+
+280
+00:18:01.900 --> 00:18:04.780
+<v Ajay Kulkarni>Our bet on Postgres has been totally right.
+
+281
+00:18:04.940 --> 00:18:06.720
+<v Ajay Kulkarni>It's become the leading database.
+
+282
+00:18:07.160 --> 00:18:08.920
+<v Ajay Kulkarni>And so continue to embrace that.
+
+283
+00:18:09.100 --> 00:18:16.540
+<v Ajay Kulkarni>I think in terms of a business, I think the two areas where we're finding the most opportunity to really help customers, help companies out there.
+
+284
+00:18:17.520 --> 00:18:18.740
+<v Ajay Kulkarni>One is in the physical world.
+
+285
+00:18:18.820 --> 00:18:20.320
+<v Ajay Kulkarni>So again, getting back to our IoT roots,
+
+286
+00:18:21.080 --> 00:18:23.440
+<v Ajay Kulkarni>helping companies who make hardware
+
+287
+00:18:23.440 --> 00:18:25.480
+<v Ajay Kulkarni>or make software for the hardware.
+
+288
+00:18:25.700 --> 00:18:26.880
+<v Ajay Kulkarni>That might be manufacturing,
+
+289
+00:18:27.320 --> 00:18:30.880
+<v Ajay Kulkarni>that might be in the electrical vehicle ecosystem.
+
+290
+00:18:31.160 --> 00:18:32.440
+<v Ajay Kulkarni>They might be in oil and gas.
+
+291
+00:18:32.700 --> 00:18:33.740
+<v Ajay Kulkarni>They might be in other energies.
+
+292
+00:18:33.760 --> 00:18:34.760
+<v Ajay Kulkarni>They might be battery companies,
+
+293
+00:18:34.920 --> 00:18:36.220
+<v Ajay Kulkarni>might be nuclear fusion companies.
+
+294
+00:18:36.300 --> 00:18:37.260
+<v Ajay Kulkarni>These are all customers that we have.
+
+295
+00:18:37.440 --> 00:18:39.180
+<v Ajay Kulkarni>They might be customers like Cerebras
+
+296
+00:18:39.180 --> 00:18:41.020
+<v Ajay Kulkarni>who are making next generation chips, right?
+
+297
+00:18:41.420 --> 00:18:43.240
+<v Ajay Kulkarni>And one thing we really found is that,
+
+298
+00:18:44.000 --> 00:18:46.780
+<v Ajay Kulkarni>that that world, the physical world has a ton of data
+
+299
+00:18:47.520 --> 00:18:49.180
+<v Ajay Kulkarni>We are uniquely suited to serve them.
+
+300
+00:18:49.220 --> 00:18:50.780
+<v Ajay Kulkarni>So I think you'll see more from us there
+
+301
+00:18:50.780 --> 00:18:52.720
+<v Ajay Kulkarni>in terms of serving the physical world
+
+302
+00:18:52.720 --> 00:18:53.520
+<v Ajay Kulkarni>and challenges they have.
+
+303
+00:18:54.000 --> 00:18:56.240
+<v Ajay Kulkarni>And then the second trend is this agents, man.
+
+304
+00:18:56.320 --> 00:18:58.120
+<v Ajay Kulkarni>I totally believe agents are the new developer.
+
+305
+00:18:58.480 --> 00:18:59.400
+<v Ajay Kulkarni>They're the new thing.
+
+306
+00:18:59.480 --> 00:19:01.080
+<v Ajay Kulkarni>It's the next patch packaging of software.
+
+307
+00:19:01.420 --> 00:19:03.720
+<v Ajay Kulkarni>And again, our philosophy isn't you,
+
+308
+00:19:04.180 --> 00:19:05.360
+<v Ajay Kulkarni>anytime a new trend comes
+
+309
+00:19:05.360 --> 00:19:06.680
+<v Ajay Kulkarni>and you rebuild everything from scratch,
+
+310
+00:19:06.780 --> 00:19:09.040
+<v Ajay Kulkarni>our philosophy is when a new trend comes,
+
+311
+00:19:09.140 --> 00:19:10.720
+<v Ajay Kulkarni>you take what's working and you make it better.
+
+312
+00:19:11.100 --> 00:19:13.780
+<v Ajay Kulkarni>And so you'll see us continue to make Postgres better
+
+313
+00:19:13.780 --> 00:19:15.840
+<v Ajay Kulkarni>for agents in line with that philosophy.
+
+314
+00:19:18.400 --> 00:19:23.520
+<v Noah Labhart>Okay, Ajay, let's switch to you. Who influences the way that you work? Name a person or many
+
+315
+00:19:23.520 --> 00:19:25.500
+<v Noah Labhart>persons or something you look up to and why.
+
+316
+00:19:26.700 --> 00:19:28.680
+<v Ajay Kulkarni>In the past few years, I think I'm a huge
+
+317
+00:19:28.680 --> 00:19:34.620
+<v Ajay Kulkarni>fan of stoicism. I love the philosophy of stoicism. Number one, it's like focus on what
+
+318
+00:19:34.620 --> 00:19:39.880
+<v Ajay Kulkarni>you can control. And as a founder, wow, man, yeah, that's very valuable. Another one is,
+
+319
+00:19:39.900 --> 00:19:44.000
+<v Ajay Kulkarni>and I think this is Marcus Aurelius who said this, is that if you're not happy with what
+
+320
+00:19:44.000 --> 00:19:48.340
+<v Ajay Kulkarni>you currently have, then you could rule the world and you would still be unhappy.
+
+321
+00:19:49.120 --> 00:19:53.400
+<v Ajay Kulkarni>So there's an interesting balance as an entrepreneur, you need to be hungry and keep
+
+322
+00:19:53.400 --> 00:19:58.360
+<v Ajay Kulkarni>striving for the next thing. But as a person, you also have to be grateful for what you currently
+
+323
+00:19:58.360 --> 00:20:02.460
+<v Ajay Kulkarni>have. Everything is a gift. I think that's another philosophy, right? Everything is a gift.
+
+324
+00:20:02.660 --> 00:20:07.680
+<v Ajay Kulkarni>Whatever things you have in your life, come and go and just be grateful to the time you had with
+
+325
+00:20:07.680 --> 00:20:12.980
+<v Ajay Kulkarni>them, whether they're people or objects or whatever. So I do, man, I love stoicism. I'm
+
+326
+00:20:14.000 --> 00:20:18.540
+<v Ajay Kulkarni>trying to, striving to think clearly and being like, dude, at the end of the day,
+
+327
+00:20:18.700 --> 00:20:22.540
+<v Ajay Kulkarni>we're all going to die. We're all going to die. You can't take any of this with you,
+
+328
+00:20:22.600 --> 00:20:27.740
+<v Ajay Kulkarni>no matter what your religious beliefs are. Live your life with that kind of purpose and meaning.
+
+329
+00:20:28.300 --> 00:20:32.620
+<v Ajay Kulkarni>That's what I strive for. I'm not a hardcore as some people, but I'm a Tony Robbins fan.
+
+330
+00:20:33.040 --> 00:20:39.600
+<v Ajay Kulkarni>And one thing he talks about is problems don't happen to you. They happen for you and problems
+
+331
+00:20:39.600 --> 00:20:45.760
+<v Ajay Kulkarni>happen for you. And I find that so powerful. And the idea isn't that this literally happened for
+
+332
+00:20:45.760 --> 00:20:49.840
+<v Ajay Kulkarni>you, but the idea is that when something happens, you just think about what good comes out of it.
+
+333
+00:20:49.920 --> 00:20:55.140
+<v Ajay Kulkarni>How do you find the gratitude in it? And I find that so powerful that instead of beating yourself
+
+334
+00:20:55.140 --> 00:20:59.680
+<v Ajay Kulkarni>up, you can embrace it. You embrace the struggle. You embrace it as a gift because it's happening
+
+335
+00:20:59.680 --> 00:21:00.180
+<v Ajay Kulkarni>for you.
+
+336
+00:21:01.480 --> 00:21:06.380
+<v Noah Labhart>Okay. Last question. So you're getting on a plane and you're sitting next to a young
+
+337
+00:21:06.380 --> 00:21:10.080
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show
+
+338
+00:21:10.080 --> 00:21:14.260
+<v Noah Labhart>it off to the world. And can we show it off to you right there on the plane? What advice do you
+
+339
+00:21:14.260 --> 00:21:16.760
+<v Noah Labhart>give that person having gone down this road a bit, several times?
+
+340
+00:21:19.620 --> 00:21:21.700
+<v Ajay Kulkarni>Three words that I repeat to myself
+
+341
+00:21:21.700 --> 00:21:29.200
+<v Ajay Kulkarni>in this journey. The first is play. That if you approach your, this journey, if you approach it as,
+
+342
+00:21:29.300 --> 00:21:33.420
+<v Ajay Kulkarni>if you look at it like, oh, this is going to be a struggle. This is going to be a lot of work.
+
+343
+00:21:33.420 --> 00:21:35.060
+<v Ajay Kulkarni>then it's gonna suck.
+
+344
+00:21:35.280 --> 00:21:36.980
+<v Ajay Kulkarni>Like you have an awful time, right?
+
+345
+00:21:37.720 --> 00:21:38.940
+<v Ajay Kulkarni>You have to approach it like play.
+
+346
+00:21:39.040 --> 00:21:40.220
+<v Ajay Kulkarni>You're just a kid playing.
+
+347
+00:21:40.420 --> 00:21:42.840
+<v Ajay Kulkarni>You're a kid playing and you're building this company.
+
+348
+00:21:42.940 --> 00:21:45.540
+<v Ajay Kulkarni>You're solving this problem because you enjoy it.
+
+349
+00:21:45.600 --> 00:21:46.160
+<v Ajay Kulkarni>You love it.
+
+350
+00:21:46.220 --> 00:21:48.180
+<v Ajay Kulkarni>And which also means that, hey, do something you love, right?
+
+351
+00:21:48.680 --> 00:21:50.360
+<v Ajay Kulkarni>Because the money will come and go.
+
+352
+00:21:50.540 --> 00:21:53.060
+<v Ajay Kulkarni>And yeah, again, when things are good,
+
+353
+00:21:53.080 --> 00:21:54.640
+<v Ajay Kulkarni>when the seas are smooth, it's easy,
+
+354
+00:21:54.780 --> 00:21:57.160
+<v Ajay Kulkarni>but the key is sticking through
+
+355
+00:21:57.720 --> 00:21:59.700
+<v Ajay Kulkarni>and building a team that sticks through
+
+356
+00:21:59.700 --> 00:22:01.180
+<v Ajay Kulkarni>when the seas get choppy.
+
+357
+00:22:01.180 --> 00:22:06.540
+<v Ajay Kulkarni>and I think that comes from a sense of play. My second tenet is love. I'm also a big Star Wars
+
+358
+00:22:06.540 --> 00:22:11.820
+<v Ajay Kulkarni>fan. I'm not sure if you are, but I believe with anything, there's a light side and a dark side
+
+359
+00:22:11.820 --> 00:22:17.060
+<v Ajay Kulkarni>approach to things. I know some people who have a chip on their shoulder and are motivated because
+
+360
+00:22:17.060 --> 00:22:23.240
+<v Ajay Kulkarni>they want to prove someone wrong. I'm not saying that's bad or the wrong thing to do. I'm saying
+
+361
+00:22:23.240 --> 00:22:28.100
+<v Ajay Kulkarni>that it can get unhealthy because you end up eating yourself alive. I approach things from
+
+362
+00:22:28.100 --> 00:22:33.320
+<v Ajay Kulkarni>a position of love just man yeah i love that i get to do this i love i get to prove myself let's go
+
+363
+00:22:33.320 --> 00:22:38.860
+<v Ajay Kulkarni>and i equate that to the jedi or the light side of the force and the third word is triumph man
+
+364
+00:22:39.240 --> 00:22:45.360
+<v Ajay Kulkarni>there's so many people especially entrepreneurs who are like they accomplish something and but
+
+365
+00:22:45.360 --> 00:22:49.900
+<v Ajay Kulkarni>it's the next thing and they're like oh man i'm a 50 million dollar business but when i get to 100
+
+366
+00:22:49.900 --> 00:22:53.920
+<v Ajay Kulkarni>i'll be happy okay now you get to 100 you're like i want to get the 200 i'll be happy get the 200
+
+367
+00:22:53.920 --> 00:22:58.080
+<v Ajay Kulkarni>like i want to get to a billion there's no finish line right like simon sinek talks about the
+
+368
+00:22:58.080 --> 00:23:02.740
+<v Ajay Kulkarni>infinite game the big book called the infinite game there's no finish line the game never ends
+
+369
+00:23:02.740 --> 00:23:09.260
+<v Ajay Kulkarni>slack was acquired for 28 billion by salesforce and people were like oh man slack really totally
+
+370
+00:23:09.260 --> 00:23:11.500
+<v Ajay Kulkarni>lost to microsoft teams they're like
+
+371
+00:23:11.500 --> 00:23:12.820
+<v Noah Labhart>28 billion dollars
+
+372
+00:23:12.820 --> 00:23:16.200
+<v Ajay Kulkarni>come on and so in my mind it's triumph
+
+373
+00:23:16.200 --> 00:23:21.280
+<v Ajay Kulkarni>like you you've already won be proud of what you've already built because it's been fucking
+
+374
+00:23:21.280 --> 00:23:25.780
+<v Ajay Kulkarni>hard. And then you might ask then what motivates you, it's the first two, it's
+
+375
+00:23:25.780 --> 00:23:29.740
+<v Ajay Kulkarni>play and love you've already run but I'm still doing this because because I
+
+376
+00:23:29.740 --> 00:23:33.920
+<v Ajay Kulkarni>enjoy it I feel like I'm a kid playing in like a sandbox and I do it out of
+
+377
+00:23:33.920 --> 00:23:37.420
+<v Ajay Kulkarni>love because I just I love working with people I get to work with the
+
+378
+00:23:37.420 --> 00:23:43.580
+<v Ajay Kulkarni>challenges we get to take on and every day isn't easy but if you approach it I
+
+379
+00:23:43.580 --> 00:23:47.320
+<v Ajay Kulkarni>think with that perspective this is what I tell the young entrepreneur yeah be
+
+380
+00:23:47.320 --> 00:23:52.120
+<v Ajay Kulkarni>be able to just, and you will thrive, you will succeed. You will be able to ride out any storm
+
+381
+00:23:52.120 --> 00:23:54.140
+<v Ajay Kulkarni>and make it out on the other side. I
+
+382
+00:23:54.140 --> 00:23:57.000
+<v Noah Labhart>certainly appreciate that, that advice and those three
+
+383
+00:23:57.000 --> 00:24:00.520
+<v Noah Labhart>words. I appreciate you sharing those. Well, Ajay, thank you for being on the show today.
+
+384
+00:24:00.720 --> 00:24:03.300
+<v Noah Labhart>Thank you for telling the creation story of Tiger Data.
+
+385
+00:24:03.880 --> 00:24:05.020
+<v Ajay Kulkarni>Thank you. Thanks for having me.
+
+386
+00:24:06.780 --> 00:24:07.280
+<v Ajay Kulkarni>And
+
+387
+00:24:07.180 --> 00:24:09.620
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+388
+00:24:16.080 --> 00:24:19.220
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+389
+00:24:19.340 --> 00:24:24.140
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+390
+00:24:24.720 --> 00:24:26.960
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+391
+00:24:27.220 --> 00:24:29.280
+<v Noah Labhart>Both things help us out tremendously.
+
+392
+00:24:32.060 --> 00:24:33.560
+<v Noah Labhart>And thanks again for listening.

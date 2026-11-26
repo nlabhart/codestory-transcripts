@@ -1,0 +1,1627 @@
+WEBVTT
+
+NOTE S4 Bonus: Engineering Collective Intelligence: How ThoughtExchange Scaled Large-Scale Discussion Engines with Dave MacLeod
+
+1
+00:00:00.660 --> 00:00:04.920
+<v Dave MacLeod>So a story we talk about a lot in ThoughtExchange is that a waiter comes up and says,
+
+2
+00:00:04.980 --> 00:00:08.240
+<v Dave MacLeod>what would you like to drink? And people say, I don't know, I'd like a beer. Sure, give me a beer.
+
+3
+00:00:08.340 --> 00:00:12.440
+<v Dave MacLeod>Yeah, I don't know, beer. And then someone says, well, it's the first sunny day of spring,
+
+4
+00:00:12.580 --> 00:00:15.780
+<v Dave MacLeod>it's really beautiful. Don't you make great margaritas here? I'd really like a margarita.
+
+5
+00:00:16.000 --> 00:00:19.760
+<v Dave MacLeod>Someone else in the group says, ooh, I'd also like a margarita. Yeah, you know what,
+
+6
+00:00:19.780 --> 00:00:23.200
+<v Dave MacLeod>me too. You know what a round of margaritas is? Except for one person sticks to their beer, maybe.
+
+7
+00:00:23.380 --> 00:00:28.100
+<v Dave MacLeod>The point of that story is that the thing that didn't happen is that people don't then stop
+
+8
+00:00:30.000 --> 00:00:35.240
+<v Dave MacLeod>get a margarita, you said beer six or seven times. That's the most frequent thing that got said,
+
+9
+00:00:35.380 --> 00:00:42.060
+<v Dave MacLeod>and therefore you have to stick with it. I'm Dave MacLeod. I'm the CEO and a co-founder of Thought
+
+10
+00:00:42.060 --> 00:00:42.560
+<v Dave MacLeod>Exchange.
+
+11
+00:00:47.900 --> 00:00:54.560
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share
+
+12
+00:00:54.560 --> 00:01:01.060
+<v Noah Labhart>Share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+13
+00:01:02.260 --> 00:01:11.480
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Dave MacLeod took a face-to-face concept and digitized learning from mass amounts of people.
+
+14
+00:01:13.540 --> 00:01:15.960
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:21.760 --> 00:01:28.160
+<v Noah Labhart>As an interesting turn to the guest I have on the podcast, Dave MacLeod is not a technologist by
+
+16
+00:01:28.160 --> 00:01:34.060
+<v Noah Labhart>trade. He is a serial entrepreneur and an old school face-to-face facilitator who cares a lot
+
+17
+00:01:34.060 --> 00:01:39.940
+<v Noah Labhart>about what people have to say and feel. He came out of college having taken every course under
+
+18
+00:01:39.940 --> 00:01:44.280
+<v Noah Labhart>the sun and getting zero degrees, which prepared him perfectly to be a consultant.
+
+19
+00:01:45.960 --> 00:01:49.180
+<v Noah Labhart>He lives in a small ski town called Rossland in British Columbia,
+
+20
+00:01:49.380 --> 00:01:54.160
+<v Noah Labhart>and it's important to him to be a good dad, a good son, and a good member of his community.
+
+21
+00:01:55.540 --> 00:01:58.860
+<v Noah Labhart>Along the way, he got to do some interesting and complex work
+
+22
+00:01:58.860 --> 00:02:02.420
+<v Noah Labhart>where he heard voices representing many different viewpoints.
+
+23
+00:02:03.340 --> 00:02:06.340
+<v Noah Labhart>In doing this, he picked up some facilitation techniques
+
+24
+00:02:06.340 --> 00:02:10.440
+<v Noah Labhart>to figure out what was important within the diverse groups of people he was working with.
+
+25
+00:02:11.460 --> 00:02:15.840
+<v Noah Labhart>And then he got hooked up with some people building software to solve a similar problem.
+
+26
+00:02:18.960 --> 00:02:21.840
+<v Noah Labhart>This is the creation story of ThoughtExchange.
+
+27
+00:02:26.260 --> 00:02:30.980
+<v Dave MacLeod>I wasn't a technologist. I wasn't into software at all, actually. I had a consulting company
+
+28
+00:02:30.980 --> 00:02:37.120
+<v Dave MacLeod>where I did a lot of face-to-face facilitation as the person that people would hire to have
+
+29
+00:02:37.120 --> 00:02:41.100
+<v Dave MacLeod>a large conversation with a hundred people or any sort of large group
+
+30
+00:02:41.100 --> 00:02:46.020
+<v Dave MacLeod>collaboration event I did a lot of those things. Along the way of doing that sort
+
+31
+00:02:46.020 --> 00:02:49.580
+<v Dave MacLeod>of work I got to do some really interesting and really complex kind of
+
+32
+00:02:49.580 --> 00:02:55.200
+<v Dave MacLeod>work where we'd have to hear voices that represented a lot of different interests.
+
+33
+00:02:55.640 --> 00:03:00.780
+<v Dave MacLeod>One of the most compelling ones was in how a province has to spend money.
+
+34
+00:03:00.880 --> 00:03:04.200
+<v Dave MacLeod>Province that's Canada for all of you listening from the States just a you
+
+35
+00:03:04.200 --> 00:03:07.040
+<v Dave MacLeod>you know, Canadian province. It's like a state, only Canadian.
+
+36
+00:03:07.520 --> 00:03:08.360
+<v Noah Labhart>Good clarification.
+
+37
+00:03:08.900 --> 00:03:10.100
+<v Dave MacLeod>So yeah, I was
+
+38
+00:03:10.100 --> 00:03:15.920
+<v Dave MacLeod>facilitating these large group meetings. I was trying to innovate and trying to hear back from
+
+39
+00:03:15.920 --> 00:03:21.480
+<v Dave MacLeod>people. Imagine a couple hundred people in a room, and you had to figure out what matters to that
+
+40
+00:03:21.480 --> 00:03:27.060
+<v Dave MacLeod>group of people. And along the way, I picked up a facilitation technique called 35, and it's
+
+41
+00:03:27.060 --> 00:03:31.640
+<v Dave MacLeod>basically recipe cards. How it works is that it doesn't matter the size of the group that can fit
+
+42
+00:03:31.640 --> 00:03:35.360
+<v Dave MacLeod>in a room. You ask everyone to say, what's something really important that we talk about
+
+43
+00:03:35.360 --> 00:03:40.520
+<v Dave MacLeod>today? Everyone writes it down on their own recipe card, and then they shuffle them around the room.
+
+44
+00:03:40.620 --> 00:03:44.500
+<v Dave MacLeod>You don't have your name on them. You shuffle those cards around the room, and then you stop,
+
+45
+00:03:44.520 --> 00:03:48.380
+<v Dave MacLeod>and everyone rates them. You shuffle and rate and shuffle and rate and shuffle and rate.
+
+46
+00:03:48.540 --> 00:03:53.380
+<v Dave MacLeod>By the time you've done that, you have the highest rated ideas rated by the whole group,
+
+47
+00:03:53.420 --> 00:03:57.720
+<v Dave MacLeod>and you start counting backwards. And the ones that got the highest rating were the ones that
+
+48
+00:03:57.720 --> 00:03:59.640
+<v Dave MacLeod>that we ended up focusing the conversation around.
+
+49
+00:04:00.280 --> 00:04:02.700
+<v Dave MacLeod>The thing that was really common is that people felt
+
+50
+00:04:02.700 --> 00:04:03.820
+<v Dave MacLeod>like it was a fair process.
+
+51
+00:04:04.160 --> 00:04:06.380
+<v Dave MacLeod>It didn't matter how many times an idea got shared.
+
+52
+00:04:06.500 --> 00:04:08.380
+<v Dave MacLeod>If it was a really great idea that got shared once,
+
+53
+00:04:08.500 --> 00:04:09.580
+<v Dave MacLeod>it might come to the very top.
+
+54
+00:04:10.120 --> 00:04:13.260
+<v Dave MacLeod>And doing that, it actually helped create lots of buy-in
+
+55
+00:04:13.260 --> 00:04:15.860
+<v Dave MacLeod>and great insights for a group in a room using recipe cards.
+
+56
+00:04:17.440 --> 00:04:19.580
+<v Dave MacLeod>Then a friend of mine, Lee White,
+
+57
+00:04:19.700 --> 00:04:22.700
+<v Dave MacLeod>who was one of the executive directors of Outward Bound,
+
+58
+00:04:23.220 --> 00:04:25.640
+<v Dave MacLeod>said, you know, this technique that you're using
+
+59
+00:04:25.640 --> 00:04:31.240
+<v Dave MacLeod>is really similar to something that a friend of mine is building in software to find a way to
+
+60
+00:04:31.240 --> 00:04:37.500
+<v Dave MacLeod>harness collective intelligence, building wisdom of crowd software to help do digital recipe cards
+
+61
+00:04:37.500 --> 00:04:42.420
+<v Dave MacLeod>to figure out en masse how you can learn from a thousand people or 10,000 people what's important.
+
+62
+00:04:43.900 --> 00:04:50.160
+<v Dave MacLeod>And famously, I thought to myself, nah, I'm not really a software guy, not that interested.
+
+63
+00:04:50.820 --> 00:04:55.440
+<v Dave MacLeod>Also famously, Lee went to Jim and said, hey, here's this guy, he's running around in his car
+
+64
+00:04:55.640 --> 00:04:57.080
+<v Dave MacLeod>with recipe cards in his trunk.
+
+65
+00:04:57.220 --> 00:04:58.420
+<v Dave MacLeod>I think you guys should meet
+
+66
+00:04:58.420 --> 00:05:00.640
+<v Dave MacLeod>because you're onto a similar thing,
+
+67
+00:05:00.780 --> 00:05:01.940
+<v Dave MacLeod>but he's doing it face-to-face
+
+68
+00:05:01.940 --> 00:05:02.860
+<v Dave MacLeod>and you're building in software.
+
+69
+00:05:03.060 --> 00:05:03.920
+<v Dave MacLeod>And Jim famously thought,
+
+70
+00:05:05.860 --> 00:05:07.380
+<v Dave MacLeod>nah, I don't see the connection.
+
+71
+00:05:07.580 --> 00:05:08.400
+<v Dave MacLeod>Not interested.
+
+72
+00:05:11.120 --> 00:05:13.360
+<v Dave MacLeod>Luckily for the perseverance of Lee,
+
+73
+00:05:13.540 --> 00:05:14.280
+<v Dave MacLeod>he's like, well, you know what?
+
+74
+00:05:14.280 --> 00:05:14.880
+<v Dave MacLeod>You probably should.
+
+75
+00:05:15.060 --> 00:05:16.860
+<v Dave MacLeod>And eventually both sides agreed.
+
+76
+00:05:17.100 --> 00:05:19.620
+<v Dave MacLeod>And I went to the first beta release
+
+77
+00:05:19.620 --> 00:05:21.900
+<v Dave MacLeod>of the dev team showing their first iteration
+
+78
+00:05:21.900 --> 00:05:24.100
+<v Dave MacLeod>at the time it was called ThoughtStream
+
+79
+00:05:25.640 --> 00:05:32.520
+<v Dave MacLeod>the wisdom of crowds. I both loved it and hated it instantly. I got instantly the power of having
+
+80
+00:05:32.520 --> 00:05:37.840
+<v Dave MacLeod>an infinite supply of recipe cards translated to every language around the world. I also thought
+
+81
+00:05:37.840 --> 00:05:41.640
+<v Dave MacLeod>there's a lot of problems to here to fix to actually make a product that's going to
+
+82
+00:05:41.640 --> 00:05:47.400
+<v Dave MacLeod>solve problems like an actual recipe card does. That's when I started working for the company for
+
+83
+00:05:47.400 --> 00:05:51.980
+<v Dave MacLeod>no shares, no cash. I just agreed to do some business development and we'd figure it out
+
+84
+00:05:51.980 --> 00:05:52.820
+<v Dave MacLeod>out later down the road.
+
+85
+00:05:55.260 --> 00:05:59.120
+<v Noah Labhart>Well, tell me about the MVP, so to speak, right? Tell me about that first
+
+86
+00:05:59.120 --> 00:06:03.780
+<v Noah Labhart>product or maybe even the product after you jumped in, you decided or you saw that, hey,
+
+87
+00:06:03.820 --> 00:06:08.040
+<v Noah Labhart>there's a lot of problems to fix. Tell me about that product, how long it took to build
+
+88
+00:06:08.040 --> 00:06:10.520
+<v Noah Labhart>and what sort of tools was used to bring it to life.
+
+89
+00:06:12.220 --> 00:06:14.800
+<v Dave MacLeod>So Jim and the team that came out of a
+
+90
+00:06:14.800 --> 00:06:22.640
+<v Dave MacLeod>company in BC called Creo had built a Flash version as rapidly as possible of a way to
+
+91
+00:06:22.640 --> 00:06:29.260
+<v Dave MacLeod>gather thoughts. And that first MVP was both exciting and very wrong. It was really built for
+
+92
+00:06:29.260 --> 00:06:34.700
+<v Dave MacLeod>people in the room to facilitate and it was really built really quickly. And we subscribed very
+
+93
+00:06:34.700 --> 00:06:39.120
+<v Dave MacLeod>strongly to the lean startup and the idea that we're going to fail fast and learn as much as
+
+94
+00:06:39.120 --> 00:06:46.300
+<v Dave MacLeod>possible. And so, yeah, it was built originally to talk to 15, 20 people in a room. That, within a
+
+95
+00:06:46.300 --> 00:06:51.580
+<v Dave MacLeod>month or two, got changed into something we called Express, so we could send it out via email and
+
+96
+00:06:51.580 --> 00:06:58.520
+<v Dave MacLeod>invite hundreds in. And we just found every way to fail as fast as we possibly could out there with
+
+97
+00:06:58.520 --> 00:07:04.060
+<v Dave MacLeod>as many customers that would be willing to try out this way of having a conversation with a group of
+
+98
+00:07:04.060 --> 00:07:04.560
+<v Dave MacLeod>people.
+
+99
+00:07:05.200 --> 00:07:09.720
+<v Noah Labhart>As you're going through that process, you're making certain decisions and trade-offs,
+
+100
+00:07:09.760 --> 00:07:15.360
+<v Noah Labhart>right? About, okay, we're going to start this small or we're going to try this next, or we're
+
+101
+00:07:15.360 --> 00:07:19.700
+<v Noah Labhart>going to take on this sort of technical depth product or trade-off. So tell me about some of
+
+102
+00:07:19.700 --> 00:07:24.360
+<v Noah Labhart>those that you had to make in the short term at that time and how you coped with those decisions.
+
+103
+00:07:25.500 --> 00:07:29.840
+<v Dave MacLeod>So some of those trade-offs where we built this Flash version of the product that was highly
+
+104
+00:07:29.840 --> 00:07:32.740
+<v Dave MacLeod>in need of humans to do all sorts of things.
+
+105
+00:07:32.860 --> 00:07:35.660
+<v Dave MacLeod>We were grouping and theming thoughts with real people.
+
+106
+00:07:35.740 --> 00:07:37.580
+<v Dave MacLeod>We were setting things up with real people.
+
+107
+00:07:38.120 --> 00:07:41.920
+<v Dave MacLeod>And the trade-offs were always sort of how much technology
+
+108
+00:07:41.920 --> 00:07:44.080
+<v Dave MacLeod>we were gonna wrap into a solution
+
+109
+00:07:44.080 --> 00:07:46.100
+<v Dave MacLeod>when we weren't sure the product market fit
+
+110
+00:07:46.100 --> 00:07:49.580
+<v Dave MacLeod>and how much people power should we put in
+
+111
+00:07:49.580 --> 00:07:52.940
+<v Dave MacLeod>knowing that at some point we need to actually build
+
+112
+00:07:52.940 --> 00:07:53.640
+<v Dave MacLeod>a SaaS solution.
+
+113
+00:07:53.960 --> 00:07:56.120
+<v Dave MacLeod>So all the way through the first year of the company,
+
+114
+00:07:56.280 --> 00:07:58.660
+<v Dave MacLeod>we really focused on working with customers,
+
+115
+00:07:59.840 --> 00:08:09.420
+<v Dave MacLeod>Whatever people were, we had nights where we were all as a company grouping and theming thoughts together so that the software wouldn't break when we were doing a large public consultation.
+
+116
+00:08:10.420 --> 00:08:14.180
+<v Dave MacLeod>And it was very non-scalable and very crazy, actually, the way we were doing it.
+
+117
+00:08:14.220 --> 00:08:20.600
+<v Dave MacLeod>But we just knew we had to put people in before we actually really understood deeply what people needed the product to do.
+
+118
+00:08:21.840 --> 00:08:24.560
+<v Dave MacLeod>So we were constantly, how much software do you build?
+
+119
+00:08:24.620 --> 00:08:25.800
+<v Dave MacLeod>How many people do you put in?
+
+120
+00:08:25.840 --> 00:08:28.620
+<v Dave MacLeod>How much investment money do you put into R&amp;D?
+
+121
+00:08:29.840 --> 00:08:35.340
+<v Dave MacLeod>focused on customer feedback, I think was the consistent conversation from everybody on the team.
+
+122
+00:08:36.760 --> 00:08:41.960
+<v Dave MacLeod>So a few years in, we actually rebuilt the entire platform, of course, threw everything away in
+
+123
+00:08:41.960 --> 00:08:47.520
+<v Dave MacLeod>Flash. And once we were confident that we had a solution that would scale and didn't require
+
+124
+00:08:47.520 --> 00:08:54.200
+<v Dave MacLeod>people and, you know, you could have a conversation in five minutes, not five weeks, we very bravely
+
+125
+00:08:54.200 --> 00:08:59.960
+<v Dave MacLeod>threw out all the code and rebuilt the entire tool to be mobile first and a proper SaaS platform,
+
+126
+00:09:00.260 --> 00:09:04.660
+<v Dave MacLeod>which did slow us down from a customer revenue point of view, but in the long term was the
+
+127
+00:09:04.660 --> 00:09:05.600
+<v Dave MacLeod>right decision for the company.
+
+128
+00:09:07.200 --> 00:09:10.260
+<v Noah Labhart>Let's actually dive into that a little bit. My next question
+
+129
+00:09:10.260 --> 00:09:17.000
+<v Noah Labhart>is around product progression and maturation. So how did you progress the product at that point?
+
+130
+00:09:17.080 --> 00:09:23.120
+<v Noah Labhart>Sounds like you did a rewrite, but dive into that a bit. And I'm interested also in how did you
+
+131
+00:09:24.200 --> 00:09:28.200
+<v Noah Labhart>What was the next most important thing to build and establish your roadmap?
+
+132
+00:09:29.720 --> 00:09:33.400
+<v Dave MacLeod>I talk sometimes to some startup founders and things like that.
+
+133
+00:09:33.520 --> 00:09:37.340
+<v Dave MacLeod>And I tell them the one thing to do is absolutely don't do what we did.
+
+134
+00:09:38.020 --> 00:09:45.100
+<v Dave MacLeod>We had a solution and we went out looking for a problem, which, you know, any anybody will tell you is the wrong way to build a product.
+
+135
+00:09:45.160 --> 00:09:50.000
+<v Dave MacLeod>Unless you happen to find that problem really quickly, fast enough.
+
+136
+00:09:50.000 --> 00:09:58.880
+<v Dave MacLeod>We burned through a lot of cycles because we had the solution, which was to scale a conversation and to have a discussion with a thousand people and learn what they think.
+
+137
+00:09:58.980 --> 00:10:02.700
+<v Dave MacLeod>That would be something that, of course, we'd believe everybody in the world would want.
+
+138
+00:10:03.540 --> 00:10:10.360
+<v Dave MacLeod>The truth was only some people wanted it, some of the time, and we needed to find those people and that fit.
+
+139
+00:10:10.540 --> 00:10:16.260
+<v Dave MacLeod>And the market had to come also to appreciate the fact that hearing from people digitally was really valuable.
+
+140
+00:10:16.260 --> 00:10:24.100
+<v Dave MacLeod>The reason I say all that is because as we went through building the product, we had different customers in different market segments.
+
+141
+00:10:24.220 --> 00:10:30.240
+<v Dave MacLeod>We were in corporations, we were in the public sector, we worked with dozens at that time and now hundreds of school districts.
+
+142
+00:10:30.540 --> 00:10:37.160
+<v Dave MacLeod>And we were always trying to listen to requirements for what they had to solve the problems that they were up against.
+
+143
+00:10:37.160 --> 00:10:43.180
+<v Dave MacLeod>and so that required us to think pretty deeply about who is our real customer here, who's our
+
+144
+00:10:43.180 --> 00:10:48.580
+<v Dave MacLeod>user, who's the one who pays the bill and how to build features for both the people that were
+
+145
+00:10:48.580 --> 00:10:53.460
+<v Dave MacLeod>using the product, sometimes public, sometimes employees way down in the organization and who
+
+146
+00:10:53.460 --> 00:10:57.280
+<v Dave MacLeod>are the people paying the bills, the leader of these large organizations or the leaders in the
+
+147
+00:10:57.280 --> 00:11:02.280
+<v Dave MacLeod>corporations and how do you balance tools for the people that are paying the bills and the people
+
+148
+00:11:02.280 --> 00:11:07.440
+<v Dave MacLeod>who are utilizing the product and that i mean that battle goes on to this day well
+
+149
+00:11:07.440 --> 00:11:07.940
+<v Noah Labhart>then okay
+
+150
+00:11:07.920 --> 00:11:12.320
+<v Noah Labhart>so you got you know how you're building your roadmap how you're balancing those things and
+
+151
+00:11:12.320 --> 00:11:17.560
+<v Noah Labhart>it's a constant balancing act i get i get that but let's switch over to to team then so you've
+
+152
+00:11:17.560 --> 00:11:21.800
+<v Noah Labhart>got a roadmap right you've got a ton of stuff that you have worked through to figure out what
+
+153
+00:11:21.800 --> 00:11:26.540
+<v Noah Labhart>are the things that you want to build how did you build your team and and what did you look for
+
+154
+00:11:26.540 --> 00:11:30.540
+<v Noah Labhart>in those people to indicate that they were the winning horses to join you
+
+155
+00:11:32.280 --> 00:11:39.820
+<v Dave MacLeod>So I think there's two topics here in how you build a team that are relevant in today's tech environment that I won't step over.
+
+156
+00:11:40.340 --> 00:11:50.960
+<v Dave MacLeod>So one is that the first people on the team are the people crazy enough to join you with your idea that's not really clearly understood in the marketplace and not really well funded from a runway point of view.
+
+157
+00:11:51.040 --> 00:11:53.180
+<v Dave MacLeod>Your runway is always in weeks or months.
+
+158
+00:11:53.340 --> 00:11:58.200
+<v Dave MacLeod>And so you end up having a group of people who believe in you probably from a past experience.
+
+159
+00:11:58.200 --> 00:12:13.620
+<v Dave MacLeod>So we were fortunate to have a really amazing team coming from Creo software development team that have worked together for many years. And we were able to get that cohort together to build a really strong engineering foundation from past projects.
+
+160
+00:12:13.620 --> 00:12:20.760
+<v Dave MacLeod>and that's both amazing and also creates a really interesting issue and it's one that I see I guess
+
+161
+00:12:20.760 --> 00:12:26.100
+<v Dave MacLeod>across almost every tech company in the world is that that group of people as you've worked together
+
+162
+00:12:26.100 --> 00:12:32.020
+<v Dave MacLeod>in your past and you've built trust you probably also have a similar group of people on LinkedIn
+
+163
+00:12:32.020 --> 00:12:37.060
+<v Dave MacLeod>and you probably have a pretty similar gender and you probably have a pretty similar color of skin
+
+164
+00:12:37.060 --> 00:12:45.580
+<v Dave MacLeod>in as well. And so there's no mystery to how founding teams of a lot of white dudes, myself
+
+165
+00:12:45.580 --> 00:12:50.960
+<v Dave MacLeod>being one of them, you know, my name's Dave, I'm six foot one, I'm a CEO, there's three CEOs in the
+
+166
+00:12:50.960 --> 00:12:55.980
+<v Dave MacLeod>Fortune 500 who are African American, there's more CEOs named Dave than there are women in the
+
+167
+00:12:55.980 --> 00:13:00.360
+<v Dave MacLeod>Fortune 500 in many different studies. And I happen to be six foot one, which is the aggregate height
+
+168
+00:13:00.360 --> 00:13:06.860
+<v Dave MacLeod>of a CEO in the Fortune 500. I understand that I'm, I'm a privileged white person. And what happens
+
+169
+00:13:07.060 --> 00:13:10.180
+<v Dave MacLeod>is that you build a team with people around you in your network.
+
+170
+00:13:10.480 --> 00:13:13.080
+<v Dave MacLeod>And so there's two answers to this question.
+
+171
+00:13:13.200 --> 00:13:14.780
+<v Dave MacLeod>One is that you build on relationship.
+
+172
+00:13:14.960 --> 00:13:15.980
+<v Dave MacLeod>You build something amazing.
+
+173
+00:13:16.040 --> 00:13:18.520
+<v Dave MacLeod>You build something that people can get really excited about
+
+174
+00:13:18.520 --> 00:13:21.700
+<v Dave MacLeod>and want to invest their life and their career in.
+
+175
+00:13:22.020 --> 00:13:25.600
+<v Dave MacLeod>And two, you ensure that you really understand
+
+176
+00:13:25.600 --> 00:13:27.940
+<v Dave MacLeod>that the value of having a diverse team
+
+177
+00:13:27.940 --> 00:13:31.160
+<v Dave MacLeod>and people from outside your silo and outside your experiences
+
+178
+00:13:31.160 --> 00:13:32.980
+<v Dave MacLeod>who might not look and think like you,
+
+179
+00:13:33.060 --> 00:13:35.280
+<v Dave MacLeod>that you're doing something to attract those people.
+
+180
+00:13:37.060 --> 00:13:41.280
+<v Dave MacLeod>honestly, and being public about valuing those things has allowed us to create a world-class
+
+181
+00:13:41.280 --> 00:13:46.620
+<v Dave MacLeod>team and we attract the most amazing people. But it's really because of the foundation of
+
+182
+00:13:46.620 --> 00:13:50.860
+<v Dave MacLeod>excellence, but then the acknowledgement of, hey, we want to meet people who don't think like us.
+
+183
+00:13:51.120 --> 00:13:57.180
+<v Dave MacLeod>And that's, I think, maybe an undervalued secret sauce that a lot of tech organizations really need
+
+184
+00:13:57.180 --> 00:13:57.680
+<v Dave MacLeod>to embrace.
+
+185
+00:13:59.920 --> 00:14:03.260
+<v Noah Labhart>Well, let's switch to scalability. So you mentioned earlier, right, you like to
+
+186
+00:14:03.260 --> 00:14:08.160
+<v Noah Labhart>build things or do things that don't scale, or at least starting off until you can identify
+
+187
+00:14:08.160 --> 00:14:13.180
+<v Noah Labhart>the thing that needs to be scaled. So tell me a little bit about that process for you,
+
+188
+00:14:13.280 --> 00:14:19.180
+<v Noah Labhart>for ThoughtExchange, and how you kind of fought this as you grew and identified the right things
+
+189
+00:14:19.180 --> 00:14:19.680
+<v Noah Labhart>to automate.
+
+190
+00:14:22.080 --> 00:14:27.380
+<v Dave MacLeod>So we're talking about something which is actually inherently, people wouldn't
+
+191
+00:14:27.380 --> 00:14:32.260
+<v Dave MacLeod>think you could scale it. So let's talk about a conversation. So a conversation is something that
+
+192
+00:14:33.260 --> 00:14:41.080
+<v Dave MacLeod>So by the time you get to five or six people in any conversation, a conversation no longer is a conversation.
+
+193
+00:14:41.540 --> 00:14:48.220
+<v Dave MacLeod>If you got a really great facilitator or somebody who can really create, you know, 10 people talking meaningfully together.
+
+194
+00:14:48.460 --> 00:14:52.300
+<v Dave MacLeod>Well, now you have maybe a facilitated dialogue or something like that.
+
+195
+00:14:52.600 --> 00:14:57.800
+<v Dave MacLeod>But the whole idea of a discussion is that you share ideas.
+
+196
+00:14:57.800 --> 00:15:03.900
+<v Dave MacLeod>ideas. Those ideas are considered by other people and really interesting insights emerge that the
+
+197
+00:15:03.900 --> 00:15:08.280
+<v Dave MacLeod>whole group sort of moved towards. So something, a story we talk about a lot in ThoughtExchange
+
+198
+00:15:08.980 --> 00:15:12.660
+<v Dave MacLeod>is that a waiter comes up and says, what would you like to drink? And people say, I don't know,
+
+199
+00:15:12.680 --> 00:15:17.140
+<v Dave MacLeod>I'd like a beer. Sure, give me a beer. Yeah, I don't know, beer. And then someone says, well,
+
+200
+00:15:17.240 --> 00:15:20.700
+<v Dave MacLeod>it's the first sunny day of spring. It's really beautiful. Don't you make great margaritas here?
+
+201
+00:15:20.780 --> 00:15:25.960
+<v Dave MacLeod>I'd really like a margarita. And someone else in the group says, ooh, that's really great.
+
+202
+00:15:27.800 --> 00:15:32.100
+<v Dave MacLeod>you know what, a round of margaritas, am I right? Except for one person sticks to their beer maybe.
+
+203
+00:15:32.400 --> 00:15:37.880
+<v Dave MacLeod>The point of that story is that the thing that didn't happen is that people don't then stop and
+
+204
+00:15:37.880 --> 00:15:43.980
+<v Dave MacLeod>say, sorry, you guys can't all get a margarita because you said beer six or seven times. And
+
+205
+00:15:43.980 --> 00:15:49.900
+<v Dave MacLeod>that's the most frequent thing that got said. And therefore you have to stick with it. The reason I
+
+206
+00:15:49.900 --> 00:15:55.620
+<v Dave MacLeod>tell you that story, the idea of a conversation actually doesn't scale. What happens as soon as
+
+207
+00:15:55.620 --> 00:16:00.660
+<v Dave MacLeod>we get to 50 or 100 people, we basically ask, what do you think? First thought, best thought.
+
+208
+00:16:00.760 --> 00:16:05.560
+<v Dave MacLeod>And then we count up the amount of times something gets said and we put it in some sort of algorithm
+
+209
+00:16:05.560 --> 00:16:11.300
+<v Dave MacLeod>or machine learning or we use natural language processing. And we say this result effectively
+
+210
+00:16:11.300 --> 00:16:16.820
+<v Dave MacLeod>is beer. Another version of this I heard was the stewards walking down an airplane and asking
+
+211
+00:16:16.820 --> 00:16:21.160
+<v Dave MacLeod>everyone wants water until they hear ginger ale. But the point is, in a conversation,
+
+212
+00:16:21.160 --> 00:16:27.140
+<v Dave MacLeod>you can't really get at what matters to people, what's important. You can easily get at what's
+
+213
+00:16:27.140 --> 00:16:31.960
+<v Dave MacLeod>frequent. And so the whole nature of ThoughtExchange actually is trying to understand how
+
+214
+00:16:31.960 --> 00:16:36.720
+<v Dave MacLeod>to scale something inherently non-scalable. And that's actually related to the book that I'm
+
+215
+00:16:36.720 --> 00:16:40.900
+<v Dave MacLeod>publishing through Wiley is about scaling conversations and tackling this problem
+
+216
+00:16:40.900 --> 00:16:46.780
+<v Dave MacLeod>of how do you actually create an outcome of a meaningfully scaled conversation with 500,
+
+217
+00:16:46.780 --> 00:16:51.660
+<v Dave MacLeod>hundred, a thousand or a hundred thousand people when there's a few things that are really important
+
+218
+00:16:51.660 --> 00:16:53.420
+<v Dave MacLeod>to make a conversation a conversation.
+
+219
+00:16:54.480 --> 00:16:57.280
+<v Noah Labhart>That's really cool. You know, I hadn't thought about it
+
+220
+00:16:57.280 --> 00:16:59.320
+<v Noah Labhart>like that. What's the title of the book?
+
+221
+00:16:59.560 --> 00:17:01.280
+<v Dave MacLeod>The title of the book is literally called
+
+222
+00:17:01.280 --> 00:17:02.660
+<v Dave MacLeod>Scaling Conversations.
+
+223
+00:17:03.000 --> 00:17:06.420
+<v Noah Labhart>Awesome. We'll make sure and link that in the show notes for sure.
+
+224
+00:17:07.180 --> 00:17:11.300
+<v Noah Labhart>That's really interesting to think about that a part of a conversation because you're right. I
+
+225
+00:17:11.300 --> 00:17:16.480
+<v Noah Labhart>mean, you code something in software and you're looking for patterns or counts or something that
+
+226
+00:17:16.780 --> 00:17:21.720
+<v Noah Labhart>can learn from behavior, but that doesn't necessarily mean that that's the most important
+
+227
+00:17:21.720 --> 00:17:23.140
+<v Noah Labhart>thing. That's really fascinating.
+
+228
+00:17:23.800 --> 00:17:26.800
+<v Dave MacLeod>I think a lot of times when we try to find a source of truth,
+
+229
+00:17:27.020 --> 00:17:32.700
+<v Dave MacLeod>we mistake truth for being a rock-like thing where, you know, you're searching the bedrock
+
+230
+00:17:32.700 --> 00:17:38.100
+<v Dave MacLeod>to find this sort of truth. Whereas in fact, when it comes to understanding the market,
+
+231
+00:17:38.120 --> 00:17:42.220
+<v Dave MacLeod>understanding the truth about, you know, what your products should be doing, it's actually a moving
+
+232
+00:17:42.220 --> 00:17:47.760
+<v Dave MacLeod>thing. It's a lot more like a river. It's people's sense of what's important changes all the time,
+
+233
+00:17:47.800 --> 00:17:53.200
+<v Dave MacLeod>every time they get more information. And so the nature of information is actually conversational.
+
+234
+00:17:53.240 --> 00:17:59.440
+<v Dave MacLeod>What becomes important to people changes as people learn from each other. And so we do a lot of
+
+235
+00:17:59.440 --> 00:18:03.440
+<v Dave MacLeod>thinking about what are those basic components. And I mean, this is the same thing in scaling
+
+236
+00:18:03.440 --> 00:18:08.860
+<v Dave MacLeod>software. You have to break it down. You have to say, what are the actual pieces that you need to
+
+237
+00:18:08.860 --> 00:18:11.120
+<v Dave MacLeod>to have in order to make a conversation scalable.
+
+238
+00:18:11.380 --> 00:18:13.180
+<v Dave MacLeod>Well, people have to be able to share their thoughts.
+
+239
+00:18:13.320 --> 00:18:15.780
+<v Dave MacLeod>You have to be able to consider the thoughts of other people.
+
+240
+00:18:15.940 --> 00:18:18.400
+<v Dave MacLeod>You have to be able to react to them in some sort of way
+
+241
+00:18:18.400 --> 00:18:20.240
+<v Dave MacLeod>and say whether you agree or you disagree.
+
+242
+00:18:20.500 --> 00:18:22.300
+<v Dave MacLeod>You have to be able to sort of understand
+
+243
+00:18:22.300 --> 00:18:24.100
+<v Dave MacLeod>which things emerge as important.
+
+244
+00:18:24.360 --> 00:18:26.360
+<v Dave MacLeod>And when you break those things down into components
+
+245
+00:18:26.360 --> 00:18:28.880
+<v Dave MacLeod>and put them into software and put events around them,
+
+246
+00:18:28.920 --> 00:18:31.000
+<v Dave MacLeod>it turns out you can actually parse them apart
+
+247
+00:18:31.390 --> 00:18:33.660
+<v Dave MacLeod>and then scale them with 10,000 people
+
+248
+00:18:33.660 --> 00:18:38.320
+<v Dave MacLeod>once you understand the actual elements of a conversation.
+
+249
+00:18:38.600 --> 00:18:41.420
+<v Dave MacLeod>And at that part, you can do some pretty fascinating things.
+
+250
+00:18:42.380 --> 00:18:49.260
+<v Noah Labhart>Well, as you step out on the balcony and you look across what you've built, ThoughtExchange, what are you most proud of?
+
+251
+00:18:51.020 --> 00:18:55.900
+<v Dave MacLeod>I think that the thing that I'm most proud of, that we're most proud of,
+
+252
+00:18:55.900 --> 00:19:02.780
+<v Dave MacLeod>is that we've built something for public organizations and corporations to actually
+
+253
+00:19:02.780 --> 00:19:09.060
+<v Dave MacLeod>harness collective intelligence, which sounds like a heady kind of a thing. But the truth as humans
+
+254
+00:19:09.060 --> 00:19:15.380
+<v Dave MacLeod>is that back when we were trying to find ways to grow stuff together, we had to learn how to talk
+
+255
+00:19:15.380 --> 00:19:20.560
+<v Dave MacLeod>to each other so we could trade with one another. And I'm pretty proud of the fact that we've had
+
+256
+00:19:20.560 --> 00:19:25.680
+<v Dave MacLeod>leaders in large organizations ask some pretty amazing things as we've started to build out the
+
+257
+00:19:25.900 --> 00:19:27.520
+<v Dave MacLeod>discussion management category.
+
+258
+00:19:27.880 --> 00:19:33.040
+<v Dave MacLeod>So some examples of that are hearing back from hundreds or sometimes thousands of
+
+259
+00:19:33.040 --> 00:19:37.400
+<v Dave MacLeod>people during change management and not caring about the color of the skin, the
+
+260
+00:19:37.400 --> 00:19:42.900
+<v Dave MacLeod>gender, the authority of that individual as thoughts are shared and rated to give
+
+261
+00:19:42.900 --> 00:19:48.080
+<v Dave MacLeod>a leader what's true in that moment for that group and to be able to take away
+
+262
+00:19:48.080 --> 00:19:51.520
+<v Dave MacLeod>all the bias that is related is something I'm pretty proud of.
+
+263
+00:19:51.520 --> 00:19:56.380
+<v Dave MacLeod>We also helped tens of thousands of people inform decisions in the public sector.
+
+264
+00:19:56.420 --> 00:20:10.640
+<v Dave MacLeod>You know, during schools, I have three kids and there were hundreds and hundreds of thousands, millions of parents involved in participating, sharing their thoughts back to the school districts as they made really hard decisions that were impacting health and the loss of lives and everything.
+
+265
+00:20:10.820 --> 00:20:12.280
+<v Dave MacLeod>And they needed a way to do that.
+
+266
+00:20:12.360 --> 00:20:18.460
+<v Dave MacLeod>And that's a pretty that's a pretty big thing to be a part of is how organizations go through change.
+
+267
+00:20:18.460 --> 00:20:24.840
+<v Dave MacLeod>And I think we can all agree there's sure been a heck of a lot of change happening in the last 12 to 18 months.
+
+268
+00:20:25.060 --> 00:20:32.180
+<v Dave MacLeod>So the fact that we're able to be a part of that change has been a real amazing thing, actually, for me personally and for the whole company.
+
+269
+00:20:33.480 --> 00:20:35.000
+<v Noah Labhart>Let's flip the script a little bit.
+
+270
+00:20:35.260 --> 00:20:38.940
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+271
+00:20:39.980 --> 00:20:42.140
+<v Dave MacLeod>Is this a four or five hour podcast?
+
+272
+00:20:42.300 --> 00:20:43.060
+<v Dave MacLeod>How long do we have?
+
+273
+00:20:43.060 --> 00:20:43.620
+<v Dave MacLeod>that
+
+274
+00:20:43.620 --> 00:20:46.520
+<v Noah Labhart>to do
+
+275
+00:20:46.520 --> 00:20:51.520
+<v Dave MacLeod>this sort of thing we we've made a lot of mistakes we make a lot of mistakes and how we
+
+276
+00:20:51.520 --> 00:20:57.580
+<v Dave MacLeod>build software and how we go to market and how we do a lot of things I think one of the mistakes
+
+277
+00:20:57.580 --> 00:21:02.920
+<v Dave MacLeod>that we made was super interesting when we first built the product we had this core assumption
+
+278
+00:21:02.920 --> 00:21:09.040
+<v Dave MacLeod>that in order for a conversation to be valuable the identity of the person in the conversation
+
+279
+00:21:09.040 --> 00:21:14.840
+<v Dave MacLeod>needed to be maintained, that you, Noah, needed to have your name on each thought that you shared.
+
+280
+00:21:14.980 --> 00:21:20.660
+<v Dave MacLeod>You also needed to have your association to how you rated thoughts so that if you said something
+
+281
+00:21:20.660 --> 00:21:25.620
+<v Dave MacLeod>great and everyone gave you really high ratings, or if you said something terrible and everyone
+
+282
+00:21:25.620 --> 00:21:30.940
+<v Dave MacLeod>gave you really low ratings, well, we'd need to know because you'd require either the glory or
+
+283
+00:21:30.940 --> 00:21:36.060
+<v Dave MacLeod>the downside of if you've said great things or if people have rated your thoughts low, etc.
+
+284
+00:21:36.060 --> 00:21:43.340
+<v Dave MacLeod>We built that right into the product at the start, identity in collective intelligence as essential.
+
+285
+00:21:43.780 --> 00:21:53.540
+<v Dave MacLeod>And really interestingly, we learned through testing with a lot of people that there's one foundational problem with that,
+
+286
+00:21:53.540 --> 00:22:00.820
+<v Dave MacLeod>that is now so blatantly obvious that it's embarrassing, which is bias is deadly.
+
+287
+00:22:01.680 --> 00:22:10.100
+<v Dave MacLeod>The idea that you require people to share their name for every idea effectively means any conversation you have is very political.
+
+288
+00:22:10.240 --> 00:22:23.820
+<v Dave MacLeod>You're not able to actually get at the truth of what people think because people aren't willing to share that truth with you for fear of a lot of things based on their experience in a bureaucracy, based on their experience with their gender, with their skin color.
+
+289
+00:22:24.980 --> 00:22:30.080
+<v Dave MacLeod>We were a company that used to say, well, you know what, if you have something to say, you got to have your name behind it.
+
+290
+00:22:30.100 --> 00:22:31.260
+<v Dave MacLeod>Otherwise, it's just not valid.
+
+291
+00:22:31.780 --> 00:22:39.460
+<v Dave MacLeod>We had to learn that actually protecting people's identity is something really critical in really surprising and interesting ways.
+
+292
+00:22:39.800 --> 00:22:42.440
+<v Dave MacLeod>It's not just because people have criticism to share.
+
+293
+00:22:42.540 --> 00:22:49.320
+<v Dave MacLeod>Some of your smartest people have fascinating things to share, but they don't want to be seen to be sucking up to a senior person in the organization.
+
+294
+00:22:49.320 --> 00:22:55.240
+<v Dave MacLeod>They don't want their name necessarily associated with the greatest idea if they've rated it.
+
+295
+00:22:55.520 --> 00:22:59.160
+<v Dave MacLeod>Or if they see a thought they really don't like, they don't want to be seen to be publicly
+
+296
+00:22:59.160 --> 00:23:03.520
+<v Dave MacLeod>writing down people that may be a close friend of theirs in the company, but they just don't
+
+297
+00:23:03.520 --> 00:23:04.100
+<v Dave MacLeod>agree with them.
+
+298
+00:23:04.180 --> 00:23:07.420
+<v Dave MacLeod>They really like the ability to actually say, well, you know what?
+
+299
+00:23:07.460 --> 00:23:10.580
+<v Dave MacLeod>We agree on a lot of things, but on that idea, I'm going to give that a one-star rating.
+
+300
+00:23:11.000 --> 00:23:16.080
+<v Dave MacLeod>Just the whole concept as an organization or as a species of the idea of protecting
+
+301
+00:23:16.080 --> 00:23:26.000
+<v Dave MacLeod>Protecting people's identity within the context of a conversation was, you know, many year process that we came to the other side with a pretty firm understanding of.
+
+302
+00:23:26.100 --> 00:23:34.460
+<v Dave MacLeod>But certainly there's all sorts of things underneath that that could have sent the company in a dramatically different direction if we weren't willing to listen.
+
+303
+00:23:36.640 --> 00:23:39.940
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+304
+00:23:41.660 --> 00:23:49.240
+<v Dave MacLeod>the future of discussion management i think is enormous i think as organizations one of the
+
+305
+00:23:49.240 --> 00:23:55.580
+<v Dave MacLeod>biggest things that happened i believe in the last year with the awful events of covid
+
+306
+00:23:55.580 --> 00:24:01.300
+<v Dave MacLeod>is that organizations you know every every event i ever went to talked about digital transformation
+
+307
+00:24:02.000 --> 00:24:08.500
+<v Dave MacLeod>and all of a sudden everybody was forced to find a way to get on a Zoom meeting or a Webex meeting
+
+308
+00:24:09.940 --> 00:24:14.940
+<v Dave MacLeod>to connect digitally, as we all know, that's obvious. The thing that happened that was really
+
+309
+00:24:14.940 --> 00:24:22.580
+<v Dave MacLeod>unique is now because one or two people are going to be irreversibly digital in all meetings, that
+
+310
+00:24:22.580 --> 00:24:28.380
+<v Dave MacLeod>means every meeting is now digital. And I think that that's a fascinating thing as a company that's
+
+311
+00:24:28.380 --> 00:24:35.660
+<v Dave MacLeod>been distributed for 10 years. The opportunity to have all meetings create data, I think, is
+
+312
+00:24:35.660 --> 00:24:41.220
+<v Dave MacLeod>completely world-shaking. So I do a lot of thinking and writing about the topic of the
+
+313
+00:24:41.220 --> 00:24:46.040
+<v Dave MacLeod>fact that we're now networked. As far as the space for discussion technology, it's actually
+
+314
+00:24:46.040 --> 00:24:50.800
+<v Dave MacLeod>really hard to get your brain completely around the idea that you can have a conversation in real
+
+315
+00:24:50.800 --> 00:24:56.480
+<v Dave MacLeod>time in 60 languages with thousands of people around the globe and learn what they think within
+
+316
+00:24:56.480 --> 00:25:03.020
+<v Dave MacLeod>five minutes on any topic. That sheer power, it's just sort of imagine what you can do with that.
+
+317
+00:25:03.920 --> 00:25:09.260
+<v Dave MacLeod>The problem before was we'd say, hey, you can actually talk to a thousand people across the globe in real time.
+
+318
+00:25:09.340 --> 00:25:13.160
+<v Dave MacLeod>The technology existed before, but the network wasn't actually there.
+
+319
+00:25:13.300 --> 00:25:16.780
+<v Dave MacLeod>And what I mean by network is, well, I don't know how we'd actually get to all of them.
+
+320
+00:25:16.840 --> 00:25:19.620
+<v Dave MacLeod>Or maybe not everybody is going to be able to get a link to that.
+
+321
+00:25:19.780 --> 00:25:23.400
+<v Dave MacLeod>Or we sort of typically don't communicate this way.
+
+322
+00:25:23.540 --> 00:25:24.920
+<v Dave MacLeod>We always do face to face.
+
+323
+00:25:25.280 --> 00:25:29.000
+<v Dave MacLeod>And so if we're going to have a meaningful conversation, it's got to be face to face.
+
+324
+00:25:29.000 --> 00:25:46.040
+<v Dave MacLeod>Now that people are comfortable conversing digitally, the idea of what's possible in scaling a conversation around the globe or around the country or around your company in real time, I think we've barely scratched the surface as far as what we can learn from one another and how we can move organizations forward.
+
+325
+00:25:46.240 --> 00:25:56.300
+<v Dave MacLeod>So I'm pretty optimistic on what's available for us now that we've actually started to unlock the idea of our totally networked organizations as it relates to communication.
+
+326
+00:25:57.840 --> 00:26:08.060
+<v Noah Labhart>Well, let's switch to you. Who influences the way that you work? Name a CEO or CTO, architect, really any person. Name a person that you look up to and why.
+
+327
+00:26:09.320 --> 00:26:17.340
+<v Dave MacLeod>I look up to a lot of people. In my work, I really look up to people who think pretty differently about how organizations should be run.
+
+328
+00:26:18.500 --> 00:26:29.660
+<v Dave MacLeod>I look at Carolyn Johnson, the CEO of Diversity Inc., who's really challenging people to understand that there is so much research in an organization that shows,
+
+329
+00:26:29.660 --> 00:26:38.100
+<v Dave MacLeod>There's a nauseating amount of research that shows that more diverse teams, more diverse organizations make more profitable companies.
+
+330
+00:26:38.360 --> 00:26:45.740
+<v Dave MacLeod>And in Carolyn's word, and by profit, we mean make more money for shareholders and save more money and don't spend it.
+
+331
+00:26:45.800 --> 00:26:48.920
+<v Dave MacLeod>The idea of profitable and diversity is really important.
+
+332
+00:26:49.220 --> 00:26:59.200
+<v Dave MacLeod>And so champions that lead that understanding for people to get us to embrace why it is that we need to hear from more people are really inspirational.
+
+333
+00:26:59.660 --> 00:27:06.760
+<v Dave MacLeod>to me. Forrest Harper is the CEO of InRoads that's helping create pathways for young people of color
+
+334
+00:27:06.760 --> 00:27:15.680
+<v Dave MacLeod>to have the opportunity of showing what they can do in corporate environments. The removal of road
+
+335
+00:27:15.680 --> 00:27:22.780
+<v Dave MacLeod>blocks as a leader to be able to help people who are extremely bright and motivated and have things
+
+336
+00:27:22.780 --> 00:27:27.460
+<v Dave MacLeod>standing in their way because of hundreds of years of systemic racism, those sort of leaders really
+
+337
+00:27:27.460 --> 00:27:32.240
+<v Dave MacLeod>really inspire me because they get the value of people and they get the problems with bias.
+
+338
+00:27:32.440 --> 00:27:37.200
+<v Dave MacLeod>And I think that leaders need to sit up straight and listen to those people that are helping guide
+
+339
+00:27:37.200 --> 00:27:42.180
+<v Dave MacLeod>the understanding of organizations to say this. If you really want your organization to succeed,
+
+340
+00:27:42.440 --> 00:27:46.100
+<v Dave MacLeod>then you need to understand what it is to appreciate diverse points of view. You need
+
+341
+00:27:46.100 --> 00:27:51.940
+<v Dave MacLeod>to understand what it is to have different ideas come in and challenge your ideas. So any leader
+
+342
+00:27:51.940 --> 00:27:55.860
+<v Dave MacLeod>that is standing up and helping educate the world, I think is helping all of our businesses
+
+343
+00:27:57.460 --> 00:28:01.440
+<v Dave MacLeod>as we start to unlock that power of hearing from more and more diverse people
+
+344
+00:28:01.440 --> 00:28:03.060
+<v Dave MacLeod>and including them in all of our workforces.
+
+345
+00:28:03.780 --> 00:28:07.640
+<v Noah Labhart>Well, we talked about a mistake, but a little bit different spin.
+
+346
+00:28:07.900 --> 00:28:11.020
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+347
+00:28:11.060 --> 00:28:13.340
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+348
+00:28:14.760 --> 00:28:16.580
+<v Dave MacLeod>Yeah, that's a really good question.
+
+349
+00:28:16.780 --> 00:28:19.280
+<v Dave MacLeod>Because I'm one of these people that have made so many mistakes,
+
+350
+00:28:19.400 --> 00:28:23.340
+<v Dave MacLeod>but it's really hard to know exactly what to do differently
+
+351
+00:28:23.340 --> 00:28:26.040
+<v Dave MacLeod>because I like where we ended.
+
+352
+00:28:28.780 --> 00:28:33.940
+<v Dave MacLeod>things. However, if I had to do a few things differently, it took us a few years to really
+
+353
+00:28:33.940 --> 00:28:41.040
+<v Dave MacLeod>focus in on a user that was getting a lot of value out of our platform. And it was a brave thing. So
+
+354
+00:28:41.040 --> 00:28:46.000
+<v Dave MacLeod>as I mentioned before, we do collective intelligence and scaling conversations for
+
+355
+00:28:46.000 --> 00:28:52.320
+<v Dave MacLeod>hundreds of thousands of people. And we learned maybe 10 years ago, this wasn't valued so much
+
+356
+00:28:52.320 --> 00:28:56.940
+<v Dave MacLeod>in the corporate environment. It was very valued by school superintendents who needed to understand
+
+357
+00:28:57.460 --> 00:29:01.820
+<v Dave MacLeod>parents, their employees, and their taxpayers, how they thought and felt as they made really
+
+358
+00:29:01.820 --> 00:29:03.880
+<v Dave MacLeod>big financial decisions impacting them.
+
+359
+00:29:04.100 --> 00:29:05.820
+<v Dave MacLeod>And so we honed in on them.
+
+360
+00:29:05.880 --> 00:29:09.380
+<v Dave MacLeod>But something that I've learned along the way is that we should have honed in twice
+
+361
+00:29:09.380 --> 00:29:14.880
+<v Dave MacLeod>as strong, twice as fast to really solve a meaningful problem with a group of people
+
+362
+00:29:14.880 --> 00:29:16.260
+<v Dave MacLeod>and to not hedge.
+
+363
+00:29:16.460 --> 00:29:22.000
+<v Dave MacLeod>Because the more we actually solved a meaningful problem with a group of people, the more our
+
+364
+00:29:22.000 --> 00:29:26.500
+<v Dave MacLeod>software became applicable broadly to all sorts of leaders across many different sectors
+
+365
+00:29:27.460 --> 00:29:31.760
+<v Dave MacLeod>with completely different problems. But that idea of hedging and always thinking, well,
+
+366
+00:29:31.780 --> 00:29:36.000
+<v Dave MacLeod>I'm going to do a little for you, but I'm going to actually keep the door open for all my other
+
+367
+00:29:36.000 --> 00:29:40.480
+<v Dave MacLeod>users is something that in the early years of the company, I would have focused twice as much
+
+368
+00:29:40.480 --> 00:29:45.620
+<v Dave MacLeod>as we did. And we focused a fair bit. You know, if you went on ThoughtExchange five or six years ago,
+
+369
+00:29:45.680 --> 00:29:50.040
+<v Dave MacLeod>it literally hit you with a school bus because we were helping superintendents with a really
+
+370
+00:29:50.040 --> 00:29:55.260
+<v Dave MacLeod>big problem. What I learned is that I would have done it twice as much. Find someone who has a
+
+371
+00:29:55.260 --> 00:29:59.060
+<v Dave MacLeod>problem, really solve that problem for them in a way that is
+
+372
+00:29:59.520 --> 00:30:03.140
+<v Dave MacLeod>unmistakable. And then the scale comes naturally on the other side
+
+373
+00:30:03.140 --> 00:30:07.260
+<v Dave MacLeod>of that. So I suppose not hedging is what I would say is maybe
+
+374
+00:30:07.260 --> 00:30:09.120
+<v Dave MacLeod>a lesson learned if I had to do it over.
+
+375
+00:30:10.900 --> 00:30:15.200
+<v Noah Labhart>Well, last question, Dave. So you're getting on a plane and you're sitting
+
+376
+00:30:15.200 --> 00:30:19.300
+<v Noah Labhart>next to a young entrepreneur who's built the next big thing. They're jazzed about
+
+377
+00:30:19.300 --> 00:30:23.300
+<v Noah Labhart>it. They can't wait to show it off to the world. Can't wait to show it off to you right there on
+
+378
+00:30:25.260 --> 00:30:27.100
+<v Noah Labhart>person having gone down this road a bit?
+
+379
+00:30:28.440 --> 00:30:31.280
+<v Dave MacLeod>The first piece of advice that I would give is be
+
+380
+00:30:31.280 --> 00:30:37.200
+<v Dave MacLeod>very wary of advice from random strangers sitting next to you, especially when they sound like they
+
+381
+00:30:37.200 --> 00:30:41.860
+<v Dave MacLeod>know what they're doing. And I say that because I think there's a lot of people that have advice
+
+382
+00:30:41.860 --> 00:30:49.020
+<v Dave MacLeod>for founders and advice for people just starting off. And I think advice is not necessarily worth
+
+383
+00:30:49.020 --> 00:30:54.360
+<v Dave MacLeod>all that much, but I think stories are worth their weight in gold. So I guess my first
+
+384
+00:30:55.260 --> 00:31:02.000
+<v Dave MacLeod>counter advice would be to listen to the stories of other founders, what mistakes they've made,
+
+385
+00:31:02.060 --> 00:31:08.740
+<v Dave MacLeod>listen to podcasts like this one, to understand the trials and tribulations that other founders
+
+386
+00:31:08.740 --> 00:31:14.760
+<v Dave MacLeod>have gone through. But then take that and apply it to yourself using your own smarts,
+
+387
+00:31:14.760 --> 00:31:18.940
+<v Dave MacLeod>that just because somebody else found a solution doing it the way they did, it doesn't mean that's
+
+388
+00:31:18.940 --> 00:31:23.100
+<v Dave MacLeod>the way that you have to do it. Because frankly, the next generation of founders, I believe,
+
+389
+00:31:23.100 --> 00:31:28.240
+<v Dave MacLeod>has to think very differently and do things differently in order to solve problems. And the
+
+390
+00:31:28.240 --> 00:31:33.000
+<v Dave MacLeod>other side of that, say that that young founder should spend a whole lot of time listening to the
+
+391
+00:31:33.000 --> 00:31:39.740
+<v Dave MacLeod>stories of their customer and really think about how you're helping your customer's customer. So
+
+392
+00:31:39.740 --> 00:31:45.620
+<v Dave MacLeod>that as you're building something, you're not only solving a technical solution for your customer
+
+393
+00:31:45.620 --> 00:31:50.060
+<v Dave MacLeod>with some short-term need, but you're actually doing something meaningful for your customer's
+
+394
+00:31:50.060 --> 00:31:55.760
+<v Dave MacLeod>customer because that's where real value is created. If you can solve a problem, it's actually
+
+395
+00:31:55.760 --> 00:32:01.380
+<v Dave MacLeod>helping an organization help other people do things better. So I'd say listen for stories,
+
+396
+00:32:01.440 --> 00:32:04.860
+<v Dave MacLeod>connect deeply with people and be very wary of advice. How's that for advice?
+
+397
+00:32:05.360 --> 00:32:09.480
+<v Noah Labhart>That's fantastic. Well, Dave, thank you for being on the show today. Thank you for being
+
+398
+00:32:09.480 --> 00:32:13.320
+<v Noah Labhart>on Code Story and telling the creation story of ThoughtExchange.
+
+399
+00:32:13.720 --> 00:32:15.340
+<v Dave MacLeod>Amazing. Thanks for having me.
+
+400
+00:32:16.660 --> 00:32:19.800
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+401
+00:32:23.160 --> 00:32:26.220
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+402
+00:32:26.540 --> 00:32:31.380
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+403
+00:32:31.760 --> 00:32:36.860
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+404
+00:32:37.220 --> 00:32:39.440
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+405
+00:32:39.700 --> 00:32:41.760
+<v Noah Labhart>Both things help us out tremendously.
+
+406
+00:32:44.280 --> 00:32:45.780
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1895 @@
+WEBVTT
+
+NOTE S5 Favorite: The Evolution of the Modern Web: Guillermo Rauch on the Architecture Behind Next.js and Vercel
+
+1
+00:00:00.000 --> 00:00:27.940
+<v Noah Labhart>This episode is brought to you by CTO.ai. You guys know that I interview a lot of great builders on this show. And one of the most important aspects of a great Code Story episode is how a team works together to continuously deliver a great product. And not only just a great product, but one that will scale to meet growing demand. It's easy for growing teams to get overwhelmed by you know it, complex tools.
+
+2
+00:00:28.860 --> 00:00:37.860
+<v Noah Labhart>Complex tools can be a major source of frustration across a team to spend all of your time managing tools instead of building great products.
+
+3
+00:00:39.800 --> 00:00:41.820
+<v Noah Labhart>Meet CTO.ai.
+
+4
+00:00:42.720 --> 00:00:53.640
+<v Noah Labhart>CTO.ai is a workflow automation platform that simplifies developer operations so your growing team can improve their delivery velocity and hit their launch dates.
+
+5
+00:00:54.280 --> 00:00:58.140
+<v Noah Labhart>What I love about the platform is that it doesn't matter your experience level.
+
+6
+00:00:58.280 --> 00:01:02.040
+<v Noah Labhart>You can be a junior dev, you can be a senior dev, it doesn't matter.
+
+7
+00:01:02.240 --> 00:01:08.220
+<v Noah Labhart>The platform allows any developer to build powerful workflow tools and share them across their team.
+
+8
+00:01:08.940 --> 00:01:17.340
+<v Noah Labhart>You can do this using their services, pipelines, commands, and insights tools to create your singular workflow in a powerful way.
+
+9
+00:01:17.620 --> 00:01:22.400
+<v Noah Labhart>You can easily release code anywhere directly from Slack. It's where you live anyway.
+
+10
+00:01:23.640 --> 00:01:25.200
+<v Noah Labhart>live previews of new feature changes,
+
+11
+00:01:25.420 --> 00:01:28.220
+<v Noah Labhart>and measure your integration, your CICD,
+
+12
+00:01:28.300 --> 00:01:31.120
+<v Noah Labhart>cadence, and stability of all of your products.
+
+13
+00:01:32.040 --> 00:01:33.700
+<v Noah Labhart>So who uses CTO.ai?
+
+14
+00:01:33.980 --> 00:01:37.360
+<v Noah Labhart>The best and most sought-after startups in the land.
+
+15
+00:01:37.880 --> 00:01:40.960
+<v Noah Labhart>CTO.ai has helped fast-growing startups
+
+16
+00:01:40.960 --> 00:01:44.020
+<v Noah Labhart>who've raised over half a billion dollars in funding
+
+17
+00:01:44.020 --> 00:01:45.920
+<v Noah Labhart>to scale their software delivery workflows.
+
+18
+00:01:46.720 --> 00:01:48.840
+<v Noah Labhart>Find out how they can help your team
+
+19
+00:01:48.840 --> 00:01:50.760
+<v Noah Labhart>workflow smarter, not harder,
+
+20
+00:01:50.760 --> 00:01:56.440
+<v Noah Labhart>by visiting go.cto.ai slash Code Story.
+
+21
+00:01:57.800 --> 00:02:00.200
+<v Noah Labhart>This episode is brought to you by Courier.
+
+22
+00:02:01.100 --> 00:02:04.080
+<v Noah Labhart>Your application speaks to your users with notifications.
+
+23
+00:02:04.380 --> 00:02:08.940
+<v Noah Labhart>But what do you do when your users each respond better to a different channel?
+
+24
+00:02:09.860 --> 00:02:11.900
+<v Noah Labhart>Building the event triggers is annoying enough.
+
+25
+00:02:12.180 --> 00:02:14.740
+<v Noah Labhart>But when you have to build templates for multiple channels,
+
+26
+00:02:14.820 --> 00:02:16.420
+<v Noah Labhart>track deliverability and performance,
+
+27
+00:02:16.700 --> 00:02:18.360
+<v Noah Labhart>and manage granular user preferences,
+
+28
+00:02:18.360 --> 00:02:23.300
+<v Noah Labhart>you end up with overwhelming complexity that distracts your team from your core product.
+
+29
+00:02:23.580 --> 00:02:27.320
+<v Noah Labhart>That's why Courier built its API and notification system as a service.
+
+30
+00:02:27.620 --> 00:02:34.400
+<v Noah Labhart>Courier is the fastest way to design, manage, and orchestrate all of your applications' notifications using a simple API.
+
+31
+00:02:34.820 --> 00:02:40.660
+<v Noah Labhart>The UI is a powerful drag-and-drop editor to help you build and send templates over any channel
+
+32
+00:02:40.660 --> 00:02:43.640
+<v Noah Labhart>while giving your users full control over their own preferences.
+
+33
+00:02:43.640 --> 00:02:54.580
+<v Noah Labhart>Plug-in providers like Twilio, SendGrid, Mailgun, and Firebase to send email, SMS, push, in-app, or even direct messages like Slack, WhatsApp, or MS Teams.
+
+34
+00:02:55.060 --> 00:02:59.240
+<v Noah Labhart>Get started today with 10,000 notifications free every month.
+
+35
+00:02:59.460 --> 00:03:00.820
+<v Noah Labhart>No credit card needed.
+
+36
+00:03:01.160 --> 00:03:04.660
+<v Noah Labhart>Just go to courier.com slash Code Story.
+
+37
+00:03:04.780 --> 00:03:10.380
+<v Noah Labhart>That's C-O-U-R-I-E-R dot com slash Code Story.
+
+38
+00:03:11.300 --> 00:03:18.060
+<v Guillermo Rauch>But I remember I just wanted to create a simple web page that used React components in particular.
+
+39
+00:03:18.060 --> 00:03:23.320
+<v Guillermo Rauch>I was trying to build the web page that said, welcome to our company, leave your email to get
+
+40
+00:03:23.320 --> 00:03:29.160
+<v Guillermo Rauch>started. And I noticed that, like, all that infrastructure was a pain to set up. Like, you
+
+41
+00:03:29.160 --> 00:03:34.240
+<v Guillermo Rauch>had to configure webpack. You had to, like, basically spend all this time just working on the meta
+
+42
+00:03:34.240 --> 00:03:39.140
+<v Guillermo Rauch>problem instead of just your UI and your brand, the cool stuff that you want to share with customers.
+
+43
+00:03:40.380 --> 00:03:44.400
+<v Guillermo Rauch>Contract of, you can get started with no configuration, and there is one command
+
+44
+00:03:44.400 --> 00:03:49.200
+<v Guillermo Rauch>to develop, one command to build, one command to run the entire thing on
+
+45
+00:03:49.200 --> 00:03:53.920
+<v Guillermo Rauch>your machine. My name is Guillermo Rauch and I'm the CEO and co-founder of Vercel.
+
+46
+00:03:58.700 --> 00:04:04.480
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries who
+
+47
+00:04:05.100 --> 00:04:09.100
+<v Noah Labhart>share in the critical moments of what it takes to change an industry and build
+
+48
+00:04:10.380 --> 00:04:11.960
+<v Noah Labhart>A team that has your back.
+
+49
+00:04:13.360 --> 00:04:15.000
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+50
+00:04:15.160 --> 00:04:19.480
+<v Noah Labhart>And today, how Guillermo Rauch combined the best developer experience
+
+51
+00:04:19.480 --> 00:04:23.260
+<v Noah Labhart>with obsessive focus on front-end performance.
+
+52
+00:04:24.460 --> 00:04:26.900
+<v Noah Labhart>All this and more on Code Story.
+
+53
+00:04:30.760 --> 00:04:33.160
+<v Noah Labhart>Guillermo Rauch is originally from Argentina.
+
+54
+00:04:33.580 --> 00:04:36.000
+<v Noah Labhart>He's always been involved in the open source world,
+
+55
+00:04:36.080 --> 00:04:38.300
+<v Noah Labhart>starting out working in Linux and native tooling.
+
+56
+00:04:38.840 --> 00:04:41.980
+<v Noah Labhart>After a while, he fell in love with the web and the front-end system,
+
+57
+00:04:42.440 --> 00:04:46.620
+<v Noah Labhart>working in the early days of Ajax, JS Animation, and jQuery competition.
+
+58
+00:04:47.440 --> 00:04:49.720
+<v Noah Labhart>When I asked him what he does for fun, he laughed,
+
+59
+00:04:49.860 --> 00:04:53.040
+<v Noah Labhart>because he really enjoys what he does professionally on the web.
+
+60
+00:04:53.580 --> 00:04:57.000
+<v Noah Labhart>On a personal level, though, he has three kiddos, so he stays pretty busy.
+
+61
+00:04:57.160 --> 00:05:00.080
+<v Noah Labhart>He's into fitness and does calisthenics and gymnastics.
+
+62
+00:05:00.600 --> 00:05:04.660
+<v Noah Labhart>Beyond that, he is into coffee, though I don't know many tech people who aren't into coffee.
+
+63
+00:05:04.660 --> 00:05:10.620
+<v Noah Labhart>me. Having been a JS person, he saw an opportunity to build out the front end layer of the web.
+
+64
+00:05:10.880 --> 00:05:16.480
+<v Noah Labhart>To put that in context, think about what Stripe, Twilio, etc. have done for the industry with their
+
+65
+00:05:16.480 --> 00:05:23.060
+<v Noah Labhart>foundational developer-first APIs. He decided to create a framework that had no opinion about how
+
+66
+00:05:23.060 --> 00:05:28.200
+<v Noah Labhart>you got your data. And alongside of this, he created the optimal ecosystem for developers
+
+67
+00:05:28.200 --> 00:05:33.120
+<v Noah Labhart>to build very fast, specifically to develop, preview, and ship.
+
+68
+00:05:34.400 --> 00:05:38.420
+<v Noah Labhart>This is the creation story of Next.js and Vercel.
+
+69
+00:05:42.620 --> 00:05:45.660
+<v Guillermo Rauch>Vercel is a developer platform for front-end teams.
+
+70
+00:05:46.320 --> 00:05:52.140
+<v Guillermo Rauch>And our intent is to give you all the tools necessary for you, your team, your company
+
+71
+00:05:52.140 --> 00:05:53.220
+<v Guillermo Rauch>to succeed on the web.
+
+72
+00:05:53.540 --> 00:05:56.880
+<v Guillermo Rauch>We have this lifecycle that we call develop, preview, ship.
+
+73
+00:05:58.200 --> 00:06:03.760
+<v Guillermo Rauch>You can use any modern front-end framework to develop our platform, but we create Next.js, which is a React-based framework.
+
+74
+00:06:04.120 --> 00:06:08.460
+<v Guillermo Rauch>We like to think of it as the SDK or the missing SDK for the web.
+
+75
+00:06:08.660 --> 00:06:22.740
+<v Guillermo Rauch>Just like every other ecosystem like Android or iOS have their SDK built in, we want to perfect this blend of opinionation and minimalism in an SDK that we can give all developers in the world for free and is completely open source.
+
+76
+00:06:22.740 --> 00:06:29.040
+<v Guillermo Rauch>So Next.js turns React into a technology that you can use to build pages and websites and
+
+77
+00:06:29.040 --> 00:06:34.840
+<v Guillermo Rauch>web applications. It's very ergonomic and easy to use. The preview part of our lifecycle is that
+
+78
+00:06:34.840 --> 00:06:40.140
+<v Guillermo Rauch>once you push your code, we give you a live URL that you can share and collaborate with, with your
+
+79
+00:06:40.140 --> 00:06:45.900
+<v Guillermo Rauch>team. We think that the best products are built by teams, not just individuals, and we think that the
+
+80
+00:06:45.900 --> 00:06:51.040
+<v Guillermo Rauch>front ecosystem has this amazing advantage that when you push code, it's just much more fun to
+
+81
+00:06:53.080 --> 00:06:56.220
+<v Guillermo Rauch>and see how it works, experience it,
+
+82
+00:06:56.400 --> 00:06:58.980
+<v Guillermo Rauch>test that it meets the needs of the product managers
+
+83
+00:06:58.980 --> 00:06:59.920
+<v Guillermo Rauch>and your customers,
+
+84
+00:07:00.180 --> 00:07:02.140
+<v Guillermo Rauch>share it with your customers even early on.
+
+85
+00:07:02.320 --> 00:07:05.160
+<v Guillermo Rauch>And then finally, the sort of ship phase of the lifecycle
+
+86
+00:07:05.160 --> 00:07:07.580
+<v Guillermo Rauch>is about delivering your application
+
+87
+00:07:07.580 --> 00:07:09.600
+<v Guillermo Rauch>to a global edge network
+
+88
+00:07:09.600 --> 00:07:13.460
+<v Guillermo Rauch>that makes your apps really, really snappy for end users.
+
+89
+00:07:14.520 --> 00:07:17.060
+<v Guillermo Rauch>So the way that we think of this as a workflow
+
+90
+00:07:17.060 --> 00:07:20.500
+<v Guillermo Rauch>is that each phase should sort of reinforce the last.
+
+91
+00:07:20.500 --> 00:07:32.600
+<v Guillermo Rauch>So when you push your front end, you want you to make sure that it performs great for your end users so that you can run the best possible business or have the most enjoyable possible application for end users.
+
+92
+00:07:33.220 --> 00:07:38.320
+<v Guillermo Rauch>So we also have an analytics layer that informs the next step of development here.
+
+93
+00:07:38.320 --> 00:07:51.480
+<v Guillermo Rauch>So when you ship your code, we measure it from the perspective of your end users, and we kind of give you the data that you can use to then develop, then preview, then ship, and make this process just a constant source of improvement for your applications.
+
+94
+00:07:52.580 --> 00:08:02.520
+<v Guillermo Rauch>It was really interesting because when I sold my previous company to WordPress, which is another great web platform, having been always a JavaScript person, a front-end person,
+
+95
+00:08:02.520 --> 00:08:05.260
+<v Guillermo Rauch>I saw an opportunity to sort of build out
+
+96
+00:08:05.260 --> 00:08:06.460
+<v Noah Labhart>basically
+
+97
+00:08:06.460 --> 00:08:20.020
+<v Guillermo Rauch>the front end layer of the web because I thought that systems like WordPress, Shopify, Stripe, Twilio, they've done such a fantastic job for the people that are working on the backend.
+
+98
+00:08:20.020 --> 00:08:32.340
+<v Guillermo Rauch>For example, at WordPress, one thing I learned is that one of our biggest customers was the person that logs in every day to edit, to review, to write new content, especially at larger companies.
+
+99
+00:08:32.900 --> 00:08:34.140
+<v Guillermo Rauch>I thought it was fantastic.
+
+100
+00:08:34.360 --> 00:08:35.940
+<v Guillermo Rauch>It has an incredible plugin ecosystem.
+
+101
+00:08:36.580 --> 00:08:39.720
+<v Guillermo Rauch>Folks love the editor, the block-based editor of WordPress.
+
+102
+00:08:40.360 --> 00:08:46.080
+<v Guillermo Rauch>But what I was noticing at the time was that there was this trend in the industry toward APIs.
+
+103
+00:08:46.580 --> 00:08:48.180
+<v Guillermo Rauch>Everything was becoming an API.
+
+104
+00:08:50.020 --> 00:08:56.500
+<v Guillermo Rauch>early on because I was always interested in how you can sort of create interesting business models
+
+105
+00:08:56.500 --> 00:09:03.140
+<v Guillermo Rauch>out of developer-first methodology. So for example, Stripe is a great fintech company that started
+
+106
+00:09:03.140 --> 00:09:08.600
+<v Guillermo Rauch>with a great developer API. I remember actually I was very excited when I was at WordPress that
+
+107
+00:09:08.600 --> 00:09:14.860
+<v Guillermo Rauch>they were starting to merge this plugin into main that was the REST API for WordPress and then a
+
+108
+00:09:14.860 --> 00:09:20.400
+<v Guillermo Rauch>GraphQL API for WordPress developed. So I was noticing that the industry was breaking down
+
+109
+00:09:20.400 --> 00:09:25.200
+<v Guillermo Rauch>that monolithic way of building where, for example, in the case of WordPress, your backend
+
+110
+00:09:25.200 --> 00:09:31.540
+<v Guillermo Rauch>and your theme all live inside the same code base and the same technology with the same tools.
+
+111
+00:09:32.600 --> 00:09:37.360
+<v Guillermo Rauch>And I thought that for the front end, the most interesting tool that you could possibly use
+
+112
+00:09:37.360 --> 00:09:44.300
+<v Guillermo Rauch>was JavaScript, let alone things like React. So I had this idea of creating a framework that made
+
+113
+00:09:44.860 --> 00:09:50.440
+<v Guillermo Rauch>This concept of sort of awesome, super interactive, super fast JavaScript applications are reality.
+
+114
+00:09:50.760 --> 00:09:56.220
+<v Guillermo Rauch>But unlike predecessors like Meteor and other ideas that had been in the JavaScript ecosystem in the past,
+
+115
+00:09:56.440 --> 00:10:06.480
+<v Guillermo Rauch>I decided that by design, this framework was not going to have its own database, its own ORM, its own opinionation about how you would get your data.
+
+116
+00:10:06.640 --> 00:10:08.600
+<v Guillermo Rauch>So it's literally just a front end layer.
+
+117
+00:10:08.600 --> 00:10:18.480
+<v Guillermo Rauch>The interesting thing that happened early on in the development of this was I noticed that the best possible experience for the front-end developer was going to come from the ability to iterate very fast.
+
+118
+00:10:18.840 --> 00:10:25.100
+<v Guillermo Rauch>So I had this idea that you should just write one command very quickly and then get your page up and running in the cloud.
+
+119
+00:10:25.280 --> 00:10:28.480
+<v Guillermo Rauch>Cloud and framework were getting closer together.
+
+120
+00:10:28.720 --> 00:10:30.820
+<v Guillermo Rauch>We're starting to merge, so to speak.
+
+121
+00:10:30.820 --> 00:10:38.840
+<v Guillermo Rauch>So I developed Next in parallel with the sort of infrastructure platform that would make Next
+
+122
+00:10:38.840 --> 00:10:43.660
+<v Guillermo Rauch>the best possible framework it could be, and it would also make the front-end developer not have
+
+123
+00:10:43.660 --> 00:10:49.820
+<v Guillermo Rauch>to worry about all these things. Like, I remember at the time even just getting SSL up and running
+
+124
+00:10:49.820 --> 00:10:56.180
+<v Guillermo Rauch>for a quick front-end project was a, like, tedious task. We developed the framework and the cloud
+
+125
+00:10:56.180 --> 00:11:00.740
+<v Guillermo Rauch>platform in parallel. And that turned out to be one of the biggest strengths of Vercel because,
+
+126
+00:11:00.860 --> 00:11:07.060
+<v Guillermo Rauch>as I mentioned earlier, we give enterprises or teams all the tools that they need to succeed,
+
+127
+00:11:07.180 --> 00:11:08.640
+<v Guillermo Rauch>from develop all the way to ship.
+
+128
+00:11:10.720 --> 00:11:14.800
+<v Noah Labhart>Let's dive into the MVP then. So that first product you built,
+
+129
+00:11:14.880 --> 00:11:18.960
+<v Noah Labhart>how long did it take you to build and what sort of tools did you use to bring it to life?
+
+130
+00:11:20.680 --> 00:11:25.560
+<v Guillermo Rauch>So one of the things that happened in the early days of the React ecosystem was that folks were
+
+131
+00:11:26.180 --> 00:11:28.500
+<v Guillermo Rauch>struggling with the idea of infrastructure,
+
+132
+00:11:28.840 --> 00:11:31.980
+<v Guillermo Rauch>but on the compiler level, on the tooling level.
+
+133
+00:11:32.180 --> 00:11:35.080
+<v Guillermo Rauch>So we had all these cool pieces of software
+
+134
+00:11:35.080 --> 00:11:38.560
+<v Guillermo Rauch>that we could use to bring a React-based project to fruition.
+
+135
+00:11:39.100 --> 00:11:43.040
+<v Guillermo Rauch>But I remember I just wanted to create a simple web page
+
+136
+00:11:43.040 --> 00:11:44.740
+<v Guillermo Rauch>that used React components.
+
+137
+00:11:45.140 --> 00:11:48.060
+<v Guillermo Rauch>In particular, I was trying to build the web page that said,
+
+138
+00:11:48.160 --> 00:11:51.500
+<v Guillermo Rauch>welcome to our company, leave your email to get started.
+
+139
+00:11:52.020 --> 00:11:55.840
+<v Guillermo Rauch>And I noticed that all that infrastructure was a pain to set up.
+
+140
+00:11:56.180 --> 00:11:58.340
+<v Guillermo Rauch>Like you had to configure webpack.
+
+141
+00:11:58.540 --> 00:12:03.360
+<v Guillermo Rauch>You had to like basically spend all this time just working on the meta problem instead of
+
+142
+00:12:03.360 --> 00:12:06.900
+<v Guillermo Rauch>just your UI and your brand, the cool stuff that you want to share with customers.
+
+143
+00:12:07.260 --> 00:12:08.620
+<v Guillermo Rauch>That was our first opportunity.
+
+144
+00:12:08.620 --> 00:12:12.840
+<v Guillermo Rauch>It was like the MVP was this zero config framework.
+
+145
+00:12:13.160 --> 00:12:18.240
+<v Guillermo Rauch>It wasn't all worked out perfectly in the beginning, but what we did have, which we
+
+146
+00:12:18.240 --> 00:12:22.960
+<v Guillermo Rauch>maintain to today is a very simple contract of you can get started with no configuration
+
+147
+00:12:22.960 --> 00:12:28.760
+<v Guillermo Rauch>And there's one command to develop and one command to build and one command to run the
+
+148
+00:12:28.760 --> 00:12:30.120
+<v Guillermo Rauch>entire thing on your machine.
+
+149
+00:12:30.500 --> 00:12:37.600
+<v Guillermo Rauch>We are one of the few open source serverless frameworks that can run in its entirety on
+
+150
+00:12:37.600 --> 00:12:39.720
+<v Guillermo Rauch>your local machine or inside a container.
+
+151
+00:12:40.460 --> 00:12:44.400
+<v Guillermo Rauch>The MVP was designed from a contract design type of thing.
+
+152
+00:12:44.500 --> 00:12:46.800
+<v Guillermo Rauch>We knew what the boundaries of the system were.
+
+153
+00:12:46.920 --> 00:12:51.580
+<v Guillermo Rauch>We knew the expectations of the simplicity of the ergonomics of the tool.
+
+154
+00:12:52.960 --> 00:12:58.040
+<v Guillermo Rauch>You know, we continuously, even until today, continue to improve the internals from those boundaries.
+
+155
+00:12:58.620 --> 00:13:02.280
+<v Guillermo Rauch>And then on the cloud infrastructure side, a very similar thing happened.
+
+156
+00:13:02.580 --> 00:13:09.080
+<v Guillermo Rauch>We knew that we wanted deployment to be as simple as git push or running one command, Vercel.
+
+157
+00:13:09.220 --> 00:13:10.300
+<v Guillermo Rauch>And then you get URL.
+
+158
+00:13:10.420 --> 00:13:14.320
+<v Guillermo Rauch>But then we iterated on the infrastructure and we continued to iterate on the infrastructure.
+
+159
+00:13:15.040 --> 00:13:22.160
+<v Guillermo Rauch>We never really stopped changing the internals because we continue to improve them based on what frameworks need and what our customers need.
+
+160
+00:13:22.960 --> 00:13:24.280
+<v Guillermo Rauch>But the boundaries have stayed the same.
+
+161
+00:13:24.360 --> 00:13:25.860
+<v Guillermo Rauch>And one of the reasons that I bet on the web
+
+162
+00:13:25.860 --> 00:13:29.280
+<v Guillermo Rauch>is I remember I was super excited about HTTP2 back then.
+
+163
+00:13:29.460 --> 00:13:31.540
+<v Guillermo Rauch>Now I'm really excited about HTTP3.
+
+164
+00:13:31.860 --> 00:13:34.280
+<v Guillermo Rauch>I figured that the hyperlink
+
+165
+00:13:34.280 --> 00:13:38.280
+<v Guillermo Rauch>is the right boundary of abstraction for the cloud side.
+
+166
+00:13:38.840 --> 00:13:41.840
+<v Guillermo Rauch>We didn't want a framework that spit out a binary
+
+167
+00:13:41.840 --> 00:13:43.840
+<v Guillermo Rauch>to run in an app store.
+
+168
+00:13:44.020 --> 00:13:48.060
+<v Guillermo Rauch>We wanted the developer to get a URL back from the system.
+
+169
+00:13:48.620 --> 00:13:52.140
+<v Guillermo Rauch>So that is the same contract that remains until today.
+
+170
+00:13:52.960 --> 00:13:53.960
+<v Guillermo Rauch>improve the underlying infrastructure.
+
+171
+00:13:55.140 --> 00:13:59.460
+<v Noah Labhart>So from that MVP, how did you progress the product and
+
+172
+00:13:59.460 --> 00:14:06.380
+<v Noah Labhart>mature it? And to give context to that question or shape, how did you build your roadmap and
+
+173
+00:14:06.380 --> 00:14:10.620
+<v Noah Labhart>figure out, okay, this is the next most important thing to build with Vercel?
+
+174
+00:14:12.380 --> 00:14:18.060
+<v Guillermo Rauch>From the outset, we launched in a very public way and we wanted to get customer feedback as
+
+175
+00:14:18.060 --> 00:14:18.740
+<v Guillermo Rauch>as soon as we could.
+
+176
+00:14:19.200 --> 00:14:21.560
+<v Guillermo Rauch>So it was very much built in collaboration
+
+177
+00:14:21.560 --> 00:14:25.160
+<v Guillermo Rauch>with anybody that was interested in building anything
+
+178
+00:14:25.160 --> 00:14:27.720
+<v Guillermo Rauch>with this new JavaScript and React technologies.
+
+179
+00:14:27.900 --> 00:14:30.640
+<v Guillermo Rauch>I think us focusing on a niche in a way,
+
+180
+00:14:30.720 --> 00:14:32.360
+<v Guillermo Rauch>even though that wasn't obvious
+
+181
+00:14:32.360 --> 00:14:34.580
+<v Guillermo Rauch>or a hundred percent conscious to us at the time,
+
+182
+00:14:34.720 --> 00:14:37.200
+<v Guillermo Rauch>we were very focused in our audience.
+
+183
+00:14:37.260 --> 00:14:39.020
+<v Guillermo Rauch>So we leveraged our existing audiences.
+
+184
+00:14:39.820 --> 00:14:41.720
+<v Guillermo Rauch>I think something that was really interesting
+
+185
+00:14:41.720 --> 00:14:43.840
+<v Guillermo Rauch>that we were doing differently at the time was,
+
+186
+00:14:44.100 --> 00:14:46.880
+<v Guillermo Rauch>Next.js was very focused on server rendering.
+
+187
+00:14:48.060 --> 00:14:53.960
+<v Guillermo Rauch>It was almost like a contrarian thing because a lot of the JS ecosystem at the time was excited about single-page applications.
+
+188
+00:14:54.500 --> 00:15:03.500
+<v Guillermo Rauch>We evolved our framework and infrastructure a lot around what are these folks that need server rendering asking us.
+
+189
+00:15:03.820 --> 00:15:10.660
+<v Guillermo Rauch>That ended up being very successful because a lot of the folks that gravitated towards Next are companies that were doing things in e-commerce.
+
+190
+00:15:10.860 --> 00:15:13.180
+<v Guillermo Rauch>Or companies that wanted really good SEO.
+
+191
+00:15:13.360 --> 00:15:14.920
+<v Guillermo Rauch>And the framework just fit really nicely.
+
+192
+00:15:14.920 --> 00:15:21.600
+<v Guillermo Rauch>So being an open source project, the roadmap and the issue management and all that is very open.
+
+193
+00:15:21.740 --> 00:15:33.540
+<v Guillermo Rauch>I think we kind of constantly evolved it based on the feedback of users in the community, either from companies or even folks that were trying out the platform in its early stages to build side projects.
+
+194
+00:15:35.580 --> 00:15:39.280
+<v Noah Labhart>So how did you organize that feedback? What was your approach there?
+
+195
+00:15:39.280 --> 00:15:40.240
+<v Noah Labhart>So
+
+196
+00:15:40.240 --> 00:15:45.400
+<v Guillermo Rauch>a big part of it in the early days was just, you know, attaining production grade quality.
+
+197
+00:15:45.980 --> 00:16:03.300
+<v Guillermo Rauch>So one of my obsessions for a long time was, you know, I want these tools to scale extremely well from, you know, I have a single page that's on a domain that I'm publishing to something that scales to like billions of pages and the largest websites in the world.
+
+198
+00:16:03.420 --> 00:16:08.020
+<v Guillermo Rauch>And a lot of that was sort of very conscious and designed from the outset.
+
+199
+00:16:09.280 --> 00:16:15.640
+<v Guillermo Rauch>early days, you know, like you kind of have to be realistic that there is only so much you can do,
+
+200
+00:16:15.820 --> 00:16:23.280
+<v Guillermo Rauch>especially as a service. So we really worked hard on the fundamentals. How can we make deployment
+
+201
+00:16:23.280 --> 00:16:29.560
+<v Guillermo Rauch>pipeline very reliable and reproducible? How can we make performance very predictable? How can we
+
+202
+00:16:29.560 --> 00:16:36.480
+<v Guillermo Rauch>work up to a point where we can give our customers SLAs rooted in SLOs of availability and performance?
+
+203
+00:16:36.480 --> 00:16:43.080
+<v Guillermo Rauch>performance. So a lot of that was like building a very strong core. In fact, the way that this
+
+204
+00:16:43.080 --> 00:16:47.800
+<v Guillermo Rauch>idea of this strong core, which we used to sort of share a lot internally in the beginning,
+
+205
+00:16:48.000 --> 00:16:54.520
+<v Guillermo Rauch>was we didn't rush to add lots of features. People are surprised sometimes of some features
+
+206
+00:16:54.520 --> 00:17:00.240
+<v Guillermo Rauch>that we decide not to include yet. And we tell you, hey, there's a user space solution for this,
+
+207
+00:17:00.300 --> 00:17:05.500
+<v Guillermo Rauch>a user land solution for this. And that had to do with continuing to develop a very strong core
+
+208
+00:17:06.480 --> 00:17:11.260
+<v Guillermo Rauch>And that in many ways means saying no to very enticing features.
+
+209
+00:17:12.360 --> 00:17:13.960
+<v Noah Labhart>Well, let's switch to team then.
+
+210
+00:17:14.020 --> 00:17:15.700
+<v Noah Labhart>So how did you build your team?
+
+211
+00:17:15.880 --> 00:17:20.680
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+212
+00:17:22.060 --> 00:17:28.640
+<v Guillermo Rauch>I think one of the most interesting strengths of an open source first organization like ours
+
+213
+00:17:28.640 --> 00:17:35.460
+<v Guillermo Rauch>is that we're able to recruit from folks that are using and or contributing to our software.
+
+214
+00:17:36.480 --> 00:17:40.200
+<v Guillermo Rauch>I think the vast majority of the initial hires came from that open source ecosystem.
+
+215
+00:17:40.700 --> 00:17:49.580
+<v Guillermo Rauch>Many came from adjacent ecosystems that had been already a part of, like MooTools, Socket.io, Mongoose, and other projects that had been involved with.
+
+216
+00:17:49.780 --> 00:17:52.120
+<v Guillermo Rauch>Many customers came from those ecosystems as well.
+
+217
+00:17:52.380 --> 00:18:03.000
+<v Guillermo Rauch>So that was kind of always the priority is people that value developer experience greatly and are already immersed in the communities in which we develop our software.
+
+218
+00:18:04.780 --> 00:18:10.500
+<v Noah Labhart>That makes a ton of sense. That is an interesting, I don't want to say byproduct, but it's super
+
+219
+00:18:10.500 --> 00:18:15.300
+<v Noah Labhart>interesting strength. Maybe byproducts the right word of an open source community like that.
+
+220
+00:18:16.380 --> 00:18:21.980
+<v Noah Labhart>This episode is sponsored by Img.ly. If you're ready to add photo or video editing to your
+
+221
+00:18:21.980 --> 00:18:27.300
+<v Noah Labhart>application, Img.ly is a great place to start. Img.ly provides a software development kit that
+
+222
+00:18:27.300 --> 00:18:31.940
+<v Noah Labhart>handles all the technology for adding photo and video editing right inside your application.
+
+223
+00:18:33.000 --> 00:18:37.640
+<v Noah Labhart>are fully customizable and can match your apps look and feel and support all major platforms.
+
+224
+00:18:38.000 --> 00:18:44.100
+<v Noah Labhart>Let users share beautiful photos or videos, create imagery for marketing campaigns, build photo books,
+
+225
+00:18:44.120 --> 00:18:49.960
+<v Noah Labhart>or even automate design with templates. Their video and photo editor SDK is used by Shopify,
+
+226
+00:18:50.280 --> 00:18:54.800
+<v Noah Labhart>Hootsuite, Shutterfly, and hundreds of other companies, helping them ship software faster.
+
+227
+00:18:55.120 --> 00:18:59.680
+<v Noah Labhart>The Img.ly software development kit is the fastest way to add photo or video functionality
+
+228
+00:19:00.680 --> 00:19:09.440
+<v Noah Labhart>application. Visit img.ly slash Code Story today to try the web demo. That's img.ly slash Code Story.
+
+229
+00:19:10.260 --> 00:19:15.260
+<v Noah Labhart>This episode is sponsored by Routable. Are you interested in joining a team that encourages
+
+230
+00:19:15.260 --> 00:19:21.020
+<v Noah Labhart>intellectual curiosity, problem solving, and openness? Not only that, but one that provides
+
+231
+00:19:21.020 --> 00:19:27.760
+<v Noah Labhart>the support and mentorship needed to succeed, learn, and grow? Meet Routable. The team at
+
+232
+00:19:27.760 --> 00:19:32.920
+<v Noah Labhart>Routable has built a world-class platform for modern bill payments, payouts, and invoicing.
+
+233
+00:19:33.580 --> 00:19:38.480
+<v Noah Labhart>Routable helps companies speed up their business payments using a secure invoice and bill payment
+
+234
+00:19:38.480 --> 00:19:43.260
+<v Noah Labhart>system. And not just for accounting groups, the company is solving problems for the CFO,
+
+235
+00:19:43.520 --> 00:19:49.680
+<v Noah Labhart>controller, the accountant, and the developer. Routable is engineering-led and fully remote.
+
+236
+00:19:49.920 --> 00:19:54.400
+<v Noah Labhart>They're looking for the best engineers and operators to join their team and drive forward
+
+237
+00:19:54.400 --> 00:19:59.720
+<v Noah Labhart>their mission of removing the burden of business payments. To apply today, go to
+
+238
+00:19:59.720 --> 00:20:08.680
+<v Noah Labhart>routable.com slash about and click view open roles. That's R-O-U-T-A-B-L-E dot com slash about.
+
+239
+00:20:09.220 --> 00:20:14.100
+<v Noah Labhart>Check out Routable today and join a team who's changing the face of business payments.
+
+240
+00:20:16.980 --> 00:20:22.700
+<v Noah Labhart>So let's flip the scalability and you mentioned wanting to focus on this earlier. So I'm going
+
+241
+00:20:24.400 --> 00:20:25.980
+<v Noah Labhart>because I want to see where you go with it.
+
+242
+00:20:26.360 --> 00:20:29.300
+<v Noah Labhart>Did you build this to scale efficiently from day one?
+
+243
+00:20:29.400 --> 00:20:33.180
+<v Noah Labhart>Or are you fighting this as Vercel grows and gets traction?
+
+244
+00:20:35.060 --> 00:20:36.640
+<v Guillermo Rauch>I think it's always a combination
+
+245
+00:20:36.640 --> 00:20:40.300
+<v Guillermo Rauch>because the speed at which things grow,
+
+246
+00:20:40.580 --> 00:20:42.760
+<v Guillermo Rauch>there's just so much that's emergent behavior.
+
+247
+00:20:43.020 --> 00:20:45.100
+<v Guillermo Rauch>And in many ways, we design things
+
+248
+00:20:45.100 --> 00:20:49.200
+<v Guillermo Rauch>to have emergent behavior within controlled boundaries.
+
+249
+00:20:50.360 --> 00:20:51.680
+<v Guillermo Rauch>I had a customer recently
+
+250
+00:20:51.680 --> 00:20:55.020
+<v Guillermo Rauch>that was bootstrapping an entire payment platform
+
+251
+00:20:55.020 --> 00:20:58.980
+<v Guillermo Rauch>on top of our API functions support in Next.js.
+
+252
+00:20:59.560 --> 00:21:01.220
+<v Guillermo Rauch>Could I have anticipated that?
+
+253
+00:21:01.260 --> 00:21:03.440
+<v Guillermo Rauch>No, because most of our customers
+
+254
+00:21:03.440 --> 00:21:06.320
+<v Guillermo Rauch>are doing cool things with components and UI and e-commerce
+
+255
+00:21:06.320 --> 00:21:10.720
+<v Guillermo Rauch>and they tend to use existing platforms for their APIs.
+
+256
+00:21:10.920 --> 00:21:14.100
+<v Guillermo Rauch>However, we knew that with introducing the API route support
+
+257
+00:21:14.100 --> 00:21:16.680
+<v Guillermo Rauch>that under the hood gets deployed as serverless functions,
+
+258
+00:21:16.820 --> 00:21:18.960
+<v Guillermo Rauch>we would give our customers tremendous flexibility
+
+259
+00:21:18.960 --> 00:21:22.660
+<v Guillermo Rauch>and scalability and just a lot of dynamic power
+
+260
+00:21:22.660 --> 00:21:23.920
+<v Guillermo Rauch>for their projects.
+
+261
+00:21:24.200 --> 00:21:27.220
+<v Guillermo Rauch>So there's always things that are interesting and emergent,
+
+262
+00:21:28.080 --> 00:21:32.140
+<v Guillermo Rauch>but we always wanted to excel at a particular use case.
+
+263
+00:21:32.280 --> 00:21:35.780
+<v Guillermo Rauch>So for us, I was, you know, we really leaned toward this.
+
+264
+00:21:35.920 --> 00:21:38.340
+<v Guillermo Rauch>This is gonna be the absolute best place
+
+265
+00:21:38.340 --> 00:21:39.540
+<v Guillermo Rauch>to deploy your front end,
+
+266
+00:21:39.620 --> 00:21:41.620
+<v Guillermo Rauch>and we're gonna give you the absolute best performance,
+
+267
+00:21:41.920 --> 00:21:44.460
+<v Guillermo Rauch>both for developer and end user.
+
+268
+00:21:44.820 --> 00:21:46.760
+<v Guillermo Rauch>Now, when it comes down to scalability,
+
+269
+00:21:46.940 --> 00:21:48.200
+<v Guillermo Rauch>things that we decided we're conscious of,
+
+270
+00:21:48.960 --> 00:21:55.160
+<v Guillermo Rauch>goal toward team scalability. So Next.js designed this page system to provide isolations between
+
+271
+00:21:55.160 --> 00:22:00.180
+<v Guillermo Rauch>the sections of your application. Going back to like one of the reasons I never liked the
+
+272
+00:22:00.180 --> 00:22:05.480
+<v Guillermo Rauch>single page application concept was I didn't think it had good team scalability. I didn't
+
+273
+00:22:05.480 --> 00:22:11.060
+<v Guillermo Rauch>think that you could come in to a project, create a new entry point and start adding complexity
+
+274
+00:22:11.060 --> 00:22:17.220
+<v Guillermo Rauch>there that wouldn't add or slow down the rest of the application. It was much harder to do that
+
+275
+00:22:18.960 --> 00:22:22.060
+<v Guillermo Rauch>So team scalability was built in from day one.
+
+276
+00:22:22.280 --> 00:22:30.760
+<v Guillermo Rauch>We also knew that with how the web works and how much is bound by how fast the initial load time is,
+
+277
+00:22:31.040 --> 00:22:36.260
+<v Guillermo Rauch>which today this concept didn't exist at the time, the web vital largest contentful paint,
+
+278
+00:22:36.500 --> 00:22:44.460
+<v Guillermo Rauch>it's extremely hard, if not impossible, to get outstanding large contentful paint timings for complex applications
+
+279
+00:22:44.460 --> 00:22:49.100
+<v Guillermo Rauch>applications without server rendering or pre-rendering in some form or fashion.
+
+280
+00:22:50.340 --> 00:22:54.440
+<v Guillermo Rauch>So with the Sign Next.js with server rendering, with that kind of scalability in mind,
+
+281
+00:22:54.560 --> 00:23:00.760
+<v Guillermo Rauch>we also knew reverse engineering how Google search and Facebook.com work. The common pattern was
+
+282
+00:23:00.760 --> 00:23:06.720
+<v Guillermo Rauch>they both use server rendering at scale. I'm not going to pick that fight. They've tried enough
+
+283
+00:23:06.720 --> 00:23:13.360
+<v Guillermo Rauch>things and they're pressured by billions of dollars a day in advertising or other sort of
+
+284
+00:23:14.460 --> 00:23:20.360
+<v Guillermo Rauch>flowing through those platforms to get that text in front of your retina in as few milliseconds as
+
+285
+00:23:20.360 --> 00:23:24.740
+<v Guillermo Rauch>possible. My whole thing was like, let's design a framework that allows customers to get that
+
+286
+00:23:24.740 --> 00:23:31.200
+<v Guillermo Rauch>ambitious with performance. Now what was emergent was, you know, for example, how fast the traffic
+
+287
+00:23:31.200 --> 00:23:37.760
+<v Guillermo Rauch>on our platform has grown and the number of use cases and frameworks and funky things that people
+
+288
+00:23:37.760 --> 00:23:42.640
+<v Guillermo Rauch>try to do with the platform. So with things being so open and growing so fast, there's a lot about
+
+289
+00:23:44.480 --> 00:23:48.540
+<v Guillermo Rauch>and you just have to adapt and react quickly to the environment.
+
+290
+00:23:50.500 --> 00:23:54.020
+<v Noah Labhart>I love what you said about the single-page application
+
+291
+00:23:54.020 --> 00:23:56.220
+<v Noah Labhart>and it not being scalable for teams.
+
+292
+00:23:56.480 --> 00:23:58.380
+<v Noah Labhart>I hadn't really thought about it like that.
+
+293
+00:23:58.460 --> 00:24:01.020
+<v Noah Labhart>I've never had a good taste in my mouth for SPAs.
+
+294
+00:24:01.800 --> 00:24:05.660
+<v Guillermo Rauch>I always share an anecdote that I got from an engineering manager
+
+295
+00:24:05.660 --> 00:24:09.280
+<v Guillermo Rauch>at a very famous shoe company where they said,
+
+296
+00:24:09.440 --> 00:24:12.780
+<v Guillermo Rauch>the thing that we like the most about Next is that we onboard a developer.
+
+297
+00:24:14.460 --> 00:24:19.360
+<v Guillermo Rauch>that page's directory and they already learned the structure of our application. They can visit
+
+298
+00:24:19.800 --> 00:24:25.140
+<v Guillermo Rauch>in their code editor the different pages and sections of the system. So it was about
+
+299
+00:24:25.140 --> 00:24:32.040
+<v Guillermo Rauch>onboarding and kind of making the system very intuitive for teams and thinking about like the
+
+300
+00:24:32.040 --> 00:24:38.280
+<v Guillermo Rauch>least number of layers of indirection that we give to a newcomer to the code base and how much damage
+
+301
+00:24:38.280 --> 00:24:44.440
+<v Guillermo Rauch>they can cost to other teams. So yeah, it's been, it was interesting to hear back from
+
+302
+00:24:44.440 --> 00:24:48.000
+<v Guillermo Rauch>customers that that model was really working out for them.
+
+303
+00:24:50.380 --> 00:24:54.400
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built,
+
+304
+00:24:54.520 --> 00:24:55.640
+<v Noah Labhart>what are you most proud of?
+
+305
+00:24:56.280 --> 00:25:04.400
+<v Guillermo Rauch>I think it would have to be Next because it's just been from day one, and this is quite literally
+
+306
+00:25:04.400 --> 00:25:09.780
+<v Guillermo Rauch>from day one, a continuous source of organic exponential growth.
+
+307
+00:25:10.500 --> 00:25:15.920
+<v Guillermo Rauch>I remember that the day that we announced it, Create React App had just come out like
+
+308
+00:25:15.920 --> 00:25:16.520
+<v Guillermo Rauch>weeks before.
+
+309
+00:25:17.060 --> 00:25:22.980
+<v Guillermo Rauch>We're very certain that our focus on server rendering warranted a new player, even though
+
+310
+00:25:22.980 --> 00:25:24.480
+<v Guillermo Rauch>Facebook was coming out with theirs.
+
+311
+00:25:24.680 --> 00:25:29.780
+<v Guillermo Rauch>And in many ways, it seemed going up against the company that started it all in many ways
+
+312
+00:25:29.780 --> 00:25:30.840
+<v Guillermo Rauch>because we're using React.
+
+313
+00:25:30.840 --> 00:25:37.140
+<v Guillermo Rauch>So we're very confident in that vision and the market reacted to it basically immediately.
+
+314
+00:25:37.860 --> 00:25:46.440
+<v Guillermo Rauch>So day one, we're like number one in Hacker News for quite a long time and it was shared on Twitter a lot and all those kind of things that happen with open source.
+
+315
+00:25:46.740 --> 00:25:53.380
+<v Guillermo Rauch>But then just kind of like the most surprising thing for me was seeing it get to production so fast.
+
+316
+00:25:53.380 --> 00:25:58.700
+<v Guillermo Rauch>ask is I was also part of the early days of the Node ecosystem and I had an intuition for like
+
+317
+00:25:58.700 --> 00:26:05.500
+<v Guillermo Rauch>time to production and how much investment goes into the thing and how much advocacy and teaching
+
+318
+00:26:05.500 --> 00:26:12.000
+<v Guillermo Rauch>it takes. And I think with Next, like that time was just very remarkably short. And this is why
+
+319
+00:26:12.000 --> 00:26:17.240
+<v Guillermo Rauch>also going back to open source, I always advocate for open source as sort of the best possible tool
+
+320
+00:26:17.240 --> 00:26:22.560
+<v Guillermo Rauch>for finding product market fit because it's free, because it has all this really smooth marketing
+
+321
+00:26:23.380 --> 00:26:29.740
+<v Guillermo Rauch>like GitHub Explorer and stars and folks always being up for trying new things.
+
+322
+00:26:30.040 --> 00:26:36.380
+<v Guillermo Rauch>But that time to prod was what kind of was unlike many other things I had created in the past.
+
+323
+00:26:37.900 --> 00:26:39.680
+<v Noah Labhart>Let's flip the script a little bit.
+
+324
+00:26:40.120 --> 00:26:43.940
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+325
+00:26:45.860 --> 00:26:52.580
+<v Guillermo Rauch>I would say that we learned really quickly how valuable backwards compatibility can be.
+
+326
+00:26:53.400 --> 00:26:59.600
+<v Guillermo Rauch>And this is pronounced much more strongly when you're operating infrastructure.
+
+327
+00:27:00.660 --> 00:27:14.980
+<v Guillermo Rauch>So we were able to turn that insight into a strength once we learned it, because I think ever since Next 0.1 and what we sort of called at the time Now V2,
+
+328
+00:27:15.280 --> 00:27:22.020
+<v Guillermo Rauch>we've never had a single meaningful breaking change to either the framework or the platform.
+
+329
+00:27:23.380 --> 00:27:28.540
+<v Guillermo Rauch>That pays massive dividends when it comes down to what I mentioned earlier, which is
+
+330
+00:27:29.340 --> 00:27:30.560
+<v Guillermo Rauch>optimizing for production.
+
+331
+00:27:31.520 --> 00:27:37.360
+<v Guillermo Rauch>So you have to navigate this space of like evolution while retaining backwards compatibility.
+
+332
+00:27:37.880 --> 00:27:42.260
+<v Guillermo Rauch>And companies like AWS, I think have done a fantastic job at doing this at scale.
+
+333
+00:27:42.420 --> 00:27:43.900
+<v Guillermo Rauch>So it definitely can be done.
+
+334
+00:27:44.820 --> 00:27:51.440
+<v Guillermo Rauch>And being new to the world of that kind of scale, when it comes down to like, you know,
+
+335
+00:27:53.380 --> 00:27:59.880
+<v Guillermo Rauch>of deploys per week, you learn it really fast and you can turn it into a strength, not just
+
+336
+00:27:59.880 --> 00:28:05.320
+<v Guillermo Rauch>not incurring that mistake, but really deliver on innovation without any disruption.
+
+337
+00:28:08.100 --> 00:28:12.140
+<v Noah Labhart>So what does the future look like for Vercel, the product and for your team?
+
+338
+00:28:13.620 --> 00:28:20.520
+<v Guillermo Rauch>I think the front end world is still going to see a major revolution, especially with
+
+339
+00:28:20.520 --> 00:28:23.340
+<v Guillermo Rauch>with two technologies that I'm particularly excited about.
+
+340
+00:28:23.560 --> 00:28:24.360
+<v Guillermo Rauch>One is edge computing,
+
+341
+00:28:25.280 --> 00:28:30.080
+<v Guillermo Rauch>which is our ability to not just put the static parts
+
+342
+00:28:30.080 --> 00:28:31.700
+<v Guillermo Rauch>of a website next to your customer,
+
+343
+00:28:31.880 --> 00:28:36.900
+<v Guillermo Rauch>but to personalize and dynamicize
+
+344
+00:28:36.900 --> 00:28:38.480
+<v Guillermo Rauch>right next to your customer.
+
+345
+00:28:38.720 --> 00:28:40.620
+<v Guillermo Rauch>I think this is going to be tremendously impactful
+
+346
+00:28:40.620 --> 00:28:45.940
+<v Guillermo Rauch>because this is a way that real-world commerce already works.
+
+347
+00:28:46.020 --> 00:28:49.040
+<v Guillermo Rauch>When you want to buy a MacBook,
+
+348
+00:28:50.520 --> 00:28:58.000
+<v Guillermo Rauch>online or you can walk to your nearest store and you'll have the most optimized hyperlocal
+
+349
+00:28:58.000 --> 00:29:03.220
+<v Guillermo Rauch>experience possible to where you are and where you live. This has not really happened for the
+
+350
+00:29:03.220 --> 00:29:09.980
+<v Guillermo Rauch>web yet. We've made a trade-off between it's fast everywhere, but kind of static, like it's
+
+351
+00:29:09.980 --> 00:29:17.280
+<v Guillermo Rauch>cached and whatnot, or it's super dynamic, but it only lives in US East 1 in Virginia.
+
+352
+00:29:17.900 --> 00:29:22.680
+<v Guillermo Rauch>and this is kind of a false dichotomy right like we can have the cake and eat it too we can
+
+353
+00:29:22.680 --> 00:29:29.080
+<v Guillermo Rauch>put the workloads everywhere in the world we can be super fast even when cold and we can
+
+354
+00:29:29.080 --> 00:29:36.860
+<v Guillermo Rauch>dynamicize without compromising availability in other words we can determine just in time for
+
+355
+00:29:36.860 --> 00:29:42.000
+<v Guillermo Rauch>every visitor what to give them and that can also be very fast and can come from a global
+
+356
+00:29:42.000 --> 00:29:48.480
+<v Guillermo Rauch>distributed cache. So I think it's going to be a leap forward in terms of the infrastructure that
+
+357
+00:29:48.480 --> 00:29:52.900
+<v Guillermo Rauch>we're giving developers. And obviously the way that we go about this with Next.js is always to
+
+358
+00:29:53.520 --> 00:30:00.300
+<v Guillermo Rauch>give them a very strong local programming model, right? Like we bake this capabilities and features
+
+359
+00:30:00.300 --> 00:30:08.340
+<v Guillermo Rauch>right into the framework such that if you choose to deploy to the edge, you can have this global
+
+360
+00:30:08.340 --> 00:30:10.680
+<v Guillermo Rauch>global maximum of performance and dynamism.
+
+361
+00:30:11.000 --> 00:30:15.620
+<v Guillermo Rauch>One of the key components here to make all this happen is this innovation is coming into
+
+362
+00:30:15.620 --> 00:30:17.940
+<v Guillermo Rauch>React called React Server Components.
+
+363
+00:30:18.360 --> 00:30:25.020
+<v Guillermo Rauch>And as the name implies, it makes components render and do data fetching on the server
+
+364
+00:30:25.020 --> 00:30:31.260
+<v Guillermo Rauch>side with tremendous advantages like minimizing the amount of client JS that gets shipped.
+
+365
+00:30:31.560 --> 00:30:35.680
+<v Guillermo Rauch>And it also optimizes drastically for dynamic workloads.
+
+366
+00:30:35.680 --> 00:30:43.140
+<v Guillermo Rauch>So like think logged in states, user personalization, recommendations, A-B tests, feature flags.
+
+367
+00:30:43.480 --> 00:30:52.040
+<v Guillermo Rauch>These are all things that when you say them, they're either too foreign for folks that are just developing or even getting started with the web today.
+
+368
+00:30:52.260 --> 00:31:01.880
+<v Guillermo Rauch>Or if you're a very large enterprise or if you're in a super well-developed application and business, they sound daunting.
+
+369
+00:31:01.880 --> 00:31:06.320
+<v Guillermo Rauch>commenting or they're being shipped as client-side scripts that are slowing the web down.
+
+370
+00:31:06.680 --> 00:31:12.180
+<v Guillermo Rauch>I think we have a great opportunity to demystify in many ways a lot of those technologies, right?
+
+371
+00:31:12.240 --> 00:31:18.440
+<v Guillermo Rauch>Like Facebook actually became very prominent for their use of experimentation, right? Like
+
+372
+00:31:18.440 --> 00:31:23.040
+<v Guillermo Rauch>everything they ship, it's not a binary thing. It's like either not shipped or shipped. It's a
+
+373
+00:31:23.040 --> 00:31:29.260
+<v Guillermo Rauch>gradient of, you know, you're going to try out this new way of commenting or this new way of reacting.
+
+374
+00:31:29.260 --> 00:31:41.760
+<v Guillermo Rauch>But when you're developing an app from scratch today on public cloud, it's very hard to even get started with a foundation, shall I say a framework like that.
+
+375
+00:31:42.020 --> 00:31:48.920
+<v Guillermo Rauch>So we're very looking forward to making this just broadly available and I would say democratized.
+
+376
+00:31:50.920 --> 00:31:52.540
+<v Noah Labhart>Let's switch to you, Guillermo.
+
+377
+00:31:52.680 --> 00:31:55.120
+<v Noah Labhart>Who influences the way that you work?
+
+378
+00:31:55.120 --> 00:32:00.460
+<v Noah Labhart>Name a CEO, CTO, architect, really any person that you look up to and why.
+
+379
+00:32:02.880 --> 00:32:05.700
+<v Guillermo Rauch>I really like Bret Taylor.
+
+380
+00:32:05.840 --> 00:32:07.540
+<v Guillermo Rauch>He's the CEO of Salesforce.
+
+381
+00:32:08.000 --> 00:32:14.620
+<v Guillermo Rauch>I think working at that scale and continuing to innovate at the scale that that company is,
+
+382
+00:32:14.680 --> 00:32:20.360
+<v Guillermo Rauch>I think it's really something that you can't take too lightly.
+
+383
+00:32:20.520 --> 00:32:23.380
+<v Guillermo Rauch>And it's an admirable position to be in.
+
+384
+00:32:25.120 --> 00:32:30.760
+<v Guillermo Rauch>the fact that we're seeing leaders like this that have such strong technical backgrounds.
+
+385
+00:32:31.280 --> 00:32:36.400
+<v Guillermo Rauch>So he was previously, I believe, CTO at Facebook. I've been following him since the days that
+
+386
+00:32:36.400 --> 00:32:43.400
+<v Guillermo Rauch>Facebook acquired FriendFeed, one of his companies. I love some of the early use cases.
+
+387
+00:32:43.680 --> 00:32:49.100
+<v Guillermo Rauch>One of the earliest use cases of React that I loved was how Quip, the company that he sold to
+
+388
+00:32:49.100 --> 00:32:52.180
+<v Guillermo Rauch>to Salesforce was using React in combination
+
+389
+00:32:52.180 --> 00:32:55.860
+<v Guillermo Rauch>with this multi-platform data synchronization layer.
+
+390
+00:32:56.720 --> 00:32:59.760
+<v Guillermo Rauch>That ratio of like really noser stuff
+
+391
+00:33:00.060 --> 00:33:03.560
+<v Guillermo Rauch>to incredible execution on the business side of things.
+
+392
+00:33:03.720 --> 00:33:06.660
+<v Guillermo Rauch>I think that's, you know, I would put Bill Joy
+
+393
+00:33:06.660 --> 00:33:08.240
+<v Guillermo Rauch>in that category as well.
+
+394
+00:33:08.780 --> 00:33:12.980
+<v Guillermo Rauch>Co-founder of Sun Microsystems, but also inventor of VI,
+
+395
+00:33:13.380 --> 00:33:15.160
+<v Guillermo Rauch>the best editor in the world.
+
+396
+00:33:15.160 --> 00:33:20.840
+<v Guillermo Rauch>and also like early versions of the TCP stack, the BSD edition.
+
+397
+00:33:21.020 --> 00:33:24.040
+<v Guillermo Rauch>So I look for that kind of completeness.
+
+398
+00:33:24.480 --> 00:33:28.800
+<v Guillermo Rauch>Kind of how, you know, the best modern tennis players
+
+399
+00:33:28.800 --> 00:33:31.640
+<v Guillermo Rauch>and all-around multi-surface tennis player.
+
+400
+00:33:32.980 --> 00:33:36.340
+<v Noah Labhart>Well, we talked about a mistake earlier, but a little bit different spin.
+
+401
+00:33:36.540 --> 00:33:39.740
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+402
+00:33:39.780 --> 00:33:42.160
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+403
+00:33:44.120 --> 00:33:51.760
+<v Guillermo Rauch>One of the things that has really worked out well for our platform has been developing
+
+404
+00:33:52.500 --> 00:33:55.920
+<v Guillermo Rauch>integrations into best-in-class systems.
+
+405
+00:33:57.160 --> 00:34:03.620
+<v Guillermo Rauch>So for example, a big source of joy in our platform comes from our GitHub integration,
+
+406
+00:34:03.620 --> 00:34:11.100
+<v Guillermo Rauch>integration where you install Vercel into your GitHub repo with just a couple clicks
+
+407
+00:34:11.100 --> 00:34:18.120
+<v Guillermo Rauch>and then we automatically deploy every push. We literally turn your existing workflow
+
+408
+00:34:18.840 --> 00:34:27.340
+<v Guillermo Rauch>which is code hosting into front-end workflow with build and hosting baked in. It's like
+
+409
+00:34:27.340 --> 00:34:29.280
+<v Guillermo Rauch>Like it becomes a git on steroids.
+
+410
+00:34:30.160 --> 00:34:36.500
+<v Guillermo Rauch>I think and I regularly advise to double down on that.
+
+411
+00:34:37.080 --> 00:34:42.340
+<v Guillermo Rauch>And I'm constantly trying to like find new ways and new integrations that are possible.
+
+412
+00:34:42.760 --> 00:34:50.340
+<v Guillermo Rauch>And I think going back, I just try to do that as soon as physically possible.
+
+413
+00:34:50.780 --> 00:34:55.560
+<v Guillermo Rauch>And it's hard to obviously find out what the exact time would have been.
+
+414
+00:34:57.340 --> 00:35:07.140
+<v Guillermo Rauch>love to always put in a strong emphasis on that and then doing my absolute best in becoming world
+
+415
+00:35:07.140 --> 00:35:15.440
+<v Guillermo Rauch>class at at your sort of place in that ecosystem like being just super aware of
+
+416
+00:35:16.520 --> 00:35:24.080
+<v Guillermo Rauch>how those ecosystems shape up and where integration is a superior alternative to
+
+417
+00:35:24.080 --> 00:35:27.580
+<v Guillermo Rauch>in some ways, reinvention or reimplementation.
+
+418
+00:35:30.380 --> 00:35:31.620
+<v Noah Labhart>Last question, Guillermo.
+
+419
+00:35:32.080 --> 00:35:33.400
+<v Noah Labhart>So you're getting on a plane
+
+420
+00:35:33.400 --> 00:35:35.200
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+421
+00:35:35.200 --> 00:35:36.980
+<v Noah Labhart>who's built the next big thing.
+
+422
+00:35:37.220 --> 00:35:38.460
+<v Noah Labhart>They're jazzed about it.
+
+423
+00:35:38.500 --> 00:35:39.760
+<v Noah Labhart>They can't wait to show it off to the world.
+
+424
+00:35:39.820 --> 00:35:41.900
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+425
+00:35:42.200 --> 00:35:43.740
+<v Noah Labhart>What advice do you give that person
+
+426
+00:35:43.740 --> 00:35:45.580
+<v Noah Labhart>having gone down this road multiple times?
+
+427
+00:35:47.320 --> 00:35:50.080
+<v Guillermo Rauch>I would say the boring answer is
+
+428
+00:35:50.080 --> 00:35:59.920
+<v Guillermo Rauch>continues to be just putting the customer at the 100% foremost priority.
+
+429
+00:36:01.220 --> 00:36:05.440
+<v Guillermo Rauch>And the twist of that in our world of dev tools making
+
+430
+00:36:05.440 --> 00:36:07.880
+<v Guillermo Rauch>is that the customer is obfuscated
+
+431
+00:36:07.880 --> 00:36:10.900
+<v Guillermo Rauch>because there is a customer that buys their tool
+
+432
+00:36:10.900 --> 00:36:14.420
+<v Guillermo Rauch>and there is a customer that gets serviced by that tool.
+
+433
+00:36:14.940 --> 00:36:22.440
+<v Guillermo Rauch>so I guess that's the kind of intellectually stimulating part of our job I would say is that
+
+434
+00:36:22.440 --> 00:36:28.280
+<v Guillermo Rauch>you have two customers in mind so I would say if you think about one and not the other
+
+435
+00:36:29.900 --> 00:36:36.540
+<v Guillermo Rauch>you're in trouble most likely so that that goes for companies that just focus on excellent dx
+
+436
+00:36:36.540 --> 00:36:44.120
+<v Guillermo Rauch>but they're not really moving the needle for that resulting UX or vice versa.
+
+437
+00:36:44.620 --> 00:36:49.560
+<v Guillermo Rauch>You might have the pinnacle of infrastructure prowess, for example.
+
+438
+00:36:49.720 --> 00:36:55.820
+<v Guillermo Rauch>And yet, how does a developer go about programming for that or implementing that?
+
+439
+00:36:56.100 --> 00:36:59.840
+<v Guillermo Rauch>So if you have one and not the other, you could be in trouble.
+
+440
+00:36:59.840 --> 00:37:09.340
+<v Guillermo Rauch>trouble. So I turned this into a repeatable piece of advice that I share with people. But, you know,
+
+441
+00:37:09.400 --> 00:37:13.920
+<v Guillermo Rauch>the caveat is always that a lot of disruptive innovation comes from
+
+442
+00:37:14.920 --> 00:37:17.980
+<v Guillermo Rauch>ignoring the advice of experts. So there's always that caveat.
+
+443
+00:37:19.640 --> 00:37:24.460
+<v Noah Labhart>That's fantastic advice. Guillermo, thank you for being on the show today. Thank you for telling
+
+444
+00:37:24.460 --> 00:37:26.360
+<v Noah Labhart>the creation story of Vercel.
+
+445
+00:37:27.560 --> 00:37:28.440
+<v Guillermo Rauch>Thanks for having me.
+
+446
+00:37:30.420 --> 00:37:31.260
+<v Guillermo Rauch>And
+
+447
+00:37:31.260 --> 00:37:33.580
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+448
+00:37:33.580 --> 00:37:34.080
+<v Noah Labhart>Code Story.
+
+449
+00:37:37.540 --> 00:37:40.060
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+450
+00:37:40.220 --> 00:37:44.980
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+451
+00:37:45.440 --> 00:37:50.480
+<v Noah Labhart>Support the show on Patreon.com slash Code Story for just five to ten bucks a month.
+
+452
+00:37:50.900 --> 00:37:52.260
+<v Noah Labhart>And when you get a chance, leave
+
+453
+00:37:52.260 --> 00:37:53.940
+<v Noah Labhart>And thanks
+
+454
+00:37:53.940 --> 00:37:58.600
+<v Guillermo Rauch>again
+
+455
+00:37:58.600 --> 00:37:59.160
+<v Noah Labhart>for listening.
+
+456
+00:38:14.520 --> 00:38:18.020
+<v Noah Labhart>This episode of Code Story is sponsored by Cloudways.
+
+457
+00:38:18.960 --> 00:38:24.820
+<v Noah Labhart>Cloudways is a managed hosting platform ideal for small to medium businesses, e-commerce, and agencies.
+
+458
+00:38:25.280 --> 00:38:29.500
+<v Noah Labhart>Because with Cloudways, they don't have to worry about managing or maintaining servers.
+
+459
+00:38:29.840 --> 00:38:31.820
+<v Noah Labhart>and can instead focus on their business.
+
+460
+00:38:32.440 --> 00:38:35.360
+<v Noah Labhart>Cloudways offers peace of mind to business owners
+
+461
+00:38:35.360 --> 00:38:38.840
+<v Noah Labhart>with reliable 24-7 support and managed backups.
+
+462
+00:38:39.220 --> 00:38:42.740
+<v Noah Labhart>Their custom stack has integrated cache and performance-boosting tech
+
+463
+00:38:42.740 --> 00:38:46.400
+<v Noah Labhart>that will improve page load times, which is super important.
+
+464
+00:38:46.820 --> 00:38:49.780
+<v Noah Labhart>With Cloudways, customers have the freedom and flexibility
+
+465
+00:38:49.780 --> 00:38:54.960
+<v Noah Labhart>to deploy PHP apps from a list of five cloud providers in just a few clicks.
+
+466
+00:38:54.960 --> 00:39:00.500
+<v Noah Labhart>Those providers are AWS, DigitalOcean, Linode, Google Cloud, and Vultr.
+
+467
+00:39:00.960 --> 00:39:04.180
+<v Noah Labhart>They can scale their servers up or down any way they want.
+
+468
+00:39:04.920 --> 00:39:09.940
+<v Noah Labhart>Cloudways has a lot of features that makes development and deployment on the cloud much easier and faster.
+
+469
+00:39:10.380 --> 00:39:18.200
+<v Noah Labhart>Features like integrated Git, a staging environment, team collaboration tools, a pre-configured composer, and free SSL.
+
+470
+00:39:18.280 --> 00:39:19.500
+<v Noah Labhart>That's right, free.
+
+471
+00:39:19.500 --> 00:39:25.940
+<v Noah Labhart>Use the promo code CODE30 and get up to two months of free hosting with a $30 credit.
+
+472
+00:39:26.640 --> 00:39:29.580
+<v Noah Labhart>That's promo code CODE30.
+
+473
+00:39:30.500 --> 00:39:34.260
+<v Noah Labhart>Take a look at their website today at cloudways.com.

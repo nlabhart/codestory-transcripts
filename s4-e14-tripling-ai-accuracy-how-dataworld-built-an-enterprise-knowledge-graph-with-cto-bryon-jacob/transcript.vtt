@@ -1,0 +1,2279 @@
+WEBVTT
+
+NOTE S4 E14: Tripling AI Accuracy: How data.world Built an Enterprise Knowledge Graph with CTO Bryon Jacob
+
+1
+00:00:03.580 --> 00:00:19.340
+<v Bryon Jacob>In the enterprise world, it's way more common for folks to already have an existing data warehouse or data lake with some kind of, you know, querying abstraction sitting on top of that, you know, various Hadoop technologies or other kind of big data tech.
+
+2
+00:00:20.600 --> 00:00:26.100
+<v Bryon Jacob>and you don't want to, you know, you would not want to try to relocate or make a copy of all
+
+3
+00:00:26.100 --> 00:00:30.480
+<v Bryon Jacob>that data inside of Data.World's platform. That's not a sensible thing to try to do.
+
+4
+00:00:31.080 --> 00:00:36.040
+<v Bryon Jacob>What you want to be able to do is connect to that data where it sits and query it in place.
+
+5
+00:00:38.160 --> 00:00:41.920
+<v Bryon Jacob>My name is Bryon Jacob and I'm the CTO and co-founder of Data.World.
+
+6
+00:00:47.680 --> 00:00:54.500
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share
+
+7
+00:00:54.500 --> 00:01:00.100
+<v Noah Labhart>in the critical moments of what it takes to change an industry and build and lead a team
+
+8
+00:01:00.100 --> 00:01:07.220
+<v Noah Labhart>that has your back. I'm your host, Noah Labhart, and today, how Bryon Jacob created a massive
+
+9
+00:01:07.220 --> 00:01:16.080
+<v Noah Labhart>of ecosystem for you to maximize your data utilization. All this and more on Code Story.
+
+10
+00:01:19.760 --> 00:01:26.880
+<v Noah Labhart>Bryon Jacob is a family man with four kids from ages 11 downward. With a young startup and family,
+
+11
+00:01:26.900 --> 00:01:31.300
+<v Noah Labhart>his hobbies have suffered some, but during the pandemic, he was able to pick back up music,
+
+12
+00:01:31.300 --> 00:01:37.640
+<v Noah Labhart>specifically playing the keyboard. He's an avid reader, mostly sci-fi, and loves to play strategy
+
+13
+00:01:37.640 --> 00:01:43.840
+<v Noah Labhart>board games. His family tends to play games like Puerto Rico and Ticket to Ride, which is simple
+
+14
+00:01:43.840 --> 00:01:50.140
+<v Noah Labhart>enough for his six-year-old to compete. He and his co-founders have created a massive open community
+
+15
+00:01:50.140 --> 00:01:55.680
+<v Noah Labhart>for data. Users can sign up for free, bring their data catalog, and analyze any data inside the
+
+16
+00:01:55.680 --> 00:02:01.220
+<v Noah Labhart>ecosystem. In doing so, they've seen traction of nearly a million users in the ecosystem,
+
+17
+00:02:01.520 --> 00:02:08.300
+<v Noah Labhart>along with enterprise users utilizing a private internal data ecosystem, all based in the cloud
+
+18
+00:02:08.300 --> 00:02:14.720
+<v Noah Labhart>and fully integrated. This is the creation story of Data.World.
+
+19
+00:02:17.440 --> 00:02:24.160
+<v Bryon Jacob>Data.World is a data catalog. It's a data and metadata management platform.
+
+20
+00:02:25.980 --> 00:02:30.260
+<v Bryon Jacob>two important lenses to look at it through, and it kind of also relates to the history and how we
+
+21
+00:02:30.260 --> 00:02:36.580
+<v Bryon Jacob>got started. Primarily, it's an enterprise data management product. We sell this to large
+
+22
+00:02:36.580 --> 00:02:41.360
+<v Bryon Jacob>enterprises, you know, really, you know, Fortune 500 companies on down to small to mid-sized
+
+23
+00:02:41.360 --> 00:02:45.800
+<v Bryon Jacob>startups who have a particular interest in, you know, kind of data management. So, you know,
+
+24
+00:02:45.860 --> 00:02:50.740
+<v Bryon Jacob>we have customers all up and down the range, but we really kind of focus on being able to
+
+25
+00:02:51.340 --> 00:02:55.420
+<v Bryon Jacob>maximize the utilization of your data across the broadest set of your organization. And so
+
+26
+00:02:55.680 --> 00:03:00.500
+<v Bryon Jacob>large companies that have a large kind of data interested team and then smaller companies where
+
+27
+00:03:00.500 --> 00:03:05.660
+<v Bryon Jacob>really the whole company needs to be wired into data. And from that point of view, folks are
+
+28
+00:03:05.660 --> 00:03:10.700
+<v Bryon Jacob>looking to bring in Data.World to make sense of and rationalize the data assets they have,
+
+29
+00:03:10.820 --> 00:03:15.200
+<v Bryon Jacob>connect to all their existing data assets, understand what they mean, how they connect,
+
+30
+00:03:15.340 --> 00:03:20.820
+<v Bryon Jacob>and then actually provide that access out to their organization so that the whole company,
+
+31
+00:03:20.820 --> 00:03:26.440
+<v Bryon Jacob>need a whole team can have an understanding of what data assets exist, understanding of how they
+
+32
+00:03:26.440 --> 00:03:31.520
+<v Bryon Jacob>connect, how they're to be used, how they're used by other folks, and then be able to utilize those
+
+33
+00:03:31.520 --> 00:03:37.520
+<v Bryon Jacob>to solve problems and share the knowledge that they learn, they gain from that. In addition to
+
+34
+00:03:37.520 --> 00:03:44.280
+<v Bryon Jacob>this enterprise product, we also offer really the exact same platform with some minor changes
+
+35
+00:03:44.280 --> 00:03:49.460
+<v Bryon Jacob>because the problem space is slightly different out as an open platform for really anyone in the
+
+36
+00:03:50.820 --> 00:03:55.280
+<v Bryon Jacob>a platform that anyone can go sign up to use for free to analyze and work on all the open data
+
+37
+00:03:55.280 --> 00:04:00.900
+<v Bryon Jacob>that's there, also to bring and contribute their own data to the open corpus of data on there. So
+
+38
+00:04:00.900 --> 00:04:06.600
+<v Bryon Jacob>I said there's about 875 or so thousand people and, you know, an open data catalog there of, you know,
+
+39
+00:04:06.600 --> 00:04:11.340
+<v Bryon Jacob>four or five hundred thousand open data sets. We organize the company as a public benefit
+
+40
+00:04:11.340 --> 00:04:15.600
+<v Bryon Jacob>corporation. It's not a not-for-profit. It's very much a for-profit venture-backed company.
+
+41
+00:04:15.600 --> 00:04:20.100
+<v Bryon Jacob>A public benefit corp is basically in almost every way, just like a standard C corporation,
+
+42
+00:04:20.420 --> 00:04:26.960
+<v Bryon Jacob>but we make a public benefit statement as part of the corporate charter that is explicitly
+
+43
+00:04:26.960 --> 00:04:31.280
+<v Bryon Jacob>allowed and in fact required to be a part of our corporate decision making.
+
+44
+00:04:31.480 --> 00:04:36.780
+<v Bryon Jacob>So over and above just the profit motive and maximizing return for shareholders, there's
+
+45
+00:04:36.780 --> 00:04:40.660
+<v Bryon Jacob>also a responsibility to adhere to this particular structure.
+
+46
+00:04:40.660 --> 00:04:46.700
+<v Bryon Jacob>and ours is really around accruing the benefits of this better data management philosophy
+
+47
+00:04:47.400 --> 00:04:51.880
+<v Bryon Jacob>back to the way that we work with data in society, not just within the walls of our
+
+48
+00:04:51.880 --> 00:04:52.720
+<v Bryon Jacob>corporate customers.
+
+49
+00:04:53.560 --> 00:04:56.260
+<v Bryon Jacob>So we wanted to get that open community out there first.
+
+50
+00:04:56.400 --> 00:05:00.260
+<v Bryon Jacob>We really spent the first two years of the company building out that open community.
+
+51
+00:05:00.740 --> 00:05:01.880
+<v Bryon Jacob>It was done for two reasons.
+
+52
+00:05:02.020 --> 00:05:07.020
+<v Bryon Jacob>One to kind of adhere to that benefit statement, but two, it was a great way to kind of go
+
+53
+00:05:07.020 --> 00:05:12.080
+<v Bryon Jacob>from ground zero when we started the company with no code, no product, nothing at all but
+
+54
+00:05:12.080 --> 00:05:17.380
+<v Bryon Jacob>an idea to build the right product and to kind of get to this point of scale where we
+
+55
+00:05:17.380 --> 00:05:20.280
+<v Bryon Jacob>can do high velocity A-B testing of features.
+
+56
+00:05:20.380 --> 00:05:24.720
+<v Bryon Jacob>When we want to test new features, we can release them out in controlled experiments
+
+57
+00:05:25.280 --> 00:05:30.380
+<v Bryon Jacob>and get really great product feedback quickly, which lets us just iterate and move much more
+
+58
+00:05:30.380 --> 00:05:35.660
+<v Bryon Jacob>quickly on making the product useful for folks doing data analysis than we could if we were
+
+59
+00:05:37.580 --> 00:05:41.620
+<v Bryon Jacob>the usage of folks within the walls of our corporate customers.
+
+60
+00:05:44.820 --> 00:05:49.820
+<v Noah Labhart>Let's dive into the MVP a little bit. Tell me about the MVP. How long did it take to build?
+
+61
+00:05:49.940 --> 00:05:52.080
+<v Noah Labhart>What sort of tools did you use to get it off the ground?
+
+62
+00:05:53.400 --> 00:05:58.920
+<v Bryon Jacob>We initially kind of founded the company in September 2015. And that was really at that
+
+63
+00:05:58.920 --> 00:06:03.740
+<v Bryon Jacob>point, it was just the four co-founders. And we were off pitching and doing our initial
+
+64
+00:06:03.740 --> 00:06:09.380
+<v Bryon Jacob>fundraise really based on the idea and the strength of that team kind of
+
+65
+00:06:09.380 --> 00:06:14.480
+<v Bryon Jacob>teed up and ready to go. During that time we built a demo and I cannot stress
+
+66
+00:06:14.480 --> 00:06:19.220
+<v Bryon Jacob>enough this was a demo. It was not real software. It was you know very
+
+67
+00:06:19.220 --> 00:06:24.420
+<v Bryon Jacob>very loose clickable demo of you know what could be that my co-founder John
+
+68
+00:06:24.420 --> 00:06:29.200
+<v Bryon Jacob>and I mostly did and then we actually brought in a few of the folks that we
+
+69
+00:06:29.200 --> 00:06:32.200
+<v Bryon Jacob>We were initially, we intended to hire onto the team
+
+70
+00:06:32.700 --> 00:06:34.820
+<v Bryon Jacob>to help flesh that out
+
+71
+00:06:34.820 --> 00:06:36.200
+<v Bryon Jacob>and give it a little bit more structure.
+
+72
+00:06:37.480 --> 00:06:41.840
+<v Bryon Jacob>We did that fundraise and we then launched the company
+
+73
+00:06:41.840 --> 00:06:45.440
+<v Bryon Jacob>properly with our initial team kind of really starting
+
+74
+00:06:45.820 --> 00:06:48.260
+<v Bryon Jacob>in January of 2016, so kind of right at the beginning
+
+75
+00:06:48.260 --> 00:06:48.760
+<v Bryon Jacob>of the year.
+
+76
+00:06:48.920 --> 00:06:52.820
+<v Bryon Jacob>We set the goal right then of launching the product
+
+77
+00:06:52.820 --> 00:06:55.640
+<v Bryon Jacob>from really nothing but this demo, which had some,
+
+78
+00:06:55.640 --> 00:07:00.200
+<v Bryon Jacob>you know, it was a reasonable, you know, clickable screenshots almost of what it could look like
+
+79
+00:07:00.200 --> 00:07:05.160
+<v Bryon Jacob>in July. And so we kind of organized around that, you know, in six months, we're going to get this
+
+80
+00:07:05.160 --> 00:07:09.120
+<v Bryon Jacob>out into the world, do a beta launch and start promoting it and building up that open community.
+
+81
+00:07:09.560 --> 00:07:12.960
+<v Bryon Jacob>And so we did that, you know, we kind of carved the team quickly into two parts,
+
+82
+00:07:13.060 --> 00:07:17.360
+<v Bryon Jacob>one kind of building out the back end and one building out the front end of the application.
+
+83
+00:07:18.460 --> 00:07:23.900
+<v Bryon Jacob>The company when we started in January 2016 was maybe 12 people, about eight of whom were on the
+
+84
+00:07:25.640 --> 00:07:29.800
+<v Bryon Jacob>engineering heavy because we knew we had to kind of do a lift from zero to something really quickly.
+
+85
+00:07:30.600 --> 00:07:35.620
+<v Bryon Jacob>One thing we did immediately when we started that was make every connection we could to go out and
+
+86
+00:07:35.620 --> 00:07:40.820
+<v Bryon Jacob>do user testing on the concepts that we were building. So everything that went into the
+
+87
+00:07:40.820 --> 00:07:46.620
+<v Bryon Jacob>product, even in that very first MVP, was, you know, something that had been put in front of,
+
+88
+00:07:46.680 --> 00:07:50.740
+<v Bryon Jacob>you know, as many users as we could get it in front of, you know, sometimes maybe only four
+
+89
+00:07:50.740 --> 00:07:55.020
+<v Bryon Jacob>or five folks, but often, you know, a dozen or more. We were doing many of these user sessions
+
+90
+00:07:55.640 --> 00:07:58.820
+<v Bryon Jacob>putting in front of folks just paper wireframes and design tools,
+
+91
+00:07:59.020 --> 00:08:02.100
+<v Bryon Jacob>and then the real product as it started to come to be more real.
+
+92
+00:08:02.940 --> 00:08:05.060
+<v Bryon Jacob>The founder of LinkedIn is kind of very famous for saying,
+
+93
+00:08:05.140 --> 00:08:07.860
+<v Bryon Jacob>if you're not embarrassed by your first effort, you launched too late.
+
+94
+00:08:08.040 --> 00:08:10.720
+<v Bryon Jacob>And I think that I'd say that was roughly accurate here.
+
+95
+00:08:10.840 --> 00:08:14.240
+<v Bryon Jacob>I think we knew that what we launched wasn't the true MVP
+
+96
+00:08:14.240 --> 00:08:16.440
+<v Bryon Jacob>that was really going to be useful to that community,
+
+97
+00:08:16.640 --> 00:08:18.800
+<v Bryon Jacob>but it was very much good enough to get it out there
+
+98
+00:08:18.800 --> 00:08:22.360
+<v Bryon Jacob>and start getting that quantitative feedback of hundreds of thousands of users
+
+99
+00:08:22.360 --> 00:08:27.480
+<v Bryon Jacob>as opposed to just the qualitative feedback of the dozens we could reach at a time with user testing.
+
+100
+00:08:27.960 --> 00:08:33.480
+<v Bryon Jacob>The product evolved very rapidly that first six months in production, the back half of 2016.
+
+101
+00:08:33.900 --> 00:08:39.180
+<v Bryon Jacob>So I think, you know, Data.World really started to exist as a thing that looks like a thing you'd recognize even today.
+
+102
+00:08:39.400 --> 00:08:43.000
+<v Bryon Jacob>Around the beginning of 2017, around a year after we really kind of started,
+
+103
+00:08:43.700 --> 00:08:51.060
+<v Bryon Jacob>the core foundation that really is the core of what we are today had crystallized over that first year.
+
+104
+00:08:52.960 --> 00:08:57.000
+<v Noah Labhart>I'm still interested in the MVP and you touched on this a little bit, but I want you to dive
+
+105
+00:08:57.000 --> 00:09:01.260
+<v Noah Labhart>in a little more to sort of the decisions and trade-offs you had to make in the short
+
+106
+00:09:01.260 --> 00:09:02.840
+<v Noah Labhart>term and how you cope with them.
+
+107
+00:09:02.920 --> 00:09:07.420
+<v Noah Labhart>And I'm looking, looking more towards, you know, technical debt, building things a certain
+
+108
+00:09:07.420 --> 00:09:10.680
+<v Noah Labhart>way to move fast, but knowing it's not going to last kind of thing.
+
+109
+00:09:11.560 --> 00:09:15.380
+<v Noah Labhart>Tell me a little bit more about those and how you cope with those sorts of decisions.
+
+110
+00:09:18.100 --> 00:09:23.440
+<v Bryon Jacob>What we tried to do, and I think we did a quite good job of, is identifying the right
+
+111
+00:09:23.440 --> 00:09:28.120
+<v Bryon Jacob>principles early on and adhering to those and kind of taking on debt intelligently and
+
+112
+00:09:28.120 --> 00:09:29.580
+<v Bryon Jacob>being able to manage that debt over time.
+
+113
+00:09:29.760 --> 00:09:33.560
+<v Bryon Jacob>So we were going to really gain the leverage of the cloud.
+
+114
+00:09:33.900 --> 00:09:40.060
+<v Bryon Jacob>We were going to build everything in a very cloud first and very much embrace the ideals
+
+115
+00:09:40.060 --> 00:09:43.840
+<v Bryon Jacob>of infrastructure as code, flexibility, repeatability,
+
+116
+00:09:44.080 --> 00:09:47.360
+<v Bryon Jacob>scalability that we could get by making sure
+
+117
+00:09:47.360 --> 00:09:50.440
+<v Bryon Jacob>that we took on the absolute minimum amount
+
+118
+00:09:50.440 --> 00:09:53.060
+<v Bryon Jacob>of operational debt and operational complexity
+
+119
+00:09:53.060 --> 00:09:55.700
+<v Bryon Jacob>and really maximize the ability for us
+
+120
+00:09:55.700 --> 00:09:57.060
+<v Bryon Jacob>to kind of automate our infrastructure.
+
+121
+00:09:57.780 --> 00:10:00.340
+<v Bryon Jacob>We actually made those things real from the beginning.
+
+122
+00:10:00.420 --> 00:10:01.840
+<v Bryon Jacob>So from the beginning of the platform,
+
+123
+00:10:02.120 --> 00:10:05.500
+<v Bryon Jacob>we never went into our AWS console
+
+124
+00:10:05.920 --> 00:10:08.420
+<v Bryon Jacob>and manually provisioned resources
+
+125
+00:10:10.060 --> 00:10:13.440
+<v Bryon Jacob>we'll automate that later. From the beginning of time, everything that's been deployed kind
+
+126
+00:10:13.440 --> 00:10:19.080
+<v Bryon Jacob>of in any production environment is done as code. You know, we didn't dwell for a long time on
+
+127
+00:10:19.080 --> 00:10:24.040
+<v Bryon Jacob>specific technology choices where we knew that we'd probably want to revisit with more data.
+
+128
+00:10:25.040 --> 00:10:31.660
+<v Bryon Jacob>One example on that is like just, you know, the technology we used to host all of our web
+
+129
+00:10:31.660 --> 00:10:37.040
+<v Bryon Jacob>services and our website in the early days, we made a decision pretty early on to deploy all
+
+130
+00:10:37.040 --> 00:10:39.800
+<v Bryon Jacob>of those things using Amazon's Elastic Beanstalk.
+
+131
+00:10:40.480 --> 00:10:42.260
+<v Bryon Jacob>I think we suspected at that point
+
+132
+00:10:42.260 --> 00:10:44.740
+<v Bryon Jacob>that wasn't really a great solution for the long haul
+
+133
+00:10:44.740 --> 00:10:47.240
+<v Bryon Jacob>to kind of scale up and that we'd want to move to something
+
+134
+00:10:47.240 --> 00:10:48.480
+<v Bryon Jacob>where we had a little bit more control
+
+135
+00:10:48.480 --> 00:10:50.440
+<v Bryon Jacob>and do some more standard containerized work.
+
+136
+00:10:50.600 --> 00:10:52.660
+<v Bryon Jacob>But it also let us just move very quickly
+
+137
+00:10:52.660 --> 00:10:55.020
+<v Bryon Jacob>with the skillset of the folks we had on staff
+
+138
+00:10:55.020 --> 00:10:57.200
+<v Bryon Jacob>at that moment to get things up and running.
+
+139
+00:10:57.960 --> 00:11:00.160
+<v Bryon Jacob>We did that, it lasted about a year or so.
+
+140
+00:11:00.360 --> 00:11:02.820
+<v Bryon Jacob>And then as we started kind of maturing
+
+141
+00:11:02.820 --> 00:11:04.960
+<v Bryon Jacob>and kind of enriching the set of services we offered,
+
+142
+00:11:05.220 --> 00:11:06.140
+<v Bryon Jacob>folks were like, yeah,
+
+143
+00:11:07.040 --> 00:11:08.360
+<v Bryon Jacob>flexible or scalable enough for us.
+
+144
+00:11:08.460 --> 00:11:09.880
+<v Bryon Jacob>Let's go replace all this out.
+
+145
+00:11:09.980 --> 00:11:13.080
+<v Bryon Jacob>But it was replacing one set of fully automated templates
+
+146
+00:11:13.080 --> 00:11:14.880
+<v Bryon Jacob>for deploying that technology with another.
+
+147
+00:11:15.380 --> 00:11:18.080
+<v Bryon Jacob>And we were able to do kind of a clean zero downtime release,
+
+148
+00:11:18.200 --> 00:11:19.740
+<v Bryon Jacob>even on something major like that.
+
+149
+00:11:19.940 --> 00:11:22.300
+<v Bryon Jacob>And that's been a story that we've repeated a bunch of times
+
+150
+00:11:22.300 --> 00:11:24.320
+<v Bryon Jacob>as being able to kind of switch out technologies,
+
+151
+00:11:24.520 --> 00:11:26.700
+<v Bryon Jacob>you know, and do so with minimal impact.
+
+152
+00:11:27.620 --> 00:11:30.560
+<v Bryon Jacob>Another kind of interesting, interesting story along the same lines,
+
+153
+00:11:31.040 --> 00:11:34.260
+<v Bryon Jacob>you know, our platform is built on top of a graph database.
+
+154
+00:11:34.800 --> 00:11:36.920
+<v Bryon Jacob>If you're kind of in the, you know, graph database world,
+
+155
+00:11:37.040 --> 00:11:43.340
+<v Bryon Jacob>It's the term for it to be a large quad store, which would be a large graph of graphs where each graph is a collection of triples.
+
+156
+00:11:43.660 --> 00:11:48.540
+<v Bryon Jacob>And there's a number of, you know, both commercial and open source products that exist in this space.
+
+157
+00:11:48.660 --> 00:11:53.100
+<v Bryon Jacob>There's a number of kind of toolkits that, you know, technology toolkits that implement pieces of this problem.
+
+158
+00:11:53.100 --> 00:11:57.680
+<v Bryon Jacob>problem. Something a little bit unique about what we were doing in the space, which is that we really
+
+159
+00:11:57.680 --> 00:12:06.040
+<v Bryon Jacob>needed to optimize for economically and performantly manage a very, very large collection of mostly
+
+160
+00:12:06.040 --> 00:12:12.160
+<v Bryon Jacob>very small graphs, which is not generally kind of the optimization that most graph databases are
+
+161
+00:12:12.160 --> 00:12:18.200
+<v Bryon Jacob>looking for. They're usually kind of almost doing the opposite. How do I solve for a single,
+
+162
+00:12:18.240 --> 00:12:22.220
+<v Bryon Jacob>very large graph and being able to kind of do deep network analytics across that?
+
+163
+00:12:23.100 --> 00:12:25.880
+<v Bryon Jacob>we were going to have to custom build some of the technology here.
+
+164
+00:12:26.680 --> 00:12:32.960
+<v Bryon Jacob>In that first 12 to 18 months, we had three complete generations of that technology.
+
+165
+00:12:33.260 --> 00:12:37.920
+<v Bryon Jacob>We had the initial version that I personally built with one of the other engineers
+
+166
+00:12:38.420 --> 00:12:42.900
+<v Bryon Jacob>that was good enough to get that MVP up and running, but that we knew almost
+
+167
+00:12:42.900 --> 00:12:47.400
+<v Bryon Jacob>from the moment we launched it that we were going to have to do a heavy iteration on.
+
+168
+00:12:47.660 --> 00:12:51.140
+<v Bryon Jacob>One of the other engineers we brought in around the six month mark kind of hit
+
+169
+00:12:53.100 --> 00:12:56.620
+<v Bryon Jacob>and really did a really impressive job taking what we did
+
+170
+00:12:56.620 --> 00:12:59.460
+<v Bryon Jacob>and clearing out a lot of the debt and re-implementing it,
+
+171
+00:12:59.500 --> 00:13:02.860
+<v Bryon Jacob>making something that was 10x or more scalable than what we did.
+
+172
+00:13:03.860 --> 00:13:05.680
+<v Bryon Jacob>And then about halfway through that project,
+
+173
+00:13:05.800 --> 00:13:07.680
+<v Bryon Jacob>we kind of stumbled on another technology
+
+174
+00:13:07.680 --> 00:13:10.100
+<v Bryon Jacob>that we previously hadn't been familiar with.
+
+175
+00:13:10.240 --> 00:13:12.500
+<v Bryon Jacob>It was actually something that we initially looked at
+
+176
+00:13:12.500 --> 00:13:15.600
+<v Bryon Jacob>as really just a way to reduce the amount of disk usage we were using,
+
+177
+00:13:15.700 --> 00:13:18.320
+<v Bryon Jacob>and we found it actually had a lot more capabilities than that.
+
+178
+00:13:18.420 --> 00:13:21.420
+<v Bryon Jacob>And so almost as soon as he launched his revamp solution,
+
+179
+00:13:23.100 --> 00:13:27.640
+<v Bryon Jacob>on kind of iteration three, over that 12 to 18 months period,
+
+180
+00:13:27.680 --> 00:13:29.700
+<v Bryon Jacob>we completely ripped out and re-implemented
+
+181
+00:13:30.180 --> 00:13:34.320
+<v Bryon Jacob>the core storage tech that we use for any data ingested
+
+182
+00:13:34.320 --> 00:13:36.300
+<v Bryon Jacob>into Data.World three times.
+
+183
+00:13:36.360 --> 00:13:38.120
+<v Bryon Jacob>The product folks, the folks kind of sitting
+
+184
+00:13:38.120 --> 00:13:40.680
+<v Bryon Jacob>at the front end of the site, building the user experience,
+
+185
+00:13:40.820 --> 00:13:42.160
+<v Bryon Jacob>building the APIs that we use to integrate
+
+186
+00:13:42.160 --> 00:13:44.660
+<v Bryon Jacob>with external tools, nothing ever changed
+
+187
+00:13:44.660 --> 00:13:47.500
+<v Bryon Jacob>from their point of view other than the system got faster,
+
+188
+00:13:47.980 --> 00:13:49.700
+<v Bryon Jacob>more scalable, more robust.
+
+189
+00:13:52.380 --> 00:13:59.020
+<v Noah Labhart>So I hear you telling the story of the product progression, but how did you go about
+
+190
+00:13:59.020 --> 00:14:04.400
+<v Noah Labhart>structuring your roadmap? How did you figure out what was the most important next thing to fix or
+
+191
+00:14:04.400 --> 00:14:08.880
+<v Noah Labhart>build? Because you have the open version and then you have the enterprise version.
+
+192
+00:14:09.060 --> 00:14:12.440
+<v Noah Labhart>How did you balance those needs and requirements?
+
+193
+00:14:14.080 --> 00:14:16.700
+<v Bryon Jacob>The interviews we did, the experiments we ran
+
+194
+00:14:16.700 --> 00:14:24.500
+<v Bryon Jacob>around how do we distill out the essence of what data work looks like to the hands-on practitioners
+
+195
+00:14:24.500 --> 00:14:30.740
+<v Bryon Jacob>actually doing the work. So who are the various personas that are performing data work? We
+
+196
+00:14:31.700 --> 00:14:37.040
+<v Bryon Jacob>hypothesized and proved out that, you know, there's quite a few personas of people who interact with
+
+197
+00:14:37.040 --> 00:14:40.960
+<v Bryon Jacob>data that maybe aren't, you know, there's your data scientist, there's your business analyst,
+
+198
+00:14:41.120 --> 00:14:44.900
+<v Bryon Jacob>there's the various things that folks kind of would be able to rattle off. But there's also,
+
+199
+00:14:46.700 --> 00:14:49.160
+<v Bryon Jacob>who are kind of responsible, usually informally,
+
+200
+00:14:49.200 --> 00:14:51.100
+<v Bryon Jacob>usually this is more of a role than like a title
+
+201
+00:14:51.100 --> 00:14:54.520
+<v Bryon Jacob>or a position for managing the knowledge around data,
+
+202
+00:14:54.660 --> 00:14:57.180
+<v Bryon Jacob>for managing kind of the subject matter expertise
+
+203
+00:14:57.180 --> 00:14:58.880
+<v Bryon Jacob>that makes the data intelligible.
+
+204
+00:14:59.720 --> 00:15:01.800
+<v Bryon Jacob>The essence of what we were trying to figure out,
+
+205
+00:15:01.840 --> 00:15:04.760
+<v Bryon Jacob>how can we codify these things as a process
+
+206
+00:15:04.760 --> 00:15:07.360
+<v Bryon Jacob>that people actually do as like a job function
+
+207
+00:15:07.360 --> 00:15:10.160
+<v Bryon Jacob>that people actually are doing in ad hoc ways,
+
+208
+00:15:10.340 --> 00:15:12.340
+<v Bryon Jacob>and that's what leads to kind of some of this sprawl,
+
+209
+00:15:12.700 --> 00:15:15.740
+<v Bryon Jacob>and then build software that actually looks
+
+210
+00:15:16.700 --> 00:15:21.080
+<v Bryon Jacob>familiar to the folks doing this activity, but streamlines their work and makes it more effective
+
+211
+00:15:21.080 --> 00:15:25.460
+<v Bryon Jacob>and makes it better communicated to other folks. So that's what we spent a lot of time in that open
+
+212
+00:15:25.460 --> 00:15:31.660
+<v Bryon Jacob>community learning. And that work has mostly translated to the enterprise for a lot of those
+
+213
+00:15:31.660 --> 00:15:36.660
+<v Bryon Jacob>use cases. So I think as we started then going to market, you know, there's a couple of things
+
+214
+00:15:36.660 --> 00:15:42.140
+<v Bryon Jacob>that shift. One is that, you know, there are business activities related to management of data
+
+215
+00:15:42.140 --> 00:15:45.540
+<v Bryon Jacob>that are substantially different from their counterparts
+
+216
+00:15:45.540 --> 00:15:47.120
+<v Bryon Jacob>in folks working with open data.
+
+217
+00:15:47.300 --> 00:15:49.500
+<v Bryon Jacob>And so we had to kind of do all the learning there
+
+218
+00:15:49.500 --> 00:15:52.420
+<v Bryon Jacob>and learn about those personas and learn what's different.
+
+219
+00:15:52.880 --> 00:15:55.520
+<v Bryon Jacob>There's also the notion of who are the other folks
+
+220
+00:15:55.520 --> 00:15:57.220
+<v Bryon Jacob>who need to interact with a platform like this
+
+221
+00:15:57.220 --> 00:15:58.700
+<v Bryon Jacob>from more of an administrative
+
+222
+00:15:59.440 --> 00:16:01.540
+<v Bryon Jacob>or a stewardship point of view.
+
+223
+00:16:01.660 --> 00:16:03.080
+<v Bryon Jacob>These are the users who,
+
+224
+00:16:03.140 --> 00:16:06.740
+<v Bryon Jacob>they don't make up the largest numbers of your user base,
+
+225
+00:16:07.280 --> 00:16:10.600
+<v Bryon Jacob>but they are the folks who are managing the metadata
+
+226
+00:16:12.140 --> 00:16:14.980
+<v Bryon Jacob>governance that actually provide the leverage to everyone else using the platform.
+
+227
+00:16:15.160 --> 00:16:20.020
+<v Bryon Jacob>So I think if we were able to use the open community to learn a lot about our end users,
+
+228
+00:16:20.340 --> 00:16:26.140
+<v Bryon Jacob>we needed to then go actually move into the enterprise space to start learning what additional
+
+229
+00:16:26.140 --> 00:16:29.320
+<v Bryon Jacob>features, functionality do we need.
+
+230
+00:16:30.060 --> 00:16:35.360
+<v Bryon Jacob>One of the big shifts that happened in the product was a heavy focus on the part of our
+
+231
+00:16:35.360 --> 00:16:38.600
+<v Bryon Jacob>product that manages the network of metadata.
+
+232
+00:16:38.600 --> 00:16:44.200
+<v Bryon Jacob>data, rethinking the entire product as fundamentally a data catalog and what that means really
+
+233
+00:16:44.200 --> 00:16:48.120
+<v Bryon Jacob>happened as we started to move into the enterprise space.
+
+234
+00:16:48.900 --> 00:16:57.480
+<v Bryon Jacob>How do we collect, curate, enrich, and package that data so that it's there to be consumed
+
+235
+00:16:57.480 --> 00:16:59.020
+<v Bryon Jacob>by all of the end user practitioners?
+
+236
+00:17:00.480 --> 00:17:03.980
+<v Noah Labhart>You know, you're building such a massive product.
+
+237
+00:17:04.100 --> 00:17:05.680
+<v Noah Labhart>This is a big thing to tackle.
+
+238
+00:17:06.060 --> 00:17:07.980
+<v Noah Labhart>And it's so interesting.
+
+239
+00:17:08.600 --> 00:17:14.040
+<v Noah Labhart>some of the biggest, you know, maybe switches or upgrades, or I won't say pivots, because that's a
+
+240
+00:17:14.040 --> 00:17:18.900
+<v Noah Labhart>big word. It's not what I mean. But what are some of the features that really stuck out to you that
+
+241
+00:17:18.900 --> 00:17:21.700
+<v Noah Labhart>you added, and that really made a big difference in the product?
+
+242
+00:17:22.480 --> 00:17:27.240
+<v Bryon Jacob>One that we've had, you know, some elements of for, you know, really a very long time,
+
+243
+00:17:27.260 --> 00:17:33.160
+<v Bryon Jacob>but we focused a lot more on in the kind of enterprise era is the notion of data virtualization.
+
+244
+00:17:34.140 --> 00:17:42.300
+<v Bryon Jacob>We've had the kind of conceptual space of data sets as kind of being a normalized way of looking at any collection of data.
+
+245
+00:17:42.480 --> 00:17:59.820
+<v Bryon Jacob>And the idea from the beginning has been the end user doesn't really care whether this data is in a data warehouse sitting in Snowflake or in Redshift or is in the SQL Server database or is in an Excel spreadsheet or a CSV file or the JSON output from some SaaS API, right?
+
+246
+00:17:59.820 --> 00:18:04.420
+<v Bryon Jacob>That's not the important detail to me trying to actually accomplish some analytical task.
+
+247
+00:18:04.660 --> 00:18:07.420
+<v Bryon Jacob>The important detail is, what is this data actually about?
+
+248
+00:18:07.620 --> 00:18:09.500
+<v Bryon Jacob>What are the facts in this data set?
+
+249
+00:18:10.720 --> 00:18:18.100
+<v Bryon Jacob>In the enterprise world, it's way more common for folks to already have an existing data warehouse
+
+250
+00:18:18.100 --> 00:18:23.300
+<v Bryon Jacob>or data lake with some kind of querying abstraction sitting on top of that
+
+251
+00:18:23.300 --> 00:18:27.540
+<v Bryon Jacob>through various Hadoop technologies or other kind of big data tech.
+
+252
+00:18:28.140 --> 00:18:34.380
+<v Bryon Jacob>you would not want to try to relocate or make a copy of all that data inside of data.world's platform.
+
+253
+00:18:34.660 --> 00:18:36.220
+<v Bryon Jacob>That's not a sensible thing to try to do.
+
+254
+00:18:36.380 --> 00:18:41.240
+<v Bryon Jacob>What you want to be able to do is connect to that data where it sits and query it in place.
+
+255
+00:18:42.540 --> 00:18:49.000
+<v Bryon Jacob>The notion of building out that data virtualization has been a major kind of effort in the enterprise era for us.
+
+256
+00:18:49.400 --> 00:18:53.940
+<v Bryon Jacob>The whole end goal is that that's not really a different thing from the point of view of the end user.
+
+257
+00:18:53.940 --> 00:18:59.600
+<v Bryon Jacob>You don't really care whether that data has been ingested fully in our platforms under our management or that we're connecting to that in place.
+
+258
+00:19:00.120 --> 00:19:07.300
+<v Bryon Jacob>So we do a lot of work on building out the technology that we need to connect into existing corporate networks that are not cloud-based.
+
+259
+00:19:07.660 --> 00:19:17.520
+<v Bryon Jacob>We also acquired a company just over a year ago, a company called Capsenta, which we had partnered with and helped provide some of the core of some of that virtualization technology.
+
+260
+00:19:18.060 --> 00:19:22.680
+<v Bryon Jacob>And ultimately what they were doing was just so aligned and so key that we ended up bringing
+
+261
+00:19:22.680 --> 00:19:26.440
+<v Bryon Jacob>them in-house to make that really kind of a part of our overall offering.
+
+262
+00:19:27.060 --> 00:19:30.300
+<v Bryon Jacob>We've also partnered with other companies that kind of help provide some of that secure
+
+263
+00:19:30.300 --> 00:19:30.800
+<v Bryon Jacob>networking.
+
+264
+00:19:31.180 --> 00:19:36.920
+<v Bryon Jacob>So this has been a major set of functionality and this is really what lets us get into,
+
+265
+00:19:37.120 --> 00:19:41.000
+<v Bryon Jacob>in some cases, the biggest companies in the world and be able to meaningfully connect
+
+266
+00:19:41.000 --> 00:19:44.220
+<v Bryon Jacob>to their existing large secure data sources
+
+267
+00:19:44.220 --> 00:19:47.820
+<v Bryon Jacob>and do that cataloging in our SaaS product.
+
+268
+00:19:49.040 --> 00:19:51.360
+<v Noah Labhart>So let's switch over to your team.
+
+269
+00:19:51.580 --> 00:19:57.560
+<v Noah Labhart>How did you build your team to really fuel the progress at Data.World?
+
+270
+00:19:57.800 --> 00:19:59.700
+<v Noah Labhart>And what did you look for in those people
+
+271
+00:19:59.700 --> 00:20:01.740
+<v Noah Labhart>to indicate that they were the winning horses?
+
+272
+00:20:02.840 --> 00:20:04.920
+<v Bryon Jacob>All four of us who co-founded it,
+
+273
+00:20:04.960 --> 00:20:08.220
+<v Bryon Jacob>we all kind of have been around in the Austin tech scene
+
+274
+00:20:08.220 --> 00:20:09.880
+<v Bryon Jacob>for a good long while,
+
+275
+00:20:11.180 --> 00:20:15.660
+<v Bryon Jacob>executives or founded a number of the bigger companies here. So we had, you know, we had
+
+276
+00:20:15.660 --> 00:20:20.480
+<v Bryon Jacob>really kind of deep and broad networks. We really had sat down even as we were doing the initial
+
+277
+00:20:20.480 --> 00:20:24.240
+<v Bryon Jacob>kind of fundraising pitch and said, you know, what's our dream team? If we could go out and
+
+278
+00:20:24.240 --> 00:20:30.560
+<v Bryon Jacob>hire the 10 or 12 people that we would want to start this company, who would they be? And, you
+
+279
+00:20:30.560 --> 00:20:36.140
+<v Bryon Jacob>know, we kind of sat down and made that list and then reached out to those folks. Almost all of
+
+280
+00:20:36.140 --> 00:20:40.220
+<v Bryon Jacob>them who we had on that initial list, you know, pretty much to a person, they all said, yes,
+
+281
+00:20:41.000 --> 00:20:43.040
+<v Bryon Jacob>raise money and start this company, we would be in.
+
+282
+00:20:43.320 --> 00:20:45.880
+<v Bryon Jacob>That actually kind of really helped with the fundraise.
+
+283
+00:20:45.920 --> 00:20:49.360
+<v Bryon Jacob>The fact that we could go in and say, not just, hey, you know, we're well-known people
+
+284
+00:20:49.360 --> 00:20:51.960
+<v Bryon Jacob>who can attract some good talent, but here's their names.
+
+285
+00:20:52.100 --> 00:20:55.520
+<v Bryon Jacob>Like if you'd like to call any of these 12 people and, you know, talk to them about why
+
+286
+00:20:55.520 --> 00:20:58.660
+<v Bryon Jacob>they want to come work for this company, if you fund it, be our guest.
+
+287
+00:20:59.520 --> 00:21:02.340
+<v Bryon Jacob>And so, you know, initially we were able to just, you know, work from our network.
+
+288
+00:21:02.560 --> 00:21:05.720
+<v Bryon Jacob>You know, then for that, I'd say for the first year, we did more hiring from our network.
+
+289
+00:21:05.800 --> 00:21:09.920
+<v Bryon Jacob>Also, you know, started to attract folks two degrees out in our social network.
+
+290
+00:21:11.000 --> 00:21:15.140
+<v Bryon Jacob>early, and you're hiring kind of folks who have to wear lots of hats, and you're hiring folks
+
+291
+00:21:15.140 --> 00:21:18.660
+<v Bryon Jacob>who, you know, are going to have to roll up their sleeves and be hands-on individual contributors.
+
+292
+00:21:19.300 --> 00:21:23.840
+<v Bryon Jacob>We've also very explicitly looked for folks who had entrepreneurial experience, who had been at a
+
+293
+00:21:23.840 --> 00:21:29.000
+<v Bryon Jacob>small startup before so they knew what they were getting into, and folks who had some amount of
+
+294
+00:21:29.000 --> 00:21:35.620
+<v Bryon Jacob>leadership experience at larger scales, with our theory being that, you know, it would be better
+
+295
+00:21:35.620 --> 00:21:40.480
+<v Bryon Jacob>if you can hire as many folks who are, like, able to be, you know, hands-on doers
+
+296
+00:21:40.480 --> 00:21:46.060
+<v Bryon Jacob>today, but who can grow to be the leaders of the various functions as the company
+
+297
+00:21:46.060 --> 00:21:49.520
+<v Bryon Jacob>grows to. You know, that's a hard thing to do, but to the degree you can do that,
+
+298
+00:21:49.520 --> 00:21:52.880
+<v Bryon Jacob>that's better, because you're gonna have people, when you get to the point of
+
+299
+00:21:52.880 --> 00:21:56.800
+<v Bryon Jacob>scaling up where you have 50 or 100 people, that are in those leadership
+
+300
+00:21:56.800 --> 00:22:01.620
+<v Bryon Jacob>positions who also have the DNA of the company and the context going back to
+
+301
+00:22:01.620 --> 00:22:06.580
+<v Bryon Jacob>to the beginning. We've always kind of strived for that. I think we've done that really well.
+
+302
+00:22:06.640 --> 00:22:10.120
+<v Bryon Jacob>Again, most of the folks who are kind of in leadership positions have been with us for a while.
+
+303
+00:22:11.060 --> 00:22:16.560
+<v Bryon Jacob>But also, this is important too, we've definitely, you know, brought in folks across those leadership
+
+304
+00:22:16.560 --> 00:22:22.020
+<v Bryon Jacob>positions as we grew who had, you know, unique skills, unique talents in that area.
+
+305
+00:22:23.340 --> 00:22:27.480
+<v Bryon Jacob>And then lastly, just kind of on the, you know, deliberate things we did kind of in
+
+306
+00:22:27.480 --> 00:22:28.200
+<v Bryon Jacob>in recruiting.
+
+307
+00:22:28.760 --> 00:22:35.780
+<v Bryon Jacob>One thing that, you know, is just a common truism in tech and it's true in Austin and
+
+308
+00:22:35.780 --> 00:22:42.240
+<v Bryon Jacob>it was true in our networks is that, you know, when you're hiring particularly in tech, it's
+
+309
+00:22:42.240 --> 00:22:47.180
+<v Bryon Jacob>very easy for companies to kind of end up looking a little more homogenous than you
+
+310
+00:22:47.180 --> 00:22:47.680
+<v Bryon Jacob>would like.
+
+311
+00:22:47.740 --> 00:22:52.480
+<v Bryon Jacob>Austin demographically is not a particularly racially diverse population.
+
+312
+00:22:53.040 --> 00:22:56.000
+<v Bryon Jacob>Tech always ends up magnifying those disparities.
+
+313
+00:22:57.480 --> 00:23:01.440
+<v Bryon Jacob>as gender diverse as it should be. And so, you know, particularly if you look across an engineering
+
+314
+00:23:01.440 --> 00:23:05.920
+<v Bryon Jacob>team, it's very easy to kind of wake up one day and realize like, hey, just by hiring the best
+
+315
+00:23:05.920 --> 00:23:10.180
+<v Bryon Jacob>people who happen to fall into our net when we were recruiting or by looking into our networks,
+
+316
+00:23:10.620 --> 00:23:15.140
+<v Bryon Jacob>we're looking, you know, way more male heavy, male centric and, you know, often way more white,
+
+317
+00:23:15.200 --> 00:23:20.000
+<v Bryon Jacob>male centric than we'd like. We kind of took a very deliberate look at this and saying, you know,
+
+318
+00:23:20.020 --> 00:23:22.580
+<v Bryon Jacob>hey, look, all the people we've hired are great people we've worked with in the past,
+
+319
+00:23:22.580 --> 00:23:27.540
+<v Bryon Jacob>but we need to actually focus on broadening our pipeline and making sure
+
+320
+00:23:27.540 --> 00:23:30.520
+<v Bryon Jacob>that we're finding the folks in our network who, you know, who kind of
+
+321
+00:23:30.520 --> 00:23:34.460
+<v Bryon Jacob>represent a more diverse background. We made it a very deliberate and conscious
+
+322
+00:23:34.460 --> 00:23:38.720
+<v Bryon Jacob>effort from, you know, really, again, sometime in that first year as we were
+
+323
+00:23:38.720 --> 00:23:44.140
+<v Bryon Jacob>growing to say, you know, we're gonna open every position more broadly. We're going
+
+324
+00:23:44.140 --> 00:23:49.200
+<v Bryon Jacob>to take an active effort to go out and, you know, seek to expand our networks,
+
+325
+00:23:49.200 --> 00:23:53.820
+<v Bryon Jacob>networks that we kind of feed into our recruiting pipeline with more women, with more people
+
+326
+00:23:53.820 --> 00:23:57.860
+<v Bryon Jacob>of color, make that a very explicit, deliberate part of our pipeline.
+
+327
+00:23:58.200 --> 00:24:02.400
+<v Bryon Jacob>And I think the balance you should be trying to strike here, we're always going to hire
+
+328
+00:24:02.400 --> 00:24:06.780
+<v Bryon Jacob>the most qualified person who we bring in and interview for the job.
+
+329
+00:24:06.920 --> 00:24:11.540
+<v Bryon Jacob>And the team's always going to maintain the exact same high bar, and we're going to recruit
+
+330
+00:24:11.540 --> 00:24:15.020
+<v Bryon Jacob>and hire the best person who matches the job needs.
+
+331
+00:24:15.020 --> 00:24:21.400
+<v Bryon Jacob>but it's our job to make sure that the total population that we're bringing in
+
+332
+00:24:21.400 --> 00:24:25.020
+<v Bryon Jacob>at the front of that funnel is as diverse as possible to make sure that we're reaching
+
+333
+00:24:25.020 --> 00:24:26.560
+<v Bryon Jacob>outside of just our personal networks.
+
+334
+00:24:27.220 --> 00:24:33.380
+<v Bryon Jacob>We have very healthy percentages of both women and people of color across the company.
+
+335
+00:24:33.500 --> 00:24:37.100
+<v Bryon Jacob>I pay obviously very close attention to the engineering team, but really across the company.
+
+336
+00:24:37.680 --> 00:24:40.140
+<v Bryon Jacob>We recognize the problem for having worked at bigger companies.
+
+337
+00:24:40.140 --> 00:24:44.820
+<v Bryon Jacob>And while we were still 12 or 15 people, like we can, we can move the percentages materially
+
+338
+00:24:44.820 --> 00:24:49.060
+<v Bryon Jacob>now with really small whole numbers. So let's go do that and make sure that, you know, the next,
+
+339
+00:24:49.120 --> 00:24:52.860
+<v Bryon Jacob>you know, that in each round of hiring, we're constantly thinking about this,
+
+340
+00:24:52.900 --> 00:24:55.560
+<v Bryon Jacob>or one day we're going to wake up and realize that the problem is unsolved.
+
+341
+00:24:58.240 --> 00:25:02.200
+<v Noah Labhart>Let's, let's double back and talk about scalability. So you talked about that when
+
+342
+00:25:02.200 --> 00:25:07.360
+<v Noah Labhart>you talked about the MVP and said, you kind of, you built it in a scalable way from the beginning,
+
+343
+00:25:07.360 --> 00:25:11.960
+<v Noah Labhart>at least in the sense of programmable infrastructure, but dive into that a little
+
+344
+00:25:11.960 --> 00:25:18.640
+<v Noah Labhart>more. How did you decide to do that and a little more detail on how you went about that process?
+
+345
+00:25:20.100 --> 00:25:26.160
+<v Bryon Jacob>The thing that I was very sensitive to making sure that we kind of kept as a first principle
+
+346
+00:25:26.160 --> 00:25:32.860
+<v Bryon Jacob>was just once you have some manual process in place that you're able to make work,
+
+347
+00:25:32.860 --> 00:25:37.960
+<v Bryon Jacob>You know, you've already got somebody who knows how to do that, who knows how to push those buttons.
+
+348
+00:25:38.240 --> 00:25:44.400
+<v Bryon Jacob>And it will always seem like a project that can be pushed down the road to later to come back and automate that.
+
+349
+00:25:45.040 --> 00:25:59.480
+<v Bryon Jacob>If you allow something as critical and core as, you know, being able to push out your infrastructure and trust that it's been released and it's operating successfully and know that, it's one of those things that you'll likely just never do.
+
+350
+00:25:59.480 --> 00:26:02.740
+<v Bryon Jacob>That was the DNA that we wanted to instill.
+
+351
+00:26:02.840 --> 00:26:13.000
+<v Bryon Jacob>And like, you're probably paying a, you know, 10% cost or something like that on every feature you build to maintain that, that invariant.
+
+352
+00:26:13.020 --> 00:26:20.500
+<v Bryon Jacob>But it doesn't feel, you know, you don't feel that tax if you just kind of make it part of the acceptance criteria of like, this is what done looks like.
+
+353
+00:26:20.500 --> 00:26:27.740
+<v Bryon Jacob>Done looks like we can automate the release process fully and no person has to be involved in doing any manual operations.
+
+354
+00:26:29.480 --> 00:26:34.160
+<v Bryon Jacob>As you scale up, you continue paying those small taxes to automate it, but it doesn't
+
+355
+00:26:34.610 --> 00:26:36.300
+<v Bryon Jacob>feel like a burden.
+
+356
+00:26:36.420 --> 00:26:38.560
+<v Bryon Jacob>It doesn't feel like something you have to go negotiate for more.
+
+357
+00:26:39.000 --> 00:26:44.700
+<v Bryon Jacob>And the benefit we get from that is, right now today in 2020, we have zero people who
+
+358
+00:26:44.700 --> 00:26:48.940
+<v Bryon Jacob>are tasked with doing any operational maintenance of the site.
+
+359
+00:26:49.640 --> 00:26:51.500
+<v Bryon Jacob>Maybe that's not a fair characterization of it.
+
+360
+00:26:51.660 --> 00:26:56.120
+<v Bryon Jacob>We have a handful of engineers who certainly specialize in this point of the stack, but
+
+361
+00:26:56.120 --> 00:27:00.180
+<v Bryon Jacob>But the key is that they are never going to be the people who say,
+
+362
+00:27:00.420 --> 00:27:04.820
+<v Bryon Jacob>okay, it's time for you to go do this weekly or monthly maintenance operation of releasing the site.
+
+363
+00:27:05.760 --> 00:27:13.080
+<v Bryon Jacob>They're there to write code to produce tools that allow the developers who are building features to self-manage,
+
+364
+00:27:13.100 --> 00:27:17.420
+<v Bryon Jacob>getting their things into production, and then participating in our fully automated pipeline.
+
+365
+00:27:18.280 --> 00:27:24.980
+<v Bryon Jacob>If you have to go do something somewhat manual as a one-off job one or two times to learn what it is so you can automate it, fine.
+
+366
+00:27:26.120 --> 00:27:30.360
+<v Bryon Jacob>But if you ever start to see a trend where this operation is something that's becoming a job,
+
+367
+00:27:31.260 --> 00:27:35.800
+<v Bryon Jacob>stop it being a job and turn it into your job is to build an automated robot to handle it.
+
+368
+00:27:36.720 --> 00:27:42.640
+<v Bryon Jacob>Like any software running operationally, we have potential platform issues.
+
+369
+00:27:42.780 --> 00:27:47.560
+<v Bryon Jacob>We have alerts that go off when things aren't working right and somebody has to dig in on that.
+
+370
+00:27:47.780 --> 00:27:52.340
+<v Bryon Jacob>And so we have a shared pager duty responsibility across the engineering team.
+
+371
+00:27:52.340 --> 00:28:07.760
+<v Bryon Jacob>Folks have a rotation where when the system detects anomalies and fires alarms, somebody is on duty to respond to that, assess the risk, and either deal with it, escalate it, or de-escalate it if it's a non-issue.
+
+372
+00:28:09.080 --> 00:28:19.260
+<v Bryon Jacob>And the goal of doing something like that, the goal of having engineer-managed operations is those should be the same people who are empowered to minimize the amount and severity of those issues.
+
+373
+00:28:19.260 --> 00:28:22.400
+<v Bryon Jacob>No one wants to get woken up at 2 a.m. to deal with an issue.
+
+374
+00:28:22.780 --> 00:28:28.680
+<v Bryon Jacob>And so the best people to wake up at 2 a.m. are the people who are empowered to make the code more robust
+
+375
+00:28:28.680 --> 00:28:31.040
+<v Bryon Jacob>so it doesn't wake you up at 2 a.m. and make it more resilient
+
+376
+00:28:31.400 --> 00:28:35.400
+<v Bryon Jacob>so that we truly only get woken up for things that are kind of environmental and outside of our control.
+
+377
+00:28:37.060 --> 00:28:44.680
+<v Bryon Jacob>90% of the time it seems that the things that happen are network anomalies and problems related to upstream services
+
+378
+00:28:44.680 --> 00:28:48.440
+<v Bryon Jacob>that we don't have a lot of control over and all we can do is kind of contain it and manage it.
+
+379
+00:28:49.260 --> 00:28:54.640
+<v Bryon Jacob>One quick story to add on this too, we went through a process of becoming SOC 2 audited.
+
+380
+00:28:55.260 --> 00:28:59.580
+<v Bryon Jacob>One of the challenges when you're kind of going through that process and mapping all your controls and things is that
+
+381
+00:28:59.580 --> 00:29:05.560
+<v Bryon Jacob>you do have to have a fairly rigorous multi-step approval process for releasing your software.
+
+382
+00:29:06.800 --> 00:29:12.340
+<v Bryon Jacob>Where the people who are coding features have those features reviewed by someone who didn't code them
+
+383
+00:29:12.340 --> 00:29:18.360
+<v Bryon Jacob>to kind of make sure that no one bad actor can actually release things into an environment
+
+384
+00:29:19.260 --> 00:29:24.600
+<v Bryon Jacob>could, you know, be adversarial code and, you know, things like that. There was a fully automated
+
+385
+00:29:24.600 --> 00:29:28.620
+<v Bryon Jacob>release script that anytime somebody wanted to execute a release they could go run, and there
+
+386
+00:29:28.620 --> 00:29:34.120
+<v Bryon Jacob>was some angst that we might lose that capability. And, you know, what ended up happening through the
+
+387
+00:29:34.120 --> 00:29:39.600
+<v Bryon Jacob>through the process of dealing with this SOC, these SOC constraints, is that one of our
+
+388
+00:29:39.600 --> 00:29:44.340
+<v Bryon Jacob>engineers who does focus on the kind of engineering and infrastructure took that initial automated
+
+389
+00:29:44.340 --> 00:29:48.580
+<v Bryon Jacob>automated process for pushing software releases rebuilt it into a Slack integration.
+
+390
+00:29:49.480 --> 00:29:53.000
+<v Bryon Jacob>And so what ended up happening is we got kind of all the auditability we wanted.
+
+391
+00:29:53.100 --> 00:29:55.660
+<v Bryon Jacob>And actually the release process got more
+
+392
+00:29:55.660 --> 00:30:00.820
+<v Bryon Jacob>streamlined, where when any engineer wants to request a release, they go into a Slack
+
+393
+00:30:00.820 --> 00:30:06.420
+<v Bryon Jacob>channel, they fire the Slack integration, it brings up all of the most recently
+
+394
+00:30:06.420 --> 00:30:09.800
+<v Bryon Jacob>built releases that could potentially get pushed out.
+
+395
+00:30:10.340 --> 00:30:12.360
+<v Bryon Jacob>They select from that menu which one they
+
+396
+00:30:14.360 --> 00:30:17.700
+<v Bryon Jacob>automatically tags and alerts everyone on the management team
+
+397
+00:30:17.700 --> 00:30:19.280
+<v Bryon Jacob>who's capable of approving the release.
+
+398
+00:30:19.520 --> 00:30:23.400
+<v Bryon Jacob>As long as one of them comes back with a thumbs up emoji
+
+399
+00:30:24.000 --> 00:30:26.820
+<v Bryon Jacob>approving that post, the release is scheduled
+
+400
+00:30:26.820 --> 00:30:27.680
+<v Bryon Jacob>and able to get released.
+
+401
+00:30:27.960 --> 00:30:32.100
+<v Bryon Jacob>All that kind of summed up to a more streamlined process.
+
+402
+00:30:32.420 --> 00:30:35.280
+<v Bryon Jacob>We release multiple times a day with this coordinated
+
+403
+00:30:35.280 --> 00:30:38.560
+<v Bryon Jacob>process and we have exactly the audit trail we need
+
+404
+00:30:38.560 --> 00:30:40.060
+<v Bryon Jacob>by pulling it off of the Slack logs.
+
+405
+00:30:40.060 --> 00:30:45.620
+<v Bryon Jacob>That mentality of making everything as automated as possible really, really generates,
+
+406
+00:30:45.800 --> 00:30:50.000
+<v Bryon Jacob>you know, just serendipities like this that actually by complying with these soft controls,
+
+407
+00:30:50.060 --> 00:30:51.460
+<v Bryon Jacob>we actually made everyone's life a little bit better.
+
+408
+00:30:53.240 --> 00:30:58.540
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built with Data.World,
+
+409
+00:30:58.700 --> 00:30:59.720
+<v Noah Labhart>what are you most proud of?
+
+410
+00:31:01.280 --> 00:31:05.820
+<v Bryon Jacob>Well, I mean, I'd have to say, you know, I think probably a lot of people say some version of
+
+411
+00:31:05.820 --> 00:31:11.340
+<v Bryon Jacob>this. I'll try to be more more specific. I'd have to say, you know, the team and the and the company
+
+412
+00:31:11.340 --> 00:31:14.960
+<v Bryon Jacob>culture. I mean, I'm, yeah, I am super proud of the product. I think we're doing some really innovative
+
+413
+00:31:14.960 --> 00:31:21.720
+<v Bryon Jacob>things but when you're building a startup and scaling it up it's a it's a marathon not a sprint
+
+414
+00:31:21.720 --> 00:31:28.980
+<v Bryon Jacob>and you know having the right team and the right you know kind of company culture where everyone
+
+415
+00:31:28.980 --> 00:31:33.120
+<v Bryon Jacob>knows that they kind of have each other's back they have their best interests at heart that you
+
+416
+00:31:33.120 --> 00:31:39.620
+<v Bryon Jacob>There's a true, genuine desire to have everyone along for the journey and really fully participating.
+
+417
+00:31:40.720 --> 00:31:47.140
+<v Bryon Jacob>That matters more than any particular piece of the technology, piece of the product, or even piece of the business.
+
+418
+00:31:48.180 --> 00:31:49.880
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+419
+00:31:50.000 --> 00:31:53.580
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+420
+00:31:54.960 --> 00:32:12.300
+<v Bryon Jacob>So, you know, one thing that, you know, when you're building something from scratch, when you're starting, you're starting a new thing, but you kind of have a good sense that if the thing you're building is going to is going to be successful at all, it's going to grow very large, very quickly.
+
+421
+00:32:13.200 --> 00:32:16.360
+<v Bryon Jacob>you know, you kind of have to, you're always juggling with that. I mean, I think every
+
+422
+00:32:16.360 --> 00:32:20.200
+<v Bryon Jacob>startup is juggling with that to some degree. You know, there's the, you want to build the
+
+423
+00:32:20.200 --> 00:32:24.920
+<v Bryon Jacob>smallest, simplest thing that will work and kind of get to the next proof point, and that's a lot
+
+424
+00:32:24.920 --> 00:32:30.660
+<v Bryon Jacob>of what's doing a startup is, but there it also kind of comes with the judgment of you want to,
+
+425
+00:32:30.660 --> 00:32:35.240
+<v Bryon Jacob>you want to make sure that you're building technology, building things that will be able
+
+426
+00:32:35.240 --> 00:32:40.040
+<v Bryon Jacob>to scale when it's time. That's a balancing act. I think, you know, when you're starting
+
+427
+00:32:40.040 --> 00:32:45.040
+<v Bryon Jacob>a new startup, you certainly should be thinking, biasing heavily toward what's the quickest thing
+
+428
+00:32:45.040 --> 00:32:50.900
+<v Bryon Jacob>I can do to kind of get this out and get tested in the market. But there is an element of how much
+
+429
+00:32:50.900 --> 00:32:58.640
+<v Bryon Jacob>am I architecting for this to scale. I think we've made those decisions largely pretty well, but I'd
+
+430
+00:32:58.640 --> 00:33:05.020
+<v Bryon Jacob>say there was a couple things in the first six months of launching Data.World that were
+
+431
+00:33:05.020 --> 00:33:12.480
+<v Bryon Jacob>designed to protect us in the event that we hyperscaled, and that were useful to us as we did
+
+432
+00:33:12.480 --> 00:33:17.240
+<v Bryon Jacob>kind of scale very quickly in our community growth and get, you know, hundreds of
+
+433
+00:33:17.240 --> 00:33:23.280
+<v Bryon Jacob>thousands of users pretty quickly, but that maybe baked us into some technology decisions ahead of
+
+434
+00:33:23.280 --> 00:33:28.900
+<v Bryon Jacob>where the product actually needed them to go. You know, how we've dealt with it is, I think,
+
+435
+00:33:28.900 --> 00:33:33.960
+<v Bryon Jacob>you know, to some degree it's just, you know, it's like any tech debt. There are
+
+436
+00:33:35.020 --> 00:33:41.760
+<v Bryon Jacob>of the platform that were decided on insufficient information. The biggest thing you can do with
+
+437
+00:33:41.760 --> 00:33:47.160
+<v Bryon Jacob>those kind of like early day decisions is just own them, acknowledge them, make it very clear that,
+
+438
+00:33:47.160 --> 00:33:53.540
+<v Bryon Jacob>you know, this is the way it is for reasons that were good at the time, but that everyone who's,
+
+439
+00:33:53.540 --> 00:33:57.960
+<v Bryon Jacob>you know, in there touching the code, touching the product today is empowered to, you know,
+
+440
+00:33:57.980 --> 00:34:01.920
+<v Bryon Jacob>revisit those decisions and make it better. Every once in a while, some new engineer who's been at
+
+441
+00:34:01.920 --> 00:34:08.160
+<v Bryon Jacob>company for a month or so will be digging around the code and say, geez, I just saw X and this
+
+442
+00:34:08.160 --> 00:34:12.860
+<v Bryon Jacob>looks really weird. Why would somebody do it this way? But I'm scared to touch it. I definitely,
+
+443
+00:34:13.080 --> 00:34:16.800
+<v Bryon Jacob>you know, my fingerprints are sometimes on those things saying, oh, I know exactly why that is the
+
+444
+00:34:16.800 --> 00:34:21.140
+<v Bryon Jacob>way it is. Here's what I was thinking five years ago. That turned out to be the wrong decision.
+
+445
+00:34:21.640 --> 00:34:26.580
+<v Bryon Jacob>You should absolutely feel free to rip that out and replace it. That's not there for any good
+
+446
+00:34:26.580 --> 00:34:30.900
+<v Bryon Jacob>reason that matters to us today. You know, nothing's safe there. There's no sacred cows.
+
+447
+00:34:31.920 --> 00:34:37.320
+<v Bryon Jacob>There's nothing about this system that should stay the way it is just because it is the way it is.
+
+448
+00:34:37.480 --> 00:34:39.920
+<v Bryon Jacob>And it doesn't matter who implemented that.
+
+449
+00:34:39.980 --> 00:34:42.780
+<v Bryon Jacob>If you see a way to make it better, make sure that you're feeling empowered to make it better.
+
+450
+00:34:45.100 --> 00:34:49.480
+<v Noah Labhart>What does the future look like for Data.World, the product, and for your team?
+
+451
+00:34:51.940 --> 00:35:01.260
+<v Bryon Jacob>So, you know, the near-term future for us is, you know, really we are just in that, you know, growing in the market phase.
+
+452
+00:35:01.920 --> 00:35:03.700
+<v Bryon Jacob>We have found our rhythm.
+
+453
+00:35:03.900 --> 00:35:08.980
+<v Bryon Jacob>We're expanding to new customers, expanding our relationship with existing customers,
+
+454
+00:35:09.260 --> 00:35:19.800
+<v Bryon Jacob>really having a great feedback loop with a good, solid customer base to understand what works and what doesn't and what their needs are.
+
+455
+00:35:20.340 --> 00:35:24.620
+<v Bryon Jacob>We've never had the problem of not having a good idea of what to do next.
+
+456
+00:35:24.800 --> 00:35:29.080
+<v Bryon Jacob>I think a lot of startups have the problem of too many great ideas of what to do next.
+
+457
+00:35:29.080 --> 00:35:34.360
+<v Bryon Jacob>We've got a huge palette of things that we know might have value in this market.
+
+458
+00:35:34.480 --> 00:35:45.640
+<v Bryon Jacob>So we're at that phase where we are getting tons of fantastic feedback from existing customers around what of those actually are the most important things, what are the things that do add real value.
+
+459
+00:35:45.940 --> 00:35:54.200
+<v Bryon Jacob>So it is about continuing to grow the relationship with those customers, making them happier by taking their feedback into account, growing the customer base.
+
+460
+00:35:54.200 --> 00:36:01.260
+<v Bryon Jacob>And then just making sure that we're kind of growing the company and keeping the company culture strong as we grow.
+
+461
+00:36:01.500 --> 00:36:04.060
+<v Bryon Jacob>We're at about around 80 people.
+
+462
+00:36:04.180 --> 00:36:08.900
+<v Bryon Jacob>We've actually grown substantially during COVID.
+
+463
+00:36:09.060 --> 00:36:17.540
+<v Bryon Jacob>So there's quite a number of people who have never actually been in our physical office space with us who are with the company.
+
+464
+00:36:17.740 --> 00:36:20.000
+<v Bryon Jacob>So that's kind of had its own challenges.
+
+465
+00:36:20.000 --> 00:36:33.680
+<v Bryon Jacob>And we're at that stage of company where we just have to be really kind of vigilant about maintaining the company culture as we are growing the business.
+
+466
+00:36:34.940 --> 00:36:36.160
+<v Noah Labhart>Let's switch to you, Bryon.
+
+467
+00:36:36.380 --> 00:36:38.440
+<v Noah Labhart>Who influences the way that you work?
+
+468
+00:36:38.600 --> 00:36:41.360
+<v Noah Labhart>It could be CEO, CTO, really any person.
+
+469
+00:36:41.500 --> 00:36:43.580
+<v Noah Labhart>Name a person you look up to and why.
+
+470
+00:36:45.800 --> 00:36:53.680
+<v Bryon Jacob>I will say, you know, previous boss of mine, the person I worked for at HomeAway, he was the CTO there.
+
+471
+00:36:53.780 --> 00:36:57.600
+<v Bryon Jacob>His name is Ross Buhrdorf, and he's now the CEO of a company called ZenBusiness.
+
+472
+00:36:58.140 --> 00:37:00.060
+<v Bryon Jacob>I learned a lot from Ross.
+
+473
+00:37:00.740 --> 00:37:10.980
+<v Bryon Jacob>One thing that really kind of stands out to me, during my time at HomeAway, I was kind of making the transition from being someone who was, you know, primarily an individual contributor,
+
+474
+00:37:10.980 --> 00:37:15.680
+<v Bryon Jacob>If I remember somebody who was writing code, architect, you know, doing hands-on individual
+
+475
+00:37:15.680 --> 00:37:22.740
+<v Bryon Jacob>contributor work and less involved in management and leadership, you know, I made the transition
+
+476
+00:37:22.740 --> 00:37:25.260
+<v Bryon Jacob>there and I credit Ross a lot with that.
+
+477
+00:37:25.400 --> 00:37:31.980
+<v Bryon Jacob>And I think, you know, I think a lot of people, as they get more senior in their career, kind
+
+478
+00:37:31.980 --> 00:37:32.760
+<v Bryon Jacob>of struggle with that.
+
+479
+00:37:32.860 --> 00:37:36.540
+<v Bryon Jacob>Like, do I want to, am I somebody who, you know, wants to be a very senior individual
+
+480
+00:37:36.540 --> 00:37:39.060
+<v Bryon Jacob>contributor, which there certainly is a career path for.
+
+481
+00:37:40.980 --> 00:37:41.820
+<v Bryon Jacob>Do I want to go into management?
+
+482
+00:37:42.360 --> 00:37:44.320
+<v Bryon Jacob>How do I kind of make those decisions?
+
+483
+00:37:44.480 --> 00:37:52.340
+<v Bryon Jacob>And I think I would have characterized myself as someone who, you know, was leaning towards staying in as an individual contributor.
+
+484
+00:37:52.840 --> 00:37:57.100
+<v Bryon Jacob>But something that, you know, Ross at one point kind of, you know, framed it up for me a little bit.
+
+485
+00:37:57.160 --> 00:38:04.260
+<v Bryon Jacob>He's like, well, the way you act, Bryon, like is, you know, you actually you want to be involved in the decision making.
+
+486
+00:38:04.420 --> 00:38:07.860
+<v Bryon Jacob>Like you actually you have a good you know, you have a good strategic mind.
+
+487
+00:38:07.860 --> 00:38:11.400
+<v Bryon Jacob>You often have the right way of doing things in mind.
+
+488
+00:38:12.400 --> 00:38:18.140
+<v Bryon Jacob>The difference is like it's actually real work to then go commit to a course of action,
+
+489
+00:38:18.800 --> 00:38:21.900
+<v Bryon Jacob>go organize other people, motivate other people and make it happen.
+
+490
+00:38:22.940 --> 00:38:26.780
+<v Bryon Jacob>Ultimately, the people who get to make the decisions are the people who are willing to do that.
+
+491
+00:38:27.020 --> 00:38:31.960
+<v Bryon Jacob>Right. It's like it was kind of like a, you know, leadership isn't what you think it is necessarily.
+
+492
+00:38:32.080 --> 00:38:36.840
+<v Bryon Jacob>When you kind of look at it from the lens of somebody who's an who's who's, you know, primarily an individual contributor.
+
+493
+00:38:37.860 --> 00:38:42.840
+<v Bryon Jacob>It's not enough just to be smart and know the right thing to do.
+
+494
+00:38:43.300 --> 00:38:49.120
+<v Bryon Jacob>It's to then actually go do the work of making the thing happen.
+
+495
+00:38:50.320 --> 00:39:01.260
+<v Bryon Jacob>And if you want to be involved in the decision making at that level, you kind of have to figure out how you do the other thing.
+
+496
+00:39:01.260 --> 00:39:12.680
+<v Bryon Jacob>And the other thing is there's a lot of different styles for how you can kind of do that leadership, how you can lead people and organize people to accomplish things.
+
+497
+00:39:12.680 --> 00:39:31.340
+<v Bryon Jacob>And he's like, you know, you will probably be very successful at that if you just embrace the idea that, like, the reason I'm doing this is because I like to be kind of directly involved and responsible and therefore accountable with the decisions that are getting made.
+
+498
+00:39:31.940 --> 00:39:37.260
+<v Bryon Jacob>And, you know, your preconceived notions of what it's like to be a manager or a leader are probably wrong.
+
+499
+00:39:37.260 --> 00:39:39.840
+<v Bryon Jacob>if you go into that with the right intention,
+
+500
+00:39:40.360 --> 00:39:42.820
+<v Bryon Jacob>you can actually find a way to make that work with your style.
+
+501
+00:39:44.320 --> 00:39:47.220
+<v Bryon Jacob>I learned a lot from Ross, but if I could summarize it,
+
+502
+00:39:47.280 --> 00:39:49.280
+<v Bryon Jacob>that would be the best way I can summarize it.
+
+503
+00:39:50.260 --> 00:39:51.760
+<v Noah Labhart>Well, we talked about mistakes,
+
+504
+00:39:51.920 --> 00:39:53.960
+<v Noah Labhart>but if you could go back to the beginning,
+
+505
+00:39:54.200 --> 00:39:55.800
+<v Noah Labhart>a little bit different spin,
+
+506
+00:39:56.020 --> 00:39:57.200
+<v Noah Labhart>if you could go back to the beginning,
+
+507
+00:39:57.400 --> 00:39:58.480
+<v Noah Labhart>what would you do differently?
+
+508
+00:39:58.520 --> 00:40:00.900
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+509
+00:40:03.000 --> 00:40:04.560
+<v Bryon Jacob>I don't actually know that I would go back
+
+510
+00:40:04.560 --> 00:40:07.920
+<v Bryon Jacob>and do anything differently.
+
+511
+00:40:09.180 --> 00:40:11.480
+<v Bryon Jacob>You know, I kind of mentioned, you know,
+
+512
+00:40:11.480 --> 00:40:14.280
+<v Bryon Jacob>Ross's influence in the last question you asked me.
+
+513
+00:40:14.340 --> 00:40:17.420
+<v Bryon Jacob>And, you know, I think I spent a long time
+
+514
+00:40:17.420 --> 00:40:20.620
+<v Bryon Jacob>not really knowing what I wanted to do.
+
+515
+00:40:21.540 --> 00:40:23.580
+<v Bryon Jacob>I was a technologist. I was a developer.
+
+516
+00:40:23.900 --> 00:40:27.200
+<v Bryon Jacob>I enjoyed advancing my career there,
+
+517
+00:40:27.340 --> 00:40:28.300
+<v Bryon Jacob>building my skills there.
+
+518
+00:40:29.540 --> 00:40:33.000
+<v Bryon Jacob>Like many folks, I think I kind of got frustrated
+
+519
+00:40:34.560 --> 00:40:37.460
+<v Bryon Jacob>that, you know, quote, management, did things,
+
+520
+00:40:37.740 --> 00:40:40.420
+<v Bryon Jacob>but I was unwilling to kind of step into the ring
+
+521
+00:40:40.420 --> 00:40:44.280
+<v Bryon Jacob>and, you know, be part of the solution there myself.
+
+522
+00:40:45.140 --> 00:40:47.300
+<v Bryon Jacob>I went through the experiences I went through
+
+523
+00:40:47.300 --> 00:40:49.420
+<v Bryon Jacob>that kind of, you know, put me in a headspace.
+
+524
+00:40:49.640 --> 00:40:51.520
+<v Bryon Jacob>I think I was fortunate to kind of be
+
+525
+00:40:51.520 --> 00:40:53.260
+<v Bryon Jacob>in a receptive enough headspace
+
+526
+00:40:53.260 --> 00:40:55.900
+<v Bryon Jacob>with somebody who was, you know,
+
+527
+00:40:55.900 --> 00:40:58.160
+<v Bryon Jacob>there to mentor me in the right direction
+
+528
+00:40:58.160 --> 00:40:58.980
+<v Bryon Jacob>at the right time.
+
+529
+00:40:59.800 --> 00:41:02.400
+<v Bryon Jacob>That kind of changed my trajectory a little bit.
+
+530
+00:41:02.400 --> 00:41:07.680
+<v Bryon Jacob>it would be nice to think that I could have come to some of those realizations earlier,
+
+531
+00:41:09.040 --> 00:41:13.620
+<v Bryon Jacob>but I don't know that there's anything that could have, I don't know that that's possible.
+
+532
+00:41:13.700 --> 00:41:18.060
+<v Bryon Jacob>I think maybe I just kind of had to take the journey I took and be in the place I was at
+
+533
+00:41:18.060 --> 00:41:18.600
+<v Bryon Jacob>the right time.
+
+534
+00:41:20.060 --> 00:41:20.940
+<v Noah Labhart>Last question, Bryon.
+
+535
+00:41:22.060 --> 00:41:26.480
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the
+
+536
+00:41:26.480 --> 00:41:27.340
+<v Noah Labhart>next big thing.
+
+537
+00:41:27.580 --> 00:41:28.720
+<v Noah Labhart>They're jazzed about it.
+
+538
+00:41:28.780 --> 00:41:30.340
+<v Noah Labhart>They can't wait to show it off to the world.
+
+539
+00:41:30.340 --> 00:41:32.880
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+540
+00:41:33.180 --> 00:41:36.460
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+541
+00:41:36.740 --> 00:41:37.240
+<v Bryon Jacob>I
+
+542
+00:41:37.140 --> 00:41:44.640
+<v Bryon Jacob>would ask them, where do you see this next big thing five years from now, 10 years from now?
+
+543
+00:41:45.000 --> 00:41:46.780
+<v Bryon Jacob>Where do you see it evolving?
+
+544
+00:41:47.160 --> 00:41:48.260
+<v Bryon Jacob>What do you see it becoming?
+
+545
+00:41:48.980 --> 00:41:52.280
+<v Bryon Jacob>What do you see your relationship to it being?
+
+546
+00:41:53.980 --> 00:41:57.960
+<v Bryon Jacob>You know, whatever answer you have for that, it's surely wrong.
+
+547
+00:41:57.960 --> 00:42:10.240
+<v Bryon Jacob>But I think that, you know, thinking about that, like if you, you know, you need to kind of have that picture, which should be constantly evolving with new information.
+
+548
+00:42:10.320 --> 00:42:20.720
+<v Bryon Jacob>But you need to have that picture, that North Star in your head, because if you're doing it right, you know, this entrepreneurship is usually somewhat of a long journey.
+
+549
+00:42:20.720 --> 00:42:29.400
+<v Bryon Jacob>I think a lot of times folks kind of think of me like, you know, I'm going to be in this for a short period of time and then on to the next thing.
+
+550
+00:42:29.600 --> 00:42:41.920
+<v Bryon Jacob>And, you know, I think if you're building something, if you're bringing something like, you know, truly new and worthwhile and interesting into the world, you probably have a vision for what that thing is going to be when it's all grown up.
+
+551
+00:42:41.920 --> 00:42:46.800
+<v Bryon Jacob>up, if you keep that in mind, if you have that, you know, so that'd be the question I'd ask the,
+
+552
+00:42:46.860 --> 00:42:50.800
+<v Bryon Jacob>my, you know, my seatmate on the plane is, you know, that's great. Show me what you have now,
+
+553
+00:42:50.980 --> 00:42:54.840
+<v Bryon Jacob>but like, what is it going to be when it's all grown up and mature? What are you going to be
+
+554
+00:42:54.840 --> 00:42:59.780
+<v Bryon Jacob>doing with this thing five or 10 years from now? That's the thing that you're kind of constantly
+
+555
+00:42:59.780 --> 00:43:05.600
+<v Bryon Jacob>steering toward and, and that will change, you know, but, but, but, but it's the having,
+
+556
+00:43:05.680 --> 00:43:07.480
+<v Bryon Jacob>having that in mind gives you a direction.
+
+557
+00:43:08.400 --> 00:43:11.140
+<v Noah Labhart>That's a fantastic question to ask and advice.
+
+558
+00:43:11.920 --> 00:43:14.260
+<v Noah Labhart>Well, Bryon, thank you for being on the show today.
+
+559
+00:43:14.360 --> 00:43:19.220
+<v Noah Labhart>Thank you for being on Code Story and telling the creation story of data.world.
+
+560
+00:43:19.720 --> 00:43:20.340
+<v Bryon Jacob>Thank you.
+
+561
+00:43:20.460 --> 00:43:21.700
+<v Bryon Jacob>It was a great conversation.
+
+562
+00:43:21.820 --> 00:43:22.540
+<v Bryon Jacob>I appreciate the time.
+
+563
+00:43:23.700 --> 00:43:26.740
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+564
+00:43:30.940 --> 00:43:33.520
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+565
+00:43:33.980 --> 00:43:38.760
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+566
+00:43:38.760 --> 00:43:44.200
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just $5 to $10 a month.
+
+567
+00:43:44.580 --> 00:43:46.820
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+568
+00:43:47.080 --> 00:43:49.020
+<v Noah Labhart>Both things help us out tremendously.
+
+569
+00:43:51.660 --> 00:43:53.160
+<v Noah Labhart>And thanks again for listening.

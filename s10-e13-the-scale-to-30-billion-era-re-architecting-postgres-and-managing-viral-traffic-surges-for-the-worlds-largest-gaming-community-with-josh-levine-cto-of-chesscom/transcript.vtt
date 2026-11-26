@@ -1,0 +1,1599 @@
+WEBVTT
+
+NOTE S10 E13: The Scale-to-30-Billion Era: Re-Architecting Postgres and Managing Viral Traffic Surges for the World’s Largest Gaming Community with Josh Levine, CTO of Chess.com
+
+1
+00:00:00.500 --> 00:00:07.100
+<v Josh Levine>When the COVID lockdowns happened, Chess.com saw traffic spike 4x over their current water level.
+
+2
+00:00:07.460 --> 00:00:12.520
+<v Josh Levine>And it would go country by country. It would just, it came in a wave. As folks started to stay home and wonder,
+
+3
+00:00:12.580 --> 00:00:16.980
+<v Josh Levine>what do I do with my time now that I can't go outside? Many millions of people turned to Chess.
+
+4
+00:00:17.260 --> 00:00:26.420
+<v Josh Levine>First of all, that's great. Second of all, they had to shard the databases and switch to application layer joins and get new hardware and all sorts of stuff was happening through 2020.
+
+5
+00:00:26.420 --> 00:00:36.000
+<v Josh Levine>And the other thing that happened is this incredible miniseries called The Queen's Gambit came out on Netflix and everybody was watching that.
+
+6
+00:00:36.120 --> 00:00:39.200
+<v Josh Levine>And the traffic went 4x again.
+
+7
+00:00:40.040 --> 00:00:43.640
+<v Josh Levine>My name is Josh Levine and I'm the CTO at Chess.com.
+
+8
+00:00:46.400 --> 00:00:48.280
+<v Noah Labhart>This is Code Story.
+
+9
+00:00:49.160 --> 00:00:52.220
+<v Noah Labhart>A podcast bringing you interviews with tech visionaries.
+
+10
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+11
+00:00:53.720 --> 00:00:55.240
+<v Clip>There's nothing on the back end.
+
+12
+00:00:56.420 --> 00:00:58.080
+<v Noah Labhart>what it takes to change an industry.
+
+13
+00:00:59.280 --> 00:01:01.260
+<v Clip>It took many goes to get right.
+
+14
+00:01:01.840 --> 00:01:04.540
+<v Noah Labhart>Who built the teams that have their back.
+
+15
+00:01:04.740 --> 00:01:06.120
+<v Clip>The company is its people.
+
+16
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+17
+00:01:07.460 --> 00:01:08.580
+<v Clip>I was proud of our team.
+
+18
+00:01:08.900 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:11.480 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+20
+00:01:12.860 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+21
+00:01:14.440 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+22
+00:01:15.540 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+23
+00:01:18.260 --> 00:01:20.040
+<v Clip>It's not an easy thing to achieve, my dear.
+
+24
+00:01:20.040 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+25
+00:01:22.860 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+26
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+27
+00:01:27.560 --> 00:01:28.780
+<v Clip>It's not just about technology.
+
+28
+00:01:29.280 --> 00:01:31.040
+<v Noah Labhart>Listen more on Code Story.
+
+29
+00:01:32.460 --> 00:01:39.460
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Josh Levine is building and optimizing the ancient game of chess,
+
+30
+00:01:40.120 --> 00:01:42.980
+<v Noah Labhart>played by many and loved by all.
+
+31
+00:01:48.880 --> 00:01:51.160
+<v Noah Labhart>Josh Levine lives in Brooklyn, New York.
+
+32
+00:01:51.300 --> 00:01:55.000
+<v Noah Labhart>He started programming when he was six years old when his dad brought home an Apple II.
+
+33
+00:01:55.400 --> 00:01:59.820
+<v Noah Labhart>He realized that though there wasn't enough Legos in the world to support his creativity,
+
+34
+00:02:00.160 --> 00:02:01.840
+<v Noah Labhart>he could get enough RAM.
+
+35
+00:02:02.420 --> 00:02:07.060
+<v Noah Labhart>Growing up, he had a deep relationship with chess, setting up his own chess program.
+
+36
+00:02:07.420 --> 00:02:12.260
+<v Noah Labhart>In fact, he states that he learned everything he knows about programming by programming chess.
+
+37
+00:02:13.100 --> 00:02:15.060
+<v Noah Labhart>Outside of tech, he's married with two kids.
+
+38
+00:02:15.180 --> 00:02:20.080
+<v Noah Labhart>He loves karaoke and is a musician with his music online under the name Heavy Pennies.
+
+39
+00:02:20.780 --> 00:02:27.680
+<v Noah Labhart>In 2011, Josh joined an amazing online game website when they started supporting his favorite game variant.
+
+40
+00:02:28.330 --> 00:02:32.680
+<v Noah Labhart>Ten years later, he researched this company and their technology to see how it worked.
+
+41
+00:02:32.820 --> 00:02:40.620
+<v Noah Labhart>He applied for one of the jobs, got rejected, but then quickly got a call from the CEO, who actually liked his application.
+
+42
+00:02:42.400 --> 00:02:46.300
+<v Noah Labhart>This is Josh's creation story at Chess.com.
+
+43
+00:02:49.520 --> 00:03:04.460
+<v Josh Levine>Chess.com is a website and an app where you can play chess against other people or dive into all the different aspects of engaging with chess, like chess puzzles or taking lessons or reviewing your game or doing analysis of different positions.
+
+44
+00:03:04.460 --> 00:03:06.860
+<v Josh Levine>I'm not sure most everybody knows.
+
+45
+00:03:07.060 --> 00:03:09.820
+<v Josh Levine>I think people have been playing chess for 1,500 years.
+
+46
+00:03:10.300 --> 00:03:17.560
+<v Josh Levine>To bring that online and make it accessible to several hundred million people, I think is the mission of chess.com.
+
+47
+00:03:18.020 --> 00:03:25.640
+<v Josh Levine>For me, my first relationship with chess.com was in 2011 when I joined the website as a member.
+
+48
+00:03:26.000 --> 00:03:28.900
+<v Josh Levine>I was previously playing on the free internet chess server.
+
+49
+00:03:28.900 --> 00:03:40.520
+<v Josh Levine>I hadn't joined Chess.com yet, even though it had been around and you could play chess online on Chess.com previously, because I am a big fan of this chess variant called Bughouse.
+
+50
+00:03:40.820 --> 00:03:46.860
+<v Josh Levine>It's two teams, and as you play, when you capture a piece, you hand it to your partner.
+
+51
+00:03:47.020 --> 00:03:53.060
+<v Josh Levine>They can place that piece on their board as their turn, and it just gets wild.
+
+52
+00:03:53.060 --> 00:03:59.340
+<v Josh Levine>I didn't join Chess.com in the very beginning because their Bughouse support didn't exist.
+
+53
+00:03:59.900 --> 00:04:04.600
+<v Josh Levine>Eventually, in 2011, they finally launched Bughouse support, and then I was a paying member.
+
+54
+00:04:05.040 --> 00:04:09.760
+<v Josh Levine>My joining Chess.com story, it was February of 2021.
+
+55
+00:04:10.580 --> 00:04:12.420
+<v Josh Levine>I was coming out of lockdown.
+
+56
+00:04:12.740 --> 00:04:19.600
+<v Josh Levine>I was on an F train platform in Brooklyn waiting for the train to come, playing Blitz games on my phone.
+
+57
+00:04:19.600 --> 00:04:23.360
+<v Josh Levine>and I was going to meet a friend for the first time in the city for a year.
+
+58
+00:04:23.440 --> 00:04:24.420
+<v Josh Levine>We were all locked down.
+
+59
+00:04:24.560 --> 00:04:26.860
+<v Josh Levine>And so I'm playing this three-minute game of finishes.
+
+60
+00:04:27.060 --> 00:04:28.740
+<v Josh Levine>I can't remember if I won or lost.
+
+61
+00:04:29.080 --> 00:04:32.880
+<v Josh Levine>I've played, I think, almost 22,000 games on chess.com.
+
+62
+00:04:33.060 --> 00:04:35.660
+<v Josh Levine>But I was curious, how did they make this website?
+
+63
+00:04:35.760 --> 00:04:39.240
+<v Josh Levine>Is this just the free internet chess server turned over with a good branding?
+
+64
+00:04:39.380 --> 00:04:40.360
+<v Josh Levine>Or what is that?
+
+65
+00:04:40.440 --> 00:04:43.580
+<v Josh Levine>And normally when I'm researching how a company makes their tech,
+
+66
+00:04:43.660 --> 00:04:46.960
+<v Josh Levine>I just go to the jobs page and I see who they're hiring for.
+
+67
+00:04:47.180 --> 00:04:49.300
+<v Josh Levine>You can get a good overview of the technology there,
+
+68
+00:04:49.600 --> 00:04:56.560
+<v Josh Levine>if they're actively hiring. And so on the jobs page of chess.com, I saw, okay, PHP. I'm like,
+
+69
+00:04:56.620 --> 00:05:02.440
+<v Josh Levine>all right, that's cool. Java, PHP and Java. That's a little bit weird. All right. iOS, native iOS,
+
+70
+00:05:02.620 --> 00:05:07.400
+<v Josh Levine>Android, things like that. And then I get to the bottom and there's this job posting. It says VP
+
+71
+00:05:07.400 --> 00:05:14.340
+<v Josh Levine>of engineering. And I get filled with dread. I'm like, I'm not going to be good enough. This is
+
+72
+00:05:14.340 --> 00:05:19.000
+<v Josh Levine>going to be too big of a team size for me. I don't have the technical skill. Who knows? I just had
+
+73
+00:05:19.600 --> 00:05:25.500
+<v Josh Levine>imposter syndrome all at once, just dumping brain chemical all over me. And I click it and it's
+
+74
+00:05:25.500 --> 00:05:29.540
+<v Josh Levine>pretty great job description. Gotta love chess, gotta be good at engineering, have to have a sense
+
+75
+00:05:29.540 --> 00:05:34.260
+<v Josh Levine>of humor, this and that. And I was like, wow, that's really kind and settling to see a level
+
+76
+00:05:34.260 --> 00:05:39.060
+<v Josh Levine>headed job description, not a more corporate version, which I was definitely afraid of.
+
+77
+00:05:39.320 --> 00:05:45.060
+<v Josh Levine>And I clicked the apply button and it's literally a Google form. There were three text areas. It was
+
+78
+00:05:45.060 --> 00:05:49.120
+<v Josh Levine>basically the same as the job description. It's like, why do you love chess? Why would you be
+
+79
+00:05:49.600 --> 00:05:52.920
+<v Josh Levine>this job from an engineering perspective and what questions do you have for us?
+
+80
+00:05:53.020 --> 00:05:57.580
+<v Josh Levine>I filled it out. I told him about my chess engine. I told him about the teams that I'd been on
+
+81
+00:05:57.580 --> 00:06:03.320
+<v Josh Levine>and companies that I'd been helping to support, startups and other things and the tech that I've
+
+82
+00:06:03.320 --> 00:06:08.460
+<v Josh Levine>been involved with. I fired it off. I went to meet my friend. I had a great time and I came home and
+
+83
+00:06:08.460 --> 00:06:12.580
+<v Josh Levine>forgot about it because I was just like, yeah, whatever. The next day I got an auto rejection
+
+84
+00:06:13.340 --> 00:06:17.620
+<v Josh Levine>letter. It's just like, you are not the right fit. I'm like, I knew it. Oh no. I felt terrible.
+
+85
+00:06:19.600 --> 00:06:24.440
+<v Josh Levine>that I had found this thing because then it would just be more disappointment. But then the following
+
+86
+00:06:24.440 --> 00:06:30.220
+<v Josh Levine>day, the CEO, Eric, wrote me an email and was like, hey, we get hundreds of these applications every
+
+87
+00:06:30.220 --> 00:06:35.340
+<v Josh Levine>day and your submission stood out and I'd love to chat. And I was like, okay, cool. This is great.
+
+88
+00:06:35.400 --> 00:06:39.380
+<v Josh Levine>When do you want to chat? I sent that off and he sends back immediately. How about right now?
+
+89
+00:06:39.520 --> 00:06:44.880
+<v Josh Levine>And I'm literally like out in front of my house walking my dog. So I get on Zoom with Eric and
+
+90
+00:06:44.880 --> 00:06:47.880
+<v Josh Levine>And Eric Alabest is an incredible human being.
+
+91
+00:06:48.020 --> 00:06:50.200
+<v Josh Levine>His kindness just pours through any medium.
+
+92
+00:06:50.380 --> 00:06:51.420
+<v Josh Levine>And we got to talking.
+
+93
+00:06:51.520 --> 00:06:52.780
+<v Josh Levine>We got along really well.
+
+94
+00:06:53.040 --> 00:06:55.300
+<v Josh Levine>And then that was the beginning of the journey.
+
+95
+00:06:55.400 --> 00:06:56.900
+<v Josh Levine>I met more people at chess.com.
+
+96
+00:06:57.260 --> 00:07:03.040
+<v Josh Levine>I guess they liked me because I started in July of 2021 as the VP of Engineering.
+
+97
+00:07:05.260 --> 00:07:12.340
+<v Noah Labhart>So my next question may be a little interesting because you joined after you'd been using the platform for quite a while.
+
+98
+00:07:12.340 --> 00:07:16.960
+<v Noah Labhart>I'm curious about what was your MVP when you joined, right?
+
+99
+00:07:17.060 --> 00:07:20.740
+<v Noah Labhart>What was not the MVP of the company or the product, but like, what was the thing, the
+
+100
+00:07:20.740 --> 00:07:23.300
+<v Noah Labhart>project that you had to go step in and take on?
+
+101
+00:07:23.460 --> 00:07:25.040
+<v Noah Labhart>And how did you go about it?
+
+102
+00:07:26.500 --> 00:07:34.760
+<v Josh Levine>When I first joined chess.com, really, I was focused on three main ideas, building relationships,
+
+103
+00:07:35.480 --> 00:07:40.640
+<v Josh Levine>building and gaining speed of transferring knowledge between everyone on the team, not
+
+104
+00:07:42.340 --> 00:07:44.220
+<v Josh Levine>and then of course our projects.
+
+105
+00:07:45.060 --> 00:07:48.300
+<v Josh Levine>And wow, we had so many different areas
+
+106
+00:07:48.300 --> 00:07:50.220
+<v Josh Levine>that had evolved to their current state.
+
+107
+00:07:50.620 --> 00:07:55.360
+<v Josh Levine>I dove in directly to the chess engine analysis
+
+108
+00:07:55.360 --> 00:07:56.880
+<v Josh Levine>in the cloud project.
+
+109
+00:07:57.820 --> 00:08:01.080
+<v Josh Levine>Now, mind you, I was contributing in many,
+
+110
+00:08:01.160 --> 00:08:04.020
+<v Josh Levine>how do you put it when there's the team,
+
+111
+00:08:04.260 --> 00:08:06.880
+<v Josh Levine>there's the process, there's the architecture itself,
+
+112
+00:08:07.240 --> 00:08:08.740
+<v Josh Levine>there's how we manage production
+
+113
+00:08:08.740 --> 00:08:10.620
+<v Josh Levine>and our vendors and budgeting,
+
+114
+00:08:12.340 --> 00:08:18.660
+<v Josh Levine>right? So this chess engine in the cloud project, it was struggling. We have a new feature in the
+
+115
+00:08:18.660 --> 00:08:22.460
+<v Josh Levine>last couple of years called Game Review, and this was powering an early version of that.
+
+116
+00:08:22.620 --> 00:08:27.300
+<v Josh Levine>And basically when a chess game finishes, you want to send the whole game up to the cloud for
+
+117
+00:08:27.300 --> 00:08:32.260
+<v Josh Levine>the chess engines to analyze it. And so they have to break apart every move and that has to fan out
+
+118
+00:08:32.260 --> 00:08:36.800
+<v Josh Levine>to run across multiple different engines in order to get a decent response time for people to look
+
+119
+00:08:36.800 --> 00:08:42.340
+<v Josh Levine>at the results. It was just hard. It was like a JavaScript monolith with a lot of interesting
+
+120
+00:08:42.340 --> 00:08:48.360
+<v Josh Levine>patterns. It delved deep into some low-level, bits-level transmission stuff for performance
+
+121
+00:08:48.360 --> 00:08:53.800
+<v Josh Levine>reasons, and then in the same breath was doing business logic. You know, we got into that
+
+122
+00:08:53.800 --> 00:08:59.480
+<v Josh Levine>project and tried to unwind basically how to do distributed systems, how to prevent single
+
+123
+00:08:59.480 --> 00:09:04.340
+<v Josh Levine>points of failure, how to monitor and observe service-level objectives. We didn't have very
+
+124
+00:09:04.340 --> 00:09:09.640
+<v Josh Levine>very many nines to start with, but we were working towards that. And then also adding features and
+
+125
+00:09:09.640 --> 00:09:14.500
+<v Josh Levine>functionalities at the same time. Really the goal of that particular technology is to explain
+
+126
+00:09:14.500 --> 00:09:22.200
+<v Josh Levine>why a certain move is good or a certain situation is risky or how to think about the qualities of
+
+127
+00:09:22.200 --> 00:09:27.800
+<v Josh Levine>a chess position in a way that's explainable to a human being, but that starts from a computer
+
+128
+00:09:27.800 --> 00:09:33.900
+<v Josh Levine>analyzing chess. And I think today, just coming from that, where we had our, I think we had eight
+
+129
+00:09:34.340 --> 00:09:39.940
+<v Josh Levine>engine nodes, as it were. Eight computers running as many cores as possible, running Stockfish on
+
+130
+00:09:39.940 --> 00:09:44.060
+<v Josh Levine>as many cores as possible, trying to produce these analyses results. And I think today we have
+
+131
+00:09:44.060 --> 00:09:51.480
+<v Josh Levine>9,300 cores. And we've previously the thing would just use those eight engines no matter how many
+
+132
+00:09:51.480 --> 00:09:56.760
+<v Josh Levine>users are requesting. And now we can dynamically spill into the cloud. I don't know if this is the
+
+133
+00:09:56.760 --> 00:10:01.820
+<v Josh Levine>MVP, but it was definitely a huge project. Trying to store all the chess games is a big project.
+
+134
+00:10:01.820 --> 00:10:05.920
+<v Josh Levine>trying to create the real-time chess as a distributed system is a huge project.
+
+135
+00:10:06.260 --> 00:10:14.300
+<v Josh Levine>When I joined at that time, the Java part of the technology was this Java server that ran all the chess games.
+
+136
+00:10:15.520 --> 00:10:19.800
+<v Josh Levine>Every user's phone or browser would be connecting to this one server in Virginia.
+
+137
+00:10:20.460 --> 00:10:24.620
+<v Josh Levine>We had to deploy it and make changes to it, and so that would happen once a week.
+
+138
+00:10:24.960 --> 00:10:29.580
+<v Josh Levine>That's rough on cycle time, only being able to make changes to your primary offering once a week.
+
+139
+00:10:29.820 --> 00:10:31.540
+<v Josh Levine>There's only 52 changes a year.
+
+140
+00:10:31.820 --> 00:10:33.340
+<v Josh Levine>minus holiday and things like that.
+
+141
+00:10:33.840 --> 00:10:35.400
+<v Josh Levine>Massive distributed systems.
+
+142
+00:10:35.580 --> 00:10:39.920
+<v Josh Levine>I think also the process by which we develop our software.
+
+143
+00:10:40.180 --> 00:10:42.240
+<v Josh Levine>I could tell some stories about that.
+
+144
+00:10:43.400 --> 00:10:47.940
+<v Noah Labhart>So you've got the MVP, you're touching on the projects and they're massive, right?
+
+145
+00:10:48.040 --> 00:10:50.620
+<v Noah Labhart>The things you have to take on and go, you know, figure out how to do.
+
+146
+00:10:50.740 --> 00:10:55.080
+<v Noah Labhart>How did you progress that piece of the product and mature it?
+
+147
+00:10:55.120 --> 00:10:58.820
+<v Noah Labhart>And I think it could be process, maybe a little bit about kind of roadmap ideas too.
+
+148
+00:10:58.940 --> 00:11:01.120
+<v Noah Labhart>Maybe that's in the background, but process or roadmap.
+
+149
+00:11:02.200 --> 00:11:06.760
+<v Noah Labhart>mature what you were working on, what you were building, what you were focusing on at chess.com.
+
+150
+00:11:08.100 --> 00:11:13.080
+<v Josh Levine>So when I joined, I asked Eric, the CEO, I was trying to be nice. And I was just like,
+
+151
+00:11:13.140 --> 00:11:18.040
+<v Josh Levine>what do you think is going to go out to production in the next 90 days? And I thought maybe we should
+
+152
+00:11:18.040 --> 00:11:22.440
+<v Josh Levine>get to a two-year roadmap or something. And Eric looked at me and he's like, I don't know.
+
+153
+00:11:22.560 --> 00:11:26.820
+<v Josh Levine>I don't have a crystal ball. We don't know necessarily what we're doing next week.
+
+154
+00:11:26.820 --> 00:11:32.800
+<v Josh Levine>We had, and we still do in a lot of cases, run basically the parkour of agile development.
+
+155
+00:11:33.100 --> 00:11:36.700
+<v Josh Levine>A lot of things evolve in Slack, a lot of things evolve via conversation.
+
+156
+00:11:37.220 --> 00:11:43.280
+<v Josh Levine>And with that, we would ship like a lot, but we didn't have a visibility into what we were shipping.
+
+157
+00:11:43.540 --> 00:11:53.680
+<v Josh Levine>And Eric would literally navigate that via being present in channels and communicating extremely fluently on a trillion points.
+
+158
+00:11:53.680 --> 00:11:58.080
+<v Josh Levine>I looked at that and I'm like, oh, actually, this is really cool because I like to do that, too.
+
+159
+00:11:58.420 --> 00:12:06.460
+<v Josh Levine>But also I noticed some developers or basically all the developers had 60 to 70 Jira tickets in their personal assigned backlog.
+
+160
+00:12:07.100 --> 00:12:15.980
+<v Josh Levine>Like anything that was like a P2 or below, priority two or below would probably not get done unless someone would hop in a Slack channel and be like, hey, what about that thing?
+
+161
+00:12:16.260 --> 00:12:17.260
+<v Josh Levine>Can we work on that?
+
+162
+00:12:17.340 --> 00:12:18.900
+<v Josh Levine>Let me finish this and then I'll do that.
+
+163
+00:12:18.900 --> 00:12:23.020
+<v Josh Levine>So it was a lot of self-direction, which led to a lot of throughput.
+
+164
+00:12:23.320 --> 00:12:29.140
+<v Josh Levine>We were very productive, but wasn't super clear what was happening.
+
+165
+00:12:29.380 --> 00:12:32.800
+<v Josh Levine>And it definitely wasn't clear when things would happen.
+
+166
+00:12:33.200 --> 00:12:35.840
+<v Josh Levine>We created a concept of work streams.
+
+167
+00:12:36.260 --> 00:12:39.400
+<v Josh Levine>That word means something to different people in different contexts.
+
+168
+00:12:39.500 --> 00:12:45.020
+<v Josh Levine>But what it meant for us, we put a lasso around several groups of features and called it a work stream.
+
+169
+00:12:45.440 --> 00:12:47.340
+<v Josh Levine>So gameplay was a work stream.
+
+170
+00:12:48.900 --> 00:12:55.800
+<v Josh Levine>stream, our learning tools as a work stream. And we started to triage new work and then prioritize
+
+171
+00:12:55.800 --> 00:13:01.520
+<v Josh Levine>it versus what's already in the work stream. And we created an affinity between a tech lead and a
+
+172
+00:13:01.520 --> 00:13:05.760
+<v Josh Levine>product manager and a work stream so that every work stream, even if it didn't have a megaton of
+
+173
+00:13:05.760 --> 00:13:11.100
+<v Josh Levine>developers or designers working on it, the work stream would at least be triaged and the backlog
+
+174
+00:13:11.100 --> 00:13:16.980
+<v Josh Levine>will be groomed and we could start to understand the flow of what we were building and in what way.
+
+175
+00:13:18.900 --> 00:13:24.780
+<v Josh Levine>monthly cadence for Eric, CEO, to come in and say, what are we doing in gameplay? Here are the most
+
+176
+00:13:24.780 --> 00:13:28.720
+<v Josh Levine>important things we could be doing. Are they at the top of the list? And it created an ability
+
+177
+00:13:28.720 --> 00:13:34.460
+<v Josh Levine>for us to flow faster without every dev managing 70 tickets in their own personal backlog.
+
+178
+00:13:34.880 --> 00:13:41.540
+<v Josh Levine>We basically did it by building a Notion database. We still use Jira, but the one weird trick was
+
+179
+00:13:41.540 --> 00:13:46.640
+<v Josh Levine>we made a Notion database. The main properties are like the work stream, who's the PM, who's the
+
+180
+00:13:46.640 --> 00:13:47.620
+<v Josh Levine>the tech lead, et cetera.
+
+181
+00:13:47.700 --> 00:13:49.740
+<v Josh Levine>What is the point of this particular investment
+
+182
+00:13:49.740 --> 00:13:50.480
+<v Josh Levine>we're trying to make?
+
+183
+00:13:50.720 --> 00:13:52.920
+<v Josh Levine>And then we would keep a one-to-one ratio
+
+184
+00:13:53.460 --> 00:13:56.320
+<v Josh Levine>between the Notion card and a Jira Epic.
+
+185
+00:13:56.580 --> 00:13:59.200
+<v Josh Levine>And basically in the past, we would have a Jira Epic
+
+186
+00:13:59.200 --> 00:14:01.140
+<v Josh Levine>and it would have all the product specs in there
+
+187
+00:14:01.140 --> 00:14:02.220
+<v Josh Levine>and designers would attach things
+
+188
+00:14:02.220 --> 00:14:03.980
+<v Josh Levine>and there would be a whole megaton of comments
+
+189
+00:14:03.980 --> 00:14:06.500
+<v Josh Levine>going back and forth and like tickets would get made,
+
+190
+00:14:06.520 --> 00:14:08.320
+<v Josh Levine>but they'd mainly be make this part of the feature,
+
+191
+00:14:08.380 --> 00:14:09.320
+<v Josh Levine>make that part of the feature.
+
+192
+00:14:09.620 --> 00:14:11.200
+<v Josh Levine>The tech underneath the covers
+
+193
+00:14:11.200 --> 00:14:13.200
+<v Josh Levine>was never really clearly illuminated.
+
+194
+00:14:13.500 --> 00:14:15.600
+<v Josh Levine>It would happen via Slack or via conversations
+
+195
+00:14:16.640 --> 00:14:21.800
+<v Josh Levine>quests, or et cetera. And so by shifting the product specification over to Notion and having
+
+196
+00:14:21.800 --> 00:14:26.520
+<v Josh Levine>that highly collaborative editing experience there, and then having a one-to-one with the Epic,
+
+197
+00:14:26.780 --> 00:14:32.660
+<v Josh Levine>the Jira Epic could then be owned by the engineering team. And they would build the
+
+198
+00:14:32.660 --> 00:14:38.740
+<v Josh Levine>implementation path in terms of tech in the Jira Epic in order to reach the product specs that
+
+199
+00:14:38.740 --> 00:14:43.120
+<v Josh Levine>were in the Notion. And with this approach, we were able to get the super high level lenses
+
+200
+00:14:43.120 --> 00:14:47.000
+<v Josh Levine>lenses that Eric wanted to see for what are we doing in this work stream? What are the major
+
+201
+00:14:47.000 --> 00:14:52.620
+<v Josh Levine>things? And then we were able to get the super low level technical implementation paths laid out so
+
+202
+00:14:52.620 --> 00:14:58.600
+<v Josh Levine>that we could attach people to projects in a way that was more portable. Gosh, like it's a PHP
+
+203
+00:14:58.600 --> 00:15:03.260
+<v Josh Levine>monolith with vertically partitioned MySQL databases. I think there's like 21 clusters.
+
+204
+00:15:03.760 --> 00:15:07.780
+<v Josh Levine>You got to know what you're doing or you're going to bring the site down with the wrong query or
+
+205
+00:15:07.780 --> 00:15:12.720
+<v Josh Levine>the wrong cardinality or other things like that. So it was really important that we were able to
+
+206
+00:15:13.120 --> 00:15:18.740
+<v Josh Levine>out implementations like that. Where we came from was that each dev would get a project and just do
+
+207
+00:15:18.740 --> 00:15:22.720
+<v Josh Levine>it. And it was cool. Symfony, Model View Controller, and Doctrine, you can do that there.
+
+208
+00:15:22.900 --> 00:15:28.080
+<v Josh Levine>But as things started to get more complex with distributed systems or just the scale,
+
+209
+00:15:28.200 --> 00:15:33.960
+<v Josh Levine>I think today there's 20 billion games in the database. It's a lot. And then you think every
+
+210
+00:15:33.960 --> 00:15:39.160
+<v Josh Levine>game has at least two players, and you're trying to navigate that in a search criteria or something
+
+211
+00:15:39.160 --> 00:15:40.060
+<v Josh Levine>You have to think ahead.
+
+212
+00:15:41.280 --> 00:15:42.860
+<v Noah Labhart>I'm curious about team.
+
+213
+00:15:43.260 --> 00:15:46.140
+<v Noah Labhart>There's a lot you're doing at chess.
+
+214
+00:15:46.380 --> 00:15:48.880
+<v Noah Labhart>And you came in and there was a team.
+
+215
+00:15:49.220 --> 00:15:56.400
+<v Noah Labhart>And I'm curious, combining maybe how it was done before and how you have changed it in your role and in your time.
+
+216
+00:15:56.540 --> 00:15:58.560
+<v Noah Labhart>How do you go about building a team?
+
+217
+00:15:58.760 --> 00:16:03.080
+<v Noah Labhart>And what do you look for in those people to indicate that they're the winning horses to join you?
+
+218
+00:16:03.840 --> 00:16:07.300
+<v Josh Levine>I think that people need to be cared for first as human beings.
+
+219
+00:16:09.160 --> 00:16:14.720
+<v Josh Levine>those relationships, we will gain knowledge. And from that knowledge, we'll know what projects to
+
+220
+00:16:14.720 --> 00:16:21.160
+<v Josh Levine>do. I think basically that's what I brought to the table for the team. They were previously
+
+221
+00:16:21.160 --> 00:16:25.820
+<v Josh Levine>projects. There was a massive amount of love. There was a massive amount of joy for the mission
+
+222
+00:16:25.820 --> 00:16:30.320
+<v Josh Levine>of chess. And we know why we're here, right? We're not here to grind Jira tickets. We're here to
+
+223
+00:16:30.320 --> 00:16:36.740
+<v Josh Levine>make chess better for everyone in the world. But there wasn't a lot of focus on how we share
+
+224
+00:16:36.740 --> 00:16:42.480
+<v Josh Levine>knowledge, on who could be a mentor, on who could just help support when something is difficult,
+
+225
+00:16:43.080 --> 00:16:49.160
+<v Josh Levine>or you need to blow off steam, or vent some concerns, or some frustrations, or even some
+
+226
+00:16:49.160 --> 00:16:55.700
+<v Josh Levine>call-ups, or shout-outs for people. What I wanted to try to do was create a set of cadences in a
+
+227
+00:16:55.700 --> 00:17:01.100
+<v Josh Levine>space that people could rely on, and that they knew that they could bring themselves to that space
+
+228
+00:17:01.100 --> 00:17:06.060
+<v Josh Levine>with or without knowledge, with or without the projects, and that would be cared for.
+
+229
+00:17:06.740 --> 00:17:12.280
+<v Josh Levine>I would say relationships lead to knowledge leads to projects is the main approach that I took to building team.
+
+230
+00:17:13.160 --> 00:17:21.840
+<v Josh Levine>We also had some challenges in team building, largely because we have so many features and so many systems that I can't make a team around every feature.
+
+231
+00:17:21.940 --> 00:17:24.360
+<v Josh Levine>There's just not enough people to work that way.
+
+232
+00:17:24.780 --> 00:17:38.060
+<v Josh Levine>So we have to get that feeling of a common understanding and that time and space to get to know one another more intentionally than just, hey, create a pizza team and shove a bunch of sprints in front of them and then they'll gel.
+
+233
+00:17:41.540 --> 00:17:45.160
+<v Noah Labhart>So I want to flip to scalability, right?
+
+234
+00:17:45.240 --> 00:17:49.980
+<v Noah Labhart>And you stepped into a system with some challenges in some areas.
+
+235
+00:17:50.020 --> 00:17:53.260
+<v Noah Labhart>So I'm curious about how you approach scalability.
+
+236
+00:17:54.360 --> 00:17:58.380
+<v Noah Labhart>scalability? And have there been interesting areas where you've had to fight it as you've grown?
+
+237
+00:17:58.500 --> 00:18:01.740
+<v Noah Labhart>And I kind of know from some of the things you said, there probably are.
+
+238
+00:18:03.060 --> 00:18:09.340
+<v Josh Levine>I want to wind back to actually before I joined chess.com through to 2019. And at the beginning
+
+239
+00:18:09.340 --> 00:18:14.520
+<v Josh Levine>of 2020, chess.com was growing about 10% a year. And we're very excited about that. And it was
+
+240
+00:18:14.520 --> 00:18:19.740
+<v Josh Levine>great business, at least from what has been shared with me and what I can see from metrics as well.
+
+241
+00:18:19.740 --> 00:18:21.840
+<v Josh Levine>Well, when the COVID lockdowns happened,
+
+242
+00:18:22.300 --> 00:18:26.520
+<v Josh Levine>Chess.com saw traffic spike 4x over their current water level.
+
+243
+00:18:26.860 --> 00:18:28.620
+<v Josh Levine>And it would go country by country.
+
+244
+00:18:28.660 --> 00:18:31.940
+<v Josh Levine>It came in a wave as folks started to stay home and wonder,
+
+245
+00:18:32.000 --> 00:18:33.960
+<v Josh Levine>what do I do with my time now that I can't go outside?
+
+246
+00:18:34.420 --> 00:18:36.420
+<v Josh Levine>Many millions of people turned to Chess.
+
+247
+00:18:37.220 --> 00:18:38.260
+<v Josh Levine>First of all, that's great.
+
+248
+00:18:38.600 --> 00:18:41.100
+<v Josh Levine>Second of all, they had to shard the databases
+
+249
+00:18:41.100 --> 00:18:44.120
+<v Josh Levine>and switch to application layer joins and get new hardware
+
+250
+00:18:44.120 --> 00:18:46.420
+<v Josh Levine>and all sorts of stuff was happening through 2020.
+
+251
+00:18:46.800 --> 00:18:49.460
+<v Josh Levine>And the other thing that happened at the end of the 2020,
+
+252
+00:18:49.740 --> 00:18:54.420
+<v Josh Levine>is this incredible mini-series called The Queen's Gambit came out on Netflix,
+
+253
+00:18:54.620 --> 00:19:00.400
+<v Josh Levine>and everybody was watching that, and the traffic went 4X again.
+
+254
+00:19:00.860 --> 00:19:01.920
+<v Josh Levine>It went again.
+
+255
+00:19:02.900 --> 00:19:08.240
+<v Josh Levine>Massive, thousand-yard stares from these SysOps folks who had been on call getting buzzed,
+
+256
+00:19:08.240 --> 00:19:12.680
+<v Josh Levine>and we had to move data center from LA to Virginia and get bigger boxes
+
+257
+00:19:12.680 --> 00:19:15.400
+<v Josh Levine>and bigger boats, basically, to carry all the water.
+
+258
+00:19:15.400 --> 00:19:20.800
+<v Josh Levine>again, like from every layer of the stack, from the edge through the application layer,
+
+259
+00:19:21.020 --> 00:19:28.320
+<v Josh Levine>internal load balancers, databases, everything needed to scale. For a while there, there was
+
+260
+00:19:28.320 --> 00:19:35.380
+<v Josh Levine>several folks who were just staring at that all day, every day, watching, monitoring, and trying
+
+261
+00:19:35.380 --> 00:19:41.520
+<v Josh Levine>to address issues proactively in the code base. When I joined, it was stable, but then we saw
+
+262
+00:19:41.520 --> 00:19:47.120
+<v Josh Levine>some major traffic, an additional. We just keep basically 4x-ing and then finding our water level
+
+263
+00:19:47.120 --> 00:19:53.440
+<v Josh Levine>at 2x below that, and then 4x-ing and again. So in 2022, we had a massive amount of traffic coming
+
+264
+00:19:53.440 --> 00:19:57.980
+<v Josh Levine>in because there was like a chess championship, and then there was this thing with cheating and
+
+265
+00:19:57.980 --> 00:20:02.820
+<v Josh Levine>other things that just drew a lot of attraction to the sport. I think it was at the opening of 2023
+
+266
+00:20:03.360 --> 00:20:10.140
+<v Josh Levine>in January, our head SysOps guy came to the mission control channel. When things are going
+
+267
+00:20:11.620 --> 00:20:15.940
+<v Josh Levine>it. And he came there and he's like, this week we have 10% more traffic. And then the next week he's
+
+268
+00:20:15.940 --> 00:20:22.020
+<v Josh Levine>like, and now we have 10% more traffic again. Uh, guys, we're all just, we're watching this and it
+
+269
+00:20:22.020 --> 00:20:26.500
+<v Josh Levine>got to the point. And again, we had moved from a data center in LA to Virginia to have a bigger
+
+270
+00:20:26.500 --> 00:20:32.240
+<v Josh Levine>data center. We've done this. And in 2023, like we were getting so much traffic that the front
+
+271
+00:20:32.240 --> 00:20:38.620
+<v Josh Levine>door switches and firewalls were dropping packets in the data center. That's bad. That's hard to get
+
+272
+00:20:38.620 --> 00:20:43.920
+<v Josh Levine>it around. How are you going to navigate that? We had to figure ways to create hybrid workloads,
+
+273
+00:20:44.140 --> 00:20:49.900
+<v Josh Levine>right? We have to run workloads not only on-prem, but also in the cloud. We had to tune everything.
+
+274
+00:20:50.540 --> 00:20:57.660
+<v Josh Levine>If you have one N plus one query in a PHP web pool, if one of those processes is taking a little
+
+275
+00:20:57.660 --> 00:21:03.320
+<v Josh Levine>bit longer, it can actually soak and fill up the entire amount of processing capability that you
+
+276
+00:21:03.320 --> 00:21:09.240
+<v Josh Levine>you have. So any slow secondary or third service that you're calling from PHP can bring down the
+
+277
+00:21:09.240 --> 00:21:13.680
+<v Josh Levine>entire website when you have a single pool. So we did some things where we actually ordained
+
+278
+00:21:13.680 --> 00:21:21.240
+<v Josh Levine>our monolith as a service and using Cloudflare and other routing tools, we would route certain
+
+279
+00:21:21.240 --> 00:21:27.660
+<v Josh Levine>paths or path prefixes to certain pools of resources, sometimes to make sure that they
+
+280
+00:21:27.660 --> 00:21:32.740
+<v Josh Levine>would be up and be guaranteed to have PHP processes available or other times because
+
+281
+00:21:33.320 --> 00:21:35.600
+<v Josh Levine>They were going to get soaked and we didn't want them to soak everything else.
+
+282
+00:21:35.640 --> 00:21:38.960
+<v Josh Levine>So at least if they were dying over here in their isolated box,
+
+283
+00:21:39.260 --> 00:21:42.240
+<v Josh Levine>it wouldn't kill the rest of the experience for everyone else on the website.
+
+284
+00:21:42.600 --> 00:21:45.460
+<v Josh Levine>So we called that the modular monolith approach.
+
+285
+00:21:45.980 --> 00:21:49.000
+<v Josh Levine>We didn't have time to decompose all the different services,
+
+286
+00:21:49.060 --> 00:21:54.060
+<v Josh Levine>but we were able to isolate certain code paths behind certain routes and node pools inside of Kubernetes.
+
+287
+00:21:54.880 --> 00:21:58.940
+<v Josh Levine>We also brought a lot of services off or out of the monolith.
+
+288
+00:21:59.160 --> 00:22:02.280
+<v Josh Levine>You can think of things like storing games or real-time gameplay,
+
+289
+00:22:03.320 --> 00:22:08.340
+<v Josh Levine>think of things like puzzles. But every time someone makes a move in a puzzle, we store that
+
+290
+00:22:08.340 --> 00:22:15.620
+<v Josh Levine>and we calculate their puzzle rating and other transactional elements. And that's a lot of puzzles
+
+291
+00:22:15.620 --> 00:22:20.600
+<v Josh Levine>per second that happen there. So we need to think about the storage layer for that. We need to
+
+292
+00:22:20.600 --> 00:22:25.880
+<v Josh Levine>separate read layer and write layer for that. And any kind of integration between multiple systems
+
+293
+00:22:25.880 --> 00:22:33.300
+<v Josh Levine>has to handle, I don't know, 8,000 requests per second, something like this. It's no slouch. It's
+
+294
+00:22:33.320 --> 00:22:39.480
+<v Josh Levine>isolation of workloads to specific resource pools, CQRS separating of reads and writes,
+
+295
+00:22:39.660 --> 00:22:45.220
+<v Josh Levine>and then just like hammering down and untangling. The moment I remember being personally involved
+
+296
+00:22:45.220 --> 00:22:51.700
+<v Josh Levine>in that amount of scaling was with our live chess Java server. So this is that one server.
+
+297
+00:22:51.980 --> 00:22:57.500
+<v Josh Levine>It has a terabyte of RAM and like a hundred and something CPUs in it. And it's a massive box and
+
+298
+00:22:57.500 --> 00:23:02.860
+<v Josh Levine>it's running Java, multiple different thread pools. At that point, I think we saw 500,000
+
+299
+00:23:03.320 --> 00:23:07.180
+<v Josh Levine>web socket connections to this thing and it was like occasionally reaching a
+
+300
+00:23:07.180 --> 00:23:11.940
+<v Josh Levine>deadlock or it would like get tuned out because the database would go too slow
+
+301
+00:23:11.940 --> 00:23:14.740
+<v Josh Levine>some query that used to take five milliseconds was now taking seven
+
+302
+00:23:14.740 --> 00:23:18.100
+<v Josh Levine>milliseconds and that would ultimately like backup back pressure into the
+
+303
+00:23:18.100 --> 00:23:21.700
+<v Josh Levine>user's experience this is old-school stuff right but if you have a Java
+
+304
+00:23:21.700 --> 00:23:25.940
+<v Josh Levine>running on a Linux you can run a kill minus three on that process and it'll
+
+305
+00:23:25.940 --> 00:23:29.700
+<v Josh Levine>dump the thread stacks to standard error and then you can look if you've got a
+
+306
+00:23:29.700 --> 00:23:32.280
+<v Josh Levine>lockup or something like that you can look and see what monitor is that
+
+307
+00:23:33.320 --> 00:23:39.440
+<v Josh Levine>doing a bunch of that and triaging and trying to write code fixes to change. In Java, there's this
+
+308
+00:23:39.440 --> 00:23:45.580
+<v Josh Levine>other thing called JMX, where anything that you've declared as a Java bean can have properties that
+
+309
+00:23:45.580 --> 00:23:51.280
+<v Josh Levine>get exposed over this JMX interface. Gosh, if that thing is exposed to the internet, someone could
+
+310
+00:23:51.280 --> 00:23:56.360
+<v Josh Levine>just come into your Java app, which is bad. But at one point when we were tuning connection pools
+
+311
+00:23:56.360 --> 00:24:01.720
+<v Josh Levine>to try to make the server stay alive under the weight of the massive chess interest, we tunneled
+
+312
+00:24:03.320 --> 00:24:09.140
+<v Josh Levine>into the live running server in order to tune the primary and secondary database connection
+
+313
+00:24:09.140 --> 00:24:13.320
+<v Josh Levine>pool parameters. It was pretty cool. We had like Datadog up on the right with graphs
+
+314
+00:24:13.320 --> 00:24:18.120
+<v Josh Levine>of how many connections were being created and relinquished and then how many queries
+
+315
+00:24:18.120 --> 00:24:21.380
+<v Josh Levine>were going through and the latencies on those queries and things like that.
+
+316
+00:24:22.020 --> 00:24:25.920
+<v Josh Levine>Literally, we were tuning how many threads are in the pool, how many active connections, etc.
+
+317
+00:24:26.740 --> 00:24:30.900
+<v Josh Levine>And it's invigorating. It's basically like doing a brain surgery while the thing is actually
+
+318
+00:24:30.900 --> 00:24:36.200
+<v Josh Levine>running. That was exciting. Nerve-wracking would be a better description of it.
+
+319
+00:24:38.860 --> 00:24:42.780
+<v Noah Labhart>When you step out on the balcony, you look across all that you've built,
+
+320
+00:24:42.940 --> 00:24:46.160
+<v Noah Labhart>at chess specifically, what are you most proud of?
+
+321
+00:24:47.100 --> 00:24:53.620
+<v Josh Levine>I think the team and the team members. I don't even talk about some of our personalization tools
+
+322
+00:24:53.620 --> 00:24:57.300
+<v Josh Levine>and things. It's called Engagetron. Pretty proud of that, proud of the team for that.
+
+323
+00:24:57.300 --> 00:25:02.280
+<v Josh Levine>but the team members and their growth and just the amount of hiring that we
+
+324
+00:25:02.280 --> 00:25:06.840
+<v Josh Levine>did I think when I joined we maybe had 90 people like all across engineering in
+
+325
+00:25:06.840 --> 00:25:12.960
+<v Josh Levine>every different area of it and I think now we're close to 250 it's more than
+
+326
+00:25:12.960 --> 00:25:19.220
+<v Josh Levine>doubled the team and we haven't really lost that sense of excellence or the key
+
+327
+00:25:19.220 --> 00:25:23.040
+<v Josh Levine>element of kindness and how we engage with one another it was basically flat
+
+328
+00:25:23.040 --> 00:25:28.240
+<v Josh Levine>when I joined, there was no real hierarchy. There was definitely a clear set of people who knew
+
+329
+00:25:28.240 --> 00:25:34.760
+<v Josh Levine>basically everything and they were indispensable. Now we have leaders in certain areas in
+
+330
+00:25:34.760 --> 00:25:42.420
+<v Josh Levine>infrastructure and in security and in architecture, in data and application development. We have a
+
+331
+00:25:42.420 --> 00:25:47.980
+<v Josh Levine>whole host of team leads who have taken on that responsibility and are learning that craft
+
+332
+00:25:47.980 --> 00:25:51.840
+<v Josh Levine>and are dedicated to getting better at that and to supporting their people.
+
+333
+00:25:52.520 --> 00:25:56.600
+<v Josh Levine>And I just think that's the most transformative thing you can do, right?
+
+334
+00:25:56.680 --> 00:25:59.400
+<v Josh Levine>You get people and you invest in them.
+
+335
+00:25:59.480 --> 00:26:03.300
+<v Josh Levine>And when they blossom and they get better, like everything around them gets better
+
+336
+00:26:03.300 --> 00:26:05.060
+<v Josh Levine>and they gain confidence in that too.
+
+337
+00:26:05.440 --> 00:26:07.880
+<v Josh Levine>And if you can do that in a way that's kind,
+
+338
+00:26:07.960 --> 00:26:10.940
+<v Josh Levine>and obviously you have to know what you're doing or chess.com will be down.
+
+339
+00:26:11.240 --> 00:26:14.640
+<v Josh Levine>I think it's the team and the people and how we've invested in them.
+
+340
+00:26:16.800 --> 00:26:21.560
+<v Noah Labhart>so let's flip the script a little bit tell me about a mistake you made and how you and your
+
+341
+00:26:21.560 --> 00:26:24.560
+<v Noah Labhart>team responded to it so
+
+342
+00:26:24.560 --> 00:26:29.900
+<v Josh Levine>we had done a bunch of performance tuning throughout 2022 and we're like
+
+343
+00:26:29.900 --> 00:26:35.180
+<v Josh Levine>this is going to be the year we change our reputation for quality and we're getting to
+
+344
+00:26:35.180 --> 00:26:39.060
+<v Josh Levine>the end of the year and we're like all right we shipped all this performance tuning i think we're
+
+345
+00:26:39.060 --> 00:26:45.540
+<v Josh Levine>ready for a massive scale. We got together with the marketing team and we decided to run a banner
+
+346
+00:26:45.540 --> 00:26:51.720
+<v Josh Levine>on the homepage of chess.com that said, see if you can crash our server. And basically just by
+
+347
+00:26:51.720 --> 00:26:57.720
+<v Josh Levine>coming and playing a live chess game. Oh gosh, that didn't go right. It crashed the server.
+
+348
+00:26:57.820 --> 00:27:07.060
+<v Josh Levine>And man, we were, we were a little, I think overconfident clearly. And I think the lesson
+
+349
+00:27:09.060 --> 00:27:13.360
+<v Josh Levine>to do. We should have done it with a feature flag or some percentage of users or something else like
+
+350
+00:27:13.360 --> 00:27:17.960
+<v Josh Levine>that. We were a bit brazen. But yeah, we crashed the server largely due to hubris, our own hubris.
+
+351
+00:27:18.340 --> 00:27:20.300
+<v Josh Levine>It was a pretty bad mistake.
+
+352
+00:27:23.200 --> 00:27:29.040
+<v Noah Labhart>So this will be fun to ask. And as a player myself and a big fan of chess.com,
+
+353
+00:27:29.140 --> 00:27:32.260
+<v Noah Labhart>what does the future look like for the product and for the team?
+
+354
+00:27:33.400 --> 00:27:37.620
+<v Josh Levine>I think more and more chess will be offline and online.
+
+355
+00:27:37.920 --> 00:27:45.180
+<v Josh Levine>I think more and more people are going to want to understand the game and want to be able to learn and develop their skills.
+
+356
+00:27:45.600 --> 00:27:53.460
+<v Josh Levine>And I think that everybody's journey with chess is unique and thus the experience on chess.com will need to be personal to them.
+
+357
+00:27:53.860 --> 00:28:00.480
+<v Josh Levine>I'm a big believer also in like multimedia and I think it would be cool if we could put a chess coach in everyone's pocket.
+
+358
+00:28:02.260 --> 00:28:06.640
+<v Josh Levine>actually so many cool things coming. Like I think chess is going to get more fun. I think chess is
+
+359
+00:28:06.640 --> 00:28:10.120
+<v Josh Levine>going to get more accessible for folks who don't know how to play yet. We're going to help them
+
+360
+00:28:10.120 --> 00:28:15.300
+<v Josh Levine>through that because chess is easy to lose, but losing is learning and learning is winning.
+
+361
+00:28:15.820 --> 00:28:20.660
+<v Josh Levine>There's a massive amount of personalization and meeting that person where they are in their
+
+362
+00:28:20.660 --> 00:28:25.260
+<v Josh Levine>journey to help them and encourage them. Now you're just getting my personal opinion, but I
+
+363
+00:28:25.260 --> 00:28:31.300
+<v Josh Levine>I think that chess is a way to engage with your own self-development and growth.
+
+364
+00:28:32.380 --> 00:28:35.840
+<v Josh Levine>It's super easy to realize you're not Magnus Carlsen.
+
+365
+00:28:35.960 --> 00:28:43.620
+<v Josh Levine>And it's also fun when you find a fork or when you find a cool mating solution or you even just solve a puzzle.
+
+366
+00:28:43.900 --> 00:28:48.120
+<v Josh Levine>To be honest, it's fun to just move the pieces on the board because it's cool.
+
+367
+00:28:48.200 --> 00:28:48.700
+<v Noah Labhart>It looks cool.
+
+368
+00:28:48.640 --> 00:28:49.260
+<v Noah Labhart>I
+
+369
+00:28:49.260 --> 00:29:15.760
+<v Josh Levine>think that the future includes more people willing to engage with their own growth and development and recognizing that any amount of time spent on chess helps with that. Whether they're a mathematician or an artist or a teacher or they're a finance person or they're in marketing or sales or any other life pursuit, it grows your capabilities from their foundations. I hope that the future just has more and more of the earth taking advantage of that.
+
+370
+00:29:17.020 --> 00:29:24.100
+<v Noah Labhart>Josh, let's switch to you. Who influences the way that you work? Name a person or many persons or something you look up to and why.
+
+371
+00:29:25.000 --> 00:29:30.360
+<v Josh Levine>I would say CEO of Chess.com, Eric Alabest, is definitely a major influence on me.
+
+372
+00:29:31.340 --> 00:29:34.800
+<v Josh Levine>He's always able to bring the kindness in the conversation.
+
+373
+00:29:35.000 --> 00:29:39.460
+<v Josh Levine>No matter what information or knowledge is being exchanged, he cares about human beings.
+
+374
+00:29:39.880 --> 00:29:45.400
+<v Josh Levine>He cares about everyone and just really shoulders that and brings that to the table.
+
+375
+00:29:45.760 --> 00:29:48.300
+<v Josh Levine>And at the same time is relentless for excellence.
+
+376
+00:29:48.540 --> 00:29:55.540
+<v Josh Levine>A lot of folks will try to use a sort of a shame or a fear or some other penalty to motivate people.
+
+377
+00:29:55.980 --> 00:30:01.900
+<v Josh Levine>If you skip that and you motivate with joy and with love, people will do way better.
+
+378
+00:30:03.680 --> 00:30:04.540
+<v Noah Labhart>Josh, last question.
+
+379
+00:30:05.000 --> 00:30:09.840
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+380
+00:30:09.940 --> 00:30:11.120
+<v Noah Labhart>They're jazzed about it.
+
+381
+00:30:11.140 --> 00:30:14.160
+<v Noah Labhart>They can't wait to show it off to the world and can't wait to show it off to you right there in the plane.
+
+382
+00:30:15.760 --> 00:30:20.240
+<v Noah Labhart>and maybe not starting chess.com, but helping to grow it to what it is today.
+
+383
+00:30:21.240 --> 00:30:23.320
+<v Josh Levine>I would just say the same thing as before,
+
+384
+00:30:23.440 --> 00:30:26.540
+<v Josh Levine>is that the relationships that you have with the people around you
+
+385
+00:30:26.540 --> 00:30:29.920
+<v Josh Levine>who are on this journey with you are going to lead to more knowledge,
+
+386
+00:30:30.100 --> 00:30:32.100
+<v Josh Levine>which will lead to the right projects.
+
+387
+00:30:32.740 --> 00:30:35.980
+<v Josh Levine>And if you treat those relationships with kindness and with love,
+
+388
+00:30:36.120 --> 00:30:37.620
+<v Josh Levine>then you're going to build an incredible thing.
+
+389
+00:30:37.760 --> 00:30:39.600
+<v Josh Levine>And if you just go for the projects,
+
+390
+00:30:39.780 --> 00:30:41.920
+<v Josh Levine>then you're probably going to burn through a bunch of relationships.
+
+391
+00:30:41.980 --> 00:30:44.480
+<v Josh Levine>And then when it gets hard, you'll be on your own.
+
+392
+00:30:45.820 --> 00:30:48.960
+<v Noah Labhart>Advice. Well, Josh, thank you for being on the show today. And thank you for telling
+
+393
+00:30:48.960 --> 00:30:51.320
+<v Noah Labhart>your creation story at chess.com.
+
+394
+00:30:51.620 --> 00:30:53.040
+<v Josh Levine>Thank you so much for having me.
+
+395
+00:30:55.680 --> 00:30:58.420
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+396
+00:31:03.260 --> 00:31:09.020
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+397
+00:31:09.180 --> 00:31:13.960
+<v Noah Labhart>or the podcasting app of your choice. And when you get a chance, leave us a review.
+
+398
+00:31:15.760 --> 00:31:16.340
+<v Noah Labhart>tremendously.
+
+399
+00:31:19.000 --> 00:31:20.580
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1463 @@
+WEBVTT
+
+NOTE S5 Bonus: No More Hotfixes: Debugging Live Production Applications Without Redeploying with Ilan Peleg of Lightrun
+
+1
+00:00:01.200 --> 00:00:09.300
+<v Ilan Peleg>Eventually, when you're enabling developers to access production environments, you're kind of having a new surface of attack here.
+
+2
+00:00:09.540 --> 00:00:16.600
+<v Ilan Peleg>So how will you create a workflow which maintains the organization's security workflows?
+
+3
+00:00:17.620 --> 00:00:27.820
+<v Ilan Peleg>And even further, the messaging and how you simply penetrate into the organization in real production environments.
+
+4
+00:00:27.820 --> 00:00:36.360
+<v Ilan Peleg>Everyone who is hearing about our concept sounds, from one hand, very magical, but on the other hand, very intrusive.
+
+5
+00:00:38.220 --> 00:00:41.900
+<v Ilan Peleg>My name is Ilan Peleg, and I am the CEO here at Lightrun.
+
+6
+00:00:47.480 --> 00:00:52.960
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+7
+00:00:52.960 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+8
+00:00:57.120 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+9
+00:01:02.340 --> 00:01:04.000
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+10
+00:01:04.100 --> 00:01:08.040
+<v Noah Labhart>and today how Ilan Peleg created the best friend for developers,
+
+11
+00:01:08.760 --> 00:01:11.600
+<v Noah Labhart>helping them to observe their applications.
+
+12
+00:01:13.360 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+13
+00:01:20.000 --> 00:01:24.600
+<v Noah Labhart>Ilan Peleg is 29 years old and has been a long-time middle distance runner.
+
+14
+00:01:24.800 --> 00:01:29.900
+<v Noah Labhart>He previously ran the 800 meters and served in the Israeli army as a professional athlete.
+
+15
+00:01:30.200 --> 00:01:33.560
+<v Noah Labhart>At the age of 21, he retired and started his tech career.
+
+16
+00:01:33.860 --> 00:01:39.480
+<v Noah Labhart>He said that there are many who would correlate their Israeli service area with their professional success.
+
+17
+00:01:39.480 --> 00:01:47.720
+<v Noah Labhart>He just recently got engaged and he proposed to his fiance outside of Tel Aviv on a cliff in the same spot where they had their first kiss.
+
+18
+00:01:48.300 --> 00:01:53.620
+<v Noah Labhart>Generally, he enjoys sports and athletics and sees it has a positive effect on how he manages his team.
+
+19
+00:01:54.140 --> 00:01:57.500
+<v Noah Labhart>He also likes to travel and stay educated on the topics that he follows.
+
+20
+00:01:58.480 --> 00:02:05.040
+<v Noah Labhart>Ilan and his co-founder were developers in many different types of companies, startups, enterprises, etc.
+
+21
+00:02:05.040 --> 00:02:14.700
+<v Noah Labhart>It seemed to them that it was easy to debug and troubleshoot applications in development, but found it very difficult to observe applications in production.
+
+22
+00:02:15.480 --> 00:02:22.920
+<v Noah Labhart>They realized that most developers were not equipped with the right tooling to troubleshoot and understand live applications in the wild.
+
+23
+00:02:23.300 --> 00:02:26.100
+<v Noah Labhart>This is the creation story of Lightrun.
+
+24
+00:02:28.680 --> 00:02:32.360
+<v Ilan Peleg>So Lightrun is in the mission to become the best friend of the developers,
+
+25
+00:02:32.600 --> 00:02:36.440
+<v Ilan Peleg>helping them to better observe, understand, and debug live applications.
+
+26
+00:02:37.880 --> 00:02:41.920
+<v Ilan Peleg>Two years ago, myself and my partner in crime, Leonid Blufstein,
+
+27
+00:02:42.000 --> 00:02:43.940
+<v Ilan Peleg>who is the CTO and the co-founder of the company,
+
+28
+00:02:44.120 --> 00:02:49.320
+<v Ilan Peleg>you know, we've both been developers in both enterprise organizations
+
+29
+00:02:49.320 --> 00:02:53.400
+<v Ilan Peleg>and environments, as well as some successful startup companies,
+
+30
+00:02:53.400 --> 00:02:54.240
+<v Ilan Peleg>which were acquired.
+
+31
+00:02:54.920 --> 00:02:59.500
+<v Ilan Peleg>And it felt to us that we simply were not equipped
+
+32
+00:02:59.500 --> 00:03:03.040
+<v Ilan Peleg>with the right tooling to be able to troubleshoot,
+
+33
+00:03:03.060 --> 00:03:06.360
+<v Ilan Peleg>debug, you know, live applications running in the wild.
+
+34
+00:03:06.940 --> 00:03:10.180
+<v Ilan Peleg>It seemed to us that when you're developing,
+
+35
+00:03:10.300 --> 00:03:12.540
+<v Ilan Peleg>it's much easier, you know,
+
+36
+00:03:12.540 --> 00:03:15.060
+<v Ilan Peleg>to debug and troubleshoot applications in dev.
+
+37
+00:03:15.240 --> 00:03:17.620
+<v Ilan Peleg>And it seemed to us that from one hand,
+
+38
+00:03:17.640 --> 00:03:20.180
+<v Ilan Peleg>under this DevOps culture that is emerging,
+
+39
+00:03:20.180 --> 00:03:27.560
+<v Ilan Peleg>In southern developers also on reliability and are in charge of debugging and testing
+
+40
+00:03:28.200 --> 00:03:34.540
+<v Ilan Peleg>rather than the old workflow where developers simply had to develop, and then there are some
+
+41
+00:03:34.540 --> 00:03:39.940
+<v Ilan Peleg>support engineers or operators maintaining the production application environment. So now in this,
+
+42
+00:03:39.940 --> 00:03:48.760
+<v Ilan Peleg>we all know, you know, the infinite loop of DevOps as we imagine it. So from one hand, the gap
+
+43
+00:03:50.700 --> 00:03:55.400
+<v Ilan Peleg>widens, but on the other hand, developers simply are not equipped with the right
+
+44
+00:03:55.400 --> 00:04:02.020
+<v Ilan Peleg>tooling to debug these live applications running in the wild. So what we kind of
+
+45
+00:04:02.020 --> 00:04:07.100
+<v Ilan Peleg>aim is to a better world where developers are being able to
+
+46
+00:04:07.100 --> 00:04:11.640
+<v Ilan Peleg>troubleshoot and understand live applications running in the wild in the
+
+47
+00:04:11.640 --> 00:04:16.460
+<v Ilan Peleg>same ease of use as they're doing with, you know, development applications.
+
+48
+00:04:16.460 --> 00:04:19.300
+<v Ilan Peleg>In depth, we call it shift left observability.
+
+49
+00:04:19.520 --> 00:04:28.500
+<v Ilan Peleg>We claim that the current observability stack is based on this, I would say, ancient kind of paradigm of log everything, analyze later.
+
+50
+00:04:29.160 --> 00:04:34.560
+<v Ilan Peleg>Again, developers have to predefine all the logs, metrics, traces they want to collect from live applications.
+
+51
+00:04:35.740 --> 00:04:38.800
+<v Ilan Peleg>And then this software is being shipped to production.
+
+52
+00:04:38.800 --> 00:04:42.440
+<v Ilan Peleg>and there's so many tools out there
+
+53
+00:04:42.440 --> 00:04:45.880
+<v Ilan Peleg>which assist you to aggregate huge amounts of data,
+
+54
+00:04:46.040 --> 00:04:48.540
+<v Ilan Peleg>correlate it, analyze it, visualize it.
+
+55
+00:04:48.640 --> 00:04:51.260
+<v Ilan Peleg>But all of them,
+
+56
+00:04:51.280 --> 00:04:54.180
+<v Ilan Peleg>they are concentrated on the right bound of the SDLC.
+
+57
+00:04:54.640 --> 00:04:56.620
+<v Ilan Peleg>They are mainly targeting operators.
+
+58
+00:04:57.460 --> 00:05:00.860
+<v Ilan Peleg>So we're being inspired by companies
+
+59
+00:05:00.860 --> 00:05:02.880
+<v Ilan Peleg>such as Snyk who shifted left security
+
+60
+00:05:02.880 --> 00:05:05.480
+<v Ilan Peleg>and HashiCorp who shifted left operations.
+
+61
+00:05:05.480 --> 00:05:11.200
+<v Ilan Peleg>And now for us, it's time to shift left observability and what it practically means.
+
+62
+00:05:11.280 --> 00:05:14.120
+<v Ilan Peleg>I know developers are listening to this podcast as well.
+
+63
+00:05:14.220 --> 00:05:20.580
+<v Ilan Peleg>So sorry for being very technical here, but suddenly developers are being able to connect to live applications.
+
+64
+00:05:20.720 --> 00:05:30.420
+<v Ilan Peleg>And while they're still running in real time, during runtime, create an ops-free process and allow them to add new logs, metrics, traces to live applications.
+
+65
+00:05:30.420 --> 00:05:38.380
+<v Ilan Peleg>And by doing so, they're simply being able to troubleshoot applications much faster and, you know, generally speaking, understand their behavior.
+
+66
+00:05:38.680 --> 00:05:42.200
+<v Ilan Peleg>So, again, this is where we started two years ago.
+
+67
+00:05:42.680 --> 00:05:48.880
+<v Ilan Peleg>Now we are proud to mention that we already secured almost $30 million under funding.
+
+68
+00:05:49.360 --> 00:05:53.340
+<v Ilan Peleg>The latest round was led by Insight Partners five months ago.
+
+69
+00:05:53.340 --> 00:06:00.420
+<v Ilan Peleg>Well, we're now 30 employees, but we're going to double this number by the upcoming three quarters.
+
+70
+00:06:00.460 --> 00:06:02.320
+<v Ilan Peleg>Three quarters, sorry, from now.
+
+71
+00:06:02.760 --> 00:06:06.220
+<v Ilan Peleg>Operating from Israel and the US as well.
+
+72
+00:06:06.780 --> 00:06:11.460
+<v Ilan Peleg>So this is very briefly, very recently named as Gartner Cool Vendor.
+
+73
+00:06:11.600 --> 00:06:19.100
+<v Ilan Peleg>And I think that we see a very good reaction from the market, you know, with regards to our new approach.
+
+74
+00:06:21.440 --> 00:06:24.260
+<v Noah Labhart>Well, let's dive into the first product you built.
+
+75
+00:06:24.320 --> 00:06:28.500
+<v Noah Labhart>So tell me about the MVP, the first version of the product.
+
+76
+00:06:28.620 --> 00:06:32.260
+<v Noah Labhart>How long did it take you to build and what sort of tools did you use to bring it to life?
+
+77
+00:06:34.060 --> 00:06:41.960
+<v Ilan Peleg>For the context, our main product allows developers to connect from within their own IDE
+
+78
+00:06:43.240 --> 00:06:46.240
+<v Ilan Peleg>to live applications running in the background.
+
+79
+00:06:46.240 --> 00:06:50.780
+<v Ilan Peleg>and add new logs, metrics, traces.
+
+80
+00:06:50.920 --> 00:06:54.140
+<v Ilan Peleg>So within their IDE, they're being able to choose a very specific line
+
+81
+00:06:54.140 --> 00:06:58.720
+<v Ilan Peleg>and decide what kind of pillar of observability,
+
+82
+00:06:58.840 --> 00:07:03.880
+<v Ilan Peleg>whether it's a new log, metric, trace, and stuff, they're willing to add.
+
+83
+00:07:05.220 --> 00:07:10.660
+<v Ilan Peleg>It requires us to develop a new plugin for IDE
+
+84
+00:07:10.660 --> 00:07:21.900
+<v Ilan Peleg>rather than the main technology which assists us in instrumenting new code to Anthem.
+
+85
+00:07:21.980 --> 00:07:26.360
+<v Ilan Peleg>So what we've decided to do, simply because we know developers,
+
+86
+00:07:27.320 --> 00:07:33.020
+<v Ilan Peleg>they're not so spoiled with regards to user interface, at least this is how we see it.
+
+87
+00:07:33.020 --> 00:07:48.200
+<v Ilan Peleg>So we started, so our MVP was a CLI actually, a command line interface, which triggers this API and assists developers in the main functionality of adding new logs to runtime applications in real time.
+
+88
+00:07:48.200 --> 00:08:00.280
+<v Ilan Peleg>So the MVP, again, was not around adding all three pillars of observability from a very native plugin on top of IDE.
+
+89
+00:08:01.020 --> 00:08:09.300
+<v Ilan Peleg>But it was a CLI and the only command that was being able to be triggered by developers is add new log.
+
+90
+00:08:11.200 --> 00:08:17.440
+<v Ilan Peleg>So this was our MVP, and the idea was better understanding how developers are reacting to
+
+91
+00:08:17.440 --> 00:08:21.400
+<v Ilan Peleg>this capability, how they're using that, and what's next.
+
+92
+00:08:21.400 --> 00:08:23.740
+<v Noah Labhart>Got it. So the MVP was a CLI version
+
+93
+00:08:23.740 --> 00:08:30.020
+<v Noah Labhart>of the product connected with the api when you were building that you probably had to make certain
+
+94
+00:08:30.020 --> 00:08:35.040
+<v Noah Labhart>decisions and it sounds like one of them a big one was start with the cli but dive into some of
+
+95
+00:08:35.040 --> 00:08:40.520
+<v Noah Labhart>of those decisions and trade-offs that you had to make, you know, in the short term around feature
+
+96
+00:08:40.520 --> 00:08:45.020
+<v Noah Labhart>cut or technical debt or anything like that. And tell me how you coped with those decisions.
+
+97
+00:08:46.340 --> 00:08:55.600
+<v Ilan Peleg>A few decisions that, you know, came to my mind right away. First is like security. Eventually,
+
+98
+00:08:55.640 --> 00:09:00.560
+<v Ilan Peleg>when you're enabling developers to access production environments, you're kind of
+
+99
+00:09:00.560 --> 00:09:03.420
+<v Ilan Peleg>having a new surface of attack here.
+
+100
+00:09:03.800 --> 00:09:05.700
+<v Ilan Peleg>So how will you create a workflow
+
+101
+00:09:05.700 --> 00:09:12.860
+<v Ilan Peleg>which maintains the organization's security workflows
+
+102
+00:09:12.860 --> 00:09:15.360
+<v Ilan Peleg>and generally speaking,
+
+103
+00:09:15.560 --> 00:09:17.720
+<v Ilan Peleg>the whole compliances
+
+104
+00:09:17.720 --> 00:09:21.820
+<v Ilan Peleg>that the organizations are being forced to maintain?
+
+105
+00:09:23.800 --> 00:09:26.580
+<v Ilan Peleg>And even further,
+
+106
+00:09:26.580 --> 00:09:34.900
+<v Ilan Peleg>further the messaging and how you simply penetrate into the organization in real production environments
+
+107
+00:09:34.900 --> 00:09:42.940
+<v Ilan Peleg>because everyone who is hearing about our concept, I'm saying concept and not product,
+
+108
+00:09:43.140 --> 00:09:48.880
+<v Ilan Peleg>but the concept sounds on one hand very magical, but on the other hand, very intrusive.
+
+109
+00:09:48.880 --> 00:09:55.700
+<v Ilan Peleg>So I'd say that at the beginning we had to cope with this struggle of how we
+
+110
+00:09:55.700 --> 00:10:05.500
+<v Ilan Peleg>persuade organizations to, you know, apply Lightrun's product in real sensitive production environments.
+
+111
+00:10:05.500 --> 00:10:14.180
+<v Ilan Peleg>And what we've done is a really thorough process of understanding,
+
+112
+00:10:14.180 --> 00:10:22.300
+<v Ilan Peleg>understanding how we're going to mitigate the whole, you know, concerns that might rise up when
+
+113
+00:10:22.300 --> 00:10:28.700
+<v Ilan Peleg>dealing with the heavy regulated enterprise organizations out there. And sounds silly, but
+
+114
+00:10:28.700 --> 00:10:35.800
+<v Ilan Peleg>we didn't have a really nice interface at the beginning, but we truly had a really, like, thorough
+
+115
+00:10:35.800 --> 00:10:40.720
+<v Ilan Peleg>thorough and serious management server or management UI,
+
+116
+00:10:40.920 --> 00:10:46.700
+<v Ilan Peleg>which allows the operators to enforce security and privacy controls,
+
+117
+00:10:46.980 --> 00:10:49.620
+<v Ilan Peleg>as well as gain visibility of the all access,
+
+118
+00:10:49.820 --> 00:10:55.300
+<v Ilan Peleg>who is gaining access to which service, which environment,
+
+119
+00:10:55.560 --> 00:11:00.660
+<v Ilan Peleg>under which permissions, allowing developers to instrument new logs,
+
+120
+00:11:00.660 --> 00:11:12.940
+<v Ilan Peleg>but verifying at the same time that all the insertions are read-only and we do not change anything in the original flow, original behavior or state of the application.
+
+121
+00:11:13.380 --> 00:11:18.280
+<v Ilan Peleg>So it somehow correlated to the previous question of defining the MVP.
+
+122
+00:11:18.280 --> 00:11:26.080
+<v Ilan Peleg>Pick, from one hand it was pretty clear for us that, you know, the early adopters wouldn't be mine,
+
+123
+00:11:27.320 --> 00:11:33.020
+<v Ilan Peleg>wouldn't mind to use our CLI version, and within time we're going to optimize the user experience.
+
+124
+00:11:33.020 --> 00:11:42.460
+<v Ilan Peleg>Right, but it is going to be a must-have capability to support their, you know, security and operational
+
+125
+00:11:42.460 --> 00:12:05.620
+<v Ilan Peleg>So this was one challenge at the beginning, because from one hand, you're, you know, suggesting a product for production environment, but on the other hand, you still want to maintain their current resiliency and stability and integrity of the, again, production application.
+
+126
+00:12:07.380 --> 00:12:16.300
+<v Noah Labhart>Well, then from that point, then, you know, you mentioned the three pillars and, you know, you started out one way, got the MVP, made your decisions and tradeoffs.
+
+127
+00:12:16.380 --> 00:12:19.280
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+128
+00:12:19.320 --> 00:12:22.440
+<v Noah Labhart>And to give context to that question, kind of put it in a box.
+
+129
+00:12:22.700 --> 00:12:30.000
+<v Noah Labhart>How did you build your roadmap and, you know, decide or go about deciding this is the next most important thing to build?
+
+130
+00:12:31.860 --> 00:12:40.480
+<v Ilan Peleg>Myself, Leonid, and the majority of the company early days mostly, we were developers, so
+
+131
+00:12:41.180 --> 00:12:46.000
+<v Ilan Peleg>based on our experience, it was pretty clear for us what should be the,
+
+132
+00:12:46.760 --> 00:12:54.720
+<v Ilan Peleg>again, the MVP. Now what happens next is you should be able to deploy this MVP with
+
+133
+00:12:54.720 --> 00:13:00.800
+<v Ilan Peleg>real environments, real customers, or let's call it design partners. They
+
+134
+00:13:00.800 --> 00:13:07.620
+<v Ilan Peleg>weren't, they were not yet, you know, paying customers, and we simply
+
+135
+00:13:08.180 --> 00:13:13.020
+<v Ilan Peleg>learned so much from this process of working with design partners. Once we
+
+136
+00:13:13.020 --> 00:13:17.860
+<v Ilan Peleg>installed the process, that, sorry, once we installed the product with real, you know,
+
+137
+00:13:17.860 --> 00:13:23.500
+<v Ilan Peleg>within real environments and real users in real production environments, it kind of
+
+138
+00:13:24.720 --> 00:13:30.420
+<v Ilan Peleg>an obvious process of how we're going to enrich our roadmap. We simply receive so many feedback,
+
+139
+00:13:30.420 --> 00:13:37.680
+<v Ilan Peleg>so many feature requests, like more tactical way, but strategically we simply better understand
+
+140
+00:13:37.680 --> 00:13:43.820
+<v Ilan Peleg>the workflow of how developers want to access production environments. Again, from one hand
+
+141
+00:13:43.820 --> 00:13:50.980
+<v Ilan Peleg>limited, because you want to limit their access, but on the other hand, how you enrich
+
+142
+00:13:50.980 --> 00:13:56.680
+<v Ilan Peleg>reach the information they want to gain from application, from live application. And again, at
+
+143
+00:13:56.680 --> 00:14:01.620
+<v Ilan Peleg>the same time, while you're enriching them with more data, you're still maintaining the services
+
+144
+00:14:01.620 --> 00:14:11.100
+<v Ilan Peleg>reliable. So just to summarize the answer, listening to customers, listening to customers, it's the main,
+
+145
+00:14:11.100 --> 00:14:20.320
+<v Ilan Peleg>you know, guidance for us, as well as you cannot only listen to them, you should have some sort of
+
+146
+00:14:21.340 --> 00:14:28.180
+<v Ilan Peleg>your domain expertise and you should also suggest some stuff and, as hypothesis, and test them.
+
+147
+00:14:28.180 --> 00:14:35.080
+<v Ilan Peleg>So I think the combination of both is, you know, how we've built that at the beginning.
+
+148
+00:14:35.080 --> 00:14:43.500
+<v Noah Labhart>right you're you're combining your product vision with the feedback of the users that you have how
+
+149
+00:14:43.500 --> 00:14:49.800
+<v Noah Labhart>are you how are you aggregating and collecting that feedback what process do you follow to get
+
+150
+00:14:50.980 --> 00:14:51.560
+<v Noah Labhart>from those users?
+
+151
+00:14:51.800 --> 00:14:52.300
+<v Noah Labhart>So
+
+152
+00:14:52.040 --> 00:14:54.000
+<v Ilan Peleg>now we are a much more established company.
+
+153
+00:14:54.180 --> 00:14:55.460
+<v Ilan Peleg>So we have processes, okay,
+
+154
+00:14:55.560 --> 00:14:58.500
+<v Ilan Peleg>which we didn't have in place before.
+
+155
+00:14:58.660 --> 00:15:00.480
+<v Ilan Peleg>But now we already have some,
+
+156
+00:15:00.560 --> 00:15:02.440
+<v Ilan Peleg>like each customer of Lightrun,
+
+157
+00:15:02.600 --> 00:15:05.160
+<v Ilan Peleg>I'm going to talk about the community layer as well,
+
+158
+00:15:05.240 --> 00:15:06.480
+<v Ilan Peleg>but each customer of Lightrun
+
+159
+00:15:06.480 --> 00:15:08.620
+<v Ilan Peleg>simply has a Trello board
+
+160
+00:15:08.620 --> 00:15:12.360
+<v Ilan Peleg>where he can list feature requests,
+
+161
+00:15:12.840 --> 00:15:13.400
+<v Ilan Peleg>bugs,
+
+162
+00:15:14.180 --> 00:15:16.980
+<v Ilan Peleg>and then he also has some transparency
+
+163
+00:15:17.700 --> 00:15:18.740
+<v Ilan Peleg>from our end,
+
+164
+00:15:18.740 --> 00:15:26.380
+<v Ilan Peleg>our end sorry where we prioritize it and he's being notified about progress with each ticket
+
+165
+00:15:26.380 --> 00:15:38.720
+<v Ilan Peleg>So it's very much organized. We also have a free tier that is being treated very nicely.
+
+166
+00:15:38.720 --> 00:15:46.400
+<v Ilan Peleg>It's strategic for us and we also listen to the free community users as well. Before that,
+
+167
+00:15:46.400 --> 00:15:57.500
+<v Ilan Peleg>you know, we were managing like very internal conversations, and I can say that we tried to,
+
+168
+00:15:57.500 --> 00:16:05.360
+<v Ilan Peleg>you know, at the beginning you have much less manpower so you cannot develop everything, and
+
+169
+00:16:05.360 --> 00:16:15.620
+<v Ilan Peleg>you also have less customers, so it's very much, it's very easy to develop something for very
+
+170
+00:16:16.400 --> 00:16:19.520
+<v Ilan Peleg>but eventually it's not going to be relevant for the mass market out there.
+
+171
+00:16:19.600 --> 00:16:27.020
+<v Ilan Peleg>So when you lack customers, you can be very biased and it's dangerous.
+
+172
+00:16:28.000 --> 00:16:32.120
+<v Ilan Peleg>So what we've tried to do is engage with the dev community,
+
+173
+00:16:32.840 --> 00:16:40.160
+<v Ilan Peleg>even that point when we simply didn't have any paying customers or some formal engagements,
+
+174
+00:16:40.160 --> 00:16:58.300
+<v Ilan Peleg>We still wanted to back our hypothesis, not only with the feedback we gained with these design partners, but also with the dev community out there to make sure that we're not biased on these very specific customers.
+
+175
+00:17:00.340 --> 00:17:01.900
+<v Noah Labhart>Well, let's switch to team.
+
+176
+00:17:02.040 --> 00:17:04.380
+<v Noah Labhart>So how did you go about building your team?
+
+177
+00:17:04.540 --> 00:17:09.640
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+178
+00:17:11.040 --> 00:17:25.020
+<v Ilan Peleg>At the beginning, the main hiring process was how we're going to establish a very, very strong, capable, and versatile development team.
+
+179
+00:17:25.400 --> 00:17:39.420
+<v Ilan Peleg>Because at the beginning, we simply had to build the product, and then came other go-to-market, operational, and other obvious stuff that we also need to hire.
+
+180
+00:17:40.160 --> 00:17:47.820
+<v Ilan Peleg>the beginning it was more around how we collect and group together some of the brightest some
+
+181
+00:17:47.820 --> 00:17:53.140
+<v Ilan Peleg>really some of the we simply have some of the brightest developers in the world to develop
+
+182
+00:17:53.140 --> 00:18:00.900
+<v Ilan Peleg>this very complex product and there are different approaches but eventually what turned out to be
+
+183
+00:18:00.900 --> 00:18:08.140
+<v Ilan Peleg>the most successful is working with uh working closer with our existing network network because
+
+184
+00:18:08.140 --> 00:18:16.360
+<v Ilan Peleg>Because it was, you know, both of us had pretty good experience within very successful organizations in the past.
+
+185
+00:18:16.460 --> 00:18:25.420
+<v Ilan Peleg>Whether, again, I'm mentioning IDF, Intelligence Corps, where Leonid, my co-founder, had a great, great pool of talents coming in.
+
+186
+00:18:25.800 --> 00:18:36.020
+<v Ilan Peleg>Who has this mentality of breaking things and, you know, this mentality of some kind of fearless attitude to build everything.
+
+187
+00:18:36.020 --> 00:18:39.700
+<v Ilan Peleg>and everything is being, you know, you can solve everything.
+
+188
+00:18:39.880 --> 00:18:43.180
+<v Ilan Peleg>So this is an approach that we truly believe in Lightrun.
+
+189
+00:18:43.460 --> 00:18:50.700
+<v Ilan Peleg>And the other thing that we were looking for was around, you know, generalists.
+
+190
+00:18:51.080 --> 00:18:56.980
+<v Ilan Peleg>We're looking for generalists who are not afraid from any aspect of development.
+
+191
+00:18:57.620 --> 00:19:02.080
+<v Ilan Peleg>And our, like, first developers, they've been capable to do everything.
+
+192
+00:19:02.080 --> 00:19:09.160
+<v Ilan Peleg>They've been capable to switch from different languages, they've been capable to deal with
+
+193
+00:19:09.160 --> 00:19:12.600
+<v Ilan Peleg>DevOps and infra and basically everything.
+
+194
+00:19:13.000 --> 00:19:18.960
+<v Ilan Peleg>So I think that at the beginning where we're just establishing a software company, you
+
+195
+00:19:18.960 --> 00:19:26.640
+<v Ilan Peleg>would like to hire some generalists who will be able to develop and build and try and fail
+
+196
+00:19:26.640 --> 00:19:27.660
+<v Ilan Peleg>everything.
+
+197
+00:19:27.660 --> 00:19:36.700
+<v Ilan Peleg>And after that, you know, you suddenly have some divisions in your company and suddenly you have different teams.
+
+198
+00:19:37.000 --> 00:19:44.020
+<v Ilan Peleg>But at the beginning, again, you want this fearless attitude of, yeah, we can build and crack everything.
+
+199
+00:19:47.240 --> 00:19:49.080
+<v Noah Labhart>Well, let's flip to scalability.
+
+200
+00:19:49.400 --> 00:19:54.780
+<v Noah Labhart>So did you build this to scale efficiently from day one or are you fighting this as you grow?
+
+201
+00:19:57.660 --> 00:20:03.900
+<v Ilan Peleg>We build it to adjust the scale of, you know, the prospects that we know.
+
+202
+00:20:04.280 --> 00:20:05.780
+<v Ilan Peleg>This is the honest answer.
+
+203
+00:20:06.320 --> 00:20:10.180
+<v Ilan Peleg>So, for example, from our end, even at the beginning,
+
+204
+00:20:10.780 --> 00:20:18.560
+<v Ilan Peleg>we've been able to support customers having up until something like
+
+205
+00:20:18.560 --> 00:20:20.900
+<v Ilan Peleg>hundreds of instances running in parallel.
+
+206
+00:20:21.100 --> 00:20:26.460
+<v Ilan Peleg>Because it was pretty straightforward for us that the majority of the early adopters
+
+207
+00:20:27.660 --> 00:20:34.280
+<v Ilan Peleg>one in you know thousands or tens of thousands instances in real production environments at the
+
+208
+00:20:34.280 --> 00:20:42.820
+<v Ilan Peleg>beginning where we weren't mature enough so for testing purposes and design partners the scale
+
+209
+00:20:42.820 --> 00:20:51.620
+<v Ilan Peleg>was pretty straightforward like tens of instances is is low uh whereas hundreds of them is is
+
+210
+00:20:51.620 --> 00:20:57.440
+<v Ilan Peleg>something that we can we should aim for so this is what we've done now that we
+
+211
+00:20:57.440 --> 00:21:02.440
+<v Ilan Peleg>already grew the organization and we support like some of the biggest
+
+212
+00:21:02.440 --> 00:21:08.200
+<v Ilan Peleg>enterprises out there obviously we already support the scale of tens of
+
+213
+00:21:08.200 --> 00:21:14.840
+<v Ilan Peleg>thousands of instances per organization which is very very impressive and and
+
+214
+00:21:14.840 --> 00:21:20.860
+<v Ilan Peleg>again now we already have some organized process where we collect data about
+
+215
+00:21:21.620 --> 00:21:30.340
+<v Ilan Peleg>So we are being prepared and we are not being surprised by their size, scope, expectations, etc.
+
+216
+00:21:32.020 --> 00:21:43.960
+<v Ilan Peleg>Even at the beginning, we identified that some of the heavy regulated enterprise organizations that we're going to work with,
+
+217
+00:21:43.960 --> 00:21:53.100
+<v Ilan Peleg>they're gonna have some issues with data privacy you know compliance as I mentioned before so even
+
+218
+00:21:53.100 --> 00:21:59.760
+<v Ilan Peleg>at the beginning it was very important for us to have some sort of a version that is being deployed
+
+219
+00:21:59.760 --> 00:22:05.940
+<v Ilan Peleg>in their premises without any information going out so even at the beginning of the of when we
+
+220
+00:22:05.940 --> 00:22:07.180
+<v Ilan Peleg>We just started Lightrun.
+
+221
+00:22:07.220 --> 00:22:10.420
+<v Ilan Peleg>We had two ways to support customers.
+
+222
+00:22:10.720 --> 00:22:15.300
+<v Ilan Peleg>One is our very simple to use SaaS product.
+
+223
+00:22:15.600 --> 00:22:20.480
+<v Ilan Peleg>And the second one is a very lightweight on-premise deployment,
+
+224
+00:22:22.060 --> 00:22:28.780
+<v Ilan Peleg>which assists them to maintain and manage the whole data flow within the organization.
+
+225
+00:22:29.880 --> 00:22:35.600
+<v Ilan Peleg>So even at the beginning, we already had that line of product.
+
+226
+00:22:35.940 --> 00:22:40.680
+<v Ilan Peleg>And this is something that you don't see a lot in early stage companies.
+
+227
+00:22:40.800 --> 00:22:45.900
+<v Ilan Peleg>And it's derived based on our experience working with other startup companies before.
+
+228
+00:22:45.980 --> 00:22:51.000
+<v Ilan Peleg>And we simply suffered from this lack of support for these enterprise companies.
+
+229
+00:22:51.580 --> 00:22:59.760
+<v Ilan Peleg>When the company grew, it was pretty clear for both of us that we want to support this motion even at the beginning, even in early days.
+
+230
+00:22:59.960 --> 00:23:01.920
+<v Ilan Peleg>And it worked like magic.
+
+231
+00:23:02.860 --> 00:23:11.580
+<v Ilan Peleg>It simply allowed us to penetrate to some heavy regulated, big, like really big organizations straight from the beginning.
+
+232
+00:23:12.120 --> 00:23:17.820
+<v Noah Labhart>That's great. I love it that it worked like magic. I can feel your confidence in saying that. That's great.
+
+233
+00:23:18.040 --> 00:23:18.540
+<v Noah Labhart>Thanks.
+
+234
+00:23:18.520 --> 00:23:19.500
+<v Ilan Peleg>Thanks. I appreciate it.
+
+235
+00:23:20.700 --> 00:23:26.180
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+236
+00:23:27.220 --> 00:23:33.800
+<v Ilan Peleg>The thing that I'm most proud of is the team. I'm leaving aside the product because the product is
+
+237
+00:23:33.800 --> 00:23:39.740
+<v Ilan Peleg>still evolving and we have so many ideas of how we're gonna build this platform, so many tests
+
+238
+00:23:40.160 --> 00:23:51.580
+<v Ilan Peleg>to conduct, but the thing that I am so proud of is our team. We've built this team of rockstars.
+
+239
+00:23:51.580 --> 00:24:00.440
+<v Ilan Peleg>it sounds like very cliche but it is it is true and and from the management team that is
+
+240
+00:24:00.440 --> 00:24:08.200
+<v Ilan Peleg>very sharp strategic and has some great domain expertise and we really brought some great people
+
+241
+00:24:08.200 --> 00:24:13.840
+<v Ilan Peleg>from the greatest companies you know in the dev space that we're dealing like leaders coming from
+
+242
+00:24:13.840 --> 00:24:15.080
+<v Ilan Peleg>from Snyk and JFrog.
+
+243
+00:24:17.160 --> 00:24:19.260
+<v Ilan Peleg>So this is one thing that I mentioned.
+
+244
+00:24:19.480 --> 00:24:24.240
+<v Ilan Peleg>And the other one is some great, great, great, great
+
+245
+00:24:24.840 --> 00:24:31.840
+<v Ilan Peleg>and hungry young people and employees that joined us
+
+246
+00:24:31.840 --> 00:24:34.180
+<v Ilan Peleg>with this mission of working very hard
+
+247
+00:24:34.180 --> 00:24:36.320
+<v Ilan Peleg>and eventually achieving success
+
+248
+00:24:37.500 --> 00:24:39.680
+<v Ilan Peleg>within their work at Lightrun.
+
+249
+00:24:39.680 --> 00:24:47.180
+<v Ilan Peleg>one the other thing that i'm proud about the team is that it seems like we can do everything
+
+250
+00:24:47.980 --> 00:24:55.960
+<v Ilan Peleg>again this fearless and competitive spirit and still have fun so i think it's very important
+
+251
+00:24:55.960 --> 00:25:04.140
+<v Ilan Peleg>and i can tell you that myself and even others um that i'm you know i'm talking with them on
+
+252
+00:25:04.140 --> 00:25:04.960
+<v Ilan Peleg>on a day-to-day basis.
+
+253
+00:25:05.100 --> 00:25:07.580
+<v Ilan Peleg>We simply enjoy arriving in the office.
+
+254
+00:25:08.140 --> 00:25:11.940
+<v Ilan Peleg>So I think this is the thing that I'm most proud of.
+
+255
+00:25:13.180 --> 00:25:14.980
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+256
+00:25:15.340 --> 00:25:17.720
+<v Noah Labhart>So tell me about a mistake you made
+
+257
+00:25:17.720 --> 00:25:20.580
+<v Noah Labhart>and how you and your team responded to it.
+
+258
+00:25:22.280 --> 00:25:24.380
+<v Ilan Peleg>Yeah, I can give you one.
+
+259
+00:25:24.800 --> 00:25:27.280
+<v Ilan Peleg>I think we weren't smart enough
+
+260
+00:25:27.280 --> 00:25:33.020
+<v Ilan Peleg>to establish a strong leadership team at the beginning.
+
+261
+00:25:34.140 --> 00:25:43.160
+<v Ilan Peleg>organization bottom up which has some great great great advantages but eventually i think that we
+
+262
+00:25:43.160 --> 00:25:57.020
+<v Ilan Peleg>should have hired the vp management level a bit before and this will this is very important when
+
+263
+00:25:57.020 --> 00:26:01.740
+<v Ilan Peleg>you want to scale very fast because managers are crucial in order to scale the organization
+
+264
+00:26:01.740 --> 00:26:13.440
+<v Ilan Peleg>So this is something that, you know, I simply couldn't anticipate that we're going to grow so fast and we're going to raise this amount of money in a pretty short period of time.
+
+265
+00:26:13.440 --> 00:26:23.960
+<v Ilan Peleg>so once that happened I can say that like again retrospectively I'll be happy
+
+266
+00:26:23.960 --> 00:26:32.420
+<v Ilan Peleg>to have more leaders in the company to be able to support the fast pace that we
+
+267
+00:26:32.420 --> 00:26:38.600
+<v Ilan Peleg>should adjust so I'm very happy to mention that now we're succeeding in
+
+268
+00:26:38.600 --> 00:26:40.080
+<v Ilan Peleg>in building this management level.
+
+269
+00:26:41.320 --> 00:26:43.900
+<v Ilan Peleg>But I think that retrospectively again,
+
+270
+00:26:44.840 --> 00:26:46.900
+<v Ilan Peleg>it was better to happen before.
+
+271
+00:26:49.560 --> 00:26:51.380
+<v Noah Labhart>So what does the future look like
+
+272
+00:26:51.380 --> 00:26:53.260
+<v Noah Labhart>for the product and for your team?
+
+273
+00:26:55.160 --> 00:26:56.720
+<v Ilan Peleg>So let's start with the team.
+
+274
+00:26:57.160 --> 00:26:58.500
+<v Ilan Peleg>As mentioned before,
+
+275
+00:26:59.120 --> 00:27:02.080
+<v Ilan Peleg>now it's the phase where we are scaling the organization
+
+276
+00:27:02.080 --> 00:27:03.640
+<v Ilan Peleg>and scaling the business.
+
+277
+00:27:03.820 --> 00:27:05.840
+<v Ilan Peleg>Because obviously the first phase
+
+278
+00:27:05.840 --> 00:27:07.660
+<v Ilan Peleg>at any given startup company
+
+279
+00:27:08.600 --> 00:27:17.660
+<v Ilan Peleg>product market fit. Once the product market fit, once we achieved that and we saw repetitive use
+
+280
+00:27:17.660 --> 00:27:25.860
+<v Ilan Peleg>cases, daily repetitive use cases inside the organization and also in between organizations,
+
+281
+00:27:27.000 --> 00:27:32.380
+<v Ilan Peleg>we got this confidence that we have a great product that now we should scale it.
+
+282
+00:27:33.660 --> 00:27:42.060
+<v Ilan Peleg>so in terms of hiring and team again we're now 30 people we're gonna be 60 employees in three
+
+283
+00:27:42.060 --> 00:27:47.720
+<v Ilan Peleg>quarters from now and we're gonna finish the next year something like 75 employees
+
+284
+00:27:47.720 --> 00:27:57.740
+<v Ilan Peleg>so we're gonna grow very fast okay and and this means that we're gonna enrich and empower our
+
+285
+00:27:57.740 --> 00:28:03.940
+<v Ilan Peleg>team with more and more go-to-market hires. So again, at the beginning we've
+
+286
+00:28:03.940 --> 00:28:12.440
+<v Ilan Peleg>been hiring mainly greatest developers and now on top of this R&amp;D and
+
+287
+00:28:12.440 --> 00:28:19.020
+<v Ilan Peleg>product and engineering staff that we constantly grow, we also grow and
+
+288
+00:28:19.020 --> 00:28:24.460
+<v Ilan Peleg>establish more and more go-to-market hires, whether it's sales, developer
+
+289
+00:28:24.460 --> 00:28:28.340
+<v Ilan Peleg>developer relations, community, marketing, etc.
+
+290
+00:28:28.960 --> 00:28:34.360
+<v Ilan Peleg>So this is how the future looks like in terms of team.
+
+291
+00:28:34.500 --> 00:28:37.180
+<v Ilan Peleg>In terms of product and strategy and vision,
+
+292
+00:28:38.030 --> 00:28:41.260
+<v Ilan Peleg>we're going to simply become the standard
+
+293
+00:28:41.260 --> 00:28:46.160
+<v Ilan Peleg>of how developers being able to better observe,
+
+294
+00:28:46.340 --> 00:28:47.960
+<v Ilan Peleg>understand and debug live applications.
+
+295
+00:28:48.360 --> 00:28:52.300
+<v Ilan Peleg>Again, we see great, great, great tools out there
+
+296
+00:28:52.300 --> 00:28:59.700
+<v Ilan Peleg>or observability tools which allow operators to maintain production environments.
+
+297
+00:29:00.120 --> 00:29:04.080
+<v Ilan Peleg>But as I claimed before, we want to shift left to observability
+
+298
+00:29:04.080 --> 00:29:09.420
+<v Ilan Peleg>and become the de facto standard of the right tooling which assists developers
+
+299
+00:29:09.420 --> 00:29:18.460
+<v Ilan Peleg>to gain, to define, to observe live applications from dev to production.
+
+300
+00:29:18.460 --> 00:29:19.220
+<v Ilan Peleg>I
+
+301
+00:29:19.220 --> 00:29:25.860
+<v Noah Labhart>like how you simply put a huge goal of to simply become the standard.
+
+302
+00:29:26.040 --> 00:29:27.960
+<v Noah Labhart>I love that. I love your aspirations.
+
+303
+00:29:28.300 --> 00:29:30.700
+<v Noah Labhart>And that's the way to do it.
+
+304
+00:29:30.920 --> 00:29:31.560
+<v Noah Labhart>Exactly,
+
+305
+00:29:31.680 --> 00:29:32.180
+<v Ilan Peleg>exactly.
+
+306
+00:29:32.220 --> 00:29:35.960
+<v Ilan Peleg>We truly believe that we're about to build a huge company.
+
+307
+00:29:36.220 --> 00:29:44.440
+<v Ilan Peleg>We're going to be the de facto standard or, again, the de facto best friend of developers to observe live applications.
+
+308
+00:29:44.440 --> 00:29:50.740
+<v Ilan Peleg>And the distributed world where we live today, it's simply a must.
+
+309
+00:29:50.880 --> 00:29:53.180
+<v Ilan Peleg>And I don't see any reason why it shouldn't happen.
+
+310
+00:29:53.360 --> 00:29:57.160
+<v Ilan Peleg>So from my perspective, it's a matter of execution.
+
+311
+00:29:59.100 --> 00:30:00.520
+<v Noah Labhart>Well, let's switch to you, Ilan.
+
+312
+00:30:00.540 --> 00:30:02.600
+<v Noah Labhart>Who influences the way that you work?
+
+313
+00:30:02.740 --> 00:30:07.180
+<v Noah Labhart>A CEO, CTO, architect, really any person that you look up to and why?
+
+314
+00:30:08.960 --> 00:30:12.240
+<v Ilan Peleg>I have some, I would call it mentors.
+
+315
+00:30:13.100 --> 00:30:24.020
+<v Ilan Peleg>Some of them are investors of here at Lightrun, some of them are just friends. I really try to
+
+316
+00:30:24.020 --> 00:30:34.560
+<v Ilan Peleg>have some domain experts in each aspect that I must you know deal with as part of my day to day
+
+317
+00:30:34.560 --> 00:30:44.000
+<v Ilan Peleg>and I will give you a few examples you know as a CEO we suddenly enforced to
+
+318
+00:30:44.000 --> 00:30:52.360
+<v Ilan Peleg>deal with finance product go to market sales marketing product strategy so in
+
+319
+00:30:52.360 --> 00:31:00.080
+<v Ilan Peleg>each and each vertical here I surrounded myself with the best people in the world
+
+320
+00:31:00.080 --> 00:31:08.060
+<v Ilan Peleg>from one hand okay so i simply have the best people in the world to consult with at each
+
+321
+00:31:08.060 --> 00:31:16.720
+<v Ilan Peleg>vertical but at the same time i also surrounded myself with some let's call it friends right
+
+322
+00:31:16.720 --> 00:31:25.900
+<v Ilan Peleg>which are other entrepreneurs or other domain experts in the same verticals that are you know
+
+323
+00:31:25.900 --> 00:31:34.700
+<v Ilan Peleg>running something like a year ahead of me, half a year ahead of me, because I found that having the
+
+324
+00:31:34.700 --> 00:31:40.900
+<v Ilan Peleg>best experts in the world advising you is great, but you want to have some others who are simply
+
+325
+00:31:40.900 --> 00:31:47.000
+<v Ilan Peleg>struggling with the same day-to-day as you are. So it was important for me, again, to surround
+
+326
+00:31:47.000 --> 00:31:55.160
+<v Ilan Peleg>myself and the CTO and even other executives here at the team with both levels of support.
+
+327
+00:31:56.060 --> 00:32:03.080
+<v Ilan Peleg>You know, the closed network who were just heading us with half a year or a year.
+
+328
+00:32:03.640 --> 00:32:08.320
+<v Ilan Peleg>And the second level of experts, which are the greatest in the world.
+
+329
+00:32:08.360 --> 00:32:12.800
+<v Ilan Peleg>So you're being guided by the best people out there.
+
+330
+00:32:13.620 --> 00:32:21.740
+<v Ilan Peleg>So this is something that guides me, myself, my co-founder and other leaders in the company as well.
+
+331
+00:32:23.860 --> 00:32:27.080
+<v Noah Labhart>We talked about a mistake earlier, but a little bit different spin.
+
+332
+00:32:27.620 --> 00:32:30.700
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+333
+00:32:30.760 --> 00:32:33.300
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+334
+00:32:35.000 --> 00:32:39.360
+<v Ilan Peleg>I will start marketing and go-to-market efforts much earlier.
+
+335
+00:32:40.300 --> 00:32:44.900
+<v Ilan Peleg>You tend to think that you want to first develop a great product,
+
+336
+00:32:45.080 --> 00:32:49.640
+<v Ilan Peleg>then gain some confidence with customers, and then start working and go-to-market.
+
+337
+00:32:49.640 --> 00:32:56.920
+<v Ilan Peleg>and and and my perspective my perspective today has been changed if I would start
+
+338
+00:32:56.920 --> 00:33:01.080
+<v Ilan Peleg>like wrong all over from the beginning I will start marketing and go to market
+
+339
+00:33:01.080 --> 00:33:05.280
+<v Ilan Peleg>efforts from the beginning even without having one single line of code written
+
+340
+00:33:05.960 --> 00:33:10.260
+<v Ilan Peleg>for sure because this is a question that I've been asked from time to time and
+
+341
+00:33:10.260 --> 00:33:17.860
+<v Ilan Peleg>this is an answer that I'm sure I would I would do differently I mean in another
+
+342
+00:33:19.860 --> 00:33:35.480
+<v Noah Labhart>Well, last question, Ilan. So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show it off to the world. Can't wait to show it off to you right there on the plane. What advice do you give that person having gone down this road a bit?
+
+343
+00:33:37.260 --> 00:33:42.440
+<v Ilan Peleg>I think my advice would be eventually we're dealing with people.
+
+344
+00:33:42.820 --> 00:33:55.080
+<v Ilan Peleg>So the humanity and you should be careful and you should truly care about people that surround you, whether it's employees, partners, customers.
+
+345
+00:33:55.480 --> 00:34:04.440
+<v Ilan Peleg>You should really care about them because eventually it's very easy to turn yourself to a numbers guy where you look at numbers and you're very analytical.
+
+346
+00:34:05.480 --> 00:34:11.300
+<v Ilan Peleg>are required to do so but eventually the people are you know eventually the motivate the motivators
+
+347
+00:34:11.300 --> 00:34:20.480
+<v Ilan Peleg>and and the executors so i think from time to time in this very competitive landscape
+
+348
+00:34:20.480 --> 00:34:28.380
+<v Ilan Peleg>where you should you know achieve very um you know ambitious goals within a very short period
+
+349
+00:34:28.380 --> 00:34:36.540
+<v Ilan Peleg>of time, it's very important to be surrounded by people you really care and they care about you
+
+350
+00:34:36.540 --> 00:34:46.560
+<v Ilan Peleg>and you have some unified mission. So I think that eventually, again, it's very easy, sorry,
+
+351
+00:34:47.440 --> 00:34:53.320
+<v Ilan Peleg>to be very results-oriented, but we are dealing with people. So I think that this would be my
+
+352
+00:34:53.320 --> 00:34:56.520
+<v Ilan Peleg>My tip, this would be my two cents for this early entrepreneur.
+
+353
+00:34:57.260 --> 00:34:58.820
+<v Noah Labhart>That is fantastic advice.
+
+354
+00:34:59.140 --> 00:35:00.560
+<v Noah Labhart>I appreciate that.
+
+355
+00:35:00.740 --> 00:35:03.000
+<v Noah Labhart>Well, Ilan, thank you for being on the show today.
+
+356
+00:35:03.160 --> 00:35:06.180
+<v Noah Labhart>Thank you for telling the creation story of Lightrun.
+
+357
+00:35:06.380 --> 00:35:07.660
+<v Ilan Peleg>Thank you very much, Noah.
+
+358
+00:35:08.040 --> 00:35:08.840
+<v Ilan Peleg>Appreciate it.
+
+359
+00:35:10.500 --> 00:35:13.520
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+360
+00:35:16.720 --> 00:35:19.800
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+361
+00:35:19.800 --> 00:35:24.700
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+362
+00:35:25.140 --> 00:35:30.180
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+363
+00:35:30.580 --> 00:35:32.780
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+364
+00:35:33.080 --> 00:35:35.000
+<v Noah Labhart>Both things help us out tremendously.
+
+365
+00:35:37.420 --> 00:35:38.880
+<v Noah Labhart>And thanks again for listening.

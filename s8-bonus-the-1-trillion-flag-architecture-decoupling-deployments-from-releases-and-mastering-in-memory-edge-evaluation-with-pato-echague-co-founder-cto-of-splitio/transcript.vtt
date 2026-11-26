@@ -1,0 +1,1199 @@
+WEBVTT
+
+NOTE S8 Bonus: The 1 Trillion Flag Architecture: Decoupling Deployments from Releases and Mastering In-Memory Edge Evaluation with Pato Echagüe, Co-Founder & CTO of Split.io
+
+1
+00:00:00.000 --> 00:00:04.500
+<v Pato Echagüe>So when you build a product like this, internal tools, someone has to be the first one to use it.
+
+2
+00:00:04.920 --> 00:00:09.500
+<v Pato Echagüe>So one of our friends, a front-end engineer, at the time he had never released software himself,
+
+3
+00:00:10.140 --> 00:00:14.180
+<v Pato Echagüe>we pushed him into production and his code actually broke the website.
+
+4
+00:00:14.860 --> 00:00:19.320
+<v Pato Echagüe>So we walked him through that internal tool. There was only one flag that was his flag.
+
+5
+00:00:19.920 --> 00:00:24.120
+<v Pato Echagüe>So we said, hey, click the kill button. 30 seconds, the site came back up.
+
+6
+00:00:24.280 --> 00:00:26.200
+<v Pato Echagüe>No need to travel to shoot on a Friday afternoon.
+
+7
+00:00:26.200 --> 00:00:30.780
+<v Pato Echagüe>afternoon, that person moved on and went to camping, came back on a weekend, on Tuesday.
+
+8
+00:00:30.780 --> 00:00:37.580
+<v Pato Echagüe>We fix the software, push it again, restore the kill flag, and the rest is history. I'm Pato Echagüe,
+
+9
+00:00:37.580 --> 00:00:40.720
+<v Pato Echagüe>co-founder and CTO at Split Software.
+
+10
+00:00:40.720 --> 00:00:48.440
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews
+
+11
+00:00:48.440 --> 00:00:54.060
+<v Noah Labhart>with tech visionaries, six months moonlighting, there's nothing on the backhand, who share what
+
+12
+00:00:54.060 --> 00:00:55.620
+<v Noah Labhart>What it takes to change an industry.
+
+13
+00:00:55.820 --> 00:00:57.620
+<v Clip>I don't exactly know what to do next.
+
+14
+00:00:57.620 --> 00:00:58.780
+<v Clip>It took many goes to get right.
+
+15
+00:00:59.400 --> 00:01:02.020
+<v Noah Labhart>Who built the teams that have their back.
+
+16
+00:01:02.280 --> 00:01:03.640
+<v Clip>The company is its people.
+
+17
+00:01:03.660 --> 00:01:04.940
+<v Clip>The teams help each other achieve.
+
+18
+00:01:04.980 --> 00:01:06.120
+<v Clip>Most proud of our team.
+
+19
+00:01:06.420 --> 00:01:08.720
+<v Noah Labhart>Keeping scalability top of mind.
+
+20
+00:01:09.020 --> 00:01:10.400
+<v Clip>All that infrastructure was a pain.
+
+21
+00:01:10.400 --> 00:01:11.800
+<v Clip>Yes, we've been fighting it as we grew.
+
+22
+00:01:11.980 --> 00:01:12.840
+<v Clip>Total waste of time.
+
+23
+00:01:13.080 --> 00:01:15.360
+<v Noah Labhart>The stories you don't read in the headlines.
+
+24
+00:01:15.800 --> 00:01:17.580
+<v Clip>It's not an easy thing to achieve, my dear.
+
+25
+00:01:17.580 --> 00:01:19.640
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+26
+00:01:20.400 --> 00:01:23.400
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+27
+00:01:23.720 --> 00:01:25.120
+<v Clip>You need to really want it.
+
+28
+00:01:25.820 --> 00:01:26.380
+<v Clip>All
+
+29
+00:01:26.380 --> 00:01:28.480
+<v Noah Labhart>this and more on Code Story.
+
+30
+00:01:29.840 --> 00:01:40.220
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Pato Echagüe has built a robust feature-flagging platform to help you separate the push and the release.
+
+31
+00:01:45.140 --> 00:01:50.040
+<v Noah Labhart>Pato Echagüe was born and raised in Argentina, and as such, is a huge soccer fan.
+
+32
+00:01:50.260 --> 00:01:54.300
+<v Noah Labhart>He played soccer and tennis growing up and enjoys following the Boca Juniors.
+
+33
+00:01:55.820 --> 00:01:57.760
+<v Noah Labhart>being influenced by the Messi effect as well,
+
+34
+00:01:57.900 --> 00:01:59.680
+<v Noah Labhart>liking Barcelona and now the States.
+
+35
+00:01:59.980 --> 00:02:02.920
+<v Noah Labhart>He's a father of two young kids, who also play soccer,
+
+36
+00:02:03.080 --> 00:02:05.880
+<v Noah Labhart>so there are a lot of nets and practice tools in his backyard.
+
+37
+00:02:07.640 --> 00:02:10.360
+<v Noah Labhart>At his prior startup, which was acquired by Salesforce,
+
+38
+00:02:10.840 --> 00:02:14.060
+<v Noah Labhart>Pato and his co-founders observed that the faster they shipped things,
+
+39
+00:02:14.260 --> 00:02:15.740
+<v Noah Labhart>the faster they broke production.
+
+40
+00:02:16.240 --> 00:02:18.520
+<v Noah Labhart>After giving in to his co-founders' persistence,
+
+41
+00:02:18.740 --> 00:02:21.400
+<v Noah Labhart>he decided to jump in and build a feature-flagging platform
+
+42
+00:02:21.400 --> 00:02:22.840
+<v Noah Labhart>to fix the problem.
+
+43
+00:02:24.220 --> 00:02:26.740
+<v Noah Labhart>This is the creation story of Split.
+
+44
+00:02:29.520 --> 00:02:36.240
+<v Pato Echagüe>Split is a feature management platform. So what it means is we help companies by way of feature
+
+45
+00:02:36.240 --> 00:02:41.640
+<v Pato Echagüe>flags and experimentation to engineering teams to move faster, deliver value to customers much
+
+46
+00:02:41.640 --> 00:02:48.140
+<v Pato Echagüe>faster and increase the quality of delivery. My product helps you decouple a push from a
+
+47
+00:02:48.140 --> 00:02:53.740
+<v Pato Echagüe>release. That means that engineers can have an extra look in production before things get released.
+
+48
+00:02:53.960 --> 00:02:57.640
+<v Pato Echagüe>When you make mistakes, you can take that back without a full rollback.
+
+49
+00:02:57.980 --> 00:03:01.320
+<v Pato Echagüe>So the industry called all of this feature management platform.
+
+50
+00:03:02.620 --> 00:03:08.500
+<v Pato Echagüe>The three founders met at a small startup called RelateIQ. For us, it was at some point,
+
+51
+00:03:08.540 --> 00:03:14.040
+<v Pato Echagüe>we pushed so much code to production that every time we pushed something, we broke something else.
+
+52
+00:03:14.660 --> 00:03:18.780
+<v Pato Echagüe>The morale kind of wasn't that high and we had to figure out how to solve that problem.
+
+53
+00:03:19.220 --> 00:03:23.020
+<v Pato Echagüe>That's when one of them who later became my co-founder mentioned to me,
+
+54
+00:03:23.040 --> 00:03:24.940
+<v Pato Echagüe>say, hey, let's build an experimentation platform.
+
+55
+00:03:25.240 --> 00:03:27.400
+<v Pato Echagüe>So he used those words. I had no idea what that meant.
+
+56
+00:03:27.540 --> 00:03:33.660
+<v Pato Echagüe>And in fact, I ignored him two times until the third time he came in and said, let's do this.
+
+57
+00:03:33.660 --> 00:03:35.240
+<v Pato Echagüe>And so I inquired a little more.
+
+58
+00:03:36.160 --> 00:03:41.120
+<v Pato Echagüe>And what he actually saying to me was, let's build a feature flagging tool.
+
+59
+00:03:41.720 --> 00:03:48.080
+<v Pato Echagüe>that changed everything because we moved from a position where every time you push the production
+
+60
+00:03:48.080 --> 00:03:53.740
+<v Pato Echagüe>you broke something to we push the production but no release and when i'm gonna later we'll
+
+61
+00:03:53.740 --> 00:03:59.940
+<v Pato Echagüe>release it for say pato and noah and both of us that were in the same team we got to test that
+
+62
+00:03:59.940 --> 00:04:04.940
+<v Pato Echagüe>feature in production we were sure about the thing that worked then we continued to roll that out to
+
+63
+00:04:04.940 --> 00:04:10.820
+<v Pato Echagüe>the team then to the company then to the outside world and it just changed the quality of the
+
+64
+00:04:11.120 --> 00:04:16.940
+<v Pato Echagüe>the morale of the team, people felt like they could push code at any time of the day, no
+
+65
+00:04:16.940 --> 00:04:21.320
+<v Pato Echagüe>nights, no weekends, as you may recall, it was a traditional way of pushing big changes
+
+66
+00:04:21.320 --> 00:04:23.320
+<v Pato Echagüe>to production when the user is not there.
+
+67
+00:04:24.340 --> 00:04:28.860
+<v Pato Echagüe>So in a way we give the developers and the product team a little bit of quality of life
+
+68
+00:04:29.380 --> 00:04:30.880
+<v Pato Echagüe>by not stressing out on a release.
+
+69
+00:04:31.140 --> 00:04:36.980
+<v Pato Echagüe>And the second consequence of that I'm proud of is we gave the ability to release software
+
+70
+00:04:36.980 --> 00:04:39.280
+<v Pato Echagüe>to people that never did that before.
+
+71
+00:04:41.120 --> 00:04:45.340
+<v Pato Echagüe>seems more independence of execution, which is a second or third more important thing.
+
+72
+00:04:47.680 --> 00:04:52.580
+<v Noah Labhart>Let's dive into that MVP. Let's dive into the MVP and tell me a little bit more about
+
+73
+00:04:52.580 --> 00:04:55.940
+<v Noah Labhart>how long it took to build and what sort of tools you use to bring it to life.
+
+74
+00:04:57.580 --> 00:05:02.480
+<v Pato Echagüe>One of the first realization, if you work at big companies, you get to see a little bit of
+
+75
+00:05:02.480 --> 00:05:07.480
+<v Pato Echagüe>the future before it comes to the rest of the industry. But also your customer is captive,
+
+76
+00:05:07.480 --> 00:05:10.980
+<v Pato Echagüe>I call it because if you're at Google or LinkedIn, the audience is internal.
+
+77
+00:05:11.200 --> 00:05:14.420
+<v Pato Echagüe>Thinking about the product for the rest of the world is a little different.
+
+78
+00:05:14.600 --> 00:05:16.640
+<v Pato Echagüe>So the feature set is broader.
+
+79
+00:05:17.540 --> 00:05:18.480
+<v Pato Echagüe>Assumptions are different.
+
+80
+00:05:18.900 --> 00:05:23.260
+<v Pato Echagüe>When you jump off the boat and build this for a living, then that becomes your business.
+
+81
+00:05:23.700 --> 00:05:28.920
+<v Pato Echagüe>We realize that the things I want you to think about are still different than when you're running inside a company.
+
+82
+00:05:29.220 --> 00:05:30.300
+<v Pato Echagüe>And then what tools we use.
+
+83
+00:05:30.460 --> 00:05:35.580
+<v Pato Echagüe>Again, we started from the beginning, three founders, and we hired very few people.
+
+84
+00:05:37.480 --> 00:05:42.620
+<v Pato Echagüe>quickly in order to help us get as fast as we can to deliver something.
+
+85
+00:05:43.160 --> 00:05:45.720
+<v Pato Echagüe>The access to the cloud was always there.
+
+86
+00:05:45.860 --> 00:05:49.420
+<v Pato Echagüe>More products that helped us achieve more with less people.
+
+87
+00:05:49.620 --> 00:05:54.640
+<v Pato Echagüe>I always tell folks that we did so much with only one DevOps person for a while.
+
+88
+00:05:54.760 --> 00:05:57.080
+<v Pato Echagüe>That could have been done many years before, obviously.
+
+89
+00:05:58.200 --> 00:06:05.600
+<v Pato Echagüe>Other tools on observability that I remember thinking and spending so much time in 2010, 2011,
+
+90
+00:06:07.480 --> 00:06:08.840
+<v Pato Echagüe>was the software doing in production.
+
+91
+00:06:09.200 --> 00:06:13.000
+<v Pato Echagüe>By 2015, you had companies on APMs
+
+92
+00:06:13.000 --> 00:06:14.940
+<v Pato Echagüe>who were more mature, easy to set up.
+
+93
+00:06:15.160 --> 00:06:17.800
+<v Pato Echagüe>Logging tools were also more available.
+
+94
+00:06:19.040 --> 00:06:20.500
+<v Pato Echagüe>Obviously, the CI/CDs were there.
+
+95
+00:06:21.840 --> 00:06:23.180
+<v Pato Echagüe>Platform as a service companies
+
+96
+00:06:23.180 --> 00:06:24.900
+<v Pato Echagüe>above the cloud per se
+
+97
+00:06:24.900 --> 00:06:27.820
+<v Pato Echagüe>were also more available and affordable
+
+98
+00:06:27.820 --> 00:06:30.840
+<v Pato Echagüe>that helped us really get a code to production
+
+99
+00:06:30.840 --> 00:06:31.920
+<v Pato Echagüe>in like a day or less.
+
+100
+00:06:32.760 --> 00:06:34.300
+<v Pato Echagüe>Even today, you're looking at hours.
+
+101
+00:06:34.760 --> 00:06:36.400
+<v Pato Echagüe>But those are the evolutions
+
+102
+00:06:37.480 --> 00:06:43.500
+<v Pato Echagüe>2010 to 2015 that really helped us get something out there for prospects to see and for investors
+
+103
+00:06:43.500 --> 00:06:49.080
+<v Pato Echagüe>to see an MVP and kind of trust that we were credible and we can build things at the fast pace.
+
+104
+00:06:50.620 --> 00:06:54.940
+<v Noah Labhart>You've got that MVP then. You're gaining that trust. You're gaining some traction. How did
+
+105
+00:06:54.940 --> 00:06:59.500
+<v Noah Labhart>you progress the product from there and mature it? I think to wrap that in a box a little bit,
+
+106
+00:06:59.560 --> 00:07:03.420
+<v Noah Labhart>what I'm looking for is how do you build your roadmap? How did you build your roadmap? And
+
+107
+00:07:03.420 --> 00:07:10.120
+<v Noah Labhart>And what criteria are you using to figure out, okay, this is the next most important thing to build or to address with Split?
+
+108
+00:07:11.820 --> 00:07:18.020
+<v Pato Echagüe>The key factors for success, getting the founders and the early people together to first define,
+
+109
+00:07:18.260 --> 00:07:20.460
+<v Pato Echagüe>what are the things that we must have?
+
+110
+00:07:21.120 --> 00:07:27.360
+<v Pato Echagüe>So we define those at the time, easy deployment, language coverage, something about the audiences.
+
+111
+00:07:28.080 --> 00:07:32.620
+<v Pato Echagüe>And all these early set of feature set, packet them by those categories.
+
+112
+00:07:33.820 --> 00:07:38.020
+<v Pato Echagüe>So like it's a good framework to understand what is a must-have if you want to hit the
+
+113
+00:07:38.020 --> 00:07:41.140
+<v Pato Echagüe>ground running and people will see value in the product.
+
+114
+00:07:42.280 --> 00:07:45.860
+<v Pato Echagüe>Again at the time we went through first what the most popular language is, so we build
+
+115
+00:07:45.860 --> 00:07:47.860
+<v Pato Echagüe>SDKs for those and progress them from there.
+
+116
+00:07:48.040 --> 00:07:53.060
+<v Pato Echagüe>We're also table stakes on the feature flag for targeting capabilities that 70% of the
+
+117
+00:07:53.060 --> 00:07:54.100
+<v Pato Echagüe>companies will do out there.
+
+118
+00:07:54.880 --> 00:07:59.240
+<v Pato Echagüe>The other conversation that was important to us also was what we appealing to.
+
+119
+00:07:59.560 --> 00:08:02.400
+<v Pato Echagüe>Are we going like bottom up developer play?
+
+120
+00:08:03.420 --> 00:08:09.780
+<v Pato Echagüe>going strong enterprise first. We made a decision early on that we wanted to appeal to enterprise.
+
+121
+00:08:09.980 --> 00:08:14.880
+<v Pato Echagüe>So as you can imagine, if you go that direction early on, you spend a lot of time on security
+
+122
+00:08:14.880 --> 00:08:21.240
+<v Pato Echagüe>certification, making sure things are clear when you go and talk to a procurement or a CISO or
+
+123
+00:08:21.240 --> 00:08:26.860
+<v Pato Echagüe>security team at the enterprise company. If you ever sold to enterprise, there's a lot of
+
+124
+00:08:26.860 --> 00:08:33.220
+<v Pato Echagüe>requirements that force us to be super efficient and find kind of multipliers. So what can I do
+
+125
+00:08:33.420 --> 00:08:35.980
+<v Pato Echagüe>that can help us win up any other customers.
+
+126
+00:08:37.160 --> 00:08:40.000
+<v Pato Echagüe>And we worked hard and a little bit of luckitude
+
+127
+00:08:40.000 --> 00:08:42.260
+<v Pato Echagüe>to sell to major banks early on,
+
+128
+00:08:42.360 --> 00:08:43.680
+<v Pato Echagüe>to the point that after that,
+
+129
+00:08:43.800 --> 00:08:45.820
+<v Pato Echagüe>anybody that asks us any questions on security,
+
+130
+00:08:46.000 --> 00:08:48.160
+<v Pato Echagüe>we have it because this other customer
+
+131
+00:08:48.160 --> 00:08:51.800
+<v Pato Echagüe>asked us 300 items to be done to get the deal.
+
+132
+00:08:53.280 --> 00:08:54.920
+<v Noah Labhart>Okay, so I hear you saying we.
+
+133
+00:08:55.060 --> 00:08:56.480
+<v Noah Labhart>Tell me about how you built your team
+
+134
+00:08:56.480 --> 00:08:58.440
+<v Noah Labhart>and what did you look for in those people
+
+135
+00:08:58.440 --> 00:09:00.920
+<v Noah Labhart>to indicate that they are the winning horses to join you?
+
+136
+00:09:01.980 --> 00:09:06.280
+<v Pato Echagüe>so the three founders we had the right set of skills although two of us were technical
+
+137
+00:09:06.280 --> 00:09:12.540
+<v Pato Echagüe>one came from the business side so we complement each other well the early people again i was
+
+138
+00:09:12.540 --> 00:09:18.480
+<v Pato Echagüe>biased also by the company i worked for before it was high energy intense work and i liked it
+
+139
+00:09:18.480 --> 00:09:23.960
+<v Pato Echagüe>the moving fast trying to achieve things i look for cues of greatness have you what have you done
+
+140
+00:09:23.960 --> 00:09:28.520
+<v Pato Echagüe>when you solve a problem when you start asking so tell me more so what decision did you make here
+
+141
+00:09:28.520 --> 00:09:36.420
+<v Pato Echagüe>If the person really have those details in their head, it means that they were actually in the trenches, like tinkering, trying to solve a really hard problem.
+
+142
+00:09:37.220 --> 00:09:38.900
+<v Pato Echagüe>And asking all those things.
+
+143
+00:09:38.980 --> 00:09:44.540
+<v Pato Echagüe>Also, I didn't find that many people that quickly at the beginning because your pipeline gets thinner.
+
+144
+00:09:44.680 --> 00:09:51.800
+<v Pato Echagüe>But even still, the first set of 10, 15 folks at the time had that type of drive in them.
+
+145
+00:09:51.900 --> 00:09:55.940
+<v Pato Echagüe>And that was very important because we have little or no funding.
+
+146
+00:09:55.940 --> 00:09:59.220
+<v Pato Echagüe>So you want to go as fast as you can with a few resources you have.
+
+147
+00:09:59.960 --> 00:10:04.180
+<v Pato Echagüe>And trying to get to that kind of DNA of his people was a lot of work.
+
+148
+00:10:04.220 --> 00:10:10.600
+<v Pato Echagüe>But that's why most of the time I spend in the early days is building the product or building the team or both.
+
+149
+00:10:13.520 --> 00:10:14.980
+<v Noah Labhart>Let's talk about scalability.
+
+150
+00:10:15.300 --> 00:10:21.600
+<v Noah Labhart>And given the development or the part of the development cycle you're supporting, I'm curious how this fits in.
+
+151
+00:10:21.600 --> 00:10:25.860
+<v Noah Labhart>Was this built to scale efficiently or with scale in mind from day one?
+
+152
+00:10:26.000 --> 00:10:29.380
+<v Noah Labhart>Or have you fought this as you've grown in any sort of capacity?
+
+153
+00:10:31.720 --> 00:10:32.220
+<v Noah Labhart>That's
+
+154
+00:10:32.160 --> 00:10:33.020
+<v Pato Echagüe>also important to know.
+
+155
+00:10:33.080 --> 00:10:36.520
+<v Pato Echagüe>What role does your product play in their production environment?
+
+156
+00:10:36.840 --> 00:10:38.540
+<v Pato Echagüe>Are you mission critical?
+
+157
+00:10:38.840 --> 00:10:39.800
+<v Pato Echagüe>Or are you important?
+
+158
+00:10:39.800 --> 00:10:42.640
+<v Pato Echagüe>Nice to have, but if your tool is down, that's okay.
+
+159
+00:10:42.700 --> 00:10:43.640
+<v Pato Echagüe>You can restart the service.
+
+160
+00:10:43.720 --> 00:10:44.220
+<v Pato Echagüe>Everybody's okay.
+
+161
+00:10:44.940 --> 00:10:47.260
+<v Pato Echagüe>So for us, it was mission critical.
+
+162
+00:10:47.260 --> 00:10:54.740
+<v Pato Echagüe>Meaning that if my product is down back then or today, your company will have a really poor user experience.
+
+163
+00:10:54.920 --> 00:10:55.480
+<v Pato Echagüe>That's the reality.
+
+164
+00:10:55.840 --> 00:11:01.640
+<v Pato Echagüe>If a feature flag cannot be served to you today, then your application doesn't have the behavior you want.
+
+165
+00:11:03.140 --> 00:11:10.540
+<v Pato Echagüe>Recognizing mission critical helped us develop practices during the development phase to understand how scalable the system is,
+
+166
+00:11:10.540 --> 00:11:13.520
+<v Pato Echagüe>is what metrics are you looking for to look at all time,
+
+167
+00:11:13.780 --> 00:11:17.580
+<v Pato Echagüe>which obviously one of them is the speed of delivering feature flags.
+
+168
+00:11:18.500 --> 00:11:22.800
+<v Pato Echagüe>But we knew that things like CDN were key players into the product,
+
+169
+00:11:22.960 --> 00:11:26.360
+<v Pato Echagüe>latency, full observability to understand what's happening,
+
+170
+00:11:26.540 --> 00:11:28.800
+<v Pato Echagüe>and you can't improve, you don't measure,
+
+171
+00:11:28.960 --> 00:11:31.080
+<v Pato Echagüe>so measurement of things were very important.
+
+172
+00:11:31.500 --> 00:11:33.680
+<v Pato Echagüe>And also when you have mission-critical software,
+
+173
+00:11:34.080 --> 00:11:36.660
+<v Pato Echagüe>always investing in your deployment pipeline is important
+
+174
+00:11:36.660 --> 00:11:38.640
+<v Pato Echagüe>because you don't want to get into a situation
+
+175
+00:11:40.540 --> 00:11:43.100
+<v Pato Echagüe>you can't deploy to production because that will hurt innovation as well.
+
+176
+00:11:43.360 --> 00:11:48.880
+<v Pato Echagüe>So it was very tricky because do all of that with very few people and have support 24-7
+
+177
+00:11:48.880 --> 00:11:52.140
+<v Pato Echagüe>and it gets stressing pretty quickly.
+
+178
+00:11:52.300 --> 00:11:55.800
+<v Pato Echagüe>But we managed and we knew that was hard work at the beginning.
+
+179
+00:11:56.000 --> 00:11:59.260
+<v Pato Echagüe>We kept at it and little by little it was paying off.
+
+180
+00:11:59.660 --> 00:12:04.240
+<v Pato Echagüe>Customers saw the value and trusted us and became paying customers and that way we can
+
+181
+00:12:04.240 --> 00:12:07.920
+<v Pato Echagüe>invest more resources and they will start to turn.
+
+182
+00:12:10.420 --> 00:12:15.200
+<v Noah Labhart>so pato as you step out on the balcony and you look across all that you've built what are you
+
+183
+00:12:15.200 --> 00:12:17.880
+<v Noah Labhart>most proud of i'm
+
+184
+00:12:17.880 --> 00:12:25.000
+<v Pato Echagüe>proud of giving product engineering teams quality of life when it
+
+185
+00:12:25.000 --> 00:12:30.940
+<v Pato Echagüe>comes to working on software and releasing customers have told us and send us pictures
+
+186
+00:12:31.660 --> 00:12:35.860
+<v Pato Echagüe>one say hey look i'm releasing software using your product sitting and watching the derby
+
+187
+00:12:35.860 --> 00:12:40.860
+<v Pato Echagüe>or someone in the car driving somewhere in an emergency
+
+188
+00:12:40.860 --> 00:12:45.660
+<v Pato Echagüe>and hitting a kill button on a flag to mitigate a problem.
+
+189
+00:12:46.580 --> 00:12:50.300
+<v Pato Echagüe>The fact that one creating a product that later becomes a category
+
+190
+00:12:50.300 --> 00:12:55.480
+<v Pato Echagüe>and giving all of these people much better time at doing what they love,
+
+191
+00:12:55.660 --> 00:12:59.640
+<v Pato Echagüe>which is building software, I think it's hard to beat that.
+
+192
+00:13:01.620 --> 00:13:03.160
+<v Noah Labhart>Let's flip the script a little bit.
+
+193
+00:13:03.160 --> 00:13:07.320
+<v Noah Labhart>So tell me about a mistake you made and how you and your team responded to it.
+
+194
+00:13:08.360 --> 00:13:12.900
+<v Pato Echagüe>As a technical founder, we started building the software and having a lot of opinions.
+
+195
+00:13:13.140 --> 00:13:30.620
+<v Pato Echagüe>And I think the biggest mistake was, for example, not stepping back a little bit and make sure that I empower teams in the early days so they can make independent decisions and trust their judgment and develop scar tissue for making those calls.
+
+196
+00:13:31.240 --> 00:13:32.780
+<v Pato Echagüe>so I tend to lean a lot
+
+197
+00:13:32.780 --> 00:13:35.100
+<v Pato Echagüe>I think it's just a natural thing that many of us do
+
+198
+00:13:35.100 --> 00:13:37.020
+<v Pato Echagüe>by retrospective I think
+
+199
+00:13:37.020 --> 00:13:39.040
+<v Pato Echagüe>it would have been more wise to not do that
+
+200
+00:13:39.040 --> 00:13:40.840
+<v Pato Echagüe>and let others make decisions
+
+201
+00:13:40.840 --> 00:13:42.960
+<v Pato Echagüe>make mistakes, come back from them
+
+202
+00:13:42.960 --> 00:13:44.200
+<v Pato Echagüe>learn and move on
+
+203
+00:13:44.200 --> 00:13:46.500
+<v Pato Echagüe>because personally I would have had much better time
+
+204
+00:13:46.500 --> 00:13:48.200
+<v Pato Echagüe>and the company too
+
+205
+00:13:48.720 --> 00:13:50.360
+<v Pato Echagüe>you learn the hard way that way
+
+206
+00:13:50.360 --> 00:13:52.260
+<v Pato Echagüe>especially as a first time founder
+
+207
+00:13:53.420 --> 00:13:54.320
+<v Pato Echagüe>moving faster
+
+208
+00:13:54.320 --> 00:13:56.940
+<v Pato Echagüe>without waiting for something to be
+
+209
+00:13:56.940 --> 00:13:59.060
+<v Pato Echagüe>fully baked, just to see if there's something there
+
+210
+00:13:59.060 --> 00:14:00.280
+<v Pato Echagüe>and if there's something there
+
+211
+00:14:00.620 --> 00:14:01.600
+<v Pato Echagüe>just keep going at it,
+
+212
+00:14:01.700 --> 00:14:04.060
+<v Pato Echagüe>I think I would have done a much better job
+
+213
+00:14:04.060 --> 00:14:05.600
+<v Pato Echagüe>trusting our guts and say,
+
+214
+00:14:05.660 --> 00:14:06.900
+<v Pato Echagüe>hey, there's something here, let's go and build something.
+
+215
+00:14:07.080 --> 00:14:07.860
+<v Pato Echagüe>See what's up.
+
+216
+00:14:07.880 --> 00:14:09.560
+<v Pato Echagüe>As opposed to like overanalyze things.
+
+217
+00:14:09.880 --> 00:14:12.120
+<v Pato Echagüe>And again, I know we all hear about these things
+
+218
+00:14:12.120 --> 00:14:13.780
+<v Pato Echagüe>and we know that it's the right thing to do,
+
+219
+00:14:13.840 --> 00:14:15.660
+<v Pato Echagüe>but something happened when you are in the trenches,
+
+220
+00:14:15.800 --> 00:14:16.520
+<v Pato Echagüe>like you don't do it.
+
+221
+00:14:17.120 --> 00:14:19.280
+<v Pato Echagüe>I think next time I'll be a little more wise
+
+222
+00:14:19.280 --> 00:14:21.680
+<v Pato Echagüe>on how to approach those challenges.
+
+223
+00:14:24.200 --> 00:14:25.280
+<v Noah Labhart>Okay, this will be fun.
+
+224
+00:14:25.820 --> 00:14:28.180
+<v Noah Labhart>For Split, what does the future look like
+
+225
+00:14:28.180 --> 00:14:29.680
+<v Noah Labhart>for the product and for your team?
+
+226
+00:14:31.360 --> 00:14:33.080
+<v Pato Echagüe>The market keeps on getting bigger.
+
+227
+00:14:33.220 --> 00:14:39.660
+<v Pato Echagüe>And all of these phrases were part of the pitch that every company is becoming a technology company and a software company.
+
+228
+00:14:39.840 --> 00:14:43.300
+<v Pato Echagüe>Because if you don't, then someone else will do it and you lose against the competition.
+
+229
+00:14:43.500 --> 00:14:46.840
+<v Pato Echagüe>Who doesn't want to move fast and add more value to customers?
+
+230
+00:14:47.380 --> 00:14:49.000
+<v Pato Echagüe>So that's the thing that's exciting to me.
+
+231
+00:14:49.040 --> 00:14:57.460
+<v Pato Echagüe>We knew this coming in, even almost nine years ago, that the investment in SaaS products and the cloud was getting bigger and bigger.
+
+232
+00:14:58.620 --> 00:15:03.580
+<v Pato Echagüe>anybody releasing software should be able to take advantage of what we build and not just us and
+
+233
+00:15:03.580 --> 00:15:09.460
+<v Pato Echagüe>many other players on different adjacent products that will become important as the world become
+
+234
+00:15:09.460 --> 00:15:16.220
+<v Pato Echagüe>more agile and observability becomes a thing and risk mitigation is more at stake so that's super
+
+235
+00:15:16.220 --> 00:15:20.900
+<v Pato Echagüe>exciting to me and when i started the company if you tell me hey pato would you have imagined
+
+236
+00:15:20.900 --> 00:15:25.600
+<v Pato Echagüe>building a software a company product that would be running in an oil rig in the middle of the
+
+237
+00:15:27.460 --> 00:15:29.280
+<v Pato Echagüe>as the smart fridges become a thing?
+
+238
+00:15:29.460 --> 00:15:30.640
+<v Pato Echagüe>And the answer would have been no.
+
+239
+00:15:31.280 --> 00:15:36.580
+<v Pato Echagüe>Or on a milk extraction machine for cows, for example, to hear the extreme.
+
+240
+00:15:37.400 --> 00:15:38.780
+<v Pato Echagüe>It's so ubiquitous.
+
+241
+00:15:38.860 --> 00:15:43.040
+<v Pato Echagüe>And that tells you how much software has been going through different areas,
+
+242
+00:15:43.120 --> 00:15:46.520
+<v Pato Echagüe>not just SaaS or the traditional SaaS companies.
+
+243
+00:15:47.000 --> 00:15:48.320
+<v Pato Echagüe>There's software everywhere.
+
+244
+00:15:48.660 --> 00:15:51.680
+<v Pato Echagüe>And when there's software everywhere, there are people releasing software and upgrades.
+
+245
+00:15:52.000 --> 00:15:56.920
+<v Pato Echagüe>And that's why I think this is super important right now to keep going at it
+
+246
+00:15:57.460 --> 00:15:58.120
+<v Pato Echagüe>There are value everywhere.
+
+247
+00:15:58.740 --> 00:16:02.960
+<v Pato Echagüe>And for people working here at Split, of course, the opportunities are so huge.
+
+248
+00:16:03.140 --> 00:16:05.120
+<v Pato Echagüe>We just need to focus and deliver value.
+
+249
+00:16:06.940 --> 00:16:08.200
+<v Noah Labhart>Let's switch to you, Pato.
+
+250
+00:16:08.300 --> 00:16:10.020
+<v Noah Labhart>Who influences the way that you work?
+
+251
+00:16:10.180 --> 00:16:13.080
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+252
+00:16:15.240 --> 00:16:20.960
+<v Pato Echagüe>I think I admire people that are long-term thinkers.
+
+253
+00:16:22.160 --> 00:16:26.940
+<v Pato Echagüe>Those who don't necessarily go after a trend that became popular today or tomorrow
+
+254
+00:16:27.460 --> 00:16:34.220
+<v Pato Echagüe>fade away but those that have like strong beliefs in how they think and go after for a long period
+
+255
+00:16:34.220 --> 00:16:39.600
+<v Pato Echagüe>of time and again i'm taking pieces from steve jobs when he said he was able to touch himself
+
+256
+00:16:40.400 --> 00:16:46.980
+<v Pato Echagüe>and look at the city from above there's a phrase about that those kind of elements are appealing
+
+257
+00:16:46.980 --> 00:16:55.100
+<v Pato Echagüe>to me or warren buffett long-term thinking or elon musk persevering at the problem again i'm not
+
+258
+00:16:55.100 --> 00:16:59.100
+<v Pato Echagüe>not picking a random person, I'm picking different pieces that to me are important. It's like, trust
+
+259
+00:16:59.100 --> 00:17:04.440
+<v Pato Echagüe>yourself, have conviction, think long term, and look at things that would be unlikely to change.
+
+260
+00:17:05.120 --> 00:17:09.140
+<v Pato Echagüe>And again, we can pick those elements from different people. I don't think I can pick one
+
+261
+00:17:09.560 --> 00:17:14.320
+<v Pato Echagüe>particular one, but the ones I mentioned have bits and pieces of those elements that are super
+
+262
+00:17:14.320 --> 00:17:14.920
+<v Pato Echagüe>important to me.
+
+263
+00:17:16.520 --> 00:17:20.240
+<v Noah Labhart>Pato, last question. So you're getting on a plane, and you're sitting next to a
+
+264
+00:17:20.240 --> 00:17:24.440
+<v Noah Labhart>young entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to show
+
+265
+00:17:25.100 --> 00:17:29.040
+<v Noah Labhart>old and can't wait to show off to you right there on the plane. What advice do you give that person
+
+266
+00:17:29.040 --> 00:17:30.760
+<v Noah Labhart>having gone down this road a bit?
+
+267
+00:17:31.760 --> 00:17:35.500
+<v Pato Echagüe>Trust yourself and your instinct because you're doing this because
+
+268
+00:17:35.500 --> 00:17:41.460
+<v Pato Echagüe>you have conviction on something and don't necessarily expect of other people to just
+
+269
+00:17:41.460 --> 00:17:45.960
+<v Pato Echagüe>follow along naturally. That's why you have the opportunity to do it, not others do necessarily,
+
+270
+00:17:46.180 --> 00:17:51.040
+<v Pato Echagüe>is to see there is something there, take the risk and have conviction and go at it.
+
+271
+00:17:52.080 --> 00:17:55.580
+<v Pato Echagüe>I developed those calluses from trying to recruit friends.
+
+272
+00:17:55.600 --> 00:17:57.020
+<v Pato Echagüe>Even though I recruited a lot of friends here,
+
+273
+00:17:57.180 --> 00:17:58.120
+<v Pato Echagüe>many of them said,
+
+274
+00:17:58.320 --> 00:18:00.360
+<v Pato Echagüe>no, you're not going to make any money from this,
+
+275
+00:18:00.360 --> 00:18:01.520
+<v Pato Echagüe>or that's super hard.
+
+276
+00:18:02.560 --> 00:18:04.960
+<v Pato Echagüe>It's easy to lose motivation from those things.
+
+277
+00:18:06.100 --> 00:18:07.740
+<v Pato Echagüe>But just trust yourself.
+
+278
+00:18:07.820 --> 00:18:08.420
+<v Pato Echagüe>Trust your gut.
+
+279
+00:18:08.580 --> 00:18:10.680
+<v Pato Echagüe>You're doing that because you have conviction on something.
+
+280
+00:18:10.940 --> 00:18:13.240
+<v Pato Echagüe>And the rest will follow along later
+
+281
+00:18:13.240 --> 00:18:15.080
+<v Pato Echagüe>when things become more obvious.
+
+282
+00:18:15.680 --> 00:18:18.760
+<v Pato Echagüe>And if you fail, you learn so much from that.
+
+283
+00:18:18.920 --> 00:18:19.680
+<v Pato Echagüe>Keep going.
+
+284
+00:18:21.040 --> 00:18:23.500
+<v Pato Echagüe>I tell my kids the same thing whenever they listen to me.
+
+285
+00:18:23.640 --> 00:18:26.560
+<v Pato Echagüe>You really learn more from failures than from successes.
+
+286
+00:18:27.060 --> 00:18:28.720
+<v Pato Echagüe>It's just hard to recover from them.
+
+287
+00:18:28.820 --> 00:18:31.800
+<v Pato Echagüe>But with the right attitude, you have the benefit of learning what doesn't work.
+
+288
+00:18:32.100 --> 00:18:33.000
+<v Noah Labhart>Fantastic advice.
+
+289
+00:18:33.560 --> 00:18:35.840
+<v Noah Labhart>Well, Pato, thank you for being on the show today.
+
+290
+00:18:35.980 --> 00:18:38.200
+<v Noah Labhart>Thank you for telling the creation story of Split.
+
+291
+00:18:38.540 --> 00:18:39.040
+<v Noah Labhart>Thank
+
+292
+00:18:38.960 --> 00:18:39.840
+<v Pato Echagüe>you, Noah, for having me.
+
+293
+00:18:39.880 --> 00:18:41.540
+<v Pato Echagüe>It's always fun to tell the beginnings.
+
+294
+00:18:42.940 --> 00:18:45.640
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+295
+00:18:49.200 --> 00:18:52.200
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+296
+00:18:52.320 --> 00:18:57.120
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+297
+00:18:57.720 --> 00:18:59.940
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+298
+00:19:00.240 --> 00:19:02.260
+<v Noah Labhart>Both things help us out tremendously.
+
+299
+00:19:05.080 --> 00:19:06.560
+<v Noah Labhart>And thanks again for listening.

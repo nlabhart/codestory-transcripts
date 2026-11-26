@@ -1,0 +1,1279 @@
+WEBVTT
+
+NOTE S10 E17: The Code-Aware DAST Era: Scaling Runtime Security at the Speed of AI Coding Assistants with Joni Klippert, Co-Founder & CEO of StackHawk
+
+1
+00:00:00.000 --> 00:00:07.260
+<v Joni Klippert>We decided the deployment mechanism that the scanning capability is deployed in the client site.
+
+2
+00:00:07.420 --> 00:00:10.540
+<v Joni Klippert>So via Docker or within your CLI.
+
+3
+00:00:10.920 --> 00:00:14.620
+<v Joni Klippert>And the choice to do that has a lot of benefit for the customer.
+
+4
+00:00:14.720 --> 00:00:25.060
+<v Joni Klippert>When the scanner is running and it's sending thousands of attacks, you don't want those attacks to traverse the Internet because it's going to take a very long time for that scan to run.
+
+5
+00:00:25.060 --> 00:00:32.620
+<v Joni Klippert>So if it's instead running right next to where your code lives, your code base is, that round trip time is really fast.
+
+6
+00:00:32.900 --> 00:00:38.740
+<v Joni Klippert>But the thing that it did for StackHawk is we are having to scale the scanning engine ourselves.
+
+7
+00:00:39.380 --> 00:00:43.080
+<v Joni Klippert>I'm Joni Klippert, CEO and co-founder of StackHawk.
+
+8
+00:00:46.140 --> 00:00:52.300
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+9
+00:00:52.300 --> 00:00:53.800
+<v Clip>Six months moonlighting.
+
+10
+00:00:53.900 --> 00:00:55.400
+<v Clip>There's nothing on the back end.
+
+11
+00:00:55.900 --> 00:00:58.200
+<v Noah Labhart>who share what it takes to change an industry,
+
+12
+00:00:58.400 --> 00:00:59.800
+<v Clip>I don't exactly know what to do next.
+
+13
+00:00:59.800 --> 00:01:01.400
+<v Clip>It took many goes to get right.
+
+14
+00:01:01.900 --> 00:01:04.600
+<v Noah Labhart>who build the teams that have their back.
+
+15
+00:01:04.800 --> 00:01:06.100
+<v Clip>A company is its people.
+
+16
+00:01:06.100 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+17
+00:01:07.500 --> 00:01:08.700
+<v Clip>Most proud of our team.
+
+18
+00:01:08.880 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:11.440 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+20
+00:01:12.860 --> 00:01:14.180
+<v Clip>Yes, we've been fighting it as a group.
+
+21
+00:01:14.440 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+22
+00:01:15.560 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+23
+00:01:18.300 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, mind you.
+
+24
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+25
+00:01:22.500 --> 00:01:25.860
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+26
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+27
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+28
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+29
+00:01:32.360 --> 00:01:33.760
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+30
+00:01:33.760 --> 00:01:43.160
+<v Noah Labhart>And today, how Joni Klippert built the ultimate API security testing platform for modern teams and dynamic applications.
+
+31
+00:01:49.280 --> 00:01:51.580
+<v Noah Labhart>Joni Klippert has spent many years in startups.
+
+32
+00:01:51.900 --> 00:02:01.680
+<v Noah Labhart>Post getting her MBA, she built her early career in Boulder, Colorado, and became very technical, learning new technologies throughout the businesses she worked for, like VictorOps and Splunk.
+
+33
+00:02:01.680 --> 00:02:04.300
+<v Noah Labhart>Outside of tech, she's married with two dogs.
+
+34
+00:02:04.520 --> 00:02:08.760
+<v Noah Labhart>Her favorite thing to do is travel with her husband to visit Michelin star restaurants.
+
+35
+00:02:09.060 --> 00:02:15.500
+<v Noah Labhart>One of her favorites was called Azuermendi in Spain, as it was not only delicious but an immersive experience.
+
+36
+00:02:17.900 --> 00:02:21.060
+<v Noah Labhart>Joni had been building software for engineers for a long time.
+
+37
+00:02:21.260 --> 00:02:29.220
+<v Noah Labhart>At one point, she started researching the last mile of DevOps and was surprised how far this particular group was behind in regards to tooling.
+
+38
+00:02:29.220 --> 00:02:39.360
+<v Noah Labhart>She dreamt of automating the pen testing remediation process and stumbled upon an opportunity as it relates to DAST, Dynamic Application Security Testing.
+
+39
+00:02:41.040 --> 00:02:44.140
+<v Noah Labhart>This is the creation story of StackHawk.
+
+40
+00:02:47.760 --> 00:02:51.260
+<v Joni Klippert>StackHawk is an API security platform.
+
+41
+00:02:51.260 --> 00:02:58.780
+<v Joni Klippert>platform. We help teams understand their API landscape and application landscape, which informs
+
+42
+00:02:58.780 --> 00:03:04.620
+<v Joni Klippert>what should be tested. And StackHawk has a very robust API security testing platform,
+
+43
+00:03:04.960 --> 00:03:11.060
+<v Joni Klippert>which was the very first capability we came out with. There's a realm out there called pen testing,
+
+44
+00:03:11.320 --> 00:03:17.640
+<v Joni Klippert>where you hire a human to attack your web properties to ensure that you're safe, right?
+
+45
+00:03:17.640 --> 00:03:18.920
+<v Joni Klippert>It's part of SOC 2 compliance.
+
+46
+00:03:19.180 --> 00:03:21.760
+<v Joni Klippert>You have to have pen tests on some regular cadence.
+
+47
+00:03:21.860 --> 00:03:25.480
+<v Joni Klippert>Maybe it's yearly, six months, quarterly, whatever it might be for your organization.
+
+48
+00:03:26.040 --> 00:03:29.280
+<v Joni Klippert>And they attack the running app and they give you a report of vulnerabilities.
+
+49
+00:03:30.120 --> 00:03:35.300
+<v Joni Klippert>For us, we believe that much of that, other than the third-party validation, can be automated.
+
+50
+00:03:35.760 --> 00:03:40.540
+<v Joni Klippert>So we help companies test their applications and APIs for vulnerabilities.
+
+51
+00:03:40.900 --> 00:03:46.500
+<v Joni Klippert>And we help the software engineering team actually fix those bugs before they deploy to production.
+
+52
+00:03:47.640 --> 00:03:52.940
+<v Joni Klippert>So I've been building software for software engineers for about 10 years before we started.
+
+53
+00:03:53.600 --> 00:03:55.860
+<v Joni Klippert>I went to a company called VictorOps.
+
+54
+00:03:56.040 --> 00:03:57.060
+<v Joni Klippert>They were super early.
+
+55
+00:03:57.140 --> 00:03:58.940
+<v Joni Klippert>We were a competitor to PagerDuty.
+
+56
+00:03:59.140 --> 00:04:03.020
+<v Joni Klippert>At that business, the idea was, okay, DevOps is a thing.
+
+57
+00:04:03.160 --> 00:04:07.080
+<v Joni Klippert>We're deploying code to production so frequently at this time.
+
+58
+00:04:07.520 --> 00:04:13.360
+<v Joni Klippert>The idea that you should send alerts about uptime or latency or downtime or anything
+
+59
+00:04:13.360 --> 00:04:20.180
+<v Joni Klippert>with your production assets to neckbeards eating Cheetos, watching dashboards, wondering what's
+
+60
+00:04:20.180 --> 00:04:24.840
+<v Joni Klippert>going to break, and then they would be the first line of defense to fix things. At the rate that
+
+61
+00:04:24.840 --> 00:04:30.480
+<v Joni Klippert>code is changing, there's no way that you could actually pass those alerts to that person. All
+
+62
+00:04:30.480 --> 00:04:36.080
+<v Joni Klippert>that's really doing is increasing your time to know and increasing your time to resolve uptime
+
+63
+00:04:36.080 --> 00:04:42.680
+<v Joni Klippert>issues. So when that company, VictorOps, was acquired by Splunk in 2018, I had the opportunity
+
+64
+00:04:43.360 --> 00:04:48.780
+<v Joni Klippert>lot of support from CEOs I'd worked for and investors to go out on my own and start a new
+
+65
+00:04:48.780 --> 00:04:54.840
+<v Joni Klippert>company. And I didn't exactly know what it would be. I know I'd built a lot of domain and digital
+
+66
+00:04:54.840 --> 00:05:01.180
+<v Joni Klippert>transformation over about 10 years. So it's something I knew a lot about. I started researching
+
+67
+00:05:01.180 --> 00:05:07.480
+<v Joni Klippert>what felt like the last mile of DevOps, which is how is it that our security teams are so far
+
+68
+00:05:07.480 --> 00:05:12.680
+<v Joni Klippert>far behind. I'd be introduced to different security folks during DevOps Days enterprise
+
+69
+00:05:12.680 --> 00:05:18.620
+<v Joni Klippert>conferences. And they're like, we're just here to figure out how we can operate in a landscape
+
+70
+00:05:18.620 --> 00:05:23.200
+<v Joni Klippert>where teams are deploying to production so fast, because none of their tooling or processes
+
+71
+00:05:23.200 --> 00:05:29.020
+<v Joni Klippert>were capable of keeping up with that pace. The very first thing I was researching was
+
+72
+00:05:29.020 --> 00:05:34.900
+<v Joni Klippert>pen testing as a service. I just thought it's so intellectually dishonest to have a human being
+
+73
+00:05:34.900 --> 00:05:41.300
+<v Joni Klippert>attack your application and provide you with a PDF report of your vulnerabilities. And you're like,
+
+74
+00:05:41.320 --> 00:05:46.720
+<v Joni Klippert>sweet, we're safe for the next year. Are you kidding? Like you deployed by the time that PDF
+
+75
+00:05:46.720 --> 00:05:52.560
+<v Joni Klippert>was printed on a piece of paper, it's already out of date. How do we automate this process?
+
+76
+00:05:52.660 --> 00:05:59.600
+<v Joni Klippert>And so I talked to 50 different CISOs and VPs of engineering about their experience.
+
+77
+00:05:59.600 --> 00:06:03.200
+<v Joni Klippert>and they just kept saying, it's not about the pen test.
+
+78
+00:06:03.320 --> 00:06:04.780
+<v Joni Klippert>Third-party validation is great,
+
+79
+00:06:04.900 --> 00:06:07.420
+<v Joni Klippert>but there's this technology that they've used called DAST,
+
+80
+00:06:08.040 --> 00:06:10.040
+<v Joni Klippert>Dynamic Application Security Testing.
+
+81
+00:06:10.400 --> 00:06:13.820
+<v Joni Klippert>And if you could automate DAST, that would be amazing.
+
+82
+00:06:14.080 --> 00:06:16.000
+<v Joni Klippert>And I was like, okay, I'm not that smart.
+
+83
+00:06:16.100 --> 00:06:17.520
+<v Joni Klippert>Why is nobody automating DAST?
+
+84
+00:06:17.740 --> 00:06:19.560
+<v Joni Klippert>Is this crazy complicated?
+
+85
+00:06:20.000 --> 00:06:22.080
+<v Joni Klippert>I'm never about to figure out what it was.
+
+86
+00:06:22.720 --> 00:06:24.940
+<v Joni Klippert>That was how the company was founded.
+
+87
+00:06:25.100 --> 00:06:26.960
+<v Joni Klippert>And I was on that customer development tour
+
+88
+00:06:26.960 --> 00:06:30.660
+<v Joni Klippert>and I met my co-founder, eventual co-founder, Scott Gerlach.
+
+89
+00:06:30.840 --> 00:06:34.460
+<v Joni Klippert>And for him, he'd been a practitioner for a long time.
+
+90
+00:06:34.640 --> 00:06:38.000
+<v Joni Klippert>So he was the CISO at SendGrid through the acquisition by Twilio.
+
+91
+00:06:38.180 --> 00:06:42.920
+<v Joni Klippert>And before that, he ran functional security teams throughout GoDaddy for 10 years.
+
+92
+00:06:43.890 --> 00:06:49.220
+<v Joni Klippert>And so he also had a very interesting disdain for products that were available
+
+93
+00:06:49.220 --> 00:06:56.020
+<v Joni Klippert>because it was his job to try to make cybersecurity tooling accessible and approachable to software engineers.
+
+94
+00:06:56.960 --> 00:07:04.240
+<v Joni Klippert>15 years of operating security teams. And he knew how deficient they were. And so we totally bonded
+
+95
+00:07:04.240 --> 00:07:10.460
+<v Joni Klippert>over how do we support the software engineer and the software engineering lifecycle, and also build
+
+96
+00:07:10.460 --> 00:07:17.840
+<v Joni Klippert>and maintain secure software. So I met him, let's see, two or three times and said, Hey, do you want
+
+97
+00:07:17.840 --> 00:07:23.440
+<v Joni Klippert>to do this thing? He fortunately said yes. And that's how the company was started.
+
+98
+00:07:23.440 --> 00:07:23.940
+<v Joni Klippert>it.
+
+99
+00:07:25.720 --> 00:07:31.580
+<v Noah Labhart>Let's dive into the MVP of StackHawk. So that first version of the product that you and your
+
+100
+00:07:31.580 --> 00:07:35.680
+<v Noah Labhart>co-founder built, how long did it take to build and what sort of tools were you using to bring
+
+101
+00:07:35.680 --> 00:07:36.180
+<v Noah Labhart>it to life?
+
+102
+00:07:36.780 --> 00:07:42.600
+<v Joni Klippert>A thing that bothered me about this space is there were a couple of open source
+
+103
+00:07:42.600 --> 00:07:49.360
+<v Joni Klippert>products available. And anytime there's open source products in a space, people aren't building
+
+104
+00:07:49.360 --> 00:07:55.800
+<v Joni Klippert>what's possible. It's interesting. It's like, how come nobody has modified any of these products to
+
+105
+00:07:55.800 --> 00:08:01.620
+<v Joni Klippert>actually make them usable earlier in software delivery lifecycle? So we chose an open source
+
+106
+00:08:01.620 --> 00:08:09.180
+<v Joni Klippert>scanner that did DAST that had some support for APIs. We got it to run. We looked at the output.
+
+107
+00:08:09.480 --> 00:08:16.380
+<v Joni Klippert>And what we realized is part of the problem is DAST was just so hard to use. It's like being
+
+108
+00:08:16.380 --> 00:08:21.480
+<v Joni Klippert>being in a Michelin star kitchen, right? There are a million tools, but the average human being,
+
+109
+00:08:21.540 --> 00:08:26.280
+<v Joni Klippert>they just want to make a sandwich. You know, like, I don't even know just how to find like a knife
+
+110
+00:08:26.280 --> 00:08:32.600
+<v Joni Klippert>and something simple and be able to actually use this capability. It's highly capable in terms of
+
+111
+00:08:32.600 --> 00:08:36.760
+<v Joni Klippert>the different tools that are involved, but getting an average person to use it was nearly impossible.
+
+112
+00:08:37.180 --> 00:08:43.000
+<v Joni Klippert>So what we decided is, okay, the world doesn't need a better scanner. Oh, I found another six
+
+113
+00:08:43.000 --> 00:08:49.060
+<v Joni Klippert>vulnerabilities out of 3000 possible vulnerabilities, what it actually needs is something that people
+
+114
+00:08:49.060 --> 00:08:49.840
+<v Joni Klippert>can use.
+
+115
+00:08:50.400 --> 00:08:55.900
+<v Joni Klippert>And so we took this open source capability and made it very highly opinionated about
+
+116
+00:08:55.900 --> 00:09:00.760
+<v Joni Klippert>how it should run and what the output should be such that it was accessible to software
+
+117
+00:09:00.760 --> 00:09:01.260
+<v Joni Klippert>engineers.
+
+118
+00:09:01.480 --> 00:09:07.100
+<v Joni Klippert>We took something that might take weeks or months to deploy, and we made it deployable
+
+119
+00:09:07.100 --> 00:09:09.700
+<v Joni Klippert>via Docker and eventually a CLI.
+
+120
+00:09:09.740 --> 00:09:11.480
+<v Joni Klippert>So it can run on your machine.
+
+121
+00:09:11.540 --> 00:09:12.680
+<v Joni Klippert>It can run in CICD.
+
+122
+00:09:13.000 --> 00:09:17.220
+<v Joni Klippert>You could point it at production assets if you wanted to, though that's not what we recommend.
+
+123
+00:09:18.000 --> 00:09:20.060
+<v Joni Klippert>We informed it via a YAML file.
+
+124
+00:09:20.260 --> 00:09:27.080
+<v Joni Klippert>With a few lines of YAML, I can actually identify a target and get a scan running in just minutes.
+
+125
+00:09:27.540 --> 00:09:35.060
+<v Joni Klippert>And then another really important piece was the output as it was finding vulnerabilities in the open source version.
+
+126
+00:09:35.120 --> 00:09:38.700
+<v Joni Klippert>It was so hard to discern what to pay attention to.
+
+127
+00:09:38.760 --> 00:09:40.520
+<v Joni Klippert>It was just garbage output.
+
+128
+00:09:40.520 --> 00:10:05.060
+<v Joni Klippert>And there's a statement that people say in cybersecurity, which is you can't get engineers to care about cybersecurity. That's bullshit. Like they do care about security. They care about quality. But if you're a software engineer and your job is to deliver value to the market, and I give you a tool with output like this, that's completely undiscernible. There's no way that they can afford to care about this.
+
+129
+00:10:05.060 --> 00:10:27.480
+<v Joni Klippert>And so we took the output of the scanning capability and made it super easy to bundle by vulnerability type, then the path, then the request response, so that you could just zero in immediately on what is the highest vulnerability, where can I go fix it, and how do I fix it fast so that I can continue my job as a software engineer of writing code.
+
+130
+00:10:27.480 --> 00:10:37.720
+<v Joni Klippert>So the MVP was, in sum, it's like taking an open source capability and just making it so easy to use and having a very PLG experience.
+
+131
+00:10:38.140 --> 00:10:52.480
+<v Joni Klippert>So something that took weeks or months to instrument, a person could come to StackHawk, they could download the scanner, point it at a target and complete the scan in around seven minutes, I think was one of our fastest deployments.
+
+132
+00:10:53.040 --> 00:10:55.540
+<v Joni Klippert>And it was often like seven minutes to 10 minutes.
+
+133
+00:10:57.480 --> 00:11:00.920
+<v Joni Klippert>And then we ended up adding, obviously, a bunch of goodies on top of that.
+
+134
+00:11:02.600 --> 00:11:04.260
+<v Noah Labhart>Let's move on to the goodies then.
+
+135
+00:11:04.420 --> 00:11:09.620
+<v Noah Labhart>So tell me about how you have, from that point, progressed and matured the product.
+
+136
+00:11:09.720 --> 00:11:14.320
+<v Noah Labhart>To wrap that in a box a little bit, what I'm looking for is how you went about building your roadmap and how you decide,
+
+137
+00:11:14.700 --> 00:11:19.040
+<v Noah Labhart>OK, this is the next most important thing to build or to address with StackHawk.
+
+138
+00:11:20.040 --> 00:11:26.540
+<v Joni Klippert>After ease of use, it started to become, how do we test APIs very thoroughly?
+
+139
+00:11:27.480 --> 00:11:34.240
+<v Joni Klippert>Legacy DAST tools didn't really have knowledge of how applications were built today.
+
+140
+00:11:34.860 --> 00:11:40.520
+<v Joni Klippert>They expected browser-based applications that you would try to spider and you look for places to have inputs,
+
+141
+00:11:40.700 --> 00:11:44.100
+<v Joni Klippert>essentially fuzz with inputs looking for outputs that generated vulnerabilities.
+
+142
+00:11:44.660 --> 00:11:50.080
+<v Joni Klippert>What we had to do was become the best possible API security testing platform
+
+143
+00:11:50.080 --> 00:11:55.660
+<v Joni Klippert>because that one API route could serve 2,000 pages on a website.
+
+144
+00:11:57.480 --> 00:12:01.780
+<v Joni Klippert>just scan the route and fix it at source. So it makes it rip and fast. And then when you fix
+
+145
+00:12:01.780 --> 00:12:08.780
+<v Joni Klippert>something, it's going to fix downstream. We went to market with REST and SOAP, and then very quickly
+
+146
+00:12:08.780 --> 00:12:14.800
+<v Joni Klippert>first to market with GraphQL testing, next gRPC testing, and then continue to add capabilities
+
+147
+00:12:14.800 --> 00:12:20.920
+<v Joni Klippert>to make sure that we could test APIs deeper, like not just really dumb fuzzing, but making sure that
+
+148
+00:12:20.920 --> 00:12:26.200
+<v Joni Klippert>we're putting in appropriate variables that help pop the right types of vulnerabilities. So there
+
+149
+00:12:27.480 --> 00:12:33.720
+<v Joni Klippert>on the scanning capability. And it was all very developer driven. So we built a product to be
+
+150
+00:12:33.720 --> 00:12:40.360
+<v Joni Klippert>automated and to be used by software engineers. And what started to happen in the market is a
+
+151
+00:12:40.360 --> 00:12:46.900
+<v Joni Klippert>couple of things. PLG in this space was slowing down as the market was starting to slow down in
+
+152
+00:12:46.900 --> 00:12:53.200
+<v Joni Klippert>2022. A lot of small companies were just trying to be companies and they were buying less software.
+
+153
+00:12:53.200 --> 00:13:01.760
+<v Joni Klippert>And then at the same time, we had been in market long enough that we started to get a lot of enterprises and evaluating stuff, which was very exciting.
+
+154
+00:13:02.080 --> 00:13:03.860
+<v Joni Klippert>But that's a big change.
+
+155
+00:13:04.800 --> 00:13:08.060
+<v Joni Klippert>And looking at our roadmap, it was, who is our ICP?
+
+156
+00:13:08.180 --> 00:13:09.060
+<v Joni Klippert>How is it evolving?
+
+157
+00:13:09.460 --> 00:13:12.380
+<v Joni Klippert>And what capabilities does this new audience need?
+
+158
+00:13:12.380 --> 00:13:18.440
+<v Joni Klippert>need. And so there've been periods in the business where we're building either very strategic,
+
+159
+00:13:18.440 --> 00:13:24.000
+<v Joni Klippert>just technology to make sure that we're being relevant, a relevant product in an API driven
+
+160
+00:13:24.000 --> 00:13:30.460
+<v Joni Klippert>world. And then there've been initiatives that are, okay, we have an evolving ICP. What do these
+
+161
+00:13:30.460 --> 00:13:37.180
+<v Joni Klippert>less technical security folks who are ultimately responsible for the security of their applications,
+
+162
+00:13:37.180 --> 00:13:42.840
+<v Joni Klippert>applications, but rely on software engineers in order to make sure that they can do their
+
+163
+00:13:42.840 --> 00:13:44.400
+<v Joni Klippert>job and build secure applications.
+
+164
+00:13:45.060 --> 00:13:46.380
+<v Joni Klippert>What do we build for them?
+
+165
+00:13:46.740 --> 00:13:53.500
+<v Joni Klippert>And so we started building more to help the security persona understand more about what
+
+166
+00:13:53.500 --> 00:13:55.080
+<v Joni Klippert>was happening in software engineering.
+
+167
+00:13:55.420 --> 00:13:57.060
+<v Joni Klippert>Like where are my APIs?
+
+168
+00:13:57.280 --> 00:13:59.060
+<v Joni Klippert>That's the thing that keeps them up at night.
+
+169
+00:13:59.160 --> 00:13:59.900
+<v Joni Klippert>They don't even know.
+
+170
+00:14:00.040 --> 00:14:01.740
+<v Joni Klippert>And we're like, they're in your code base.
+
+171
+00:14:01.920 --> 00:14:02.720
+<v Joni Klippert>They can start there.
+
+172
+00:14:02.720 --> 00:14:10.440
+<v Joni Klippert>Let me help show you where they are and then how fast that landscape is changing so you know what to put under test.
+
+173
+00:14:11.380 --> 00:14:13.960
+<v Joni Klippert>We always identify a large initiative.
+
+174
+00:14:14.060 --> 00:14:18.800
+<v Joni Klippert>We build a roadmap around that and then we fill in all the stuff that you have to fill in, right?
+
+175
+00:14:18.900 --> 00:14:22.240
+<v Joni Klippert>Like customer requests or hardening of our systems.
+
+176
+00:14:22.900 --> 00:14:25.020
+<v Joni Klippert>But that's generally how we build a roadmap.
+
+177
+00:14:26.560 --> 00:14:28.020
+<v Noah Labhart>I'm curious about team.
+
+178
+00:14:28.240 --> 00:14:30.200
+<v Noah Labhart>You know, I hear in that description, you're talking about we.
+
+179
+00:14:30.200 --> 00:14:36.100
+<v Noah Labhart>Tell me about how you built your team and what you look for in those people to indicate that they're the winning horses to join you.
+
+180
+00:14:37.440 --> 00:14:42.900
+<v Joni Klippert>Early on when we were building our technical team, I looked for experience.
+
+181
+00:14:43.060 --> 00:14:48.000
+<v Joni Klippert>I just felt like this is a really interesting problem to solve.
+
+182
+00:14:48.220 --> 00:14:50.200
+<v Joni Klippert>I think it's important to solve it.
+
+183
+00:14:50.200 --> 00:14:57.200
+<v Joni Klippert>it. I'm going to hire engineers who have several startups under their belt of building SaaS,
+
+184
+00:14:57.580 --> 00:15:03.020
+<v Joni Klippert>building authentication and multi-tenant SaaS, like building like the core pieces and a really
+
+185
+00:15:03.020 --> 00:15:09.380
+<v Joni Klippert>scalable infrastructure because the death knell is you hire inexperienced engineers to get an MVP
+
+186
+00:15:09.380 --> 00:15:13.680
+<v Joni Klippert>off. And the second you start to get traction in your business, you have to rewrite your
+
+187
+00:15:13.680 --> 00:15:20.140
+<v Joni Klippert>code base. That was not going to happen. I picked up really awesome folks that I had met in the
+
+188
+00:15:20.140 --> 00:15:27.120
+<v Joni Klippert>Boulder community or had known that I knew would help tee up this platform for success. And then
+
+189
+00:15:27.120 --> 00:15:35.200
+<v Joni Klippert>as we expanded outside of engineering, the value that I look for the most is I want to hire people
+
+190
+00:15:35.200 --> 00:15:43.200
+<v Joni Klippert>that feel an inappropriate amount of responsibility for their title for the success of this company.
+
+191
+00:15:43.680 --> 00:15:49.440
+<v Joni Klippert>I want them to care so much that they really think about the whole business and everything
+
+192
+00:15:49.440 --> 00:15:54.760
+<v Joni Klippert>that they're doing day to make sure we are in a position to succeed and to win.
+
+193
+00:15:55.260 --> 00:15:56.620
+<v Joni Klippert>Sense of responsibility.
+
+194
+00:15:56.780 --> 00:15:59.180
+<v Joni Klippert>Now, this is my job and I do this one job.
+
+195
+00:15:59.620 --> 00:16:03.040
+<v Joni Klippert>I'll do anything it takes to help make StackHawk successful.
+
+196
+00:16:03.540 --> 00:16:08.540
+<v Joni Klippert>And we've really tried to continue to find people with that.
+
+197
+00:16:08.640 --> 00:16:10.780
+<v Joni Klippert>It can be hard as you scale, right?
+
+198
+00:16:10.780 --> 00:16:15.140
+<v Joni Klippert>And you do start to hire more specific type employees than generalists.
+
+199
+00:16:15.240 --> 00:16:21.020
+<v Joni Klippert>But that fire in the belly and that level of responsibility is something we really try to screen for.
+
+200
+00:16:23.920 --> 00:16:25.400
+<v Noah Labhart>Let's flip to scalability.
+
+201
+00:16:25.540 --> 00:16:40.100
+<v Noah Labhart>And this will be interesting because, you know, who you're building for, you're building for a very opinionated group and a group that also understands scalable software and, you know, essentially requires it.
+
+202
+00:16:40.780 --> 00:16:42.340
+<v Noah Labhart>Tell me about how you approach scalability.
+
+203
+00:16:42.480 --> 00:16:45.420
+<v Noah Labhart>Was it built with scale in mind kind of from day one?
+
+204
+00:16:45.760 --> 00:16:49.520
+<v Noah Labhart>Or were there interesting areas where you've had to fight it as you've grown?
+
+205
+00:16:50.740 --> 00:16:57.940
+<v Joni Klippert>I think part of hiring really seasoned engineers have kept us out of that problem to date.
+
+206
+00:16:58.560 --> 00:17:07.040
+<v Joni Klippert>Early technical decision we made, and I honestly didn't fully understand it as we were making it because I was so used to SaaS-based software,
+
+207
+00:17:07.040 --> 00:17:10.380
+<v Joni Klippert>is we decided the deployment mechanism,
+
+208
+00:17:10.580 --> 00:17:14.440
+<v Joni Klippert>the scanning capability is deployed in the client site.
+
+209
+00:17:14.580 --> 00:17:17.700
+<v Joni Klippert>So via Docker or within your CLI.
+
+210
+00:17:18.360 --> 00:17:22.380
+<v Joni Klippert>And the choice to do that has a lot of benefit for the customer
+
+211
+00:17:22.380 --> 00:17:26.860
+<v Joni Klippert>in that when the scanner's running and it's sending thousands of attacks,
+
+212
+00:17:27.260 --> 00:17:29.900
+<v Joni Klippert>you don't want those attacks to traverse the internet
+
+213
+00:17:29.900 --> 00:17:33.900
+<v Joni Klippert>because it's going to take a very long time for that scan to run.
+
+214
+00:17:33.900 --> 00:17:44.660
+<v Joni Klippert>So if it's instead running right next to where your code lives, your code base is, that round trip time is really fast and it makes the scanning capability really fast.
+
+215
+00:17:45.220 --> 00:17:51.220
+<v Joni Klippert>But the thing that it did for StackHawk is we aren't having to scale the scanning engine ourselves.
+
+216
+00:17:51.220 --> 00:17:59.440
+<v Joni Klippert>selves. So it's a very sort of inexpensive and highly scalable platform to run because as the
+
+217
+00:17:59.440 --> 00:18:03.820
+<v Joni Klippert>scanner turns on, it's phoning home and we're getting all of the telemetry and streaming results
+
+218
+00:18:03.820 --> 00:18:09.880
+<v Joni Klippert>live. And so there's a very heavy SaaS component to the business, but we aren't having to scale
+
+219
+00:18:09.880 --> 00:18:16.920
+<v Joni Klippert>and manage scan runners on behalf of customers all over the world, running as many scans as
+
+220
+00:18:16.920 --> 00:18:22.720
+<v Joni Klippert>possible. So that was a very smart technical decision that had benefits for both sort of
+
+221
+00:18:22.720 --> 00:18:26.320
+<v Joni Klippert>the cost of running StackHawk, but also the experience for the customer.
+
+222
+00:18:28.860 --> 00:18:32.500
+<v Noah Labhart>As you step out on a balcony and you look across all that you've built,
+
+223
+00:18:32.560 --> 00:18:34.720
+<v Noah Labhart>with StackHawk in particular, what are you most proud of?
+
+224
+00:18:35.880 --> 00:18:42.600
+<v Joni Klippert>As a product person, what I would quickly say is the product's very elegant. You have brands,
+
+225
+00:18:42.600 --> 00:18:47.980
+<v Joni Klippert>brands, household name brands using your product and telling you how much they love it. There is a
+
+226
+00:18:47.980 --> 00:18:54.720
+<v Joni Klippert>an incredible amount of pride that I feel associated with that. But more than the product,
+
+227
+00:18:55.000 --> 00:19:03.000
+<v Joni Klippert>our team is killer. Like our company culture is so much fun. Those early engineers I talked about
+
+228
+00:19:03.000 --> 00:19:08.040
+<v Joni Klippert>still work here. That's their five and a half years in and they love coming to work. They
+
+229
+00:19:08.040 --> 00:19:09.140
+<v Joni Klippert>They love each other.
+
+230
+00:19:09.580 --> 00:19:12.520
+<v Joni Klippert>It's just a really special place to be.
+
+231
+00:19:12.720 --> 00:19:25.100
+<v Joni Klippert>And when one chooses to work this hard and do something like a startup, part of the value of that is you get to pick the people that you work with and build incredible relationships with them.
+
+232
+00:19:25.280 --> 00:19:34.440
+<v Joni Klippert>So for me, the team, the cultural organism that is StackHawk is something that I'm blessed to be a part of and really proud of.
+
+233
+00:19:36.740 --> 00:19:42.240
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+234
+00:19:43.560 --> 00:19:52.980
+<v Joni Klippert>We launched the product with a very PLG focus. So easy to try and buy land and expand software. That's everything in DevOps. It's nothing in cybersecurity.
+
+235
+00:19:53.640 --> 00:20:01.720
+<v Joni Klippert>It was actually really interesting to investors to be like, okay, you're not the 3000 company trying to sell to a CISO.
+
+236
+00:20:01.720 --> 00:20:07.540
+<v Joni Klippert>those poor people. They're just inundated with enterprise top-down sales. And we're like,
+
+237
+00:20:07.620 --> 00:20:11.880
+<v Joni Klippert>no way. This is sign up for a trial, use the product, open documentation.
+
+238
+00:20:12.560 --> 00:20:17.460
+<v Joni Klippert>And the foundation of the company being that was really important. And I think it still
+
+239
+00:20:17.460 --> 00:20:24.140
+<v Joni Klippert>has a lot of value for StackHawk because people can tinker, play, get familiar with the product.
+
+240
+00:20:24.320 --> 00:20:27.500
+<v Joni Klippert>And then once they enter a POV in a more enterprise sales cycle,
+
+241
+00:20:27.680 --> 00:20:31.260
+<v Joni Klippert>it's super fast because they've had some experience with the product.
+
+242
+00:20:31.720 --> 00:20:54.580
+<v Joni Klippert>But the market was shifting. We're moving into more enterprise sales. The top of mind was the most normal stuff, which is, okay, can we close these guys? These are huge customers. Do we have the product for them to be happy and successful? Are there a bunch of features they need that are different than when you're serving an SMB clientele?
+
+243
+00:20:55.200 --> 00:20:57.940
+<v Joni Klippert>Fortunately, we had built a lot of those, so that was good.
+
+244
+00:20:58.220 --> 00:20:59.180
+<v Joni Klippert>Will they grow?
+
+245
+00:20:59.440 --> 00:21:00.320
+<v Joni Klippert>Will they adopt?
+
+246
+00:21:00.540 --> 00:21:01.880
+<v Joni Klippert>And then can I find more?
+
+247
+00:21:02.160 --> 00:21:06.220
+<v Joni Klippert>And I think a mistake we made, we just let it happen to us.
+
+248
+00:21:06.620 --> 00:21:10.880
+<v Joni Klippert>We were rapidly trying to answer all of those questions that I just mentioned.
+
+249
+00:21:11.080 --> 00:21:19.100
+<v Joni Klippert>And at the same time, we were spending a lot of money on an inbound focus demand gen marketing
+
+250
+00:21:19.100 --> 00:21:35.020
+<v Joni Klippert>That works in SMB and it can provide air cover for enterprise sales, but it's a little wasteful because you really have to shift the motion to a more sophisticated enterprise and sometimes top-down sale.
+
+251
+00:21:35.020 --> 00:21:52.400
+<v Joni Klippert>And I think we waited too long to do that. Like I would have augmented the team faster and get more bench in enterprise sales faster, rather than making sure we checked off every single box of that handful of questions that I shared early on.
+
+252
+00:21:55.000 --> 00:21:57.680
+<v Noah Labhart>Joni, this will be interesting to hear.
+
+253
+00:21:57.800 --> 00:22:03.220
+<v Noah Labhart>And I always get excited to talk about the future, right, with the founders and what's next and where are you going?
+
+254
+00:22:03.360 --> 00:22:04.740
+<v Noah Labhart>So tell me about that future.
+
+255
+00:22:04.880 --> 00:22:08.360
+<v Noah Labhart>What does it look like for the product, for your team and for the whole company?
+
+256
+00:22:08.800 --> 00:22:18.740
+<v Joni Klippert>Yeah, I think the market is really starting to understand, the cybersecurity market, the importance of a really strong API security platform.
+
+257
+00:22:18.740 --> 00:22:25.040
+<v Joni Klippert>platform. Early on, and even within the last couple of years, I think there's been a lot of
+
+258
+00:22:25.040 --> 00:22:31.820
+<v Joni Klippert>fear from the cybersecurity side of, oh gosh, so many APIs, they're getting released so fast,
+
+259
+00:22:32.040 --> 00:22:37.660
+<v Joni Klippert>we can't keep up, we don't know where they are. With our journey, the evolution has been, okay,
+
+260
+00:22:37.700 --> 00:22:44.900
+<v Joni Klippert>create a super fast, can run in pipeline, developer first testing capability. And then it was, okay,
+
+261
+00:22:44.900 --> 00:22:50.880
+<v Joni Klippert>okay, we have a great product to test APIs, but our buyer is in cybersecurity and they don't even
+
+262
+00:22:50.880 --> 00:22:56.320
+<v Joni Klippert>know what APIs and applications they have. So let's help them. So that was the next piece,
+
+263
+00:22:56.500 --> 00:23:01.720
+<v Joni Klippert>which is, okay, this is what your landscape, your attack surface looks like. Here's how fast it's
+
+264
+00:23:01.720 --> 00:23:07.280
+<v Joni Klippert>changing. And we can even tell you in advance before an API or an application has been shipped
+
+265
+00:23:07.280 --> 00:23:11.160
+<v Joni Klippert>to prod that it's under development. So you can make sure that thing is tested.
+
+266
+00:23:11.160 --> 00:23:16.400
+<v Joni Klippert>And what that has illuminated is the scope of the problem.
+
+267
+00:23:16.990 --> 00:23:26.520
+<v Joni Klippert>If you're a mid-market company, you easily have 1,000 or 2,000 repositories in whatever code repository that you're using.
+
+268
+00:23:26.700 --> 00:23:36.620
+<v Joni Klippert>And we see about 30 to 50% of those repositories contain APIs or applications that need to be under test with something like StackHawk.
+
+269
+00:23:36.620 --> 00:23:45.600
+<v Joni Klippert>And that is very overwhelming for a security professional to realize that they have to get all of that under test and they need to use their developers to help them.
+
+270
+00:23:45.600 --> 00:24:10.740
+<v Joni Klippert>The future of our roadmap is pretty AI heavy, but it's AI heavy in that we can do things that allow us to introspect the code base and get all of these assets under test very quickly and remove a lot of sort of the cumbersome human manual components of filling out a YAML file and knowing what your authentication mechanism is.
+
+271
+00:24:10.740 --> 00:24:16.340
+<v Joni Klippert>And when you introspect the code base and use AI, it is so much faster.
+
+272
+00:24:16.540 --> 00:24:21.100
+<v Joni Klippert>You could have written code for it before, but it would take a long time.
+
+273
+00:24:21.620 --> 00:24:25.580
+<v Joni Klippert>And now we can just move a lot faster for our customers.
+
+274
+00:24:25.700 --> 00:24:33.560
+<v Joni Klippert>So it's a lot about ease of use and testing your APIs at scale and leveraging AI to help us do that.
+
+275
+00:24:34.140 --> 00:24:35.400
+<v Noah Labhart>Let's switch to you, Joni.
+
+276
+00:24:35.440 --> 00:24:37.600
+<v Noah Labhart>Who influences the way that you work?
+
+277
+00:24:37.760 --> 00:24:39.700
+<v Noah Labhart>Name a person or many persons or something.
+
+278
+00:24:40.740 --> 00:24:41.240
+<v Noah Labhart>who and why.
+
+279
+00:24:41.960 --> 00:24:50.260
+<v Joni Klippert>The first CEO I worked for is a woman that was building technology in the child care,
+
+280
+00:24:50.380 --> 00:24:56.900
+<v Joni Klippert>home care industry. And to be perfectly honest, I didn't care at all about what this company did.
+
+281
+00:24:57.040 --> 00:25:03.180
+<v Joni Klippert>Like it was not passion of mine at all. But when I met her, I was like, I have to work for this
+
+282
+00:25:03.180 --> 00:25:10.300
+<v Joni Klippert>woman. She's just had such a presence. She was so convicted, so strong willed. And I was really
+
+283
+00:25:10.740 --> 00:25:18.300
+<v Joni Klippert>to learn from her. And to this day, that was pre-grad school. She is a coach of mine. And so
+
+284
+00:25:18.300 --> 00:25:22.880
+<v Joni Klippert>when I approach her with things about how I work, how I show up for my team,
+
+285
+00:25:23.160 --> 00:25:29.260
+<v Joni Klippert>she really helps me with that. And then Todd Vernon, I had the pleasure of working for
+
+286
+00:25:29.260 --> 00:25:36.720
+<v Joni Klippert>at VictorOps. And when you are a first-time CEO, a first-time founder, there are a lot of
+
+287
+00:25:36.720 --> 00:25:41.800
+<v Joni Klippert>of things that come your way that you have never thought about before. And having a great CEO coach
+
+288
+00:25:41.800 --> 00:25:47.740
+<v Joni Klippert>and mentor to help you understand what is important. And sometimes to help you realize
+
+289
+00:25:47.740 --> 00:25:53.720
+<v Joni Klippert>there actually isn't a decision to be made here. I know you think there is, but here's how this is
+
+290
+00:25:53.720 --> 00:26:00.360
+<v Joni Klippert>going to play out. It's really useful to have somebody with so much experience helping to
+
+291
+00:26:00.360 --> 00:26:05.380
+<v Joni Klippert>filter through the noise and helping me focus on what is really important in this job. So
+
+292
+00:26:06.720 --> 00:26:09.380
+<v Joni Klippert>I'm very fortunate to have those two in my corner.
+
+293
+00:26:10.440 --> 00:26:11.380
+<v Noah Labhart>Joni, last question.
+
+294
+00:26:11.640 --> 00:26:16.820
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+295
+00:26:16.920 --> 00:26:22.860
+<v Noah Labhart>Maybe they're on their way to go to a Michelin restaurant with you and they just want to show off the thing that they have built.
+
+296
+00:26:23.020 --> 00:26:24.260
+<v Noah Labhart>They're jazzed about it.
+
+297
+00:26:24.320 --> 00:26:26.180
+<v Noah Labhart>They can't wait to show it to you right there on the plane.
+
+298
+00:26:26.280 --> 00:26:30.100
+<v Noah Labhart>What advice do you want to give that person having gone down this road a bit?
+
+299
+00:26:31.200 --> 00:26:32.640
+<v Joni Klippert>First, congratulations, person.
+
+300
+00:26:32.640 --> 00:26:39.240
+<v Joni Klippert>person. I'm very happy that you were so excited and have built the next great thing. But what I
+
+301
+00:26:39.240 --> 00:26:47.000
+<v Joni Klippert>would say is this job, the amount of responsibility associated with being a founder is very high.
+
+302
+00:26:48.080 --> 00:26:52.620
+<v Joni Klippert>I'm giving this advice to both the person sitting next to me on the airplane and myself right now.
+
+303
+00:26:53.920 --> 00:27:01.220
+<v Joni Klippert>There is a danger a little bit in no longer being able to discern yourself as a human being from
+
+304
+00:27:02.640 --> 00:27:09.300
+<v Joni Klippert>It can be very dangerous to have your identity completely tied to what you do and your company.
+
+305
+00:27:09.540 --> 00:27:12.460
+<v Joni Klippert>And so what I would say to this person is enjoy it.
+
+306
+00:27:12.860 --> 00:27:17.340
+<v Joni Klippert>And I understand the responsibility and I understand how easy that is.
+
+307
+00:27:17.480 --> 00:27:26.860
+<v Joni Klippert>But also to carve out time for the other humans in your life and build tools to be really present with them.
+
+308
+00:27:26.960 --> 00:27:30.020
+<v Joni Klippert>Because one day that company won't be your identity anymore.
+
+309
+00:27:30.020 --> 00:27:36.160
+<v Joni Klippert>more. And you want to know who you are when that's all done and have all your champions that have
+
+310
+00:27:36.160 --> 00:27:40.120
+<v Joni Klippert>been cheering you on along the way, continuing to have really great relationships with them.
+
+311
+00:27:40.480 --> 00:27:45.060
+<v Noah Labhart>That's fantastic advice. Couldn't agree more. Well, Joni, thank you for being on the show today.
+
+312
+00:27:45.120 --> 00:27:47.580
+<v Noah Labhart>And thank you for telling the creation story of StackHawk.
+
+313
+00:27:47.900 --> 00:27:49.200
+<v Joni Klippert>Thank you for having me.
+
+314
+00:27:51.420 --> 00:27:54.160
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+315
+00:27:59.000 --> 00:28:02.120
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+316
+00:28:02.240 --> 00:28:07.020
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+317
+00:28:07.620 --> 00:28:09.840
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+318
+00:28:10.120 --> 00:28:12.160
+<v Noah Labhart>Both things help us out tremendously.
+
+319
+00:28:14.960 --> 00:28:16.460
+<v Noah Labhart>And thanks again for listening.

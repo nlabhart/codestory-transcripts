@@ -1,0 +1,1667 @@
+WEBVTT
+
+NOTE S9 Bonus: The Edge-Computing Architecture Blueprint: Breaking Server Latency and Scaling Developer-First Feature Flags with Jonathan Norris, Co-Founder & CTO of DevCycle & Taplytics
+
+1
+00:00:01.100 --> 00:00:10.080
+<v Jonathan Norris>So we had this incredible opportunity with a FANG company to deploy the email marketing automation software we had developed at Taplytics on premise.
+
+2
+00:00:10.340 --> 00:00:14.440
+<v Jonathan Norris>We had not much of a product for email marketing at that time.
+
+3
+00:00:14.560 --> 00:00:21.340
+<v Jonathan Norris>We were the only software vendor inside of that big company that was connecting multiple of their internal systems together.
+
+4
+00:00:21.600 --> 00:00:29.300
+<v Jonathan Norris>We had to do a lot of legwork just to get those different parts of the company to talk to each other, to integrate our software with a lot of these very legacy systems.
+
+5
+00:00:31.000 --> 00:00:38.660
+<v Jonathan Norris>That really hurt our momentum because we had a ton of our resources focused on getting this fork of our software working.
+
+6
+00:00:39.280 --> 00:00:40.880
+<v Jonathan Norris>I'm Jonathan Norris.
+
+7
+00:00:40.900 --> 00:00:43.600
+<v Jonathan Norris>I'm the co-founder and CTO at DevCycle.
+
+8
+00:00:46.500 --> 00:00:52.140
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:52.320 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+10
+00:00:53.760 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+11
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+12
+00:00:58.300 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+13
+00:01:01.460 --> 00:01:02.020
+<v Clip>Who
+
+14
+00:01:02.020 --> 00:01:04.540
+<v Noah Labhart>built the teams that have their back.
+
+15
+00:01:08.920 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+16
+00:01:13.800 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+17
+00:01:15.460 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+18
+00:01:18.260 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+19
+00:01:19.980 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+20
+00:01:22.780 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+21
+00:01:26.120 --> 00:01:27.600
+<v Clip>You need to really want it.
+
+22
+00:01:27.640 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+23
+00:01:28.940 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+24
+00:01:32.480 --> 00:01:37.780
+<v Noah Labhart>I'm your host, Noah Labhart, and today how Jonathan Norris is giving you, the developer,
+
+25
+00:01:38.060 --> 00:01:43.340
+<v Noah Labhart>a way to manage features for your CD pipeline one flag at a time.
+
+26
+00:01:47.740 --> 00:01:52.360
+<v Noah Labhart>Jonathan Norris lives in Toronto and has a passion for tech that started early in his life.
+
+27
+00:01:52.560 --> 00:01:57.440
+<v Noah Labhart>He has participated in the FIRST Robotics competition which got him into mechanical engineering,
+
+28
+00:01:58.940 --> 00:02:00.300
+<v Noah Labhart>leading teams to world championships.
+
+29
+00:02:00.720 --> 00:02:03.480
+<v Noah Labhart>He still actively volunteers and mentors people
+
+30
+00:02:03.480 --> 00:02:04.400
+<v Noah Labhart>in the program today.
+
+31
+00:02:04.900 --> 00:02:06.700
+<v Noah Labhart>But outside of tech, he's a new dad
+
+32
+00:02:06.700 --> 00:02:09.020
+<v Noah Labhart>and stays quite busy parenting his kid
+
+33
+00:02:09.020 --> 00:02:10.760
+<v Noah Labhart>when he's not riding an e-bike to work.
+
+34
+00:02:12.540 --> 00:02:15.580
+<v Noah Labhart>In winter 2014, Jonathan and his founding team
+
+35
+00:02:15.580 --> 00:02:17.920
+<v Noah Labhart>did Y Combinator and formed Taplytics.
+
+36
+00:02:18.600 --> 00:02:20.420
+<v Noah Labhart>After doing this for nearly 10 years,
+
+37
+00:02:20.700 --> 00:02:23.400
+<v Noah Labhart>what his team noticed was the most passionate users
+
+38
+00:02:23.400 --> 00:02:25.480
+<v Noah Labhart>were developers using feature flagging
+
+39
+00:02:25.480 --> 00:02:27.220
+<v Noah Labhart>over the core offering of the product.
+
+40
+00:02:28.940 --> 00:02:32.400
+<v Noah Labhart>they decided to spin out a new brand to focus on just that.
+
+41
+00:02:34.600 --> 00:02:37.360
+<v Noah Labhart>This is the creation story of DevCycle.
+
+42
+00:02:42.440 --> 00:02:47.180
+<v Jonathan Norris>DevCycle, the product's about two, two and a half years old at this point.
+
+43
+00:02:47.300 --> 00:02:51.800
+<v Jonathan Norris>And it's an interesting story because our sort of parent company is called Taplytics.
+
+44
+00:02:51.880 --> 00:02:53.860
+<v Jonathan Norris>And DevCycle's really our second product.
+
+45
+00:02:53.920 --> 00:02:56.600
+<v Jonathan Norris>It's the pivot of our company where we're going.
+
+46
+00:02:56.600 --> 00:02:59.820
+<v Jonathan Norris>And Taplytics, we've been around for about 10 years.
+
+47
+00:02:59.980 --> 00:03:03.300
+<v Jonathan Norris>We did YC back in winter 2014.
+
+48
+00:03:04.180 --> 00:03:09.280
+<v Jonathan Norris>We came from the mobile A-B testing and feature flagging space.
+
+49
+00:03:09.600 --> 00:03:16.100
+<v Jonathan Norris>And really, Taplytics at its core at the start was the first way to do visual, like no-code
+
+50
+00:03:16.100 --> 00:03:20.900
+<v Jonathan Norris>A-B testing with native iOS and Android mobile apps.
+
+51
+00:03:20.900 --> 00:03:27.060
+<v Jonathan Norris>And over the years, we grew that business into a pretty successful, self-sustaining business.
+
+52
+00:03:27.200 --> 00:03:32.580
+<v Jonathan Norris>We raised some money in about 2017, and we're able to create a pretty healthy business around that product.
+
+53
+00:03:32.720 --> 00:03:34.400
+<v Jonathan Norris>And that product had gotten really wide.
+
+54
+00:03:34.440 --> 00:03:39.220
+<v Jonathan Norris>It had gotten to the point where it was a really wide marketing automation tool set,
+
+55
+00:03:39.300 --> 00:03:44.880
+<v Jonathan Norris>where you could do everything from those kind of no-code A-B testing on mobile, on web.
+
+56
+00:03:45.140 --> 00:03:49.560
+<v Jonathan Norris>We had push notifications. We had a full sort of audience system behind it.
+
+57
+00:03:50.900 --> 00:03:54.960
+<v Jonathan Norris>I don't know, a relatively sort of small-ish team around 50 people.
+
+58
+00:03:55.400 --> 00:04:01.300
+<v Jonathan Norris>The interesting nugget we found were our most passionate and daily users of the product
+
+59
+00:04:01.300 --> 00:04:05.480
+<v Jonathan Norris>were actually developers using our platform for feature flagging.
+
+60
+00:04:05.800 --> 00:04:10.840
+<v Jonathan Norris>At its core, it was really more of an A-B testing product for kind of more for marketing and product people.
+
+61
+00:04:11.120 --> 00:04:18.460
+<v Jonathan Norris>And we saw this very consistent daily usage from engineering teams who were shipping features for their customers
+
+62
+00:04:18.460 --> 00:04:23.660
+<v Jonathan Norris>and just using our in-code SDKs for feature flagging for deploying their products.
+
+63
+00:04:23.840 --> 00:04:25.120
+<v Jonathan Norris>And that was really interesting to us.
+
+64
+00:04:25.260 --> 00:04:32.200
+<v Jonathan Norris>And at the same time, actually, internally, we were trying to move more towards continuous deployment
+
+65
+00:04:32.200 --> 00:04:34.260
+<v Jonathan Norris>and shipping our own features faster.
+
+66
+00:04:34.440 --> 00:04:37.180
+<v Jonathan Norris>And so we were actually using our own feature flagging tools to do that.
+
+67
+00:04:38.060 --> 00:04:42.420
+<v Jonathan Norris>To be honest, there was some headwinds, especially in the mobile A-B testing and no-code solution.
+
+68
+00:04:42.420 --> 00:04:45.100
+<v Jonathan Norris>like the transition from Objective-C to Swift
+
+69
+00:04:45.100 --> 00:04:46.580
+<v Jonathan Norris>and some of the new libraries
+
+70
+00:04:46.580 --> 00:04:48.360
+<v Jonathan Norris>really limited our ability to do
+
+71
+00:04:48.360 --> 00:04:50.440
+<v Jonathan Norris>a lot of the no-code stuff we were doing
+
+72
+00:04:50.440 --> 00:04:52.100
+<v Jonathan Norris>with native iOS and Android apps.
+
+73
+00:04:52.420 --> 00:04:54.640
+<v Jonathan Norris>We definitely saw some headwinds coming.
+
+74
+00:04:54.720 --> 00:04:56.720
+<v Jonathan Norris>Okay, we need to fundamentally change this business
+
+75
+00:04:56.720 --> 00:04:58.220
+<v Jonathan Norris>to see growth in it.
+
+76
+00:04:58.360 --> 00:05:00.140
+<v Jonathan Norris>And so that drove us in the direction of,
+
+77
+00:05:00.160 --> 00:05:03.380
+<v Jonathan Norris>okay, what if we create a really great focus product
+
+78
+00:05:03.380 --> 00:05:05.200
+<v Jonathan Norris>for developers, for engineers,
+
+79
+00:05:05.480 --> 00:05:07.440
+<v Jonathan Norris>focus on a great feature flagging experience?
+
+80
+00:05:07.920 --> 00:05:10.000
+<v Jonathan Norris>That was really what DevCycle has become
+
+81
+00:05:10.000 --> 00:05:12.080
+<v Jonathan Norris>over the last couple of years.
+
+82
+00:05:14.420 --> 00:05:18.740
+<v Noah Labhart>Let's dive into what you would consider the MVP of DevCycle, right?
+
+83
+00:05:18.820 --> 00:05:23.600
+<v Noah Labhart>So what that first version of the product that you built or moved to, tell me how long
+
+84
+00:05:23.600 --> 00:05:27.060
+<v Noah Labhart>it took you to build, what sort of tools you used to bring it to life and anything around
+
+85
+00:05:27.060 --> 00:05:27.560
+<v Noah Labhart>there.
+
+86
+00:05:29.380 --> 00:05:35.380
+<v Jonathan Norris>We had a really interesting decision to make because with Taplytics, we had a feature flagging
+
+87
+00:05:35.380 --> 00:05:40.660
+<v Jonathan Norris>product and we had an infrastructure that we'd built up over 10 years of serving that
+
+88
+00:05:40.660 --> 00:05:41.160
+<v Jonathan Norris>product.
+
+89
+00:05:42.420 --> 00:05:48.420
+<v Jonathan Norris>traditional large AWS deployment, thousands of cores of CPUs and AWS serving this large sort of
+
+90
+00:05:48.420 --> 00:05:56.260
+<v Jonathan Norris>centralized API cluster. Do we just reskin the existing product in Taplytics and create a better
+
+91
+00:05:56.260 --> 00:06:02.140
+<v Jonathan Norris>like UI and experience and maybe a new set of APIs around that existing infrastructure? Or do we go
+
+92
+00:06:02.140 --> 00:06:08.360
+<v Jonathan Norris>full Greenfield and redo everything from the ground up? As you can probably hear, we did the
+
+93
+00:06:08.360 --> 00:06:14.000
+<v Jonathan Norris>the Greenfield approach. And the real reason for that was, yes, like, it was more technically
+
+94
+00:06:14.000 --> 00:06:17.720
+<v Jonathan Norris>interesting to do that. Like, our engineers are going to have a lot more fun building out a
+
+95
+00:06:17.720 --> 00:06:22.840
+<v Jonathan Norris>Greenfield project than trying to reskin our old product. But the real reason behind it was
+
+96
+00:06:22.840 --> 00:06:28.640
+<v Jonathan Norris>more architectural, where we learned over the years that serving 10s or 100s of billions of
+
+97
+00:06:28.640 --> 00:06:34.520
+<v Jonathan Norris>HTTP requests every month with a large sort of AWS deployment, how costly that is to do,
+
+98
+00:06:34.520 --> 00:06:36.120
+<v Jonathan Norris>how hard it is to scale that.
+
+99
+00:06:36.300 --> 00:06:39.720
+<v Jonathan Norris>And especially serving mobile applications with Taplytics,
+
+100
+00:06:39.820 --> 00:06:42.580
+<v Jonathan Norris>we had served some of the largest mobile applications in the world.
+
+101
+00:06:42.680 --> 00:06:45.800
+<v Jonathan Norris>Companies like Grubhub, and we had Tinder as a client in the past,
+
+102
+00:06:45.800 --> 00:06:46.320
+<v Jonathan Norris>and things like that.
+
+103
+00:06:46.380 --> 00:06:49.120
+<v Jonathan Norris>And we had learned that a ton of that traffic is super spiky.
+
+104
+00:06:49.220 --> 00:06:51.180
+<v Jonathan Norris>A lot of it comes in from push notifications.
+
+105
+00:06:51.480 --> 00:06:55.580
+<v Jonathan Norris>So you can imagine a news app, some push notification gets sent to that app,
+
+106
+00:06:55.820 --> 00:06:59.580
+<v Jonathan Norris>and their load will increase by a thousand times.
+
+107
+00:06:59.960 --> 00:07:04.240
+<v Jonathan Norris>You'll literally see like half a million people open the app all within.
+
+108
+00:07:04.520 --> 00:07:11.440
+<v Jonathan Norris>less than a minute, right? Managing that type of very spiky load in sort of a traditional
+
+109
+00:07:11.440 --> 00:07:17.860
+<v Jonathan Norris>large sort of like AWS autoscale deployment is really hard. So with DevCycle, we're like, okay,
+
+110
+00:07:17.900 --> 00:07:24.040
+<v Jonathan Norris>how can we flip the architecture of this system? And how we did that is in two ways. The first,
+
+111
+00:07:24.080 --> 00:07:28.660
+<v Jonathan Norris>investing in edge computing. Instead of sort of us running our own servers, we're using edge
+
+112
+00:07:28.660 --> 00:07:33.040
+<v Jonathan Norris>computing and the theory there is that you basically can ship your code to the
+
+113
+00:07:33.040 --> 00:07:37.620
+<v Jonathan Norris>edge and Cloudflare will run it for you and automatically scale it across there
+
+114
+00:07:37.620 --> 00:07:41.280
+<v Jonathan Norris>hundreds of data centers all around the world so for you there might be a data
+
+115
+00:07:41.280 --> 00:07:45.280
+<v Jonathan Norris>center in Dallas or somewhere in Texas that's serving your local traffic and
+
+116
+00:07:45.280 --> 00:07:48.240
+<v Jonathan Norris>there's a data center here in Toronto that's serving our traffic and serving
+
+117
+00:07:48.240 --> 00:07:52.340
+<v Jonathan Norris>that worker and there's not like a centralized system and the other way we
+
+118
+00:07:52.340 --> 00:07:57.220
+<v Jonathan Norris>flipped our architecture is trying to move our core logic as close to the end
+
+119
+00:07:58.660 --> 00:08:00.280
+<v Jonathan Norris>The edge is one part of that.
+
+120
+00:08:00.320 --> 00:08:07.900
+<v Jonathan Norris>The other part of that is actually moving a lot of our business logic into the SDKs that our customers are running in their own platform.
+
+121
+00:08:08.140 --> 00:08:13.640
+<v Jonathan Norris>So all of our server SDKs, all the business logic is now actually not running in our servers.
+
+122
+00:08:13.740 --> 00:08:17.360
+<v Jonathan Norris>It's running in their servers by the SDKs they're installing.
+
+123
+00:08:17.480 --> 00:08:24.300
+<v Jonathan Norris>That core architectural change and flip required us to rethink a lot of our products and our decisions.
+
+124
+00:08:24.300 --> 00:08:41.560
+<v Jonathan Norris>And then on the non sort of like deep technical side of things, we also took a look at the landscape, took a look at how teams were actually using feature flags at scale and wanted to rethink that a little bit so that we could better model how teams actually develop software.
+
+125
+00:08:42.240 --> 00:08:50.200
+<v Jonathan Norris>Engineering teams are generally consisted of a bunch of smaller teams that are working on maybe one or maybe two features at a time.
+
+126
+00:08:50.200 --> 00:09:00.180
+<v Jonathan Norris>But for most feature flagging platforms, when you go to their kind of dashboard, you just see like a giant list of in some of these large orgs, like hundreds or thousands of flags.
+
+127
+00:09:01.220 --> 00:09:03.560
+<v Jonathan Norris>Nobody knows what all those flags mean.
+
+128
+00:09:03.760 --> 00:09:12.620
+<v Jonathan Norris>And we thought we could remodel how feature flags are organized to better match how teams actually like small teams actually write and develop software.
+
+129
+00:09:12.800 --> 00:09:17.340
+<v Jonathan Norris>So our top level kind of organization layer is like, what feature are you working on?
+
+130
+00:09:17.340 --> 00:09:19.960
+<v Jonathan Norris>Are you working on this audit logging feature?
+
+131
+00:09:20.120 --> 00:09:23.320
+<v Jonathan Norris>Are you working on this new checkout flow feature?
+
+132
+00:09:23.480 --> 00:09:25.200
+<v Jonathan Norris>That's the feature that your team is working on.
+
+133
+00:09:25.360 --> 00:09:30.780
+<v Jonathan Norris>And then under that feature, you might have one flag or you might have 100 flags associated
+
+134
+00:09:30.780 --> 00:09:31.660
+<v Jonathan Norris>with that feature.
+
+135
+00:09:31.780 --> 00:09:38.640
+<v Jonathan Norris>And then within that organization layer, you can then go and see in one page how you're
+
+136
+00:09:38.640 --> 00:09:43.540
+<v Jonathan Norris>targeting users to those feature flags and where that feature flag is enabled across
+
+137
+00:09:43.540 --> 00:09:45.800
+<v Jonathan Norris>all of your multitude of environment.
+
+138
+00:09:47.340 --> 00:09:51.540
+<v Jonathan Norris>us was like, when you're trying to manage your feature flags at scale, you shouldn't have to
+
+139
+00:09:51.540 --> 00:09:57.280
+<v Jonathan Norris>like bounce between 10 different tabs to figure out where that flag is enabled on all your different
+
+140
+00:09:57.280 --> 00:10:02.180
+<v Jonathan Norris>environments. And it should be really clear to the organization as a whole who owns the different
+
+141
+00:10:02.180 --> 00:10:08.600
+<v Jonathan Norris>flags and which parts of the organization own those different features. And that allows a bunch
+
+142
+00:10:08.600 --> 00:10:13.960
+<v Jonathan Norris>of cool things where like teams now trust their whole engineering and product teams to be in
+
+143
+00:10:13.960 --> 00:10:19.140
+<v Jonathan Norris>our DevCycle platform, where with a lot of other platforms, where they historically have gone,
+
+144
+00:10:19.200 --> 00:10:26.040
+<v Jonathan Norris>sort of get really locked down into having one owner of their feature flags, who sort of control,
+
+145
+00:10:26.340 --> 00:10:31.080
+<v Jonathan Norris>who are like the master controllers, who act and it creates a lot of siloing where we're trying to,
+
+146
+00:10:31.080 --> 00:10:32.820
+<v Jonathan Norris>yeah, we're trying to break out of that a little bit.
+
+147
+00:10:34.260 --> 00:10:40.780
+<v Noah Labhart>You've got that, you know, version of the product, you're ready to move forward. How did you progress
+
+148
+00:10:41.780 --> 00:10:45.460
+<v Noah Labhart>point? How have you matured it? And I think to wrap in a box a little bit, Jonathan, what I'm
+
+149
+00:10:45.460 --> 00:10:50.600
+<v Noah Labhart>looking for is like, how do you build your roadmap? How do you go about deciding this is the next most
+
+150
+00:10:50.600 --> 00:10:53.440
+<v Noah Labhart>important thing to build or to address with DevCycle?
+
+151
+00:10:54.500 --> 00:10:56.880
+<v Jonathan Norris>It was tough for us. And I think it's
+
+152
+00:10:56.880 --> 00:11:01.820
+<v Jonathan Norris>tough for everyone to sort that out because we had a host of existing customers that were using
+
+153
+00:11:01.820 --> 00:11:07.020
+<v Jonathan Norris>our Taplytics products that we wanted to migrate over to DevCycle, right? We want to capture that
+
+154
+00:11:07.020 --> 00:11:11.940
+<v Jonathan Norris>revenue and migrate those customers over from one product to the next, which was really hard.
+
+155
+00:11:12.660 --> 00:11:18.000
+<v Jonathan Norris>With DevCycle, we got, I think within about less than six months, we got to a point where
+
+156
+00:11:18.000 --> 00:11:24.740
+<v Jonathan Norris>we built our API, we built our website, we got the full end-to-end flow going, and then we had
+
+157
+00:11:24.740 --> 00:11:30.400
+<v Jonathan Norris>to make the decision, okay, how do we now get this in the hands of customers? There's a couple of
+
+158
+00:11:30.400 --> 00:11:35.480
+<v Jonathan Norris>early customers that are like us that were really relying on TypeScript and Node.js and things like
+
+159
+00:11:37.020 --> 00:11:43.480
+<v Jonathan Norris>platform, you have the problem of the multitude of SDKs, where there's a never ending list of SDKs
+
+160
+00:11:43.480 --> 00:11:48.660
+<v Jonathan Norris>and platforms that you can support with feature flagging. And to have a wide product base,
+
+161
+00:11:48.740 --> 00:11:53.220
+<v Jonathan Norris>you have to do that. You have to have a lot of those SDKs. And the ways you can sort of short
+
+162
+00:11:53.220 --> 00:11:57.880
+<v Jonathan Norris>circuit that problem, instead of creating what I was describing earlier, like those local bucketing
+
+163
+00:11:57.880 --> 00:12:04.060
+<v Jonathan Norris>SDKs, where everything's being evaluated locally, you can rely on your like your HTTP endpoints to
+
+164
+00:12:04.060 --> 00:12:09.880
+<v Jonathan Norris>to be those SDKs. And we call those our cloud SDKs. And so we created an open API spec that
+
+165
+00:12:09.880 --> 00:12:15.880
+<v Jonathan Norris>pointed to our edge workers on Cloudflare that could respond in like sub 10 milliseconds to
+
+166
+00:12:15.880 --> 00:12:25.060
+<v Jonathan Norris>requests. And then we fired up a bunch of SDK generation tools. And as you can imagine,
+
+167
+00:12:25.240 --> 00:12:30.840
+<v Jonathan Norris>like you give these SDK generation tools and API spec, and it'll just go and give you a PHP SDK
+
+168
+00:12:30.840 --> 00:12:32.340
+<v Jonathan Norris>or a Python SDK or whatever.
+
+169
+00:12:32.740 --> 00:12:34.900
+<v Jonathan Norris>And so we fired our cannon
+
+170
+00:12:34.900 --> 00:12:37.040
+<v Jonathan Norris>at generating all these different SDKs.
+
+171
+00:12:37.060 --> 00:12:39.480
+<v Jonathan Norris>And yeah, and the code that it generates is fine.
+
+172
+00:12:39.580 --> 00:12:40.320
+<v Jonathan Norris>It's not great.
+
+173
+00:12:40.520 --> 00:12:42.300
+<v Jonathan Norris>I think for each of those SDKs,
+
+174
+00:12:42.300 --> 00:12:45.080
+<v Jonathan Norris>we probably had to put in another week or so
+
+175
+00:12:45.080 --> 00:12:48.100
+<v Jonathan Norris>of like engineering work to clean them up
+
+176
+00:12:48.100 --> 00:12:50.120
+<v Jonathan Norris>and document them and test them
+
+177
+00:12:50.120 --> 00:12:51.800
+<v Jonathan Norris>and make sure that they worked fine.
+
+178
+00:12:52.100 --> 00:12:54.460
+<v Jonathan Norris>And that was like our hack in the first six months
+
+179
+00:12:54.460 --> 00:12:58.040
+<v Jonathan Norris>to say that we supported Python and Java and Go
+
+180
+00:12:58.040 --> 00:12:59.480
+<v Jonathan Norris>and all these SDKs.
+
+181
+00:13:00.680 --> 00:13:07.220
+<v Jonathan Norris>experience. Parallel to that, we're going down the path of how do we create a cross-platform piece of
+
+182
+00:13:07.220 --> 00:13:12.040
+<v Jonathan Norris>business logic that we can share across all these different SDKs and environments? Like,
+
+183
+00:13:12.040 --> 00:13:17.100
+<v Jonathan Norris>how do we not have to rewrite this couple thousand lines of code in eight different languages to
+
+184
+00:13:17.100 --> 00:13:20.760
+<v Jonathan Norris>support all the languages we need to support? Like, how do I write this once and run it everywhere?
+
+185
+00:13:20.920 --> 00:13:25.240
+<v Jonathan Norris>Like, there's a JavaScript runtime for pretty much every language. But you know, for most languages,
+
+186
+00:13:25.240 --> 00:13:31.640
+<v Jonathan Norris>Like V8, the engine behind Chrome and a lot of browsers is magic and is super fast.
+
+187
+00:13:31.860 --> 00:13:34.560
+<v Jonathan Norris>That's why Node.js has been great and the web has gotten so fast.
+
+188
+00:13:34.800 --> 00:13:41.580
+<v Jonathan Norris>But for most of those runtimes that are running your JavaScript code in Java or in Go or some other lower-level language,
+
+189
+00:13:41.800 --> 00:13:44.720
+<v Jonathan Norris>they're pretty compromised and really not a great solution.
+
+190
+00:13:45.300 --> 00:13:51.400
+<v Jonathan Norris>And so the next solution, the solution we actually went down, was investing in what's called WebAssembly.
+
+191
+00:13:51.400 --> 00:14:02.500
+<v Jonathan Norris>And WebAssembly is a binary compilation target that you can basically compile your code into WebAssembly that can then be executed on runtimes across the board, across a bunch of different languages.
+
+192
+00:14:02.720 --> 00:14:04.360
+<v Jonathan Norris>And yes, it's very tied to the web.
+
+193
+00:14:04.460 --> 00:14:13.900
+<v Jonathan Norris>And so this is how people like Figma or a bunch or a 1Password or like a lot of companies write like C++ or Rust code and can run it in their web browser using WebAssembly.
+
+194
+00:14:13.900 --> 00:14:31.000
+<v Jonathan Norris>But you can also do it the opposite way where you can take your Rust or we actually ended up using AssemblyScript, which is a subset of TypeScript that could compile to WebAssembly that we could then run in all these SDKs like in Java and Go and Python and all these things.
+
+195
+00:14:31.100 --> 00:14:33.700
+<v Jonathan Norris>So we didn't have to reinvent the wheel a lot.
+
+196
+00:14:34.020 --> 00:14:34.600
+<v Jonathan Norris>So, yeah.
+
+197
+00:14:34.660 --> 00:14:43.260
+<v Jonathan Norris>So once we got all those like cloud SDKs packed together and in a couple of weeks and published and they were good enough to get like beta customers on the product.
+
+198
+00:14:43.900 --> 00:14:49.600
+<v Jonathan Norris>knew if we wanted to support real paying customers and enterprise customers and things like that,
+
+199
+00:14:49.680 --> 00:14:53.000
+<v Jonathan Norris>we needed a better solution. And that's where we went down that WebAssembly
+
+200
+00:14:53.580 --> 00:14:58.880
+<v Jonathan Norris>cross-platform runtime where we can now share code. We can have the same piece of code that's
+
+201
+00:14:58.880 --> 00:15:02.720
+<v Jonathan Norris>running in our edge workers also run in our server SDKs.
+
+202
+00:15:04.180 --> 00:15:08.760
+<v Noah Labhart>So I hear you saying we. How did you go about building your team? And what did you look for
+
+203
+00:15:08.760 --> 00:15:12.040
+<v Noah Labhart>in those people to indicate that they were the winning horses to join you?
+
+204
+00:15:13.900 --> 00:15:23.060
+<v Jonathan Norris>The nice thing about being in business for about 10 years now is that we've built up a stable of just great people over the years.
+
+205
+00:15:23.320 --> 00:15:31.640
+<v Jonathan Norris>And doing this as a second, as a pivot, as a second startup within our existing company, we didn't have to go and hire a bunch of people.
+
+206
+00:15:31.700 --> 00:15:36.520
+<v Jonathan Norris>We already had people that we knew and we trusted and we believed in that could build this product internally.
+
+207
+00:15:36.520 --> 00:15:40.940
+<v Jonathan Norris>internally so a lot of it was just like re-energizing those people giving them a new
+
+208
+00:15:40.940 --> 00:15:46.820
+<v Jonathan Norris>reason to be energized to be invested to really believe in the future of where we're going with
+
+209
+00:15:46.820 --> 00:15:52.720
+<v Jonathan Norris>the new product was hugely energizing for the team that was one of the great things about doing a
+
+210
+00:15:52.720 --> 00:15:57.860
+<v Jonathan Norris>pivot like this was just like seeing a lot of those folks step up again or take more responsibility
+
+211
+00:15:57.860 --> 00:16:04.220
+<v Jonathan Norris>in this new product than they ever had in the old product i think one of the things i've learned
+
+212
+00:16:04.220 --> 00:16:08.580
+<v Jonathan Norris>especially at the smaller scale where you don't have layers of management to manage and motivate
+
+213
+00:16:08.580 --> 00:16:12.700
+<v Jonathan Norris>people you need to find people who are self-motivating yep you need to find people who
+
+214
+00:16:12.700 --> 00:16:18.080
+<v Jonathan Norris>i like to say are pushing you along instead of you having to pull them along right if you're
+
+215
+00:16:18.080 --> 00:16:23.680
+<v Jonathan Norris>really having to pull them and get them engaged and get them into what you're building it's a bit
+
+216
+00:16:23.680 --> 00:16:28.460
+<v Jonathan Norris>too much of a time suck in the early days and those people can be really effective and productive
+
+217
+00:16:28.460 --> 00:16:33.660
+<v Jonathan Norris>when you get into the later stages of your company and you have layers of management that can manage
+
+218
+00:16:34.220 --> 00:16:38.800
+<v Jonathan Norris>in the early stage when things are just chaotic and you need people who are self-motivating,
+
+219
+00:16:38.800 --> 00:16:43.520
+<v Jonathan Norris>self-have a lot of ownership over what's going on, you want those people that are pushing you.
+
+220
+00:16:43.580 --> 00:16:48.720
+<v Jonathan Norris>You want those people that feel like they're doing more work than you're asking them to do.
+
+221
+00:16:49.180 --> 00:16:52.140
+<v Jonathan Norris>As I talked about in the early days, the FIRST Robotics competition,
+
+222
+00:16:52.540 --> 00:16:56.180
+<v Jonathan Norris>we've hired a lot of people who are FIRST alumni who have that mindset
+
+223
+00:16:56.180 --> 00:17:00.140
+<v Jonathan Norris>and really know how to get things done, know how to push, know how to execute
+
+224
+00:17:00.140 --> 00:17:02.100
+<v Jonathan Norris>and take ownership of things.
+
+225
+00:17:02.100 --> 00:17:06.400
+<v Jonathan Norris>And I've learned a lot of lessons of hiring external people for startups.
+
+226
+00:17:06.540 --> 00:17:13.560
+<v Jonathan Norris>And I think it can be really attractive to hire senior people who've been around and have seen a lot of things for a startup.
+
+227
+00:17:14.440 --> 00:17:28.360
+<v Jonathan Norris>But I've only seen a couple of senior folks who are really those type of pushers rather than need to be pulled along and need to spend a lot of time insuring them into your technology and your product and things like that to make them productive.
+
+228
+00:17:28.360 --> 00:17:35.980
+<v Jonathan Norris>I find more sort of intermediate level engineers who are maybe being held back in their existing companies.
+
+229
+00:17:36.260 --> 00:17:40.540
+<v Jonathan Norris>And if you give them sort of the runway and the opportunity to spread their wings,
+
+230
+00:17:40.740 --> 00:17:47.260
+<v Jonathan Norris>I found those people to be a much better fit in the early days of a startup where you need people taking responsibility and things.
+
+231
+00:17:47.760 --> 00:17:51.260
+<v Jonathan Norris>You have to also build up like a diverse pool of people.
+
+232
+00:17:51.320 --> 00:17:53.840
+<v Jonathan Norris>And I think going remote has really helped that.
+
+233
+00:17:53.880 --> 00:17:56.480
+<v Jonathan Norris>I think half of our teams in Toronto, half of it's fully remote.
+
+234
+00:17:58.360 --> 00:18:02.780
+<v Jonathan Norris>Our ability to hire more folks and be more selective of who we choose.
+
+235
+00:18:03.020 --> 00:18:09.000
+<v Jonathan Norris>Having a diverse set of backgrounds and viewpoints has been really healthy.
+
+236
+00:18:10.210 --> 00:18:18.280
+<v Jonathan Norris>And I think as a Canadian company, we have a great group of folks who get along and are kind to each other.
+
+237
+00:18:18.760 --> 00:18:24.260
+<v Jonathan Norris>We have a lot of young engineers who've now been with us for six years, a bunch.
+
+238
+00:18:24.460 --> 00:18:27.360
+<v Jonathan Norris>The majority have been here at least three to four years.
+
+239
+00:18:28.360 --> 00:18:32.740
+<v Jonathan Norris>A lot of them are still very young, but they care about each other and they're kind to each other.
+
+240
+00:18:32.900 --> 00:18:37.100
+<v Jonathan Norris>And that really helps build up a culture of folks who want to work together.
+
+241
+00:18:37.540 --> 00:18:43.680
+<v Jonathan Norris>The things I always tell young engineers, and I think most young engineers don't understand this truly,
+
+242
+00:18:43.780 --> 00:18:51.140
+<v Jonathan Norris>that how you communicate with somebody, how you work together with somebody is vastly more important than your technical abilities.
+
+243
+00:18:51.500 --> 00:18:54.160
+<v Jonathan Norris>And I don't think young engineers understand that.
+
+244
+00:18:54.180 --> 00:18:57.220
+<v Jonathan Norris>I think young engineers just think they're just there to write code.
+
+245
+00:18:58.360 --> 00:19:01.020
+<v Jonathan Norris>no, I'm hiring you to solve problems with a team.
+
+246
+00:19:01.240 --> 00:19:05.340
+<v Jonathan Norris>And yes, the end result of that is writing code to solve that problem.
+
+247
+00:19:05.480 --> 00:19:08.340
+<v Jonathan Norris>But the only way you get to a problem together
+
+248
+00:19:08.340 --> 00:19:11.780
+<v Jonathan Norris>is if you can communicate and collaborate and work together.
+
+249
+00:19:12.120 --> 00:19:16.360
+<v Jonathan Norris>And so I hire mainly for the soft skills
+
+250
+00:19:16.360 --> 00:19:18.820
+<v Jonathan Norris>and the teamwork abilities of engineers
+
+251
+00:19:18.820 --> 00:19:23.400
+<v Jonathan Norris>and the communication abilities of engineers over the technical ability.
+
+252
+00:19:24.240 --> 00:19:26.400
+<v Jonathan Norris>All of our hiring mistakes over the years
+
+253
+00:19:28.400 --> 00:19:32.740
+<v Jonathan Norris>who are great technically, but couldn't work together and couldn't collaborate well.
+
+254
+00:19:32.900 --> 00:19:38.960
+<v Jonathan Norris>And especially now in the remote world, your ability to communicate and build relationships
+
+255
+00:19:38.960 --> 00:19:45.180
+<v Jonathan Norris>with your teammates and work together is 10 times more important. Because like in the old world,
+
+256
+00:19:45.240 --> 00:19:49.500
+<v Jonathan Norris>we would all be in an office together. If I saw that someone was getting frustrated with a problem
+
+257
+00:19:49.500 --> 00:19:53.440
+<v Jonathan Norris>or not working well with somebody, I could just grab them and go for a walk with them and just
+
+258
+00:19:53.440 --> 00:19:59.080
+<v Jonathan Norris>talk through the problem, right? And that's so much harder to intervene in those ways as a manager
+
+259
+00:19:59.080 --> 00:20:05.240
+<v Jonathan Norris>now in the remote world. So you need people who are more emotionally centered and communicate
+
+260
+00:20:05.240 --> 00:20:09.020
+<v Jonathan Norris>really well and can build sort of trust and relationships with their co-workers.
+
+261
+00:20:12.100 --> 00:20:16.980
+<v Noah Labhart>So let's switch to scalability. And this will be interesting. You're building a feature flagging
+
+262
+00:20:16.980 --> 00:20:22.840
+<v Noah Labhart>tool for developers and engineers are very picky and very opinionated, and they will leave you in
+
+263
+00:20:23.440 --> 00:20:27.140
+<v Noah Labhart>But tell me about scalability and how you built this.
+
+264
+00:20:27.280 --> 00:20:32.620
+<v Noah Labhart>And given your history, I'm sure there's lots of wisdom put into the platform.
+
+265
+00:20:32.760 --> 00:20:33.580
+<v Noah Labhart>But tell me about that.
+
+266
+00:20:33.660 --> 00:20:38.600
+<v Noah Labhart>And I'm curious if there were any sort of areas you had to fight as you grew.
+
+267
+00:20:40.340 --> 00:20:43.720
+<v Jonathan Norris>We deal with incredibly high network loads.
+
+268
+00:20:43.800 --> 00:20:48.520
+<v Jonathan Norris>You can imagine we're serving hundreds of millions of end devices per month.
+
+269
+00:20:48.520 --> 00:20:58.840
+<v Jonathan Norris>We're one of the few products where you really do reach kind of those internet scale type of services that only the big billion dollar corporations really do.
+
+270
+00:20:59.380 --> 00:21:04.020
+<v Jonathan Norris>A-B testing, feature flagging, analytics are some of those spaces that really do get to scale.
+
+271
+00:21:04.300 --> 00:21:11.600
+<v Jonathan Norris>I have stories I could tell of product managers at like Google from like Google's BigQuery team being like calling me over Christmas being like,
+
+272
+00:21:11.780 --> 00:21:15.740
+<v Jonathan Norris>your systems are like breaking BigQuery for all of our customers across Google.
+
+273
+00:21:15.820 --> 00:21:18.120
+<v Jonathan Norris>Can we get on the phone now and fix it?
+
+274
+00:21:19.020 --> 00:21:26.440
+<v Jonathan Norris>Tinder joined the platform around this time, like early December of one year, and just crushed our databases.
+
+275
+00:21:26.800 --> 00:21:33.940
+<v Jonathan Norris>And I spent all Christmas with a bunch of members of our team trying to learn how to scale up our databases in our systems to handle their load.
+
+276
+00:21:34.680 --> 00:21:39.320
+<v Jonathan Norris>A lot of those learnings over the years led to that architecture switch for DevCycle,
+
+277
+00:21:39.400 --> 00:21:46.180
+<v Jonathan Norris>where we're trying to move that core decisioning logic and core performance-sensitive logic
+
+278
+00:21:46.180 --> 00:21:48.860
+<v Jonathan Norris>as close to the end device as possible.
+
+279
+00:21:49.040 --> 00:21:53.160
+<v Jonathan Norris>So whether that's using edge computing, as I talked about with Cloudflare Workers,
+
+280
+00:21:53.360 --> 00:21:58.400
+<v Jonathan Norris>which we should be the fastest API response on your website or your mobile app.
+
+281
+00:21:58.520 --> 00:22:00.660
+<v Jonathan Norris>Like, we should see sub-50 millisecond.
+
+282
+00:22:00.660 --> 00:22:05.740
+<v Jonathan Norris>like a lot of cases it's sub 20 millisecond response times which is really great and then
+
+283
+00:22:05.740 --> 00:22:11.260
+<v Jonathan Norris>even further trying to get the actual business logic of our software into the open source sdks
+
+284
+00:22:11.260 --> 00:22:17.560
+<v Jonathan Norris>that our customers are running in their servers or in their products there's no easier way to get
+
+285
+00:22:17.560 --> 00:22:22.920
+<v Jonathan Norris>low latency than to get rid of the network call with dev cycle we're really focused on getting
+
+286
+00:22:22.920 --> 00:22:29.100
+<v Jonathan Norris>that decisioning logic as close to the end device as possible and that even means like with some of
+
+287
+00:22:30.660 --> 00:22:34.660
+<v Jonathan Norris>is a very large internet scale networking company
+
+288
+00:22:34.660 --> 00:22:37.840
+<v Jonathan Norris>and our SDKs are running in their CDN servers
+
+289
+00:22:37.840 --> 00:22:39.680
+<v Jonathan Norris>at the edge around the world.
+
+290
+00:22:39.820 --> 00:22:42.160
+<v Jonathan Norris>And so like they're measuring things
+
+291
+00:22:42.160 --> 00:22:45.740
+<v Jonathan Norris>at like the nanosecond scale performance.
+
+292
+00:22:46.120 --> 00:22:48.580
+<v Jonathan Norris>And so when they onboarded,
+
+293
+00:22:48.600 --> 00:22:50.600
+<v Jonathan Norris>we went through a really fascinating
+
+294
+00:22:50.600 --> 00:22:54.160
+<v Jonathan Norris>performance optimization problem with our Go SDK
+
+295
+00:22:54.160 --> 00:22:57.300
+<v Jonathan Norris>to optimize every Go routine,
+
+296
+00:22:57.900 --> 00:22:59.540
+<v Jonathan Norris>basically every inch of code
+
+297
+00:23:00.660 --> 00:23:04.700
+<v Jonathan Norris>performance is possible for them because they're running data centers of servers around the world.
+
+298
+00:23:05.120 --> 00:23:10.120
+<v Jonathan Norris>They're doing hundreds of billions of flag evaluations per day in those data centers.
+
+299
+00:23:10.340 --> 00:23:14.660
+<v Jonathan Norris>And those flag evaluations really cost them money if they're not performing.
+
+300
+00:23:16.340 --> 00:23:20.300
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've built,
+
+301
+00:23:20.360 --> 00:23:21.240
+<v Noah Labhart>what are you most proud of?
+
+302
+00:23:22.180 --> 00:23:27.280
+<v Jonathan Norris>The people that I've gotten to work with over the years. I think we've created a
+
+303
+00:23:27.280 --> 00:23:33.100
+<v Jonathan Norris>just a great culture of really energetic people who care about the problem, who care about each
+
+304
+00:23:33.100 --> 00:23:38.120
+<v Jonathan Norris>other, and generally just enjoy working together with each other. And I think when I think about
+
+305
+00:23:38.120 --> 00:23:42.300
+<v Jonathan Norris>my day-to-day, it's like, what excites me the most? Yes, the technology and the interesting
+
+306
+00:23:42.300 --> 00:23:46.760
+<v Jonathan Norris>problems we get to solve. But the thing that excites me and motivates me most every day,
+
+307
+00:23:46.820 --> 00:23:52.640
+<v Jonathan Norris>it's just like the great sort of group of people that we get to work with every day.
+
+308
+00:23:52.740 --> 00:23:55.680
+<v Jonathan Norris>And so I think that's the thing I'm most proud of and how we've been able to nurture
+
+309
+00:23:57.280 --> 00:24:02.320
+<v Jonathan Norris>a lot of those folks over the years into great engineers, just great people in general.
+
+310
+00:24:02.880 --> 00:24:06.440
+<v Jonathan Norris>Obviously, I'm proud of the crazy scale problems we've solved.
+
+311
+00:24:06.700 --> 00:24:11.780
+<v Jonathan Norris>Like for Taplytics, we actually, we spent about two or three years deploying our software
+
+312
+00:24:11.780 --> 00:24:14.740
+<v Jonathan Norris>on premises for a FANG company.
+
+313
+00:24:14.880 --> 00:24:20.080
+<v Jonathan Norris>And that whole storyline, which is just like a whole different wild hour podcast we could do.
+
+314
+00:24:20.580 --> 00:24:21.820
+<v Jonathan Norris>We're builders here.
+
+315
+00:24:21.920 --> 00:24:26.520
+<v Jonathan Norris>And maybe to a fault, we're builders where I think one of the lessons we've learned is that
+
+316
+00:24:27.280 --> 00:24:32.140
+<v Jonathan Norris>We've maybe built too many things in too many disconnected systems over the years.
+
+317
+00:24:32.260 --> 00:24:35.740
+<v Jonathan Norris>And we're trying to correct that with a more focused product with DevCycle.
+
+318
+00:24:36.280 --> 00:24:43.900
+<v Jonathan Norris>I know we can build things, but I think the thing I'm most proud of is the people that we've built and we've developed over the years, day to day.
+
+319
+00:24:43.980 --> 00:24:48.040
+<v Jonathan Norris>That's the thing that gets me most excited to come to work every day.
+
+320
+00:24:49.920 --> 00:24:51.280
+<v Noah Labhart>Let's flip the script a little bit.
+
+321
+00:24:51.380 --> 00:24:55.080
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+322
+00:24:56.200 --> 00:25:02.320
+<v Jonathan Norris>so we had this incredible opportunity with a FANG company to deploy the email marketing
+
+323
+00:25:02.320 --> 00:25:09.780
+<v Jonathan Norris>automation software we had developed at Taplytics on premise we had not much of a product for email
+
+324
+00:25:09.780 --> 00:25:15.100
+<v Jonathan Norris>marketing at that time we were the only software vendor inside of that big company that was
+
+325
+00:25:15.100 --> 00:25:19.960
+<v Jonathan Norris>connecting multiple of their internal systems together we had to do a lot of legwork just to
+
+326
+00:25:19.960 --> 00:25:24.700
+<v Jonathan Norris>get those different parts of the company to talk to each other to integrate our software with a
+
+327
+00:25:25.080 --> 00:25:32.880
+<v Jonathan Norris>very legacy systems. And as a business, that really hurt our momentum because we had a ton
+
+328
+00:25:32.880 --> 00:25:39.840
+<v Jonathan Norris>of our resources focused on basically getting this fork of our software working on premise for this
+
+329
+00:25:39.840 --> 00:25:45.180
+<v Jonathan Norris>very large customer, the very large contract. And most like a bunch of our team was flying from like
+
+330
+00:25:45.180 --> 00:25:51.020
+<v Jonathan Norris>Toronto to California every week for a year and a half to get this to work. But it really
+
+331
+00:25:51.020 --> 00:25:56.060
+<v Jonathan Norris>distracted from our core business. The rest of our business was in stasis for that period of time,
+
+332
+00:25:56.180 --> 00:26:02.880
+<v Jonathan Norris>and we weren't really able to both develop the existing cloud product and this on-premise
+
+333
+00:26:02.880 --> 00:26:08.480
+<v Jonathan Norris>product at the same time, just due to the complexities that came with deploying it.
+
+334
+00:26:09.740 --> 00:26:13.680
+<v Jonathan Norris>That was a big challenge for us. And I think after that whole situation wrapped up,
+
+335
+00:26:13.720 --> 00:26:18.160
+<v Jonathan Norris>that's where we took a hard look at our business of what we had left, what we wanted to spend
+
+336
+00:26:18.160 --> 00:26:24.560
+<v Jonathan Norris>like the next five years of our time on and came to that the decision to build it build DevCycle
+
+337
+00:26:24.560 --> 00:26:30.080
+<v Jonathan Norris>and start fresh with that so I think I think it ended up in a really healthy place but you
+
+338
+00:26:30.080 --> 00:26:35.460
+<v Jonathan Norris>probably would have made a different business decision there that definitely set us back and
+
+339
+00:26:35.460 --> 00:26:39.700
+<v Jonathan Norris>changed us in a lot of ways like we had to get a lot slower we had to go from like continuous
+
+340
+00:26:39.700 --> 00:26:45.400
+<v Jonathan Norris>deployment to releasing every two months right and like things like that had such an effect on
+
+341
+00:26:45.400 --> 00:26:52.060
+<v Jonathan Norris>our engineering culture and our pace of delivery and our just ability to get things done and
+
+342
+00:26:52.060 --> 00:26:56.840
+<v Jonathan Norris>really keep engineers happy and motivated. We didn't realize what we were getting into
+
+343
+00:26:56.840 --> 00:26:58.920
+<v Jonathan Norris>with those effects when we signed that deal.
+
+344
+00:27:01.280 --> 00:27:03.360
+<v Noah Labhart>So this will be fun to ask. What does the future
+
+345
+00:27:03.360 --> 00:27:05.900
+<v Noah Labhart>look like for DevCycle, the product and for your team?
+
+346
+00:27:07.180 --> 00:27:09.640
+<v Jonathan Norris>Yeah, we're still in that early growth stage
+
+347
+00:27:09.640 --> 00:27:13.200
+<v Jonathan Norris>trying to figure out all the product market fit things,
+
+348
+00:27:13.360 --> 00:27:15.940
+<v Jonathan Norris>trying to really hone in on our messaging
+
+349
+00:27:15.940 --> 00:27:17.500
+<v Jonathan Norris>and where the product's going.
+
+350
+00:27:17.600 --> 00:27:19.680
+<v Jonathan Norris>I think we have a pretty clear direction now.
+
+351
+00:27:19.780 --> 00:27:22.840
+<v Jonathan Norris>I think we've tried a lot of experiments over the last year.
+
+352
+00:27:23.640 --> 00:27:25.280
+<v Jonathan Norris>One big part of that is actually
+
+353
+00:27:25.280 --> 00:27:27.240
+<v Jonathan Norris>supporting the open source community.
+
+354
+00:27:27.480 --> 00:27:28.640
+<v Jonathan Norris>I don't know if you've heard of it,
+
+355
+00:27:28.700 --> 00:27:30.100
+<v Jonathan Norris>but there's a new open source standard
+
+356
+00:27:30.100 --> 00:27:32.580
+<v Jonathan Norris>that we're involved in called Open Feature,
+
+357
+00:27:32.740 --> 00:27:34.420
+<v Jonathan Norris>which is an open standardized protocol
+
+358
+00:27:34.420 --> 00:27:36.560
+<v Jonathan Norris>for interfacing with feature flags,
+
+359
+00:27:37.580 --> 00:27:39.000
+<v Jonathan Norris>platform agnostic protocol,
+
+360
+00:27:39.640 --> 00:27:41.220
+<v Jonathan Norris>that you can plug in different vendors into.
+
+361
+00:27:41.460 --> 00:27:43.200
+<v Jonathan Norris>And we're supporting that pretty directly
+
+362
+00:27:43.200 --> 00:27:47.120
+<v Jonathan Norris>and look to continue to try to help that community grow.
+
+363
+00:27:47.400 --> 00:27:50.440
+<v Jonathan Norris>If you've heard of OpenTelemetry or OTEL,
+
+364
+00:27:50.600 --> 00:27:52.720
+<v Jonathan Norris>it's basically the same style of project,
+
+365
+00:27:52.780 --> 00:27:53.820
+<v Jonathan Norris>but for feature flagging.
+
+366
+00:27:54.200 --> 00:27:56.200
+<v Jonathan Norris>You're potentially instrumenting
+
+367
+00:27:56.200 --> 00:27:58.060
+<v Jonathan Norris>like hundreds of different places in your code
+
+368
+00:27:58.060 --> 00:28:00.940
+<v Jonathan Norris>with feature flags that are difficult
+
+369
+00:28:00.940 --> 00:28:02.680
+<v Jonathan Norris>to change providers and vendors
+
+370
+00:28:02.680 --> 00:28:05.060
+<v Jonathan Norris>because there's a lot of lock-in effects with feature flags
+
+371
+00:28:05.060 --> 00:28:08.580
+<v Jonathan Norris>that makes it difficult to transition between providers.
+
+372
+00:28:09.640 --> 00:28:14.480
+<v Jonathan Norris>The idea behind open feature is that you can use that interface once and then change providers later.
+
+373
+00:28:15.080 --> 00:28:19.380
+<v Jonathan Norris>We actually see most customers coming to us actually come from internal tools.
+
+374
+00:28:19.540 --> 00:28:29.140
+<v Jonathan Norris>So we definitely recommend if you have an internal feature flagging tool, look at adopting the open feature standards and SDKs around that internal tool.
+
+375
+00:28:29.280 --> 00:28:34.380
+<v Jonathan Norris>And that'll make that migration process to a platform like DevCycle a lot easier in the future.
+
+376
+00:28:34.380 --> 00:28:39.920
+<v Jonathan Norris>and also just provide you with a higher quality SDK and interface for your developers to use
+
+377
+00:28:39.920 --> 00:28:43.120
+<v Jonathan Norris>than most teams have the ability to build themselves.
+
+378
+00:28:43.980 --> 00:28:48.960
+<v Jonathan Norris>We also see a lot of success with engineering teams that are adopting,
+
+379
+00:28:49.160 --> 00:28:53.140
+<v Jonathan Norris>that are moving fast and adopting like continuous deployment and things like that.
+
+380
+00:28:53.180 --> 00:28:58.340
+<v Jonathan Norris>The Next.js community, we're working on a big sort of Next.js SDK
+
+381
+00:28:58.340 --> 00:29:01.820
+<v Jonathan Norris>that combines client-side rendering with server-side rendering
+
+382
+00:29:01.820 --> 00:29:06.600
+<v Jonathan Norris>and all the complexities of how feature flags work across client-side and server-side renderings.
+
+383
+00:29:06.640 --> 00:29:08.180
+<v Jonathan Norris>That's going to be a big push for us.
+
+384
+00:29:08.340 --> 00:29:12.200
+<v Jonathan Norris>But yeah, those are the two pillars of where we're going as a product.
+
+385
+00:29:12.360 --> 00:29:19.020
+<v Jonathan Norris>Open feature and the Next.js ecosystem are the two main pillars for DevCycle looking forward.
+
+386
+00:29:21.320 --> 00:29:22.340
+<v Noah Labhart>Jonathan, last question.
+
+387
+00:29:22.620 --> 00:29:27.200
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+388
+00:29:27.360 --> 00:29:28.440
+<v Noah Labhart>They're jazzed about it.
+
+389
+00:29:28.440 --> 00:29:31.740
+<v Noah Labhart>They can't wait to show it off to the world and can't wait to show it off to you right there on the plane.
+
+390
+00:29:32.260 --> 00:29:35.140
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+391
+00:29:37.400 --> 00:29:42.780
+<v Jonathan Norris>Showing your products to your customers earlier than you're comfortable with, I think, is great.
+
+392
+00:29:42.920 --> 00:29:48.780
+<v Jonathan Norris>I think getting early feedback, getting in the hands of customers as early as possible is such a core thing.
+
+393
+00:29:48.880 --> 00:29:54.140
+<v Jonathan Norris>I think a lot of entrepreneurs struggle with perfecting their products and polishing them to a point.
+
+394
+00:29:54.180 --> 00:29:56.600
+<v Jonathan Norris>And they're not having enough time to iterate on the product.
+
+395
+00:29:58.440 --> 00:30:03.300
+<v Jonathan Norris>feature flagging, continuous deployment, all these things help you with is get to a culture of
+
+396
+00:30:03.300 --> 00:30:07.840
+<v Jonathan Norris>iteration, right? And being comfortable with changing your product and iterating on your
+
+397
+00:30:07.840 --> 00:30:12.840
+<v Jonathan Norris>product at a rapid pace. And I think for early stage companies, those iteration cycles are
+
+398
+00:30:12.840 --> 00:30:18.640
+<v Jonathan Norris>incredibly key. And so get to a place where you can iterate and test and move really quickly with
+
+399
+00:30:18.640 --> 00:30:24.400
+<v Jonathan Norris>your product. And then find employees and advisors and people like that, that you can trust and
+
+400
+00:30:24.400 --> 00:30:28.600
+<v Jonathan Norris>believe in the mission, right? Creating that support system around you.
+
+401
+00:30:29.180 --> 00:30:34.160
+<v Jonathan Norris>I think most people don't know this, but most startups don't fail because they don't find
+
+402
+00:30:34.160 --> 00:30:38.500
+<v Jonathan Norris>product market fit or they don't get enough revenue or whatever. Most of it fails because
+
+403
+00:30:38.500 --> 00:30:42.440
+<v Jonathan Norris>of interpersonal issues, mainly between the co-founders, but a lot of the times between
+
+404
+00:30:42.440 --> 00:30:47.160
+<v Jonathan Norris>the founders and the early employees. So working with people that you can trust and build a deep
+
+405
+00:30:47.160 --> 00:30:53.100
+<v Jonathan Norris>relationship with and have a key core connection with is very important. It's more important than
+
+406
+00:30:54.400 --> 00:31:01.620
+<v Jonathan Norris>People that you can trust and communicate well with and create a deep connection with is more important than anything else.
+
+407
+00:31:02.040 --> 00:31:03.360
+<v Noah Labhart>That's fantastic advice.
+
+408
+00:31:03.580 --> 00:31:05.680
+<v Noah Labhart>Well, Jonathan, thank you for being on the show today.
+
+409
+00:31:05.900 --> 00:31:08.380
+<v Noah Labhart>Thank you for telling the creation story of DevCycle.
+
+410
+00:31:08.600 --> 00:31:09.640
+<v Jonathan Norris>Yeah, thanks for having me.
+
+411
+00:31:11.220 --> 00:31:14.040
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+412
+00:31:18.840 --> 00:31:21.500
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+413
+00:31:21.500 --> 00:31:26.420
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+414
+00:31:27.060 --> 00:31:29.240
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+415
+00:31:29.560 --> 00:31:31.440
+<v Noah Labhart>Both things help us out tremendously.
+
+416
+00:31:34.420 --> 00:31:35.880
+<v Noah Labhart>And thanks again for listening.

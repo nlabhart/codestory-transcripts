@@ -1,0 +1,2047 @@
+WEBVTT
+
+NOTE S5 Bonus: Solving the Data Firehose Problem: Hybrid SQL/NoSQL Architectures with Kyle Bernhardy of HarperDB
+
+1
+00:00:00.760 --> 00:00:11.900
+<v Kyle Bernhardy>I will say I had to grow up a lot through this process and you know when I co-founded HarperDB, I was not ready to be CTO.
+
+2
+00:00:12.400 --> 00:00:19.840
+<v Kyle Bernhardy>I had to learn how to be CTO and I also had to learn how to trust. I had to learn how to cede some control.
+
+3
+00:00:19.840 --> 00:00:24.360
+<v Kyle Bernhardy>I also had to learn to become comfortable making decisions.
+
+4
+00:00:24.580 --> 00:00:34.440
+<v Kyle Bernhardy>So in looking back, there was a lot of things I did because of the things I just said that did not help the team scale.
+
+5
+00:00:35.700 --> 00:00:39.740
+<v Kyle Bernhardy>My name is Kyle Bernhardy and I'm co-founder and CTO at HarperDB.
+
+6
+00:00:47.500 --> 00:00:49.400
+<v Noah Labhart>This is Code Story.
+
+7
+00:00:49.840 --> 00:01:00.840
+<v Noah Labhart>The podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+8
+00:01:02.220 --> 00:01:12.280
+<v Noah Labhart>I'm your host, Noah Labhart, and today I'll help Kyle Bernhardy build the best database solution based on speed, reliability, and hybrid cloud.
+
+9
+00:01:13.320 --> 00:01:15.860
+<v Noah Labhart>All this and more on Code Story.
+
+10
+00:01:19.840 --> 00:01:22.920
+<v Noah Labhart>Kyle Bernhardy had a less than traditional path to the tech world.
+
+11
+00:01:23.420 --> 00:01:27.400
+<v Noah Labhart>He's been in the industry since the late 90s, but it all started when he was growing up,
+
+12
+00:01:27.480 --> 00:01:30.960
+<v Noah Labhart>attempting to program text adventure games on his Commodore 64.
+
+13
+00:01:31.800 --> 00:01:35.700
+<v Noah Labhart>In high school, he started running, and that became a major part of his life,
+
+14
+00:01:35.840 --> 00:01:37.980
+<v Noah Labhart>so much so he went to run for Penn State University.
+
+15
+00:01:38.640 --> 00:01:43.040
+<v Noah Labhart>He settled into an exercise and sports science major so he could stay close to the sport.
+
+16
+00:01:44.020 --> 00:01:46.140
+<v Noah Labhart>Post-college, he didn't know what to do with his degree.
+
+17
+00:01:46.140 --> 00:01:51.180
+<v Noah Labhart>He worked in a few corporate fitness centers, but didn't enjoy what he was doing and didn't see a path for himself.
+
+18
+00:01:51.520 --> 00:01:53.880
+<v Noah Labhart>During that time, he ended up getting a job in tech support.
+
+19
+00:01:54.280 --> 00:01:59.260
+<v Noah Labhart>He grew in this role, in his knowledge of database basics, SQL, and supporting database reporting.
+
+20
+00:01:59.620 --> 00:02:01.700
+<v Noah Labhart>Once this happened, he moved into the development world.
+
+21
+00:02:02.380 --> 00:02:06.120
+<v Noah Labhart>Programming for Kyle is a creative outlet, but not for art, for problem solving.
+
+22
+00:02:07.340 --> 00:02:11.200
+<v Noah Labhart>In 2010, he started working for a data center company and met his now co-founder.
+
+23
+00:02:11.840 --> 00:02:14.900
+<v Noah Labhart>They would hang out and chat about what it would be like to build something together.
+
+24
+00:02:16.140 --> 00:02:24.720
+<v Noah Labhart>While working for a large data aggregation company, he worked through a number of data availability, reliability, and infrastructure issues around massive data processing.
+
+25
+00:02:25.460 --> 00:02:27.740
+<v Noah Labhart>Internally, he thought there must be a better way.
+
+26
+00:02:29.040 --> 00:02:31.620
+<v Noah Labhart>This is the creation story of HarperDB.
+
+27
+00:02:35.380 --> 00:02:43.740
+<v Kyle Bernhardy>So HarperDB is a single data model, NoSQL database with SQL semantics, meaning that
+
+28
+00:02:43.740 --> 00:02:49.560
+<v Kyle Bernhardy>things are stored similar to a document store, but you can execute SQL against that. There's
+
+29
+00:02:49.560 --> 00:02:55.960
+<v Kyle Bernhardy>no underlying data transformations. And so you can do either NoSQL or SQL, we don't care.
+
+30
+00:02:55.960 --> 00:03:01.760
+<v Kyle Bernhardy>We're globally distributed. The focus is on simplicity, meaning that an engineer
+
+31
+00:03:01.760 --> 00:03:06.300
+<v Kyle Bernhardy>with a few clicks can get HarperDB up and running very quickly, connect
+
+32
+00:03:06.300 --> 00:03:10.700
+<v Kyle Bernhardy>multiple nodes together, start replicating data very easily. We're fully
+
+33
+00:03:10.700 --> 00:03:14.940
+<v Kyle Bernhardy>indexed, meaning that every top-level attribute in your records are
+
+34
+00:03:14.940 --> 00:03:19.920
+<v Kyle Bernhardy>automatically created in indices for, and we automatically real-time index that
+
+35
+00:03:19.920 --> 00:03:25.240
+<v Kyle Bernhardy>data. So the goal with all this is to make it simple, to make it performant. You
+
+36
+00:03:25.960 --> 00:03:30.360
+<v Kyle Bernhardy>table joins, you can do aggregates, you can do multiple where clauses, all that stuff
+
+37
+00:03:30.360 --> 00:03:31.000
+<v Kyle Bernhardy>you would expect.
+
+38
+00:03:31.360 --> 00:03:35.280
+<v Kyle Bernhardy>And now we have a new feature that just came out called custom functions.
+
+39
+00:03:35.440 --> 00:03:42.180
+<v Kyle Bernhardy>So on top of a very performant database, you can build your own endpoints that run resident
+
+40
+00:03:42.180 --> 00:03:48.200
+<v Kyle Bernhardy>with the data, similar to something like Amazon, AWS, Lambda, they're all in JavaScript.
+
+41
+00:03:48.680 --> 00:03:54.700
+<v Kyle Bernhardy>But you can build your own logic around our operations with access to our underlying functions.
+
+42
+00:03:55.960 --> 00:03:57.580
+<v Kyle Bernhardy>but with your extra logic,
+
+43
+00:03:57.660 --> 00:03:59.760
+<v Kyle Bernhardy>and you can bring in your own packages.
+
+44
+00:03:59.860 --> 00:04:04.100
+<v Kyle Bernhardy>So you can do things like ML, AI, things like that.
+
+45
+00:04:04.320 --> 00:04:05.400
+<v Kyle Bernhardy>You could also do it,
+
+46
+00:04:05.420 --> 00:04:08.280
+<v Kyle Bernhardy>host a static site inside HarperDB.
+
+47
+00:04:08.560 --> 00:04:11.240
+<v Kyle Bernhardy>So the focus is like now expanding that simplicity
+
+48
+00:04:11.240 --> 00:04:14.620
+<v Kyle Bernhardy>beyond just the database to now making it a data platform.
+
+49
+00:04:15.800 --> 00:04:18.600
+<v Kyle Bernhardy>Fizzle was this big data aggregation company
+
+50
+00:04:18.600 --> 00:04:20.400
+<v Kyle Bernhardy>for sports and entertainment.
+
+51
+00:04:20.820 --> 00:04:22.660
+<v Kyle Bernhardy>And so one of the things we did was
+
+52
+00:04:22.660 --> 00:04:25.280
+<v Kyle Bernhardy>We had firehose access to Twitter.
+
+53
+00:04:25.920 --> 00:04:31.060
+<v Kyle Bernhardy>And one of the biggest projects we did was analyzing every single tweet for the World Cup.
+
+54
+00:04:31.260 --> 00:04:39.660
+<v Kyle Bernhardy>It was 250,000 tweets per second that we were doing natural language processing on and further analysis.
+
+55
+00:04:39.960 --> 00:04:43.500
+<v Kyle Bernhardy>And those records were turning into millions and billions of records.
+
+56
+00:04:43.840 --> 00:04:46.940
+<v Kyle Bernhardy>And really, you're looking at all these tweets for every single game.
+
+57
+00:04:47.300 --> 00:04:49.640
+<v Kyle Bernhardy>We were doing branded tweets for this telco.
+
+58
+00:04:49.640 --> 00:05:00.220
+<v Kyle Bernhardy>And so within an hour after the game, we were putting up a 3D visualization of the sentiment of the game while it was going on.
+
+59
+00:05:00.320 --> 00:05:03.140
+<v Kyle Bernhardy>Like what people were talking about is pretty crazy.
+
+60
+00:05:03.340 --> 00:05:09.060
+<v Kyle Bernhardy>Like our database infrastructure was at the beginning was not built to handle that.
+
+61
+00:05:09.180 --> 00:05:16.220
+<v Kyle Bernhardy>And we were on a relational database and that relational database could not handle large scale individual transactions.
+
+62
+00:05:16.420 --> 00:05:17.600
+<v Kyle Bernhardy>It just kept crashing.
+
+63
+00:05:17.600 --> 00:05:22.120
+<v Kyle Bernhardy>And so we started like, you know, during that month, we build in a more resiliency.
+
+64
+00:05:22.180 --> 00:05:27.520
+<v Kyle Bernhardy>So we added DynamoDB as this umbrella to catch all these transactions.
+
+65
+00:05:27.740 --> 00:05:34.080
+<v Kyle Bernhardy>And then we would bulk push them to the relational database, which relational databases are very good at handling.
+
+66
+00:05:34.480 --> 00:05:45.380
+<v Kyle Bernhardy>But in order to get that over timely, we had to build this custom ETL tool to do this pipeline from one database to another because Amazon didn't have anything at the time that could help us out.
+
+67
+00:05:45.380 --> 00:05:51.040
+<v Kyle Bernhardy>So our database infrastructure got super complicated and that was really the
+
+68
+00:05:51.040 --> 00:05:55.480
+<v Kyle Bernhardy>genesis for HarperDB because we were spending at least $10,000 a month, I
+
+69
+00:05:55.480 --> 00:05:57.980
+<v Kyle Bernhardy>think ten to twenty thousand dollars a month just on our database
+
+70
+00:05:57.980 --> 00:06:03.620
+<v Kyle Bernhardy>infrastructure and a lot of our manpower was going to that. Sort of like late
+
+71
+00:06:03.620 --> 00:06:09.260
+<v Kyle Bernhardy>night TV commercials where you're like there's got to be a better way. So we had
+
+72
+00:06:09.260 --> 00:06:13.920
+<v Kyle Bernhardy>come up with you know an idea of we loved NoSQL databases because they're
+
+73
+00:06:15.380 --> 00:06:23.120
+<v Kyle Bernhardy>We also liked the relational databases, the ability to run like the SQL semantics and the analytics.
+
+74
+00:06:23.580 --> 00:06:27.600
+<v Kyle Bernhardy>And so we really wanted that like peanut butter and chocolate merged together.
+
+75
+00:06:28.160 --> 00:06:32.700
+<v Kyle Bernhardy>And we initially came up with an idea that was like multiple products tied together.
+
+76
+00:06:32.880 --> 00:06:35.300
+<v Kyle Bernhardy>We also realized we're not database people.
+
+77
+00:06:35.480 --> 00:06:40.580
+<v Kyle Bernhardy>We were power users of databases, but someone else will address this that knows better than us.
+
+78
+00:06:40.900 --> 00:06:43.940
+<v Kyle Bernhardy>And, you know, about a year went by and we always talked about this idea.
+
+79
+00:06:45.380 --> 00:06:52.080
+<v Kyle Bernhardy>about having a single model for being able to do NoSQL and SQL operations against the unified model.
+
+80
+00:06:52.820 --> 00:07:01.800
+<v Kyle Bernhardy>We left Fizzle and just we had about maybe three months of runway and we just decided to go for it.
+
+81
+00:07:04.120 --> 00:07:09.840
+<v Noah Labhart>So tell me about the MVP, that first product you built. How long did it take to build and what sort
+
+82
+00:07:09.840 --> 00:07:11.840
+<v Noah Labhart>What sort of tools did you use to bring it to life?
+
+83
+00:07:12.900 --> 00:07:20.060
+<v Kyle Bernhardy>From the inception of HarperDB up until now, the development framework for HarperDB is Node.js.
+
+84
+00:07:20.780 --> 00:07:31.380
+<v Kyle Bernhardy>So all JavaScript that, like I said, always was and is our underlying framework for HarperDB.
+
+85
+00:07:31.760 --> 00:07:39.280
+<v Kyle Bernhardy>And the reason for that was, one, our team had a lot of experience in scaling Node.js applications.
+
+86
+00:07:39.840 --> 00:07:45.720
+<v Kyle Bernhardy>we all have experience with it also when you're talking about especially an mvp you need to get
+
+87
+00:07:45.720 --> 00:07:54.780
+<v Kyle Bernhardy>something done well um but quickly um as a early stage startup um you're benchmarked more on
+
+88
+00:07:54.780 --> 00:08:01.420
+<v Kyle Bernhardy>technology in a tech space you're kind of benchmarked on the tech that you have and the
+
+89
+00:08:01.420 --> 00:08:05.960
+<v Kyle Bernhardy>ability to like create something and deliver something so we needed to get something out
+
+90
+00:08:05.960 --> 00:08:11.400
+<v Kyle Bernhardy>quickly and we realized that we could leverage the community so NPM is one of
+
+91
+00:08:11.400 --> 00:08:17.740
+<v Kyle Bernhardy>the largest if not the largest package manager in the world and there's tons of
+
+92
+00:08:17.740 --> 00:08:23.660
+<v Kyle Bernhardy>high quality open source libraries that we can leverage in order to propel our
+
+93
+00:08:23.660 --> 00:08:31.100
+<v Kyle Bernhardy>product forward so that is the framework the MVP we got we started in March of
+
+94
+00:08:31.100 --> 00:08:40.660
+<v Kyle Bernhardy>2017. We had an MVP out September, September-October of 2017. So pretty quick. That was an intense
+
+95
+00:08:41.140 --> 00:08:53.860
+<v Kyle Bernhardy>summer. And then we had our V1 product out January-February of 2018. So less than a year from
+
+96
+00:08:53.860 --> 00:09:02.640
+<v Kyle Bernhardy>From inception to like a V1 that we felt happy for users to start building products on.
+
+97
+00:09:04.120 --> 00:09:17.420
+<v Noah Labhart>Well, with any MVP, you've got to make certain decisions and trade-offs about what you're going to focus on in the beginning, what trade-offs you're going to make, and even what technical debt you're going to accept in the short term.
+
+98
+00:09:17.540 --> 00:09:22.200
+<v Noah Labhart>So tell me about some of those decisions and trade-offs you had to make and how you coped with them.
+
+99
+00:09:23.860 --> 00:09:41.500
+<v Kyle Bernhardy>It was a real challenge because being a database and the mindset that we had at the time was creating something new and unique to the marketplace and also how we went about being allowed to ingest JSON or CSV or records via SQL.
+
+100
+00:09:42.320 --> 00:09:50.140
+<v Kyle Bernhardy>We had this notion of just taking in that record or entry and completely blowing it apart by attribute.
+
+101
+00:09:50.140 --> 00:09:55.380
+<v Kyle Bernhardy>We, at the time, built our own underlying data store based on the file system.
+
+102
+00:09:56.020 --> 00:10:00.200
+<v Kyle Bernhardy>So there was a ton of time building that out, deciding how to do this.
+
+103
+00:10:00.420 --> 00:10:02.120
+<v Kyle Bernhardy>And that was really the core part.
+
+104
+00:10:02.300 --> 00:10:04.280
+<v Kyle Bernhardy>And we spent months just on that piece.
+
+105
+00:10:04.540 --> 00:10:06.920
+<v Kyle Bernhardy>And then you need to build the layers on top of it.
+
+106
+00:10:07.000 --> 00:10:08.640
+<v Kyle Bernhardy>You need to be able to insert data.
+
+107
+00:10:08.760 --> 00:10:09.600
+<v Kyle Bernhardy>You need to update it.
+
+108
+00:10:09.700 --> 00:10:11.020
+<v Kyle Bernhardy>You know, just general crud.
+
+109
+00:10:11.400 --> 00:10:19.720
+<v Kyle Bernhardy>For the MVP, the thing we realized initially was just to prove our model, we had the layers
+
+110
+00:10:20.140 --> 00:10:27.860
+<v Kyle Bernhardy>to execute SQL, but for the MVP we did not have a SQL layer when the initial
+
+111
+00:10:27.860 --> 00:10:35.160
+<v Kyle Bernhardy>MVP went out. Putting SQL to the side so that we can focus on sort of the core
+
+112
+00:10:35.160 --> 00:10:39.700
+<v Kyle Bernhardy>operations and the underlying guts of HarperDB, that was actually very freeing.
+
+113
+00:10:39.740 --> 00:10:44.640
+<v Kyle Bernhardy>So making these decisions at the time to say we will do this at this point in
+
+114
+00:10:44.640 --> 00:10:50.920
+<v Kyle Bernhardy>time. So time boxing it, not saying we'll get to it sometime, but saying we will get to it once
+
+115
+00:10:50.920 --> 00:10:56.460
+<v Kyle Bernhardy>this is complete. This is the next phase in our product. To be honest, it's freeing because
+
+116
+00:10:56.460 --> 00:11:02.420
+<v Kyle Bernhardy>there's that mental space that gets released so that you can focus on what's actually like very,
+
+117
+00:11:02.480 --> 00:11:06.820
+<v Kyle Bernhardy>very important rather than trying to eat the whole elephant. You're just taking bites.
+
+118
+00:11:07.580 --> 00:11:13.220
+<v Kyle Bernhardy>Also, the data distribution was something that we had to let go. So with HarperDB being,
+
+119
+00:11:14.660 --> 00:11:18.500
+<v Kyle Bernhardy>capacity to be globally replicated, you have to have a data synchronization
+
+120
+00:11:18.500 --> 00:11:23.200
+<v Kyle Bernhardy>mechanism, communication protocols between nodes, things like that. That was
+
+121
+00:11:23.200 --> 00:11:26.860
+<v Kyle Bernhardy>also something that we just had to let go because you got to build the
+
+122
+00:11:26.860 --> 00:11:32.540
+<v Kyle Bernhardy>foundation for the product before you start adding connective tissue. Again it
+
+123
+00:11:32.540 --> 00:11:37.520
+<v Kyle Bernhardy>was not, we'll get to it at some point, it was these things are also critical
+
+124
+00:11:37.520 --> 00:11:42.600
+<v Kyle Bernhardy>because they are part of our vision for the product and we can't actually do an
+
+125
+00:11:42.600 --> 00:11:49.700
+<v Kyle Bernhardy>official release until these things are available. But for an MVP just to say, hey, check out how
+
+126
+00:11:49.700 --> 00:11:56.960
+<v Kyle Bernhardy>easy HarperDB is. This is a beta MVP. Come and check it out. Being able to do the things that
+
+127
+00:11:56.960 --> 00:12:02.120
+<v Kyle Bernhardy>we did were huge successes in our minds. And also, you know, for our investors, you know,
+
+128
+00:12:02.120 --> 00:12:06.780
+<v Kyle Bernhardy>through all that, we were able to bring on more investors, start gaining community traction
+
+129
+00:12:06.780 --> 00:12:11.380
+<v Kyle Bernhardy>and feeling like, yes, we are continuously onto something here.
+
+130
+00:12:13.860 --> 00:12:18.000
+<v Noah Labhart>So from that point, how did you progress the product and mature it?
+
+131
+00:12:18.080 --> 00:12:25.760
+<v Noah Labhart>And I assume, you know, you're getting you're getting feedback and people are using the MVP and you're able to maybe go back and build some of those things.
+
+132
+00:12:25.820 --> 00:12:33.920
+<v Noah Labhart>But how did you go about, you know, building and structuring your roadmap and figuring out, OK, this thing is the next most important thing to build?
+
+133
+00:12:36.060 --> 00:12:41.660
+<v Kyle Bernhardy>When we started the company and before we started writing code, we did a ton of planning sessions.
+
+134
+00:12:42.600 --> 00:12:49.080
+<v Kyle Bernhardy>Aside from the product, from a company perspective, some of the very first things that we did was establish mission vision values.
+
+135
+00:12:49.460 --> 00:12:55.000
+<v Kyle Bernhardy>So really what that is, is creating an identity that's reflective of the people that make up the organization.
+
+136
+00:12:55.620 --> 00:13:00.880
+<v Kyle Bernhardy>And I'm only bringing that up because those are guideposts for how you make decisions.
+
+137
+00:13:01.200 --> 00:13:09.740
+<v Kyle Bernhardy>And that then helped us also decide, like, how do we make decisions when we're deciding what to do, how to do things, not just on the technical side.
+
+138
+00:13:09.740 --> 00:13:13.600
+<v Kyle Bernhardy>A lot of times these are even more important on the business side.
+
+139
+00:13:13.920 --> 00:13:20.720
+<v Kyle Bernhardy>We had pre-established an initial roadmap for HarperDB when we started the company.
+
+140
+00:13:20.820 --> 00:13:23.400
+<v Kyle Bernhardy>And again, before we actually started coding anything.
+
+141
+00:13:23.640 --> 00:13:27.920
+<v Kyle Bernhardy>So it was just like stepwise, we need to do this and now we need to do this.
+
+142
+00:13:28.040 --> 00:13:34.600
+<v Kyle Bernhardy>And so really plotting it out and being methodical about what we knew we had to do for the first year of the company.
+
+143
+00:13:34.600 --> 00:13:41.440
+<v Kyle Bernhardy>The custom functions thing was something that we knew we wanted to do from the inception of the company.
+
+144
+00:13:41.540 --> 00:13:43.840
+<v Kyle Bernhardy>It just was not as important.
+
+145
+00:13:44.260 --> 00:13:48.500
+<v Kyle Bernhardy>And so even four years later, there's still things that we had roadmapped.
+
+146
+00:13:48.680 --> 00:13:52.200
+<v Kyle Bernhardy>It just was not that had more of a question mark to it.
+
+147
+00:13:52.320 --> 00:13:56.580
+<v Kyle Bernhardy>But SQL was a must have. Data replication was a must have.
+
+148
+00:13:56.880 --> 00:13:58.160
+<v Kyle Bernhardy>We have to do this.
+
+149
+00:13:59.040 --> 00:14:03.420
+<v Kyle Bernhardy>But also, like you said, is being flexible and agile.
+
+150
+00:14:04.600 --> 00:14:12.420
+<v Kyle Bernhardy>What investors, you know, their investors, especially in the tech space, have a lot of experience, have invested in similar companies.
+
+151
+00:14:12.560 --> 00:14:25.400
+<v Kyle Bernhardy>And so listening to their feedback, trying to put ego aside and realizing that we don't know best and like, you know, other perspectives should be synthesized.
+
+152
+00:14:26.220 --> 00:14:33.980
+<v Kyle Bernhardy>Now, what we do is we have a feedback board for people to put feedback and people can rank them, you know, vote on them.
+
+153
+00:14:34.600 --> 00:14:35.820
+<v Kyle Bernhardy>We have a Slack channel now.
+
+154
+00:14:35.940 --> 00:14:38.360
+<v Kyle Bernhardy>And so we get a lot of feedback through our Slack group.
+
+155
+00:14:39.020 --> 00:14:42.280
+<v Kyle Bernhardy>Customers or potential customers hearing their needs,
+
+156
+00:14:42.830 --> 00:14:44.020
+<v Kyle Bernhardy>you know, because we're still a startup
+
+157
+00:14:44.020 --> 00:14:46.680
+<v Kyle Bernhardy>and you need to adapt to, you know,
+
+158
+00:14:46.680 --> 00:14:48.560
+<v Kyle Bernhardy>needs of your customers and things like that.
+
+159
+00:14:48.720 --> 00:14:51.700
+<v Kyle Bernhardy>So while we also internally have things
+
+160
+00:14:51.700 --> 00:14:52.600
+<v Kyle Bernhardy>that we want to achieve,
+
+161
+00:14:52.700 --> 00:14:55.980
+<v Kyle Bernhardy>it's also making sure that this product is useful
+
+162
+00:14:55.980 --> 00:14:59.660
+<v Kyle Bernhardy>to customers and potential customers as well.
+
+163
+00:14:59.760 --> 00:15:02.280
+<v Kyle Bernhardy>So it's really just like a mix of structure
+
+164
+00:15:02.280 --> 00:15:06.440
+<v Kyle Bernhardy>and some organic feedback and filtering that.
+
+165
+00:15:06.620 --> 00:15:09.520
+<v Kyle Bernhardy>And there's times where we think we're going to do one thing
+
+166
+00:15:09.520 --> 00:15:13.020
+<v Kyle Bernhardy>and we push it because there's just something that comes up.
+
+167
+00:15:13.500 --> 00:15:15.200
+<v Kyle Bernhardy>To go back to custom functions,
+
+168
+00:15:15.300 --> 00:15:18.820
+<v Kyle Bernhardy>that was something that maybe we would have tackled
+
+169
+00:15:19.500 --> 00:15:21.100
+<v Kyle Bernhardy>like maybe the end of this year,
+
+170
+00:15:21.220 --> 00:15:23.880
+<v Kyle Bernhardy>but we had a proof of concept that we were doing
+
+171
+00:15:23.880 --> 00:15:28.760
+<v Kyle Bernhardy>for a potential customer where enabling them
+
+172
+00:15:28.760 --> 00:15:31.940
+<v Kyle Bernhardy>to be able to build their own routes on top of HarperDB
+
+173
+00:15:32.280 --> 00:15:40.840
+<v Kyle Bernhardy>custom logic was critical and then also realizing that there's a lot of stickiness around this idea
+
+174
+00:15:41.360 --> 00:15:48.280
+<v Kyle Bernhardy>in the marketplace and so we jump started that through you know earlier this year and completing
+
+175
+00:15:48.280 --> 00:15:53.020
+<v Kyle Bernhardy>it uh this summer and it's just like that was something that we realized like we got to do
+
+176
+00:15:53.020 --> 00:15:58.200
+<v Kyle Bernhardy>this we have to do it for this customer and other customers and now when we socialize it
+
+177
+00:15:58.200 --> 00:16:04.480
+<v Kyle Bernhardy>you know, whether it's like through our Slack group or in sales calls, like it's the thing that
+
+178
+00:16:04.480 --> 00:16:09.180
+<v Kyle Bernhardy>people get the most excited about. Like they're excited about HarperDB, but when they realize,
+
+179
+00:16:09.320 --> 00:16:15.180
+<v Kyle Bernhardy>oh, I can build something on this, like that's custom to me and my organization, like the lights
+
+180
+00:16:15.180 --> 00:16:20.700
+<v Kyle Bernhardy>really turn on. And so that's just a great example of being flexible, but also staying within your
+
+181
+00:16:20.700 --> 00:16:21.200
+<v Kyle Bernhardy>vision.
+
+182
+00:16:22.600 --> 00:16:27.080
+<v Noah Labhart>Well, let's switch to team. And you touched on this a bit in the Genesis story of
+
+183
+00:16:28.220 --> 00:16:34.080
+<v Noah Labhart>that joined you and were co-founders and then you worked with on the product.
+
+184
+00:16:34.300 --> 00:16:37.780
+<v Noah Labhart>But tell me about the process you went through to build your team.
+
+185
+00:16:37.940 --> 00:16:42.600
+<v Noah Labhart>And I'm interested in what you look for in those people to indicate that they're the
+
+186
+00:16:42.600 --> 00:16:43.800
+<v Noah Labhart>winning horses to join you.
+
+187
+00:16:45.240 --> 00:16:49.740
+<v Kyle Bernhardy>Circle back to what I said, talking about mission, vision, values for an organization
+
+188
+00:16:49.740 --> 00:16:56.560
+<v Kyle Bernhardy>and especially essentially really how we choose people that are going to be great fits, great
+
+189
+00:16:56.560 --> 00:16:57.180
+<v Kyle Bernhardy>successes.
+
+190
+00:16:58.200 --> 00:17:03.420
+<v Kyle Bernhardy>really based on our values and our core values are authenticity, transparency, empowerment,
+
+191
+00:17:03.560 --> 00:17:09.240
+<v Kyle Bernhardy>and focus. What we want to promote is an environment where people can be themselves
+
+192
+00:17:09.240 --> 00:17:15.060
+<v Kyle Bernhardy>and just be authentic to who they are because we don't want to generate a company of
+
+193
+00:17:15.060 --> 00:17:20.040
+<v Kyle Bernhardy>corporate drones or anything like that. And also people that bring their unique perspectives,
+
+194
+00:17:20.300 --> 00:17:26.820
+<v Kyle Bernhardy>their unique identity to our organization. They allow us to come up with better ideas,
+
+195
+00:17:28.200 --> 00:17:32.160
+<v Kyle Bernhardy>solving a better community around HarperDB.
+
+196
+00:17:32.700 --> 00:17:35.040
+<v Kyle Bernhardy>So with that authenticity, it's also around
+
+197
+00:17:35.040 --> 00:17:36.780
+<v Kyle Bernhardy>you really accept yourself
+
+198
+00:17:36.780 --> 00:17:38.560
+<v Kyle Bernhardy>and you learn to accept other people.
+
+199
+00:17:38.780 --> 00:17:40.680
+<v Kyle Bernhardy>And that creates really comfortable environments
+
+200
+00:17:40.680 --> 00:17:43.620
+<v Kyle Bernhardy>because work is super stressful and it gets more,
+
+201
+00:17:43.740 --> 00:17:47.180
+<v Kyle Bernhardy>human interactions can make things even more stressful
+
+202
+00:17:47.180 --> 00:17:48.500
+<v Kyle Bernhardy>that's outside of work.
+
+203
+00:17:49.520 --> 00:17:51.920
+<v Kyle Bernhardy>Transparency is also really critical for us
+
+204
+00:17:51.920 --> 00:17:54.720
+<v Kyle Bernhardy>in the sense that we as an organization
+
+205
+00:17:55.600 --> 00:17:57.620
+<v Kyle Bernhardy>share what's going on, good and bad,
+
+206
+00:17:58.200 --> 00:18:03.920
+<v Kyle Bernhardy>a business side. When I'm making decisions for the engineering team, you know, someone asks me
+
+207
+00:18:03.920 --> 00:18:12.000
+<v Kyle Bernhardy>a question, I don't just say, yes, let's do that. I explain my thought process as to why I agree with,
+
+208
+00:18:12.100 --> 00:18:16.740
+<v Kyle Bernhardy>like, we're going to do this and this is why we are doing this. And then so if I'm transparent
+
+209
+00:18:16.740 --> 00:18:22.580
+<v Kyle Bernhardy>with people, I'm also expressing vulnerability with them and that also helps people typically
+
+210
+00:18:22.580 --> 00:18:25.580
+<v Kyle Bernhardy>typically feel more relaxed and reflect that back as well.
+
+211
+00:18:25.860 --> 00:18:28.920
+<v Kyle Bernhardy>And that also leads into then empowerment, right?
+
+212
+00:18:29.020 --> 00:18:32.260
+<v Kyle Bernhardy>Because I'm expressing my thought process in this example,
+
+213
+00:18:32.400 --> 00:18:35.360
+<v Kyle Bernhardy>and my team feels empowered to challenge me
+
+214
+00:18:35.360 --> 00:18:36.780
+<v Kyle Bernhardy>or ask me more questions.
+
+215
+00:18:37.000 --> 00:18:38.580
+<v Kyle Bernhardy>I want that from them.
+
+216
+00:18:38.720 --> 00:18:41.320
+<v Kyle Bernhardy>I'm not just saying, it's not a dictatorial
+
+217
+00:18:41.320 --> 00:18:44.100
+<v Kyle Bernhardy>where it's just do what I say, and this is the way it is.
+
+218
+00:18:44.240 --> 00:18:45.420
+<v Kyle Bernhardy>Do not question me.
+
+219
+00:18:46.400 --> 00:18:49.580
+<v Kyle Bernhardy>I don't know everything, and the more time goes on,
+
+220
+00:18:49.580 --> 00:18:53.840
+<v Kyle Bernhardy>I feel like I know less and less about more and more.
+
+221
+00:18:54.780 --> 00:18:57.540
+<v Kyle Bernhardy>So, you know, having an empowered team
+
+222
+00:18:57.540 --> 00:19:01.920
+<v Kyle Bernhardy>that can, you know, have this like cross conversation,
+
+223
+00:19:02.140 --> 00:19:04.320
+<v Kyle Bernhardy>it creates a really dynamic environment.
+
+224
+00:19:04.480 --> 00:19:06.580
+<v Kyle Bernhardy>And with that authenticity and transparency,
+
+225
+00:19:06.940 --> 00:19:10.540
+<v Kyle Bernhardy>it also creates like an environment that is not combative.
+
+226
+00:19:11.320 --> 00:19:12.440
+<v Kyle Bernhardy>It's collaborative.
+
+227
+00:19:13.840 --> 00:19:15.980
+<v Kyle Bernhardy>You know, and our final aspect is focus.
+
+228
+00:19:16.040 --> 00:19:19.480
+<v Kyle Bernhardy>And that's about like not trying to do five things
+
+229
+00:19:19.580 --> 00:19:24.920
+<v Kyle Bernhardy>at once. It's about like focusing and doing something well and then moving on to the next
+
+230
+00:19:24.920 --> 00:19:31.920
+<v Kyle Bernhardy>thing. For the people where those values don't mesh for them, and again, I'm not saying anyone's
+
+231
+00:19:31.920 --> 00:19:40.020
+<v Kyle Bernhardy>right or anyone's wrong. It's just what works for our organization. Typically, the people where this
+
+232
+00:19:40.020 --> 00:19:45.820
+<v Kyle Bernhardy>does not resonate with them, they won't continue in an interview process. It's not that we eliminate
+
+233
+00:19:45.820 --> 00:19:48.780
+<v Kyle Bernhardy>them it's just that they'll be like oh you know this organization is not for me
+
+234
+00:19:50.260 --> 00:19:55.260
+<v Kyle Bernhardy>my favorite thing for engineers is and it's really based off of my background
+
+235
+00:19:55.260 --> 00:20:00.900
+<v Kyle Bernhardy>was I was given a chance I had no computer science background it's a
+
+236
+00:20:00.900 --> 00:20:05.880
+<v Kyle Bernhardy>Commodore 64 you know I had an engineering background with like a lot
+
+237
+00:20:05.880 --> 00:20:11.300
+<v Kyle Bernhardy>of math and science but not like fingers the keyboard and knowing algorithms and
+
+238
+00:20:11.300 --> 00:20:17.880
+<v Kyle Bernhardy>and things like that. But I was given a chance. And I really love people that are that make
+
+239
+00:20:19.060 --> 00:20:24.260
+<v Kyle Bernhardy>career switches through their lives, like whether that's, you know, regardless of stage in life,
+
+240
+00:20:24.360 --> 00:20:28.740
+<v Kyle Bernhardy>like age or whatever. Those are some of my favorite people, because again, they're bringing
+
+241
+00:20:28.740 --> 00:20:35.120
+<v Kyle Bernhardy>a different perspective from their previous work to now. And also they chose to like upend a career,
+
+242
+00:20:35.120 --> 00:20:42.640
+<v Kyle Bernhardy>career make a very conscientious decision be like I am gonna go from wherever I was to into the
+
+243
+00:20:42.640 --> 00:20:48.880
+<v Kyle Bernhardy>technology space because I love it and there's various reasons for people getting into it but
+
+244
+00:20:48.880 --> 00:20:54.420
+<v Kyle Bernhardy>there's like a a legitimate passion it's not just like you know I was in high school and I thought
+
+245
+00:20:54.420 --> 00:21:00.860
+<v Kyle Bernhardy>I could make money and like this is good enough and you know you know and that's not wrong um but
+
+246
+00:21:00.860 --> 00:21:05.040
+<v Kyle Bernhardy>but like people that really enjoy technology and really enjoy solving problems.
+
+247
+00:21:05.960 --> 00:21:09.720
+<v Kyle Bernhardy>And it's also for me, it's like giving someone a chance
+
+248
+00:21:10.300 --> 00:21:13.080
+<v Kyle Bernhardy>is like the best way I can give back to the industry.
+
+249
+00:21:14.840 --> 00:21:19.140
+<v Kyle Bernhardy>It's like helping people break in because someone helped me a long time ago
+
+250
+00:21:19.140 --> 00:21:23.540
+<v Kyle Bernhardy>and many people invested in me a long time ago.
+
+251
+00:21:23.700 --> 00:21:27.720
+<v Kyle Bernhardy>So, you know, I learned early on that that was really important.
+
+252
+00:21:30.860 --> 00:21:34.740
+<v Noah Labhart>Well, this next question will be interesting, given the nature of your product.
+
+253
+00:21:35.180 --> 00:21:41.100
+<v Noah Labhart>Did you build this to scale efficiently from day one, or are you fighting this as you grow?
+
+254
+00:21:42.860 --> 00:21:50.560
+<v Kyle Bernhardy>I think from a staffing perspective, you know, with what I had already talked about, I think that was like built to scale.
+
+255
+00:21:50.880 --> 00:21:56.160
+<v Kyle Bernhardy>I will say I had to grow up a lot through this process.
+
+256
+00:21:56.160 --> 00:22:02.940
+<v Kyle Bernhardy>us. And, you know, when I co-founded HarperDB, I was not ready to be CTO. I had to learn how to be
+
+257
+00:22:02.940 --> 00:22:09.560
+<v Kyle Bernhardy>CTO. And I also had to learn how to trust. I had to learn how to cede some control. I also had to
+
+258
+00:22:09.560 --> 00:22:16.600
+<v Kyle Bernhardy>learn to become comfortable making decisions. So I, in looking back, there was a lot of things I
+
+259
+00:22:16.600 --> 00:22:23.960
+<v Kyle Bernhardy>did because of the things I just said that did not help the team or help the team scale. And,
+
+260
+00:22:23.960 --> 00:22:29.420
+<v Kyle Bernhardy>And, you know, that's something I'm, I'm not saying I'm the yogi on top of the mountain.
+
+261
+00:22:29.480 --> 00:22:35.560
+<v Kyle Bernhardy>I'm still working on all of those things, but I feel like I am better and I, I love
+
+262
+00:22:35.560 --> 00:22:42.020
+<v Kyle Bernhardy>my team and I trust my team and I am happy to see them taking the reins on things where
+
+263
+00:22:42.020 --> 00:22:42.800
+<v Kyle Bernhardy>I am now.
+
+264
+00:22:43.160 --> 00:22:48.780
+<v Kyle Bernhardy>I feel like I am much better now to scale from a personnel perspective.
+
+265
+00:22:48.780 --> 00:22:51.880
+<v Kyle Bernhardy>but when we started the company, not really.
+
+266
+00:22:52.740 --> 00:22:57.400
+<v Kyle Bernhardy>Because I had a lot of insecurities and I had to learn.
+
+267
+00:22:57.580 --> 00:23:00.280
+<v Kyle Bernhardy>And I was used to being an individual contributor
+
+268
+00:23:00.280 --> 00:23:04.920
+<v Kyle Bernhardy>and I had to learn that how I scale my capability
+
+269
+00:23:04.920 --> 00:23:07.340
+<v Kyle Bernhardy>is by helping the team.
+
+270
+00:23:07.800 --> 00:23:09.940
+<v Kyle Bernhardy>It's not just based on my work,
+
+271
+00:23:10.060 --> 00:23:13.180
+<v Kyle Bernhardy>it's on my ability to unblock other people.
+
+272
+00:23:14.300 --> 00:23:15.700
+<v Kyle Bernhardy>From a product perspective,
+
+273
+00:23:15.700 --> 00:23:23.920
+<v Kyle Bernhardy>perspective, I talked about our underlying data storage algorithm. That was based on the file
+
+274
+00:23:23.920 --> 00:23:30.880
+<v Kyle Bernhardy>system. After about two years, it just had significant scale on data issues. And again,
+
+275
+00:23:31.060 --> 00:23:36.380
+<v Kyle Bernhardy>that went back to being like, oh, we're building something unique. So it needs to be unique from
+
+276
+00:23:36.380 --> 00:23:44.140
+<v Kyle Bernhardy>the bottom to the top. But what we realized was our initial data storage process,
+
+277
+00:23:45.700 --> 00:23:51.300
+<v Kyle Bernhardy>called inodes. We just abused the file system and it just could not scale for large-scale
+
+278
+00:23:51.300 --> 00:23:56.040
+<v Kyle Bernhardy>data sets. And if you're using a database, it needs to scale to large-scale data sets.
+
+279
+00:23:56.240 --> 00:24:03.480
+<v Kyle Bernhardy>And so two years ago we had identified, hey, we need to address this. We need to change this.
+
+280
+00:24:03.780 --> 00:24:10.720
+<v Kyle Bernhardy>I had done a bake-off on a bunch of key value stores. And so on that note, that also goes back
+
+281
+00:24:10.720 --> 00:24:13.940
+<v Kyle Bernhardy>to feedback that we had gotten from investors.
+
+282
+00:24:14.400 --> 00:24:17.720
+<v Kyle Bernhardy>They said to us, your data storage is very unique.
+
+283
+00:24:18.400 --> 00:24:24.580
+<v Kyle Bernhardy>Also, a lot of databases enable multiple data storage mechanisms for different use cases.
+
+284
+00:24:24.720 --> 00:24:29.960
+<v Kyle Bernhardy>And have you thought about implementing something else and primarily key value stores?
+
+285
+00:24:30.120 --> 00:24:32.260
+<v Kyle Bernhardy>And we've gotten that feedback a few times.
+
+286
+00:24:32.400 --> 00:24:36.880
+<v Kyle Bernhardy>And we really just sort of discounted it because that was ego on our end.
+
+287
+00:24:36.880 --> 00:24:39.440
+<v Kyle Bernhardy>and then when you start running into problems,
+
+288
+00:24:39.600 --> 00:24:43.080
+<v Kyle Bernhardy>you get humbled and you break down a little bit
+
+289
+00:24:43.080 --> 00:24:45.240
+<v Kyle Bernhardy>and you realize, oh yeah,
+
+290
+00:24:45.400 --> 00:24:47.100
+<v Kyle Bernhardy>these guys knew what they were talking about.
+
+291
+00:24:47.620 --> 00:24:51.460
+<v Kyle Bernhardy>We landed on an open source key value store called LMDB.
+
+292
+00:24:51.680 --> 00:24:53.580
+<v Kyle Bernhardy>It's Lightning Memory Map Database.
+
+293
+00:24:53.640 --> 00:24:56.120
+<v Kyle Bernhardy>It's an amazing key value store
+
+294
+00:24:56.120 --> 00:25:00.320
+<v Kyle Bernhardy>and that has allowed us to scale.
+
+295
+00:25:00.440 --> 00:25:03.380
+<v Kyle Bernhardy>Like now, like, you know, data size is not,
+
+296
+00:25:03.420 --> 00:25:06.000
+<v Kyle Bernhardy>it's really just limited to like the disk you have.
+
+297
+00:25:06.880 --> 00:25:12.780
+<v Kyle Bernhardy>was one very specific technology area where we were not built to scale. Once we implemented that
+
+298
+00:25:12.780 --> 00:25:17.840
+<v Kyle Bernhardy>underlying data store and released that from a business perspective, things really started
+
+299
+00:25:17.840 --> 00:25:19.100
+<v Kyle Bernhardy>opening up for us.
+
+300
+00:25:21.740 --> 00:25:25.680
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built,
+
+301
+00:25:25.820 --> 00:25:26.920
+<v Noah Labhart>what are you most proud of?
+
+302
+00:25:28.400 --> 00:25:34.040
+<v Kyle Bernhardy>I'm most proud of my team. I love the people in my team. We do,
+
+303
+00:25:35.100 --> 00:25:36.060
+<v Kyle Bernhardy>especially since
+
+304
+00:25:36.960 --> 00:25:39.380
+<v Kyle Bernhardy>COVID has hit, we're all fully remote
+
+305
+00:25:39.380 --> 00:25:40.040
+<v Kyle Bernhardy>and so
+
+306
+00:25:41.260 --> 00:25:43.100
+<v Kyle Bernhardy>every day at 10 o'clock I have
+
+307
+00:25:43.100 --> 00:25:44.840
+<v Kyle Bernhardy>a stand up with my
+
+308
+00:25:44.840 --> 00:25:47.100
+<v Kyle Bernhardy>engineering team and it's like
+
+309
+00:25:47.100 --> 00:25:49.180
+<v Kyle Bernhardy>my favorite part of the day is I get to see everybody
+
+310
+00:25:49.920 --> 00:25:51.300
+<v Kyle Bernhardy>and it used to be
+
+311
+00:25:51.300 --> 00:25:53.060
+<v Kyle Bernhardy>stand up because when we were in an office
+
+312
+00:25:53.060 --> 00:25:55.380
+<v Kyle Bernhardy>it's like 15 minutes, no more than
+
+313
+00:25:55.380 --> 00:25:56.620
+<v Kyle Bernhardy>30 and it's just like hey
+
+314
+00:25:56.620 --> 00:25:59.440
+<v Kyle Bernhardy>it was almost like let's just get this over
+
+315
+00:25:59.440 --> 00:26:01.400
+<v Kyle Bernhardy>with, there's definitely some things
+
+316
+00:26:01.400 --> 00:26:03.140
+<v Kyle Bernhardy>that we need to talk through here
+
+317
+00:26:04.040 --> 00:26:08.340
+<v Kyle Bernhardy>point to doing a stand-up but it was like well we're all a small team we're all like kind of on
+
+318
+00:26:08.340 --> 00:26:14.240
+<v Kyle Bernhardy>top of each other anyway like you know we're just sort of doing this from a process perspective but
+
+319
+00:26:14.820 --> 00:26:21.780
+<v Kyle Bernhardy>since you know we've all gone remote um it's it's like we socialize and like I have learned like how
+
+320
+00:26:21.780 --> 00:26:27.440
+<v Kyle Bernhardy>much I really appreciate all of these people and then when I get to interact with our sales team
+
+321
+00:26:27.440 --> 00:26:35.320
+<v Kyle Bernhardy>team, just like how passionate and invested all of these people are and just like their
+
+322
+00:26:35.320 --> 00:26:37.160
+<v Kyle Bernhardy>unique personalities.
+
+323
+00:26:37.460 --> 00:26:42.800
+<v Kyle Bernhardy>Like just, you know, and again, going back to what I said is like our organization, like
+
+324
+00:26:42.800 --> 00:26:44.680
+<v Kyle Bernhardy>any company is made up of people.
+
+325
+00:26:44.980 --> 00:26:49.780
+<v Kyle Bernhardy>And so the organization will then reflect the people inside of it.
+
+326
+00:26:49.860 --> 00:26:53.740
+<v Kyle Bernhardy>And what you create is generated by all of them.
+
+327
+00:26:53.740 --> 00:27:00.000
+<v Kyle Bernhardy>them. So if I love the product, I love the people too. And I certainly do. And just the
+
+328
+00:27:00.000 --> 00:27:06.480
+<v Kyle Bernhardy>team that we have created so far and continue to create, I'm just super excited about the
+
+329
+00:27:06.480 --> 00:27:06.980
+<v Kyle Bernhardy>people.
+
+330
+00:27:07.900 --> 00:27:12.480
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made and how you
+
+331
+00:27:12.480 --> 00:27:13.820
+<v Noah Labhart>and your team responded to it.
+
+332
+00:27:15.520 --> 00:27:20.000
+<v Kyle Bernhardy>I'm not going to name this company because there's nothing wrong with them. But when
+
+333
+00:27:20.000 --> 00:27:28.960
+<v Kyle Bernhardy>When we initially had evaluated key value stores, we had actually partnered with a company.
+
+334
+00:27:28.980 --> 00:27:40.300
+<v Kyle Bernhardy>It was a for-profit company, and we partnered with them to redo our underlying data store based on their product.
+
+335
+00:27:42.840 --> 00:27:47.520
+<v Kyle Bernhardy>And we didn't do enough due diligence, and it's not their fault.
+
+336
+00:27:47.660 --> 00:27:48.620
+<v Kyle Bernhardy>It's on us.
+
+337
+00:27:50.000 --> 00:27:53.420
+<v Kyle Bernhardy>enough due diligence around like how their product would interact with our product,
+
+338
+00:27:54.840 --> 00:27:59.540
+<v Kyle Bernhardy>how it would all play out. And we just sort of, uh, it was almost like we felt like it was a
+
+339
+00:27:59.540 --> 00:28:06.680
+<v Kyle Bernhardy>lifeline that was being thrown to us. So we dove in and, you know, it cost us some money and it
+
+340
+00:28:06.680 --> 00:28:14.400
+<v Kyle Bernhardy>ended up just not working out. Um, and, uh, we were sort of planning on like doing, yeah, just
+
+341
+00:28:14.400 --> 00:28:17.720
+<v Kyle Bernhardy>just like being able to like roll this thing out
+
+342
+00:28:17.720 --> 00:28:19.820
+<v Kyle Bernhardy>in like late 2019.
+
+343
+00:28:20.020 --> 00:28:23.820
+<v Kyle Bernhardy>And we're all super excited about the potential for it.
+
+344
+00:28:23.880 --> 00:28:25.480
+<v Kyle Bernhardy>But once we were doing benchmarks,
+
+345
+00:28:25.640 --> 00:28:27.920
+<v Kyle Bernhardy>it just was like our existing data store
+
+346
+00:28:27.920 --> 00:28:31.360
+<v Kyle Bernhardy>and a lot of use cases was faster than there.
+
+347
+00:28:31.800 --> 00:28:34.300
+<v Kyle Bernhardy>And again, it wasn't a product, it was the implementation.
+
+348
+00:28:34.360 --> 00:28:37.800
+<v Kyle Bernhardy>And just our two products were not,
+
+349
+00:28:39.480 --> 00:28:41.760
+<v Kyle Bernhardy>like just the way our product works
+
+350
+00:28:41.760 --> 00:28:49.400
+<v Kyle Bernhardy>and the way their product work in our scenario it just was not a good fit um and so we lost money
+
+351
+00:28:49.800 --> 00:29:00.840
+<v Kyle Bernhardy>on that we also lost tech time on that um and that was like a real kind of gut punch um and um
+
+352
+00:29:01.700 --> 00:29:08.140
+<v Kyle Bernhardy>but you know we learned a lot from that and we learned uh when you learn what doesn't work you
+
+353
+00:29:08.140 --> 00:29:11.140
+<v Kyle Bernhardy>you also then get closer to what will work.
+
+354
+00:29:11.300 --> 00:29:12.700
+<v Kyle Bernhardy>And so for us, it's like, well,
+
+355
+00:29:12.880 --> 00:29:15.760
+<v Kyle Bernhardy>our underlying data store can't run as a separate server.
+
+356
+00:29:16.320 --> 00:29:20.260
+<v Kyle Bernhardy>It needs to run in line and embedded with our product.
+
+357
+00:29:21.260 --> 00:29:23.220
+<v Kyle Bernhardy>And that was like one of the key things
+
+358
+00:29:23.220 --> 00:29:25.720
+<v Kyle Bernhardy>and it needs to be very flexible.
+
+359
+00:29:25.800 --> 00:29:28.640
+<v Kyle Bernhardy>And so as we're adding metadata,
+
+360
+00:29:28.920 --> 00:29:31.080
+<v Kyle Bernhardy>we need to be able to on the fly,
+
+361
+00:29:31.200 --> 00:29:34.980
+<v Kyle Bernhardy>real time add new indexes or sub database
+
+362
+00:29:34.980 --> 00:29:36.380
+<v Kyle Bernhardy>or whatever you wanna call it
+
+363
+00:29:39.280 --> 00:29:45.980
+<v Kyle Bernhardy>and you know we need to be able to really efficiently create iterators based off of
+
+364
+00:29:45.980 --> 00:29:50.680
+<v Kyle Bernhardy>different types of range searches or equal searches or you know you know all different
+
+365
+00:29:50.680 --> 00:29:58.540
+<v Kyle Bernhardy>kinds of scans and have you know control on over how the data is actually like put into the data
+
+366
+00:29:58.540 --> 00:30:06.260
+<v Kyle Bernhardy>store itself so we learned a lot through that and then that helped us move forward to what I had
+
+367
+00:30:08.140 --> 00:30:16.460
+<v Kyle Bernhardy>the bake-off and LMDB. But it was really disheartening. And the two engineers that I had
+
+368
+00:30:16.460 --> 00:30:25.880
+<v Kyle Bernhardy>tasked with implementing this product, they were gutted because they spent three months working on
+
+369
+00:30:25.880 --> 00:30:33.100
+<v Kyle Bernhardy>this and it was really exciting. And then it just turns out, and we, you know, Steven, our CEO and
+
+370
+00:30:33.100 --> 00:30:37.160
+<v Kyle Bernhardy>myself, we personally communicated to them. It was like, this was not your fault. Like we,
+
+371
+00:30:37.740 --> 00:30:41.900
+<v Kyle Bernhardy>Steve and I own this because we made this decision. We sent you down this path and we
+
+372
+00:30:41.900 --> 00:30:46.200
+<v Kyle Bernhardy>tasked you with this. Um, it's not your fault. It's our fault, but they were still gutted too.
+
+373
+00:30:46.360 --> 00:30:52.060
+<v Kyle Bernhardy>And so you also need to, uh, reassure people that the work they did was valuable. It just
+
+374
+00:30:52.060 --> 00:31:00.020
+<v Kyle Bernhardy>didn't work out. And, um, I mean, it took, you know, uh, a month or so of, uh, shaking it off
+
+375
+00:31:00.020 --> 00:31:04.420
+<v Kyle Bernhardy>and trying to figure out what reality is like at this point.
+
+376
+00:31:04.500 --> 00:31:07.680
+<v Kyle Bernhardy>And, you know, how do you go forward from here?
+
+377
+00:31:07.860 --> 00:31:14.100
+<v Kyle Bernhardy>But, you know, we took that time and, you know, like I said, we, you know, did a new
+
+378
+00:31:14.100 --> 00:31:14.600
+<v Kyle Bernhardy>evaluate.
+
+379
+00:31:14.680 --> 00:31:19.380
+<v Kyle Bernhardy>Like also what I learned was, you know, the old phrase, trust, but verify.
+
+380
+00:31:20.120 --> 00:31:21.400
+<v Kyle Bernhardy>And that's what I did.
+
+381
+00:31:21.540 --> 00:31:26.100
+<v Kyle Bernhardy>And that's what I've also learned since then is, you know, using any implementation, working
+
+382
+00:31:26.100 --> 00:31:29.720
+<v Kyle Bernhardy>with any other partner, because I would expect that of them of us.
+
+383
+00:31:30.020 --> 00:31:33.820
+<v Kyle Bernhardy>And doing that with anyone else too is like, hey, your product sounds great.
+
+384
+00:31:33.940 --> 00:31:37.020
+<v Kyle Bernhardy>I'm going to run it through its paces and make sure it does what I need it to do.
+
+385
+00:31:38.040 --> 00:31:40.180
+<v Kyle Bernhardy>So, you know, there was a lot of learning lessons through that.
+
+386
+00:31:40.260 --> 00:31:51.020
+<v Kyle Bernhardy>So it's more like learning that even inside challenges, there's always an opportunity to learn something from it.
+
+387
+00:31:51.080 --> 00:31:57.800
+<v Kyle Bernhardy>Right. And that's always like for me personally, like whether it's in work or life, you know, I can't know.
+
+388
+00:31:57.800 --> 00:32:03.860
+<v Kyle Bernhardy>I can't control what happens in life, but what I can control is my reaction and also looking for,
+
+389
+00:32:04.480 --> 00:32:08.800
+<v Kyle Bernhardy>you know, this is a really hard time right now, but what can I learn from it? And how can I
+
+390
+00:32:08.800 --> 00:32:14.740
+<v Kyle Bernhardy>choose to go through this in a way that is not detrimental to relationships and, you know,
+
+391
+00:32:14.740 --> 00:32:20.220
+<v Kyle Bernhardy>other aspects of like my personal life or my work life or, you know, the work stream that we're
+
+392
+00:32:20.220 --> 00:32:20.720
+<v Kyle Bernhardy>doing.
+
+393
+00:32:21.200 --> 00:32:27.060
+<v Noah Labhart>I haven't heard it as succinct as the way you put it, but trust, but verify. I really liked
+
+394
+00:32:27.800 --> 00:32:29.980
+<v Noah Labhart>explaining that or talking to that to one of my team members today.
+
+395
+00:32:31.500 --> 00:32:36.340
+<v Noah Labhart>Well, what does the future look like for HarperDB, the product, and for your team?
+
+396
+00:32:38.320 --> 00:32:41.980
+<v Kyle Bernhardy>We're at a really exciting juncture in our company.
+
+397
+00:32:42.660 --> 00:32:45.960
+<v Kyle Bernhardy>We're partnering with a number of telcos,
+
+398
+00:32:46.680 --> 00:32:49.680
+<v Kyle Bernhardy>working with a number of large-scale gaming companies,
+
+399
+00:32:50.040 --> 00:32:53.560
+<v Kyle Bernhardy>really focused on the distributed nature of HarperDB.
+
+400
+00:32:53.560 --> 00:32:57.560
+<v Kyle Bernhardy>and the goal of that is really around edge computing.
+
+401
+00:32:57.940 --> 00:33:03.060
+<v Kyle Bernhardy>And so the last 15 years, cloud has been king.
+
+402
+00:33:03.380 --> 00:33:04.340
+<v Kyle Bernhardy>Cloud is amazing.
+
+403
+00:33:04.540 --> 00:33:06.820
+<v Kyle Bernhardy>We use Amazon for our cloud offering.
+
+404
+00:33:07.900 --> 00:33:09.980
+<v Kyle Bernhardy>There are some challenges with cloud,
+
+405
+00:33:10.140 --> 00:33:14.340
+<v Kyle Bernhardy>and that is centralization, and that introduces latency.
+
+406
+00:33:14.700 --> 00:33:16.740
+<v Kyle Bernhardy>And even though you can scale applications,
+
+407
+00:33:17.040 --> 00:33:18.920
+<v Kyle Bernhardy>let's say you're on Amazon and you can scale
+
+408
+00:33:18.920 --> 00:33:25.920
+<v Kyle Bernhardy>you know to Virginia and Oregon and Chicago and LA but you might have
+
+409
+00:33:25.920 --> 00:33:32.640
+<v Kyle Bernhardy>someone that's down in Texas and the latency for them to get that data may
+
+410
+00:33:32.640 --> 00:33:39.260
+<v Kyle Bernhardy>still not be great and also like your databases specifically tend to be very
+
+411
+00:33:39.260 --> 00:33:44.420
+<v Kyle Bernhardy>centralized and so you're creating choke points and all that and so the focus for
+
+412
+00:33:44.420 --> 00:33:50.360
+<v Kyle Bernhardy>a lot of use cases that we're addressing now is about decentralizing your data and scaling it
+
+413
+00:33:50.360 --> 00:33:56.920
+<v Kyle Bernhardy>across the globe, bringing your data and your logic close to the users that need it. So while
+
+414
+00:33:56.920 --> 00:34:02.880
+<v Kyle Bernhardy>you may be in Singapore, you're not having to make a hop across the ocean to Oregon to
+
+415
+00:34:02.880 --> 00:34:10.920
+<v Kyle Bernhardy>hit the API and access the database. Or even if the API is scaled, there's still a hop that has
+
+416
+00:34:10.920 --> 00:34:16.460
+<v Kyle Bernhardy>to make to the database itself. So bringing everything closer to your user base and because
+
+417
+00:34:16.460 --> 00:34:21.780
+<v Kyle Bernhardy>you know we're we live in the world where you know you're on your phone and something takes two
+
+418
+00:34:21.780 --> 00:34:28.200
+<v Kyle Bernhardy>seconds and you're like oh why is it taking so long? And it's because like you know like what's
+
+419
+00:34:28.200 --> 00:34:34.200
+<v Kyle Bernhardy>going to sometimes it's like going up to outer space to make a request. It's super exciting that
+
+420
+00:34:34.200 --> 00:34:37.160
+<v Kyle Bernhardy>that this vision that we've created about scale
+
+421
+00:34:37.160 --> 00:34:41.060
+<v Kyle Bernhardy>and simplicity is really starting to catch on.
+
+422
+00:34:41.260 --> 00:34:44.700
+<v Kyle Bernhardy>For a while, we were focused on the IoT industry,
+
+423
+00:34:44.960 --> 00:34:46.440
+<v Kyle Bernhardy>which is more like micro-compute.
+
+424
+00:34:47.200 --> 00:34:49.600
+<v Kyle Bernhardy>And so now this is still Edge,
+
+425
+00:34:49.760 --> 00:34:51.300
+<v Kyle Bernhardy>but it's like Edge data centers.
+
+426
+00:34:51.420 --> 00:34:53.220
+<v Kyle Bernhardy>And it's not necessarily micro-compute.
+
+427
+00:34:53.300 --> 00:34:56.340
+<v Kyle Bernhardy>You can definitely use our product on a Raspberry Pi
+
+428
+00:34:56.340 --> 00:34:58.420
+<v Kyle Bernhardy>to synchronize to bigger servers,
+
+429
+00:34:58.580 --> 00:35:03.520
+<v Kyle Bernhardy>but having just what you would consider to be a big server,
+
+430
+00:35:04.200 --> 00:35:10.980
+<v Kyle Bernhardy>to people is really like powering a lot of cool solutions and making the lives easier for customers
+
+431
+00:35:10.980 --> 00:35:18.080
+<v Kyle Bernhardy>and like the people that use those customers. You know one of the things I'm working on like
+
+432
+00:35:18.080 --> 00:35:23.560
+<v Kyle Bernhardy>currently right now is just researching you know improving our data replication algorithm
+
+433
+00:35:24.840 --> 00:35:32.640
+<v Kyle Bernhardy>and cross node consistency and so making that more battle hardened. It works great now but just
+
+434
+00:35:34.200 --> 00:35:39.600
+<v Kyle Bernhardy>making it like looking towards the future and looking towards higher scale and just making this
+
+435
+00:35:39.600 --> 00:35:46.520
+<v Kyle Bernhardy>more resilient, more powerful. So I'm just super excited on that from a technology perspective.
+
+436
+00:35:49.140 --> 00:35:55.660
+<v Kyle Bernhardy>And also on the custom functions piece, just as people are using it, getting user feedback from
+
+437
+00:35:55.660 --> 00:36:00.960
+<v Kyle Bernhardy>that, hearing what their needs are and starting to build out that framework and the underlying
+
+438
+00:36:03.040 --> 00:36:06.080
+<v Kyle Bernhardy>SDKs and features that entail that product as well.
+
+439
+00:36:06.340 --> 00:36:09.940
+<v Kyle Bernhardy>And it's really, for me, it's about empowering our user base
+
+440
+00:36:10.560 --> 00:36:12.360
+<v Kyle Bernhardy>to do awesome stuff.
+
+441
+00:36:14.000 --> 00:36:17.240
+<v Noah Labhart>Let's switch to you, Kyle. Who influences the way that you work?
+
+442
+00:36:17.360 --> 00:36:21.880
+<v Noah Labhart>Your name is CEO, CTO, architect, really any person that you look up to and why.
+
+443
+00:36:24.040 --> 00:36:25.460
+<v Kyle Bernhardy>Steven Goldberg, our CEO,
+
+444
+00:36:26.500 --> 00:36:29.680
+<v Kyle Bernhardy>he's not involved day to day,
+
+445
+00:36:30.960 --> 00:36:37.900
+<v Kyle Bernhardy>I are super close. Uh, and we have a lot of like very like deep talks just sort of about like,
+
+446
+00:36:37.960 --> 00:36:42.120
+<v Kyle Bernhardy>what are we working on? Why are we doing the things where it's like, ends up being more
+
+447
+00:36:42.120 --> 00:36:48.320
+<v Kyle Bernhardy>philosophical. Uh, Steven was like a religious studies major. Um, and so I think that's where,
+
+448
+00:36:48.360 --> 00:36:51.980
+<v Kyle Bernhardy>you know, a lot of that comes from for him, but like, we just have a very good connection
+
+449
+00:36:51.980 --> 00:36:59.660
+<v Kyle Bernhardy>and he helps guide me when I'm having a hard time, you know, making a decision or, um, you know,
+
+450
+00:37:01.620 --> 00:37:05.280
+<v Kyle Bernhardy>challenge in the organization and also like we've known each other for a long
+
+451
+00:37:05.280 --> 00:37:09.360
+<v Kyle Bernhardy>time we're like best friends and so like there's also you know on the personal
+
+452
+00:37:09.360 --> 00:37:15.320
+<v Kyle Bernhardy>side of our lives you know we get to also like share like you know great
+
+453
+00:37:15.320 --> 00:37:18.120
+<v Kyle Bernhardy>things are happening our lives challenging things are happening our
+
+454
+00:37:18.120 --> 00:37:25.960
+<v Kyle Bernhardy>lives and so um yeah I mean he's just a huge support for me but you know I would
+
+455
+00:37:25.960 --> 00:37:33.360
+<v Kyle Bernhardy>also say like on top of Steven like who influences my work is uh like my engineering team because
+
+456
+00:37:33.360 --> 00:37:41.340
+<v Kyle Bernhardy>I'm always looking for feedback um from them and I learn new things from them all the time
+
+457
+00:37:41.340 --> 00:37:48.700
+<v Kyle Bernhardy>and so they also impact me in like many small ways.
+
+458
+00:37:50.200 --> 00:37:53.000
+<v Noah Labhart>Well we talked about a mistake but a little bit
+
+459
+00:37:53.000 --> 00:37:57.300
+<v Noah Labhart>different spin. If you could go back to the beginning, what would you do differently? Or
+
+460
+00:37:57.300 --> 00:37:59.440
+<v Noah Labhart>where would you consider taking a different approach?
+
+461
+00:38:01.620 --> 00:38:03.600
+<v Kyle Bernhardy>I guess, you know, if I could go back
+
+462
+00:38:03.600 --> 00:38:10.820
+<v Kyle Bernhardy>in time and like inject some knowledge from where I am currently, I would, around the whole data
+
+463
+00:38:10.820 --> 00:38:18.520
+<v Kyle Bernhardy>storage piece, I would, you know, push myself to change that. But you know, where we were at the
+
+464
+00:38:18.520 --> 00:38:25.020
+<v Kyle Bernhardy>time I don't know that I can make that change from a technology side I think more than anything
+
+465
+00:38:25.020 --> 00:38:34.500
+<v Kyle Bernhardy>what I would you know say to myself just very personally is like um uh yeah this is serious
+
+466
+00:38:34.500 --> 00:38:40.580
+<v Kyle Bernhardy>but try not to take it too seriously like you can still do serious things with a light heart
+
+467
+00:38:41.560 --> 00:38:42.400
+<v Noah Labhart>and
+
+468
+00:38:42.400 --> 00:38:51.660
+<v Kyle Bernhardy>so I think I would give myself that advice is like try not to or try to enjoy this a little
+
+469
+00:38:51.660 --> 00:39:03.700
+<v Kyle Bernhardy>bit more and don't be as feeling so afraid I guess I would say and being afraid of failure
+
+470
+00:39:03.700 --> 00:39:14.740
+<v Kyle Bernhardy>failure because it's not the end. Failing is not the end. It's just, you know, not to be a cliche,
+
+471
+00:39:14.900 --> 00:39:22.180
+<v Kyle Bernhardy>but it's just the start of something new. And it's an opportunity to try something different.
+
+472
+00:39:23.080 --> 00:39:28.420
+<v Kyle Bernhardy>So I think it would be less about the technology and more about like me personally, how I would
+
+473
+00:39:28.420 --> 00:39:31.040
+<v Kyle Bernhardy>would approach starting the company.
+
+474
+00:39:33.840 --> 00:39:35.200
+<v Noah Labhart>Well, last question, Kyle.
+
+475
+00:39:35.400 --> 00:39:36.760
+<v Noah Labhart>So you're getting on a plane
+
+476
+00:39:36.760 --> 00:39:38.740
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+477
+00:39:38.740 --> 00:39:40.180
+<v Noah Labhart>who's built the next big thing.
+
+478
+00:39:40.480 --> 00:39:41.620
+<v Noah Labhart>They're jazzed about it.
+
+479
+00:39:41.660 --> 00:39:42.880
+<v Noah Labhart>They can't wait to show it off to the world.
+
+480
+00:39:42.940 --> 00:39:45.060
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+481
+00:39:45.560 --> 00:39:47.100
+<v Noah Labhart>What advice do you give that person
+
+482
+00:39:47.100 --> 00:39:48.640
+<v Noah Labhart>having gone down this road a bit?
+
+483
+00:39:49.680 --> 00:39:52.920
+<v Kyle Bernhardy>Well, one, I would just appreciate their excitement
+
+484
+00:39:52.920 --> 00:39:56.380
+<v Kyle Bernhardy>and the stage that they are at in their path,
+
+485
+00:39:56.380 --> 00:40:00.420
+<v Kyle Bernhardy>that they're like at the cusp of so much opportunity.
+
+486
+00:40:02.080 --> 00:40:09.500
+<v Kyle Bernhardy>The advice I would give is I think the advice I was going to give me from four years ago was,
+
+487
+00:40:09.600 --> 00:40:13.460
+<v Kyle Bernhardy>you know, this is a long race.
+
+488
+00:40:13.580 --> 00:40:14.660
+<v Kyle Bernhardy>It's not a sprint.
+
+489
+00:40:16.400 --> 00:40:19.380
+<v Kyle Bernhardy>Try to make sure that you take care of yourself.
+
+490
+00:40:19.380 --> 00:40:26.420
+<v Kyle Bernhardy>and while you know there's a lot of things that you have to do from a work perspective
+
+491
+00:40:27.980 --> 00:40:35.860
+<v Kyle Bernhardy>try to focus on you know the people in your life that help fulfill you the things in your life that
+
+492
+00:40:35.860 --> 00:40:42.800
+<v Kyle Bernhardy>help restore you whatever those things are going for a walk laughing with a friend
+
+493
+00:40:42.800 --> 00:40:51.060
+<v Kyle Bernhardy>you know reading a book whatever that is make sure you spend time on those things and
+
+494
+00:40:52.180 --> 00:40:59.320
+<v Kyle Bernhardy>try make sure you meter out your energy as much as you can while this is also a very
+
+495
+00:40:59.320 --> 00:41:02.520
+<v Kyle Bernhardy>can be an intense ride at some at times
+
+496
+00:41:04.800 --> 00:41:10.740
+<v Kyle Bernhardy>it's gonna and also it's like the the lows while they feel very low are not permanent
+
+497
+00:41:10.740 --> 00:41:15.780
+<v Kyle Bernhardy>and look for the, like, when you're in the parts that are really fun,
+
+498
+00:41:16.480 --> 00:41:23.440
+<v Kyle Bernhardy>take a moment and, like, feel it and acknowledge it and say, this is good too.
+
+499
+00:41:24.860 --> 00:41:27.100
+<v Noah Labhart>Well, Kyle, thank you for being on the show today.
+
+500
+00:41:27.240 --> 00:41:30.260
+<v Noah Labhart>Thank you for telling the creation story of HarperDB.
+
+501
+00:41:31.080 --> 00:41:31.920
+<v Kyle Bernhardy>Oh, my pleasure.
+
+502
+00:41:32.020 --> 00:41:34.680
+<v Kyle Bernhardy>Yeah, thank you again for having me on and just, you know,
+
+503
+00:41:34.700 --> 00:41:38.980
+<v Kyle Bernhardy>giving me the opportunity to, yeah, tell the story about myself
+
+504
+00:41:40.740 --> 00:41:42.560
+<v Kyle Bernhardy>the company and the people in our company.
+
+505
+00:41:44.380 --> 00:41:47.440
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+506
+00:41:50.060 --> 00:41:53.160
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+507
+00:41:53.300 --> 00:41:58.080
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+508
+00:41:58.460 --> 00:42:03.580
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+509
+00:42:03.880 --> 00:42:06.160
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+510
+00:42:06.380 --> 00:42:08.360
+<v Noah Labhart>Both things help us out tremendously.
+
+511
+00:42:10.880 --> 00:42:12.240
+<v Noah Labhart>And thanks again for listening.

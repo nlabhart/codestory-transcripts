@@ -1,0 +1,2431 @@
+WEBVTT
+
+NOTE S6 E8: Killing the SSH Key: Building Identity-Native Cloud Access and a $1B Unicorn with Ev Kontsevoy of Teleport
+
+1
+00:00:00.660 --> 00:00:05.680
+<v Ev Kontsevoy>We had our own roadmap, and then we had things that customers wanted, and we would only implement
+
+2
+00:00:05.680 --> 00:00:11.080
+<v Ev Kontsevoy>things that were on our roadmap anyway. So, in other words, we continue to be extremely
+
+3
+00:00:11.080 --> 00:00:16.140
+<v Ev Kontsevoy>opinionated. And right now, by the way, it's giving us massive benefits because Teleport
+
+4
+00:00:16.140 --> 00:00:21.700
+<v Ev Kontsevoy>is just so far ahead versus competing solutions because it doesn't use any secrets, any passwords
+
+5
+00:00:21.700 --> 00:00:27.020
+<v Ev Kontsevoy>anywhere. But in the early days, it was not obvious. I think at some point, like one of
+
+6
+00:00:27.020 --> 00:00:31.120
+<v Ev Kontsevoy>of Google teams reached out to us. They wanted us to support public-private keys for authentication.
+
+7
+00:00:31.660 --> 00:00:35.860
+<v Ev Kontsevoy>And believe it or not, we said no. We had like almost no revenue at the time and Google is
+
+8
+00:00:35.860 --> 00:00:41.300
+<v Ev Kontsevoy>calling and they want to purchase your product. We said no. My name is Ev Kontsevoy. I'm CEO and
+
+9
+00:00:41.300 --> 00:00:42.540
+<v Ev Kontsevoy>founder of Teleport.
+
+10
+00:00:47.640 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+11
+00:00:52.920 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+12
+00:00:57.100 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+13
+00:01:02.240 --> 00:01:03.880
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+14
+00:01:04.040 --> 00:01:08.520
+<v Noah Labhart>and today how Ev Kontsevoy built the easiest, most secure way
+
+15
+00:01:08.520 --> 00:01:12.160
+<v Noah Labhart>to access and connect to your cloud infrastructure.
+
+16
+00:01:13.380 --> 00:01:15.840
+<v Noah Labhart>All this and more on Code Story.
+
+17
+00:01:19.260 --> 00:01:22.340
+<v Noah Labhart>Ev Kontsevoy wanted to be an engineer when he grew up,
+
+18
+00:01:22.920 --> 00:01:27.620
+<v Noah Labhart>this was directly influenced by his engineering parents. When he was younger, computers were
+
+19
+00:01:27.620 --> 00:01:32.380
+<v Noah Labhart>relatively uncool still, but as they grew in popularity, he started to explore how to make
+
+20
+00:01:32.380 --> 00:01:38.220
+<v Noah Labhart>computers do what he wanted them to do, specifically to interact with hardware. He recalls burning up
+
+21
+00:01:38.220 --> 00:01:42.800
+<v Noah Labhart>a monitor once because he was tinkering with changing the refresh rate. Eventually, he got
+
+22
+00:01:42.800 --> 00:01:48.520
+<v Noah Labhart>into infrastructure so he could serve engineers and stay close to the hardware. Fun fact about him,
+
+23
+00:01:48.520 --> 00:01:50.940
+<v Noah Labhart>Ev enjoys to watch computers boot.
+
+24
+00:01:51.100 --> 00:01:51.600
+<v Noah Labhart>Wow.
+
+25
+00:01:51.800 --> 00:01:54.980
+<v Noah Labhart>Outside of tech, he likes to tinker with photography, but not digitally.
+
+26
+00:01:55.200 --> 00:01:58.340
+<v Noah Labhart>He likes the old cameras, where you have to develop the pictures yourself.
+
+27
+00:01:59.620 --> 00:02:02.540
+<v Noah Labhart>Prior to his current venture, he created Mailgun,
+
+28
+00:02:02.720 --> 00:02:05.700
+<v Noah Labhart>one of the top transactional email platforms out there,
+
+29
+00:02:05.800 --> 00:02:07.300
+<v Noah Labhart>which he eventually sold to Rackspace.
+
+30
+00:02:07.900 --> 00:02:11.080
+<v Noah Labhart>During his time scaling Mailgun and working for Rackspace,
+
+31
+00:02:11.340 --> 00:02:15.180
+<v Noah Labhart>he started to feel the pain of logging into multiple cloud services.
+
+32
+00:02:15.180 --> 00:02:20.780
+<v Noah Labhart>So much so that he decided to consolidate these connections into a single platform.
+
+33
+00:02:22.120 --> 00:02:24.900
+<v Noah Labhart>This is the creation story of Teleport.
+
+34
+00:02:28.400 --> 00:02:34.100
+<v Ev Kontsevoy>Teleport, it's the easiest way to access securely all of your computing infrastructure.
+
+35
+00:02:34.680 --> 00:02:42.240
+<v Ev Kontsevoy>SSH for servers, so if you need to access Kubernetes clusters or various databases like MongoDB, MySQL, Postgres,
+
+36
+00:02:42.240 --> 00:02:45.280
+<v Ev Kontsevoy>even Windows desktops, which is RDP protocol.
+
+37
+00:02:45.580 --> 00:02:47.780
+<v Ev Kontsevoy>So it's basically a remote access solution
+
+38
+00:02:47.780 --> 00:02:49.460
+<v Ev Kontsevoy>that speaks all of these protocols.
+
+39
+00:02:49.820 --> 00:02:53.560
+<v Ev Kontsevoy>And just as I described what Teleport is,
+
+40
+00:02:53.640 --> 00:02:55.700
+<v Ev Kontsevoy>I think it should be pretty obvious why it was built
+
+41
+00:02:55.700 --> 00:02:58.620
+<v Ev Kontsevoy>because all of us scaling Mailgun
+
+42
+00:02:58.620 --> 00:02:59.780
+<v Ev Kontsevoy>and then being at Rackspace
+
+43
+00:02:59.780 --> 00:03:01.460
+<v Ev Kontsevoy>and interacting with people
+
+44
+00:03:01.460 --> 00:03:04.160
+<v Ev Kontsevoy>who are major users of cloud computing
+
+45
+00:03:04.160 --> 00:03:05.740
+<v Ev Kontsevoy>because I was trying to understand,
+
+46
+00:03:05.940 --> 00:03:07.220
+<v Ev Kontsevoy>being at Rackspace,
+
+47
+00:03:07.420 --> 00:03:08.280
+<v Ev Kontsevoy>I was trying to understand
+
+48
+00:03:08.280 --> 00:03:10.280
+<v Ev Kontsevoy>why would someone use Azure?
+
+49
+00:03:12.260 --> 00:03:16.760
+<v Ev Kontsevoy>space, it was number one pain point that people were always complaining about. Because we have
+
+50
+00:03:16.760 --> 00:03:21.360
+<v Ev Kontsevoy>this technology stacks, like the computing environments that we deploy into. And those
+
+51
+00:03:21.940 --> 00:03:26.760
+<v Ev Kontsevoy>are getting taller and taller. Because we as an industry, we keep building new technologies and
+
+52
+00:03:26.760 --> 00:03:32.420
+<v Ev Kontsevoy>we never make anything obsolete. So every single layer, they all have remote access. They all
+
+53
+00:03:32.420 --> 00:03:37.200
+<v Ev Kontsevoy>listen and network. They all have their own login, authentication, authorization. They have their own
+
+54
+00:03:37.200 --> 00:03:42.060
+<v Ev Kontsevoy>audit logs. So if you want to do computing securely, you have to have expertise on your team.
+
+55
+00:03:42.240 --> 00:03:44.420
+<v Ev Kontsevoy>how to set up remote access to all of these technologies.
+
+56
+00:03:45.280 --> 00:03:47.880
+<v Ev Kontsevoy>Or let's just download, put Teleport in.
+
+57
+00:03:47.960 --> 00:03:50.340
+<v Ev Kontsevoy>And Teleport is a single proxy, single endpoint,
+
+58
+00:03:50.640 --> 00:03:53.320
+<v Ev Kontsevoy>single login into all of these layers.
+
+59
+00:03:53.780 --> 00:03:58.880
+<v Ev Kontsevoy>So Teleport is adopted by NASDAQ, by IBM, Sumo Logic.
+
+60
+00:03:58.940 --> 00:04:01.360
+<v Ev Kontsevoy>We have lots and lots of really, really cool logos.
+
+61
+00:04:01.540 --> 00:04:04.720
+<v Ev Kontsevoy>And the inspiration for Teleport obviously was
+
+62
+00:04:04.720 --> 00:04:05.980
+<v Ev Kontsevoy>because we needed it ourselves.
+
+63
+00:04:06.600 --> 00:04:10.000
+<v Ev Kontsevoy>As our previous company, Mailgun, grew,
+
+64
+00:04:10.000 --> 00:04:12.100
+<v Ev Kontsevoy>and then we launched another product called Gravity,
+
+65
+00:04:12.280 --> 00:04:14.060
+<v Ev Kontsevoy>which was the Kubernetes-based thing.
+
+66
+00:04:14.500 --> 00:04:17.460
+<v Ev Kontsevoy>Like we just realized that there needs to be a single way
+
+67
+00:04:17.460 --> 00:04:19.060
+<v Ev Kontsevoy>to accessing all of your infrastructure.
+
+68
+00:04:19.400 --> 00:04:21.620
+<v Ev Kontsevoy>And we realized that there needs to be a technology
+
+69
+00:04:21.620 --> 00:04:22.820
+<v Ev Kontsevoy>that's called AccessPlane.
+
+70
+00:04:23.500 --> 00:04:26.340
+<v Ev Kontsevoy>AccessPlane is a single way of accessing everything you have.
+
+71
+00:04:26.500 --> 00:04:29.060
+<v Ev Kontsevoy>And there is this futuristic part of me
+
+72
+00:04:29.060 --> 00:04:31.180
+<v Ev Kontsevoy>that also welcomes this development
+
+73
+00:04:31.180 --> 00:04:34.300
+<v Ev Kontsevoy>because if we think about evolution of computing,
+
+74
+00:04:34.720 --> 00:04:36.320
+<v Ev Kontsevoy>let's say you work at Twilio,
+
+75
+00:04:36.400 --> 00:04:37.840
+<v Ev Kontsevoy>or like pick any tech company,
+
+76
+00:04:37.840 --> 00:04:40.400
+<v Ev Kontsevoy>Twilio, Snowflake, Airbnb, whatever.
+
+77
+00:04:40.600 --> 00:04:42.000
+<v Ev Kontsevoy>So you join Airbnb.
+
+78
+00:04:42.340 --> 00:04:46.560
+<v Ev Kontsevoy>And then you, so your job is to write programs, computer programs.
+
+79
+00:04:46.840 --> 00:04:49.520
+<v Ev Kontsevoy>But what are these programs running on?
+
+80
+00:04:49.960 --> 00:04:52.700
+<v Ev Kontsevoy>Back in the day, like way back, 30, 40 years ago,
+
+81
+00:04:52.780 --> 00:04:54.580
+<v Ev Kontsevoy>those programs would run on a machine.
+
+82
+00:04:54.740 --> 00:04:55.760
+<v Ev Kontsevoy>There was a single machine.
+
+83
+00:04:56.600 --> 00:05:00.160
+<v Ev Kontsevoy>And to put your program into that machine, you would access that machine.
+
+84
+00:05:00.240 --> 00:05:02.080
+<v Ev Kontsevoy>You would use a keyboard, mouse, whatever.
+
+85
+00:05:02.260 --> 00:05:05.640
+<v Ev Kontsevoy>So you would get into that box, put your program in there, it would run.
+
+86
+00:05:05.640 --> 00:05:08.240
+<v Ev Kontsevoy>It would be like one-to-one interaction between you and the machine.
+
+87
+00:05:08.440 --> 00:05:11.340
+<v Ev Kontsevoy>But now, all these machines, they're scattered all over.
+
+88
+00:05:11.580 --> 00:05:16.040
+<v Ev Kontsevoy>They are in multiple data centers across different cloud providers, Amazon East, Amazon West,
+
+89
+00:05:16.140 --> 00:05:16.880
+<v Ev Kontsevoy>availability zones.
+
+90
+00:05:17.140 --> 00:05:19.200
+<v Ev Kontsevoy>And it's not just machines that we're interacting.
+
+91
+00:05:19.380 --> 00:05:22.740
+<v Ev Kontsevoy>We're interacting with databases, CI/CD tooling.
+
+92
+00:05:22.900 --> 00:05:24.940
+<v Ev Kontsevoy>There's just a lot of these different technologies.
+
+93
+00:05:25.440 --> 00:05:30.220
+<v Ev Kontsevoy>And we, as an industry, we're now starting to realize that things are just too complex.
+
+94
+00:05:30.520 --> 00:05:34.880
+<v Ev Kontsevoy>The complexity, the distributed nature of it all, they're slowing us down.
+
+95
+00:05:35.640 --> 00:05:39.020
+<v Ev Kontsevoy>So now I think that we as an industry need to start to simplify things.
+
+96
+00:05:39.200 --> 00:05:43.540
+<v Ev Kontsevoy>So if you join, let's say, Airbnb, we're going to use this as an example.
+
+97
+00:05:43.640 --> 00:05:47.880
+<v Ev Kontsevoy>And you should think that I am going to program Airbnb computer.
+
+98
+00:05:48.140 --> 00:05:52.140
+<v Ev Kontsevoy>And that Airbnb computer just happens to consist of cloud environments,
+
+99
+00:05:52.300 --> 00:05:55.320
+<v Ev Kontsevoy>servers, Kubernetes clusters, whatever it is that Airbnb is using.
+
+100
+00:05:55.480 --> 00:05:59.040
+<v Ev Kontsevoy>But having this interface that makes it feel that it's a single machine
+
+101
+00:05:59.580 --> 00:06:01.200
+<v Ev Kontsevoy>would be nice, don't you think?
+
+102
+00:06:01.660 --> 00:06:06.020
+<v Ev Kontsevoy>We want everyone to feel that they are interacting with a single machine.
+
+103
+00:06:06.200 --> 00:06:08.460
+<v Ev Kontsevoy>So it has the context that knows who you are.
+
+104
+00:06:08.520 --> 00:06:15.000
+<v Ev Kontsevoy>And the fact that it consists of thousands of SSH servers or Kubernetes clusters, databases, and so on and so forth, it doesn't matter.
+
+105
+00:06:15.180 --> 00:06:23.700
+<v Ev Kontsevoy>From a practical perspective, it's probably the best open source implementation of SSH, RDP, and all these database protocols for accessing them remotely.
+
+106
+00:06:25.860 --> 00:06:26.900
+<v Noah Labhart>Tell me about the MVP.
+
+107
+00:06:27.200 --> 00:06:31.040
+<v Noah Labhart>Tell me how long it took you to build and what sort of tools you used to bring it to life.
+
+108
+00:06:32.520 --> 00:06:35.920
+<v Ev Kontsevoy>Teleport originally, as I said, it started as an internal project
+
+109
+00:06:35.920 --> 00:06:39.060
+<v Ev Kontsevoy>So we were working on a different technology at the time
+
+110
+00:06:39.060 --> 00:06:45.680
+<v Ev Kontsevoy>We wanted to figure out how we can make Kubernetes cluster exist in a single file
+
+111
+00:06:45.680 --> 00:06:48.940
+<v Ev Kontsevoy>And how you can take that single executable file
+
+112
+00:06:48.940 --> 00:06:52.280
+<v Ev Kontsevoy>And put it on any infrastructure anywhere in the world
+
+113
+00:06:52.280 --> 00:06:56.000
+<v Ev Kontsevoy>The idea was, how do we make Kubernetes clusters extremely portable
+
+114
+00:06:56.000 --> 00:07:00.180
+<v Ev Kontsevoy>So you could have exact same system that you can capture in a single file
+
+115
+00:07:01.200 --> 00:07:03.640
+<v Ev Kontsevoy>replica on, AWS on, in many different environments.
+
+116
+00:07:03.700 --> 00:07:04.780
+<v Ev Kontsevoy>A completely different project.
+
+117
+00:07:05.100 --> 00:07:11.600
+<v Ev Kontsevoy>We were working on that technology and we needed something that will give us absolutely
+
+118
+00:07:11.600 --> 00:07:17.740
+<v Ev Kontsevoy>secure access to any place in the world, even if that place is not even on the same network.
+
+119
+00:07:17.980 --> 00:07:19.560
+<v Ev Kontsevoy>And we needed to be convenient.
+
+120
+00:07:19.680 --> 00:07:23.480
+<v Ev Kontsevoy>And we also needed to have extremely solid security compliance guarantees.
+
+121
+00:07:23.720 --> 00:07:28.360
+<v Ev Kontsevoy>Because at the time, we were dreaming about selling that technology to Air Force, for
+
+122
+00:07:28.360 --> 00:07:29.520
+<v Ev Kontsevoy>example, as a customer.
+
+123
+00:07:31.200 --> 00:07:37.320
+<v Ev Kontsevoy>port was born, that we felt that the traditional way of doing SSH, for example, is to like set up
+
+124
+00:07:37.320 --> 00:07:43.080
+<v Ev Kontsevoy>a jump host or a bastion in one place and open some network ports and then basically start figuring
+
+125
+00:07:43.080 --> 00:07:48.880
+<v Ev Kontsevoy>out how to rotate SSH keys and you have some kind of secure vault for those keys. It's the usual
+
+126
+00:07:48.880 --> 00:07:53.440
+<v Ev Kontsevoy>stuff that most companies use and none of that scaled for this use case, right? So if you have
+
+127
+00:07:53.440 --> 00:07:58.640
+<v Ev Kontsevoy>thousands and thousands of locations all over, like there could be firewalls with, they're not
+
+128
+00:07:58.640 --> 00:08:04.360
+<v Ev Kontsevoy>even like you don't have any open ports you cannot really get into that so we couldn't distribute our
+
+129
+00:08:04.360 --> 00:08:10.340
+<v Ev Kontsevoy>kubernetes payload into those locations so the idea of teleport was born as a it's almost like
+
+130
+00:08:10.340 --> 00:08:15.760
+<v Ev Kontsevoy>let's encrypt for private enterprise so you have this single access point and into that access
+
+131
+00:08:15.760 --> 00:08:20.620
+<v Ev Kontsevoy>point you would have this reverse tunnels from all of these different locations and that access
+
+132
+00:08:20.620 --> 00:08:25.160
+<v Ev Kontsevoy>point and those tunnels that would be identity aware so you would go through sso whatever you
+
+133
+00:08:25.160 --> 00:08:30.520
+<v Ev Kontsevoy>use, Active Directory, Okta, GitHub, Google Apps, like in your organization. And that would give you
+
+134
+00:08:30.520 --> 00:08:36.360
+<v Ev Kontsevoy>access to any computing device like in the world, even if it's a flying drone. And the MVP was coded
+
+135
+00:08:36.360 --> 00:08:43.300
+<v Ev Kontsevoy>by our CTO, Sasha, in literally a weekend, because he recognized very early that we as an industry
+
+136
+00:08:43.300 --> 00:08:47.960
+<v Ev Kontsevoy>need to move away from all forms of shared credentials, secrets, passwords, all of that is
+
+137
+00:08:47.960 --> 00:08:53.520
+<v Ev Kontsevoy>just not going to scale. It's going to get obsolete. And Teleport was built as probably the only SSH
+
+138
+00:08:55.160 --> 00:09:01.020
+<v Ev Kontsevoy>it only could do SSH. It's 100% based on certificates. There is no other way to configure
+
+139
+00:09:01.020 --> 00:09:08.020
+<v Ev Kontsevoy>it, which made certificate-based experience first class. It's actually easier to use Teleport with
+
+140
+00:09:08.020 --> 00:09:14.480
+<v Ev Kontsevoy>certs than to use OpenSSH with public-private keys. So not only it's basically better technology,
+
+141
+00:09:14.560 --> 00:09:20.440
+<v Ev Kontsevoy>but also easier to use. So he built Teleport, what felt to me was a single weekend, the prototype.
+
+142
+00:09:20.440 --> 00:09:25.940
+<v Ev Kontsevoy>time. And he even managed to pack a lot of things into it that on the surface make no sense.
+
+143
+00:09:26.740 --> 00:09:33.640
+<v Ev Kontsevoy>For example, we thought, like, we knew that there are some use cases where, like, two people could
+
+144
+00:09:33.640 --> 00:09:38.860
+<v Ev Kontsevoy>get into the same machine at the same time. And you could enforce things like one of them needs
+
+145
+00:09:38.860 --> 00:09:43.320
+<v Ev Kontsevoy>to watch what the other one is doing. Like some banks, they called it like four-eye policy. So
+
+146
+00:09:43.320 --> 00:09:48.300
+<v Ev Kontsevoy>we've had this idea of shared sessions where multiple people are in the same session in the
+
+147
+00:09:48.300 --> 00:09:53.860
+<v Ev Kontsevoy>same box and then we figured why don't we have chat for it so we added chats can you imagine
+
+148
+00:09:53.860 --> 00:09:59.580
+<v Ev Kontsevoy>like ssh having built-in chat all of this was just for internal use probably similar to story of slack
+
+149
+00:10:00.100 --> 00:10:05.480
+<v Ev Kontsevoy>but then we quickly realized that no like we like chat is just that's bad idea to have chat in a
+
+150
+00:10:05.480 --> 00:10:10.920
+<v Ev Kontsevoy>security solution we also quickly realized that these days you have to have some kind of web ui
+
+151
+00:10:10.920 --> 00:10:17.600
+<v Ev Kontsevoy>so the second part of the mvp was to add a web ui and again just kind of curious fact i really
+
+152
+00:10:18.460 --> 00:10:20.700
+<v Ev Kontsevoy>the UI to look very global
+
+153
+00:10:20.700 --> 00:10:22.000
+<v Ev Kontsevoy>because I wanted to show it
+
+154
+00:10:22.000 --> 00:10:23.140
+<v Ev Kontsevoy>to some early investors
+
+155
+00:10:23.140 --> 00:10:23.820
+<v Ev Kontsevoy>because we were thinking
+
+156
+00:10:23.820 --> 00:10:25.100
+<v Ev Kontsevoy>about raising seed stage
+
+157
+00:10:25.100 --> 00:10:25.640
+<v Ev Kontsevoy>and ask them,
+
+158
+00:10:25.660 --> 00:10:27.620
+<v Ev Kontsevoy>Sasha, can you put like a world map
+
+159
+00:10:27.620 --> 00:10:31.160
+<v Ev Kontsevoy>as a first UI screen
+
+160
+00:10:31.160 --> 00:10:32.480
+<v Ev Kontsevoy>you see when you open
+
+161
+00:10:32.480 --> 00:10:33.340
+<v Ev Kontsevoy>teleport in a browser
+
+162
+00:10:33.340 --> 00:10:34.160
+<v Ev Kontsevoy>just to show like
+
+163
+00:10:34.160 --> 00:10:35.300
+<v Ev Kontsevoy>this is the map of the world
+
+164
+00:10:35.300 --> 00:10:35.880
+<v Ev Kontsevoy>and this is where
+
+165
+00:10:35.880 --> 00:10:37.000
+<v Ev Kontsevoy>your teleport locations are.
+
+166
+00:10:37.480 --> 00:10:38.960
+<v Ev Kontsevoy>It's amazing how quickly
+
+167
+00:10:38.960 --> 00:10:40.220
+<v Ev Kontsevoy>you could build something valuable
+
+168
+00:10:40.220 --> 00:10:42.260
+<v Ev Kontsevoy>if you have a very clear idea
+
+169
+00:10:42.260 --> 00:10:45.080
+<v Ev Kontsevoy>why someone would want this.
+
+170
+00:10:47.520 --> 00:10:53.620
+<v Noah Labhart>you've got your mvp done really quickly sasha nailed it crushed it really quickly added in
+
+171
+00:10:53.620 --> 00:10:58.020
+<v Noah Labhart>stuff that you needed or didn't need but was really cool that it was there how did you progress
+
+172
+00:10:58.020 --> 00:11:03.520
+<v Noah Labhart>it from that point right how did you decide how did you build your roadmap and decide okay this
+
+173
+00:11:03.520 --> 00:11:05.800
+<v Noah Labhart>is the next most important thing to build
+
+174
+00:11:05.800 --> 00:11:09.940
+<v Ev Kontsevoy>so once again scratching your own itch is a really
+
+175
+00:11:09.940 --> 00:11:12.060
+<v Ev Kontsevoy>really powerful way of building products.
+
+176
+00:11:12.200 --> 00:11:13.860
+<v Ev Kontsevoy>Because remember, in the early days,
+
+177
+00:11:13.980 --> 00:11:15.740
+<v Ev Kontsevoy>we were the only users of Teleport.
+
+178
+00:11:15.800 --> 00:11:16.600
+<v Ev Kontsevoy>We built it for ourselves.
+
+179
+00:11:17.100 --> 00:11:20.020
+<v Ev Kontsevoy>And the early roadmap basically consisted of things
+
+180
+00:11:20.020 --> 00:11:23.180
+<v Ev Kontsevoy>that we needed to get done to operate as a company.
+
+181
+00:11:23.320 --> 00:11:24.800
+<v Ev Kontsevoy>Because our original business was
+
+182
+00:11:25.420 --> 00:11:27.260
+<v Ev Kontsevoy>these portable Kubernetes clusters
+
+183
+00:11:27.260 --> 00:11:30.520
+<v Ev Kontsevoy>that you could move around as a kind of single file deployments.
+
+184
+00:11:31.460 --> 00:11:32.760
+<v Ev Kontsevoy>And for a while,
+
+185
+00:11:32.860 --> 00:11:35.360
+<v Ev Kontsevoy>we didn't even think that Teleport could be a product.
+
+186
+00:11:35.540 --> 00:11:37.720
+<v Ev Kontsevoy>We decided that we want to open source it
+
+187
+00:11:37.720 --> 00:11:40.960
+<v Ev Kontsevoy>and put it on GitHub strictly for recruiting purposes.
+
+188
+00:11:41.340 --> 00:11:43.020
+<v Ev Kontsevoy>We had two things going for us.
+
+189
+00:11:43.100 --> 00:11:47.040
+<v Ev Kontsevoy>First is that our entire code base was fresh, clean, written in Golang,
+
+190
+00:11:47.060 --> 00:11:48.840
+<v Ev Kontsevoy>and a lot of engineers appreciated that.
+
+191
+00:11:49.800 --> 00:11:54.740
+<v Ev Kontsevoy>But what we always felt that we couldn't offer is ability to work on open source.
+
+192
+00:11:55.600 --> 00:11:57.820
+<v Ev Kontsevoy>Because some developers would say,
+
+193
+00:11:57.960 --> 00:12:01.020
+<v Ev Kontsevoy>like, I think I'm going to go to that company because I like to work on open source.
+
+194
+00:12:01.220 --> 00:12:03.420
+<v Ev Kontsevoy>And we decided we're just going to make open source free
+
+195
+00:12:03.420 --> 00:12:05.100
+<v Ev Kontsevoy>because it's not our core product.
+
+196
+00:12:05.180 --> 00:12:07.220
+<v Ev Kontsevoy>It's just a component of another product.
+
+197
+00:12:07.720 --> 00:12:10.440
+<v Ev Kontsevoy>And then we can claim that we do contribute to open source.
+
+198
+00:12:11.040 --> 00:12:14.660
+<v Ev Kontsevoy>So that's how launching, let's say, of Teleport happened.
+
+199
+00:12:14.780 --> 00:12:17.600
+<v Ev Kontsevoy>It just showed up on GitHub one day in a public repository
+
+200
+00:12:18.640 --> 00:12:22.240
+<v Ev Kontsevoy>with extremely short couple of sentences, README file.
+
+201
+00:12:22.560 --> 00:12:25.220
+<v Ev Kontsevoy>And then things started to progress from there.
+
+202
+00:12:25.300 --> 00:12:26.520
+<v Ev Kontsevoy>So people noticed it.
+
+203
+00:12:26.660 --> 00:12:28.980
+<v Ev Kontsevoy>Someone reported the first bug.
+
+204
+00:12:29.260 --> 00:12:34.040
+<v Ev Kontsevoy>And then slowly, slowly, it wasn't, by no means, it was overnight success.
+
+205
+00:12:34.040 --> 00:12:39.480
+<v Ev Kontsevoy>us, but people started to notice and they started to like us. So the number of stars on GitHub
+
+206
+00:12:39.480 --> 00:12:45.080
+<v Ev Kontsevoy>started to grow and feature requests started to come in. And then we just had this idea,
+
+207
+00:12:45.220 --> 00:12:49.820
+<v Ev Kontsevoy>what if we say that you can pay for Teleport and then we implement the feature that you want?
+
+208
+00:12:49.980 --> 00:12:55.060
+<v Ev Kontsevoy>And funnily enough, we didn't really change our website, but in Teleport documentation and in
+
+209
+00:12:55.060 --> 00:13:01.540
+<v Ev Kontsevoy>the readme, we said that if you want Teleport Enterprise, then just reach out to sales at
+
+210
+00:13:01.540 --> 00:13:02.740
+<v Ev Kontsevoy>at goteleport.com.
+
+211
+00:13:02.960 --> 00:13:05.680
+<v Ev Kontsevoy>And that's how we started to get customers
+
+212
+00:13:05.680 --> 00:13:06.960
+<v Ev Kontsevoy>who were willing to pay.
+
+213
+00:13:07.100 --> 00:13:08.260
+<v Ev Kontsevoy>And they had feature requests.
+
+214
+00:13:08.620 --> 00:13:10.540
+<v Ev Kontsevoy>And again, we could do that
+
+215
+00:13:10.540 --> 00:13:13.120
+<v Ev Kontsevoy>because Teleport was not our primary product.
+
+216
+00:13:13.360 --> 00:13:14.560
+<v Ev Kontsevoy>We had our own roadmap
+
+217
+00:13:14.560 --> 00:13:16.700
+<v Ev Kontsevoy>and then we had things that customers wanted.
+
+218
+00:13:16.820 --> 00:13:18.740
+<v Ev Kontsevoy>And we would only implement things
+
+219
+00:13:18.740 --> 00:13:20.860
+<v Ev Kontsevoy>that were on our roadmap anyway.
+
+220
+00:13:21.140 --> 00:13:22.340
+<v Ev Kontsevoy>So in other words,
+
+221
+00:13:22.380 --> 00:13:24.440
+<v Ev Kontsevoy>we continue to be extremely opinionated.
+
+222
+00:13:24.900 --> 00:13:26.440
+<v Ev Kontsevoy>And right now, by the way,
+
+223
+00:13:26.480 --> 00:13:27.860
+<v Ev Kontsevoy>it's giving us massive benefits
+
+224
+00:13:27.860 --> 00:13:29.700
+<v Ev Kontsevoy>because Teleport is just so far ahead
+
+225
+00:13:29.700 --> 00:13:30.820
+<v Ev Kontsevoy>versus competing solutions
+
+226
+00:13:31.560 --> 00:13:37.080
+<v Ev Kontsevoy>it doesn't use any secrets, any passwords, anywhere. It's a 100% certificate-based system
+
+227
+00:13:37.080 --> 00:13:41.420
+<v Ev Kontsevoy>for all protocols. But in the early days, it was not obvious. I think at some point,
+
+228
+00:13:41.460 --> 00:13:46.720
+<v Ev Kontsevoy>like one of Google teams reached out to us. They wanted to use Teleport to access some network
+
+229
+00:13:46.720 --> 00:13:50.760
+<v Ev Kontsevoy>devices. They don't remember what they were, but they wanted us to support public-private
+
+230
+00:13:50.760 --> 00:13:55.740
+<v Ev Kontsevoy>keys for authentication. And believe it or not, we said no. We had like almost no revenue at the
+
+231
+00:13:55.740 --> 00:13:58.640
+<v Ev Kontsevoy>time and Google is calling and they want to purchase your product, but they said no.
+
+232
+00:13:58.640 --> 00:14:04.040
+<v Ev Kontsevoy>No, we will never do that because it's really important for us to remain 100% certificate-based.
+
+233
+00:14:04.280 --> 00:14:05.760
+<v Ev Kontsevoy>And that's how it started to grow.
+
+234
+00:14:05.920 --> 00:14:10.340
+<v Ev Kontsevoy>So we continue to be extremely opinionated on how proper security and access needs to
+
+235
+00:14:10.340 --> 00:14:11.600
+<v Ev Kontsevoy>be implemented and used.
+
+236
+00:14:11.820 --> 00:14:18.220
+<v Ev Kontsevoy>But we use customer and user feedback as a prioritization signal to figure out what to
+
+237
+00:14:18.220 --> 00:14:18.760
+<v Ev Kontsevoy>build next.
+
+238
+00:14:19.320 --> 00:14:24.020
+<v Ev Kontsevoy>I think it's extremely important for anyone trying to start a company is that you raise
+
+239
+00:14:24.020 --> 00:14:27.560
+<v Ev Kontsevoy>money and there's this pressure to start generating revenue right away.
+
+240
+00:14:28.640 --> 00:14:31.280
+<v Ev Kontsevoy>oftentimes it means compromising on your original vision.
+
+241
+00:14:31.460 --> 00:14:35.140
+<v Ev Kontsevoy>And it's easy to get sidetracked
+
+242
+00:14:35.140 --> 00:14:36.900
+<v Ev Kontsevoy>and basically build a kitchen sink
+
+243
+00:14:36.900 --> 00:14:39.520
+<v Ev Kontsevoy>that maybe some early customers wanted,
+
+244
+00:14:39.600 --> 00:14:40.620
+<v Ev Kontsevoy>but no one else wanted.
+
+245
+00:14:41.120 --> 00:14:42.980
+<v Ev Kontsevoy>So to not do that,
+
+246
+00:14:43.040 --> 00:14:44.700
+<v Ev Kontsevoy>you either have to raise a lot of money.
+
+247
+00:14:45.160 --> 00:14:48.020
+<v Ev Kontsevoy>So then you have a lot of coding in the cave
+
+248
+00:14:48.020 --> 00:14:50.000
+<v Ev Kontsevoy>and talking to potential customers time.
+
+249
+00:14:50.120 --> 00:14:52.940
+<v Ev Kontsevoy>So you can really, really nail what it's going to be.
+
+250
+00:14:53.320 --> 00:14:55.460
+<v Ev Kontsevoy>Or you could do what we did
+
+251
+00:14:55.460 --> 00:14:57.840
+<v Ev Kontsevoy>and you could have another product
+
+252
+00:14:58.640 --> 00:15:04.300
+<v Ev Kontsevoy>had revenue. Like we were doing quite fine growing that Kubernetes solution. And that gave us plenty
+
+253
+00:15:04.300 --> 00:15:12.020
+<v Ev Kontsevoy>of time to figure out how access needs to look like in 2021, 22 and beyond. So because initially,
+
+254
+00:15:12.160 --> 00:15:13.340
+<v Ev Kontsevoy>it's just not obvious.
+
+255
+00:15:14.560 --> 00:15:19.120
+<v Noah Labhart>Well, let's switch to team then. So how did you go about building your team?
+
+256
+00:15:19.280 --> 00:15:24.020
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to
+
+257
+00:15:24.020 --> 00:15:25.020
+<v Noah Labhart>to join you at Teleport?
+
+258
+00:15:25.660 --> 00:15:27.300
+<v Ev Kontsevoy>Look, at Teleport, I was cheating
+
+259
+00:15:27.300 --> 00:15:30.300
+<v Ev Kontsevoy>because we built another company prior to that.
+
+260
+00:15:30.400 --> 00:15:31.780
+<v Ev Kontsevoy>So they got acquired by Rackspace.
+
+261
+00:15:31.960 --> 00:15:33.960
+<v Ev Kontsevoy>So we had a fantastic opportunity
+
+262
+00:15:33.960 --> 00:15:37.680
+<v Ev Kontsevoy>not only to reach out to successful mailgun
+
+263
+00:15:37.680 --> 00:15:40.320
+<v Ev Kontsevoy>early employees and co-founders
+
+264
+00:15:40.320 --> 00:15:42.540
+<v Ev Kontsevoy>and just like, hey, let's go do this again.
+
+265
+00:15:42.620 --> 00:15:45.100
+<v Ev Kontsevoy>But this time it's going to be like a million times bigger.
+
+266
+00:15:45.320 --> 00:15:47.100
+<v Ev Kontsevoy>And then we had additional luxury
+
+267
+00:15:47.100 --> 00:15:49.980
+<v Ev Kontsevoy>of going after like best people at Rackspace
+
+268
+00:15:49.980 --> 00:15:57.140
+<v Ev Kontsevoy>space that we met being part of Rackspace for three years. So again, massive shortcut that
+
+269
+00:15:57.140 --> 00:16:04.600
+<v Ev Kontsevoy>maybe not all entrepreneurs can take. But going back even to Mailgun Days, we did the same thing
+
+270
+00:16:04.600 --> 00:16:10.900
+<v Ev Kontsevoy>that other people, successful people in our shoes did. So you hire people with... You have to pick
+
+271
+00:16:10.900 --> 00:16:17.720
+<v Ev Kontsevoy>co-founders that have complementary skills to yours. In our case, myself, Sasha, and Taylor,
+
+272
+00:16:17.720 --> 00:16:22.760
+<v Ev Kontsevoy>the three like sasha and myself we are engineers so we understand technology really well and it
+
+273
+00:16:22.760 --> 00:16:27.580
+<v Ev Kontsevoy>helps to have two engineers majority of founding team early on because we could build a lot of
+
+274
+00:16:27.580 --> 00:16:33.200
+<v Ev Kontsevoy>things quickly without hiring people so just sitting and coding 24 7 gives you a lot of
+
+275
+00:16:33.200 --> 00:16:38.480
+<v Ev Kontsevoy>advantage in the early days but the difference is that sasha is more like a hardcore computer
+
+276
+00:16:38.480 --> 00:16:43.460
+<v Ev Kontsevoy>scientist so he can go into a lot of these topics much much much deeper versus i am more of a
+
+277
+00:16:43.460 --> 00:16:48.740
+<v Ev Kontsevoy>a generalist and a little bit of a salesperson and storyteller, which also helps when you're
+
+278
+00:16:48.740 --> 00:16:54.020
+<v Ev Kontsevoy>doing customer research, like having conversations with potential users and constantly asking them
+
+279
+00:16:54.020 --> 00:16:58.460
+<v Ev Kontsevoy>deep technical questions to figure out how this technology might be used. Then we had Taylor,
+
+280
+00:16:58.560 --> 00:17:06.540
+<v Ev Kontsevoy>who would take care of things like early legal, finance, setting up operation. And basically,
+
+281
+00:17:06.540 --> 00:17:12.080
+<v Ev Kontsevoy>Basically, there's just 80% of the company that is not writing code.
+
+282
+00:17:12.320 --> 00:17:23.440
+<v Ev Kontsevoy>So that made three of us extremely self-sufficient for the first few months when we were just getting some prototypes out and building our fundraising decks.
+
+283
+00:17:23.660 --> 00:17:28.040
+<v Ev Kontsevoy>So, yeah, that's the criteria for building a founding team.
+
+284
+00:17:28.160 --> 00:17:29.460
+<v Ev Kontsevoy>Make sure you're all complementary.
+
+285
+00:17:30.060 --> 00:17:32.240
+<v Ev Kontsevoy>Yeah, and you have to get along.
+
+286
+00:17:33.380 --> 00:17:35.080
+<v Ev Kontsevoy>That is a very obvious thing.
+
+287
+00:17:36.540 --> 00:17:43.420
+<v Ev Kontsevoy>When you do have some cash in your checking account, so you raise your seed round, typically,
+
+288
+00:17:43.960 --> 00:17:48.520
+<v Ev Kontsevoy>and I think it's a fairly common story, you hire people who believe in you.
+
+289
+00:17:49.040 --> 00:17:53.700
+<v Ev Kontsevoy>Because most of the time, it means that they have to take some additional risk, introduce
+
+290
+00:17:53.700 --> 00:17:55.220
+<v Ev Kontsevoy>this risk into their lives.
+
+291
+00:17:55.540 --> 00:17:57.480
+<v Ev Kontsevoy>It probably means they're going to take a pay cut.
+
+292
+00:17:58.680 --> 00:18:03.280
+<v Ev Kontsevoy>And people who are willing to do that, they tend to be either our friends or people we
+
+293
+00:18:03.280 --> 00:18:04.020
+<v Ev Kontsevoy>worked with before.
+
+294
+00:18:04.240 --> 00:18:05.840
+<v Ev Kontsevoy>So they trust you.
+
+295
+00:18:06.540 --> 00:18:10.580
+<v Ev Kontsevoy>trust actually, the trust issue never goes away. Even if you like scale the company,
+
+296
+00:18:11.260 --> 00:18:15.340
+<v Ev Kontsevoy>trust is the fundamental kind of grease that makes the entire machinery
+
+297
+00:18:16.100 --> 00:18:21.580
+<v Ev Kontsevoy>operating. And it starts to work in the very early days, which comes to building your early
+
+298
+00:18:21.580 --> 00:18:22.800
+<v Ev Kontsevoy>kind of founding team.
+
+299
+00:18:25.920 --> 00:18:30.300
+<v Noah Labhart>Well, let's flip to scalability. So did you build this to scale
+
+300
+00:18:30.300 --> 00:18:34.880
+<v Noah Labhart>efficiently from day one? Did Sasha build it? Did you build it? Did you design it?
+
+301
+00:18:36.540 --> 00:18:38.180
+<v Noah Labhart>this as you grow and gain traction.
+
+302
+00:18:39.540 --> 00:18:41.740
+<v Ev Kontsevoy>I will find myself bragging again.
+
+303
+00:18:42.480 --> 00:18:45.540
+<v Ev Kontsevoy>But yes, we built it extremely scalable since day one.
+
+304
+00:18:45.720 --> 00:18:49.020
+<v Ev Kontsevoy>But we do have a slightly maybe different definition of scalability.
+
+305
+00:18:49.500 --> 00:18:53.220
+<v Ev Kontsevoy>Because remember, Teleport was built for our use case.
+
+306
+00:18:53.380 --> 00:19:00.000
+<v Ev Kontsevoy>And our use case, and we really wanted to figure out a way to make software run anywhere
+
+307
+00:19:00.000 --> 00:19:05.360
+<v Ev Kontsevoy>in the world by itself without active management, without supervision, to simplify computing.
+
+308
+00:19:06.720 --> 00:19:11.720
+<v Ev Kontsevoy>And this is why I use Tesla as a company as an example, because you always have to pick
+
+309
+00:19:11.720 --> 00:19:14.220
+<v Ev Kontsevoy>organizations that are kind of living in the future.
+
+310
+00:19:14.540 --> 00:19:21.260
+<v Ev Kontsevoy>You might have an argument that said the F, but like, there are not that many people or
+
+311
+00:19:21.260 --> 00:19:22.980
+<v Ev Kontsevoy>companies that operate like Tesla.
+
+312
+00:19:23.380 --> 00:19:29.020
+<v Ev Kontsevoy>And I would say, look, back in the day when Google was small, people would say, but there
+
+313
+00:19:29.020 --> 00:19:31.120
+<v Ev Kontsevoy>are not that many companies operating at Google scale.
+
+314
+00:19:31.180 --> 00:19:35.640
+<v Ev Kontsevoy>And now look around, you can actually find companies with 12, 15 engineers, and they
+
+315
+00:19:36.540 --> 00:19:37.900
+<v Ev Kontsevoy>10,000 servers somewhere.
+
+316
+00:19:38.420 --> 00:19:40.120
+<v Ev Kontsevoy>So that is changing fast.
+
+317
+00:19:40.340 --> 00:19:41.960
+<v Ev Kontsevoy>I'm pretty confident that soon
+
+318
+00:19:41.960 --> 00:19:44.320
+<v Ev Kontsevoy>more and more companies will be operating
+
+319
+00:19:44.320 --> 00:19:45.080
+<v Ev Kontsevoy>at Tesla scale.
+
+320
+00:19:45.780 --> 00:19:48.600
+<v Ev Kontsevoy>And we believe that the existing technology,
+
+321
+00:19:48.900 --> 00:19:50.800
+<v Ev Kontsevoy>like everything in DevOps space,
+
+322
+00:19:50.980 --> 00:19:52.300
+<v Ev Kontsevoy>the way how we do this DevOps,
+
+323
+00:19:52.560 --> 00:19:54.740
+<v Ev Kontsevoy>kind of dirty sausage making,
+
+324
+00:19:55.000 --> 00:19:56.260
+<v Ev Kontsevoy>none of that will scale
+
+325
+00:19:56.260 --> 00:19:59.420
+<v Ev Kontsevoy>to this planetary size computing.
+
+326
+00:19:59.900 --> 00:20:02.080
+<v Ev Kontsevoy>Because if you have infrastructure all over,
+
+327
+00:20:02.160 --> 00:20:04.060
+<v Ev Kontsevoy>because you have the super tall tech stacks
+
+328
+00:20:04.060 --> 00:20:05.340
+<v Ev Kontsevoy>that get more and more complicated.
+
+329
+00:20:06.540 --> 00:20:12.920
+<v Ev Kontsevoy>have to be automated. And Teleport was built for that use case. And when I say that we have
+
+330
+00:20:12.920 --> 00:20:18.600
+<v Ev Kontsevoy>different definition of scalability, I primarily meant that Teleport was also meant to be extremely
+
+331
+00:20:18.600 --> 00:20:24.860
+<v Ev Kontsevoy>simple. So if you need to have this level of access anywhere in the world, if you have thousands of
+
+332
+00:20:24.860 --> 00:20:28.800
+<v Ev Kontsevoy>devices, you just have to assume that some of those things are going to be servers, others
+
+333
+00:20:28.800 --> 00:20:33.920
+<v Ev Kontsevoy>going to be embedded devices, there can be some drones. So then we designed Teleport to be a single
+
+334
+00:20:33.920 --> 00:20:38.600
+<v Ev Kontsevoy>binary. Like for us, we felt that's really definition of scale. So because if you're
+
+335
+00:20:38.600 --> 00:20:45.120
+<v Ev Kontsevoy>building this SaaS contraption that needs, that itself needs a giant tech stack to sit on top of,
+
+336
+00:20:45.540 --> 00:20:50.080
+<v Ev Kontsevoy>yeah, sure, you can process a lot of traffic, but that is not scalable to me because reproducing
+
+337
+00:20:50.080 --> 00:20:55.760
+<v Ev Kontsevoy>that entire environment thousands and thousands of times, that's not scalable. Maybe that's not
+
+338
+00:20:55.760 --> 00:21:00.960
+<v Ev Kontsevoy>definition of scale that most DevOps engineers have in mind. But look, I have met companies that
+
+339
+00:21:00.960 --> 00:21:03.700
+<v Ev Kontsevoy>that are, I probably cannot be using names,
+
+340
+00:21:03.820 --> 00:21:05.800
+<v Ev Kontsevoy>but I've talked to people at some companies
+
+341
+00:21:05.800 --> 00:21:09.320
+<v Ev Kontsevoy>who admitted to me that if AWS shuts down
+
+342
+00:21:10.120 --> 00:21:11.680
+<v Ev Kontsevoy>their eastern region,
+
+343
+00:21:12.400 --> 00:21:15.180
+<v Ev Kontsevoy>they said we will not be able to get our environment up and running.
+
+344
+00:21:15.300 --> 00:21:17.000
+<v Ev Kontsevoy>We've forgotten how to do that.
+
+345
+00:21:17.080 --> 00:21:19.300
+<v Ev Kontsevoy>We lost that institutional knowledge.
+
+346
+00:21:19.580 --> 00:21:20.980
+<v Ev Kontsevoy>That, to me, is not scalable.
+
+347
+00:21:22.260 --> 00:21:22.760
+<v Ev Kontsevoy>Okay?
+
+348
+00:21:23.080 --> 00:21:25.980
+<v Ev Kontsevoy>So, and that was the requirement for Teleport,
+
+349
+00:21:26.060 --> 00:21:28.100
+<v Ev Kontsevoy>that we wanted Teleport to feel like magic dust.
+
+350
+00:21:28.260 --> 00:21:30.120
+<v Ev Kontsevoy>It's a single binary, you put it in your infrastructure,
+
+351
+00:21:30.960 --> 00:21:36.600
+<v Ev Kontsevoy>massive capabilities. And yes, you could deal with a massive number of clients, massive number of
+
+352
+00:21:36.600 --> 00:21:42.380
+<v Ev Kontsevoy>servers, massive number of connections. But making your technology dead simple is absolutely a
+
+353
+00:21:42.380 --> 00:21:44.660
+<v Ev Kontsevoy>prerequisite for scalability in my mind.
+
+354
+00:21:45.780 --> 00:21:49.640
+<v Noah Labhart>Well, as you step out on the balcony and you look across
+
+355
+00:21:49.640 --> 00:21:52.720
+<v Noah Labhart>all that you've built with Teleport, what are you most proud of?
+
+356
+00:21:53.860 --> 00:21:56.120
+<v Ev Kontsevoy>So we're cloud-machief kids.
+
+357
+00:21:56.120 --> 00:22:05.620
+<v Ev Kontsevoy>let's use that language we we've been coding on like linux on thinkpads since day one so we
+
+358
+00:22:05.620 --> 00:22:13.540
+<v Ev Kontsevoy>always used linux-based tools we were one of the first companies to play with docker and kubernetes
+
+359
+00:22:13.540 --> 00:22:22.020
+<v Ev Kontsevoy>so it was quite challenging for us to start answering questions from windows users when
+
+360
+00:22:22.020 --> 00:22:25.360
+<v Ev Kontsevoy>they started to ask when teleport technology is coming to Windows.
+
+361
+00:22:25.680 --> 00:22:28.840
+<v Ev Kontsevoy>And for a while, it was extremely tempting to say, you know what, never.
+
+362
+00:22:29.880 --> 00:22:36.020
+<v Ev Kontsevoy>Like we were totally prepared to just hide from this massive demand from the Windows side of things.
+
+363
+00:22:36.620 --> 00:22:41.780
+<v Ev Kontsevoy>But then we realized, you know what, like most of the world east of Oakland runs on Windows.
+
+364
+00:22:41.980 --> 00:22:43.940
+<v Ev Kontsevoy>You cannot ignore Windows.
+
+365
+00:22:44.140 --> 00:22:49.540
+<v Ev Kontsevoy>And it was quite scary because we were at this point already operating at certain scale
+
+366
+00:22:49.540 --> 00:22:50.940
+<v Ev Kontsevoy>and we had plenty of engineers
+
+367
+00:22:50.940 --> 00:22:53.800
+<v Ev Kontsevoy>and we had our practices and engineering culture.
+
+368
+00:22:53.940 --> 00:22:56.640
+<v Ev Kontsevoy>And now we need to start building Windows software.
+
+369
+00:22:57.080 --> 00:22:59.640
+<v Ev Kontsevoy>So that was challenging.
+
+370
+00:23:00.020 --> 00:23:00.760
+<v Ev Kontsevoy>And you know what?
+
+371
+00:23:00.840 --> 00:23:03.120
+<v Ev Kontsevoy>We actually did roll out support for RDP
+
+372
+00:23:03.120 --> 00:23:04.860
+<v Ev Kontsevoy>and Teleport can now be used
+
+373
+00:23:04.860 --> 00:23:06.200
+<v Ev Kontsevoy>to access Windows machines as well.
+
+374
+00:23:06.500 --> 00:23:08.880
+<v Ev Kontsevoy>And I'm proud of the fact that we pulled it off,
+
+375
+00:23:09.020 --> 00:23:10.720
+<v Ev Kontsevoy>that we made some key hires
+
+376
+00:23:10.720 --> 00:23:12.180
+<v Ev Kontsevoy>who implemented these capabilities.
+
+377
+00:23:12.380 --> 00:23:13.220
+<v Ev Kontsevoy>And most importantly,
+
+378
+00:23:13.380 --> 00:23:18.180
+<v Ev Kontsevoy>we kind of integrated that into the company culture.
+
+379
+00:23:19.540 --> 00:23:21.080
+<v Ev Kontsevoy>complete cross-platform capability.
+
+380
+00:23:21.520 --> 00:23:24.500
+<v Ev Kontsevoy>So for me, again, I said it was going to be a silly answer,
+
+381
+00:23:24.620 --> 00:23:25.620
+<v Ev Kontsevoy>but I was proud of it.
+
+382
+00:23:26.720 --> 00:23:28.380
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+383
+00:23:28.520 --> 00:23:30.540
+<v Noah Labhart>So tell me about a mistake you made
+
+384
+00:23:30.540 --> 00:23:33.080
+<v Noah Labhart>and how you and your team responded to it.
+
+385
+00:23:34.720 --> 00:23:37.500
+<v Ev Kontsevoy>I could offer you two answers here.
+
+386
+00:23:37.620 --> 00:23:39.000
+<v Ev Kontsevoy>On the business side,
+
+387
+00:23:39.180 --> 00:23:43.140
+<v Ev Kontsevoy>because I get a sense that guests here
+
+388
+00:23:43.140 --> 00:23:44.240
+<v Ev Kontsevoy>talk about this frequently.
+
+389
+00:23:44.440 --> 00:23:45.980
+<v Ev Kontsevoy>So in terms of building a company
+
+390
+00:23:45.980 --> 00:23:48.400
+<v Ev Kontsevoy>and growing as quickly as possible,
+
+391
+00:23:49.540 --> 00:23:50.720
+<v Ev Kontsevoy>lots of mistakes you can make.
+
+392
+00:23:50.800 --> 00:23:51.900
+<v Ev Kontsevoy>And the classic one,
+
+393
+00:23:52.580 --> 00:23:53.780
+<v Ev Kontsevoy>it's classic in the sense
+
+394
+00:23:53.780 --> 00:23:55.460
+<v Ev Kontsevoy>that it's mentioned over and over again.
+
+395
+00:23:55.520 --> 00:23:57.440
+<v Ev Kontsevoy>Almost every entrepreneur talks about it.
+
+396
+00:23:58.120 --> 00:23:59.820
+<v Ev Kontsevoy>If you ask them,
+
+397
+00:24:00.320 --> 00:24:02.640
+<v Ev Kontsevoy>and plenty of business literature is written on it,
+
+398
+00:24:02.660 --> 00:24:03.540
+<v Ev Kontsevoy>and we still made it.
+
+399
+00:24:03.620 --> 00:24:05.920
+<v Ev Kontsevoy>This is why it's so embarrassing.
+
+400
+00:24:06.260 --> 00:24:07.220
+<v Ev Kontsevoy>It's the lack of focus.
+
+401
+00:24:08.040 --> 00:24:10.380
+<v Ev Kontsevoy>Notice how I mentioned multiple times
+
+402
+00:24:10.380 --> 00:24:11.660
+<v Ev Kontsevoy>that we used to have another product.
+
+403
+00:24:11.740 --> 00:24:13.440
+<v Ev Kontsevoy>So we basically, for a long time,
+
+404
+00:24:13.520 --> 00:24:14.500
+<v Ev Kontsevoy>we had two products.
+
+405
+00:24:14.540 --> 00:24:16.660
+<v Ev Kontsevoy>We had this Kubernetes deployment system called Gravity
+
+406
+00:24:16.660 --> 00:24:17.480
+<v Ev Kontsevoy>and we had Teleport.
+
+407
+00:24:18.200 --> 00:24:23.040
+<v Ev Kontsevoy>and we we always believe that teleport is a solution that everyone should have
+
+408
+00:24:23.980 --> 00:24:31.960
+<v Ev Kontsevoy>and for whatever reason we we operated for way too long having two products instead of just one
+
+409
+00:24:32.740 --> 00:24:38.960
+<v Ev Kontsevoy>so not asking ourselves tough question about what kind of company we want to build like do we want
+
+410
+00:24:38.960 --> 00:24:42.980
+<v Ev Kontsevoy>to be an access company or we want to be a new type of deployment company because those are
+
+411
+00:24:42.980 --> 00:24:48.880
+<v Ev Kontsevoy>of different companies you cannot be both in like too early like later on look at microsoft they
+
+412
+00:24:48.880 --> 00:24:53.920
+<v Ev Kontsevoy>started with basic interpreter and now they have everything so eventually sure but in the early
+
+413
+00:24:53.920 --> 00:25:01.100
+<v Ev Kontsevoy>days it helps to have a single product and we we stayed in this two product mode for too long
+
+414
+00:25:01.100 --> 00:25:07.800
+<v Ev Kontsevoy>um look it's i can probably explain why we behave this way because both products were selling
+
+415
+00:25:07.800 --> 00:25:12.600
+<v Ev Kontsevoy>they're both growing we had some really big customers who are using gravity which was the
+
+416
+00:25:12.980 --> 00:25:18.820
+<v Ev Kontsevoy>other product but in hindsight i understand now that if we switched and became 100 teleport
+
+417
+00:25:18.820 --> 00:25:24.940
+<v Ev Kontsevoy>earlier we probably could have been two three times bigger by now if we did it so that's a
+
+418
+00:25:24.940 --> 00:25:32.640
+<v Ev Kontsevoy>mistake on on the product side i'm sorry on on the business side and on the product side the
+
+419
+00:25:35.220 --> 00:25:41.320
+<v Ev Kontsevoy>the mistake i think that we made early on you know what let's just kind of scrap that because it was
+
+420
+00:25:42.980 --> 00:25:47.500
+<v Ev Kontsevoy>retired all of our mistakes with gravity because when you're shutting down one of your two products
+
+421
+00:25:47.500 --> 00:25:52.980
+<v Ev Kontsevoy>you can just take away all the mistakes so teleport in the in this in in the way it exists
+
+422
+00:25:52.980 --> 00:25:58.140
+<v Ev Kontsevoy>today it's pretty much mistake free and when i talk to engineers i oftentimes even say hey you
+
+423
+00:25:58.140 --> 00:26:02.940
+<v Ev Kontsevoy>want to join a company without any technical debt some of our engineers might disagree with me but
+
+424
+00:26:02.940 --> 00:26:09.060
+<v Ev Kontsevoy>look i'm an engineer myself i look how engineering is done and we we clearly had a chance to make
+
+425
+00:26:09.060 --> 00:26:12.300
+<v Ev Kontsevoy>make sure that Teleport is indeed as clean as possible.
+
+426
+00:26:12.600 --> 00:26:14.420
+<v Ev Kontsevoy>And so, yeah, I continue to use this line.
+
+427
+00:26:14.500 --> 00:26:16.560
+<v Ev Kontsevoy>We have extremely low level of technical debt.
+
+428
+00:26:16.660 --> 00:26:18.240
+<v Ev Kontsevoy>So come and join Teleport.
+
+429
+00:26:20.060 --> 00:26:24.520
+<v Noah Labhart>Well, what does the future look like for Teleport, the product, and for your team?
+
+430
+00:26:26.160 --> 00:26:32.000
+<v Ev Kontsevoy>Let me step back a second and talk about what we feel the future is going to look like for all of us.
+
+431
+00:26:32.240 --> 00:26:38.000
+<v Ev Kontsevoy>Because we need to occupy a certain place, a certain role we need to play in that future.
+
+432
+00:26:39.060 --> 00:26:50.960
+<v Ev Kontsevoy>One observation that we made looking at, it's especially telling if you look at the default behavior of engineers who are joining you straight out of college.
+
+433
+00:26:51.120 --> 00:26:52.300
+<v Ev Kontsevoy>Because that's a new generation.
+
+434
+00:26:52.520 --> 00:26:53.400
+<v Ev Kontsevoy>That's fresh blood.
+
+435
+00:26:53.640 --> 00:26:55.300
+<v Ev Kontsevoy>So they have all these fresh ideas.
+
+436
+00:26:56.240 --> 00:26:59.880
+<v Ev Kontsevoy>And I will use the language that I just recently developed for myself.
+
+437
+00:27:00.000 --> 00:27:01.780
+<v Ev Kontsevoy>So if it's unclear, please correct me.
+
+438
+00:27:01.940 --> 00:27:06.400
+<v Ev Kontsevoy>I noticed that they are acting like they're remote first engineers.
+
+439
+00:27:06.400 --> 00:27:15.000
+<v Ev Kontsevoy>years. And the difference from local host first is this. When I entered the field and started
+
+440
+00:27:15.000 --> 00:27:21.800
+<v Ev Kontsevoy>working as a programmer, we used to build software on a laptop. It was a local process. Everything is
+
+441
+00:27:21.800 --> 00:27:26.280
+<v Ev Kontsevoy>on your laptop or your desktop, whatever. And then when you need to put it into a data center or in
+
+442
+00:27:26.280 --> 00:27:30.900
+<v Ev Kontsevoy>the cloud, essentially what you're doing, you're recreating your local host environment somewhere
+
+443
+00:27:30.900 --> 00:27:35.960
+<v Ev Kontsevoy>somewhere else and you're making it bigger. So that to me is like local host first development.
+
+444
+00:27:36.400 --> 00:27:41.240
+<v Ev Kontsevoy>And that's really why Docker became popular because Docker was built by that same generation
+
+445
+00:27:41.240 --> 00:27:46.840
+<v Ev Kontsevoy>of engineers. Like we would recreate our full environment on our laptops and then we will try
+
+446
+00:27:46.840 --> 00:27:53.380
+<v Ev Kontsevoy>to replicate them in the cloud. But these days with new generation of tooling, developers are
+
+447
+00:27:53.380 --> 00:28:00.640
+<v Ev Kontsevoy>now building things remotely since day one. So you are using cloud hosted databases. You like
+
+448
+00:28:00.900 --> 00:28:07.700
+<v Ev Kontsevoy>code is on github you're deploying with github actions people using code editors that are hosted
+
+449
+00:28:07.700 --> 00:28:14.240
+<v Ev Kontsevoy>in a browser and the editing code that never even lands on your machine anymore so this remote first
+
+450
+00:28:14.240 --> 00:28:23.720
+<v Ev Kontsevoy>orientation is the future so that's one uh that is one shift that we are observing that we are
+
+451
+00:28:23.720 --> 00:28:29.840
+<v Ev Kontsevoy>going to be using cloud more and more not just to run software but also to build software the
+
+452
+00:28:30.900 --> 00:28:37.140
+<v Ev Kontsevoy>is moving online. And the second trend, which is also interesting, is because of complexity of
+
+453
+00:28:37.140 --> 00:28:42.240
+<v Ev Kontsevoy>computing environments ever increasing, and all these different components that your application
+
+454
+00:28:42.240 --> 00:28:48.100
+<v Ev Kontsevoy>will either depend on or consist of, those components are scattered all over.
+
+455
+00:28:49.360 --> 00:28:54.900
+<v Ev Kontsevoy>It is really important for all of these components to securely talk to each other. You have a one
+
+456
+00:28:54.900 --> 00:29:00.080
+<v Ev Kontsevoy>microservice that goes to a database, gets some data out of there, then goes talks to another
+
+457
+00:29:00.900 --> 00:29:04.520
+<v Ev Kontsevoy>and that thing interacts with some external APIs and services.
+
+458
+00:29:04.680 --> 00:29:07.920
+<v Ev Kontsevoy>So, which means that the secure access is now becoming
+
+459
+00:29:07.920 --> 00:29:10.880
+<v Ev Kontsevoy>not just something for humans, but also for machines.
+
+460
+00:29:11.320 --> 00:29:12.420
+<v Ev Kontsevoy>Because what is access?
+
+461
+00:29:12.460 --> 00:29:14.160
+<v Ev Kontsevoy>Access is authentication, authorization,
+
+462
+00:29:14.620 --> 00:29:16.380
+<v Ev Kontsevoy>actually secure connectivity and audit.
+
+463
+00:29:16.560 --> 00:29:18.540
+<v Ev Kontsevoy>So those four things need to be in place,
+
+464
+00:29:18.620 --> 00:29:21.780
+<v Ev Kontsevoy>not just when computer humans talking to machines,
+
+465
+00:29:21.860 --> 00:29:23.440
+<v Ev Kontsevoy>but also when machines are talking to machines.
+
+466
+00:29:23.660 --> 00:29:24.880
+<v Ev Kontsevoy>And that's the second trend,
+
+467
+00:29:24.960 --> 00:29:27.900
+<v Ev Kontsevoy>that we believe that machines are now to go,
+
+468
+00:29:28.060 --> 00:29:30.600
+<v Ev Kontsevoy>they are going to do more and more heavy lifting
+
+469
+00:29:30.900 --> 00:29:34.380
+<v Ev Kontsevoy>So which means that machines need to adopt the best industry,
+
+470
+00:29:34.480 --> 00:29:37.900
+<v Ev Kontsevoy>best remote access practices that are currently only used by humans.
+
+471
+00:29:38.280 --> 00:29:40.200
+<v Ev Kontsevoy>Like one example is like, what is an API key?
+
+472
+00:29:40.380 --> 00:29:41.440
+<v Ev Kontsevoy>Well, that's a password.
+
+473
+00:29:41.720 --> 00:29:44.100
+<v Ev Kontsevoy>Didn't we already agree that passwords is a bad idea?
+
+474
+00:29:44.260 --> 00:29:47.440
+<v Ev Kontsevoy>So why don't we take the exact same idea and apply it to software,
+
+475
+00:29:47.620 --> 00:29:50.160
+<v Ev Kontsevoy>which means that we should stop using API keys, right?
+
+476
+00:29:50.260 --> 00:29:51.980
+<v Ev Kontsevoy>And replace them with something else.
+
+477
+00:29:52.340 --> 00:29:55.420
+<v Ev Kontsevoy>And that is the future where Teleport is going,
+
+478
+00:29:55.540 --> 00:29:57.860
+<v Ev Kontsevoy>that we want to create technology.
+
+479
+00:29:58.100 --> 00:30:00.460
+<v Ev Kontsevoy>Well, we are in the process of creating it.
+
+480
+00:30:00.900 --> 00:30:08.320
+<v Ev Kontsevoy>that allows all humans and all machines to interact with each other and do trusted computing, basically.
+
+481
+00:30:08.540 --> 00:30:14.600
+<v Ev Kontsevoy>And we also want to do it in a remote-first fashion, that your local host environment doesn't matter at all.
+
+482
+00:30:14.760 --> 00:30:26.000
+<v Ev Kontsevoy>So, which basically means that I see Teleport in the future as a secure and trusted message bus used by machines and humans to do, basically, computations.
+
+483
+00:30:26.350 --> 00:30:27.780
+<v Ev Kontsevoy>So the future is huge.
+
+484
+00:30:27.920 --> 00:30:28.660
+<v Ev Kontsevoy>It's massive.
+
+485
+00:30:28.680 --> 00:30:31.280
+<v Ev Kontsevoy>So teleport, I think, is going to be a big part of it.
+
+486
+00:30:31.320 --> 00:30:33.280
+<v Ev Kontsevoy>And what it means for our team,
+
+487
+00:30:33.440 --> 00:30:37.440
+<v Ev Kontsevoy>it means that we should not think of ourselves
+
+488
+00:30:37.440 --> 00:30:38.620
+<v Ev Kontsevoy>as a security company.
+
+489
+00:30:39.200 --> 00:30:40.920
+<v Ev Kontsevoy>Because remember, if you are sure,
+
+490
+00:30:41.530 --> 00:30:44.480
+<v Ev Kontsevoy>like being a secure message bus for the entire internet
+
+491
+00:30:44.480 --> 00:30:45.500
+<v Ev Kontsevoy>is really, really important.
+
+492
+00:30:45.980 --> 00:30:48.740
+<v Ev Kontsevoy>But it's not just security as the only benefit.
+
+493
+00:30:48.900 --> 00:30:51.140
+<v Ev Kontsevoy>You also, we need to make sure
+
+494
+00:30:51.140 --> 00:30:53.760
+<v Ev Kontsevoy>that our solution feels native and awesome
+
+495
+00:30:53.760 --> 00:30:55.580
+<v Ev Kontsevoy>and easy to use and pleasant.
+
+496
+00:30:56.000 --> 00:31:01.640
+<v Ev Kontsevoy>to Kubernetes users, to database people, to Linux hackers, to Windows professionals,
+
+497
+00:31:01.920 --> 00:31:05.840
+<v Ev Kontsevoy>to machine learning researchers, to all of these people who need computing resources.
+
+498
+00:31:06.360 --> 00:31:13.580
+<v Ev Kontsevoy>So which means that user experience, the quality of the user interface, not just the security,
+
+499
+00:31:13.760 --> 00:31:20.980
+<v Ev Kontsevoy>all of these things are important. So we need to build ourselves as a platform company moving on,
+
+500
+00:31:20.980 --> 00:31:22.300
+<v Ev Kontsevoy>not just as a security play.
+
+501
+00:31:22.980 --> 00:31:26.760
+<v Ev Kontsevoy>And it only makes sense because when we interact with our users who use Teleport,
+
+502
+00:31:26.960 --> 00:31:30.780
+<v Ev Kontsevoy>Kubernetes people believe that we are, and we are, so they believe correctly,
+
+503
+00:31:30.960 --> 00:31:32.860
+<v Ev Kontsevoy>that we're Kubernetes security experts.
+
+504
+00:31:34.660 --> 00:31:39.560
+<v Ev Kontsevoy>Linux developers, they believe that we are Linux kernel security gurus,
+
+505
+00:31:39.600 --> 00:31:45.700
+<v Ev Kontsevoy>which means that we need to acquire this expertise across this extremely wide spectrum
+
+506
+00:31:45.700 --> 00:31:47.660
+<v Ev Kontsevoy>of technologies that are being used today.
+
+507
+00:31:47.660 --> 00:31:48.160
+<v Ev Kontsevoy>day.
+
+508
+00:31:49.840 --> 00:31:55.560
+<v Noah Labhart>Let's switch to you, Ev. Who influences the way that you work? Name a CEO, a CTO,
+
+509
+00:31:55.680 --> 00:31:58.560
+<v Noah Labhart>an architect, really any person that you look up to and why.
+
+510
+00:32:00.120 --> 00:32:03.220
+<v Ev Kontsevoy>I usually pay attention to people
+
+511
+00:32:03.220 --> 00:32:11.820
+<v Ev Kontsevoy>who, in addition to having opinions and strong opinions, also are not shy presenting their
+
+512
+00:32:11.820 --> 00:32:18.580
+<v Ev Kontsevoy>thought frameworks. So people who think in terms of frameworks is who I usually pay attention to.
+
+513
+00:32:18.980 --> 00:32:25.260
+<v Ev Kontsevoy>And I wouldn't give you a specific name or two. Like, yeah, I subscribe to philosophy of these
+
+514
+00:32:25.260 --> 00:32:33.600
+<v Ev Kontsevoy>people, but I can share my approach that I seek thinking frameworks. And you could definitely see
+
+515
+00:32:33.600 --> 00:32:40.240
+<v Ev Kontsevoy>the framework. And again, I'm not going to surprise anyone if I mention people like Steve
+
+516
+00:32:41.960 --> 00:32:47.620
+<v Ev Kontsevoy>like the way he thinks about this like what is the concept that he uh they constantly is referring
+
+517
+00:32:47.620 --> 00:32:52.480
+<v Ev Kontsevoy>to is the feedback loop like there is no such thing as input and output like the principle of
+
+518
+00:32:52.480 --> 00:32:59.340
+<v Ev Kontsevoy>reflection that is what he uh referred to in in his thinking which means that whatever it is you
+
+519
+00:32:59.340 --> 00:33:06.880
+<v Ev Kontsevoy>doing you influencing the outcome but the outcome itself becomes input in in another cycle that is
+
+520
+00:33:06.880 --> 00:33:09.860
+<v Ev Kontsevoy>is the kind of thinking and advice I'm gravitating to.
+
+521
+00:33:09.960 --> 00:33:12.820
+<v Ev Kontsevoy>And the reason for that is because it gives you the,
+
+522
+00:33:14.580 --> 00:33:17.440
+<v Ev Kontsevoy>it allows you to keep asking why, why, why, why,
+
+523
+00:33:17.580 --> 00:33:19.200
+<v Ev Kontsevoy>and always get an answer.
+
+524
+00:33:19.300 --> 00:33:20.540
+<v Ev Kontsevoy>You know how interacting with kids,
+
+525
+00:33:20.660 --> 00:33:22.160
+<v Ev Kontsevoy>and they ask you a question, they give you an answer,
+
+526
+00:33:22.200 --> 00:33:23.580
+<v Ev Kontsevoy>and they ask why, and you ask why.
+
+527
+00:33:23.800 --> 00:33:26.040
+<v Ev Kontsevoy>So if you give them a framework,
+
+528
+00:33:26.280 --> 00:33:27.820
+<v Ev Kontsevoy>then these whys, they go away.
+
+529
+00:33:27.900 --> 00:33:29.520
+<v Ev Kontsevoy>They can go and figure this all out.
+
+530
+00:33:29.700 --> 00:33:32.080
+<v Ev Kontsevoy>So that is just something that I gravitate towards that.
+
+531
+00:33:33.380 --> 00:33:35.460
+<v Noah Labhart>Well, okay, we talked about a mistake earlier,
+
+532
+00:33:36.880 --> 00:33:41.160
+<v Noah Labhart>spin. If you go back to the beginning, what would you do differently? Or where would you consider
+
+533
+00:33:41.160 --> 00:33:42.380
+<v Noah Labhart>taking a different approach?
+
+534
+00:33:43.640 --> 00:33:47.640
+<v Ev Kontsevoy>I would probably consider building a developer experience team
+
+535
+00:33:47.640 --> 00:33:53.360
+<v Ev Kontsevoy>a little bit sooner. So when I say developer experience, the activity that I'm referring to
+
+536
+00:33:53.360 --> 00:33:59.420
+<v Ev Kontsevoy>is what some other companies call sometimes DevRel, like engineers who educating other
+
+537
+00:33:59.420 --> 00:34:03.720
+<v Ev Kontsevoy>engineers on how to use certain technology, because we adopted this kind of strange
+
+538
+00:34:03.720 --> 00:34:08.940
+<v Ev Kontsevoy>sequential approach that first we are going to build this technology then
+
+539
+00:34:08.940 --> 00:34:14.800
+<v Ev Kontsevoy>we're going to use early adopters early users to make sure that is it is indeed
+
+540
+00:34:14.800 --> 00:34:19.240
+<v Ev Kontsevoy>something that other people want and willing to pay money for and then we'll
+
+541
+00:34:19.240 --> 00:34:25.860
+<v Ev Kontsevoy>get to evangelizing and we will start explaining it and from there you could
+
+542
+00:34:25.860 --> 00:34:30.300
+<v Ev Kontsevoy>basically see it's like how some of the things we've done we've done too late
+
+543
+00:34:30.300 --> 00:34:33.640
+<v Ev Kontsevoy>The quality of documentation in the early days was not that great.
+
+544
+00:34:34.140 --> 00:34:41.060
+<v Ev Kontsevoy>To this day, we're not really frequent presenters at different conferences.
+
+545
+00:34:41.160 --> 00:34:46.860
+<v Ev Kontsevoy>So only now we're starting to realize that in a world where there is a lot of new tech
+
+546
+00:34:46.860 --> 00:34:51.320
+<v Ev Kontsevoy>that seemingly excites you in the early days is coming out every day.
+
+547
+00:34:51.620 --> 00:34:53.760
+<v Ev Kontsevoy>So it all gets perceived as noise.
+
+548
+00:34:53.760 --> 00:35:07.940
+<v Ev Kontsevoy>So being better at and being actually more approachable, educating other engineers on security best practices, on productivity costs, by the way, of improperly set up access systems.
+
+549
+00:35:07.940 --> 00:35:10.200
+<v Ev Kontsevoy>So all of these things we should have done sooner.
+
+550
+00:35:10.560 --> 00:35:14.560
+<v Ev Kontsevoy>And some companies actually are doing it right.
+
+551
+00:35:14.780 --> 00:35:18.660
+<v Ev Kontsevoy>They start educating before the product is actually ready.
+
+552
+00:35:19.140 --> 00:35:20.920
+<v Ev Kontsevoy>Maybe Docker is a great example.
+
+553
+00:35:20.920 --> 00:35:26.700
+<v Ev Kontsevoy>they had some really early demos where docker was basically a toy and they were already showing
+
+554
+00:35:26.700 --> 00:35:32.020
+<v Ev Kontsevoy>everyone what the future might look like and it was exciting yes it took them a while for docker
+
+555
+00:35:32.020 --> 00:35:36.520
+<v Ev Kontsevoy>actually to mature to becoming that tool but i do believe it's it's just a better approach because
+
+556
+00:35:36.520 --> 00:35:42.420
+<v Ev Kontsevoy>even if you like you might fail on the technology side but sharing ideas early and interacting with
+
+557
+00:35:42.420 --> 00:35:47.440
+<v Ev Kontsevoy>community more frequently and having higher quality conversation it invites other people
+
+558
+00:35:47.440 --> 00:35:49.600
+<v Ev Kontsevoy>to dream with you, contribute to your dreams.
+
+559
+00:35:49.760 --> 00:35:51.260
+<v Ev Kontsevoy>I do believe that actually leads
+
+560
+00:35:51.260 --> 00:35:52.460
+<v Ev Kontsevoy>to better products in the end.
+
+561
+00:35:52.560 --> 00:35:55.000
+<v Ev Kontsevoy>So if I were to compress my rambling,
+
+562
+00:35:55.120 --> 00:35:57.420
+<v Ev Kontsevoy>I would say like we spent too much time coding in a cave.
+
+563
+00:35:58.340 --> 00:36:00.400
+<v Ev Kontsevoy>Sure, we were talking to potential customers,
+
+564
+00:36:00.620 --> 00:36:03.300
+<v Ev Kontsevoy>but I wish we would have interacted more with the community.
+
+565
+00:36:05.940 --> 00:36:06.960
+<v Noah Labhart>Well, last question, Ev.
+
+566
+00:36:07.200 --> 00:36:08.580
+<v Noah Labhart>So you're getting on a plane
+
+567
+00:36:08.580 --> 00:36:10.300
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+568
+00:36:10.300 --> 00:36:11.780
+<v Noah Labhart>who's built the next big thing.
+
+569
+00:36:11.920 --> 00:36:12.920
+<v Noah Labhart>They're jazzed about it.
+
+570
+00:36:12.940 --> 00:36:13.960
+<v Noah Labhart>They can't wait to show it to the world.
+
+571
+00:36:14.080 --> 00:36:15.820
+<v Noah Labhart>They can't wait to show it to you right there on the plane.
+
+572
+00:36:17.440 --> 00:36:20.180
+<v Noah Labhart>that person having gone down this road a bit multiple times.
+
+573
+00:36:20.900 --> 00:36:27.580
+<v Ev Kontsevoy>I would share the advice that I received from one of my Y Combinator partners, Paul Buchheit,
+
+574
+00:36:28.240 --> 00:36:33.440
+<v Ev Kontsevoy>where he said, Ev, listen to advice, but remember that everyone's advice is just overgeneralization
+
+575
+00:36:33.440 --> 00:36:36.260
+<v Ev Kontsevoy>multiplied by limited personal experience.
+
+576
+00:36:36.580 --> 00:36:44.620
+<v Ev Kontsevoy>I loved it so much because it allows you to very quickly see, especially if you see you
+
+577
+00:36:44.620 --> 00:36:49.420
+<v Ev Kontsevoy>can receive a lot of advice that it's actually there could be conflicted pieces of advice so
+
+578
+00:36:49.420 --> 00:36:55.480
+<v Ev Kontsevoy>don't pitch don't pay too much attention to um to what other people think about your business that
+
+579
+00:36:55.480 --> 00:37:00.420
+<v Ev Kontsevoy>advice has a certain shape and form so you cannot copy paste it from one company to another
+
+580
+00:37:00.420 --> 00:37:06.400
+<v Ev Kontsevoy>but most importantly too it has an expiration date and in today's technology world all advice
+
+581
+00:37:06.400 --> 00:37:10.680
+<v Ev Kontsevoy>gets obsolete very quickly not just technology advice even advice on how to run marketing sales
+
+582
+00:37:10.680 --> 00:37:11.520
+<v Ev Kontsevoy>almost anything.
+
+583
+00:37:12.820 --> 00:37:14.180
+<v Ev Kontsevoy>And the reason I like that
+
+584
+00:37:14.180 --> 00:37:15.860
+<v Ev Kontsevoy>is because it will take care
+
+585
+00:37:15.860 --> 00:37:17.100
+<v Ev Kontsevoy>of your anxiety a little bit
+
+586
+00:37:17.100 --> 00:37:18.720
+<v Ev Kontsevoy>because it's easy to be overwhelmed
+
+587
+00:37:18.720 --> 00:37:21.060
+<v Ev Kontsevoy>by advice that either doesn't make sense
+
+588
+00:37:21.060 --> 00:37:23.000
+<v Ev Kontsevoy>or is not compatible
+
+589
+00:37:23.000 --> 00:37:24.180
+<v Ev Kontsevoy>with something else you've heard.
+
+590
+00:37:24.380 --> 00:37:25.560
+<v Ev Kontsevoy>So just keep that in mind.
+
+591
+00:37:25.620 --> 00:37:26.720
+<v Ev Kontsevoy>Every advice is just
+
+592
+00:37:26.720 --> 00:37:28.440
+<v Ev Kontsevoy>some random person's opinion.
+
+593
+00:37:29.880 --> 00:37:30.380
+<v Noah Labhart>Absolutely.
+
+594
+00:37:30.540 --> 00:37:31.780
+<v Noah Labhart>Well, Ev, thank you for being
+
+595
+00:37:31.780 --> 00:37:32.540
+<v Noah Labhart>on the show today.
+
+596
+00:37:32.760 --> 00:37:33.760
+<v Noah Labhart>Thank you for telling
+
+597
+00:37:33.760 --> 00:37:35.580
+<v Noah Labhart>the creation story of Teleport.
+
+598
+00:37:35.840 --> 00:37:36.800
+<v Ev Kontsevoy>Thanks for having me.
+
+599
+00:37:36.860 --> 00:37:38.080
+<v Ev Kontsevoy>I had a good time.
+
+600
+00:37:39.280 --> 00:37:42.380
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+601
+00:37:45.220 --> 00:37:48.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+602
+00:37:48.400 --> 00:37:53.180
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+603
+00:37:53.620 --> 00:37:58.680
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+604
+00:37:59.040 --> 00:38:01.260
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+605
+00:38:01.520 --> 00:38:03.580
+<v Noah Labhart>Both things help us out tremendously.
+
+606
+00:38:05.860 --> 00:38:07.360
+<v Noah Labhart>And thanks again for listening.
+
+607
+00:38:11.580 --> 00:38:13.080
+<v Ev Kontsevoy>Thank you.

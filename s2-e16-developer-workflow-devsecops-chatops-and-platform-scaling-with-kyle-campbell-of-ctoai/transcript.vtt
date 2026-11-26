@@ -1,0 +1,2403 @@
+WEBVTT
+
+NOTE S2 E16: Developer Workflow & DevSecOps, ChatOps and Platform Scaling, with Kyle Campbell of CTO.ai
+
+1
+00:00:00.000 --> 00:00:07.960
+<v Noah Labhart>This episode of Code Story is sponsored by Ladder. Ladder was founded by LeBron James and Arnold Schwarzenegger to change the way supplements are made.
+
+2
+00:00:08.320 --> 00:00:18.580
+<v Noah Labhart>They worked with the top scientists to formulate a line of clean performance products. Unlike other supplements, every batch is tested by a third party to verify the highest standards for quality and safety.
+
+3
+00:00:18.760 --> 00:00:26.280
+<v Noah Labhart>We all know what a tremendous athlete LeBron is, and Arnold, no explanation needed. If they back it, you know it's gotta be good.
+
+4
+00:00:26.680 --> 00:00:29.620
+<v Noah Labhart>Ladder's goal is to help you unlock your best in any situation.
+
+5
+00:00:30.060 --> 00:00:34.080
+<v Noah Labhart>Right now, that means access to special offers and expert advice from their community.
+
+6
+00:00:34.620 --> 00:00:41.920
+<v Noah Labhart>Use code BETTEREVERYDAY, all one word, all caps, for 30% off everything site-wide at ladder.sport.
+
+7
+00:00:42.080 --> 00:00:47.520
+<v Noah Labhart>That's BETTEREVERYDAY, all caps, all one word, for 30% off at ladder.sport.
+
+8
+00:00:50.860 --> 00:00:55.180
+<v Kyle Campbell>And that came with a greater deal of overhead than I probably even would have expected when
+
+9
+00:00:56.280 --> 00:01:01.920
+<v Kyle Campbell>back in 2016. But now that we've made it through that transition and that focus, and we are now a
+
+10
+00:01:01.920 --> 00:01:07.220
+<v Kyle Campbell>very product-led organization, I can't look back and say I would do it any differently. I don't
+
+11
+00:01:07.220 --> 00:01:11.400
+<v Kyle Campbell>think we'd have the product and the momentum in the community that we have now without that.
+
+12
+00:01:11.540 --> 00:01:15.860
+<v Kyle Campbell>But I do know that it maybe would have been easier to just stay very product-focused and
+
+13
+00:01:15.860 --> 00:01:20.600
+<v Kyle Campbell>continue to give ourselves permission to throw away early iterations. And I think that's what
+
+14
+00:01:20.600 --> 00:01:26.000
+<v Kyle Campbell>helps companies and startups to iterate into market without carrying a ton of technical debt
+
+15
+00:01:26.280 --> 00:01:32.160
+<v Kyle Campbell>them. My name is Kyle Campbell. I'm founder and CEO of CTO.ai.
+
+16
+00:01:37.680 --> 00:01:42.940
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+17
+00:01:42.940 --> 00:01:46.880
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+18
+00:01:46.880 --> 00:01:50.740
+<v Noah Labhart>and build and lead a team that has your back.
+
+19
+00:01:52.460 --> 00:02:01.980
+<v Noah Labhart>I'm your host Noah Labhart and today how Kyle Campbell set out to make DevOps easier by integrating automation where development happens.
+
+20
+00:02:02.260 --> 00:02:04.780
+<v Noah Labhart>All this and more on Code Story.
+
+21
+00:02:08.060 --> 00:02:11.760
+<v Noah Labhart>Kyle Campbell is a native Canadian and high school dropout.
+
+22
+00:02:12.060 --> 00:02:16.780
+<v Noah Labhart>Growing up in Nova Scotia, he's been working with technology since he was eight years old.
+
+23
+00:02:16.780 --> 00:02:21.740
+<v Noah Labhart>learning computers, building websites, and even starting an online record label.
+
+24
+00:02:21.880 --> 00:02:26.980
+<v Noah Labhart>A husband and a dad, he loves the outdoors, camping and motorbikes, and frequently hits
+
+25
+00:02:26.980 --> 00:02:29.060
+<v Noah Labhart>the trails with a group of tight-knit campers.
+
+26
+00:02:29.220 --> 00:02:33.900
+<v Noah Labhart>After moving into entrepreneurship post-high school, he worked his way up through the ranks
+
+27
+00:02:33.900 --> 00:02:38.480
+<v Noah Labhart>of several companies in the Vancouver area and founded his own companies along the way,
+
+28
+00:02:38.520 --> 00:02:40.580
+<v Noah Labhart>one of which got acquired by Zillow.
+
+29
+00:02:40.700 --> 00:02:45.600
+<v Noah Labhart>Post that, Kyle started to consider the current complexity of the infrastructure and DevOps
+
+30
+00:02:45.600 --> 00:02:46.100
+<v Noah Labhart>landscape,
+
+31
+00:02:46.780 --> 00:02:49.140
+<v Noah Labhart>cloud, Kubernetes, containers, etc.
+
+32
+00:02:49.660 --> 00:02:52.840
+<v Noah Labhart>So he set out with the mission to make DevOps successful,
+
+33
+00:02:53.240 --> 00:02:57.400
+<v Noah Labhart>easy to use, and bring developer tools to where development happens
+
+34
+00:02:57.400 --> 00:02:59.480
+<v Noah Labhart>by enabling developer shortcuts.
+
+35
+00:02:59.940 --> 00:03:03.420
+<v Noah Labhart>This is the creation story of CTO.ai.
+
+36
+00:03:03.900 --> 00:03:10.020
+<v Kyle Campbell>We had a very interesting and unique path to product in market as we have now.
+
+37
+00:03:10.240 --> 00:03:12.100
+<v Kyle Campbell>For the first couple of years of the business,
+
+38
+00:03:12.240 --> 00:03:14.520
+<v Kyle Campbell>we've decided to not focus on technology.
+
+39
+00:03:14.520 --> 00:03:24.640
+<v Kyle Campbell>As a solo founder and also somebody who's been so technology focused, I knew that I could go out and raise money off my prior success and maybe jump into a product and play that whole game.
+
+40
+00:03:24.740 --> 00:03:26.540
+<v Kyle Campbell>But I wanted to take a more sustainable path.
+
+41
+00:03:26.700 --> 00:03:30.720
+<v Kyle Campbell>So we bootstrapped the business and really focused on professional services early.
+
+42
+00:03:30.900 --> 00:03:32.440
+<v Kyle Campbell>We provided DevOps as a service.
+
+43
+00:03:32.620 --> 00:03:43.640
+<v Kyle Campbell>And what that meant is we both were able to align with the customer pain points in some of these companies that I have been talking to, to understand what were the deep challenges that they were having within the developer experience.
+
+44
+00:03:44.520 --> 00:03:50.160
+<v Kyle Campbell>able to then profitably start testing our ideas both with those customers and internally. So we
+
+45
+00:03:50.160 --> 00:03:55.020
+<v Kyle Campbell>ended up building a lot of early concepts that weren't even what I would consider a product.
+
+46
+00:03:55.220 --> 00:04:00.300
+<v Kyle Campbell>We were building them to suit the customer pain points. And over about a year, a year and a half,
+
+47
+00:04:00.360 --> 00:04:04.940
+<v Kyle Campbell>we started to see this pattern emerging. And that's where we kind of came to the idea of the
+
+48
+00:04:04.940 --> 00:04:10.360
+<v Kyle Campbell>ops platform and iterated it into market and transitioned the business to focus primarily
+
+49
+00:04:10.360 --> 00:04:11.760
+<v Kyle Campbell>on a platform strategy.
+
+50
+00:04:12.140 --> 00:04:19.100
+<v Kyle Campbell>So the early iterations of the MVP were very much designed to be one-time use and things
+
+51
+00:04:19.100 --> 00:04:21.680
+<v Kyle Campbell>that we were very happy and easy to throw away.
+
+52
+00:04:21.960 --> 00:04:27.060
+<v Kyle Campbell>We started out focused on CLIs and building out different CLIs for different user experiences
+
+53
+00:04:27.580 --> 00:04:31.560
+<v Kyle Campbell>and different problems that these customers wanted to solve within their developer tools.
+
+54
+00:04:31.940 --> 00:04:36.480
+<v Kyle Campbell>And because it was a CLI, it was really inexpensive to build, but we could also create a really
+
+55
+00:04:36.480 --> 00:04:38.580
+<v Kyle Campbell>good feedback loop with our team and our customer.
+
+56
+00:04:40.360 --> 00:04:45.860
+<v Kyle Campbell>understand that there was a set of paradigms that we needed to be able to achieve to really make
+
+57
+00:04:45.860 --> 00:04:51.760
+<v Kyle Campbell>DevOps accessible. And it went beyond just the idea of a good CLI, which is where we brought
+
+58
+00:04:51.760 --> 00:04:57.320
+<v Kyle Campbell>things to Slack. We eventually reached a product that we were very confident in that we had tested
+
+59
+00:04:57.320 --> 00:05:03.080
+<v Kyle Campbell>with a number of teams. And so we brought the community edition of the Ops platform to market
+
+60
+00:05:03.080 --> 00:05:10.700
+<v Kyle Campbell>last fall after raising some capital from really great investors. And we launched our Slack Ops
+
+61
+00:05:10.700 --> 00:05:17.220
+<v Kyle Campbell>MVP in Q1. And now we're about to launch a new MVP around delivery metrics that we're really
+
+62
+00:05:17.220 --> 00:05:18.200
+<v Kyle Campbell>excited about as well.
+
+63
+00:05:18.860 --> 00:05:22.800
+<v Noah Labhart>So tell me a little bit more about the decisions and trade-offs you had
+
+64
+00:05:22.800 --> 00:05:27.880
+<v Noah Labhart>to make on that early MVP. So when you're building an MVP, you got to decide what you can build now,
+
+65
+00:05:27.900 --> 00:05:32.440
+<v Noah Labhart>what you can build later. Dig into that a little more and how you coped with those decisions.
+
+66
+00:05:33.080 --> 00:05:37.960
+<v Noah Labhart>surprise you later? Did technical debt ever kind of create any problems? Tell me a little more
+
+67
+00:05:37.960 --> 00:05:38.460
+<v Noah Labhart>about that.
+
+68
+00:05:38.580 --> 00:05:42.900
+<v Kyle Campbell>I think those things are always true. And as somebody who's been building these
+
+69
+00:05:42.900 --> 00:05:48.740
+<v Kyle Campbell>businesses that are very technical for a long time, I'm pretty desensitized to those compromises.
+
+70
+00:05:48.840 --> 00:05:54.140
+<v Kyle Campbell>But I think the compromise that was really clear that we were making based on our strategy,
+
+71
+00:05:54.280 --> 00:05:58.060
+<v Kyle Campbell>which is maybe counterintuitive to how most technology founders would approach this,
+
+72
+00:05:58.060 --> 00:06:01.400
+<v Kyle Campbell>is we focused on profitability and sales,
+
+73
+00:06:01.520 --> 00:06:03.900
+<v Kyle Campbell>and we sold into customer pain points
+
+74
+00:06:03.900 --> 00:06:05.180
+<v Kyle Campbell>ahead of building product.
+
+75
+00:06:05.420 --> 00:06:06.880
+<v Kyle Campbell>That meant we were generating
+
+76
+00:06:06.880 --> 00:06:09.760
+<v Kyle Campbell>eight figures in revenue last year.
+
+77
+00:06:10.060 --> 00:06:11.220
+<v Kyle Campbell>As a result of that,
+
+78
+00:06:11.300 --> 00:06:13.340
+<v Kyle Campbell>we had some significant responsibilities
+
+79
+00:06:13.340 --> 00:06:16.440
+<v Kyle Campbell>and expectations with our customers.
+
+80
+00:06:16.640 --> 00:06:20.140
+<v Kyle Campbell>And so as we were building products and building concepts,
+
+81
+00:06:20.440 --> 00:06:22.400
+<v Kyle Campbell>we really had to balance those two things.
+
+82
+00:06:22.580 --> 00:06:26.300
+<v Kyle Campbell>We had to make sure that we were separating IP concerns
+
+83
+00:06:28.060 --> 00:06:30.620
+<v Kyle Campbell>were expecting us to deliver clear IP to them,
+
+84
+00:06:30.680 --> 00:06:32.520
+<v Kyle Campbell>and that was a commitment we made and a commitment
+
+85
+00:06:32.520 --> 00:06:33.200
+<v Kyle Campbell>that we were honoring.
+
+86
+00:06:33.400 --> 00:06:35.040
+<v Kyle Campbell>We also had to then be able to figure out
+
+87
+00:06:35.040 --> 00:06:36.680
+<v Kyle Campbell>how we could test these different tools
+
+88
+00:06:36.680 --> 00:06:39.160
+<v Kyle Campbell>and build these different concepts within our own right.
+
+89
+00:06:39.340 --> 00:06:42.320
+<v Kyle Campbell>So a lot of the challenges were less about the technology
+
+90
+00:06:42.320 --> 00:06:45.220
+<v Kyle Campbell>and probably more about how we approached business operations.
+
+91
+00:06:45.900 --> 00:06:48.060
+<v Kyle Campbell>When it came to the technology and the product,
+
+92
+00:06:48.280 --> 00:06:51.240
+<v Kyle Campbell>we kept things very, very thin to avoid
+
+93
+00:06:51.240 --> 00:06:52.360
+<v Kyle Campbell>a lot of technical debt.
+
+94
+00:06:52.540 --> 00:06:54.380
+<v Kyle Campbell>And we also gave ourselves a lot of permission
+
+95
+00:06:54.380 --> 00:06:56.860
+<v Kyle Campbell>to throw away code that we'd written.
+
+96
+00:06:58.060 --> 00:07:02.180
+<v Kyle Campbell>really challenging for most individual contributors and most team members and so something i was
+
+97
+00:07:02.180 --> 00:07:09.380
+<v Kyle Campbell>completely and constantly trying to evangelize is okay but we probably threw away four to five
+
+98
+00:07:09.380 --> 00:07:14.560
+<v Kyle Campbell>different versions of what we built and every single time we got stronger and better because
+
+99
+00:07:14.560 --> 00:07:19.200
+<v Kyle Campbell>we gave ourselves permission to throw away the code base i think that's something that most
+
+100
+00:07:19.200 --> 00:07:23.960
+<v Kyle Campbell>companies and most teams that i've seen don't do often enough and then it leads them to some
+
+101
+00:07:23.960 --> 00:07:29.520
+<v Kyle Campbell>some really crippling technical debt or some really crippling compromises. For us, I think we
+
+102
+00:07:29.520 --> 00:07:35.020
+<v Kyle Campbell>took that approach very consciously on the product and technology side, having been through this a
+
+103
+00:07:35.020 --> 00:07:38.680
+<v Kyle Campbell>number of times in the past. But what was a really big learning experience was how we approach the
+
+104
+00:07:38.680 --> 00:07:43.680
+<v Kyle Campbell>business operations and the go-to-market strategy and how we were sort of managing a duality in our
+
+105
+00:07:43.680 --> 00:07:47.880
+<v Kyle Campbell>business model. And that came with a greater deal of overhead than I probably even would have
+
+106
+00:07:47.880 --> 00:07:53.200
+<v Kyle Campbell>expected when I wrote the business plan back in 2016. But now that we've made it through that
+
+107
+00:07:53.960 --> 00:07:58.680
+<v Kyle Campbell>and that focus, and we are now a very product-led organization. I can't look back and say I would
+
+108
+00:07:58.680 --> 00:08:03.220
+<v Kyle Campbell>do it any differently. I don't think we'd have the product and the momentum in the community
+
+109
+00:08:03.220 --> 00:08:07.560
+<v Kyle Campbell>that we have now without that. But I do know that it maybe would have been easier to just
+
+110
+00:08:07.560 --> 00:08:11.320
+<v Kyle Campbell>stay very product-focused and continue to give ourselves permission to throw away
+
+111
+00:08:11.320 --> 00:08:16.780
+<v Kyle Campbell>early iterations. And I think that's what helps companies and startups to iterate into market
+
+112
+00:08:16.780 --> 00:08:19.900
+<v Kyle Campbell>without carrying a ton of technical debt behind them.
+
+113
+00:08:20.080 --> 00:08:23.380
+<v Noah Labhart>I love that. I love what you said about
+
+114
+00:08:23.960 --> 00:08:35.940
+<v Noah Labhart>Throwing away code, giving permission to throw away things that you've built that may have been right for the time, but no longer work essentially for what you're trying to do moving forward.
+
+115
+00:08:36.060 --> 00:08:44.000
+<v Noah Labhart>I think that is a huge, it is difficult for individual contributors and it's difficult for engineers to throw away their babies, so to speak.
+
+116
+00:08:44.040 --> 00:08:52.320
+<v Noah Labhart>But it's really critical for the advancement of a product to feel enabled and free to scrap something and start over.
+
+117
+00:08:53.960 --> 00:08:56.560
+<v Kyle Campbell>And I talk about this a lot on Twitter and different areas.
+
+118
+00:08:56.740 --> 00:08:59.320
+<v Kyle Campbell>I mean, it's probably the one area where I try to lean into thought leadership.
+
+119
+00:08:59.700 --> 00:09:01.940
+<v Kyle Campbell>And I think there's a lot of misconceptions, right?
+
+120
+00:09:02.300 --> 00:09:08.640
+<v Kyle Campbell>Generally, an engineer comes to their profession with the expectation that they know how to
+
+121
+00:09:08.640 --> 00:09:09.160
+<v Kyle Campbell>build it right.
+
+122
+00:09:09.300 --> 00:09:13.280
+<v Kyle Campbell>As a business owner, I expect you to know how to build it right.
+
+123
+00:09:13.320 --> 00:09:16.100
+<v Kyle Campbell>Or that's at least the perception that these individual contributors will often have.
+
+124
+00:09:16.600 --> 00:09:21.060
+<v Kyle Campbell>And what's unintuitive for them is in an early stage startup, my perspective is maybe
+
+125
+00:09:21.060 --> 00:09:26.380
+<v Kyle Campbell>be more like, we don't know how to build it right. We're completely wrong. And over some amount of
+
+126
+00:09:26.380 --> 00:09:30.780
+<v Kyle Campbell>time, we should try to be right. And you won't know how to build it right until you've failed
+
+127
+00:09:30.780 --> 00:09:35.600
+<v Kyle Campbell>a couple of times. That's really ingrained in my personality because of how I came up,
+
+128
+00:09:35.640 --> 00:09:40.700
+<v Kyle Campbell>you know, as somebody who failed their way to where I'm at for 20 years. And that's literally
+
+129
+00:09:40.700 --> 00:09:45.380
+<v Kyle Campbell>the overnight success that I, you know, I have a talk about that's on YouTube. It's just something
+
+130
+00:09:45.380 --> 00:09:49.740
+<v Kyle Campbell>that I maybe take for granted sometimes. So I try to stop and definitely normalize that for people
+
+131
+00:09:51.060 --> 00:09:54.640
+<v Kyle Campbell>super important. And it's, it's hard if people haven't spent a lot of time in an early stage
+
+132
+00:09:54.640 --> 00:09:55.780
+<v Kyle Campbell>startup to accept that.
+
+133
+00:09:56.420 --> 00:10:00.380
+<v Noah Labhart>Absolutely. That's awesome. So how did you progress the product
+
+134
+00:10:00.380 --> 00:10:05.680
+<v Noah Labhart>from the early days? And how did you go about building your roadmap and deciding what's the
+
+135
+00:10:05.680 --> 00:10:11.520
+<v Noah Labhart>next most important thing to build on top of keeping it thin, you know, a tight core product?
+
+136
+00:10:11.620 --> 00:10:14.380
+<v Noah Labhart>What did you, how did you decide to what to build next? Even
+
+137
+00:10:14.380 --> 00:10:16.300
+<v Kyle Campbell>though we've been in business for three
+
+138
+00:10:16.300 --> 00:10:21.880
+<v Kyle Campbell>years, it's still pretty early days for us on the product and platform side. We're three quarters
+
+139
+00:10:21.880 --> 00:10:26.500
+<v Kyle Campbell>into market, you know, with about two years of iterating and testing and concepting before that.
+
+140
+00:10:26.500 --> 00:10:33.280
+<v Kyle Campbell>we really focused on trying to figure out how could we best influence the developer experience
+
+141
+00:10:33.280 --> 00:10:37.780
+<v Kyle Campbell>and what was really challenging about this it's not necessarily as an intuitive focus as you would
+
+142
+00:10:37.780 --> 00:10:43.140
+<v Kyle Campbell>think the developer experience is fragmented across thousands of different tools and any
+
+143
+00:10:43.140 --> 00:10:48.220
+<v Kyle Campbell>single one of them can be perceived as a competitor or a conflict with what you're trying to build.
+
+144
+00:10:48.340 --> 00:10:52.400
+<v Kyle Campbell>So we try to stay really focused on, is this something that we think will provide the
+
+145
+00:10:52.400 --> 00:10:56.800
+<v Kyle Campbell>developer a better experience? And we sort of have two pillars that we evaluated. The first is
+
+146
+00:10:56.800 --> 00:11:02.060
+<v Kyle Campbell>a really good developer experience, as I said, but the second is how can we then source information,
+
+147
+00:11:02.280 --> 00:11:07.320
+<v Kyle Campbell>data, context, delivery metrics, or DORA metrics as they're called sometimes in the industry,
+
+148
+00:11:07.460 --> 00:11:12.960
+<v Kyle Campbell>and how can we create that feedback loop to the developer, the team, and the business so that they
+
+149
+00:11:13.140 --> 00:11:15.580
+<v Kyle Campbell>have a strong degree of context about how they're working.
+
+150
+00:11:15.780 --> 00:11:19.280
+<v Kyle Campbell>And that was sort of how we set up the guiding principles.
+
+151
+00:11:19.620 --> 00:11:22.600
+<v Kyle Campbell>I really take an opinionated view
+
+152
+00:11:22.920 --> 00:11:25.380
+<v Kyle Campbell>as the founder of product roadmap early.
+
+153
+00:11:25.840 --> 00:11:29.360
+<v Kyle Campbell>I do believe in a very customer-centric approach
+
+154
+00:11:29.360 --> 00:11:32.120
+<v Kyle Campbell>to product roadmap, but I think it can be really challenging
+
+155
+00:11:32.120 --> 00:11:33.800
+<v Kyle Campbell>if you do that too early.
+
+156
+00:11:34.120 --> 00:11:36.680
+<v Kyle Campbell>There's a bit of a balance and I think a tipping point
+
+157
+00:11:36.680 --> 00:11:39.540
+<v Kyle Campbell>in which the information that you're getting from customers
+
+158
+00:11:39.540 --> 00:11:44.500
+<v Kyle Campbell>can invalidate the intuition that a product founder may have,
+
+159
+00:11:44.780 --> 00:11:47.140
+<v Kyle Campbell>especially after 20 years in a particular industry.
+
+160
+00:11:47.280 --> 00:11:49.060
+<v Kyle Campbell>Now, there's also biases that you have to check
+
+161
+00:11:49.060 --> 00:11:50.840
+<v Kyle Campbell>and you have to be really careful about that.
+
+162
+00:11:50.940 --> 00:11:53.600
+<v Kyle Campbell>But the way we approached it was I wrote out a very,
+
+163
+00:11:53.660 --> 00:11:55.260
+<v Kyle Campbell>what I would call a very detailed,
+
+164
+00:11:55.420 --> 00:11:58.320
+<v Kyle Campbell>but I guess it's more on a medium level of detail roadmap
+
+165
+00:11:58.320 --> 00:12:01.320
+<v Kyle Campbell>where I just will iterate semantic versioning style
+
+166
+00:12:01.320 --> 00:12:03.760
+<v Kyle Campbell>from 0.1 through to 1.0.
+
+167
+00:12:03.860 --> 00:12:05.980
+<v Kyle Campbell>And I'll lay out generally milestones
+
+168
+00:12:05.980 --> 00:12:07.600
+<v Kyle Campbell>on the path to get there.
+
+169
+00:12:09.540 --> 00:12:12.660
+<v Kyle Campbell>use is, look, we're all going on a road trip to get trip together, and we know
+
+170
+00:12:12.660 --> 00:12:15.900
+<v Kyle Campbell>that we're gonna have to stop for gas along the way, but here's the checkpoints
+
+171
+00:12:15.900 --> 00:12:19.980
+<v Kyle Campbell>where we're gonna stop and sleep. And that gives people some level of sanity
+
+172
+00:12:19.980 --> 00:12:23.220
+<v Kyle Campbell>along a long journey, especially if you're, you know, driving for days, weeks,
+
+173
+00:12:23.220 --> 00:12:28.820
+<v Kyle Campbell>you know, months or even years, to have a bit of context and see the forest
+
+174
+00:12:28.820 --> 00:12:33.860
+<v Kyle Campbell>through the trees. So what I try to do is set an opinionated view early that is,
+
+175
+00:12:33.860 --> 00:12:38.460
+<v Kyle Campbell>you know, relatively medium context, which there's a lot of area for individual
+
+176
+00:12:39.540 --> 00:12:46.180
+<v Kyle Campbell>to paint in the level of detail as they take tasks into an implementation view, sprint to sprint.
+
+177
+00:12:46.440 --> 00:12:50.840
+<v Kyle Campbell>And then what I do is I look for a tipping point where the context and the information that's
+
+178
+00:12:50.840 --> 00:12:58.060
+<v Kyle Campbell>coming back from users is more valuable or more validating than what I think my opinion is. I'm a
+
+179
+00:12:58.060 --> 00:13:01.960
+<v Kyle Campbell>generally opinionated person. I like to say, you know, the old, you know, strong opinions loosely
+
+180
+00:13:01.960 --> 00:13:07.460
+<v Kyle Campbell>held. And one of the things that I say to the team is a quote from, I believe it's Jim Barksdale
+
+181
+00:13:07.460 --> 00:13:12.120
+<v Kyle Campbell>from Netscape is, you know, if you want to talk about opinions, let's use mine, but otherwise
+
+182
+00:13:12.120 --> 00:13:18.160
+<v Kyle Campbell>let's use data. And, you know, I'm really looking for getting to a tipping point of an opinionated
+
+183
+00:13:18.160 --> 00:13:22.780
+<v Kyle Campbell>view of the world, which users can align with, which at that point you switch gears from saying,
+
+184
+00:13:22.820 --> 00:13:27.160
+<v Kyle Campbell>look, here's my roadmap to really just letting the customers tell you what your roadmap should be.
+
+185
+00:13:27.480 --> 00:13:32.860
+<v Kyle Campbell>And then what we try to do is use something called an ICE score, or it's also called a
+
+186
+00:13:32.860 --> 00:13:35.900
+<v Kyle Campbell>a RICE score when you have a much larger user base.
+
+187
+00:13:36.080 --> 00:13:41.500
+<v Kyle Campbell>And the idea of an ICE score is impact plus confidence divided by effort.
+
+188
+00:13:41.640 --> 00:13:48.000
+<v Kyle Campbell>So if you take the impact plus the confidence of your proposed feature and you divide that
+
+189
+00:13:48.000 --> 00:13:53.200
+<v Kyle Campbell>by the effort that it's estimated to accomplish that, you ultimately end up with a really
+
+190
+00:13:53.200 --> 00:13:57.180
+<v Kyle Campbell>good prioritization framework for what is your best work.
+
+191
+00:13:57.320 --> 00:14:00.000
+<v Kyle Campbell>And one of our core values is that we prioritize our best work.
+
+192
+00:14:00.000 --> 00:14:03.400
+<v Kyle Campbell>And so a framework like this is important, I think,
+
+193
+00:14:03.400 --> 00:14:06.700
+<v Kyle Campbell>to helping you prioritize what you should do.
+
+194
+00:14:07.000 --> 00:14:09.620
+<v Kyle Campbell>And as you start to include users into this,
+
+195
+00:14:09.680 --> 00:14:11.200
+<v Kyle Campbell>you also then have the concept of reach,
+
+196
+00:14:11.320 --> 00:14:13.260
+<v Kyle Campbell>which is how many users will this impact?
+
+197
+00:14:13.500 --> 00:14:14.960
+<v Kyle Campbell>Is, you know, if one in 10 users say
+
+198
+00:14:14.960 --> 00:14:16.480
+<v Kyle Campbell>that this is a good feature,
+
+199
+00:14:16.640 --> 00:14:20.340
+<v Kyle Campbell>then my reach is not as high as if 10 out of 10 say it.
+
+200
+00:14:20.600 --> 00:14:22.520
+<v Kyle Campbell>And so I think if you look at it through that lens,
+
+201
+00:14:22.640 --> 00:14:24.560
+<v Kyle Campbell>that's where you start to hit this tipping point
+
+202
+00:14:24.940 --> 00:14:26.920
+<v Kyle Campbell>where the data can invalidate the opinion,
+
+203
+00:14:27.100 --> 00:14:29.160
+<v Kyle Campbell>but in an early, early stage product,
+
+204
+00:14:30.000 --> 00:14:34.120
+<v Kyle Campbell>to have somebody opinionated. You know, it's typically the founder who's the one who's setting
+
+205
+00:14:34.120 --> 00:14:39.640
+<v Kyle Campbell>expectations and saying, look, this is what I see and what I've understood from being in this market.
+
+206
+00:14:39.780 --> 00:14:41.620
+<v Kyle Campbell>And here's how we want to approach it.
+
+207
+00:15:00.000 --> 00:15:04.220
+<v Noah Labhart>including those hardest to reach, and do whatever it takes for children every day.
+
+208
+00:15:04.420 --> 00:15:08.420
+<v Noah Labhart>Right now, the coronavirus is the biggest global health crisis of our lifetime.
+
+209
+00:15:08.640 --> 00:15:10.680
+<v Noah Labhart>It threatens children in every way.
+
+210
+00:15:10.900 --> 00:15:13.840
+<v Noah Labhart>COVID-19 has already left many children without caregivers,
+
+211
+00:15:14.140 --> 00:15:17.000
+<v Noah Labhart>out of school, and exposed to violence and exploitation.
+
+212
+00:15:17.560 --> 00:15:21.820
+<v Noah Labhart>With your support, SaveTheChildren.org can help children in unsafe households
+
+213
+00:15:21.820 --> 00:15:25.360
+<v Noah Labhart>and help support distance learning in the face of school closures.
+
+214
+00:15:25.620 --> 00:15:28.520
+<v Noah Labhart>Here are some of the ways your support can make a difference.
+
+215
+00:15:30.000 --> 00:15:34.840
+<v Noah Labhart>you can buy a baby's first book, providing comfort and inspiring a lifelong love of learning.
+
+216
+00:15:35.140 --> 00:15:40.880
+<v Noah Labhart>For $10, you can nourish an out-of-school child in need for one-day breakfast, lunch, and dinner.
+
+217
+00:15:41.360 --> 00:15:47.900
+<v Noah Labhart>For $35, you can provide educational toys and activities to engage eager out-of-school learners.
+
+218
+00:15:48.160 --> 00:15:52.860
+<v Noah Labhart>And for $50, you can deliver essentials that keep kids learning while out of school,
+
+219
+00:15:52.960 --> 00:15:57.380
+<v Noah Labhart>like books, activities, and supplies. Go to savethechildren.org
+
+220
+00:15:57.380 --> 00:16:05.840
+<v Noah Labhart>slash savekids today or www.savethechildren.org slash savekids to make a difference.
+
+221
+00:16:06.900 --> 00:16:12.660
+<v Noah Labhart>This message is brought to you by Atomic Child. Do you love the outdoors? Do you wish you had a
+
+222
+00:16:12.660 --> 00:16:17.600
+<v Noah Labhart>way to keep it with you throughout your week? Atomic Child is an artist-run brand that is
+
+223
+00:16:17.600 --> 00:16:22.420
+<v Noah Labhart>inspired by nature. They capture the great outdoors through unique designs and their
+
+224
+00:16:22.420 --> 00:16:26.340
+<v Noah Labhart>And their designs can be found on stickers, blankets, water bottles, mugs, pins, patches,
+
+225
+00:16:26.480 --> 00:16:28.960
+<v Noah Labhart>and more at AtomicChild.com.
+
+226
+00:16:29.560 --> 00:16:31.600
+<v Noah Labhart>Need nature-based art in your life?
+
+227
+00:16:31.840 --> 00:16:32.840
+<v Noah Labhart>Look no further.
+
+228
+00:16:33.020 --> 00:16:37.220
+<v Noah Labhart>Atomic Child has the gear for you, because they bring nature to you.
+
+229
+00:16:37.900 --> 00:16:43.080
+<v Noah Labhart>Me personally, I'm eyeing a new coffee mug or hat with a sweet Colorado design on it.
+
+230
+00:16:43.300 --> 00:16:48.700
+<v Noah Labhart>You can bet I'll be ordering some sweet nature-based clothing and accessories right here from Atomic
+
+231
+00:16:48.700 --> 00:16:49.200
+<v Noah Labhart>Child.
+
+232
+00:16:48.960 --> 00:16:53.060
+<v Noah Labhart>Check out their store and art prints at AtomicChild.com.
+
+233
+00:16:53.540 --> 00:16:56.120
+<v Noah Labhart>That's AtomicChild.com.
+
+234
+00:16:57.640 --> 00:16:59.340
+<v Noah Labhart>There's so much I love in that.
+
+235
+00:16:59.400 --> 00:17:00.580
+<v Noah Labhart>I love the ICE score.
+
+236
+00:17:00.740 --> 00:17:04.240
+<v Noah Labhart>I've heard it in different terms before, but I love the way you've broken it down.
+
+237
+00:17:04.280 --> 00:17:06.300
+<v Noah Labhart>ICE sounds way cooler than the ones I've heard before.
+
+238
+00:17:06.540 --> 00:17:07.680
+<v Kyle Campbell>Can't take credit for that one.
+
+239
+00:17:08.160 --> 00:17:09.340
+<v Noah Labhart>Sure, sure.
+
+240
+00:17:09.460 --> 00:17:10.300
+<v Noah Labhart>But it's still really cool.
+
+241
+00:17:10.420 --> 00:17:18.960
+<v Noah Labhart>And then I also feel the surfacing of your outdoor loves there and how, you know, you have this predetermined plan or places.
+
+242
+00:17:18.960 --> 00:17:20.060
+<v Noah Labhart>where you're going to sleep.
+
+243
+00:17:20.160 --> 00:17:21.340
+<v Noah Labhart>Like when you're on a road trip,
+
+244
+00:17:21.420 --> 00:17:23.540
+<v Noah Labhart>I feel your motorbike stuff coming out there
+
+245
+00:17:23.540 --> 00:17:24.980
+<v Noah Labhart>and your camping stuff coming out there.
+
+246
+00:17:25.300 --> 00:17:26.600
+<v Noah Labhart>But it makes so much sense.
+
+247
+00:17:26.760 --> 00:17:28.560
+<v Noah Labhart>Like it's, we're going to build this thing
+
+248
+00:17:28.560 --> 00:17:29.500
+<v Noah Labhart>and then we're going to get to this point
+
+249
+00:17:29.500 --> 00:17:31.500
+<v Noah Labhart>and we're going to rest and we're going to watch
+
+250
+00:17:31.500 --> 00:17:33.100
+<v Noah Labhart>and we're going to observe and we're going to take notes
+
+251
+00:17:33.100 --> 00:17:33.960
+<v Noah Labhart>and we're going to listen.
+
+252
+00:17:34.080 --> 00:17:35.040
+<v Noah Labhart>And it's super valuable.
+
+253
+00:17:35.220 --> 00:17:35.960
+<v Noah Labhart>So as
+
+254
+00:17:35.960 --> 00:17:37.080
+<v Kyle Campbell>a founder and CEO,
+
+255
+00:17:37.600 --> 00:17:39.520
+<v Kyle Campbell>one of the things I've had developed from,
+
+256
+00:17:39.620 --> 00:17:40.580
+<v Kyle Campbell>you know, CTO prior,
+
+257
+00:17:40.740 --> 00:17:42.780
+<v Kyle Campbell>and as I moved into CEO position,
+
+258
+00:17:42.960 --> 00:17:44.880
+<v Kyle Campbell>the number one skill set I've had to develop
+
+259
+00:17:44.880 --> 00:17:45.760
+<v Kyle Campbell>is storytelling.
+
+260
+00:17:46.060 --> 00:17:47.500
+<v Kyle Campbell>And I've always been a good storyteller,
+
+261
+00:17:48.960 --> 00:17:54.720
+<v Kyle Campbell>So, you know, this is just one more of the, you know, many analogies that I'll use to get a point across sometimes.
+
+262
+00:17:55.320 --> 00:17:59.680
+<v Noah Labhart>That's fantastic. I love it. Tell me about your team. How did you build your team?
+
+263
+00:17:59.720 --> 00:18:07.680
+<v Noah Labhart>And what did you look for in the people that you chose to join CTO.ai to indicate that they were the winning horses?
+
+264
+00:18:08.280 --> 00:18:12.320
+<v Kyle Campbell>This is one of the hardest things about building a company.
+
+265
+00:18:12.460 --> 00:18:16.320
+<v Kyle Campbell>And sometimes you can get it really right and sometimes you can get it really wrong.
+
+266
+00:18:16.320 --> 00:18:32.200
+<v Kyle Campbell>And there's the old adages about this, of course, that we all hear. I think hiring is something that you need to really contextualize within the short term, but also within the long term. You need to contextualize it within the strategy, but also within the goals.
+
+267
+00:18:32.200 --> 00:18:47.960
+<v Kyle Campbell>And we had, as I talked about earlier, sort of a bifurcated business model where we were taking professional services, we were working with professional services, and we were a professional service-oriented company for about two years.
+
+268
+00:18:47.960 --> 00:18:55.520
+<v Kyle Campbell>And as a result, we hired a lot of people who were really skilled at delivering professional services and professional service-based tooling.
+
+269
+00:18:55.740 --> 00:19:14.260
+<v Kyle Campbell>As a result, what we looked for was also people who had a really good product sense and would be comfortable and adaptable in a product environment because the expectation, the business plan was eventually to transition to a product-led business model.
+
+270
+00:19:14.260 --> 00:19:25.880
+<v Kyle Campbell>This is something that's really, really challenging because I think it's hard to prioritize both what you need in the moment, but also what you need in the long term when you have this sort of bifurcated business model.
+
+271
+00:19:26.280 --> 00:19:31.940
+<v Kyle Campbell>Most businesses, I would say, are set up more simply where there is just a focus.
+
+272
+00:19:32.220 --> 00:19:42.960
+<v Kyle Campbell>And with us, now that there is a very clear product focus, we have a very different hiring strategy than we did in earlier stages of the business because of that.
+
+273
+00:19:44.260 --> 00:19:49.640
+<v Kyle Campbell>I've spent a lot of time thinking about how do you hire right and how do you hire right at the
+
+274
+00:19:49.640 --> 00:19:53.940
+<v Kyle Campbell>right time? And there's even some throwbacks to what we were saying about technology. I think
+
+275
+00:19:53.940 --> 00:19:58.540
+<v Kyle Campbell>it's important that when you're hiring people, you're clear with them about what stage of the
+
+276
+00:19:58.540 --> 00:20:01.860
+<v Kyle Campbell>business you're hiring them for. I think that's the number one thing that you have to get right,
+
+277
+00:20:01.960 --> 00:20:06.440
+<v Kyle Campbell>especially even if you're not in a bifurcated scenario, just if you're in a scenario where
+
+278
+00:20:06.440 --> 00:20:13.240
+<v Kyle Campbell>you are an early stage business, you should expect that the people you hire early will be the people
+
+279
+00:20:14.260 --> 00:20:17.720
+<v Kyle Campbell>for the long term. But over the course of the business, if the business is successful,
+
+280
+00:20:17.980 --> 00:20:22.340
+<v Kyle Campbell>especially in a hyperscale business, you know, the definition of hyperscale is it's growing faster
+
+281
+00:20:22.340 --> 00:20:26.340
+<v Kyle Campbell>than any of us can even adapt to. But in a hyperscale business, your business should and
+
+282
+00:20:26.340 --> 00:20:31.800
+<v Kyle Campbell>will grow the individuals that you're hiring. So I think there's a few things that are really
+
+283
+00:20:31.800 --> 00:20:35.860
+<v Kyle Campbell>important that I've learned here. The first is what people say is like, have a really clear
+
+284
+00:20:35.860 --> 00:20:40.440
+<v Kyle Campbell>sort of strategy for who you're hiring. What are the archetypes and the attributes that you're
+
+285
+00:20:40.440 --> 00:20:45.260
+<v Kyle Campbell>looking for. And a book like Who, which I recently read, is a really great framework for how to think
+
+286
+00:20:45.260 --> 00:20:50.380
+<v Kyle Campbell>about this. It's a short read. I encourage everyone to read it. What I prioritize really comes back to
+
+287
+00:20:50.380 --> 00:20:56.520
+<v Kyle Campbell>the values and virtues of the business. Our virtues are speed, adaptability, decisiveness,
+
+288
+00:20:56.620 --> 00:21:02.100
+<v Kyle Campbell>and culture. So I want people who prioritize our culture, who emphasize the speed of delivery,
+
+289
+00:21:02.380 --> 00:21:07.180
+<v Kyle Campbell>meaning prioritizing their best work, not necessarily doing things wrong, but prioritizing
+
+290
+00:21:07.180 --> 00:21:11.180
+<v Kyle Campbell>in their best work who are decisive and want to debate things with data over who understand,
+
+291
+00:21:11.320 --> 00:21:15.600
+<v Kyle Campbell>disagree and commit. And then obviously adaptability because plans change, especially
+
+292
+00:21:15.600 --> 00:21:20.120
+<v Kyle Campbell>in early stage startups. That's the archetype I look for. And then what I try to do is make sure
+
+293
+00:21:20.120 --> 00:21:23.600
+<v Kyle Campbell>that, you know, this is something that I think everyone has to learn. Every founder has to learn
+
+294
+00:21:23.600 --> 00:21:28.500
+<v Kyle Campbell>is you need to make sure that you hire people in appropriate to where you're at as a business and
+
+295
+00:21:28.500 --> 00:21:33.100
+<v Kyle Campbell>give them a lot of headroom to grow. So this would mean hiring people in typically at an early stage
+
+296
+00:21:33.100 --> 00:21:40.780
+<v Kyle Campbell>as a director instead of as a VP or as a senior contributor instead of as a director. And you
+
+297
+00:21:40.780 --> 00:21:44.940
+<v Kyle Campbell>really have to think about what's the long term in the business and what's the headroom to grow.
+
+298
+00:21:45.140 --> 00:21:53.320
+<v Kyle Campbell>I think it's something that is really hard to get perfect. But the longer you can keep a team small,
+
+299
+00:21:53.480 --> 00:21:59.420
+<v Kyle Campbell>well aligned and cohesive, I think the better and easier it is to hire because it's not always been
+
+300
+00:21:59.420 --> 00:22:04.260
+<v Kyle Campbell>the founder or the leader who's making those decisions. It's the team who starts to really
+
+301
+00:22:04.260 --> 00:22:10.360
+<v Kyle Campbell>lean into that. And as soon as your team are the ones who are really setting a clear standard about
+
+302
+00:22:10.360 --> 00:22:16.060
+<v Kyle Campbell>who are the people that are coming in and joining the team because they know what the standard is
+
+303
+00:22:16.060 --> 00:22:20.540
+<v Kyle Campbell>and they want to make sure they maintain that standard. I think that's where you start to really
+
+304
+00:22:20.540 --> 00:22:27.120
+<v Kyle Campbell>get hiring right. It's really hard to hire as a business owner, even a hiring manager and get it
+
+305
+00:22:27.120 --> 00:22:32.440
+<v Kyle Campbell>right in a context of one. So I think it's really important that you spend the time not just learning
+
+306
+00:22:32.440 --> 00:22:36.460
+<v Kyle Campbell>and training yourself on what to look for. And, you know, obviously those are the attributes I'm
+
+307
+00:22:36.460 --> 00:22:39.760
+<v Kyle Campbell>looking for, but they can be different in a different stage of business. I think the most
+
+308
+00:22:39.760 --> 00:22:43.540
+<v Kyle Campbell>important thing is once you get past that, figuring out how to train your team to look for those
+
+309
+00:22:43.540 --> 00:22:48.500
+<v Kyle Campbell>things, because now you have hiring managers who are hiring people and you may or may not be able
+
+310
+00:22:48.500 --> 00:22:54.700
+<v Kyle Campbell>to meet every single person and you really should as much as possible. So, you know, I tried for as
+
+311
+00:22:54.700 --> 00:23:00.140
+<v Kyle Campbell>as long as possible to meet every single person we hired. But it wasn't always, you know, 100%
+
+312
+00:23:00.140 --> 00:23:06.340
+<v Kyle Campbell>my decision because you want to delegate and afford your team the responsibility of hiring
+
+313
+00:23:06.340 --> 00:23:10.700
+<v Kyle Campbell>their team because that's what accountability really is at the end of the day.
+
+314
+00:23:10.980 --> 00:23:16.200
+<v Noah Labhart>I love that. So let's talk about scalability a little bit. You mentioned you're building the MVP
+
+315
+00:23:16.200 --> 00:23:21.260
+<v Noah Labhart>thin to make sure, and as you progressed it, to make sure you had a tight core product that
+
+316
+00:23:21.260 --> 00:23:24.100
+<v Noah Labhart>that you didn't take on a lot of technical debt,
+
+317
+00:23:24.280 --> 00:23:26.400
+<v Noah Labhart>but that doesn't necessarily translate
+
+318
+00:23:26.400 --> 00:23:28.560
+<v Noah Labhart>to scalability exactly.
+
+319
+00:23:29.140 --> 00:23:30.120
+<v Noah Labhart>So tell me about that.
+
+320
+00:23:30.300 --> 00:23:32.740
+<v Noah Labhart>Was this something you thought of from the very beginning
+
+321
+00:23:32.740 --> 00:23:34.860
+<v Noah Labhart>or were you fighting this as you grew?
+
+322
+00:23:35.060 --> 00:23:37.280
+<v Noah Labhart>Were there particular points over the past three years
+
+323
+00:23:37.280 --> 00:23:39.640
+<v Noah Labhart>that maybe you hit a wall or anything like that?
+
+324
+00:23:39.860 --> 00:23:42.480
+<v Kyle Campbell>This is a really interesting concept.
+
+325
+00:23:42.780 --> 00:23:43.860
+<v Kyle Campbell>There's two types of scalability.
+
+326
+00:23:44.060 --> 00:23:45.480
+<v Kyle Campbell>There's like organizational scalability
+
+327
+00:23:45.480 --> 00:23:47.820
+<v Kyle Campbell>and then there's technology scalability.
+
+328
+00:23:48.080 --> 00:23:49.600
+<v Kyle Campbell>Within organizational scalability,
+
+329
+00:23:51.260 --> 00:23:56.160
+<v Kyle Campbell>business model you choose. And, you know, we chose a business model early on that didn't scale.
+
+330
+00:23:56.380 --> 00:24:01.740
+<v Kyle Campbell>Like Paul Graham says, do things that don't scale early. And I think we hit that limit really,
+
+331
+00:24:01.800 --> 00:24:06.580
+<v Kyle Campbell>really clearly from an organizational scalability. It was really hard to continue to grow the
+
+332
+00:24:06.580 --> 00:24:13.140
+<v Kyle Campbell>business based on where we thought the unit economics would take us and the amount of
+
+333
+00:24:13.140 --> 00:24:18.380
+<v Kyle Campbell>hiring and people that needed to come into the business to approach that. But I really knew
+
+334
+00:24:18.380 --> 00:24:20.000
+<v Kyle Campbell>knew upfront that that wasn't going to scale.
+
+335
+00:24:20.100 --> 00:24:21.640
+<v Kyle Campbell>And so I wasn't surprised by that.
+
+336
+00:24:21.840 --> 00:24:27.900
+<v Kyle Campbell>And so transitioning the business into a platform-led model was entirely about scalability and unit
+
+337
+00:24:27.900 --> 00:24:33.040
+<v Kyle Campbell>economics and doubling down on the traction that we had seen by taking a top-down approach
+
+338
+00:24:33.040 --> 00:24:37.420
+<v Kyle Campbell>with working with companies and trying to then cultivate that in what we think of as
+
+339
+00:24:37.420 --> 00:24:42.500
+<v Kyle Campbell>a bottom-up model through community developers and DevOps enthusiasts who are out there trying
+
+340
+00:24:42.500 --> 00:24:44.960
+<v Kyle Campbell>to make the world a better developer experience.
+
+341
+00:24:44.960 --> 00:25:03.400
+<v Kyle Campbell>When we think about the product and the technology, I'm very opinionated in the sense of at an early stage until you get to a clear tipping point of product market fit and are growing, let's say 30% month over month with less than 10% churn, I think you don't have to worry about scalability and you shouldn't worry about scalability.
+
+342
+00:25:03.400 --> 00:25:06.980
+<v Kyle Campbell>In our case, we had a lot of momentum as we went to market.
+
+343
+00:25:07.120 --> 00:25:13.860
+<v Kyle Campbell>And also just because we're a company who focuses on DevOps and scalability is one of our core attributes as a regard.
+
+344
+00:25:13.980 --> 00:25:16.440
+<v Kyle Campbell>We actually did focus on it quite early on.
+
+345
+00:25:16.820 --> 00:25:21.140
+<v Kyle Campbell>Our first few MVPs were very much not meant to be scalable.
+
+346
+00:25:21.300 --> 00:25:24.120
+<v Kyle Campbell>And we did so really credibly.
+
+347
+00:25:24.200 --> 00:25:28.980
+<v Kyle Campbell>But once we got to a place where we thought we knew what to build and we could build it right,
+
+348
+00:25:28.980 --> 00:25:40.640
+<v Kyle Campbell>We did invest the time into making it scalable enough that as our growth happened, we were not going to be spending all of our time duct taping it together.
+
+349
+00:25:40.980 --> 00:25:44.340
+<v Kyle Campbell>I think this is a really challenging balance.
+
+350
+00:25:44.620 --> 00:25:50.180
+<v Kyle Campbell>I mean, I think of this as one of the ultimate dichotomies in startup world, especially for founders and CTOs.
+
+351
+00:25:50.180 --> 00:25:57.160
+<v Kyle Campbell>the natural dichotomy between stability and velocity, I think is something that is really
+
+352
+00:25:57.160 --> 00:26:02.980
+<v Kyle Campbell>important as well managed by a technical founder. I think you have to early on prioritize velocity
+
+353
+00:26:02.980 --> 00:26:08.600
+<v Kyle Campbell>and care less about stability. But over time, you need to find out how to get to stability and
+
+354
+00:26:08.600 --> 00:26:15.160
+<v Kyle Campbell>therefore scalability. I think one of the things that is a silver bullet in that is what I said
+
+355
+00:26:15.160 --> 00:26:21.020
+<v Kyle Campbell>earlier about giving yourself permission to throw away product because if you do that it's sometimes
+
+356
+00:26:21.020 --> 00:26:25.940
+<v Kyle Campbell>much easier to build for scale from first principles knowing what you actually went
+
+357
+00:26:25.940 --> 00:26:31.340
+<v Kyle Campbell>through, right? If I knew what I knew, that if I knew what I knew now, then how would I have built this?
+
+358
+00:26:31.340 --> 00:26:37.200
+<v Kyle Campbell>and i think that's how i would think about it i think most businesses and would get to a place
+
+359
+00:26:37.200 --> 00:26:40.720
+<v Kyle Campbell>where if you give yourself permission to throw away code until you get to a tipping point and
+
+360
+00:26:40.720 --> 00:26:44.580
+<v Kyle Campbell>then you build for scale that will be the best way and that's how we thought about it's how we
+
+361
+00:26:45.160 --> 00:26:51.060
+<v Kyle Campbell>We just threw away the first number of products and we transitioned the business model really
+
+362
+00:26:51.060 --> 00:26:51.940
+<v Kyle Campbell>quickly.
+
+363
+00:26:52.240 --> 00:26:56.980
+<v Kyle Campbell>And I think as a result of that, it set us up in such a place where now we are building
+
+364
+00:26:56.980 --> 00:27:00.840
+<v Kyle Campbell>for scalability and that's well aligned with our actual growth as a business.
+
+365
+00:27:01.260 --> 00:27:01.980
+<v Noah Labhart>Very cool.
+
+366
+00:27:02.100 --> 00:27:07.680
+<v Noah Labhart>As you step out on the balcony and look across all that you've built, what are you most
+
+367
+00:27:07.680 --> 00:27:08.260
+<v Noah Labhart>proud of?
+
+368
+00:27:08.500 --> 00:27:10.300
+<v Kyle Campbell>Wow, that's an incredible question.
+
+369
+00:27:10.480 --> 00:27:11.540
+<v Kyle Campbell>Brings a lot of imagery.
+
+370
+00:27:11.540 --> 00:27:16.140
+<v Kyle Campbell>I wouldn't say that I have ever, I step out on any kind of balcony.
+
+371
+00:27:16.240 --> 00:27:18.620
+<v Kyle Campbell>Rather, I think what I would prefer to do is take the stairs.
+
+372
+00:27:19.080 --> 00:27:21.700
+<v Kyle Campbell>I'm really proud of the team that we've built.
+
+373
+00:27:21.860 --> 00:27:25.500
+<v Kyle Campbell>I think that's probably the most important thing about any of this.
+
+374
+00:27:26.440 --> 00:27:40.560
+<v Kyle Campbell>There's a quality of endurance and adaptability and just growth in the team that is with me on this journey that I'm really proud of because we've had to put a lot of energy into that.
+
+375
+00:27:41.540 --> 00:27:47.500
+<v Kyle Campbell>very quickly to 60 people and then, you know, made some really big changes recently. And our
+
+376
+00:27:47.500 --> 00:27:54.100
+<v Kyle Campbell>team's been through a lot and it's been a wild ride. And just to see how dedicated they are and
+
+377
+00:27:54.100 --> 00:27:58.980
+<v Kyle Campbell>how adaptable they are, but how passionate they are and how willing they are to take initiative
+
+378
+00:27:58.980 --> 00:28:06.460
+<v Kyle Campbell>and, you know, approach these really challenging problems while knowing that they don't have the
+
+379
+00:28:06.460 --> 00:28:09.480
+<v Kyle Campbell>the answers, nor do I, and we're figuring them out.
+
+380
+00:28:09.640 --> 00:28:12.240
+<v Kyle Campbell>I think that creates like a level of cohesiveness
+
+381
+00:28:12.240 --> 00:28:14.200
+<v Kyle Campbell>and an interpersonal connection.
+
+382
+00:28:14.360 --> 00:28:16.380
+<v Kyle Campbell>That's probably my most favorite part
+
+383
+00:28:16.380 --> 00:28:18.140
+<v Kyle Campbell>about building startups.
+
+384
+00:28:18.580 --> 00:28:20.660
+<v Kyle Campbell>I think that's what I would go with.
+
+385
+00:28:20.760 --> 00:28:22.760
+<v Kyle Campbell>I don't know that I could look at much else
+
+386
+00:28:22.760 --> 00:28:26.760
+<v Kyle Campbell>and say that it's the number one thing I'm proud of.
+
+387
+00:28:26.840 --> 00:28:30.060
+<v Kyle Campbell>I think if I use the regret minimization technique,
+
+388
+00:28:30.180 --> 00:28:32.140
+<v Kyle Campbell>I look back at the end of my life,
+
+389
+00:28:32.260 --> 00:28:33.700
+<v Kyle Campbell>I don't ever think it's gonna be
+
+390
+00:28:34.020 --> 00:28:35.800
+<v Kyle Campbell>that I remember the technology I built
+
+391
+00:28:36.460 --> 00:28:41.300
+<v Kyle Campbell>or I wrote, but I definitely, even now looking back at my prior startups, I always remember the
+
+392
+00:28:41.300 --> 00:28:45.940
+<v Kyle Campbell>people. I always remember the situations, you know, the late nights and the digging in and
+
+393
+00:28:45.940 --> 00:28:50.380
+<v Kyle Campbell>enduring some challenge that we didn't think we could solve and then coming out the other side
+
+394
+00:28:50.380 --> 00:28:54.660
+<v Kyle Campbell>with high fives. I mean, that's really, we'll always remember. And I think the thing that I'm
+
+395
+00:28:54.660 --> 00:28:55.280
+<v Kyle Campbell>most proud of.
+
+396
+00:28:56.000 --> 00:29:00.220
+<v Noah Labhart>Love it. That's awesome. Let's flip the script just a little bit. Tell me about
+
+397
+00:29:00.220 --> 00:29:05.980
+<v Noah Labhart>a mistake you made throughout the process, the last three years, and how did you and your team
+
+398
+00:29:06.460 --> 00:29:07.500
+<v Noah Labhart>to it? I
+
+399
+00:29:07.500 --> 00:29:11.960
+<v Kyle Campbell>guess the one that I'll use is a more recent example that's still fresh. And, you know,
+
+400
+00:29:12.020 --> 00:29:17.000
+<v Kyle Campbell>I think it'll require me to be a bit vulnerable. Why not? As many businesses struggle through this
+
+401
+00:29:17.000 --> 00:29:21.380
+<v Kyle Campbell>big change in the market, I mean, so have we. We've made some significant changes in the business to
+
+402
+00:29:21.380 --> 00:29:27.880
+<v Kyle Campbell>go from both 60 people down to 21 people. And that's probably the hardest thing that I've ever
+
+403
+00:29:28.800 --> 00:29:34.400
+<v Kyle Campbell>experienced. And it was something that was really challenging. And I think one of the reasons in
+
+404
+00:29:34.400 --> 00:29:42.680
+<v Kyle Campbell>in retrospect, that this happened was I, as a leader, made a decision to ramp up our team
+
+405
+00:29:42.680 --> 00:29:49.920
+<v Kyle Campbell>really quickly and did not have the foresight to anticipate what's happened recently with COVID.
+
+406
+00:29:50.360 --> 00:29:55.760
+<v Kyle Campbell>And as a result, I really had to come back to the team, especially the state team, and say,
+
+407
+00:29:55.800 --> 00:30:01.480
+<v Kyle Campbell>look, here is a very obvious and painful mistake that I've made that's impacted a lot of people.
+
+408
+00:30:01.480 --> 00:30:05.820
+<v Kyle Campbell>I have to make this decision and this is a decision that I don't take lightly.
+
+409
+00:30:06.280 --> 00:30:07.780
+<v Kyle Campbell>And here's why it's being made.
+
+410
+00:30:07.860 --> 00:30:10.800
+<v Kyle Campbell>And here's full transparency into how we are as a business.
+
+411
+00:30:11.020 --> 00:30:12.600
+<v Kyle Campbell>And I can't change that now.
+
+412
+00:30:12.720 --> 00:30:18.520
+<v Kyle Campbell>But what I can make sure I do is I can control how we treat the team who's leaving and how
+
+413
+00:30:18.520 --> 00:30:19.500
+<v Kyle Campbell>we try to support them.
+
+414
+00:30:19.640 --> 00:30:23.880
+<v Kyle Campbell>And I want us, you know, my leadership team, I want all of us to put as much energy as
+
+415
+00:30:23.880 --> 00:30:26.500
+<v Kyle Campbell>we can into supporting them through this time.
+
+416
+00:30:27.240 --> 00:30:30.500
+<v Kyle Campbell>And one of the things, I mean, even just going back to your prior question that I'm so
+
+417
+00:30:31.480 --> 00:30:35.960
+<v Kyle Campbell>of is the team who stayed and even our alumni, people who've worked with us over the last
+
+418
+00:30:35.960 --> 00:30:38.640
+<v Kyle Campbell>couple of years, really rallied around this.
+
+419
+00:30:38.800 --> 00:30:44.400
+<v Kyle Campbell>And, you know, it was something that I was really proud to see how everybody really leaned
+
+420
+00:30:44.400 --> 00:30:45.640
+<v Kyle Campbell>into supporting these people.
+
+421
+00:30:45.820 --> 00:30:47.780
+<v Kyle Campbell>And ultimately, that was my mistake.
+
+422
+00:30:48.020 --> 00:30:55.880
+<v Kyle Campbell>It was something that I made decisions in the business that required change at a time
+
+423
+00:30:55.880 --> 00:30:58.400
+<v Kyle Campbell>of very clear uncertainty, I guess.
+
+424
+00:30:58.400 --> 00:31:13.560
+<v Kyle Campbell>And I was just really, really humbled and proud to see how the team we had assembled responded to it, how they rallied around those people, but then also how they realigned their focus towards our mission and our objectives.
+
+425
+00:31:13.800 --> 00:31:24.440
+<v Kyle Campbell>And how as a small team, they came together through all of this change to really focus on not just taking care of people, but then focusing on product and profits in that order.
+
+426
+00:31:24.440 --> 00:31:30.340
+<v Kyle Campbell>and you know it was something that I had I had very little you know once once these decisions
+
+427
+00:31:30.340 --> 00:31:36.120
+<v Kyle Campbell>were made there was only taking control over trying to make the best decision in a very
+
+428
+00:31:36.120 --> 00:31:42.220
+<v Kyle Campbell>difficult circumstance but having that team behind me who was supporting me you know giving me
+
+429
+00:31:42.220 --> 00:31:48.360
+<v Kyle Campbell>permission to fail in some ways was really really humbling and I don't think I ever want to go
+
+430
+00:31:48.360 --> 00:31:53.580
+<v Kyle Campbell>through that again and we're never you know that's not something that we're ever want to do again but
+
+431
+00:31:54.440 --> 00:32:00.040
+<v Kyle Campbell>definitely going to be a defining moment of my experience building this company. And it's
+
+432
+00:32:00.040 --> 00:32:04.580
+<v Kyle Campbell>something that I'm okay with talking about openly because I think there's a lot of people going
+
+433
+00:32:04.580 --> 00:32:09.700
+<v Kyle Campbell>through tough times right now. And it's important that to some degree we can share our experiences
+
+434
+00:32:09.700 --> 00:32:16.120
+<v Kyle Campbell>and hope that it, you know, normalizes the fact that everything will be okay in the end.
+
+435
+00:32:16.900 --> 00:32:22.180
+<v Noah Labhart>And I appreciate you sharing that and your vulnerability. That's a great story and something
+
+436
+00:32:22.180 --> 00:32:25.080
+<v Noah Labhart>Something to highlight that you've walked through and your team has walked through.
+
+437
+00:32:25.220 --> 00:32:30.580
+<v Noah Labhart>Tell me what the future looks like for CTO.ai and for your team.
+
+438
+00:32:31.140 --> 00:32:33.120
+<v Kyle Campbell>Our future is very bright.
+
+439
+00:32:33.260 --> 00:32:39.620
+<v Kyle Campbell>I think one thing that I spent a lot of time doing in the last couple of weeks is really
+
+440
+00:32:39.620 --> 00:32:41.480
+<v Kyle Campbell>trying to understand where I think the world's going.
+
+441
+00:32:42.340 --> 00:32:46.440
+<v Kyle Campbell>I think that's one of the jobs of a CEO or any good entrepreneur is to try to think ahead
+
+442
+00:32:46.440 --> 00:32:47.920
+<v Kyle Campbell>of where is this world going?
+
+443
+00:32:48.180 --> 00:32:50.420
+<v Kyle Campbell>And I think there's one thing that's clear.
+
+444
+00:32:52.180 --> 00:32:58.640
+<v Kyle Campbell>that against prior examples of the past, you know, I come to a set of conclusions that make me very
+
+445
+00:32:58.640 --> 00:33:03.420
+<v Kyle Campbell>excited about our future. And this is how I think about it. You know, if I look back at 2001, 2008,
+
+446
+00:33:03.660 --> 00:33:07.360
+<v Kyle Campbell>there was really big businesses, you know, they call them T-shaped businesses that came out of
+
+447
+00:33:07.360 --> 00:33:13.520
+<v Kyle Campbell>these downturns. In 2008, the example was, you know, companies like Uber and Airbnb and sort of
+
+448
+00:33:13.520 --> 00:33:18.580
+<v Kyle Campbell>the need for the gig economy and incremental earning opportunities and incremental work.
+
+449
+00:33:18.580 --> 00:33:24.480
+<v Kyle Campbell>I think this change that we're in right now is actually quite different. And the defining factor
+
+450
+00:33:24.480 --> 00:33:30.920
+<v Kyle Campbell>for me is the move to remote. We set ourselves up as a business. And the reason we aligned with
+
+451
+00:33:30.920 --> 00:33:37.640
+<v Kyle Campbell>Slack as an investor is we really believed that the world was going remote. We didn't anticipate
+
+452
+00:33:37.640 --> 00:33:45.000
+<v Kyle Campbell>it to go remote in 18 days by a factor of 18 months. But with that move to remote work,
+
+453
+00:33:45.000 --> 00:33:53.200
+<v Kyle Campbell>We believe that there is a strong need to bring developer tools and developer experiences to the place where communication collaboration happen in Slack.
+
+454
+00:33:53.420 --> 00:34:07.960
+<v Kyle Campbell>And that's really exciting for us because I think more than ever, the need for developer tools and developer strategies that bring communication collaboration as well as observability to teams to help them work better together is really, really important.
+
+455
+00:34:07.960 --> 00:34:14.800
+<v Kyle Campbell>So we feel really excited and really fortunate to be on what we think is a big wave.
+
+456
+00:34:15.000 --> 00:34:19.720
+<v Kyle Campbell>I think any business need any good startup has to have a few things. And one of them is timing.
+
+457
+00:34:19.940 --> 00:34:24.880
+<v Kyle Campbell>The other is a great team. And, you know, idea and funding is kind of far down the line after that.
+
+458
+00:34:25.040 --> 00:34:32.000
+<v Kyle Campbell>So I think the timing is really great for us. And we're seeing a huge shift to using Slack as a jump
+
+459
+00:34:32.000 --> 00:34:37.780
+<v Kyle Campbell>off point for developer experiences as a jump off point for the DevOps process. And I think that
+
+460
+00:34:37.960 --> 00:34:43.400
+<v Kyle Campbell>paints a really bright future for where we're going. And we're going to stay focused on keeping
+
+461
+00:34:43.400 --> 00:34:48.560
+<v Kyle Campbell>our team, you know, as lean as possible. We're really investing heavily into the idea of community
+
+462
+00:34:49.000 --> 00:34:54.140
+<v Kyle Campbell>right now. We've got a growing Slack community. We call it the ops community. It can be found on
+
+463
+00:34:54.140 --> 00:35:00.320
+<v Kyle Campbell>our website. And we have lots of really experienced DevOps engineers, as well as thought leaders who
+
+464
+00:35:00.320 --> 00:35:04.240
+<v Kyle Campbell>are joining that. And together, we're all just spending a lot of time talking about what is the
+
+465
+00:35:04.240 --> 00:35:12.440
+<v Kyle Campbell>future of DevOps, especially now that we factor in this real clear need for remote tools that are
+
+466
+00:35:12.440 --> 00:35:15.440
+<v Kyle Campbell>that are enabling communication collaboration within development teams.
+
+467
+00:35:15.780 --> 00:35:16.760
+<v Noah Labhart>That's fantastic.
+
+468
+00:35:16.960 --> 00:35:23.200
+<v Noah Labhart>Well, who influences the way that you work? Name a CEO, CTO, or really any person. Name a person
+
+469
+00:35:23.200 --> 00:35:24.540
+<v Noah Labhart>you look up to and why.
+
+470
+00:35:24.780 --> 00:35:29.820
+<v Kyle Campbell>I look up to a lot of the startup greats and I probably draw a little bit
+
+471
+00:35:29.820 --> 00:35:36.780
+<v Kyle Campbell>inspiration from all of them. I try to not over index on any overly too much. But even in this
+
+472
+00:35:36.780 --> 00:35:41.540
+<v Kyle Campbell>interview, I've probably called out, you know, a number of thoughts that, you know, stem from
+
+473
+00:35:41.540 --> 00:35:46.860
+<v Kyle Campbell>influence from people like Elon Musk, who says, you know, startup leaders should look at the world
+
+474
+00:35:46.860 --> 00:35:50.540
+<v Kyle Campbell>like through a physics mindset, start with being wrong and work towards being right.
+
+475
+00:35:51.060 --> 00:35:56.960
+<v Kyle Campbell>The person who's probably influenced me the most in the recent year or two would be, I think,
+
+476
+00:35:56.960 --> 00:36:02.620
+<v Kyle Campbell>Ben Horowitz. And it's probably a result of reading his two books. So obviously, The Hard
+
+477
+00:36:02.620 --> 00:36:07.620
+<v Kyle Campbell>Things is a classic. And that's something that reading through his experiences and how he went
+
+478
+00:36:07.620 --> 00:36:13.060
+<v Kyle Campbell>through that process and came out ahead, I think would just build a really strong foundation. I
+
+479
+00:36:13.060 --> 00:36:17.940
+<v Kyle Campbell>also just identify with him in the way that he tries to not take himself too seriously, it would
+
+480
+00:36:17.940 --> 00:36:23.340
+<v Kyle Campbell>appear and how he communicates with the world. But I really, really liked his more recent book,
+
+481
+00:36:23.340 --> 00:36:27.720
+<v Kyle Campbell>the red book, What We Do Is Who We Are, which is about startup culture and how he goes and
+
+482
+00:36:27.720 --> 00:36:32.520
+<v Kyle Campbell>analyzes all of these really great cultures and talks about what it means to build a great culture
+
+483
+00:36:32.520 --> 00:36:37.000
+<v Kyle Campbell>in a business. I think, you know, I've read all of the other business books and I subscribe to a
+
+484
+00:36:37.000 --> 00:36:42.720
+<v Kyle Campbell>lot of business ideology. It's actually the only category of books that I have any patience to read
+
+485
+00:36:42.720 --> 00:36:47.840
+<v Kyle Campbell>is books that would, you know, help me to be a better CEO and a better technology founder.
+
+486
+00:36:47.840 --> 00:36:53.160
+<v Kyle Campbell>But those are probably of recent memory, two books that I really, really enjoyed.
+
+487
+00:36:53.400 --> 00:36:58.640
+<v Kyle Campbell>And I think a lot of the ideology that he shares in those books are things that have influenced me a great deal.
+
+488
+00:36:59.560 --> 00:37:06.580
+<v Noah Labhart>If you could go back to the beginning, what would you do differently or where would you consider taking a different approach?
+
+489
+00:37:07.520 --> 00:37:13.500
+<v Kyle Campbell>The answer always has to be I wouldn't because you really don't know where you'd be now if you did.
+
+490
+00:37:13.960 --> 00:37:18.460
+<v Kyle Campbell>However, if I were to look at it through a bit more of a selfish point of view, I started
+
+491
+00:37:18.460 --> 00:37:20.900
+<v Kyle Campbell>this business three days before my son was born.
+
+492
+00:37:21.040 --> 00:37:26.020
+<v Kyle Campbell>And I really did so with a lot of urgency thinking, look, I have a very little amount
+
+493
+00:37:26.020 --> 00:37:31.040
+<v Kyle Campbell>of time to try to create something here that will endure and, you know, legacy and all
+
+494
+00:37:31.040 --> 00:37:32.900
+<v Kyle Campbell>those things that, you know, some people care about.
+
+495
+00:37:33.400 --> 00:37:40.020
+<v Kyle Campbell>I took an approach early on of being profitable and that approach turned out, I think, to
+
+496
+00:37:40.020 --> 00:37:41.740
+<v Kyle Campbell>be the best approach.
+
+497
+00:37:43.500 --> 00:37:49.760
+<v Kyle Campbell>approach as I look back is certainly an interesting one as well. The idea of either
+
+498
+00:37:49.760 --> 00:37:56.820
+<v Kyle Campbell>keeping the business small and not growing it was one approach that I think would have maybe
+
+499
+00:37:56.820 --> 00:38:02.440
+<v Kyle Campbell>potentially changed my course quite differently. I think in that scenario, I would be spending a
+
+500
+00:38:02.440 --> 00:38:07.320
+<v Kyle Campbell>lot more time with my son in his early years. And then there's the other approach, obviously,
+
+501
+00:38:07.320 --> 00:38:13.620
+<v Kyle Campbell>of, hey, look, let's just raise a bunch of money upfront. Let's focus on product market fit from
+
+502
+00:38:13.620 --> 00:38:19.320
+<v Kyle Campbell>day one and let's roll the dice. Maybe we're too early in the market and maybe we're ahead of
+
+503
+00:38:19.320 --> 00:38:23.800
+<v Kyle Campbell>where the world is going. And in retrospect, that probably would have been true. We probably would
+
+504
+00:38:23.800 --> 00:38:27.720
+<v Kyle Campbell>have been a couple of years too early. And who knows if we would have been able to continue to
+
+505
+00:38:27.720 --> 00:38:31.740
+<v Kyle Campbell>raise the kind of capital we would need to sustain the business and learn at the rate that we did
+
+506
+00:38:32.460 --> 00:38:36.540
+<v Kyle Campbell>profitably. And in that situation, I probably would have had a lot less time with my son.
+
+507
+00:38:37.320 --> 00:38:42.680
+<v Kyle Campbell>way, the really motivating factor for me as I look back is how can I use the time that I have
+
+508
+00:38:42.680 --> 00:38:50.920
+<v Kyle Campbell>now as wisely as possible so that whether or not I'm successful at this, I know that I put as much
+
+509
+00:38:50.920 --> 00:38:57.640
+<v Kyle Campbell>as I could into it and that in the scenario where we're successful, I will have an incredible amount
+
+510
+00:38:57.640 --> 00:39:04.920
+<v Kyle Campbell>of opportunity, invest into as much time as I need to with my son and focus on that. I think
+
+511
+00:39:05.920 --> 00:39:09.000
+<v Kyle Campbell>interesting now is I've sort of found this nice balancing point, especially with coming
+
+512
+00:39:09.000 --> 00:39:13.520
+<v Kyle Campbell>to remote work where, you know, he's regularly coming into my office and playing with me
+
+513
+00:39:13.520 --> 00:39:18.380
+<v Kyle Campbell>while I'm working. So it's nice to now finally be in a position as I see it, where I can
+
+514
+00:39:18.380 --> 00:39:22.500
+<v Kyle Campbell>balance out those priorities. But when I think back, I mean, that's the one thing that keeps
+
+515
+00:39:22.500 --> 00:39:26.700
+<v Kyle Campbell>me up at night as I think it should. Anybody who works as much and as hard as you have
+
+516
+00:39:26.700 --> 00:39:31.620
+<v Kyle Campbell>to in early startup is like, how am I spending my time? And as I look back, will this rationalize
+
+517
+00:39:31.620 --> 00:39:37.600
+<v Kyle Campbell>for me with my personal life. And it's not really a factor of like, what's the money in it? It's
+
+518
+00:39:37.600 --> 00:39:43.440
+<v Kyle Campbell>more a question of like, what did I create? Was it enduring? And is that something that will provide
+
+519
+00:39:43.440 --> 00:39:50.000
+<v Kyle Campbell>for my family and for other people's families for enough time in the future that they will be able to
+
+520
+00:39:50.000 --> 00:39:54.580
+<v Kyle Campbell>pursue other things and make meaningful advancement in their personal lives?
+
+521
+00:39:55.360 --> 00:39:58.920
+<v Noah Labhart>That's a great answer. I relate to a lot of that as a husband and a dad.
+
+522
+00:39:58.920 --> 00:40:05.340
+<v Noah Labhart>last question kyle you're getting on a plane and you're sitting next to a young entrepreneur who's
+
+523
+00:40:05.340 --> 00:40:10.860
+<v Noah Labhart>built the next big thing they are jazzed about it they can't wait to show it off to the world
+
+524
+00:40:10.860 --> 00:40:15.820
+<v Noah Labhart>can't wait to show it off to you and they think it's going to solve a ton of problems what advice
+
+525
+00:40:15.820 --> 00:40:20.200
+<v Noah Labhart>do you give that person having gone down this road a bit i've
+
+526
+00:40:20.200 --> 00:40:21.320
+<v Kyle Campbell>been that young entrepreneur
+
+527
+00:40:21.320 --> 00:40:27.260
+<v Kyle Campbell>The interesting story here is that's how I met Stewart Butterfield from Slack.
+
+528
+00:40:27.740 --> 00:40:34.860
+<v Kyle Campbell>I hopped on a plane and I sat down and Stewart sat next to me. The approach I took was to introduce
+
+529
+00:40:34.860 --> 00:40:40.140
+<v Kyle Campbell>myself. Obviously, I was very nervous. I wasn't sure if it was Stewart or not. And then just be
+
+530
+00:40:40.140 --> 00:40:44.900
+<v Kyle Campbell>telling what I did and why I was excited to introduce myself. I think the next most important
+
+531
+00:40:44.900 --> 00:40:50.880
+<v Kyle Campbell>thing that I did was not bug him for the entire flight. And, you know, I think if I was sitting
+
+532
+00:40:51.320 --> 00:40:57.720
+<v Kyle Campbell>position, I think I would do much like he did. I would have offered an ear. I would offer some
+
+533
+00:40:57.720 --> 00:41:02.820
+<v Kyle Campbell>feedback, some encouragement, and then I would have offered the opportunity to follow up to
+
+534
+00:41:02.820 --> 00:41:09.640
+<v Kyle Campbell>provide more feedback. I give a lot of feedback to entrepreneurs. I was just talking to one the
+
+535
+00:41:09.640 --> 00:41:14.320
+<v Kyle Campbell>other day who's raising money, which is a difficult challenge in this climate. And the approach that I
+
+536
+00:41:14.320 --> 00:41:20.820
+<v Kyle Campbell>tend to take with people is maybe a bit more tough love, but usually the first piece of advice I will
+
+537
+00:41:21.320 --> 00:41:24.220
+<v Kyle Campbell>is again, something that I will take from Elon Musk,
+
+538
+00:41:24.320 --> 00:41:26.360
+<v Kyle Campbell>which is if you need encouraging words, don't do it.
+
+539
+00:41:26.520 --> 00:41:29.260
+<v Kyle Campbell>But generally what I will do for young entrepreneurs
+
+540
+00:41:29.260 --> 00:41:30.800
+<v Kyle Campbell>is give them that advice upfront,
+
+541
+00:41:30.980 --> 00:41:33.060
+<v Kyle Campbell>because I think it takes a lot of time
+
+542
+00:41:33.060 --> 00:41:34.040
+<v Kyle Campbell>to understand their business,
+
+543
+00:41:34.160 --> 00:41:35.280
+<v Kyle Campbell>to give them meaningful advice.
+
+544
+00:41:35.480 --> 00:41:37.460
+<v Kyle Campbell>But the one thing I do know I can do
+
+545
+00:41:37.460 --> 00:41:39.120
+<v Kyle Campbell>if it's just a fleeting moment
+
+546
+00:41:39.120 --> 00:41:41.420
+<v Kyle Campbell>where I don't have the opportunity to follow up and dig in
+
+547
+00:41:41.420 --> 00:41:42.880
+<v Kyle Campbell>and often in the meaningful feedback
+
+548
+00:41:43.340 --> 00:41:45.300
+<v Kyle Campbell>is I can just identify with the journey
+
+549
+00:41:45.300 --> 00:41:46.420
+<v Kyle Campbell>that they're about to go on.
+
+550
+00:41:46.620 --> 00:41:48.080
+<v Kyle Campbell>And I think for most people,
+
+551
+00:41:48.140 --> 00:41:50.680
+<v Kyle Campbell>that's the most important thing that we skip over
+
+552
+00:41:51.480 --> 00:41:55.880
+<v Kyle Campbell>entrepreneurial standpoint. And it's the most important thing to get right. You know, you have
+
+553
+00:41:55.880 --> 00:41:59.900
+<v Kyle Campbell>to pick a business that's solving a pain point that you have in an area that you think you can
+
+554
+00:41:59.900 --> 00:42:06.560
+<v Kyle Campbell>be the best. Because if you were doing something you didn't love and weren't driven to do, it was
+
+555
+00:42:06.560 --> 00:42:13.400
+<v Kyle Campbell>just too hard to make it through this experience of building a company. So I tend to start with
+
+556
+00:42:13.400 --> 00:42:17.520
+<v Kyle Campbell>that advice of like, hey, look, are you sure you want to do this? Because I think it's important
+
+557
+00:42:17.520 --> 00:42:19.020
+<v Kyle Campbell>to just recognize that.
+
+558
+00:42:19.120 --> 00:42:21.820
+<v Kyle Campbell>And I think it's too easy these days to start a business.
+
+559
+00:42:22.040 --> 00:42:24.440
+<v Kyle Campbell>And so many people end up starting them.
+
+560
+00:42:24.540 --> 00:42:26.040
+<v Kyle Campbell>And not that that's a bad thing,
+
+561
+00:42:26.120 --> 00:42:28.580
+<v Kyle Campbell>but it can be a really poor use of their time
+
+562
+00:42:28.580 --> 00:42:31.560
+<v Kyle Campbell>if they're not completely dedicated and driven
+
+563
+00:42:31.560 --> 00:42:33.980
+<v Kyle Campbell>and really understand what they're getting into.
+
+564
+00:42:34.240 --> 00:42:36.480
+<v Kyle Campbell>And to call back to the prior question,
+
+565
+00:42:36.580 --> 00:42:37.620
+<v Kyle Campbell>I mean, that's how I think about it.
+
+566
+00:42:37.680 --> 00:42:39.700
+<v Kyle Campbell>Like I'm investing the first couple of years
+
+567
+00:42:39.700 --> 00:42:41.580
+<v Kyle Campbell>of my son's life into this.
+
+568
+00:42:41.620 --> 00:42:44.700
+<v Kyle Campbell>So it has to be something incredibly meaningful to me
+
+569
+00:42:44.700 --> 00:42:46.500
+<v Kyle Campbell>and something that can be incredibly meaningful
+
+570
+00:42:46.500 --> 00:42:47.340
+<v Kyle Campbell>to him and others.
+
+571
+00:42:47.520 --> 00:42:51.820
+<v Kyle Campbell>for that to make sense. So I think that's where I would start. And then I would try to, you know,
+
+572
+00:42:52.300 --> 00:42:56.240
+<v Kyle Campbell>go from there and say like, okay, if you're really excited about this, and this is something that you
+
+573
+00:42:56.240 --> 00:43:00.340
+<v Kyle Campbell>really want to talk about, let's find some time to talk about it because the details matter.
+
+574
+00:43:00.740 --> 00:43:05.340
+<v Kyle Campbell>And I think more than anything, what every entrepreneur needs is that other entrepreneur
+
+575
+00:43:05.340 --> 00:43:11.620
+<v Kyle Campbell>who's going to tell them the things that they're doing wrong, very bluntly, or just, you know,
+
+576
+00:43:11.620 --> 00:43:16.220
+<v Kyle Campbell>tell them why their idea is bad, very bluntly, especially early on. Because again, if you can
+
+577
+00:43:17.540 --> 00:43:19.480
+<v Kyle Campbell>and you're just left with the ones that do.
+
+578
+00:43:19.780 --> 00:43:22.760
+<v Kyle Campbell>And I think that's the process that takes a lot of time
+
+579
+00:43:22.760 --> 00:43:23.720
+<v Kyle Campbell>and is unintuitive.
+
+580
+00:43:23.940 --> 00:43:26.140
+<v Kyle Campbell>And if I can accelerate that for another founder
+
+581
+00:43:26.140 --> 00:43:28.500
+<v Kyle Campbell>so that they're just really clear about what will work,
+
+582
+00:43:28.600 --> 00:43:30.580
+<v Kyle Campbell>and then there's a way that I can then enable them
+
+583
+00:43:30.580 --> 00:43:33.260
+<v Kyle Campbell>to accelerate that through introductions or other things
+
+584
+00:43:33.260 --> 00:43:35.760
+<v Kyle Campbell>that tend to be the means to the end,
+
+585
+00:43:35.860 --> 00:43:37.840
+<v Kyle Campbell>then you can lean in a lot more
+
+586
+00:43:37.840 --> 00:43:39.600
+<v Kyle Campbell>and be more helpful to that person
+
+587
+00:43:39.600 --> 00:43:43.320
+<v Kyle Campbell>and build great relationships through mutual success.
+
+588
+00:43:43.920 --> 00:43:44.880
+<v Noah Labhart>That's great advice.
+
+589
+00:43:44.880 --> 00:43:51.420
+<v Noah Labhart>Nice. Well, Kyle, thank you for being on Code Story today. Thank you for telling the creation story of CTO.ai.
+
+590
+00:43:51.920 --> 00:43:53.880
+<v Kyle Campbell>Yeah, thanks for having me. I really enjoyed it.
+
+591
+00:43:54.280 --> 00:43:57.220
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+592
+00:44:01.340 --> 00:44:07.840
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Season two episodes are co-produced and edited by Bradley Denham.
+
+593
+00:44:08.080 --> 00:44:12.900
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+594
+00:44:14.880 --> 00:44:20.180
+<v Noah Labhart>patreon.com slash Code Story for just five to 10 bucks a month. And when you get a chance,
+
+595
+00:44:20.220 --> 00:44:25.640
+<v Noah Labhart>leave us a review. Both things help us out tremendously. And thanks again for listening.
+
+596
+00:44:39.520 --> 00:44:43.040
+<v Noah Labhart>This message is from our friends at Collard. Collard helps engineering managers,
+
+597
+00:44:44.880 --> 00:44:49.780
+<v Noah Labhart>to build healthy teams, one-on-ones, career goals, team insights, and stakeholder communication.
+
+598
+00:44:50.240 --> 00:44:55.380
+<v Noah Labhart>It's all covered in a single place. Though they aren't live yet, they are launching very soon.
+
+599
+00:44:55.600 --> 00:45:03.100
+<v Noah Labhart>Visit www.collard.app slash Code Story to download the 20 one-on-one mistakes and how to avoid them
+
+600
+00:45:03.100 --> 00:45:10.920
+<v Noah Labhart>guide and join their waiting list. Again, that's www.collard.app slash Code Story to get the guide.

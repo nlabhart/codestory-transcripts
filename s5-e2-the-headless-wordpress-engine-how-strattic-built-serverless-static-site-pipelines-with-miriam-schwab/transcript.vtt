@@ -1,0 +1,2435 @@
+WEBVTT
+
+NOTE S5 E2: The Headless WordPress Engine: How Strattic Built Serverless Static Site Pipelines with Miriam Schwab
+
+1
+00:00:00.560 --> 00:00:04.900
+<v Miriam Schwab>Some people, when I've told people this story, they're like, oh yeah, that's happened to me. Like it's a thing.
+
+2
+00:00:05.520 --> 00:00:12.160
+<v Miriam Schwab>Sometime in the beginning, we all went to sleep and we woke up finding out that we had a runaway lambda.
+
+3
+00:00:12.400 --> 00:00:17.380
+<v Miriam Schwab>I guess you could call it that on AWS. And it had racked up the most enormous bill.
+
+4
+00:00:17.860 --> 00:00:25.200
+<v Miriam Schwab>First of all, we had to recover from that. It was a huge expense. We begged AWS for flexibility and whatever.
+
+5
+00:00:25.200 --> 00:00:28.340
+<v Miriam Schwab>I think maybe we just weren't aware enough.
+
+6
+00:00:28.560 --> 00:00:30.280
+<v Miriam Schwab>And also we had said, no, it's fine.
+
+7
+00:00:30.320 --> 00:00:32.360
+<v Miriam Schwab>If something goes wrong, we'll like know about it.
+
+8
+00:00:32.420 --> 00:00:34.940
+<v Miriam Schwab>No, AWS has no mercy.
+
+9
+00:00:35.140 --> 00:00:36.400
+<v Miriam Schwab>They're going to charge you for it.
+
+10
+00:00:36.960 --> 00:00:38.540
+<v Miriam Schwab>I thought that was the end of the company.
+
+11
+00:00:39.660 --> 00:00:40.940
+<v Miriam Schwab>My name is Miriam Schwab.
+
+12
+00:00:41.060 --> 00:00:42.780
+<v Miriam Schwab>I'm co-founder and CEO at Strattic.
+
+13
+00:00:47.660 --> 00:00:49.320
+<v Noah Labhart>This is Code Story,
+
+14
+00:00:49.560 --> 00:00:52.940
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+15
+00:00:52.940 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+16
+00:00:57.120 --> 00:01:00.820
+<v Noah Labhart>and build and lead a team that has your back.
+
+17
+00:01:02.200 --> 00:01:04.140
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+18
+00:01:04.220 --> 00:01:09.080
+<v Noah Labhart>and today how Miriam Schwab built a company around making WordPress better
+
+19
+00:01:10.120 --> 00:01:11.740
+<v Noah Labhart>by making it static.
+
+20
+00:01:13.520 --> 00:01:16.100
+<v Noah Labhart>All this and more on Code Story.
+
+21
+00:01:19.720 --> 00:01:22.000
+<v Noah Labhart>Miriam Schwab is originally from Canada.
+
+22
+00:01:22.940 --> 00:01:27.600
+<v Noah Labhart>She's been in Israel for 26 years and moved there after high school to attend university.
+
+23
+00:01:28.400 --> 00:01:32.460
+<v Noah Labhart>She studied English literature in school and she really enjoyed the focus,
+
+24
+00:01:32.700 --> 00:01:35.440
+<v Noah Labhart>though it has little to do with what she is doing today.
+
+25
+00:01:35.940 --> 00:01:39.340
+<v Noah Labhart>Even still, her heart was always pointed towards technology.
+
+26
+00:01:39.900 --> 00:01:43.480
+<v Noah Labhart>She's a mother of seven children, which keeps her super busy.
+
+27
+00:01:43.660 --> 00:01:48.540
+<v Noah Labhart>The oldest is 22, a boy, and the rest are girls, with the youngest being eight.
+
+28
+00:01:48.540 --> 00:01:53.800
+<v Noah Labhart>If she does have spare time in there, she spends it with her extended family or goes out with friends.
+
+29
+00:01:54.760 --> 00:02:00.880
+<v Noah Labhart>Around the time she had kid number four, she took her maternity leave to re-evaluate what she wanted to do.
+
+30
+00:02:01.120 --> 00:02:05.160
+<v Noah Labhart>She started freelancing and building people websites on a contract basis.
+
+31
+00:02:05.940 --> 00:02:10.660
+<v Noah Labhart>At the time, she was exploring open content management systems, namely WordPress.
+
+32
+00:02:11.000 --> 00:02:15.280
+<v Noah Labhart>She was one of the first people in Israel to offer WordPress as a business solution.
+
+33
+00:02:15.280 --> 00:02:21.480
+<v Noah Labhart>Her business grew from just her to being an agency building sites for businesses for 13 years.
+
+34
+00:02:22.200 --> 00:02:28.420
+<v Noah Labhart>As more and more people built websites she began to realize that the content on the site was sluggish to load.
+
+35
+00:02:28.620 --> 00:02:33.260
+<v Noah Labhart>And the stack used to power WordPress wasn't keeping up with the growth in content.
+
+36
+00:02:33.600 --> 00:02:37.200
+<v Noah Labhart>She stumbled across a new trend around static site generation.
+
+37
+00:02:37.640 --> 00:02:40.040
+<v Noah Labhart>She immediately thought she had found the answer.
+
+38
+00:02:41.580 --> 00:02:44.500
+<v Noah Labhart>This is the creation story of Strattic.
+
+39
+00:02:46.880 --> 00:02:48.800
+<v Miriam Schwab>I had just moved to Israel. I didn't know Hebrew well.
+
+40
+00:02:48.900 --> 00:02:54.560
+<v Miriam Schwab>And I tried studying computer science here for a year and I didn't know what was flying because I didn't understand what they were saying.
+
+41
+00:02:54.680 --> 00:02:57.220
+<v Miriam Schwab>So I ended up studying English literature, which I loved.
+
+42
+00:02:57.340 --> 00:03:04.960
+<v Miriam Schwab>But after I gave birth to my fourth kid, I took my maternity leave time to think about what I want to do next.
+
+43
+00:03:05.120 --> 00:03:10.500
+<v Miriam Schwab>I had been working in an intellectual property firm, working on patents and trademarks.
+
+44
+00:03:10.720 --> 00:03:14.920
+<v Miriam Schwab>I loved that world of innovation and being exposed to people's inventions.
+
+45
+00:03:15.280 --> 00:03:21.620
+<v Miriam Schwab>and creativity. I knew I wanted to do something of my own. I wasn't quite sure what. After my
+
+46
+00:03:21.620 --> 00:03:25.980
+<v Miriam Schwab>maternity leave ended, I decided to start freelancing. At first, providing content
+
+47
+00:03:25.980 --> 00:03:29.020
+<v Miriam Schwab>services to people, since that just made sense after my English literature degree.
+
+48
+00:03:29.160 --> 00:03:33.300
+<v Miriam Schwab>At the same time, I started to teach myself how to build websites and started offering that as
+
+49
+00:03:33.300 --> 00:03:38.520
+<v Miriam Schwab>a service. And then I was looking for a way to allow the people I was building sites for to
+
+50
+00:03:38.520 --> 00:03:41.880
+<v Miriam Schwab>manage their sites on their own so that they didn't have to come to me every time they wanted
+
+51
+00:03:41.880 --> 00:03:47.020
+<v Miriam Schwab>to edit a sentence and I explored the world of open source content management systems
+
+52
+00:03:47.650 --> 00:03:52.560
+<v Miriam Schwab>and I fell in love with WordPress. I saw a lot of potential there both in terms of the ease of
+
+53
+00:03:52.560 --> 00:03:56.340
+<v Miriam Schwab>building websites for clients but also that my clients would be able to manage their sites well
+
+54
+00:03:56.340 --> 00:04:02.540
+<v Miriam Schwab>and I was one of the first people in Israel to offer WordPress as a business solution. At the
+
+55
+00:04:02.540 --> 00:04:09.080
+<v Miriam Schwab>time people were still skeptical about WordPress being a full-fledged solution for real businesses.
+
+56
+00:04:09.080 --> 00:04:17.040
+<v Miriam Schwab>Slowly, there was a shift. People were tired of vendor lock-in, all sorts of proprietary CMSs that were limiting.
+
+57
+00:04:17.400 --> 00:04:23.300
+<v Miriam Schwab>And so they started turning towards WordPress and there was growing demand for people who could build WordPress websites.
+
+58
+00:04:23.380 --> 00:04:28.100
+<v Miriam Schwab>And that was me. My business grew and went from just being me to being an agency.
+
+59
+00:04:28.260 --> 00:04:34.480
+<v Miriam Schwab>We were building custom WordPress websites for top tech companies in Israel and large nonprofits and universities.
+
+60
+00:04:34.480 --> 00:04:42.340
+<v Miriam Schwab>universities. And I did that for about 13 years. As time went on, while demand continued to grow
+
+61
+00:04:42.340 --> 00:04:48.640
+<v Miriam Schwab>for WordPress development, WordPress also became trickier and more challenging to manage. The
+
+62
+00:04:48.640 --> 00:04:52.540
+<v Miriam Schwab>website started to get slower. They were more dynamic and richer, but also slower. And the
+
+63
+00:04:52.540 --> 00:04:57.540
+<v Miriam Schwab>LAMP stack that they were on was not really keeping up with it. And also hacking went from an individual
+
+64
+00:04:57.540 --> 00:05:02.640
+<v Miriam Schwab>to hacker bots. So it became harder to stay ahead of the curve in terms of these bots,
+
+65
+00:05:04.480 --> 00:05:09.200
+<v Miriam Schwab>there in WordPress and there were a lot of them. And I started to think, well, maybe WordPress is
+
+66
+00:05:09.200 --> 00:05:14.680
+<v Miriam Schwab>not the right solution anymore. Maybe I'm not doing right by my clients by only offering WordPress.
+
+67
+00:05:15.220 --> 00:05:21.700
+<v Miriam Schwab>So I started to explore what else was out there at the time. I stumbled across this new emerging
+
+68
+00:05:21.700 --> 00:05:26.920
+<v Miriam Schwab>trend, which was known as static site generators. And I was like, wow, this is amazing because
+
+69
+00:05:26.920 --> 00:05:33.120
+<v Miriam Schwab>these static sites are everything that WordPress isn't. They're resilient. There's basically
+
+70
+00:05:34.480 --> 00:05:38.360
+<v Miriam Schwab>super fast because every page is pre-rendered. They're scalable. So you don't have to worry
+
+71
+00:05:38.360 --> 00:05:42.680
+<v Miriam Schwab>about, oh, I'm doing a campaign. Will all my servers keep the site up? I was like, this is
+
+72
+00:05:42.680 --> 00:05:47.180
+<v Miriam Schwab>amazing. But when I looked into it further, I realized that there were a number of issues with
+
+73
+00:05:47.180 --> 00:05:51.980
+<v Miriam Schwab>that approach. One is building a site that would be based on a static site generator would take
+
+74
+00:05:51.980 --> 00:05:57.200
+<v Miriam Schwab>three or four times as long, which means it would cost that much more for my clients. And I knew
+
+75
+00:05:57.200 --> 00:06:01.660
+<v Miriam Schwab>nobody was going to want to invest that much just to have the shiniest new tech when in the end,
+
+76
+00:06:01.660 --> 00:06:05.940
+<v Miriam Schwab>they were doing just fine with their WordPress sites. We, the agency, were managing the sites
+
+77
+00:06:05.940 --> 00:06:09.780
+<v Miriam Schwab>for them. So we were fending off the hackers, et cetera. But from their point of view, WordPress
+
+78
+00:06:09.780 --> 00:06:15.380
+<v Miriam Schwab>was fine and the price point was good enough. But also once a site is built with a static site
+
+79
+00:06:15.380 --> 00:06:19.520
+<v Miriam Schwab>generator, then continuously maintaining it is also more challenging than with WordPress.
+
+80
+00:06:19.740 --> 00:06:25.280
+<v Miriam Schwab>The end users of a site are marketers or business people. They're used to the WYSIWYG editor in
+
+81
+00:06:25.280 --> 00:06:29.280
+<v Miriam Schwab>WordPress. They're used to the plugins and the tooling that they can install and the integrations
+
+82
+00:06:29.280 --> 00:06:34.780
+<v Miriam Schwab>and everything. And then that would be gone, mostly. Even user management becomes challenging
+
+83
+00:06:34.780 --> 00:06:39.980
+<v Miriam Schwab>static site generators. I was like, okay, this isn't going to work, but maybe WordPress itself
+
+84
+00:06:39.980 --> 00:06:47.460
+<v Miriam Schwab>can be a static site generator. That's how the concept for Strattic was born. I started working
+
+85
+00:06:47.460 --> 00:06:53.640
+<v Miriam Schwab>on Strattic while I was still managing the agency, trying to move it forward, trying to determine the
+
+86
+00:06:53.640 --> 00:06:59.200
+<v Miriam Schwab>feasibility, whether the market would be interested in it, etc. And that was going slowly. I did join
+
+87
+00:06:59.280 --> 00:07:04.360
+<v Miriam Schwab>two startup accelerators in Jerusalem, one after the other, one that was for more early stage and
+
+88
+00:07:04.360 --> 00:07:10.480
+<v Miriam Schwab>one that was for companies reaching more globally. Eventually, I sold my agency with very good timing.
+
+89
+00:07:10.780 --> 00:07:17.540
+<v Miriam Schwab>And at the same time, my partner, Josh Lawrence, joined me. Together, we were able to raise
+
+90
+00:07:17.540 --> 00:07:23.760
+<v Miriam Schwab>pre-seed funding and build out an initial, more than a prototype of Strattic, prove that it's
+
+91
+00:07:23.760 --> 00:07:27.340
+<v Miriam Schwab>possible and start onboarding some customers.
+
+92
+00:07:29.760 --> 00:07:33.120
+<v Noah Labhart>Tell me about the MVP. So that first product
+
+93
+00:07:33.120 --> 00:07:39.520
+<v Noah Labhart>you built, that first service you built, the product that was Strattic, the first one,
+
+94
+00:07:39.620 --> 00:07:43.100
+<v Noah Labhart>how long did it take to build and what sort of tools did you use to bring it to life?
+
+95
+00:07:44.600 --> 00:07:52.400
+<v Miriam Schwab>So the very first MVP or proof of concept was basically me running a scraper on a WordPress
+
+96
+00:07:53.760 --> 00:07:56.940
+<v Miriam Schwab>static files were downloaded to my laptop.
+
+97
+00:07:57.340 --> 00:08:00.420
+<v Miriam Schwab>And then I pushed those static files up into S3
+
+98
+00:08:01.380 --> 00:08:03.460
+<v Miriam Schwab>and put a CloudFront distribution in front of it.
+
+99
+00:08:03.540 --> 00:08:04.300
+<v Miriam Schwab>And then I tested,
+
+100
+00:08:04.780 --> 00:08:06.860
+<v Miriam Schwab>was that site faster than the original site?
+
+101
+00:08:07.660 --> 00:08:10.780
+<v Miriam Schwab>And was there like an attack surface on the static site?
+
+102
+00:08:10.960 --> 00:08:13.400
+<v Miriam Schwab>So the answer to both was yes, it's faster
+
+103
+00:08:13.400 --> 00:08:15.520
+<v Miriam Schwab>and no, there's no attack surface.
+
+104
+00:08:15.760 --> 00:08:18.240
+<v Miriam Schwab>Like that, it was like down and dirty, that was it.
+
+105
+00:08:18.460 --> 00:08:20.820
+<v Miriam Schwab>But then when we started building it out as a platform,
+
+106
+00:08:20.820 --> 00:08:26.980
+<v Miriam Schwab>The tools that we used were, we decided pretty quickly to go with AWS as our cloud platform
+
+107
+00:08:27.320 --> 00:08:28.360
+<v Miriam Schwab>for various reasons.
+
+108
+00:08:28.720 --> 00:08:33.420
+<v Miriam Schwab>One was we got quite a generous amount of credits from them as part of their startup
+
+109
+00:08:33.420 --> 00:08:35.540
+<v Miriam Schwab>program because I had been in their startup accelerator.
+
+110
+00:08:35.880 --> 00:08:40.540
+<v Miriam Schwab>And so that allowed us to get up and running with them with no initial output cost.
+
+111
+00:08:41.120 --> 00:08:46.980
+<v Miriam Schwab>So the main reason we went with AWS was beyond the credits is that hiring talent with a strong
+
+112
+00:08:46.980 --> 00:08:48.640
+<v Miriam Schwab>background in AWS is much easier.
+
+113
+00:08:48.640 --> 00:08:52.660
+<v Miriam Schwab>The developer community around AWS is stronger.
+
+114
+00:08:53.140 --> 00:08:55.920
+<v Miriam Schwab>And AWS has been around much longer than, let's say, Google Cloud.
+
+115
+00:08:56.080 --> 00:08:58.820
+<v Miriam Schwab>So the people working with it have much more experience.
+
+116
+00:08:59.920 --> 00:09:05.960
+<v Miriam Schwab>And so we knew that as we grew, for hiring purposes, it would be ideal that we were on AWS.
+
+117
+00:09:06.700 --> 00:09:08.620
+<v Miriam Schwab>So AWS was our main tool.
+
+118
+00:09:09.240 --> 00:09:13.380
+<v Miriam Schwab>And, you know, using various coding languages within AWS and building up the platform there.
+
+119
+00:09:13.960 --> 00:09:15.840
+<v Miriam Schwab>Learning a lot as we went along the way.
+
+120
+00:09:15.840 --> 00:09:18.900
+<v Miriam Schwab>So for example, we're an end-to-end platform.
+
+121
+00:09:19.180 --> 00:09:25.060
+<v Miriam Schwab>We host the WordPress site, the original WordPress site on the platform, and the static site, and then the CDN.
+
+122
+00:09:25.500 --> 00:09:30.080
+<v Miriam Schwab>Turns out that converting a WordPress site into static is a very resource-intensive process.
+
+123
+00:09:30.240 --> 00:09:34.800
+<v Miriam Schwab>And so we would keep crashing our own servers when we were trying to generate the static version of the site.
+
+124
+00:09:34.860 --> 00:09:40.380
+<v Miriam Schwab>And then you would end up with a static site that was all like 500 pages or something like really not attractive.
+
+125
+00:09:40.960 --> 00:09:54.360
+<v Miriam Schwab>And so we had to keep trying and figuring out how to scale that infrastructure and make sure that it doesn't fail in the middle, detect when it's failing, all sorts of things around that to keep it up and running and make that process smooth.
+
+126
+00:09:54.460 --> 00:10:06.400
+<v Miriam Schwab>So when I started out with Strattic, initially, like when I first had the idea and that first very messy MVP that I described, I was like, well, this is basically just scraping a site and then this should be easy.
+
+127
+00:10:06.660 --> 00:10:08.820
+<v Miriam Schwab>Like I should we should be able to have something up and running in six months.
+
+128
+00:10:10.380 --> 00:10:31.380
+<v Miriam Schwab>Much more complicated. There's a lot to take into consideration. And we've learned a ton along the way from our customers, basically, to keep improving, understanding different types of edge cases and circumstances, so that for our users, all they have to do is click a button, and then they get the static output. But what happens behind the scenes is actually quite complex. And I would even call it like fancy.
+
+129
+00:10:31.380 --> 00:10:32.040
+<v Miriam Schwab>Before
+
+130
+00:10:32.040 --> 00:10:51.920
+<v Noah Labhart>we get into the product progression there, when you're building an MVP, you got to make certain decisions and trade-offs, right? And it sounds like there were some decisions around speed, potentially even around technical debt. Tell me about some of those decisions and trade-offs you had to make and how you cope with them.
+
+131
+00:10:52.520 --> 00:11:19.420
+<v Miriam Schwab>Okay, there are a few things. One is the importance of saying no. So, you know, you have a team like myself and my partner and all of our employees, whoever they were at the time. It was a much smaller team then. And everyone's very smart. They're smart people. And they have ideas. And everyone is constantly throwing out ideas. We could do this and we could do that. And also, a lot of the ideas often are trying to guess what our customers might want to do at some point.
+
+132
+00:11:19.420 --> 00:11:23.860
+<v Miriam Schwab>So what we learned to do is say, does this matter now?
+
+133
+00:11:24.240 --> 00:11:27.160
+<v Miriam Schwab>Is this a pain point for our customers now, like for real?
+
+134
+00:11:28.060 --> 00:11:29.540
+<v Miriam Schwab>Also, is there a workaround?
+
+135
+00:11:29.640 --> 00:11:30.840
+<v Miriam Schwab>Can we do something manually?
+
+136
+00:11:30.960 --> 00:11:35.320
+<v Miriam Schwab>Can we like shift this from here to there or something to solve this in the meantime?
+
+137
+00:11:35.540 --> 00:11:36.740
+<v Miriam Schwab>And will that be good enough?
+
+138
+00:11:37.660 --> 00:11:40.640
+<v Miriam Schwab>Basically, always looking to where you can say no.
+
+139
+00:11:40.720 --> 00:11:46.740
+<v Miriam Schwab>So you focus on your core product and also ear to the ground, meaning our communication
+
+140
+00:11:46.740 --> 00:11:51.120
+<v Miriam Schwab>Communication with our customers is paramount in how we determine what we're doing next.
+
+141
+00:11:51.660 --> 00:11:54.440
+<v Miriam Schwab>We use Intercom for customer support for chat.
+
+142
+00:11:54.920 --> 00:11:56.140
+<v Miriam Schwab>I'm always reading it.
+
+143
+00:11:56.180 --> 00:11:56.680
+<v Miriam Schwab>Always.
+
+144
+00:11:56.700 --> 00:11:58.660
+<v Miriam Schwab>I read almost every customer support chat.
+
+145
+00:11:59.100 --> 00:12:02.620
+<v Miriam Schwab>And so do other people on the team because you learn so much from your customers.
+
+146
+00:12:02.720 --> 00:12:04.120
+<v Miriam Schwab>In the end, that's what you're building it for.
+
+147
+00:12:04.220 --> 00:12:06.080
+<v Miriam Schwab>So it's really important to listen to them.
+
+148
+00:12:06.140 --> 00:12:07.780
+<v Miriam Schwab>And we can often see a pattern.
+
+149
+00:12:07.900 --> 00:12:11.000
+<v Miriam Schwab>Like three people say, oh, I didn't understand that this button does that.
+
+150
+00:12:11.200 --> 00:12:14.920
+<v Miriam Schwab>So we're like, all right, let's look at the UX of this thing and try to figure out how
+
+151
+00:12:16.480 --> 00:12:21.060
+<v Miriam Schwab>understand. Three customers come along and they're all using a plugin we don't yet support. So we
+
+152
+00:12:21.060 --> 00:12:25.460
+<v Miriam Schwab>think, okay, not only will this help these three customers, how big is the potential user base of
+
+153
+00:12:25.460 --> 00:12:30.520
+<v Miriam Schwab>this particular, let's say, plugin? Should we roll out support for it? Yes, no. And we have also
+
+154
+00:12:30.520 --> 00:12:35.620
+<v Miriam Schwab>stopped trying to second guess what our customers might want to do in the future, like Strattic user
+
+155
+00:12:35.620 --> 00:12:40.800
+<v Miriam Schwab>management, our own user management, not WordPress's. Well, maybe there will be an agency that will want
+
+156
+00:12:40.800 --> 00:12:45.740
+<v Miriam Schwab>to bring in a sub-agency that will maybe, you know, like these types of things. And we say, uh, no.
+
+157
+00:12:46.740 --> 00:12:50.060
+<v Miriam Schwab>actually happen, it's not even something that we need to discuss or think about right now,
+
+158
+00:12:50.220 --> 00:12:50.960
+<v Miriam Schwab>we say no.
+
+159
+00:12:51.480 --> 00:12:55.920
+<v Miriam Schwab>In my agency, I worked with someone from the beginning named Rebecca Markowitz.
+
+160
+00:12:56.240 --> 00:12:59.700
+<v Miriam Schwab>She was my first hire in my agency and then she shifted with me to Strattic.
+
+161
+00:12:59.820 --> 00:13:02.940
+<v Miriam Schwab>So she had been a project manager at my agency, Illuminae.
+
+162
+00:13:03.380 --> 00:13:07.820
+<v Miriam Schwab>When she joined Strattic, we shifted her into a product management role because she was
+
+163
+00:13:07.820 --> 00:13:09.240
+<v Miriam Schwab>so good at that type of thing.
+
+164
+00:13:09.380 --> 00:13:13.800
+<v Miriam Schwab>And we just became clear that that made order of everything that we were working on.
+
+165
+00:13:13.800 --> 00:13:19.040
+<v Miriam Schwab>someone was keeping on top of the tasks and the bugs and making sure that things were prioritized
+
+166
+00:13:19.040 --> 00:13:23.760
+<v Miriam Schwab>according to business needs not just shiny new tools like this is the coolest thing that we
+
+167
+00:13:23.760 --> 00:13:27.820
+<v Miriam Schwab>could possibly develop but it doesn't have business needs so what is the business need right now
+
+168
+00:13:28.800 --> 00:13:34.240
+<v Miriam Schwab>and then eventually we hired a vp product with a ton of experience and people often think that
+
+169
+00:13:34.240 --> 00:13:40.180
+<v Miriam Schwab>that's a weird hire to make at the beginning but what it helped us stop doing was take two steps
+
+170
+00:13:40.180 --> 00:13:44.040
+<v Miriam Schwab>forward and one step back, it made sure that we were constantly moving forward.
+
+171
+00:13:44.140 --> 00:13:47.960
+<v Miriam Schwab>And we were all on the same page and on the same path and aware of where we were going.
+
+172
+00:13:49.400 --> 00:13:55.240
+<v Noah Labhart>Let's dig into that a little bit. So you got MVP, you're staying close to your customers,
+
+173
+00:13:55.480 --> 00:14:00.100
+<v Noah Labhart>you're building a process around how you determine what's the next thing to build.
+
+174
+00:14:00.360 --> 00:14:10.160
+<v Noah Labhart>How did you progress the product from there and then continue building out your roadmap? And
+
+175
+00:14:10.180 --> 00:14:10.680
+<v Noah Labhart>thing to build?
+
+176
+00:14:11.260 --> 00:14:16.920
+<v Miriam Schwab>That is a good question. So there were a number of things that we knew we had to
+
+177
+00:14:16.920 --> 00:14:21.100
+<v Miriam Schwab>build out in order to make sure that the vast majority of customers that came along could
+
+178
+00:14:21.100 --> 00:14:26.600
+<v Miriam Schwab>easily onboard to Strattic. And those were very integral parts of our initial product. So those
+
+179
+00:14:26.600 --> 00:14:32.720
+<v Miriam Schwab>were related to features that were traditionally dynamic. And when I say dynamic, I don't mean
+
+180
+00:14:32.720 --> 00:14:38.980
+<v Miriam Schwab>like interactive or something. I mean, depending on a database and processing PHP. So that could
+
+181
+00:14:40.180 --> 00:14:46.080
+<v Miriam Schwab>forms and comments. And a lot of websites in the WordPress community are using WordPress
+
+182
+00:14:46.080 --> 00:14:51.760
+<v Miriam Schwab>plugins for their forms. Also things like infinite scrolling. So that's actually challenging on a
+
+183
+00:14:51.760 --> 00:14:54.700
+<v Miriam Schwab>static site. So we had to figure these things out because we were seeing them again and again.
+
+184
+00:14:54.880 --> 00:14:59.280
+<v Miriam Schwab>And also because of my background and Rebecca's background, after building who knows how many
+
+185
+00:14:59.280 --> 00:15:05.120
+<v Miriam Schwab>websites for clients and our agency, we knew what was out there and what was common functionality
+
+186
+00:15:05.120 --> 00:15:06.520
+<v Miriam Schwab>and that we needed to support.
+
+187
+00:15:07.020 --> 00:15:09.700
+<v Miriam Schwab>So those were the initial major goals
+
+188
+00:15:09.700 --> 00:15:12.480
+<v Miriam Schwab>combined with whatever bug quashing,
+
+189
+00:15:12.500 --> 00:15:14.460
+<v Miriam Schwab>stability increasing measures
+
+190
+00:15:14.460 --> 00:15:15.740
+<v Miriam Schwab>we needed to take at the same time.
+
+191
+00:15:16.320 --> 00:15:18.420
+<v Miriam Schwab>There was always a combination of the two,
+
+192
+00:15:18.580 --> 00:15:23.100
+<v Miriam Schwab>proactive features with reactive, improving our platform,
+
+193
+00:15:23.320 --> 00:15:24.780
+<v Miriam Schwab>which are equally important
+
+194
+00:15:25.540 --> 00:15:27.040
+<v Miriam Schwab>because as we improve the platform,
+
+195
+00:15:27.180 --> 00:15:28.960
+<v Miriam Schwab>we improve our customer user experience,
+
+196
+00:15:29.160 --> 00:15:31.260
+<v Miriam Schwab>not just by making sure that there weren't bugs,
+
+197
+00:15:31.260 --> 00:15:35.320
+<v Miriam Schwab>but also optimizing the build process and things like that for them.
+
+198
+00:15:35.660 --> 00:15:40.440
+<v Miriam Schwab>And then as we went along, we would be onboarding more and more customers
+
+199
+00:15:40.440 --> 00:15:45.340
+<v Miriam Schwab>who at the time our focus was to onboard them not for the revenue they generated for the company,
+
+200
+00:15:45.480 --> 00:15:46.520
+<v Miriam Schwab>but to learn from them.
+
+201
+00:15:47.320 --> 00:15:49.760
+<v Miriam Schwab>Through these new customers, we would learn things like
+
+202
+00:15:49.760 --> 00:15:52.640
+<v Miriam Schwab>sometimes the site's permalink structure is this way.
+
+203
+00:15:52.780 --> 00:15:54.220
+<v Miriam Schwab>We need to be able to catch that.
+
+204
+00:15:54.460 --> 00:15:57.460
+<v Miriam Schwab>Oh, sometimes they don't have an ending slash.
+
+205
+00:15:57.580 --> 00:15:58.200
+<v Miriam Schwab>Sometimes they do.
+
+206
+00:15:58.200 --> 00:16:03.360
+<v Miriam Schwab>Sometimes they have these types of users and those types of users and we need user management.
+
+207
+00:16:03.560 --> 00:16:08.260
+<v Miriam Schwab>And so we were particularly targeting mid-level enterprise companies.
+
+208
+00:16:08.460 --> 00:16:11.200
+<v Miriam Schwab>And so we would definitely learn what those use cases were about.
+
+209
+00:16:11.240 --> 00:16:16.800
+<v Miriam Schwab>And then we would say, OK, if we roll out AMP support for this customer, then we actually have it for everyone.
+
+210
+00:16:16.880 --> 00:16:19.200
+<v Miriam Schwab>And that's great because we see that there's a lot of interest in it.
+
+211
+00:16:19.200 --> 00:16:31.140
+<v Miriam Schwab>So there was like bigger picture goals, the stabilizing and rolling out features that increased our total addressable market and then learned goals as we went along.
+
+212
+00:16:31.640 --> 00:16:34.640
+<v Miriam Schwab>The projects related to building out form support were quite big.
+
+213
+00:16:34.760 --> 00:16:47.240
+<v Miriam Schwab>So at first we were hoping that we could encourage customers that came along to replace the forms on their site that were depending on some kind of form plugin with something third party that works perfectly on Strattic.
+
+214
+00:16:49.200 --> 00:16:51.580
+<v Miriam Schwab>right, you embed a native HubSpot form in your site.
+
+215
+00:16:51.700 --> 00:16:52.820
+<v Miriam Schwab>It looks like it's part of the site,
+
+216
+00:16:52.900 --> 00:16:54.580
+<v Miriam Schwab>but all of the data goes straight into HubSpot
+
+217
+00:16:54.580 --> 00:16:56.500
+<v Miriam Schwab>and doesn't try to go into WordPress first,
+
+218
+00:16:56.620 --> 00:16:59.040
+<v Miriam Schwab>which also, in my opinion, is a better way of doing things.
+
+219
+00:16:59.120 --> 00:17:01.040
+<v Miriam Schwab>Why should WordPress be processing form submissions?
+
+220
+00:17:01.620 --> 00:17:02.540
+<v Miriam Schwab>That's not what it's meant for.
+
+221
+00:17:02.800 --> 00:17:03.980
+<v Miriam Schwab>But what can you do?
+
+222
+00:17:04.120 --> 00:17:05.360
+<v Miriam Schwab>A lot of people use these form plugins
+
+223
+00:17:05.360 --> 00:17:06.500
+<v Miriam Schwab>because they're very convenient.
+
+224
+00:17:06.740 --> 00:17:09.100
+<v Miriam Schwab>It allows them to build forms really easily,
+
+225
+00:17:09.280 --> 00:17:11.520
+<v Miriam Schwab>drag and drop, and they're good to go.
+
+226
+00:17:12.280 --> 00:17:14.700
+<v Miriam Schwab>So we determined which were the most popular ones
+
+227
+00:17:14.700 --> 00:17:15.600
+<v Miriam Schwab>among our target audience,
+
+228
+00:17:16.040 --> 00:17:18.900
+<v Miriam Schwab>and we created native Strattic support for it.
+
+229
+00:17:19.200 --> 00:17:26.180
+<v Miriam Schwab>So that means that a person can build a form with Gravity Forms on Strattic, click our publish button, and on the Strattic site, that form will look the same.
+
+230
+00:17:26.260 --> 00:17:27.680
+<v Miriam Schwab>And it will also act the same.
+
+231
+00:17:27.760 --> 00:17:29.540
+<v Miriam Schwab>The form submission will get sent to the right people.
+
+232
+00:17:29.960 --> 00:17:31.200
+<v Miriam Schwab>They can have conditional fields.
+
+233
+00:17:31.500 --> 00:17:34.440
+<v Miriam Schwab>We support, I would say, 99% of Gravity Forms functionality.
+
+234
+00:17:34.900 --> 00:17:39.580
+<v Miriam Schwab>And that allowed us to onboard a lot of customers that otherwise would have been challenged.
+
+235
+00:17:40.480 --> 00:17:42.000
+<v Noah Labhart>Well, then let's switch to team.
+
+236
+00:17:42.220 --> 00:17:44.440
+<v Noah Labhart>So how did you go about building your team?
+
+237
+00:17:44.440 --> 00:17:50.280
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+238
+00:17:51.980 --> 00:18:01.680
+<v Miriam Schwab>Our initial team was very much based on, in Hebrew, there's a term, friend being a friend.
+
+239
+00:18:02.020 --> 00:18:05.540
+<v Miriam Schwab>And it was like, OK, Rebecca joined me from my agency.
+
+240
+00:18:06.300 --> 00:18:08.740
+<v Miriam Schwab>Josh knew two people who were making a career shift.
+
+241
+00:18:09.300 --> 00:18:11.820
+<v Miriam Schwab>And, you know, we decided to give them a chance as interns.
+
+242
+00:18:11.820 --> 00:18:14.540
+<v Miriam Schwab>and then they grew within the company and they're now key players.
+
+243
+00:18:15.080 --> 00:18:18.220
+<v Miriam Schwab>Our chief architect I knew from within the Jerusalem tech community
+
+244
+00:18:18.220 --> 00:18:20.200
+<v Miriam Schwab>and I had wanted to work with him for quite a while
+
+245
+00:18:20.200 --> 00:18:22.860
+<v Miriam Schwab>and luckily the timing worked at a certain point for him to join us.
+
+246
+00:18:24.000 --> 00:18:26.660
+<v Miriam Schwab>Our CTO is someone named Zev Suraski
+
+247
+00:18:26.660 --> 00:18:29.380
+<v Miriam Schwab>and he's the co-creator of the PHP programming language.
+
+248
+00:18:30.040 --> 00:18:33.040
+<v Miriam Schwab>So he was also the co-founder of a company called Zend.
+
+249
+00:18:33.040 --> 00:18:35.020
+<v Miriam Schwab>Zend was like the PHP company.
+
+250
+00:18:35.820 --> 00:18:38.920
+<v Miriam Schwab>I organized five WordCamps in Israel.
+
+251
+00:18:39.080 --> 00:18:41.420
+<v Miriam Schwab>I'm a very active member of the WordPress community
+
+252
+00:18:41.820 --> 00:18:43.860
+<v Miriam Schwab>So I would organize the local conferences.
+
+253
+00:18:43.980 --> 00:18:50.820
+<v Miriam Schwab>And the last one that I did, right before that, I had somehow realized that there was this key player in the world of PHP, and he was Israeli.
+
+254
+00:18:51.100 --> 00:18:53.820
+<v Miriam Schwab>And not only was he Israeli, he actually was based in Israel.
+
+255
+00:18:53.960 --> 00:18:55.640
+<v Miriam Schwab>And I was like, wow, that's amazing.
+
+256
+00:18:56.320 --> 00:19:01.140
+<v Miriam Schwab>And I really need to try to get him to speak at WordCamp because that would be the coolest thing ever.
+
+257
+00:19:01.340 --> 00:19:06.120
+<v Miriam Schwab>So I reached out and he came and he was the keynote at the last WordCamp that I did.
+
+258
+00:19:06.200 --> 00:19:09.900
+<v Miriam Schwab>Now, I was all fangirling and like, he's really like a rock star.
+
+259
+00:19:11.820 --> 00:19:15.200
+<v Miriam Schwab>70% of the internet. And of course with WordPress, it's the language.
+
+260
+00:19:15.420 --> 00:19:19.120
+<v Miriam Schwab>So when Josh and I were working together, Josh, my partner, he was like,
+
+261
+00:19:19.140 --> 00:19:22.400
+<v Miriam Schwab>let's let's show Strattic to Zev. He's like, okay,
+
+262
+00:19:23.160 --> 00:19:26.900
+<v Miriam Schwab>we'll see what he says. So we went to meet him and we showed him, uh,
+
+263
+00:19:26.900 --> 00:19:30.680
+<v Miriam Schwab>Strattic and he actually liked it. So, uh, we,
+
+264
+00:19:30.760 --> 00:19:33.080
+<v Miriam Schwab>we created a relationship around Strattic already then,
+
+265
+00:19:33.200 --> 00:19:35.360
+<v Miriam Schwab>and his company then had been acquired.
+
+266
+00:19:35.620 --> 00:19:39.240
+<v Miriam Schwab>And while we were getting advice from him, whatever, along the way,
+
+267
+00:19:39.240 --> 00:19:44.180
+<v Miriam Schwab>we started to talk to him about joining as CTO. He really identified with what we were doing.
+
+268
+00:19:44.380 --> 00:19:48.440
+<v Miriam Schwab>He says something funny. He says, the best way to run PHP is not to run it at all.
+
+269
+00:19:49.760 --> 00:19:54.880
+<v Miriam Schwab>So because our static sites don't even, it doesn't even run PHP. PHP happens by the
+
+270
+00:19:54.880 --> 00:19:59.580
+<v Miriam Schwab>scene. So he joined us. He joined us as CTO and he's amazing to work with. Of course, he's brilliant.
+
+271
+00:20:00.080 --> 00:20:05.180
+<v Miriam Schwab>So we managed to do that connections type of hiring for a while and that worked really well
+
+272
+00:20:05.180 --> 00:20:11.640
+<v Miriam Schwab>all for us. But now we're at a stage where we need to think bigger in terms of hiring. We just hired
+
+273
+00:20:11.640 --> 00:20:19.220
+<v Miriam Schwab>our first CMO. Until now, all marketing and sales have basically been me and Josh doing our best,
+
+274
+00:20:19.340 --> 00:20:24.720
+<v Miriam Schwab>trying to, you know, do some outreach when we have time. I try to speak on podcasts like this
+
+275
+00:20:24.720 --> 00:20:29.800
+<v Miriam Schwab>or at online conferences in the community, whatever and wherever. We have content on our
+
+276
+00:20:29.800 --> 00:20:34.580
+<v Miriam Schwab>site that gets organic traffic, but that's been it. Now we're at go-to-market stage, and so we
+
+277
+00:20:35.180 --> 00:20:36.820
+<v Miriam Schwab>and very strong to lead that.
+
+278
+00:20:37.260 --> 00:20:38.960
+<v Miriam Schwab>When you start hiring in that way,
+
+279
+00:20:38.980 --> 00:20:40.140
+<v Miriam Schwab>it becomes much more challenging.
+
+280
+00:20:40.240 --> 00:20:42.420
+<v Miriam Schwab>So that was a much more intensive process,
+
+281
+00:20:43.020 --> 00:20:45.320
+<v Miriam Schwab>talking to a lot of people, working with recruiters.
+
+282
+00:20:45.600 --> 00:20:47.380
+<v Miriam Schwab>So I think we're now at the stage
+
+283
+00:20:47.380 --> 00:20:51.160
+<v Miriam Schwab>where we're beyond the friend bring a friend stage.
+
+284
+00:20:52.480 --> 00:20:54.100
+<v Miriam Schwab>Israel's a very close-knit community.
+
+285
+00:20:54.160 --> 00:20:56.640
+<v Miriam Schwab>So in the end, naturally there tends to be,
+
+286
+00:20:56.680 --> 00:20:58.380
+<v Miriam Schwab>you know, employees tell their friends
+
+287
+00:20:58.380 --> 00:20:59.460
+<v Miriam Schwab>about open positions
+
+288
+00:20:59.460 --> 00:21:02.360
+<v Miriam Schwab>and that often helps bring leads for positions.
+
+289
+00:21:02.540 --> 00:21:04.940
+<v Miriam Schwab>But so in the beginning, it was like people we know,
+
+290
+00:21:05.180 --> 00:21:09.540
+<v Miriam Schwab>people we want to work with anyways, let's see how it goes. And that worked out really well, but
+
+291
+00:21:10.220 --> 00:21:11.340
+<v Miriam Schwab>it's different now.
+
+292
+00:21:16.580 --> 00:21:22.700
+<v Noah Labhart>So let's talk about scalability a little bit. So did you build Strattic to scale efficiently from
+
+293
+00:21:22.700 --> 00:21:27.020
+<v Noah Labhart>day one, or was this something you kind of fighting as you grew? And I think you touched
+
+294
+00:21:27.020 --> 00:21:28.840
+<v Noah Labhart>on it a little bit, but let's dive into it.
+
+295
+00:21:30.460 --> 00:21:33.240
+<v Miriam Schwab>So on day one, it was not built to scale.
+
+296
+00:21:35.180 --> 00:21:36.660
+<v Miriam Schwab>to scale to a certain extent.
+
+297
+00:21:37.000 --> 00:21:38.420
+<v Miriam Schwab>And then we would reach that point
+
+298
+00:21:38.420 --> 00:21:41.460
+<v Miriam Schwab>and then have to rethink things or tweak things.
+
+299
+00:21:41.860 --> 00:21:43.580
+<v Miriam Schwab>In the beginning, we built it out to scale.
+
+300
+00:21:43.840 --> 00:21:45.540
+<v Miriam Schwab>I don't know if I'm remembering correctly,
+
+301
+00:21:45.720 --> 00:21:46.300
+<v Miriam Schwab>but I think it was like,
+
+302
+00:21:46.380 --> 00:21:48.040
+<v Miriam Schwab>let's be able to support a hundred,
+
+303
+00:21:48.180 --> 00:21:49.620
+<v Miriam Schwab>like including trial sites.
+
+304
+00:21:50.200 --> 00:21:52.580
+<v Miriam Schwab>And then, okay, we hit that and we're like,
+
+305
+00:21:52.660 --> 00:21:53.500
+<v Miriam Schwab>okay, what's next?
+
+306
+00:21:53.600 --> 00:21:55.020
+<v Miriam Schwab>Let's try to support a thousand.
+
+307
+00:21:56.100 --> 00:21:57.940
+<v Miriam Schwab>Sometimes it would mean rebuilding some stuff
+
+308
+00:21:57.940 --> 00:21:58.900
+<v Miriam Schwab>and sometimes it would mean
+
+309
+00:21:58.900 --> 00:22:00.400
+<v Miriam Schwab>throwing more resources at something.
+
+310
+00:22:00.540 --> 00:22:01.720
+<v Miriam Schwab>And also as we went along,
+
+311
+00:22:01.800 --> 00:22:04.820
+<v Miriam Schwab>we would learn things about what we would need to support.
+
+312
+00:22:05.180 --> 00:22:07.560
+<v Miriam Schwab>and also how we can optimize the way we support things.
+
+313
+00:22:07.800 --> 00:22:11.320
+<v Miriam Schwab>So it's been a growing process as we go along.
+
+314
+00:22:11.540 --> 00:22:13.420
+<v Miriam Schwab>And right now we're at a place
+
+315
+00:22:13.420 --> 00:22:15.500
+<v Miriam Schwab>where we're actually taking a deeper dive
+
+316
+00:22:15.500 --> 00:22:18.580
+<v Miriam Schwab>into a particular component of our platform
+
+317
+00:22:19.020 --> 00:22:20.820
+<v Miriam Schwab>because it's starting to have performance issues.
+
+318
+00:22:20.960 --> 00:22:22.780
+<v Miriam Schwab>Like it's been great until now.
+
+319
+00:22:22.900 --> 00:22:25.420
+<v Miriam Schwab>And then now it's like starting to feel a little bit heavy.
+
+320
+00:22:25.500 --> 00:22:26.140
+<v Miriam Schwab>What can we do here?
+
+321
+00:22:26.500 --> 00:22:29.480
+<v Miriam Schwab>The great thing about every time we look at our platform
+
+322
+00:22:29.480 --> 00:22:30.200
+<v Miriam Schwab>and take a deep dive,
+
+323
+00:22:30.340 --> 00:22:33.440
+<v Miriam Schwab>we end up not just solving the issue, but much more.
+
+324
+00:22:35.180 --> 00:22:39.460
+<v Miriam Schwab>speed things up in a way that we didn't actually plan to. And so there's a lot of wins there.
+
+325
+00:22:39.780 --> 00:22:44.120
+<v Miriam Schwab>Our balance is like when you're building something, you can be doing two things. You can be
+
+326
+00:22:44.120 --> 00:22:49.420
+<v Miriam Schwab>moving forward and building, or you can be optimizing. And optimizing means like optimizing
+
+327
+00:22:49.420 --> 00:22:53.940
+<v Miriam Schwab>for scale, but also optimizing for cost. When you're running on the cloud, the cost can add
+
+328
+00:22:53.940 --> 00:22:57.300
+<v Miriam Schwab>up pretty quickly. Like you have the credits in the beginning and that's great. And a lot of the
+
+329
+00:22:57.300 --> 00:23:02.320
+<v Miriam Schwab>cloud providers, once you burn through the first batch, you can ask for more. But at a certain
+
+330
+00:23:02.320 --> 00:23:06.220
+<v Miriam Schwab>point they're like all right it's time for you to stand on your own two feet which is legitimate
+
+331
+00:23:07.020 --> 00:23:11.300
+<v Miriam Schwab>and at that point you know you can start to think well we should always be optimizing for cost but
+
+332
+00:23:11.300 --> 00:23:15.320
+<v Miriam Schwab>then when you spend that time optimizing for cost you're not building the product so we've always
+
+333
+00:23:15.320 --> 00:23:20.380
+<v Miriam Schwab>put building the product above optimizing for cost and then every every so often just like we
+
+334
+00:23:20.380 --> 00:23:25.580
+<v Miriam Schwab>look about how at how we can scale further we also look at okay is there some place here where we can
+
+335
+00:23:25.580 --> 00:23:30.040
+<v Miriam Schwab>maybe we don't have to be using this these particular servers or maybe uh we're not
+
+336
+00:23:30.040 --> 00:23:33.740
+<v Miriam Schwab>not maximizing the potential of them or, oh, oops, look, you know, these servers are running,
+
+337
+00:23:33.800 --> 00:23:37.940
+<v Miriam Schwab>we're not using them. So we don't, we can shut them down, that kind of stuff. But the priority
+
+338
+00:23:37.940 --> 00:23:43.940
+<v Miriam Schwab>is always moving forward. And then, okay, there's an issue. Now let's resolve it. Okay, move forward.
+
+339
+00:23:45.280 --> 00:23:50.280
+<v Noah Labhart>Well, as you step out on the balcony, and you look across all that you've built with Strattic,
+
+340
+00:23:50.360 --> 00:23:51.400
+<v Noah Labhart>what are you most proud of?
+
+341
+00:23:52.980 --> 00:23:56.960
+<v Miriam Schwab>When COVID hit, we actually shut our office. We had an office in Jerusalem. It was really great.
+
+342
+00:23:56.960 --> 00:24:01.040
+<v Miriam Schwab>It was in a great location. It was right next to the local market, which is a very colorful place.
+
+343
+00:24:01.240 --> 00:24:06.220
+<v Miriam Schwab>And the building was a historical building. So it had like a touch of Jerusalem with like a modern tech style.
+
+344
+00:24:06.480 --> 00:24:12.280
+<v Miriam Schwab>And we shut it down and we moved to work from home. And so we actually didn't meet up for almost a year, all of us.
+
+345
+00:24:12.480 --> 00:24:15.880
+<v Miriam Schwab>Throughout that time, we also grew. We also hired people we hadn't ever met.
+
+346
+00:24:15.980 --> 00:24:20.060
+<v Miriam Schwab>And we actually met up for the first time, the entire Israeli team.
+
+347
+00:24:20.140 --> 00:24:23.840
+<v Miriam Schwab>We have, most of us are in Israel. We have four people outside of Israel.
+
+348
+00:24:23.840 --> 00:24:26.660
+<v Miriam Schwab>But we all met up in person and it hit me.
+
+349
+00:24:26.780 --> 00:24:32.080
+<v Miriam Schwab>People look very different when they're in like real life as opposed to being video squares.
+
+350
+00:24:33.500 --> 00:24:43.660
+<v Miriam Schwab>And it hit me that these were all these people who were working for Strattic and helping us build this product, this platform and hopefully fulfill all of our dreams.
+
+351
+00:24:43.720 --> 00:24:45.320
+<v Miriam Schwab>And I couldn't believe it.
+
+352
+00:24:45.480 --> 00:24:47.040
+<v Miriam Schwab>It was like a little bit.
+
+353
+00:24:47.180 --> 00:24:50.120
+<v Miriam Schwab>It suddenly hit me like, whoa, this is like a team.
+
+354
+00:24:50.300 --> 00:24:52.140
+<v Miriam Schwab>It's starting to be a real team.
+
+355
+00:24:53.840 --> 00:24:59.460
+<v Miriam Schwab>of that. I'm proud of our team. Our team is really nice people, very supportive and respectful,
+
+356
+00:24:59.740 --> 00:25:06.200
+<v Miriam Schwab>helpful to each other. We all have a really good time together. And everyone was so happy to see
+
+357
+00:25:06.200 --> 00:25:12.280
+<v Miriam Schwab>each other. You could see how much everyone likes working together. We have worked hard on trying to
+
+358
+00:25:12.280 --> 00:25:17.060
+<v Miriam Schwab>preserve the culture of the company, even while we're remote. So we implemented different initiatives,
+
+359
+00:25:17.440 --> 00:25:22.580
+<v Miriam Schwab>like we extended our daily stand-up so that it's not just an efficient stand-up, like I did this
+
+360
+00:25:23.840 --> 00:25:26.160
+<v Miriam Schwab>to allow for schmooze time so everyone can catch up.
+
+361
+00:25:26.320 --> 00:25:28.080
+<v Miriam Schwab>And we have happy hour every week
+
+362
+00:25:28.080 --> 00:25:29.620
+<v Miriam Schwab>and we have something called Java time
+
+363
+00:25:29.620 --> 00:25:31.300
+<v Miriam Schwab>where three random people meet up
+
+364
+00:25:31.300 --> 00:25:33.060
+<v Miriam Schwab>just to talk, not about work.
+
+365
+00:25:33.840 --> 00:25:37.680
+<v Miriam Schwab>But I guess, yeah, I'm really proud of our team.
+
+366
+00:25:37.820 --> 00:25:39.960
+<v Miriam Schwab>I'm excited about the people that we work with.
+
+367
+00:25:40.080 --> 00:25:42.500
+<v Miriam Schwab>I feel very grateful that we can offer
+
+368
+00:25:42.500 --> 00:25:44.620
+<v Miriam Schwab>high quality employment to people
+
+369
+00:25:44.620 --> 00:25:47.480
+<v Miriam Schwab>so that they are happy in their jobs
+
+370
+00:25:47.480 --> 00:25:48.880
+<v Miriam Schwab>and satisfied in their jobs
+
+371
+00:25:48.880 --> 00:25:50.540
+<v Miriam Schwab>and enjoy what they're doing every day.
+
+372
+00:25:50.860 --> 00:25:53.420
+<v Miriam Schwab>I'm glad, I'm very grateful that we can do that for people.
+
+373
+00:25:54.920 --> 00:25:58.960
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made and how you
+
+374
+00:25:58.960 --> 00:26:00.580
+<v Noah Labhart>and your team responded to it.
+
+375
+00:26:01.200 --> 00:26:06.000
+<v Miriam Schwab>Oh my gosh, we've made a lot of mistakes. But one that stands out in mind, because I
+
+376
+00:26:06.000 --> 00:26:11.700
+<v Miriam Schwab>was just remembering about it, I had forgotten, is that sometime in the beginning, we all
+
+377
+00:26:11.700 --> 00:26:16.720
+<v Miriam Schwab>went to sleep and we woke up finding out that we had a runaway Lambda, I guess you could
+
+378
+00:26:16.720 --> 00:26:22.660
+<v Miriam Schwab>call it that, on AWS. And it had racked up the most enormous bill. I thought that was
+
+379
+00:26:24.100 --> 00:26:27.680
+<v Miriam Schwab>Some people, when I've told people this story, they're like, oh yeah, that's happened to me.
+
+380
+00:26:27.800 --> 00:26:28.420
+<v Miriam Schwab>Like it's a thing.
+
+381
+00:26:28.620 --> 00:26:30.160
+<v Miriam Schwab>First of all, we had to recover from that.
+
+382
+00:26:30.260 --> 00:26:31.640
+<v Miriam Schwab>It was a huge expense.
+
+383
+00:26:31.900 --> 00:26:35.660
+<v Miriam Schwab>We begged AWS for flexibility and whatever.
+
+384
+00:26:36.040 --> 00:26:41.580
+<v Miriam Schwab>We happened to also have just raised some more funding from, but like, it was like the timing was perfect.
+
+385
+00:26:41.680 --> 00:26:45.940
+<v Miriam Schwab>But it was, it was painful because that money basically more or less covered that bill.
+
+386
+00:26:46.760 --> 00:26:53.080
+<v Miriam Schwab>And what we immediately did after that is we set up all sorts of alerts on our platform.
+
+387
+00:26:53.840 --> 00:26:56.860
+<v Miriam Schwab>And since then, we set up more and more alerts around things.
+
+388
+00:26:57.480 --> 00:26:59.020
+<v Miriam Schwab>So that's what that taught us.
+
+389
+00:26:59.400 --> 00:27:02.760
+<v Miriam Schwab>My advice to anyone who's starting to build out anything on the cloud,
+
+390
+00:27:02.880 --> 00:27:06.580
+<v Miriam Schwab>I don't know if it's like this in Google Cloud or Azure or something,
+
+391
+00:27:06.680 --> 00:27:09.380
+<v Miriam Schwab>but AWS, certain parts of the system, particularly Lambda,
+
+392
+00:27:09.520 --> 00:27:13.440
+<v Miriam Schwab>can get into a loop and AWS has no mercy.
+
+393
+00:27:13.660 --> 00:27:14.880
+<v Miriam Schwab>They're going to charge you for it.
+
+394
+00:27:14.960 --> 00:27:17.840
+<v Miriam Schwab>Even though you're not getting any value from that Lambda function
+
+395
+00:27:17.840 --> 00:27:21.300
+<v Miriam Schwab>going into some loop and it's racking up the most insane bill,
+
+396
+00:27:21.300 --> 00:27:27.760
+<v Miriam Schwab>in the end it's more or less unused in the beginning this this was uh this was part of
+
+397
+00:27:27.760 --> 00:27:32.560
+<v Miriam Schwab>the balance of let's keep moving forward while not like optimizing i think maybe we just weren't
+
+398
+00:27:32.560 --> 00:27:37.520
+<v Miriam Schwab>aware enough and also we had said no it's fine if something goes wrong we'll like know about it
+
+399
+00:27:37.520 --> 00:27:43.980
+<v Miriam Schwab>no have alert set them up in slack whatever it is we have channels just for alert different types
+
+400
+00:27:43.980 --> 00:27:49.360
+<v Miriam Schwab>of alerts so we can be on the ball around different things within our system um but that
+
+401
+00:27:51.300 --> 00:27:52.620
+<v Miriam Schwab>and wow, yeah.
+
+402
+00:27:56.140 --> 00:27:58.420
+<v Noah Labhart>Well, what does the future look like for Strattic,
+
+403
+00:27:58.480 --> 00:28:00.040
+<v Noah Labhart>for the product and for your team?
+
+404
+00:28:01.720 --> 00:28:03.720
+<v Miriam Schwab>There's two aspects to what we're doing now
+
+405
+00:28:03.720 --> 00:28:05.860
+<v Miriam Schwab>in terms of how people engage with us.
+
+406
+00:28:05.940 --> 00:28:08.680
+<v Miriam Schwab>One is the general trend of Jamstack,
+
+407
+00:28:08.840 --> 00:28:10.160
+<v Miriam Schwab>which is a growing trend,
+
+408
+00:28:10.780 --> 00:28:13.300
+<v Miriam Schwab>thanks in a large part to Netlify's efforts
+
+409
+00:28:13.300 --> 00:28:14.680
+<v Miriam Schwab>to first coin the term,
+
+410
+00:28:14.780 --> 00:28:16.320
+<v Miriam Schwab>like create awareness around it
+
+411
+00:28:16.320 --> 00:28:18.140
+<v Miriam Schwab>and garner developer excitement.
+
+412
+00:28:18.760 --> 00:28:20.500
+<v Miriam Schwab>And so that's a growing trend
+
+413
+00:28:21.300 --> 00:28:25.620
+<v Miriam Schwab>the related tooling, all the headless CMSs and the static site generators.
+
+414
+00:28:26.960 --> 00:28:31.260
+<v Miriam Schwab>So it actually, it often reminds me of when I started with WordPress.
+
+415
+00:28:31.460 --> 00:28:35.380
+<v Miriam Schwab>So all of the, there was like a lot of open source PHP tools that were constantly being
+
+416
+00:28:35.380 --> 00:28:41.420
+<v Miriam Schwab>released, different forum tools and websites, you know, CMS tools and just a lot of different
+
+417
+00:28:41.420 --> 00:28:41.920
+<v Miriam Schwab>things.
+
+418
+00:28:41.660 --> 00:28:42.280
+<v Miriam Schwab>It was always exciting.
+
+419
+00:28:42.360 --> 00:28:43.360
+<v Miriam Schwab>There was always a shiny new tool.
+
+420
+00:28:43.660 --> 00:28:48.500
+<v Miriam Schwab>That's what I feel like is going on in a way in a Jamstack world, which is, it's really
+
+421
+00:28:48.500 --> 00:28:49.080
+<v Miriam Schwab>fun to watch.
+
+422
+00:28:49.080 --> 00:28:52.060
+<v Miriam Schwab>like people just releasing all sorts of interesting tooling around this.
+
+423
+00:28:53.060 --> 00:28:57.040
+<v Miriam Schwab>Then in WordPress, so WordPress continues to grow in its standard form.
+
+424
+00:28:57.280 --> 00:29:03.580
+<v Miriam Schwab>And at the same time, this JAMstack static site generation world is starting to permeate WordPress,
+
+425
+00:29:03.900 --> 00:29:10.100
+<v Miriam Schwab>thanks to the efforts of the individuals who are working on building tooling around this
+
+426
+00:29:10.100 --> 00:29:12.920
+<v Miriam Schwab>and think that this is a good idea for WordPress in the future.
+
+427
+00:29:13.200 --> 00:29:15.400
+<v Miriam Schwab>So more and more people are becoming aware of it.
+
+428
+00:29:15.400 --> 00:29:26.220
+<v Miriam Schwab>And what's happening is that people who are looking for solutions to their issues with speed and security scalability would normally look for security plugins, caching plugins.
+
+429
+00:29:26.960 --> 00:29:31.420
+<v Miriam Schwab>They're starting to become aware that they can look for static WordPress solutions.
+
+430
+00:29:31.720 --> 00:29:37.720
+<v Miriam Schwab>We see an uptick in that in terms of people visiting our site around terms like this and the leads that we're getting.
+
+431
+00:29:38.720 --> 00:29:44.920
+<v Miriam Schwab>I think that the world of WordPress will continue largely in its current form.
+
+432
+00:29:45.660 --> 00:29:53.720
+<v Miriam Schwab>And at the same time, people will be looking to future-proof their WordPress website and also adopt more modern approaches.
+
+433
+00:29:54.640 --> 00:29:57.780
+<v Miriam Schwab>And then they're going to find Strattic.
+
+434
+00:29:58.040 --> 00:30:06.640
+<v Miriam Schwab>And so definitely we can see it in the numbers around our own activity, that things are starting to really pick up and grow.
+
+435
+00:30:07.720 --> 00:30:13.800
+<v Miriam Schwab>And I could see us becoming a serious contender in the WordPress hosting and management space.
+
+436
+00:30:15.580 --> 00:30:16.980
+<v Noah Labhart>Let's switch to you, Miriam.
+
+437
+00:30:17.140 --> 00:30:19.580
+<v Noah Labhart>Who influences the way that you work?
+
+438
+00:30:19.680 --> 00:30:24.040
+<v Noah Labhart>Name a CEO, architect, CTO, person, really any person.
+
+439
+00:30:24.400 --> 00:30:26.540
+<v Noah Labhart>Name a person you look up to and why.
+
+440
+00:30:28.700 --> 00:30:34.260
+<v Miriam Schwab>So interestingly, okay, the way that I work is influenced in two directions.
+
+441
+00:30:34.460 --> 00:30:36.800
+<v Miriam Schwab>One is actually my kids.
+
+442
+00:30:37.720 --> 00:30:44.920
+<v Miriam Schwab>I always have said that I learned to be a better mother through my work and I learned to do work better through my parenting.
+
+443
+00:30:46.380 --> 00:30:57.980
+<v Miriam Schwab>Both aspects influence each other and it teaches a lot about putting things in proportion and prioritizing and always reminding myself, like, why am I doing what I'm doing?
+
+444
+00:30:59.500 --> 00:31:00.500
+<v Miriam Schwab>It's for my kids.
+
+445
+00:31:00.500 --> 00:31:05.240
+<v Miriam Schwab>it's for myself also obviously I enjoy what I'm doing and I'm excited to be able to build
+
+446
+00:31:05.240 --> 00:31:10.820
+<v Miriam Schwab>something that hopefully will have a significant impact in improving people's workflows and you
+
+447
+00:31:10.820 --> 00:31:19.620
+<v Miriam Schwab>know but it keeps me grounded and there's a story that I have told recently about after we raised
+
+448
+00:31:19.620 --> 00:31:26.700
+<v Miriam Schwab>our seed round so we had flown to San Francisco a few times to work on our seed round we ended up
+
+449
+00:31:26.700 --> 00:31:29.400
+<v Miriam Schwab>raising most of our funding there, not in Israel.
+
+450
+00:31:30.140 --> 00:31:33.800
+<v Miriam Schwab>And in some ways, that's kind of like a glamorous thing to be doing, right?
+
+451
+00:31:33.960 --> 00:31:36.340
+<v Miriam Schwab>Like, it seems like very shiny and exciting.
+
+452
+00:31:36.540 --> 00:31:40.720
+<v Miriam Schwab>And it is, like, you know, we're flying over there, we're meeting with the top VCs in the
+
+453
+00:31:40.720 --> 00:31:41.220
+<v Miriam Schwab>world.
+
+454
+00:31:41.460 --> 00:31:45.720
+<v Miriam Schwab>And then, you know, we raised quite a lot, you know, a very nice round.
+
+455
+00:31:45.900 --> 00:31:48.560
+<v Miriam Schwab>And so that looks very exciting and very cool.
+
+456
+00:31:50.020 --> 00:31:52.340
+<v Miriam Schwab>We flew, we closed the round.
+
+457
+00:31:52.480 --> 00:31:55.920
+<v Miriam Schwab>And as, like, on the flight back to Israel, like, everything just fell into place.
+
+458
+00:31:56.700 --> 00:32:01.460
+<v Miriam Schwab>and sealed and not everything happened and so by the time we landed it was a done deal and like
+
+459
+00:32:01.460 --> 00:32:09.000
+<v Miriam Schwab>I was like I'm such a high it's so exciting and uh I dropped my partner off at home and we took
+
+460
+00:32:09.000 --> 00:32:14.620
+<v Miriam Schwab>a taxi and then I and I drove to my house and I got home I'm a single mom by the way and I came in
+
+461
+00:32:14.620 --> 00:32:20.600
+<v Miriam Schwab>and uh I was like so excited and so proud of myself and I saw I walked into the kitchen and
+
+462
+00:32:20.600 --> 00:32:21.800
+<v Miriam Schwab>And there's just like a sink full of dishes.
+
+463
+00:32:22.600 --> 00:32:25.460
+<v Miriam Schwab>And so I was like, well, got to wash the dishes.
+
+464
+00:32:25.840 --> 00:32:28.680
+<v Miriam Schwab>And so I rolled up my sleeves and I just started washing the dishes.
+
+465
+00:32:28.800 --> 00:32:31.080
+<v Miriam Schwab>And like, it just, it keeps you grounded.
+
+466
+00:32:31.180 --> 00:32:32.960
+<v Miriam Schwab>It's like, yeah, good for you.
+
+467
+00:32:33.000 --> 00:32:33.600
+<v Miriam Schwab>Very cool.
+
+468
+00:32:33.760 --> 00:32:35.700
+<v Miriam Schwab>But like, you're also going to wash the dishes.
+
+469
+00:32:35.840 --> 00:32:38.520
+<v Miriam Schwab>So like, don't think too much of yourself and stay humble.
+
+470
+00:32:39.860 --> 00:32:42.940
+<v Miriam Schwab>So that humility impacts a lot of what I do.
+
+471
+00:32:44.540 --> 00:32:46.180
+<v Miriam Schwab>I mean, I hope I'm humble.
+
+472
+00:32:46.180 --> 00:32:51.620
+<v Miriam Schwab>What I mean is my efforts to stay humble and to remember that this is all, like, whatever.
+
+473
+00:32:51.840 --> 00:32:54.220
+<v Miriam Schwab>It's just I'm working and I'm trying to build something.
+
+474
+00:32:54.460 --> 00:32:56.860
+<v Miriam Schwab>And I'm also a mom and I also wash dishes and do laundry.
+
+475
+00:32:58.800 --> 00:33:04.500
+<v Miriam Schwab>From the other side, so what's really nice in the Israeli tech community is that people are very supportive.
+
+476
+00:33:04.840 --> 00:33:07.740
+<v Miriam Schwab>Like, I have reached out to so many people who didn't know who I was.
+
+477
+00:33:07.820 --> 00:33:11.360
+<v Miriam Schwab>I said, I'd really like your advice on something, like whatever it is that I was working on at the time.
+
+478
+00:33:11.760 --> 00:33:13.960
+<v Miriam Schwab>Or, you know, what our goal was in the company.
+
+479
+00:33:13.960 --> 00:33:16.840
+<v Miriam Schwab>I said, I like your advice, let's stay on Go To Market.
+
+480
+00:33:17.080 --> 00:33:18.040
+<v Miriam Schwab>And they're like, okay.
+
+481
+00:33:18.540 --> 00:33:19.760
+<v Miriam Schwab>And then we would talk.
+
+482
+00:33:20.100 --> 00:33:25.760
+<v Miriam Schwab>And people's generosity and the attitude of,
+
+483
+00:33:26.120 --> 00:33:28.040
+<v Miriam Schwab>yeah, we're all building things for ourselves,
+
+484
+00:33:28.220 --> 00:33:30.460
+<v Miriam Schwab>but we all do better when we help each other.
+
+485
+00:33:31.620 --> 00:33:34.200
+<v Miriam Schwab>So seeing that within the community
+
+486
+00:33:34.200 --> 00:33:35.360
+<v Miriam Schwab>and learning that from others
+
+487
+00:33:36.060 --> 00:33:38.020
+<v Miriam Schwab>also I think has impacted me a lot.
+
+488
+00:33:38.620 --> 00:33:40.520
+<v Miriam Schwab>Everything that I do, I'm like, okay, how can I help?
+
+489
+00:33:40.560 --> 00:33:41.640
+<v Miriam Schwab>How can I help my employees?
+
+490
+00:33:41.720 --> 00:33:42.420
+<v Miriam Schwab>How can I help my team?
+
+491
+00:33:43.960 --> 00:33:46.100
+<v Miriam Schwab>in the tech community, particularly female founders.
+
+492
+00:33:46.300 --> 00:33:50.660
+<v Miriam Schwab>I try to be involved in initiatives to promote women
+
+493
+00:33:51.080 --> 00:33:52.420
+<v Miriam Schwab>and mentor women.
+
+494
+00:33:52.880 --> 00:33:55.900
+<v Miriam Schwab>I'm involved now in an initiative here in Jerusalem
+
+495
+00:33:55.900 --> 00:33:58.180
+<v Miriam Schwab>where we mentor women who are in tech
+
+496
+00:33:58.180 --> 00:33:59.700
+<v Miriam Schwab>to help them get promotions
+
+497
+00:33:59.700 --> 00:34:01.280
+<v Miriam Schwab>and build their careers, whatever.
+
+498
+00:34:01.500 --> 00:34:04.120
+<v Miriam Schwab>So that is definitely something that has influenced me,
+
+499
+00:34:04.140 --> 00:34:05.620
+<v Miriam Schwab>seeing other people do that.
+
+500
+00:34:05.720 --> 00:34:07.060
+<v Miriam Schwab>It's hard to say someone specific.
+
+501
+00:34:07.900 --> 00:34:11.060
+<v Miriam Schwab>I'm the result of all the people that I've met,
+
+502
+00:34:11.180 --> 00:34:12.640
+<v Miriam Schwab>and so each person has an impact.
+
+503
+00:34:13.960 --> 00:34:16.620
+<v Miriam Schwab>from every person that I meet and whatever impresses me.
+
+504
+00:34:17.300 --> 00:34:21.120
+<v Miriam Schwab>Kindness, generosity, creative approaches, thinking outside of the box.
+
+505
+00:34:21.580 --> 00:34:24.400
+<v Miriam Schwab>I try to learn from every person that I speak to and I meet.
+
+506
+00:34:25.880 --> 00:34:29.040
+<v Noah Labhart>Well, we talked about mistakes, but a little difference, Ben.
+
+507
+00:34:29.200 --> 00:34:32.240
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+508
+00:34:32.280 --> 00:34:34.900
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+509
+00:34:38.740 --> 00:34:41.000
+<v Miriam Schwab>I have a hard time answering that question because
+
+510
+00:34:41.000 --> 00:34:48.920
+<v Miriam Schwab>Because every time I thought that, oh, I wish something had worked out differently, it ended up basically working out for the best.
+
+511
+00:34:49.580 --> 00:34:50.720
+<v Miriam Schwab>I'll give you an example.
+
+512
+00:34:51.060 --> 00:34:58.660
+<v Miriam Schwab>When we were trying to raise funding here in Israel, we had gone through quite an intense process with one fund.
+
+513
+00:34:59.280 --> 00:35:00.920
+<v Miriam Schwab>And it was looking really good.
+
+514
+00:35:01.200 --> 00:35:02.940
+<v Miriam Schwab>And we really needed that money.
+
+515
+00:35:03.280 --> 00:35:04.000
+<v Miriam Schwab>Like, really.
+
+516
+00:35:04.160 --> 00:35:06.000
+<v Miriam Schwab>In the early days, it was really like that.
+
+517
+00:35:06.080 --> 00:35:09.060
+<v Miriam Schwab>Like, every day we needed to figure out how we were going to pay the bills.
+
+518
+00:35:11.000 --> 00:35:13.980
+<v Miriam Schwab>At the end they said, no, it's not a good fit or whatever.
+
+519
+00:35:14.400 --> 00:35:16.400
+<v Miriam Schwab>And we were so disappointed.
+
+520
+00:35:16.720 --> 00:35:17.800
+<v Miriam Schwab>It was very upsetting.
+
+521
+00:35:20.920 --> 00:35:24.440
+<v Miriam Schwab>And a while later, like a year, year and a half later,
+
+522
+00:35:24.900 --> 00:35:29.960
+<v Miriam Schwab>we heard that that fund had imploded in such a messy way.
+
+523
+00:35:30.240 --> 00:35:31.420
+<v Miriam Schwab>Something had happened there.
+
+524
+00:35:31.520 --> 00:35:35.800
+<v Miriam Schwab>I don't know, political conflict, drama, something, something.
+
+525
+00:35:36.780 --> 00:35:39.420
+<v Miriam Schwab>But at that point, I was like, oh my goodness,
+
+526
+00:35:41.180 --> 00:35:43.260
+<v Miriam Schwab>that would be really problematic.
+
+527
+00:35:44.300 --> 00:35:47.760
+<v Miriam Schwab>Another example of that is Israel has a government arm
+
+528
+00:35:47.760 --> 00:35:49.000
+<v Miriam Schwab>called the Israel Innovation Authority
+
+529
+00:35:49.000 --> 00:35:52.900
+<v Miriam Schwab>which gives money to startups based on certain criteria to help them grow.
+
+530
+00:35:53.740 --> 00:35:55.700
+<v Miriam Schwab>Basically it's equity free.
+
+531
+00:35:56.060 --> 00:35:58.340
+<v Miriam Schwab>There are some conditions that come along with it
+
+532
+00:35:58.340 --> 00:36:01.220
+<v Miriam Schwab>like you end up having to do a lot of paperwork before, during and after
+
+533
+00:36:01.220 --> 00:36:03.920
+<v Miriam Schwab>but a lot of companies that have gotten it have really benefited.
+
+534
+00:36:04.540 --> 00:36:07.920
+<v Miriam Schwab>So we tried to get this funding
+
+535
+00:36:07.920 --> 00:36:10.520
+<v Miriam Schwab>this type of grant and we went through the process
+
+536
+00:36:11.000 --> 00:36:13.220
+<v Miriam Schwab>It was a really terrible process for us.
+
+537
+00:36:13.280 --> 00:36:15.700
+<v Miriam Schwab>We think partly because I'm a female founder
+
+538
+00:36:15.700 --> 00:36:19.140
+<v Miriam Schwab>and that there was bias that was felt throughout the process.
+
+539
+00:36:19.940 --> 00:36:22.040
+<v Miriam Schwab>But they determined that our tech wasn't deep enough
+
+540
+00:36:22.040 --> 00:36:24.860
+<v Miriam Schwab>and that we didn't have opportunity or whatever it was.
+
+541
+00:36:24.960 --> 00:36:25.600
+<v Miriam Schwab>And they said no.
+
+542
+00:36:26.700 --> 00:36:30.300
+<v Miriam Schwab>Also, very, very upsetting because all the founders around me
+
+543
+00:36:30.300 --> 00:36:32.080
+<v Miriam Schwab>that I knew had managed to get this funding.
+
+544
+00:36:32.280 --> 00:36:36.900
+<v Miriam Schwab>And from my perspective, those founders who I love and respect,
+
+545
+00:36:37.080 --> 00:36:39.100
+<v Miriam Schwab>their opportunities weren't necessarily as large as ours.
+
+546
+00:36:41.000 --> 00:36:48.300
+<v Miriam Schwab>internet so it was very upsetting we ended up going out and raising like subsequently and later
+
+547
+00:36:48.300 --> 00:36:52.380
+<v Miriam Schwab>day we we stopped trying to raise funding in israel we went to the states and we raised an
+
+548
+00:36:52.380 --> 00:36:58.260
+<v Miriam Schwab>amazing seed round if we had taken the money from the innovation authority it would have caused a
+
+549
+00:36:58.260 --> 00:37:02.560
+<v Miriam Schwab>lot of challenges around that round for various reasons like technical reasons in terms of ip
+
+550
+00:37:02.560 --> 00:37:07.300
+<v Miriam Schwab>whatever that comes back to what those grants demand and require maybe we would have been able
+
+551
+00:37:07.300 --> 00:37:11.600
+<v Miriam Schwab>to work around it but it just would have caused a lot of complication and so it actually worked
+
+552
+00:37:11.600 --> 00:37:16.300
+<v Miriam Schwab>out well that they didn't give it to us okay so those were like challenges those were like
+
+553
+00:37:16.300 --> 00:37:21.240
+<v Miriam Schwab>disappointments that were hard but also a lot of the mistakes that we made along the way or
+
+554
+00:37:21.240 --> 00:37:27.880
+<v Miriam Schwab>challenges ended up being really good learning opportunities that helped us do things better
+
+555
+00:37:27.880 --> 00:37:33.600
+<v Miriam Schwab>from that point on i don't think a founder or a human being in general can like avoid making
+
+556
+00:37:33.600 --> 00:37:38.440
+<v Miriam Schwab>making mistakes. You try to do your best. You try to make the most educated decision at the time.
+
+557
+00:37:38.900 --> 00:37:44.440
+<v Miriam Schwab>Sometimes it works out well, hopefully, most of the time. Sometimes it doesn't, but you can learn
+
+558
+00:37:44.440 --> 00:37:49.820
+<v Miriam Schwab>from it. Like in the case of the runaway Lambda, that could have destroyed our company. Thank God
+
+559
+00:37:49.820 --> 00:37:54.580
+<v Miriam Schwab>it didn't. And then that would have been a mistake. I would have been like, I should have known to put
+
+560
+00:37:55.100 --> 00:38:00.840
+<v Miriam Schwab>in place alerts earlier on in the company. So I learned that like a painful way later, but
+
+561
+00:38:00.840 --> 00:38:06.000
+<v Miriam Schwab>But all the mistakes have ended up just being a good learning experience.
+
+562
+00:38:06.240 --> 00:38:07.420
+<v Miriam Schwab>That might sound romantic.
+
+563
+00:38:07.780 --> 00:38:11.420
+<v Miriam Schwab>There's definitely, it's not like everything was super easy at all.
+
+564
+00:38:11.500 --> 00:38:12.000
+<v Miriam Schwab>Oh my gosh.
+
+565
+00:38:12.080 --> 00:38:18.060
+<v Miriam Schwab>I mean, there's been a lot of painful things that we've gone through and different aspects
+
+566
+00:38:18.060 --> 00:38:19.380
+<v Miriam Schwab>of the business that have been hard.
+
+567
+00:38:19.580 --> 00:38:23.060
+<v Miriam Schwab>And a lot of no's, a lot of no's.
+
+568
+00:38:23.160 --> 00:38:26.100
+<v Miriam Schwab>People saying, you know, this is not a great idea.
+
+569
+00:38:26.380 --> 00:38:28.840
+<v Miriam Schwab>You're not, it's not going to go anywhere.
+
+570
+00:38:29.060 --> 00:38:29.640
+<v Miriam Schwab>All that.
+
+571
+00:38:30.840 --> 00:38:36.160
+<v Miriam Schwab>part of the journey. So it's okay to make mistakes as long as you learn from them and grow from them.
+
+572
+00:38:37.200 --> 00:38:41.960
+<v Noah Labhart>Well, last question, Miriam. So you're getting on a plane and you're sitting next to a young
+
+573
+00:38:41.960 --> 00:38:46.660
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+574
+00:38:46.660 --> 00:38:49.900
+<v Noah Labhart>show it off to the world. Can't wait to show it off to you right there on the plane.
+
+575
+00:38:50.100 --> 00:38:53.400
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+576
+00:38:56.660 --> 00:39:04.680
+<v Miriam Schwab>my advice would be the following do you have a partner if you don't find a partner i don't know
+
+577
+00:39:04.680 --> 00:39:10.340
+<v Miriam Schwab>how anyone does this without having a good partner that you know you have you can share the good
+
+578
+00:39:10.340 --> 00:39:14.780
+<v Miriam Schwab>times and the bad times with because all those those mistakes and hard times that i mentioned
+
+579
+00:39:14.780 --> 00:39:21.980
+<v Miriam Schwab>i could only get through them because josh and i would pick each other up we'd also laugh and move
+
+580
+00:39:23.400 --> 00:39:29.900
+<v Miriam Schwab>could and move on. So number one, get yourself a partner. Also, investors tend to prefer to invest
+
+581
+00:39:29.900 --> 00:39:36.320
+<v Miriam Schwab>in founders where there's more than one person. The second thing is don't think you know your
+
+582
+00:39:36.320 --> 00:39:41.300
+<v Miriam Schwab>customers. Go out and find people who actually want your thing. You might think it's the coolest
+
+583
+00:39:41.300 --> 00:39:47.440
+<v Miriam Schwab>thing, but you need actual other human beings to confirm that. But you need them to confirm
+
+584
+00:39:47.440 --> 00:39:51.180
+<v Miriam Schwab>in an objective way. There's a really good book. I think it's called Don't Ask Your Mom.
+
+585
+00:39:51.180 --> 00:39:58.700
+<v Miriam Schwab>mom. It's about how to ask people non-leading questions. The premise of the book is I go to my
+
+586
+00:39:58.700 --> 00:40:03.100
+<v Miriam Schwab>mom and I go, mom, I'm working on this thing called Strattic. It's going to like really make
+
+587
+00:40:03.100 --> 00:40:07.460
+<v Miriam Schwab>the WordPress industry really cool and whatever. And my mom would of course say, that's amazing,
+
+588
+00:40:07.660 --> 00:40:13.720
+<v Miriam Schwab>Miriam. Good for you. I'm sure it's the best idea ever. Okay. But that doesn't help me because I
+
+589
+00:40:13.720 --> 00:40:17.680
+<v Miriam Schwab>don't actually know what other people who aren't my mom think about this and if they would use it.
+
+590
+00:40:17.680 --> 00:40:23.160
+<v Miriam Schwab>So you need to properly like get some kind of prototype in place and get real honest,
+
+591
+00:40:23.880 --> 00:40:27.200
+<v Miriam Schwab>even brutal feedback about what it is that you're doing to make sure that you're building
+
+592
+00:40:27.200 --> 00:40:28.740
+<v Miriam Schwab>it for people who actually want it.
+
+593
+00:40:28.820 --> 00:40:31.580
+<v Miriam Schwab>Because it's very nice to build it for you, but you're just a bad instead of one.
+
+594
+00:40:31.820 --> 00:40:34.980
+<v Miriam Schwab>You need to know that that other people out there will want it.
+
+595
+00:40:35.060 --> 00:40:38.280
+<v Miriam Schwab>And it doesn't have to, you don't have to talk to a hundred people, talk to five people,
+
+596
+00:40:38.340 --> 00:40:43.880
+<v Miriam Schwab>but like find those people who truly want it and you make sure that they actually truly
+
+597
+00:40:43.880 --> 00:40:44.380
+<v Miriam Schwab>want it.
+
+598
+00:40:44.300 --> 00:40:47.120
+<v Miriam Schwab>because everyone says they want something until it comes down to actually paying you.
+
+599
+00:40:47.460 --> 00:40:49.280
+<v Miriam Schwab>So that would be my advice.
+
+600
+00:40:50.200 --> 00:40:51.480
+<v Noah Labhart>Right on. That's great advice.
+
+601
+00:40:51.860 --> 00:40:54.160
+<v Noah Labhart>Well, Miriam, thank you for being on the show today.
+
+602
+00:40:54.280 --> 00:40:57.340
+<v Noah Labhart>Thank you for telling the creation story of Strattic.
+
+603
+00:40:58.380 --> 00:41:00.660
+<v Miriam Schwab>My pleasure. This was fun. Thanks for having me.
+
+604
+00:41:01.580 --> 00:41:04.480
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+605
+00:41:09.400 --> 00:41:12.340
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+606
+00:41:14.300 --> 00:41:20.360
+<v Noah Labhart>podcast, Spotify, or the podcasting app of your choice. Support the show on patreon.com slash
+
+607
+00:41:20.360 --> 00:41:25.380
+<v Noah Labhart>Code Story for just five to ten bucks a month. And when you get a chance, leave us a review.
+
+608
+00:41:25.680 --> 00:41:31.500
+<v Noah Labhart>Both things help us out tremendously. And thanks again for listening.

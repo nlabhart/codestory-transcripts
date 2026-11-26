@@ -1,0 +1,2043 @@
+WEBVTT
+
+NOTE S3 E11: Engineering Dynamic Ad Insertion: How RedCircle Scaled Podcast Monetization with Mike Kadin
+
+1
+00:00:00.800 --> 00:00:29.980
+<v Mike Kadin>I started working on the thing as a side project, right? So it was just kind of me sitting there with a computer learning how to write Go for the first time. One of the most interesting things that we do on RedCircle, which is a technology called dynamic insertion. So with dynamic insertion, we are actually stitching together the audio files that you download when you download a podcast, right when the download is happening. So right when the listener presses play, you know, we're analyzing what rules are firing to decide what advertisements are to be inserted in this content. And then we are actually stitching together
+
+2
+00:00:30.000 --> 00:00:31.660
+<v Mike Kadin>the audio file right there on the fly.
+
+3
+00:00:32.300 --> 00:00:33.520
+<v Mike Kadin>But there was no front end.
+
+4
+00:00:33.560 --> 00:00:34.140
+<v Mike Kadin>There was no nothing.
+
+5
+00:00:34.220 --> 00:00:36.100
+<v Mike Kadin>There was just kind of a big back end
+
+6
+00:00:36.100 --> 00:00:37.340
+<v Mike Kadin>that was capable of doing that stuff.
+
+7
+00:00:39.200 --> 00:00:42.360
+<v Mike Kadin>I'm Mike Kadin, the co-founder and CEO of RedCircle.
+
+8
+00:00:47.680 --> 00:00:49.140
+<v Noah Labhart>This is Code Story,
+
+9
+00:00:49.340 --> 00:00:52.680
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+10
+00:00:52.680 --> 00:00:55.240
+<v Noah Labhart>who share in the critical moments
+
+11
+00:00:55.240 --> 00:00:56.900
+<v Noah Labhart>of what it takes to change an industry
+
+12
+00:00:56.900 --> 00:01:00.680
+<v Noah Labhart>and build and lead a team that has your back.
+
+13
+00:01:02.220 --> 00:01:07.720
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Mike Kadin went from teaching physics in high school
+
+14
+00:01:07.720 --> 00:01:11.800
+<v Noah Labhart>to creating a platform to help podcasters get paid.
+
+15
+00:01:13.420 --> 00:01:15.880
+<v Noah Labhart>All this and more on Code Story.
+
+16
+00:01:20.640 --> 00:01:25.240
+<v Noah Labhart>Mike Kadin is a family man, having been married for seven years with a two-year-old.
+
+17
+00:01:26.900 --> 00:01:31.620
+<v Noah Labhart>phase. He studied electrical engineering, specifically chip design and computer architecture,
+
+18
+00:01:32.490 --> 00:01:38.540
+<v Noah Labhart>obtaining a dual degree in EE and education. He's a musician, singing in a cappella groups,
+
+19
+00:01:38.660 --> 00:01:44.240
+<v Noah Labhart>playing the drums, piano, guitar, and is a polished beatboxer, having been practicing
+
+20
+00:01:44.240 --> 00:01:49.900
+<v Noah Labhart>regularly over the years. Mike started his career as a high school physics and math teacher.
+
+21
+00:01:50.300 --> 00:01:55.180
+<v Noah Labhart>During this time, he learned a lot about managing a bunch of kids in a class and catering to
+
+22
+00:01:56.900 --> 00:02:02.180
+<v Noah Labhart>It was at this time he found himself trying to find a way to write code to make his classroom work better.
+
+23
+00:02:02.600 --> 00:02:07.340
+<v Noah Labhart>In the winter of 2017, Mike was working at Uber, leading the communications platform team.
+
+24
+00:02:07.460 --> 00:02:12.320
+<v Noah Labhart>As the company grew bigger, he found himself longing to be in a smaller, more tight-knit team
+
+25
+00:02:12.320 --> 00:02:16.040
+<v Noah Labhart>along with being aligned to a long-term vision for positive impact.
+
+26
+00:02:16.880 --> 00:02:20.700
+<v Noah Labhart>At the same time, he started hacking on a side project on nights and weekends,
+
+27
+00:02:20.900 --> 00:02:25.700
+<v Noah Labhart>learning the Go programming language and creating a unique way to stitch together podcast episodes.
+
+28
+00:02:26.900 --> 00:02:34.780
+<v Noah Labhart>He found his passion not only for the solution he was building, but for making an impact in the podcasting industry, for podcasters and marketers.
+
+29
+00:02:35.040 --> 00:02:41.640
+<v Noah Labhart>He went on to commit to building a marketplace to easily connect the two, creating a win-win scenario for both.
+
+30
+00:02:43.080 --> 00:02:46.140
+<v Noah Labhart>This is the creation story of RedCircle.
+
+31
+00:02:49.420 --> 00:02:53.300
+<v Mike Kadin>RedCircle is a podcast growth and monetization platform.
+
+32
+00:02:53.300 --> 00:03:02.200
+<v Mike Kadin>So we help podcasters distribute their content, do all the things that they need to have a podcast in the world, distribute it, have analytics for it, have a content management system.
+
+33
+00:03:02.360 --> 00:03:05.660
+<v Mike Kadin>Then more importantly, we work on tools for growth and monetization.
+
+34
+00:03:05.800 --> 00:03:12.500
+<v Mike Kadin>So we have a product that allows podcasters to exchange cross promotional advertisements with other podcasters to help grow their audience.
+
+35
+00:03:12.660 --> 00:03:22.600
+<v Mike Kadin>And we also help them make money both through collecting payments from their listeners, either as a recurring donation or as a paywall for some of their content, as well as with advertising.
+
+36
+00:03:23.520 --> 00:03:27.720
+<v Mike Kadin>match podcasts up with advertisers who might be interested in buying on their content. And so
+
+37
+00:03:27.720 --> 00:03:32.560
+<v Mike Kadin>altogether, kind of trying to take podcasting from a hobby to a small business. That's what
+
+38
+00:03:32.560 --> 00:03:36.120
+<v Mike Kadin>we do for folks, folks who want to take their podcast seriously and want to step up to the
+
+39
+00:03:36.120 --> 00:03:41.040
+<v Mike Kadin>next level and grow and make money on their work. That's what we do. We have some shows that make
+
+40
+00:03:41.040 --> 00:03:45.220
+<v Mike Kadin>no money. We have some shows that make grocery money and we have some shows that make rent money
+
+41
+00:03:45.220 --> 00:03:49.160
+<v Mike Kadin>and we have some shows that are small businesses that are all off their podcast. It really depends
+
+42
+00:03:49.160 --> 00:03:52.660
+<v Mike Kadin>Depends on sort of where you are and how your content is resonating with audience.
+
+43
+00:03:52.920 --> 00:03:54.140
+<v Mike Kadin>But that's sort of what we do.
+
+44
+00:03:54.260 --> 00:04:00.220
+<v Mike Kadin>And then on the other side of the business, we also work with advertisers to help them purchase inventory on those podcasts.
+
+45
+00:04:00.320 --> 00:04:09.260
+<v Mike Kadin>So we built software to make the actual process of buying podcast advertisements both efficient and effective, which is something that's hard to come by in the podcasting industry.
+
+46
+00:04:09.580 --> 00:04:17.560
+<v Mike Kadin>So we're trying to sort of bring some efficiency and automation, make it possible for advertisers to purchase advertising on more than just the top 100 shows.
+
+47
+00:04:19.160 --> 00:04:21.860
+<v Mike Kadin>and be purchasing on hundreds of shows or even dozens of shows,
+
+48
+00:04:21.940 --> 00:04:23.840
+<v Mike Kadin>the overhead of doing that gets quite complicated.
+
+49
+00:04:24.060 --> 00:04:29.080
+<v Mike Kadin>Long story short, we're a podcast platform that helps both podcasters and advertisers to be heard.
+
+50
+00:04:29.300 --> 00:04:32.600
+<v Mike Kadin>We started the business back in the winter of 2017.
+
+51
+00:04:32.940 --> 00:04:35.080
+<v Mike Kadin>I was working at Uber at the time.
+
+52
+00:04:35.100 --> 00:04:41.080
+<v Mike Kadin>I was an engineering manager managing a team at Uber responsible for all of Uber's email and SMS
+
+53
+00:04:41.080 --> 00:04:43.080
+<v Mike Kadin>and push notifications and phone calls.
+
+54
+00:04:43.180 --> 00:04:45.040
+<v Mike Kadin>We were called the communications platform team,
+
+55
+00:04:45.040 --> 00:04:59.960
+<v Mike Kadin>Sort of taking all the touch points between Uber and the third party world of communications and all those different media and building it into a platform internally so that one team at Uber could very easily send a text or send an email without having to deal with the complexity of those worlds.
+
+56
+00:05:00.560 --> 00:05:05.780
+<v Mike Kadin>You know, we had a team of about 30 or 40 engineers and product managers and designers working on these problems.
+
+57
+00:05:06.000 --> 00:05:11.940
+<v Mike Kadin>We had built out a bunch of stuff internally for marketers to be able to execute campaigns on top of those communications channels.
+
+58
+00:05:11.940 --> 00:05:24.400
+<v Mike Kadin>So a lot of software, fun problems at scale where you're sending a bajillion push notifications a day and so on, trying to enable riders and drivers to make phone calls without seeing each other's numbers and making sure that worked across the globe.
+
+59
+00:05:24.580 --> 00:05:29.240
+<v Mike Kadin>I had been at Uber for about five years and the company was really, really big.
+
+60
+00:05:29.360 --> 00:05:34.700
+<v Mike Kadin>By this time, I was starting to feel like it was time for me to step back to something small.
+
+61
+00:05:34.760 --> 00:05:38.920
+<v Mike Kadin>When I started at Uber, there was about 50 engineers there, about 250 people.
+
+62
+00:05:38.920 --> 00:05:46.440
+<v Mike Kadin>I sort of miss that smallness and that hustle and that interconnectedness between teams of people on teams that comes with a smaller sort of high growth experience.
+
+63
+00:05:46.620 --> 00:05:57.360
+<v Mike Kadin>So I wanted to find something like that for myself and actually started looking around for jobs and spent the evenings, you know, writing code to get myself ready to do a coding interview.
+
+64
+00:05:57.660 --> 00:06:00.680
+<v Mike Kadin>You know, I was a manager, but was interested in exploring coding again.
+
+65
+00:06:00.820 --> 00:06:06.480
+<v Mike Kadin>And the project that I chose was to build something for podcasters because I was just an avid podcast listener.
+
+66
+00:06:06.480 --> 00:06:10.360
+<v Mike Kadin>listener and you know I interviewed around at a bunch of places and I didn't find anything that
+
+67
+00:06:10.360 --> 00:06:14.280
+<v Mike Kadin>I really liked and more and more I was liking what I was building on the side and you know
+
+68
+00:06:14.280 --> 00:06:19.620
+<v Mike Kadin>eventually sort of found myself up at two in the morning you know reading podcast trade press and
+
+69
+00:06:19.620 --> 00:06:23.580
+<v Mike Kadin>reading the research about the industry and starting to think about hey maybe there's an
+
+70
+00:06:23.580 --> 00:06:28.420
+<v Mike Kadin>opportunity to do something here that can help creators that that formerly haven't been able
+
+71
+00:06:28.420 --> 00:06:32.520
+<v Mike Kadin>to monetize and make money on their work and actually turn this into a small business and I
+
+72
+00:06:32.520 --> 00:06:36.380
+<v Mike Kadin>was really motivated by that and sort of sat down with my wife and decided like hey maybe maybe
+
+73
+00:06:36.480 --> 00:06:40.900
+<v Mike Kadin>be, we should try to pull this off here. Maybe there's a opportunity to build a business that,
+
+74
+00:06:40.960 --> 00:06:45.360
+<v Mike Kadin>you know, in some ways follow the same promise of what Uber was after, which is that, you know,
+
+75
+00:06:45.360 --> 00:06:50.220
+<v Mike Kadin>anyone with a car should be able to go out there and make money. It was unclear to me whether I
+
+76
+00:06:50.220 --> 00:06:53.960
+<v Mike Kadin>was pumped to be working there anymore. And I wanted to make sure that the thing I worked on
+
+77
+00:06:53.960 --> 00:06:58.180
+<v Mike Kadin>next was a fundamental good in the world. When I found something that felt like it resonated with
+
+78
+00:06:58.180 --> 00:07:02.440
+<v Mike Kadin>me, even though it was my own idea and just me, you know, late at night working on a side project,
+
+79
+00:07:02.620 --> 00:07:05.300
+<v Mike Kadin>something felt right and it just felt like I needed to pursue it.
+
+80
+00:07:06.620 --> 00:07:14.460
+<v Noah Labhart>Let's dive into the MVP a little bit. Tell me about the first product you built. How long did it take you to build and what sort of tools did you use to bring it to life?
+
+81
+00:07:15.060 --> 00:07:17.420
+<v Mike Kadin>I started working on the thing as a side project, right?
+
+82
+00:07:17.460 --> 00:07:21.400
+<v Mike Kadin>So it was just kind of me sitting there with a computer learning how to write Go for the
+
+83
+00:07:21.400 --> 00:07:21.900
+<v Mike Kadin>first time.
+
+84
+00:07:21.800 --> 00:07:23.080
+<v Mike Kadin>So our backend is written in Go.
+
+85
+00:07:23.400 --> 00:07:29.660
+<v Mike Kadin>I started in the winter of 2017 and then sort of had a fully functioning backend in the
+
+86
+00:07:29.660 --> 00:07:31.060
+<v Mike Kadin>spring of 2018.
+
+87
+00:07:31.500 --> 00:07:33.300
+<v Mike Kadin>You know, again, it was just kind of like a side project.
+
+88
+00:07:33.360 --> 00:07:36.320
+<v Mike Kadin>So if I was working on it full time, I think it would have been done a lot quicker than
+
+89
+00:07:36.320 --> 00:07:36.820
+<v Mike Kadin>that.
+
+90
+00:07:36.740 --> 00:07:40.680
+<v Mike Kadin>And that was just a backend that had, you know, everything you need to create and manage
+
+91
+00:07:40.680 --> 00:07:45.000
+<v Mike Kadin>a podcast, as well as one of the most interesting things that we do on RedCircle, which is a
+
+92
+00:07:45.000 --> 00:07:49.400
+<v Mike Kadin>technology called dynamic insertion. So with dynamic insertion, we are actually stitching
+
+93
+00:07:49.400 --> 00:07:54.580
+<v Mike Kadin>together the audio files that you download when you download a podcast right when the download
+
+94
+00:07:54.580 --> 00:08:01.000
+<v Mike Kadin>is happening. So right when the listener presses play, we're analyzing what rules are firing to
+
+95
+00:08:01.000 --> 00:08:04.920
+<v Mike Kadin>decide what advertisements are to be inserted in this content. And then we are actually stitching
+
+96
+00:08:04.920 --> 00:08:09.260
+<v Mike Kadin>together the audio file right there on the fly. And that was sort of the core and interesting
+
+97
+00:08:10.680 --> 00:08:14.460
+<v Mike Kadin>built into the MVP, but there was no front end. There was no nothing. There was just kind of a
+
+98
+00:08:14.460 --> 00:08:19.580
+<v Mike Kadin>big backend that was capable of doing that stuff. And then I took, started working on the front end,
+
+99
+00:08:19.680 --> 00:08:24.240
+<v Mike Kadin>which I did for a couple months. But, you know, the last time I had written front end, it was
+
+100
+00:08:24.240 --> 00:08:30.320
+<v Mike Kadin>like a jQuery and very older frameworks that people don't really use anymore. So learning
+
+101
+00:08:30.320 --> 00:08:34.060
+<v Mike Kadin>React from scratch was fun and interesting, but took me, it took me a little bit of time,
+
+102
+00:08:34.080 --> 00:08:39.120
+<v Mike Kadin>you know, and I don't have any design chops. I don't have a lot of product experience. And so
+
+103
+00:08:40.680 --> 00:08:44.180
+<v Mike Kadin>from scratch on the front end was, you know, it was really just kind of looked like wireframes
+
+104
+00:08:44.180 --> 00:08:48.060
+<v Mike Kadin>and was really quite ugly. And it's still the same front end that we have today that is built
+
+105
+00:08:48.060 --> 00:08:53.340
+<v Mike Kadin>off that same original frameworks, but obviously has evolved quite a bit. And so it really sort of
+
+106
+00:08:53.340 --> 00:08:59.780
+<v Mike Kadin>took me from the winter of 2017 to the summer of 2018 before I sort of stopped building everything
+
+107
+00:08:59.780 --> 00:09:05.160
+<v Mike Kadin>and looked back and said, you know, hey, this is a full featured thing. Now it's time to go
+
+108
+00:09:05.160 --> 00:09:07.460
+<v Mike Kadin>find some people to work with me on it.
+
+109
+00:09:08.200 --> 00:09:11.980
+<v Noah Labhart>So when you're building that MVP, you have to make certain
+
+110
+00:09:11.980 --> 00:09:16.080
+<v Noah Labhart>decisions and trade-offs, right? Like I'm going to build this now, or I'm going to build it this way
+
+111
+00:09:16.080 --> 00:09:21.280
+<v Noah Labhart>because it's faster versus how I want to build it. Tell me about some of those decisions and
+
+112
+00:09:21.280 --> 00:09:24.040
+<v Noah Labhart>trade-offs that you had to make and how did you cope with them?
+
+113
+00:09:24.800 --> 00:09:26.080
+<v Mike Kadin>I think one of the biggest ones
+
+114
+00:09:26.080 --> 00:09:31.680
+<v Mike Kadin>was all of the coding that I had done sort of at scale was either on a team. I'd previously worked
+
+115
+00:09:31.680 --> 00:09:35.160
+<v Mike Kadin>at a nonprofit where there was like an infrastructure team that had managed everything
+
+116
+00:09:35.620 --> 00:09:39.260
+<v Mike Kadin>infrastructure related. And then at Uber, obviously there was like a ton of people working on that.
+
+117
+00:09:39.360 --> 00:09:43.780
+<v Mike Kadin>And there was a bunch of infrastructure to quickly spin up new, new applications and new services.
+
+118
+00:09:43.860 --> 00:09:48.980
+<v Mike Kadin>And the biggest thing I had to do was like, learn how to do all of that. Like I'm not a stranger to
+
+119
+00:09:48.980 --> 00:09:53.360
+<v Mike Kadin>Linux. In fact, I wrote all this on a, on a Linux machine. So I know my way around a server and,
+
+120
+00:09:53.380 --> 00:09:57.760
+<v Mike Kadin>but you know, setting up production infrastructure that's monitored that, that can be easily
+
+121
+00:09:57.760 --> 00:10:02.780
+<v Mike Kadin>easily redeployed that can be spun up and spun down as demand changes for the service.
+
+122
+00:10:03.000 --> 00:10:09.240
+<v Mike Kadin>All of that work was really a lot of new learning for me. And so as much as I wanted to learn about
+
+123
+00:10:09.240 --> 00:10:15.140
+<v Mike Kadin>Docker and Kubernetes and other modern deployment systems and stuff like that, I decided there's
+
+124
+00:10:15.140 --> 00:10:18.580
+<v Mike Kadin>only so many new things that you can learn while you're building something from scratch and decided
+
+125
+00:10:18.580 --> 00:10:22.920
+<v Mike Kadin>to just stick with the things that I know. So I would say our deployment system is scripting-based.
+
+126
+00:10:22.920 --> 00:10:23.840
+<v Mike Kadin>It uses Ansible.
+
+127
+00:10:24.080 --> 00:10:29.600
+<v Mike Kadin>It's like a much more old school style for how you might deploy and manage production
+
+128
+00:10:29.600 --> 00:10:30.120
+<v Mike Kadin>applications.
+
+129
+00:10:30.420 --> 00:10:31.620
+<v Mike Kadin>And we hold that to this day.
+
+130
+00:10:31.700 --> 00:10:32.500
+<v Mike Kadin>It's super stable.
+
+131
+00:10:32.600 --> 00:10:33.420
+<v Mike Kadin>Don't get me wrong.
+
+132
+00:10:33.620 --> 00:10:36.980
+<v Mike Kadin>But I think could be more fluid if I had spent more time kind of learning that.
+
+133
+00:10:37.040 --> 00:10:39.400
+<v Mike Kadin>But, you know, you can only spend so much time learning when you're spinning things
+
+134
+00:10:39.400 --> 00:10:39.960
+<v Mike Kadin>up from scratch.
+
+135
+00:10:40.140 --> 00:10:45.080
+<v Mike Kadin>The other thing that sticks around that's from the MVP is I spent a long time going
+
+136
+00:10:45.080 --> 00:10:48.280
+<v Mike Kadin>really, really deep into how MP3s work.
+
+137
+00:10:48.280 --> 00:10:52.500
+<v Mike Kadin>work, because in order to do this dynamic stitching, we really needed to be able to
+
+138
+00:10:52.500 --> 00:10:56.400
+<v Mike Kadin>play around with MP3s and stitch them together on the fly.
+
+139
+00:10:56.720 --> 00:11:01.900
+<v Mike Kadin>And one of the compromises that I made early on to make the math and the complexity of
+
+140
+00:11:01.900 --> 00:11:06.320
+<v Mike Kadin>that stitching make sense was that we were going to pre-process all of the audio that
+
+141
+00:11:06.320 --> 00:11:06.940
+<v Mike Kadin>we stitched together.
+
+142
+00:11:07.080 --> 00:11:12.120
+<v Mike Kadin>So when you upload something to RedCircle, we're going to run it through some processing.
+
+143
+00:11:12.320 --> 00:11:15.720
+<v Mike Kadin>We're going to change the MP3 itself that we're going to use to serve a little bit.
+
+144
+00:11:15.720 --> 00:11:17.920
+<v Mike Kadin>And, you know, that that can upset some folks.
+
+145
+00:11:18.020 --> 00:11:24.040
+<v Mike Kadin>They might want a higher bit rate than we use or they want a lower bit rate because they don't want us to generate such large files.
+
+146
+00:11:24.280 --> 00:11:26.920
+<v Mike Kadin>There are pros and cons to having to do this pre-processing.
+
+147
+00:11:26.920 --> 00:11:29.840
+<v Mike Kadin>It also takes time after you upload an episode to Red Circle.
+
+148
+00:11:29.920 --> 00:11:33.780
+<v Mike Kadin>You have to wait a few minutes while the processing happens, just like it would happen on YouTube, for example.
+
+149
+00:11:33.980 --> 00:11:41.140
+<v Mike Kadin>And so, you know, all of that comes from, gosh, I'm just one guy late at night trying to figure out how to get these MP3s to stitch together.
+
+150
+00:11:41.140 --> 00:11:46.180
+<v Mike Kadin>other, had to make some compromises there on how to make that work that stick around to this day.
+
+151
+00:11:46.340 --> 00:11:50.000
+<v Mike Kadin>But, you know, we're the right choice at the time because, you know, if I'm just building another
+
+152
+00:11:50.000 --> 00:11:54.460
+<v Mike Kadin>podcast hosting platform, there's 30 of them out there. Building dynamic insertion from scratch,
+
+153
+00:11:54.560 --> 00:11:56.520
+<v Mike Kadin>I think was one of the coolest things that we did early on.
+
+154
+00:11:58.040 --> 00:12:03.460
+<v Noah Labhart>Absolutely. It's definitely a differentiator there. I can totally see that and feel that as a
+
+155
+00:12:03.880 --> 00:12:09.560
+<v Noah Labhart>user of RedCircle. Tell me about how you progress the product from there. Okay. So you got the MVP
+
+156
+00:12:11.140 --> 00:12:15.920
+<v Noah Labhart>have to make some decisions early on of what to do and not to do. But how did you progress it past
+
+157
+00:12:15.920 --> 00:12:16.420
+<v Noah Labhart>that point?
+
+158
+00:12:17.440 --> 00:12:21.020
+<v Mike Kadin>One of the key things we did to progress it from there is hire a bunch of other
+
+159
+00:12:21.020 --> 00:12:24.440
+<v Mike Kadin>people to join the team so that we could be a stronger group of folks to push the product
+
+160
+00:12:24.440 --> 00:12:29.960
+<v Mike Kadin>forward. So not long after the timeline that I said, so I guess in the fall of 2018, in the winter
+
+161
+00:12:29.960 --> 00:12:35.060
+<v Mike Kadin>of 2019, we hired on two more engineers and we've been working with a brand designer and a contract
+
+162
+00:12:35.060 --> 00:12:39.180
+<v Mike Kadin>designer for some time. So I think the most important things about the evolution is that
+
+163
+00:12:41.140 --> 00:12:42.260
+<v Mike Kadin>to help move the thing forward.
+
+164
+00:12:42.440 --> 00:12:44.960
+<v Mike Kadin>And some of the key things that we did
+
+165
+00:12:44.960 --> 00:12:47.280
+<v Mike Kadin>were sort of taking the core technology
+
+166
+00:12:47.280 --> 00:12:49.940
+<v Mike Kadin>that we had developed in dynamic insertion
+
+167
+00:12:49.940 --> 00:12:53.020
+<v Mike Kadin>and starting to apply it to new and interesting domains.
+
+168
+00:12:53.200 --> 00:12:55.460
+<v Mike Kadin>So we created this cross-promotional marketplace
+
+169
+00:12:55.460 --> 00:12:58.040
+<v Mike Kadin>where two podcasters can upload
+
+170
+00:12:58.040 --> 00:13:00.140
+<v Mike Kadin>a little 30-second promo for their show
+
+171
+00:13:00.140 --> 00:13:02.620
+<v Mike Kadin>and we'll take care of the automated insertion
+
+172
+00:13:02.620 --> 00:13:04.920
+<v Mike Kadin>of those advertisements on the two different podcasts.
+
+173
+00:13:05.200 --> 00:13:07.440
+<v Mike Kadin>And so that was the first kind of out-of-the-gate product
+
+174
+00:13:07.440 --> 00:13:08.340
+<v Mike Kadin>that we launched with.
+
+175
+00:13:09.060 --> 00:13:10.440
+<v Mike Kadin>So that's worked great.
+
+176
+00:13:11.140 --> 00:13:15.480
+<v Mike Kadin>to show how it moves audience around and can be effective if there's a good match between the two
+
+177
+00:13:15.480 --> 00:13:20.960
+<v Mike Kadin>shows. And just continuing to push forward and use that dynamic insertion technology for user-facing
+
+178
+00:13:20.960 --> 00:13:26.580
+<v Mike Kadin>features. So all the way up to today, where we have a fully automated advertising marketplace
+
+179
+00:13:26.580 --> 00:13:30.760
+<v Mike Kadin>where both parties can kind of click a few buttons and end up with an executed ad campaign.
+
+180
+00:13:31.080 --> 00:13:36.000
+<v Mike Kadin>I think on the front end, we've had a lot of time to take it from what I said before was basically
+
+181
+00:13:36.000 --> 00:13:41.860
+<v Mike Kadin>like an ugly set of wireframes to a real beautiful and highly usable UI. And that came from, again,
+
+182
+00:13:41.900 --> 00:13:45.540
+<v Mike Kadin>just having folks who know the front end way better than me, having designers that are gifted
+
+183
+00:13:45.540 --> 00:13:49.820
+<v Mike Kadin>and building something that ended up being a lot more usable than what the thing looked like on
+
+184
+00:13:49.820 --> 00:13:54.440
+<v Mike Kadin>the first day. I would be embarrassed to show you. Another thing we built not long after cross
+
+185
+00:13:54.440 --> 00:13:57.900
+<v Mike Kadin>promotion were some of our payments products, which allow podcasters to collect recurring
+
+186
+00:13:57.900 --> 00:14:03.000
+<v Mike Kadin>payments. We know we needed to work on paying out podcasters for advertising, which was our
+
+187
+00:14:03.000 --> 00:14:07.420
+<v Mike Kadin>eventual goal to build. And so we started working with Stripe. We started figuring out how are we
+
+188
+00:14:07.420 --> 00:14:11.440
+<v Mike Kadin>going to configure things so that podcasters can connect their bank accounts and get paid out.
+
+189
+00:14:11.560 --> 00:14:16.220
+<v Mike Kadin>So all of these were kind of steps that we were taking towards the dynamic advertising marketplace
+
+190
+00:14:16.220 --> 00:14:20.800
+<v Mike Kadin>that we're running today. To get there was really about strapping on additional products that were
+
+191
+00:14:20.800 --> 00:14:25.340
+<v Mike Kadin>using our core features of dynamic insertion, moving the money around and podcast hosting,
+
+192
+00:14:25.500 --> 00:14:29.160
+<v Mike Kadin>and starting to expand on those as we move closer to what we were actually trying to build.
+
+193
+00:14:29.160 --> 00:14:35.220
+<v Noah Labhart>A lot of this is in the answer you just gave, but how did you go about building your roadmap?
+
+194
+00:14:35.560 --> 00:14:41.420
+<v Noah Labhart>What's the next most important thing to build in your roadmap and what helped you decide that?
+
+195
+00:14:41.840 --> 00:14:46.680
+<v Mike Kadin>There's a lot of literature to read about what is essentially a marketplace business.
+
+196
+00:14:46.860 --> 00:14:51.060
+<v Mike Kadin>RedCircle is essentially a marketplace business because we have podcasters on one side,
+
+197
+00:14:51.220 --> 00:14:55.940
+<v Mike Kadin>they're offering up their supply of advertising. And then we have demand on the other side and
+
+198
+00:14:55.940 --> 00:14:59.280
+<v Mike Kadin>the advertisers who are looking to buy. And there's a lot of literature that you can read
+
+199
+00:14:59.280 --> 00:15:04.180
+<v Mike Kadin>about marketplace businesses. And one of the key things that you need to figure out to get them off
+
+200
+00:15:04.180 --> 00:15:08.560
+<v Mike Kadin>the ground is how to solve the so-called chicken and egg problem, where you're not going to have
+
+201
+00:15:08.560 --> 00:15:12.220
+<v Mike Kadin>any advertisers interested in buying your content unless you have enough content to make them
+
+202
+00:15:12.220 --> 00:15:16.120
+<v Mike Kadin>interested. And you're not going to have any podcasters who want to use your platform if
+
+203
+00:15:16.120 --> 00:15:20.380
+<v Mike Kadin>nobody's making any money through advertising. And so that's a classic chicken and egg problem.
+
+204
+00:15:20.740 --> 00:15:25.800
+<v Mike Kadin>At Uber, the way they solved this was by paying the drivers hourly when they launched in a new
+
+205
+00:15:25.940 --> 00:15:31.020
+<v Mike Kadin>So in the beginning, Uber just made hourly guarantees to drivers before the app was popular in a new city.
+
+206
+00:15:31.140 --> 00:15:38.980
+<v Mike Kadin>They would just make sure the drivers were getting paid so that the cars were always out there until enough demand was appearing and the market would kind of get kicked off the ground.
+
+207
+00:15:39.160 --> 00:15:49.000
+<v Mike Kadin>And in many ways, what RedCircle did was something very similar, which is, you know, we had all these tools for podcasters to be able to distribute and do analytics and all the things that you get from a podcast hosting company.
+
+208
+00:15:49.160 --> 00:15:51.640
+<v Mike Kadin>And we decided that we would just give that away for free.
+
+209
+00:15:51.640 --> 00:15:56.700
+<v Mike Kadin>for many podcasters that was enticing instead of paying 20 bucks a month for podcast hosting they
+
+210
+00:15:56.700 --> 00:16:00.380
+<v Mike Kadin>could come and host with us for free and take advantage of some of the tools that we give with
+
+211
+00:16:00.380 --> 00:16:04.920
+<v Mike Kadin>dynamic insertion so that was kind of how we got off over the hump and then a lot of the roadmap
+
+212
+00:16:04.920 --> 00:16:09.920
+<v Mike Kadin>was just inspired by the first year of the business wasn't really about helping podcasters
+
+213
+00:16:09.920 --> 00:16:14.380
+<v Mike Kadin>make money through advertising it was really about bringing on enough podcasters such that
+
+214
+00:16:14.380 --> 00:16:18.280
+<v Mike Kadin>we would have enough inventory so that advertisers would be interested and so that was about building
+
+215
+00:16:18.280 --> 00:16:23.100
+<v Mike Kadin>building more and more features for podcasters and giving them away for free to entice them onto the platform.
+
+216
+00:16:23.240 --> 00:16:25.660
+<v Mike Kadin>So that was that was kind of how the roadmap came to exist.
+
+217
+00:16:25.840 --> 00:16:28.820
+<v Mike Kadin>First, it was like, all right, let's do hosting. Let's help our shows grow.
+
+218
+00:16:29.000 --> 00:16:33.940
+<v Mike Kadin>Let's do payments products so that we can help some podcasters make money before the advertisers are ready to be here.
+
+219
+00:16:34.240 --> 00:16:37.560
+<v Mike Kadin>Let's release tools for dynamic insertion that you can configure yourself.
+
+220
+00:16:37.720 --> 00:16:44.760
+<v Mike Kadin>For example, put an intro in the beginning of your podcast on all of your episodes and change the audio all at once
+
+221
+00:16:44.760 --> 00:16:48.040
+<v Mike Kadin>instead of having to go into GarageBand and edit 100 episodes.
+
+222
+00:16:48.160 --> 00:16:49.940
+<v Mike Kadin>You can do it through our UI in a couple of clicks.
+
+223
+00:16:50.160 --> 00:16:53.800
+<v Mike Kadin>So really just trying to sweeten the pot to bring podcasters on
+
+224
+00:16:53.800 --> 00:16:58.000
+<v Mike Kadin>with the hopes of being able to bring on enough to open it up for advertisers.
+
+225
+00:16:58.140 --> 00:16:59.440
+<v Mike Kadin>And we've done that now.
+
+226
+00:16:59.500 --> 00:17:01.520
+<v Mike Kadin>We've got our advertising marketplace off the ground.
+
+227
+00:17:01.580 --> 00:17:02.700
+<v Mike Kadin>The demand is here.
+
+228
+00:17:02.880 --> 00:17:09.180
+<v Mike Kadin>There are podcasters making five figures or more on the platform right now.
+
+229
+00:17:09.240 --> 00:17:12.280
+<v Mike Kadin>So we've sort of gotten over the hump and got the flywheel starting to spin.
+
+230
+00:17:12.280 --> 00:17:16.360
+<v Mike Kadin>in. And so that was really kind of how the roadmap was designed is let's just build a bunch of
+
+231
+00:17:16.360 --> 00:17:20.920
+<v Mike Kadin>amazing tools for podcasters to entice them on board. Let's give them away for free. And then
+
+232
+00:17:20.920 --> 00:17:23.460
+<v Mike Kadin>let's figure out how to help them make money down the road.
+
+233
+00:17:24.560 --> 00:17:27.080
+<v Noah Labhart>So how did you go about building your
+
+234
+00:17:27.080 --> 00:17:33.120
+<v Noah Labhart>team? You got to bring in people to help you take this thing to the next level. How did you do that?
+
+235
+00:17:33.180 --> 00:17:38.600
+<v Noah Labhart>And how or what did you look for in those people to indicate they were the winning horses to join
+
+236
+00:17:38.600 --> 00:17:39.100
+<v Noah Labhart>on your team?
+
+237
+00:17:39.500 --> 00:17:44.240
+<v Mike Kadin>I got a lot to say about this. I mean, I worked at Uber when Uber went from 250
+
+238
+00:17:44.240 --> 00:17:50.340
+<v Mike Kadin>people to, I don't know, 25,000. A lot of people were there by the time I left. And over the course
+
+239
+00:17:50.340 --> 00:17:55.480
+<v Mike Kadin>of the time I was there, I hired probably 50 people and also was part of a program there at
+
+240
+00:17:55.480 --> 00:18:00.480
+<v Mike Kadin>Uber called Bar Raisers, which is a thing they stole from Amazon. It's the idea that there's
+
+241
+00:18:00.480 --> 00:18:06.760
+<v Mike Kadin>always sort of like, I don't want to call them a cop, but an experienced interviewer whose job it
+
+242
+00:18:08.600 --> 00:18:09.120
+<v Mike Kadin>across the organization.
+
+243
+00:18:09.500 --> 00:18:11.060
+<v Mike Kadin>And so because I was part of that program,
+
+244
+00:18:11.200 --> 00:18:13.200
+<v Mike Kadin>I probably did like five or 600 interviews
+
+245
+00:18:13.200 --> 00:18:14.420
+<v Mike Kadin>over my time at Uber,
+
+246
+00:18:14.540 --> 00:18:15.720
+<v Mike Kadin>which is just an insane number.
+
+247
+00:18:15.840 --> 00:18:17.680
+<v Mike Kadin>So I have a lot to say about what it means
+
+248
+00:18:17.680 --> 00:18:19.920
+<v Mike Kadin>to pick the right people for your team.
+
+249
+00:18:20.040 --> 00:18:21.180
+<v Mike Kadin>I have a lot to say about that.
+
+250
+00:18:21.260 --> 00:18:22.540
+<v Mike Kadin>I think, first of all,
+
+251
+00:18:22.560 --> 00:18:24.020
+<v Mike Kadin>you should know a lot of the folks
+
+252
+00:18:24.020 --> 00:18:25.840
+<v Mike Kadin>from the early RedCircle team
+
+253
+00:18:25.840 --> 00:18:26.860
+<v Mike Kadin>also came from Uber.
+
+254
+00:18:27.000 --> 00:18:28.880
+<v Mike Kadin>And so I had the luck of being able
+
+255
+00:18:28.880 --> 00:18:30.300
+<v Mike Kadin>to have some folks reach out
+
+256
+00:18:30.300 --> 00:18:30.880
+<v Mike Kadin>who were interested,
+
+257
+00:18:31.020 --> 00:18:32.240
+<v Mike Kadin>who I wanted to,
+
+258
+00:18:32.340 --> 00:18:33.540
+<v Mike Kadin>who I sort of already knew
+
+259
+00:18:33.540 --> 00:18:35.520
+<v Mike Kadin>and was familiar with their work.
+
+260
+00:18:35.680 --> 00:18:37.420
+<v Mike Kadin>And so it's just a lot more powerful
+
+261
+00:18:38.600 --> 00:18:40.540
+<v Mike Kadin>who's working familiar with in the real world
+
+262
+00:18:40.540 --> 00:18:44.140
+<v Mike Kadin>versus four hours of interviews and coding tests
+
+263
+00:18:44.140 --> 00:18:45.540
+<v Mike Kadin>where somebody's breathing down your neck.
+
+264
+00:18:46.200 --> 00:18:48.640
+<v Mike Kadin>It was great to work with folks from Uber
+
+265
+00:18:48.640 --> 00:18:51.900
+<v Mike Kadin>who I was previously familiar with their work.
+
+266
+00:18:52.120 --> 00:18:54.800
+<v Mike Kadin>And that's just a much better starting point
+
+267
+00:18:54.800 --> 00:18:56.640
+<v Mike Kadin>than a couple hours of interviews.
+
+268
+00:18:56.800 --> 00:18:59.100
+<v Mike Kadin>It's just that you can actually know about their work
+
+269
+00:18:59.100 --> 00:19:00.100
+<v Mike Kadin>and have met their manager
+
+270
+00:19:00.100 --> 00:19:01.480
+<v Mike Kadin>or even sat in on meetings
+
+271
+00:19:01.480 --> 00:19:02.800
+<v Mike Kadin>where their performance was discussed.
+
+272
+00:19:02.840 --> 00:19:04.640
+<v Mike Kadin>Then you know you're hiring somebody who's truly great.
+
+273
+00:19:04.800 --> 00:19:07.300
+<v Mike Kadin>But the other thing is when you're working at a startup,
+
+274
+00:19:08.600 --> 00:19:13.680
+<v Mike Kadin>the first couple of people, these are absolutely critical hires for the future success of your
+
+275
+00:19:13.680 --> 00:19:17.740
+<v Mike Kadin>business. Not just because of their sort of how well can they code, how well can they build,
+
+276
+00:19:17.940 --> 00:19:22.940
+<v Mike Kadin>but also sort of the team is small. If you have one bad apple there in terms of culture,
+
+277
+00:19:23.140 --> 00:19:27.800
+<v Mike Kadin>you can be in a really tough spot in the beginning. And so we were very diligent about
+
+278
+00:19:27.800 --> 00:19:32.060
+<v Mike Kadin>hanging out with people, getting to know them, getting a feel for what it would be like to work
+
+279
+00:19:32.060 --> 00:19:37.880
+<v Mike Kadin>together so that we were sure we were hiring the right people. In my view, that latter category,
+
+280
+00:19:38.600 --> 00:19:43.440
+<v Mike Kadin>sometimes call soft skills, which I think is a bogus name, but you get the idea. That category,
+
+281
+00:19:43.680 --> 00:19:48.580
+<v Mike Kadin>especially in the early stages, just as important as somebody's technical skills. I think that's
+
+282
+00:19:48.580 --> 00:19:53.760
+<v Mike Kadin>super important. The other thing is that we were careful about and really thought about was trying
+
+283
+00:19:53.760 --> 00:19:58.980
+<v Mike Kadin>to maintain a gender balance as much as possible and look for other forms of diversity too. And if
+
+284
+00:19:58.980 --> 00:20:03.820
+<v Mike Kadin>you take a look at the RedCircle team and how it stands today, there's 11 of us. We all look very
+
+285
+00:20:03.820 --> 00:20:08.280
+<v Mike Kadin>different. We all talk very different. We did a good job of making sure that it wasn't just
+
+286
+00:20:08.600 --> 00:20:12.380
+<v Mike Kadin>bunch of people that look and sound like me, which is cool and was important. And I think,
+
+287
+00:20:12.400 --> 00:20:16.960
+<v Mike Kadin>you know, there are like moral reasons to want to have a diverse team, but more importantly,
+
+288
+00:20:17.500 --> 00:20:21.200
+<v Mike Kadin>you know, the research and the literature out there is very clear that diverse teams just make
+
+289
+00:20:21.200 --> 00:20:25.760
+<v Mike Kadin>better decisions. When you have more diverse ideas generated from more diverse backgrounds,
+
+290
+00:20:26.020 --> 00:20:28.600
+<v Mike Kadin>you know, you're going to end up with better decisions getting made.
+
+291
+00:20:29.560 --> 00:20:36.040
+<v Noah Labhart>So let's talk about scalability. So did you build this to be able to scale efficiently from day one,
+
+292
+00:20:36.040 --> 00:20:38.940
+<v Noah Labhart>or was this something you were fighting kind of as you grew?
+
+293
+00:20:39.600 --> 00:20:42.900
+<v Mike Kadin>Yeah, we haven't struggled with scalability too much.
+
+294
+00:20:42.940 --> 00:20:44.320
+<v Mike Kadin>And I think there's a couple of reasons for that.
+
+295
+00:20:44.380 --> 00:20:47.560
+<v Mike Kadin>One is we learned a lot of lessons from our time at Uber
+
+296
+00:20:47.560 --> 00:20:50.120
+<v Mike Kadin>and I personally learned a lot of lessons there.
+
+297
+00:20:50.280 --> 00:20:52.940
+<v Mike Kadin>Whereas at a startup, you should make trade-offs.
+
+298
+00:20:52.960 --> 00:20:55.100
+<v Mike Kadin>You don't need to set everything up to scale for forever.
+
+299
+00:20:55.520 --> 00:20:58.080
+<v Mike Kadin>But on the other hand, I've been in the horror shows
+
+300
+00:20:58.080 --> 00:20:59.660
+<v Mike Kadin>of what happens if you pay no attention.
+
+301
+00:20:59.860 --> 00:21:02.600
+<v Mike Kadin>And so we did put some time into making sure
+
+302
+00:21:02.600 --> 00:21:04.100
+<v Mike Kadin>we were ready to do that from the start.
+
+303
+00:21:06.040 --> 00:21:10.160
+<v Mike Kadin>we did for that to be possible. So one is, you know, different from a lot of other podcasting
+
+304
+00:21:10.160 --> 00:21:15.480
+<v Mike Kadin>companies, our application is actually serving these audio files because we're stitching together
+
+305
+00:21:15.480 --> 00:21:20.320
+<v Mike Kadin>the content on the fly. So instead of just a CDN serving a static file, we're actually stitching
+
+306
+00:21:20.320 --> 00:21:25.800
+<v Mike Kadin>these byte for byte together as the file flies out. You know, if you're doing that in a slow
+
+307
+00:21:25.800 --> 00:21:30.680
+<v Mike Kadin>language on a slow machine, you're going to run into performance problems, I think, pretty quickly.
+
+308
+00:21:30.780 --> 00:21:35.540
+<v Mike Kadin>And so we were sort of, I think, smart in having the backend being written in a high performance
+
+309
+00:21:36.040 --> 00:21:40.000
+<v Mike Kadin>like Go as opposed to an interpreted language that's going to do that much slower.
+
+310
+00:21:40.280 --> 00:21:41.720
+<v Mike Kadin>I'm very glad we made that call.
+
+311
+00:21:41.820 --> 00:21:45.100
+<v Mike Kadin>The other thing that was a huge improvement over our time at Uber, where Uber ran its
+
+312
+00:21:45.100 --> 00:21:50.500
+<v Mike Kadin>own data centers, was using AWS and just taking advantage of all the services that you can
+
+313
+00:21:50.500 --> 00:21:55.400
+<v Mike Kadin>use there that can just easily scale up like DynamoDB, which we use for the database, or
+
+314
+00:21:55.400 --> 00:21:59.060
+<v Mike Kadin>EC2, where we can spin up new instances as needed on the fly.
+
+315
+00:21:59.380 --> 00:22:03.660
+<v Mike Kadin>You know, a bunch of other stuff, hosted Elasticsearch, their Kinesis streams, which are like, you
+
+316
+00:22:03.660 --> 00:22:04.540
+<v Mike Kadin>know, streaming infrastructure.
+
+317
+00:22:06.040 --> 00:22:09.800
+<v Mike Kadin>it really easy to scale up without having to think too hard. And like, maybe that means I'm going to
+
+318
+00:22:09.800 --> 00:22:14.240
+<v Mike Kadin>be paying a bajillion dollars to AWS down the road, but it's been worth it to take advantage
+
+319
+00:22:14.240 --> 00:22:18.060
+<v Mike Kadin>of their infrastructure instead of just relying on low level stuff or what Uber did, which was
+
+320
+00:22:18.060 --> 00:22:22.920
+<v Mike Kadin>to run its own data centers, which nowadays is just nuts. So I would say we spent enough time
+
+321
+00:22:22.920 --> 00:22:26.680
+<v Mike Kadin>on it to make sure it wouldn't hold us back. And I think that was the right choice, given that,
+
+322
+00:22:26.680 --> 00:22:31.300
+<v Mike Kadin>you know, if your podcast platform fails all the time and you're not serving the content,
+
+323
+00:22:31.300 --> 00:22:38.240
+<v Mike Kadin>The thing that's tricky about our platform is we have about 1,500 monthly active podcasters on the platform.
+
+324
+00:22:38.840 --> 00:22:43.180
+<v Mike Kadin>That's great, but we have millions and millions of listeners that are listening to that content.
+
+325
+00:22:43.640 --> 00:22:50.800
+<v Mike Kadin>While our software and our business size is really designed to service those 1,500 podcasters,
+
+326
+00:22:50.980 --> 00:22:56.520
+<v Mike Kadin>if things break for the listeners, you're going to hear it from a lot of people who are trying to do it.
+
+327
+00:22:56.520 --> 00:23:01.760
+<v Mike Kadin>And so we wanted to make sure that no matter what, our podcast delivery is up.
+
+328
+00:23:01.860 --> 00:23:05.240
+<v Mike Kadin>And I think history has shown that our uptime there is really good.
+
+329
+00:23:05.880 --> 00:23:12.880
+<v Mike Kadin>On the other hand, using a high performance language like Go has slowed us down in terms of development.
+
+330
+00:23:13.080 --> 00:23:18.120
+<v Mike Kadin>So we could have used something like Ruby on Rails or Django or something where you can really iterate a lot more quickly.
+
+331
+00:23:18.580 --> 00:23:23.620
+<v Mike Kadin>And I actually think a better choice would have been to sort of do a hybrid between the two,
+
+332
+00:23:23.620 --> 00:23:27.720
+<v Mike Kadin>where the actual streaming of the audio is happening in a high performance language,
+
+333
+00:23:27.880 --> 00:23:32.140
+<v Mike Kadin>but the general sort of content management and regular features that you want to iterate on
+
+334
+00:23:32.140 --> 00:23:34.480
+<v Mike Kadin>quickly was done somewhere else.
+
+335
+00:23:35.720 --> 00:23:38.360
+<v Noah Labhart>So as you step out on the balcony,
+
+336
+00:23:38.460 --> 00:23:42.940
+<v Noah Labhart>look across all that you've built with RedCircle, what are you most proud of?
+
+337
+00:23:43.800 --> 00:23:50.520
+<v Mike Kadin>I think it's easy to be proud of making podcasters money. I think when we looked at this industry and
+
+338
+00:23:50.520 --> 00:23:55.760
+<v Mike Kadin>And we saw where the money was being made is really in the hands of the top thousand podcasts only.
+
+339
+00:23:55.820 --> 00:24:05.240
+<v Mike Kadin>And most of those podcasts were existing celebrities from other places or folks associated with large podcast networks that are sort of big businesses getting acquired for $100 million.
+
+340
+00:24:05.240 --> 00:24:11.200
+<v Mike Kadin>million. What we saw when we looked at the data is that we believe there is a ton, half or more
+
+341
+00:24:11.200 --> 00:24:15.880
+<v Mike Kadin>of the engagement is actually happening on podcasts that sit in the middle of the market,
+
+342
+00:24:15.940 --> 00:24:24.520
+<v Mike Kadin>that have between 1,000 and 50 to 100,000 listeners. And those podcasts are very underserved
+
+343
+00:24:24.520 --> 00:24:29.040
+<v Mike Kadin>by the current state of monetization in podcasting today. And so when I look around at the podcasts
+
+344
+00:24:29.040 --> 00:24:33.840
+<v Mike Kadin>that are making tens of thousands of dollars since we've started working with ads, or the
+
+345
+00:24:35.240 --> 00:24:39.520
+<v Mike Kadin>thousands of dollars by putting up paywalls in front of their content and using RedCircle.
+
+346
+00:24:39.720 --> 00:24:43.060
+<v Mike Kadin>You can be super proud that these folks who basically weren't making much money before
+
+347
+00:24:43.060 --> 00:24:49.220
+<v Mike Kadin>on this content, all of a sudden are getting their rent paid or more from their work and
+
+348
+00:24:49.220 --> 00:24:54.400
+<v Mike Kadin>sort of taking what was maybe a hobby or a small source of income for them and turning
+
+349
+00:24:54.400 --> 00:24:58.080
+<v Mike Kadin>it into something big and powerful in their lives is really amazing.
+
+350
+00:24:58.400 --> 00:25:02.400
+<v Mike Kadin>You know, we've had a couple of folks reach out to us in search of advertising revenue
+
+351
+00:25:02.400 --> 00:25:04.220
+<v Mike Kadin>since the pandemic has hit.
+
+352
+00:25:05.240 --> 00:25:10.540
+<v Mike Kadin>where folks have lost their jobs or they work a sort of gig worker life. And so some of their
+
+353
+00:25:10.540 --> 00:25:14.440
+<v Mike Kadin>gigs have dropped out. And so they're looking to make more. And so when we can help people
+
+354
+00:25:14.440 --> 00:25:19.460
+<v Mike Kadin>make ends meet or not have to worry about making ends meet, that's just something that makes me
+
+355
+00:25:19.460 --> 00:25:24.000
+<v Mike Kadin>feel really proud about the work that we've done. And then on top of that, separate from the money
+
+356
+00:25:24.000 --> 00:25:29.680
+<v Mike Kadin>part, because we offer up the podcasting services for free, we have a number of podcasters who
+
+357
+00:25:29.680 --> 00:25:31.820
+<v Mike Kadin>who are too small to make money for now,
+
+358
+00:25:31.980 --> 00:25:35.040
+<v Mike Kadin>but have had the opportunity to get their voice heard
+
+359
+00:25:35.040 --> 00:25:36.860
+<v Mike Kadin>simply because our platform exists.
+
+360
+00:25:37.040 --> 00:25:40.220
+<v Mike Kadin>So we have school classrooms that are publishing content.
+
+361
+00:25:40.520 --> 00:25:43.580
+<v Mike Kadin>We have folks who have told us
+
+362
+00:25:43.580 --> 00:25:45.260
+<v Mike Kadin>that this is their first time ever
+
+363
+00:25:45.260 --> 00:25:46.760
+<v Mike Kadin>kind of producing something
+
+364
+00:25:46.760 --> 00:25:48.020
+<v Mike Kadin>and publishing it out to the world.
+
+365
+00:25:48.420 --> 00:25:49.960
+<v Mike Kadin>That's just an amazing feeling
+
+366
+00:25:49.960 --> 00:25:52.020
+<v Mike Kadin>to give people voice for the first time.
+
+367
+00:25:52.220 --> 00:25:54.700
+<v Mike Kadin>So it's easy to be proud of connecting
+
+368
+00:25:54.700 --> 00:25:55.800
+<v Mike Kadin>with so many creators
+
+369
+00:25:55.800 --> 00:25:57.580
+<v Mike Kadin>and helping them to get themselves out there.
+
+370
+00:25:57.580 --> 00:25:58.420
+<v Mike Kadin>So
+
+371
+00:25:58.420 --> 00:25:59.840
+<v Noah Labhart>let's flip the script a little bit.
+
+372
+00:25:59.920 --> 00:26:04.500
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+373
+00:26:05.680 --> 00:26:19.800
+<v Mike Kadin>One of the products that we released, we decided that my co-founder, who is a product manager by training, was going to work on sort of non-product and engineering work for a minute and work on growth.
+
+374
+00:26:20.000 --> 00:26:26.980
+<v Mike Kadin>And I was going to work as the product manager on a product and sort of wing it without a designer and just kind of figure it out.
+
+375
+00:26:27.640 --> 00:26:31.920
+<v Mike Kadin>My opinion on product managers has really evolved over the course of my career as an engineer,
+
+376
+00:26:32.000 --> 00:26:36.860
+<v Mike Kadin>and it has never been more appreciative of the work of what a product manager does
+
+377
+00:26:36.860 --> 00:26:39.840
+<v Mike Kadin>than when I tried to do it and did such a bad job.
+
+378
+00:26:40.180 --> 00:26:43.740
+<v Mike Kadin>I think a lot of times engineers can look at product and think,
+
+379
+00:26:43.760 --> 00:26:47.340
+<v Mike Kadin>this person's a taskmaster, or this person always wants us to jump higher,
+
+380
+00:26:47.540 --> 00:26:50.560
+<v Mike Kadin>or this person doesn't really understand what's going on under the hood,
+
+381
+00:26:50.620 --> 00:26:53.540
+<v Mike Kadin>and just sort of develop a natural tension.
+
+382
+00:26:53.740 --> 00:26:55.800
+<v Mike Kadin>And a little bit of tension is good in that relationship,
+
+383
+00:26:57.580 --> 00:27:00.280
+<v Mike Kadin>to be a product manager as a technical engineer with no design skills.
+
+384
+00:27:00.800 --> 00:27:02.900
+<v Mike Kadin>It's very, very hard and very, very challenging.
+
+385
+00:27:03.040 --> 00:27:05.280
+<v Mike Kadin>And we did a poor job on a product as a result.
+
+386
+00:27:05.360 --> 00:27:07.080
+<v Mike Kadin>And the result, you know, the product is out there.
+
+387
+00:27:07.140 --> 00:27:07.640
+<v Mike Kadin>It's great.
+
+388
+00:27:07.480 --> 00:27:08.580
+<v Mike Kadin>It's making people lots of money.
+
+389
+00:27:08.720 --> 00:27:13.640
+<v Mike Kadin>But the result is that it took a lot longer, believe it or not, than it should have.
+
+390
+00:27:13.940 --> 00:27:16.580
+<v Mike Kadin>And it was missing pieces because I didn't think through edge cases.
+
+391
+00:27:16.740 --> 00:27:20.320
+<v Mike Kadin>I didn't think all the way through all the ways that people might use the product.
+
+392
+00:27:20.480 --> 00:27:21.760
+<v Mike Kadin>I didn't do user research.
+
+393
+00:27:21.800 --> 00:27:24.600
+<v Mike Kadin>So people were confused by certain items that we had to go back and revise.
+
+394
+00:27:24.600 --> 00:27:29.560
+<v Mike Kadin>buys, it's just important to thank your product manager and to make sure that you're doing the
+
+395
+00:27:29.560 --> 00:27:34.020
+<v Mike Kadin>work and not just firing from the hip when making product decisions. Otherwise, it's going to end up
+
+396
+00:27:34.020 --> 00:27:39.240
+<v Mike Kadin>taking you longer while you go back in time and fix bugs or product problems that could have been
+
+397
+00:27:39.240 --> 00:27:40.920
+<v Mike Kadin>anticipated with the product work up front.
+
+398
+00:27:41.280 --> 00:27:43.980
+<v Noah Labhart>Absolutely. That's great stuff. We need to set
+
+399
+00:27:43.980 --> 00:27:49.400
+<v Noah Labhart>up a national holiday for thank your product manager day. Definitely. From all the engineers.
+
+400
+00:27:49.400 --> 00:27:54.780
+<v Noah Labhart>years. So what does the future look like for RedCircle, the product and for your team?
+
+401
+00:27:56.040 --> 00:28:01.040
+<v Mike Kadin>Right now, we're very focused on getting podcasters paid. It's been a long run of
+
+402
+00:28:01.040 --> 00:28:05.580
+<v Mike Kadin>let's get podcasters on board so that we can get them paid. And now it's very focused on let's get
+
+403
+00:28:05.580 --> 00:28:09.700
+<v Mike Kadin>podcasters paid. Obviously, RedCircle has a revenue share as a part of getting podcasters
+
+404
+00:28:09.700 --> 00:28:13.440
+<v Mike Kadin>paid. So we have an interest in there so we can continue to grow our business and help more
+
+405
+00:28:13.440 --> 00:28:18.420
+<v Mike Kadin>podcasters get paid. So that's what our main focus is. And what that means is a lot of our
+
+406
+00:28:19.400 --> 00:28:23.420
+<v Mike Kadin>is focused on making more and more attractive technology for advertisers,
+
+407
+00:28:23.840 --> 00:28:26.160
+<v Mike Kadin>because that's going to bring more liquidity to the marketplace.
+
+408
+00:28:26.460 --> 00:28:29.520
+<v Mike Kadin>So what are the kinds of things that advertisers really want
+
+409
+00:28:29.520 --> 00:28:33.400
+<v Mike Kadin>are very sort of specific features to the way that they buy.
+
+410
+00:28:33.540 --> 00:28:37.800
+<v Mike Kadin>So for example, RedCircle right now uses dynamic insertion for the advertising.
+
+411
+00:28:38.360 --> 00:28:40.280
+<v Mike Kadin>Some advertisers really want to buy,
+
+412
+00:28:40.460 --> 00:28:43.440
+<v Mike Kadin>I want to buy an episode that drops in this week,
+
+413
+00:28:43.460 --> 00:28:45.580
+<v Mike Kadin>and I want only that episode and nothing else.
+
+414
+00:28:45.620 --> 00:28:48.620
+<v Mike Kadin>Or I want an episode in these three weeks and those episodes and nothing else.
+
+415
+00:28:49.400 --> 00:28:51.540
+<v Mike Kadin>despite the fact that we can stitch their ad into any episode,
+
+416
+00:28:51.700 --> 00:28:53.400
+<v Mike Kadin>they really want to buy on specific ones.
+
+417
+00:28:53.600 --> 00:28:57.180
+<v Mike Kadin>So we have new features coming out that are going to help advertisers to be able to do that.
+
+418
+00:28:57.420 --> 00:29:02.580
+<v Mike Kadin>We have new features coming out that are going to help advertisers to be able to negotiate on rates
+
+419
+00:29:02.580 --> 00:29:05.780
+<v Mike Kadin>because advertisers want to see if they can get a 20% discount.
+
+420
+00:29:06.360 --> 00:29:09.460
+<v Mike Kadin>Podcasters don't want to make it 10% and then everybody's happy because the deal gets done.
+
+421
+00:29:09.640 --> 00:29:13.860
+<v Mike Kadin>So really just trying to look for ways to make it easier for the advertisers to accomplish their goals
+
+422
+00:29:13.860 --> 00:29:18.520
+<v Mike Kadin>so that all the podcasters can get paid is very much our focus for a minute here.
+
+423
+00:29:19.400 --> 00:29:23.940
+<v Mike Kadin>And then the other thing is advertisers right now in podcasting is mostly folks with pretty
+
+424
+00:29:23.940 --> 00:29:28.740
+<v Mike Kadin>large budgets, maybe not large budgets in, you know, like a Pepsi size budget, but large
+
+425
+00:29:28.740 --> 00:29:32.980
+<v Mike Kadin>budgets relative to some of these smaller and midsize podcasts that we work with.
+
+426
+00:29:33.040 --> 00:29:37.560
+<v Mike Kadin>You know, a lot of those smaller midsize advertisers can't access podcasting without
+
+427
+00:29:37.560 --> 00:29:41.780
+<v Mike Kadin>dedicating a ton of time and emails and spreadsheets to be able to running these campaigns by hand.
+
+428
+00:29:42.000 --> 00:29:45.660
+<v Mike Kadin>And they're too small to hire an agency to do it on their behalf because the agency is
+
+429
+00:29:45.660 --> 00:29:47.980
+<v Mike Kadin>not going to make enough money to make it worth their while either.
+
+430
+00:29:49.400 --> 00:29:54.120
+<v Mike Kadin>focused and interested on what are these small and mid-sized advertisers look like? How can we
+
+431
+00:29:54.120 --> 00:29:59.200
+<v Mike Kadin>service them? How can we build tools for them to be able to execute campaigns and not have it be
+
+432
+00:29:59.200 --> 00:30:03.620
+<v Mike Kadin>incredibly complicated, but also not powerful enough to be able to help them achieve their
+
+433
+00:30:03.620 --> 00:30:09.240
+<v Mike Kadin>goals? So very focused on the advertiser right now. But again, I didn't leave Uber to be very
+
+434
+00:30:09.240 --> 00:30:13.160
+<v Mike Kadin>excited to build an advertising technology business. What we were excited to do was help
+
+435
+00:30:13.160 --> 00:30:17.480
+<v Mike Kadin>get podcasters paid and make their podcasts, take it from a hobby to a business. So that's what
+
+436
+00:30:19.400 --> 00:30:20.800
+<v Noah Labhart>Let's switch to you, Mike, a little bit.
+
+437
+00:30:20.940 --> 00:30:23.300
+<v Noah Labhart>Who influences the way that you work?
+
+438
+00:30:23.380 --> 00:30:27.600
+<v Noah Labhart>I'm going to name a CEO, CTO, architect, really any person.
+
+439
+00:30:27.740 --> 00:30:29.880
+<v Noah Labhart>Name a person you look up to and why.
+
+440
+00:30:30.220 --> 00:30:34.920
+<v Mike Kadin>I'm not a believer in what I call entrepreneurialism or the entrepreneurial religion.
+
+441
+00:30:35.260 --> 00:30:41.160
+<v Mike Kadin>I think that businesses are started by real people every day that have families and hobbies
+
+442
+00:30:41.160 --> 00:30:46.440
+<v Mike Kadin>and are not spending their days asleep on the floor of their office like Edison.
+
+443
+00:30:46.440 --> 00:30:51.240
+<v Mike Kadin>medicine, I don't think you have to be some kind of incredible hustler who doesn't do anything but
+
+444
+00:30:51.240 --> 00:30:55.280
+<v Mike Kadin>their work in order to be successful in this world. And if you are that, are you really
+
+445
+00:30:55.280 --> 00:31:00.180
+<v Mike Kadin>successful in this world? I tend not to buy into some of the people that a lot of folks kind of
+
+446
+00:31:00.180 --> 00:31:06.200
+<v Mike Kadin>look at and say, this is the Elon Musks out there. That's not my style. And so I think most of the
+
+447
+00:31:06.200 --> 00:31:10.860
+<v Mike Kadin>people who I would look up to and how they run a business actually aren't the ones that you read
+
+448
+00:31:10.860 --> 00:31:14.100
+<v Mike Kadin>about every day. And so instead to answer this question, I think I'll give you somebody who's
+
+449
+00:31:14.100 --> 00:31:20.940
+<v Mike Kadin>not real. I'm a nerd. I like Star Trek. I think Jean-Luc Picard is a good example of somebody to
+
+450
+00:31:20.940 --> 00:31:27.140
+<v Mike Kadin>look up to in terms of leadership. Everything he does from a leadership perspective is what real
+
+451
+00:31:27.140 --> 00:31:33.500
+<v Mike Kadin>leaders should follow. Certainly hardworking, but also listens to his team when there's tough
+
+452
+00:31:33.500 --> 00:31:40.100
+<v Mike Kadin>decisions to be made, takes in all sides, shows humility. There's just a ton that's there to show
+
+453
+00:31:40.100 --> 00:31:43.880
+<v Mike Kadin>you how good leadership is done, where you're building deep relationships with the people that
+
+454
+00:31:44.100 --> 00:31:49.420
+<v Mike Kadin>with you so that they'll follow you into anything, but trying to maintain your morals along the way.
+
+455
+00:31:49.520 --> 00:31:53.380
+<v Mike Kadin>There's a lot to learn from him. And I encourage folks not familiar with Star Trek The Next
+
+456
+00:31:53.380 --> 00:31:54.420
+<v Mike Kadin>Generation to give it a watch.
+
+457
+00:31:55.820 --> 00:31:58.000
+<v Noah Labhart>So if you could go back to the beginning,
+
+458
+00:31:58.220 --> 00:32:02.060
+<v Noah Labhart>what would you do differently? Or where would you consider taking a different approach?
+
+459
+00:32:04.040 --> 00:32:07.400
+<v Mike Kadin>Using something like Rails for the business logic, I think that would have been something
+
+460
+00:32:07.400 --> 00:32:12.560
+<v Mike Kadin>that would have been a smart choice early on. I think that another piece that would have been
+
+461
+00:32:14.640 --> 00:32:19.740
+<v Mike Kadin>early was to build our products with a little bit more automation and a little bit less
+
+462
+00:32:19.740 --> 00:32:24.940
+<v Mike Kadin>customization. I would say our software has a good number of bells and whistles and lots of
+
+463
+00:32:24.940 --> 00:32:30.020
+<v Mike Kadin>little knobs. And most people just want to click a button and be done with it. And that's always
+
+464
+00:32:30.020 --> 00:32:34.100
+<v Mike Kadin>a balance in any software as to how much customization you want to have versus ease
+
+465
+00:32:34.100 --> 00:32:38.880
+<v Mike Kadin>of use. But I think we may have gone a little bit down the customization angle a little too far.
+
+466
+00:32:39.000 --> 00:32:43.000
+<v Mike Kadin>I'll give you an example. So right now, if you want to run a cross promotion on RedCircle,
+
+467
+00:32:44.100 --> 00:32:48.280
+<v Mike Kadin>a cross promotion with another podcast, you get a little chat window where the two of you can chat
+
+468
+00:32:48.280 --> 00:32:52.840
+<v Mike Kadin>back and forth. And then you both configure your side of the cross promotion campaign and both
+
+469
+00:32:52.840 --> 00:32:56.780
+<v Mike Kadin>parties kind of click a button to say, accept once they like the deal in the state that it's in,
+
+470
+00:32:56.840 --> 00:33:01.300
+<v Mike Kadin>and then it runs. I think what probably would have worked better is something that was a lot more
+
+471
+00:33:01.300 --> 00:33:05.680
+<v Mike Kadin>sort of automated where, you know, we would match you up with somebody else based on what we know
+
+472
+00:33:05.680 --> 00:33:10.720
+<v Mike Kadin>about the two audiences, kind of walk everybody through it, as opposed to giving like an open
+
+473
+00:33:10.720 --> 00:33:14.420
+<v Mike Kadin>and chat window where everybody can interact and learn from each other just kind of creates more
+
+474
+00:33:14.420 --> 00:33:18.900
+<v Mike Kadin>friction instead of actually getting the deal done. And so I think going back, we probably
+
+475
+00:33:18.900 --> 00:33:24.300
+<v Mike Kadin>should have taken a more opinionated stance on how the software should be used as opposed to
+
+476
+00:33:24.300 --> 00:33:25.680
+<v Mike Kadin>just giving a bunch of knobs and whistles.
+
+477
+00:33:26.320 --> 00:33:28.880
+<v Noah Labhart>So you're getting on a plane and you're sitting
+
+478
+00:33:28.880 --> 00:33:33.640
+<v Noah Labhart>next to a young entrepreneur who has built the next big thing. They're jazzed about it. They
+
+479
+00:33:33.640 --> 00:33:38.680
+<v Noah Labhart>can't wait to show it off to the world. They can't wait to show it to you. And they think it's really
+
+480
+00:33:38.680 --> 00:33:43.240
+<v Noah Labhart>going to be a game changer. What advice do you give that person having gone down this road a bit?
+
+481
+00:33:43.480 --> 00:33:46.900
+<v Mike Kadin>I think you're going to get a different answer from me than you might get from other people on
+
+482
+00:33:46.900 --> 00:33:50.940
+<v Mike Kadin>this one. So it gets back to this kind of entrepreneurialism that I was talking about
+
+483
+00:33:50.940 --> 00:33:57.420
+<v Mike Kadin>before, where I think a lot of people worship the entrepreneur, but they forget that there's
+
+484
+00:33:57.420 --> 00:34:01.820
+<v Mike Kadin>a selection bias in the people that you see who succeed. There's a lot of folks who don't.
+
+485
+00:34:01.980 --> 00:34:06.600
+<v Mike Kadin>The entrepreneurial journey, this is not the first company I've tried to start. I've had
+
+486
+00:34:06.600 --> 00:34:11.840
+<v Mike Kadin>had other ideas in the past that didn't get off the ground long ago, you know, a lot of times it
+
+487
+00:34:11.840 --> 00:34:15.860
+<v Mike Kadin>doesn't work out. You know, in this case, it's working out great for me, but sometimes it doesn't
+
+488
+00:34:15.860 --> 00:34:21.600
+<v Mike Kadin>work out. I think a lot of things to pay attention to also is that, you know, it's not all guts and
+
+489
+00:34:21.600 --> 00:34:26.200
+<v Mike Kadin>glory. You know, a lot of what's made us successful is taking things that should be done by technology
+
+490
+00:34:26.200 --> 00:34:30.780
+<v Mike Kadin>and managing them by hand. You know, for a long time before we had an automated marketplace for
+
+491
+00:34:30.780 --> 00:34:35.980
+<v Mike Kadin>advertising, we were doing a lot of ad deals by hand and doing that stuff is really just kind of
+
+492
+00:34:36.600 --> 00:34:55.740
+<v Mike Kadin>Right. So be ready to grind, I think, is one of the first things that you should say. And it's not all glorious while you're doing it. And then I think the other thing is that people because of that entrepreneurial religion, I think people get caught up in the hustle, in the hype and in the growth itself instead of focusing on their customers, their product, its growth details.
+
+493
+00:34:55.740 --> 00:35:00.720
+<v Mike Kadin>details. And so, you know, being an entrepreneur is about motivating your team and is about
+
+494
+00:35:00.720 --> 00:35:05.600
+<v Mike Kadin>generating buzz for your product. But if you're generating buzz and nothing else, then, you know,
+
+495
+00:35:05.620 --> 00:35:09.400
+<v Mike Kadin>one day you're going to look down and there's going to be no floor under you or, you know,
+
+496
+00:35:09.400 --> 00:35:13.380
+<v Mike Kadin>the music's going to stop and there's going to be no chair. And so it's very, very important not to
+
+497
+00:35:13.380 --> 00:35:19.460
+<v Mike Kadin>get caught up in being an entrepreneur and instead to just be super laser focused on the product,
+
+498
+00:35:19.520 --> 00:35:23.760
+<v Mike Kadin>on your customers, on your business and how it's operating to make sure that you can, you know,
+
+499
+00:35:25.740 --> 00:35:29.800
+<v Mike Kadin>still making sure that you stay connected to reality and not just hype.
+
+500
+00:35:30.510 --> 00:35:34.520
+<v Noah Labhart>That's great advice. Well, Mike, thanks for being on the show today. Thank you for being
+
+501
+00:35:34.520 --> 00:35:38.060
+<v Noah Labhart>on Code Story and telling the creation story of RedCircle.
+
+502
+00:35:38.380 --> 00:35:39.780
+<v Mike Kadin>No problem. Thanks for having me.
+
+503
+00:35:40.370 --> 00:35:42.800
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+504
+00:35:49.180 --> 00:35:55.040
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts,
+
+505
+00:35:55.740 --> 00:35:57.420
+<v Noah Labhart>or the podcasting app of your choice.
+
+506
+00:35:57.860 --> 00:36:01.160
+<v Noah Labhart>Support the show on patreon.com slash Code Story
+
+507
+00:36:01.160 --> 00:36:02.920
+<v Noah Labhart>for just five to ten bucks a month.
+
+508
+00:36:03.300 --> 00:36:05.500
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+509
+00:36:05.820 --> 00:36:07.740
+<v Noah Labhart>Both things help us out tremendously.
+
+510
+00:36:10.380 --> 00:36:11.840
+<v Noah Labhart>And thanks again for listening.

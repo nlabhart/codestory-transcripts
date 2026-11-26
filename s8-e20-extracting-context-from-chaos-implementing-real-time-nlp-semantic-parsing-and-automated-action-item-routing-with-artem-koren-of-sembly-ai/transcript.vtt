@@ -1,0 +1,1095 @@
+WEBVTT
+
+NOTE S8 E20: Extracting Context from Chaos: Implementing Real-Time NLP Semantic Parsing and Automated Action-Item Routing with Artem Koren of Sembly AI
+
+1
+00:00:01.220 --> 00:00:05.660
+<v Artem Koren>We built some custom solutions for scaling different parts of our system differently.
+
+2
+00:00:06.120 --> 00:00:10.360
+<v Artem Koren>All the while, of course, from the very get-go, we were Dockerized and we were using Kubernetes
+
+3
+00:00:10.360 --> 00:00:11.380
+<v Artem Koren>and things like that.
+
+4
+00:00:11.580 --> 00:00:16.120
+<v Artem Koren>But in many cases, that wasn't enough, especially in our case.
+
+5
+00:00:16.280 --> 00:00:19.240
+<v Artem Koren>It's interesting, meetings tend to start at the top of the hour.
+
+6
+00:00:19.460 --> 00:00:26.420
+<v Artem Koren>And so you would have this barrage of instantiation of meeting sessions all around the same time,
+
+7
+00:00:26.500 --> 00:00:28.420
+<v Artem Koren>and then meetings finish around the same time.
+
+8
+00:00:30.000 --> 00:00:36.120
+<v Artem Koren>a platform that can scale very flexibly and quickly on demand and handle these peak loads,
+
+9
+00:00:36.260 --> 00:00:42.100
+<v Artem Koren>which we were constantly having. My name is Artem Koren. I'm the co-founder and chief product
+
+10
+00:00:42.100 --> 00:00:43.700
+<v Artem Koren>officer of Sembly AI.
+
+11
+00:00:46.420 --> 00:00:51.460
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech
+
+12
+00:00:51.460 --> 00:00:53.940
+<v Clip>visionaries. It's six months moonlighting. There's
+
+13
+00:00:53.940 --> 00:00:54.980
+<v Clip>nothing on the back
+
+14
+00:00:54.980 --> 00:00:56.900
+<v Noah Labhart>end. Who share what it takes
+
+15
+00:00:56.900 --> 00:00:58.040
+<v Noah Labhart>to change an industry.
+
+16
+00:00:59.280 --> 00:01:01.260
+<v Clip>It took many goes to get right.
+
+17
+00:01:01.840 --> 00:01:04.540
+<v Noah Labhart>Who built the teams that have their back.
+
+18
+00:01:04.820 --> 00:01:06.120
+<v Clip>The company is its people.
+
+19
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+20
+00:01:07.440 --> 00:01:08.580
+<v Clip>I was proud of our team.
+
+21
+00:01:08.900 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+22
+00:01:11.480 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+23
+00:01:12.860 --> 00:01:14.240
+<v Clip>Yes, we've been fighting it as a group.
+
+24
+00:01:14.440 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+25
+00:01:15.540 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+26
+00:01:18.240 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, Mike.
+
+27
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+28
+00:01:22.860 --> 00:01:25.840
+<v Noah Labhart>Deride the ups and downs of the startup life.
+
+29
+00:01:26.120 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+30
+00:01:27.560 --> 00:01:28.780
+<v Clip>It's not just about technology.
+
+31
+00:01:29.280 --> 00:01:37.240
+<v Noah Labhart>us some more on Code Story. I'm your host, Noah Labhart, and today, Artem Koren is taking AI
+
+32
+00:01:37.240 --> 00:01:43.120
+<v Noah Labhart>to new levels and building the smartest team assistant for your meetings.
+
+33
+00:01:49.620 --> 00:01:54.560
+<v Noah Labhart>Artem Koren is now based in Amsterdam and has been a techie since his early years.
+
+34
+00:01:54.560 --> 00:02:00.000
+<v Noah Labhart>He was programming in QBasic and C in fifth grade, and building web applications in high school.
+
+35
+00:02:00.440 --> 00:02:06.460
+<v Noah Labhart>Post-school at Columbia, he started working at dot-com businesses, but found himself disenchanted with the state of AI.
+
+36
+00:02:07.560 --> 00:02:14.420
+<v Noah Labhart>Outside of tech, he loves chess, attending running club, jiu-jitsu, and cosmology, the study of space, black holes, and things like that.
+
+37
+00:02:16.200 --> 00:02:19.700
+<v Noah Labhart>Artem and his co-founder have years of experience in digital transformation.
+
+38
+00:02:19.700 --> 00:02:28.080
+<v Noah Labhart>With the latest innovations in AI proving useful, they decided to make digesting and utilizing information from meetings easier.
+
+39
+00:02:29.900 --> 00:02:33.000
+<v Noah Labhart>This is the creation story of Sembly AI.
+
+40
+00:02:36.520 --> 00:02:41.580
+<v Artem Koren>Sembly AI is an AI teammate, also known as an AI meeting assistant.
+
+41
+00:02:42.020 --> 00:02:46.020
+<v Artem Koren>It's an application that you invite to your online meetings.
+
+42
+00:02:46.020 --> 00:02:51.740
+<v Artem Koren>So you can invite it to Microsoft Teams meeting, a Google meeting or a Zoom meeting, just like you would a regular person.
+
+43
+00:02:51.900 --> 00:02:56.560
+<v Artem Koren>So you can include Sembly on your invite or you can in our app tell us to join your meeting.
+
+44
+00:02:57.020 --> 00:02:59.680
+<v Artem Koren>Sembly will show up as another participant in your meeting.
+
+45
+00:02:59.840 --> 00:03:02.260
+<v Artem Koren>It will say hello. It will say, hey, I'm recording this meeting.
+
+46
+00:03:02.360 --> 00:03:03.940
+<v Artem Koren>And then it will hang out with you during the meeting.
+
+47
+00:03:04.260 --> 00:03:12.360
+<v Artem Koren>At the end of the meeting, Sembly will process all the information it heard during the call and generate some insights for you.
+
+48
+00:03:12.420 --> 00:03:15.000
+<v Artem Koren>So, for instance, you'll have the full transcript of the meeting.
+
+49
+00:03:16.020 --> 00:03:21.880
+<v Artem Koren>meeting notes that are very comprehensive and very actionable. You'll also have automatically
+
+50
+00:03:21.880 --> 00:03:28.120
+<v Artem Koren>generated list of tasks. So all the things that you may have to do after the meeting is over,
+
+51
+00:03:28.280 --> 00:03:33.260
+<v Artem Koren>you'll have those tasks already generated for you, which can appear both in Sembly,
+
+52
+00:03:33.340 --> 00:03:39.140
+<v Artem Koren>but also in your to-do app or task management app, and they can be automatically populated there.
+
+53
+00:03:39.920 --> 00:03:44.560
+<v Artem Koren>There's things like risks and issues and decisions that Sembly picks up on.
+
+54
+00:03:46.020 --> 00:03:51.180
+<v Artem Koren>there is an AI chatbot called Semblian with whom you can talk to about your meeting. So you can ask
+
+55
+00:03:51.180 --> 00:03:55.800
+<v Artem Koren>Semblian some questions about the meeting or ask it to generate some content based on the meeting.
+
+56
+00:03:55.880 --> 00:04:01.040
+<v Artem Koren>So for instance, literal example from yesterday, I was talking to one of our recruiters after a
+
+57
+00:04:01.040 --> 00:04:05.460
+<v Artem Koren>candidate interview and I gave some feedback on the candidate. So I said, okay, these are things
+
+58
+00:04:05.460 --> 00:04:09.100
+<v Artem Koren>that were good, but these are the things I'm concerned about. So then after that call, I went
+
+59
+00:04:09.100 --> 00:04:16.140
+<v Artem Koren>into Semblian and I asked it to generate for me the resume of an ideal candidate based on my
+
+60
+00:04:16.140 --> 00:04:20.480
+<v Artem Koren>feedback on the call. And it did it. And I just copied and pasted that to the recruiter.
+
+61
+00:04:22.640 --> 00:04:26.820
+<v Noah Labhart>Let's dive into the MVP then. So that first version of the product you built,
+
+62
+00:04:26.960 --> 00:04:30.840
+<v Noah Labhart>how long did it take you to build and what sort of tools did you use to bring it to life?
+
+63
+00:04:32.360 --> 00:04:41.860
+<v Artem Koren>So the decision on the platform, the stack was crucial. And I have previous experience in,
+
+64
+00:04:41.900 --> 00:04:47.840
+<v Artem Koren>you know, IT management and product management. So I kind of knew the macro things that would
+
+65
+00:04:47.840 --> 00:04:53.600
+<v Artem Koren>be involved. I consulted with some of my friends who happened to be architects in the IT space and
+
+66
+00:04:53.600 --> 00:05:00.720
+<v Artem Koren>talked about what's in vogue and which frameworks are good for what. And so we ultimately landed on
+
+67
+00:05:00.840 --> 00:05:07.720
+<v Artem Koren>a Postgres backend for the database, Django middle layer, and React for the front end.
+
+68
+00:05:08.140 --> 00:05:14.300
+<v Artem Koren>Then I'm giving you some goodies now. What I did was I hired not too expensive, but like a fairly
+
+69
+00:05:14.300 --> 00:05:21.920
+<v Artem Koren>expensive professional shop to build me a skeleton of my SaaS platform. So basically build a framework
+
+70
+00:05:21.920 --> 00:05:29.020
+<v Artem Koren>where the main screen of the interfaces, the login, the user management piece, just the basic,
+
+71
+00:05:30.840 --> 00:05:34.320
+<v Artem Koren>SaaS application, right? You need to be able to register, you need to be able to log in, log out,
+
+72
+00:05:34.380 --> 00:05:38.560
+<v Artem Koren>and then you need to be able to see some stuff on your screen. And so they built that framework.
+
+73
+00:05:39.260 --> 00:05:45.840
+<v Artem Koren>And then we hired a team in Odessa, Ukraine, that I then hand-held to take the application
+
+74
+00:05:45.840 --> 00:05:53.060
+<v Artem Koren>all the way out. And that first MVP, I think there's a proof of concept bit that we did
+
+75
+00:05:53.060 --> 00:05:58.460
+<v Artem Koren>using a Raspberry Pi as a recorded device, believe it or not. We did that in a matter of maybe three
+
+76
+00:05:58.460 --> 00:06:02.680
+<v Artem Koren>three months or so, like two, three months. And then the first MVP, I would say is probably
+
+77
+00:06:02.680 --> 00:06:04.060
+<v Artem Koren>six or seven months in.
+
+78
+00:06:05.100 --> 00:06:08.380
+<v Noah Labhart>Let's stay on an MVP for a minute. With any MVP, you got to make certain
+
+79
+00:06:08.380 --> 00:06:12.680
+<v Noah Labhart>decisions and trade-offs. And I'm curious about some you had to make and specifically how you
+
+80
+00:06:12.680 --> 00:06:13.860
+<v Noah Labhart>coped with those decisions.
+
+81
+00:06:15.420 --> 00:06:19.680
+<v Artem Koren>We were building Sembly at a time when there was no such concept
+
+82
+00:06:19.680 --> 00:06:25.460
+<v Artem Koren>of an AI meeting assistant in the wild. I mean, companies existed, but it wasn't well known.
+
+83
+00:06:25.460 --> 00:06:32.080
+<v Artem Koren>And so when you would go to a potential user or company and say, hey, there's this product we have.
+
+84
+00:06:32.260 --> 00:06:32.920
+<v Artem Koren>Are you interested?
+
+85
+00:06:33.500 --> 00:06:40.100
+<v Artem Koren>Very often you'd get blank stares and you would have to do a lot of education to those users to explain to them what it is and what it can do for them.
+
+86
+00:06:40.460 --> 00:06:47.780
+<v Artem Koren>There were a few must-have components that we needed in our system for it to be basically workable.
+
+87
+00:06:47.900 --> 00:06:51.620
+<v Artem Koren>And so the first was we had to be able to attend meetings and record them.
+
+88
+00:06:51.740 --> 00:06:54.120
+<v Artem Koren>We needed to be able to transcribe them.
+
+89
+00:06:55.460 --> 00:07:00.780
+<v Artem Koren>able to diarize them, meaning figure out who said what, and then be able to extract insights from
+
+90
+00:07:00.780 --> 00:07:06.600
+<v Artem Koren>them and finally present those insights. We had to have some minimal version of all those components
+
+91
+00:07:06.600 --> 00:07:12.520
+<v Artem Koren>lined up and working together to present a result. Otherwise, the product wasn't there.
+
+92
+00:07:12.660 --> 00:07:19.220
+<v Artem Koren>And so in that sense, there's some products that I think MVPs could be simpler, like what is the
+
+93
+00:07:19.220 --> 00:07:24.060
+<v Artem Koren>minimal set of components it takes for it to be alive. For our product, unfortunately, there's a
+
+94
+00:07:25.460 --> 00:07:29.600
+<v Artem Koren>very often, it's just the web app part, the interface part that's enough to be alive.
+
+95
+00:07:29.760 --> 00:07:33.480
+<v Artem Koren>But in our case, we had to attend meetings, record meetings, transcribe diaries, analyze.
+
+96
+00:07:33.700 --> 00:07:38.180
+<v Artem Koren>So there was a lot of little pieces that all had to come together. And when we started developing
+
+97
+00:07:38.180 --> 00:07:43.040
+<v Artem Koren>this product back in 2019, a lot of these technologies were still very raw. Transcription
+
+98
+00:07:43.040 --> 00:07:50.180
+<v Artem Koren>was an unsolved problem. Diarization was generally not available. And AI was just not even a buzzword
+
+99
+00:07:50.180 --> 00:07:58.480
+<v Artem Koren>at the time. So we had to do a lot of innovation on the fly to stick it all together to present
+
+100
+00:07:58.480 --> 00:08:04.900
+<v Artem Koren>and to present a product that our users can minimally get benefit from. So that's kind of
+
+101
+00:08:04.900 --> 00:08:05.680
+<v Artem Koren>how we started out.
+
+102
+00:08:07.260 --> 00:08:11.140
+<v Noah Labhart>Okay, so you've got your MVP, it's working, people like it, you're gaining
+
+103
+00:08:11.140 --> 00:08:16.180
+<v Noah Labhart>traction. I'm curious about how you progressed and matured the product from there. And I think
+
+104
+00:08:16.180 --> 00:08:19.380
+<v Noah Labhart>to wrap that in a box a little bit, what I'm looking for is how did you build your roadmap?
+
+105
+00:08:20.180 --> 00:08:25.100
+<v Noah Labhart>go about deciding, okay, this is the next most important thing to build with Sembly?
+
+106
+00:08:27.540 --> 00:08:35.420
+<v Artem Koren>So important to know, we started by orienting ourselves to the larger company market,
+
+107
+00:08:35.640 --> 00:08:40.360
+<v Artem Koren>so larger companies and enterprises. And that's where both me and my co-founder,
+
+108
+00:08:40.360 --> 00:08:44.680
+<v Artem Koren>Gil McLeod, that's, you know, our background is a lot in that. And so our thinking and our
+
+109
+00:08:44.680 --> 00:08:49.000
+<v Artem Koren>styling of the product was always towards the larger environment, which ended up being our
+
+110
+00:08:50.180 --> 00:08:54.940
+<v Artem Koren>few years because we build a product that fits the enterprise, but the usability and experience
+
+111
+00:08:54.940 --> 00:09:00.600
+<v Artem Koren>on the individual levels was very lacking. It was tough to use. It was hard to understand.
+
+112
+00:09:00.820 --> 00:09:06.180
+<v Artem Koren>It wasn't intuitive. It was hard to gain traction because even though we're able to get in the door
+
+113
+00:09:06.180 --> 00:09:14.120
+<v Artem Koren>of some larger companies, once it hit the users, we hit a lot of roadblock because they just didn't
+
+114
+00:09:14.120 --> 00:09:19.220
+<v Artem Koren>really know what to do with it. One of the users told us it's like sitting into a Boeing or an
+
+115
+00:09:20.360 --> 00:09:23.500
+<v Artem Koren>and they just don't know which buttons to press or why they would press them.
+
+116
+00:09:23.660 --> 00:09:27.660
+<v Artem Koren>And so we had a big pivot where we reoriented to the individual experience.
+
+117
+00:09:27.860 --> 00:09:30.340
+<v Artem Koren>And this happened maybe three years ago, somewhere around there.
+
+118
+00:09:30.440 --> 00:09:34.180
+<v Artem Koren>And that was kind of the first step in the right direction,
+
+119
+00:09:34.320 --> 00:09:41.320
+<v Artem Koren>where we made the experience, the user experience, very simple, very intuitive, very easy,
+
+120
+00:09:41.960 --> 00:09:46.080
+<v Artem Koren>and then started to just give the user just the basics,
+
+121
+00:09:46.080 --> 00:09:52.700
+<v Artem Koren>but really polished and really well done in such a way that it's pretty easy to ramp up in the
+
+122
+00:09:52.700 --> 00:09:57.980
+<v Artem Koren>product and have it be valuable for you very quickly. And then, you know, once we started to
+
+123
+00:09:57.980 --> 00:10:04.540
+<v Artem Koren>see an uptake from users, then we started slowly adding features based on what our users told us,
+
+124
+00:10:04.640 --> 00:10:09.440
+<v Artem Koren>based on what we thought made sense internally, and also based on what we were seeing from some
+
+125
+00:10:09.440 --> 00:10:10.160
+<v Artem Koren>of our competitors.
+
+126
+00:10:10.960 --> 00:10:14.700
+<v Noah Labhart>So how did you go about building your team? And what did you look for
+
+127
+00:10:16.080 --> 00:10:18.300
+<v Noah Labhart>that they were the winning horses to join you?
+
+128
+00:10:20.120 --> 00:10:22.120
+<v Artem Koren>The thinking was that, you know,
+
+129
+00:10:22.120 --> 00:10:24.640
+<v Artem Koren>we were a pretty cash-strapped startup.
+
+130
+00:10:24.800 --> 00:10:26.120
+<v Artem Koren>And so the thinking was, okay,
+
+131
+00:10:26.180 --> 00:10:27.760
+<v Artem Koren>so first of all, to afford developers,
+
+132
+00:10:27.840 --> 00:10:29.780
+<v Artem Koren>we need to go to a market
+
+133
+00:10:29.780 --> 00:10:32.620
+<v Artem Koren>where it's less expensive than, let's say, in the US.
+
+134
+00:10:32.840 --> 00:10:37.640
+<v Artem Koren>And so I had some experience traveling in Ukraine.
+
+135
+00:10:37.800 --> 00:10:40.420
+<v Artem Koren>I also happened to speak fluent Russian.
+
+136
+00:10:40.840 --> 00:10:43.560
+<v Artem Koren>And so we started with a core team
+
+137
+00:10:43.560 --> 00:10:45.820
+<v Artem Koren>of about five developers or so
+
+138
+00:10:46.080 --> 00:10:50.900
+<v Artem Koren>out in Ukraine. And that allowed us to build an MVP with very, very manageable budget.
+
+139
+00:10:51.920 --> 00:10:56.000
+<v Artem Koren>The trick there was that I thought, you know, we'd hire these guys and then I'd go back to New York
+
+140
+00:10:56.000 --> 00:11:00.600
+<v Artem Koren>and I'd manage them remotely. But very quickly, you know, within a matter of a few days, I realized
+
+141
+00:11:00.600 --> 00:11:06.800
+<v Artem Koren>that I can't leave because there's so much interaction that we're constantly, constantly
+
+142
+00:11:06.800 --> 00:11:13.620
+<v Artem Koren>sharing information that they really needed, you know, my presence there. And the guys were more
+
+143
+00:11:13.620 --> 00:11:20.880
+<v Artem Koren>more junior. And I think if I didn't have the technical depth that I had, it probably would
+
+144
+00:11:20.880 --> 00:11:27.340
+<v Artem Koren>have been a no-go. But because I could give them enough guidance and show them, okay, this is the
+
+145
+00:11:27.340 --> 00:11:31.180
+<v Artem Koren>kind of thing that I'm looking for. This is the kind of architecture that I'm thinking about.
+
+146
+00:11:31.440 --> 00:11:36.780
+<v Artem Koren>This is the kind of experience. This is one way we can technically make these things work.
+
+147
+00:11:37.260 --> 00:11:42.860
+<v Artem Koren>They would be able to kind of fill in the rest. And as I mentioned, we already had that skeleton
+
+148
+00:11:43.620 --> 00:11:49.620
+<v Artem Koren>of a SaaS platform. And so they weren't starting with zero. And so with that, you know, my expertise
+
+149
+00:11:49.620 --> 00:11:55.880
+<v Artem Koren>plus their enthusiasm and zero fear, you're able to get things done. I think the zero fear thing
+
+150
+00:11:55.880 --> 00:11:58.900
+<v Artem Koren>is very important. You know, there are some decisions that they're going to make that you're
+
+151
+00:11:58.900 --> 00:12:06.400
+<v Artem Koren>going to need to revisit later. But at the same time, they're very enthusiastic and not apprehensive
+
+152
+00:12:06.400 --> 00:12:12.100
+<v Artem Koren>about solving a different difficult problem that an experienced developer would be like, you're out
+
+153
+00:12:13.620 --> 00:12:14.620
+<v Artem Koren>we can do this in a month.
+
+154
+00:12:17.140 --> 00:12:19.900
+<v Noah Labhart>Let's flip to scalability then. And this will be interesting.
+
+155
+00:12:20.140 --> 00:12:25.840
+<v Noah Labhart>Did you build this to scale efficiently from day one or with scale in mind,
+
+156
+00:12:25.880 --> 00:12:29.200
+<v Noah Labhart>or have you been fighting this as you grow and gain traction?
+
+157
+00:12:31.820 --> 00:12:39.620
+<v Artem Koren>We were building with scale in mind. However, scalability is one of those things that it's very,
+
+158
+00:12:39.620 --> 00:12:47.000
+<v Artem Koren>very difficult to know that your product is well scaled because the test for scalability is complex
+
+159
+00:12:47.000 --> 00:12:53.580
+<v Artem Koren>and in our case very difficult to execute and to build a worthwhile test suite would be as complex
+
+160
+00:12:53.580 --> 00:12:58.860
+<v Artem Koren>as building you know real features in the product and so we always had to opt for the real features
+
+161
+00:12:58.860 --> 00:13:06.700
+<v Artem Koren>rather than the scalability test once the platform really got traction by virtue of the of the
+
+162
+00:13:06.700 --> 00:13:10.320
+<v Artem Koren>the traffic and the platform, we found the places where we weren't scalable.
+
+163
+00:13:11.100 --> 00:13:16.080
+<v Artem Koren>With every growth spurt, we would identify kind of the next weakest link in the environment
+
+164
+00:13:16.080 --> 00:13:20.420
+<v Artem Koren>and start to patch that link and then, you know, find the next.
+
+165
+00:13:20.560 --> 00:13:24.820
+<v Artem Koren>And then, you know, eventually we got to a point where we're very comfortable with the
+
+166
+00:13:24.820 --> 00:13:28.740
+<v Artem Koren>end-to-end and we have some custom, I would say, scaling mechanisms.
+
+167
+00:13:28.840 --> 00:13:34.260
+<v Artem Koren>Like we scale in a custom way where we shape our usage pattern.
+
+168
+00:13:34.260 --> 00:13:39.440
+<v Artem Koren>Because you can imagine that an AI meeting assistant, we're very active during working hours, wherever they may be.
+
+169
+00:13:39.540 --> 00:13:42.720
+<v Artem Koren>But then after work hours, there's very little activity on the platform.
+
+170
+00:13:42.980 --> 00:13:48.940
+<v Artem Koren>And so we needed to be able to scale with that load to also be cost effective in the way we manage our cloud.
+
+171
+00:13:49.120 --> 00:13:53.740
+<v Artem Koren>And so we built some custom solutions for scaling different parts of our system differently.
+
+172
+00:13:54.220 --> 00:13:59.480
+<v Artem Koren>All the while, of course, from the very get-go, we were Dockerized and we were using Kubernetes and things like that.
+
+173
+00:13:59.480 --> 00:14:06.680
+<v Artem Koren>But in many cases that that wasn't enough, especially in our case, like it's interesting, you know, meetings tend to start at the top of the hour.
+
+174
+00:14:06.820 --> 00:14:15.900
+<v Artem Koren>And so you would have like this barrage of instantiation of meeting sessions all around the same time and then meetings finish around the same time.
+
+175
+00:14:16.000 --> 00:14:24.660
+<v Artem Koren>And so you really have to build a platform that can scale very flexibly and quickly on demand and handle these peak loads, which we were constantly having.
+
+176
+00:14:26.120 --> 00:14:31.700
+<v Noah Labhart>well Artem as you step out on the balcony and you look across all that you've built
+
+177
+00:14:31.700 --> 00:14:33.140
+<v Noah Labhart>what are you most proud of
+
+178
+00:14:33.140 --> 00:14:39.420
+<v Artem Koren>I'll probably say the the the overall Sembly team and organization
+
+179
+00:14:39.420 --> 00:14:46.340
+<v Artem Koren>that we were able to build I think that's probably the the number one most proud like the people how
+
+180
+00:14:46.340 --> 00:14:53.040
+<v Artem Koren>they're organized the the company taste that we have our style of work how everyone collaborates
+
+181
+00:14:55.040 --> 00:15:00.200
+<v Artem Koren>machine that we were able to stand up with, I'm most proud of. If, you know, if we're going to
+
+182
+00:15:00.200 --> 00:15:04.680
+<v Artem Koren>go into like different solutions or business decisions, there's so many candidates for that
+
+183
+00:15:04.680 --> 00:15:10.020
+<v Artem Koren>spot. But I think if I had to pick one, it would be, you know, our company culture and the team
+
+184
+00:15:10.020 --> 00:15:14.040
+<v Artem Koren>organization around that culture. Okay,
+
+185
+00:15:14.120 --> 00:15:15.800
+<v Noah Labhart>let's flip the script a little bit.
+
+186
+00:15:16.220 --> 00:15:21.080
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+187
+00:15:22.520 --> 00:15:29.800
+<v Artem Koren>we didn't start to build telemetry into our product until much later than would have been
+
+188
+00:15:29.800 --> 00:15:35.500
+<v Artem Koren>optimal which means that for a long time we were kind of flying blind and we weren't really sure
+
+189
+00:15:35.500 --> 00:15:39.880
+<v Artem Koren>if there were issues happening in certain parts of the system that if they were happening why
+
+190
+00:15:39.880 --> 00:15:44.780
+<v Artem Koren>they were happening who they were impacting how frequently and so on and it took us a while
+
+191
+00:15:44.780 --> 00:15:52.080
+<v Artem Koren>to get around to building this telemetry into every step of the way of our user's journey
+
+192
+00:15:52.080 --> 00:15:58.720
+<v Artem Koren>with Sembly then we started to be able to ask good questions and get answers to those questions
+
+193
+00:15:58.720 --> 00:16:04.420
+<v Artem Koren>as far as what's happening when users use our platform and so today we have a lot of telemetry
+
+194
+00:16:04.420 --> 00:16:09.360
+<v Artem Koren>and we know a lot about how the our users want Sembly to attend like which languages they use
+
+195
+00:16:09.360 --> 00:16:13.900
+<v Artem Koren>like you know how you know how long they stay on calls like all sorts of things like what parts of
+
+196
+00:16:14.780 --> 00:16:21.000
+<v Artem Koren>they use and how often. And that really, really helps. You're always challenged with like something
+
+197
+00:16:21.000 --> 00:16:26.300
+<v Artem Koren>happens. Why did this happen? You have to be able to have good telemetry to be able to answer those
+
+198
+00:16:26.300 --> 00:16:30.980
+<v Artem Koren>questions. And that I think didn't let us correct certain things quick enough, very early.
+
+199
+00:16:33.020 --> 00:16:37.960
+<v Noah Labhart>Well, this will be fun to ask Artem. I'm always interested to hear the founder's perspective here.
+
+200
+00:16:38.160 --> 00:16:42.040
+<v Noah Labhart>What does the future look like for the product and for your team?
+
+201
+00:16:43.980 --> 00:16:51.260
+<v Artem Koren>there's so much possibility for what we've built with Sembly. I believe we're just scratching the
+
+202
+00:16:51.260 --> 00:16:57.300
+<v Artem Koren>surface so it's items that we're generating today from team conversations meeting notes task
+
+203
+00:16:57.300 --> 00:17:05.860
+<v Artem Koren>that's kind of like the low-hanging fruit and the the big challenge to date was effectively
+
+204
+00:17:05.860 --> 00:17:21.500
+<v Artem Koren>Effectively being able to flow into our users' day-to-day meeting environment, making it very fluid to be able to participate in any meeting they're on and to effectively capture their conversations and turn them into something that we can analyze.
+
+205
+00:17:22.000 --> 00:17:25.520
+<v Artem Koren>And a lot, a lot, a lot of the platform is based on that.
+
+206
+00:17:25.540 --> 00:17:30.120
+<v Artem Koren>And, you know, to do that not only for individuals, but to do that in like large corporate environments.
+
+207
+00:17:30.120 --> 00:17:43.060
+<v Artem Koren>In the years that are coming, you have to think about the fact that as these AI teammates hang out with you in your conversations, they're basically made aware of everything that's going on in your team.
+
+208
+00:17:43.160 --> 00:17:47.820
+<v Artem Koren>And so they're starting to build this digital trail of your work activity.
+
+209
+00:17:47.820 --> 00:18:08.080
+<v Artem Koren>And you can see how an AI who has full awareness of this digital trail of each individual in the team plus the team as a whole can now make intelligent decisions or notice certain things that it can communicate to team members, it can communicate to team leads, and it can also communicate across teams.
+
+210
+00:18:08.080 --> 00:18:24.880
+<v Artem Koren>And so the future is, you know, one of the paths in the future is this enterprise awareness in organizations where there's this kind of a second brain that's behind the scenes, that's aware of all of the things that are happening on teams.
+
+211
+00:18:24.880 --> 00:18:41.120
+<v Artem Koren>And in practically real time can relay that information across different AI nodes in the organization and measure that in next to real time against strategic value metrics, performance metrics, against certain competitive metrics.
+
+212
+00:18:41.440 --> 00:18:49.460
+<v Artem Koren>And you can imagine as an organization coming alive, the nerve endings can respond almost instantaneously.
+
+213
+00:18:49.460 --> 00:19:07.500
+<v Artem Koren>Whereas today, if you go to an enterprise environment, they try to do these things. But these things take, in the best case, a quarter, but in most cases, a couple of quarters to do what's called strategic alignment and project portfolio optimization, which is some of the things we used to do in management consulting back in the day.
+
+214
+00:19:07.500 --> 00:19:13.700
+<v Artem Koren>these are very manual takes a very long time takes a lot of hours a lot of effort and you know there's
+
+215
+00:19:13.700 --> 00:19:19.420
+<v Artem Koren>there's a lot of variance to to the the results because it's very human reliant on who and how
+
+216
+00:19:19.420 --> 00:19:24.300
+<v Artem Koren>is managing these kinds of efforts often they fall to the pmo sometimes not but it's a very like
+
+217
+00:19:24.300 --> 00:19:30.480
+<v Artem Koren>frozen in time process whereas now you can have an organization that becomes highly responsive
+
+218
+00:19:31.100 --> 00:19:35.180
+<v Artem Koren>to everything that's going on all the all at the same time it kind of can feel itself
+
+219
+00:19:35.180 --> 00:19:37.460
+<v Artem Koren>through the nodes of all of its team members
+
+220
+00:19:37.460 --> 00:19:41.240
+<v Artem Koren>because it has a tentacle that's kind of this AI tentacle
+
+221
+00:19:41.240 --> 00:19:43.900
+<v Artem Koren>in all of the team members through this AI teammate
+
+222
+00:19:43.900 --> 00:19:46.720
+<v Artem Koren>that hangs out with you and participates with you on all your meetings.
+
+223
+00:19:47.380 --> 00:19:50.580
+<v Artem Koren>Sounds a little sci-fi, but I think that's the world we live in.
+
+224
+00:19:51.960 --> 00:19:53.100
+<v Noah Labhart>Let's switch to you, Artem.
+
+225
+00:19:53.220 --> 00:19:55.340
+<v Noah Labhart>Who influences the way that you work?
+
+226
+00:19:55.540 --> 00:19:59.960
+<v Noah Labhart>Name a person or many persons or something that you look up to and why.
+
+227
+00:20:02.320 --> 00:20:09.340
+<v Artem Koren>Well, there's the classics, like Steve Jobs and how he used to think about product and organization.
+
+228
+00:20:10.100 --> 00:20:12.820
+<v Artem Koren>I really like what he has to say.
+
+229
+00:20:13.760 --> 00:20:19.460
+<v Artem Koren>And then I think it's like a big mix of some of the popular voices in tech.
+
+230
+00:20:19.740 --> 00:20:25.540
+<v Artem Koren>I like what Yann LeCun has to say with regards to how to approach AI.
+
+231
+00:20:25.540 --> 00:20:30.980
+<v Artem Koren>He's very even keeled and practical and he doesn't give into the hype.
+
+232
+00:20:31.240 --> 00:20:39.340
+<v Artem Koren>The way we think about engineering solutions and innovation, I pay a lot of attention to what he has to say.
+
+233
+00:20:39.980 --> 00:20:45.000
+<v Artem Koren>There's no like one person that I will kind of single out like this.
+
+234
+00:20:45.080 --> 00:20:48.000
+<v Artem Koren>You know, this is exactly the person that that I want to emulate.
+
+235
+00:20:48.000 --> 00:20:56.200
+<v Artem Koren>I think I kind of survey across the landscape and then I pick out things that I think resonate with me really well and try to adopt those things.
+
+236
+00:20:57.860 --> 00:20:59.080
+<v Noah Labhart>Okay, last question, Artem.
+
+237
+00:20:59.200 --> 00:21:04.320
+<v Noah Labhart>So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+238
+00:21:04.620 --> 00:21:05.720
+<v Noah Labhart>They're jazzed about it.
+
+239
+00:21:05.780 --> 00:21:09.260
+<v Noah Labhart>They can't wait to show it off to the world and can't wait to show it off to you right there on the plane.
+
+240
+00:21:09.820 --> 00:21:13.620
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+241
+00:21:14.640 --> 00:21:24.760
+<v Artem Koren>it first of all every startup is a unique organism in the unique ecosystem and my first advice is
+
+242
+00:21:25.280 --> 00:21:31.240
+<v Artem Koren>take every piece of advice with a grain of salt there is no prescription to a successful startup
+
+243
+00:21:31.240 --> 00:21:37.220
+<v Artem Koren>it just doesn't exist that's like saying what's the perfect living organism okay i mean like a
+
+244
+00:21:37.220 --> 00:21:43.460
+<v Artem Koren>fish okay and land that's not going to survive human okay in the space in the cosmos like outside
+
+245
+00:21:43.620 --> 00:21:50.480
+<v Artem Koren>atmosphere, we won't survive. So it really depends on the timing, the environment, some of the social
+
+246
+00:21:50.480 --> 00:21:56.840
+<v Artem Koren>tendencies, some of the technical tendencies, like what business problems are in vogue at the time,
+
+247
+00:21:56.840 --> 00:22:02.880
+<v Artem Koren>so, so much the financial landscape. There's so, so many factors and they all culminating in this
+
+248
+00:22:02.880 --> 00:22:09.520
+<v Artem Koren>one startup. The first thing is like recognize that you're a unique and special marble and
+
+249
+00:22:09.520 --> 00:22:13.940
+<v Artem Koren>And there's nothing universal that will apply to you that applies to everyone else.
+
+250
+00:22:13.980 --> 00:22:16.900
+<v Artem Koren>That said, you have to keep your ears open.
+
+251
+00:22:17.020 --> 00:22:24.420
+<v Artem Koren>You have to keep your antennas up and listen as much as possible and then see if what you're
+
+252
+00:22:24.420 --> 00:22:26.120
+<v Artem Koren>doing is getting you progress.
+
+253
+00:22:26.460 --> 00:22:34.060
+<v Artem Koren>By progress, that is, are you seeing growing enthusiasm from people who you talk to about
+
+254
+00:22:34.060 --> 00:22:36.040
+<v Artem Koren>your product or idea?
+
+255
+00:22:36.040 --> 00:22:46.540
+<v Artem Koren>Yeah. If you're already in a stage where you have a product or an MVP to show or people, you know, wanting to bring this in rather than you having to explain to them why they need it.
+
+256
+00:22:46.600 --> 00:22:53.020
+<v Artem Koren>So kind of pay attention to those like very intuitive indicators that there's a pull for your product.
+
+257
+00:22:53.200 --> 00:22:56.540
+<v Artem Koren>And I think and that's the question of market market fit.
+
+258
+00:22:56.700 --> 00:23:02.960
+<v Artem Koren>Probably the most in our experience, maybe not for every product, but in our experience, this has been the most challenging, challenging question.
+
+259
+00:23:02.960 --> 00:23:08.160
+<v Artem Koren>And it's like, how do you find a fit for the product in such a way that it generates demand?
+
+260
+00:23:08.380 --> 00:23:11.340
+<v Artem Koren>And it took us a while to get there, luckily, some correct notes.
+
+261
+00:23:11.560 --> 00:23:15.320
+<v Artem Koren>And then now, you know, we're very successful in terms of our growth.
+
+262
+00:23:15.580 --> 00:23:17.140
+<v Artem Koren>But I would say, yeah, I would say that.
+
+263
+00:23:17.200 --> 00:23:18.260
+<v Artem Koren>I would say it's like you're unique.
+
+264
+00:23:18.540 --> 00:23:20.300
+<v Artem Koren>There's no kind of advice that's universal.
+
+265
+00:23:20.800 --> 00:23:26.680
+<v Artem Koren>That said, talk to a lot of people, get a lot of feedback and start to notice what are
+
+266
+00:23:26.680 --> 00:23:29.900
+<v Artem Koren>the, you know, what are some common themes and are you getting that pull?
+
+267
+00:23:30.020 --> 00:23:32.340
+<v Artem Koren>And if you're not getting that pull, that means you have some work to do.
+
+268
+00:23:32.960 --> 00:23:39.100
+<v Noah Labhart>That's great advice. Well, Artem, thank you for being on the show today. And thank you for telling the creation story of Sembly AI.
+
+269
+00:23:39.860 --> 00:23:40.920
+<v Artem Koren>Thank you for having me.
+
+270
+00:23:42.900 --> 00:23:45.940
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+271
+00:23:49.600 --> 00:23:57.600
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+272
+00:23:57.600 --> 00:24:02.620
+<v Noah Labhart>and when you get a chance leave us a review both things help us out tremendously
+
+273
+00:24:05.200 --> 00:24:07.040
+<v Noah Labhart>and thanks again for listening

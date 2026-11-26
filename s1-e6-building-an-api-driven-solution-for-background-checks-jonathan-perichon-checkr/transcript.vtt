@@ -1,0 +1,1627 @@
+WEBVTT
+
+NOTE S1 E6: Building an API Driven Solution for Background Checks | Jonathan Perichon (Checkr)
+
+1
+00:00:00.000 --> 00:00:29.700
+<v Noah Labhart>Hey, before we start the show, I'd like to give a shout out to a very special sponsor of the Code Story podcast, and that's DevMountain. DevMountain is one of the highest rated coding schools in the country, employing experts who are passionate about sharing their craft and empowering the next wave of programmers. Through their bootcamp, they accelerate education by focusing on modern skills to align their students with the needs of the tech industry. They offer a variety of courses from web development to
+
+2
+00:00:30.000 --> 00:00:35.200
+<v Noah Labhart>design to iOS development, and their hands-on approach enables students to launch their
+
+3
+00:00:35.200 --> 00:00:41.020
+<v Noah Labhart>careers or build their startups, and ultimately to achieve their goals. I can personally vouch
+
+4
+00:00:41.020 --> 00:00:45.680
+<v Noah Labhart>for the quality developers they produce, having hired six graduates from their Dallas campus.
+
+5
+00:00:46.160 --> 00:00:50.360
+<v Noah Labhart>Not only does DevMountain teach the practical skills needed to build software,
+
+6
+00:00:50.580 --> 00:00:55.500
+<v Noah Labhart>they give their students a foundation to amplify the necessary creative thinking,
+
+7
+00:00:55.500 --> 00:01:01.200
+<v Noah Labhart>problem solving, and project-focused skills required for tech professionals today.
+
+8
+00:01:02.020 --> 00:01:07.780
+<v Noah Labhart>You can find out more information about their programs and how to sign up at devmountain.com.
+
+9
+00:01:08.060 --> 00:01:10.660
+<v Noah Labhart>That's D-E-V-M-O-U-N-T-A-I-N dot com.
+
+10
+00:01:14.520 --> 00:01:19.960
+<v Jonathan Perichon>I was pretty much a nerd since as long as I can remember.
+
+11
+00:01:21.440 --> 00:01:23.560
+<v Jonathan Perichon>At heart, we are a technology company.
+
+12
+00:01:25.500 --> 00:01:31.800
+<v Jonathan Perichon>in the industry we tackled it with technology first approach. It was our first time being
+
+13
+00:01:31.800 --> 00:01:40.320
+<v Jonathan Perichon>managers so you can imagine we made our own mistakes. The day I don't learn anymore I think
+
+14
+00:01:40.800 --> 00:01:49.760
+<v Jonathan Perichon>probably not a good sign. The most important was to hire a great culture fit especially on the
+
+15
+00:01:49.760 --> 00:01:50.600
+<v Jonathan Perichon>the humility side.
+
+16
+00:01:57.100 --> 00:01:58.860
+<v Noah Labhart>This is Code Story,
+
+17
+00:01:59.380 --> 00:02:02.480
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+18
+00:02:02.480 --> 00:02:06.220
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+19
+00:02:06.220 --> 00:02:10.240
+<v Noah Labhart>and build and lead a team that has your back.
+
+20
+00:02:11.460 --> 00:02:13.300
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+21
+00:02:13.440 --> 00:02:18.120
+<v Noah Labhart>And today, how Jonathan Perichon was introduced to the pains of background checks
+
+22
+00:02:19.760 --> 00:02:25.160
+<v Noah Labhart>make it better with an API. All this and more on Code Story.
+
+23
+00:02:27.780 --> 00:02:33.340
+<v Noah Labhart>Through a chance internship in LA, Jonathan Perichon made his way from France to the United
+
+24
+00:02:33.340 --> 00:02:38.440
+<v Noah Labhart>States. In doing so, he fell in love with the culture and opportunity of Silicon Valley.
+
+25
+00:02:39.500 --> 00:02:43.200
+<v Noah Labhart>After working for a startup requiring background checks for its users,
+
+26
+00:02:43.360 --> 00:02:47.040
+<v Noah Labhart>he saw firsthand how antiquated and slow the process can be.
+
+27
+00:02:47.900 --> 00:03:00.680
+<v Noah Labhart>After about six months, he and his co-founder set off to build an API-driven solution, facilitating the submission, reporting, and workflow of background checks for candidate workers, and much, much more.
+
+28
+00:03:02.600 --> 00:03:08.840
+<v Noah Labhart>I would love to learn more about you, Jonathan. Tell me how you got started and founded Checkr.
+
+29
+00:03:08.840 --> 00:03:09.560
+<v Jonathan Perichon>So
+
+30
+00:03:09.560 --> 00:03:18.920
+<v Jonathan Perichon>as you can hear it from my accent, I'm from France. I grew up in a small town in the countryside called Vichy.
+
+31
+00:03:19.100 --> 00:03:26.640
+<v Jonathan Perichon>I did my studies there. I was pretty much a nerd since as long as I can remember.
+
+32
+00:03:26.640 --> 00:03:31.940
+<v Jonathan Perichon>So it was a no-brainer to study computer science back home.
+
+33
+00:03:32.080 --> 00:03:39.120
+<v Jonathan Perichon>And then moved to LA for kind of an experiment, an internship.
+
+34
+00:03:40.340 --> 00:03:46.180
+<v Jonathan Perichon>Loved the life there, and that's how I kind of migrated to the US.
+
+35
+00:03:47.170 --> 00:03:50.260
+<v Jonathan Perichon>So it's been about six, seven years now.
+
+36
+00:03:50.740 --> 00:03:54.720
+<v Jonathan Perichon>Yes, so with my co-founder, Daniel, a good friend as well,
+
+37
+00:03:56.640 --> 00:04:00.860
+<v Jonathan Perichon>on-demand delivery company called Deliv in the Bay Area.
+
+38
+00:04:02.400 --> 00:04:08.320
+<v Jonathan Perichon>And, you know, we were recruiting hundreds of delivery drivers every week.
+
+39
+00:04:09.200 --> 00:04:11.700
+<v Jonathan Perichon>We are doing background checks on them.
+
+40
+00:04:12.220 --> 00:04:16.200
+<v Jonathan Perichon>So that was really our first exposure to the background check industry.
+
+41
+00:04:17.040 --> 00:04:18.880
+<v Jonathan Perichon>We are both coming from France.
+
+42
+00:04:19.560 --> 00:04:21.520
+<v Jonathan Perichon>In France, actually, there's no background checks.
+
+43
+00:04:21.780 --> 00:04:24.240
+<v Jonathan Perichon>So we don't even know it was a world.
+
+44
+00:04:24.240 --> 00:04:31.860
+<v Jonathan Perichon>so we had to learn a lot and what we've noticed back then I believe is the kind
+
+45
+00:04:31.860 --> 00:04:38.660
+<v Jonathan Perichon>of current solutions were really archaic, there was no good technology, there was
+
+46
+00:04:38.660 --> 00:04:48.660
+<v Jonathan Perichon>no good APIs, it was very kind of older generation products. So that's kind of
+
+47
+00:04:48.660 --> 00:04:51.220
+<v Jonathan Perichon>what started to spike our interest,
+
+48
+00:04:52.130 --> 00:04:53.620
+<v Jonathan Perichon>especially on the API side.
+
+49
+00:04:53.960 --> 00:04:59.640
+<v Jonathan Perichon>We love simple, well-designed APIs as big nerds.
+
+50
+00:04:59.660 --> 00:05:03.060
+<v Jonathan Perichon>And so seeing hundreds of pages,
+
+51
+00:05:03.140 --> 00:05:06.480
+<v Jonathan Perichon>page of SOAP API on a Word document
+
+52
+00:05:06.480 --> 00:05:09.900
+<v Jonathan Perichon>from the industry was really shocking
+
+53
+00:05:09.900 --> 00:05:12.320
+<v Jonathan Perichon>and it was really the thing that pushed us
+
+54
+00:05:12.320 --> 00:05:13.660
+<v Jonathan Perichon>to look into this industry.
+
+55
+00:05:13.960 --> 00:05:17.920
+<v Noah Labhart>Is Daniel a tech background guy as well?
+
+56
+00:05:18.660 --> 00:05:20.100
+<v Noah Labhart>Is he more on the product side?
+
+57
+00:05:20.340 --> 00:05:20.840
+<v Jonathan Perichon>Yeah,
+
+58
+00:05:20.560 --> 00:05:22.760
+<v Jonathan Perichon>he has a tech background as well.
+
+59
+00:05:22.920 --> 00:05:27.000
+<v Jonathan Perichon>I think he studied electrical engineering.
+
+60
+00:05:28.180 --> 00:05:34.540
+<v Jonathan Perichon>But yeah, we are both software engineers at a couple of companies,
+
+61
+00:05:34.840 --> 00:05:35.880
+<v Jonathan Perichon>a couple of startups.
+
+62
+00:05:36.840 --> 00:05:40.780
+<v Jonathan Perichon>And yeah, we built the initial product together.
+
+63
+00:05:41.640 --> 00:05:45.360
+<v Noah Labhart>When you were working at Deliv, tell me a little bit about Deliv.
+
+64
+00:05:45.360 --> 00:05:46.260
+<v Noah Labhart>So it's on-demand delivery.
+
+65
+00:05:46.440 --> 00:05:47.560
+<v Noah Labhart>What was being delivered?
+
+66
+00:05:48.660 --> 00:05:56.760
+<v Jonathan Perichon>Yeah, so it was really this concept of delivering anything from the mall to your home.
+
+67
+00:05:57.480 --> 00:06:04.180
+<v Jonathan Perichon>So let's say you go shopping in the afternoon, you get a bunch of boxes, a bunch of bags, but you don't have a car.
+
+68
+00:06:04.660 --> 00:06:11.020
+<v Jonathan Perichon>So it was a service to allow people to go shopping in person
+
+69
+00:06:11.020 --> 00:06:12.240
+<v Jonathan Perichon>and
+
+70
+00:06:12.240 --> 00:06:18.220
+<v Jonathan Perichon>receive their package delivered at home the same day.
+
+71
+00:06:18.660 --> 00:06:20.100
+<v Jonathan Perichon>It was same day, different.
+
+72
+00:06:20.780 --> 00:06:24.680
+<v Jonathan Perichon>You know, back then it was a pretty small startup.
+
+73
+00:06:24.900 --> 00:06:27.120
+<v Jonathan Perichon>I think they're doing really well.
+
+74
+00:06:27.300 --> 00:06:31.100
+<v Jonathan Perichon>As far as I can tell on the news, they're still doing well.
+
+75
+00:06:32.140 --> 00:06:37.380
+<v Noah Labhart>So you're at Deliv, you see firsthand the gaps in the background check industry.
+
+76
+00:06:38.020 --> 00:06:40.640
+<v Noah Labhart>You and Daniel put your heads together and decide to take it on.
+
+77
+00:06:40.760 --> 00:06:41.740
+<v Noah Labhart>Tell me about the MVP.
+
+78
+00:06:42.080 --> 00:06:44.180
+<v Noah Labhart>How long did it take to build?
+
+79
+00:06:44.320 --> 00:06:47.040
+<v Noah Labhart>What tools did you start out using and things like that?
+
+80
+00:06:49.540 --> 00:06:56.200
+<v Jonathan Perichon>Because it makes me laugh because for MVP, our goal was really to go as fast as we could.
+
+81
+00:06:56.820 --> 00:07:00.600
+<v Jonathan Perichon>And you have to really fake it with MVP.
+
+82
+00:07:00.940 --> 00:07:08.280
+<v Jonathan Perichon>So I remember, for example, the first really MVP, we built kind of the UI, the front end,
+
+83
+00:07:08.420 --> 00:07:09.460
+<v Jonathan Perichon>the API.
+
+84
+00:07:09.460 --> 00:07:18.140
+<v Jonathan Perichon>But then behind the scene, we were manually requesting background checks using a different
+
+85
+00:07:18.640 --> 00:07:19.360
+<v Jonathan Perichon>background check company.
+
+86
+00:07:19.620 --> 00:07:22.100
+<v Jonathan Perichon>We were hiding all the operations.
+
+87
+00:07:22.920 --> 00:07:26.360
+<v Jonathan Perichon>It looked automated, but behind the scene it was not.
+
+88
+00:07:27.340 --> 00:07:31.060
+<v Noah Labhart>What did you put in front of the end users, in the end users' face then?
+
+89
+00:07:31.140 --> 00:07:36.820
+<v Noah Labhart>Was it just a website with a form or was it something a little more complicated than that?
+
+90
+00:07:36.820 --> 00:07:37.800
+<v Jonathan Perichon>So
+
+91
+00:07:37.800 --> 00:07:42.160
+<v Jonathan Perichon>initially we built an API because that was what we wanted to do.
+
+92
+00:07:42.440 --> 00:07:47.020
+<v Jonathan Perichon>Turns out our first customers didn't want an API yet.
+
+93
+00:07:47.260 --> 00:07:53.980
+<v Jonathan Perichon>And so we built a form, simple form, so that this person was leading operations team,
+
+94
+00:07:54.340 --> 00:08:05.220
+<v Jonathan Perichon>could enter consumer information and starting to invite consumers to fill in their information as well.
+
+95
+00:08:06.820 --> 00:08:15.180
+<v Jonathan Perichon>a form there is a lot of kind of legal jargon and and consents and disclosures so that was a
+
+96
+00:08:15.180 --> 00:08:21.740
+<v Jonathan Perichon>bit difficult you know to actually get in place because we are only two we don't have a legal team
+
+97
+00:08:21.740 --> 00:08:25.180
+<v Jonathan Perichon>so we had to to dig a bit there so
+
+98
+00:08:25.180 --> 00:08:28.880
+<v Noah Labhart>You have this MVP, you've built it, and it's, you know, basically
+
+99
+00:08:28.880 --> 00:08:33.660
+<v Noah Labhart>a front for for a manual process behind it. Where did you take it from there, and what sort of
+
+100
+00:08:33.660 --> 00:08:35.320
+<v Noah Labhart>decisions did you have to make after that?
+
+101
+00:08:35.520 --> 00:08:41.380
+<v Jonathan Perichon>For us at Checkr, we got lucky that in terms of timing,
+
+102
+00:08:42.090 --> 00:08:50.160
+<v Jonathan Perichon>I believe we are really lucky because of the on-demand economy boom. And so when we started
+
+103
+00:08:50.160 --> 00:08:59.960
+<v Jonathan Perichon>in 2014, more and more on-demand economy were growing and scaling or just being created at
+
+104
+00:08:59.960 --> 00:09:05.620
+<v Jonathan Perichon>at that time. And so there was a big need for background checks for those companies that were
+
+105
+00:09:05.620 --> 00:09:12.960
+<v Jonathan Perichon>scaling and hiring contractors. And so pretty early on actually we had a lot of interest
+
+106
+00:09:13.590 --> 00:09:22.540
+<v Jonathan Perichon>from these companies and so we had to work really hard. The good thing is we knew
+
+107
+00:09:22.540 --> 00:09:25.660
+<v Jonathan Perichon>what to build because we had a lot of customer requests.
+
+108
+00:09:26.880 --> 00:09:32.740
+<v Jonathan Perichon>So that led to having good insight on what we needed to build.
+
+109
+00:09:33.060 --> 00:09:35.160
+<v Jonathan Perichon>The scary part is there was a lot.
+
+110
+00:09:35.900 --> 00:09:42.380
+<v Jonathan Perichon>And so there was a lot of demand, a lot of different types of customers and partners
+
+111
+00:09:43.340 --> 00:09:44.840
+<v Jonathan Perichon>in the on-demand space.
+
+112
+00:09:44.840 --> 00:09:53.980
+<v Jonathan Perichon>space. But overall, I see this as a good problem to have. Getting customers really early on
+
+113
+00:09:53.980 --> 00:09:59.480
+<v Jonathan Perichon>really pushed us to build the right products and get to scale pretty quickly.
+
+114
+00:10:00.060 --> 00:10:06.020
+<v Noah Labhart>What named technologies are you using? Are you using Ruby on Rails? Are you using .NET
+
+115
+00:10:06.020 --> 00:10:08.780
+<v Noah Labhart>stack? Are you using Node? What tech are you using?
+
+116
+00:10:08.780 --> 00:10:09.580
+<v Jonathan Perichon>We
+
+117
+00:10:09.580 --> 00:10:12.620
+<v Jonathan Perichon>use Ruby mostly as a language.
+
+118
+00:10:13.340 --> 00:10:17.840
+<v Jonathan Perichon>We discussed we didn't want to use Rails at the time
+
+119
+00:10:17.840 --> 00:10:23.680
+<v Jonathan Perichon>because Rails was coming with all the UI dependencies as well.
+
+120
+00:10:23.800 --> 00:10:25.380
+<v Jonathan Perichon>So it was backend and UI.
+
+121
+00:10:26.160 --> 00:10:29.420
+<v Jonathan Perichon>And we really wanted to decouple the UI from the backend.
+
+122
+00:10:30.260 --> 00:10:34.860
+<v Jonathan Perichon>So we ended up using Sinatra, which is a similar framework.
+
+123
+00:10:34.980 --> 00:10:37.520
+<v Jonathan Perichon>You have to do a bit more manual setup,
+
+124
+00:10:38.780 --> 00:10:40.760
+<v Jonathan Perichon>At the end of the day, it's pretty similar.
+
+125
+00:10:41.000 --> 00:10:42.800
+<v Jonathan Perichon>For the front end, we started with Angular.
+
+126
+00:10:43.500 --> 00:10:46.240
+<v Jonathan Perichon>We are moving to React these days.
+
+127
+00:10:47.340 --> 00:10:50.820
+<v Jonathan Perichon>And one thing that, you know, as engineers,
+
+128
+00:10:50.900 --> 00:10:54.920
+<v Jonathan Perichon>when we started, we wanted to do microservices from the get-go.
+
+129
+00:10:55.660 --> 00:10:59.020
+<v Jonathan Perichon>Turns out it's difficult as you want to go really fast.
+
+130
+00:10:59.300 --> 00:11:01.340
+<v Jonathan Perichon>And I think we got some in place.
+
+131
+00:11:01.400 --> 00:11:02.240
+<v Jonathan Perichon>We had a vision.
+
+132
+00:11:02.680 --> 00:11:07.800
+<v Jonathan Perichon>But, you know, some of the services we wanted to build back then,
+
+133
+00:11:08.780 --> 00:11:10.460
+<v Jonathan Perichon>still haven't been built yet.
+
+134
+00:11:10.500 --> 00:11:12.020
+<v Jonathan Perichon>So, and we are thinking about it.
+
+135
+00:11:12.340 --> 00:11:16.820
+<v Noah Labhart>The customers or the clients that came on and used Checkr,
+
+136
+00:11:16.900 --> 00:11:19.060
+<v Noah Labhart>what's the split between, you know,
+
+137
+00:11:19.060 --> 00:11:23.580
+<v Noah Labhart>sort of pure API usage versus kind of one-off requests?
+
+138
+00:11:24.040 --> 00:11:26.780
+<v Noah Labhart>Is it primarily API versus the other?
+
+139
+00:11:27.040 --> 00:11:27.540
+<v Jonathan Perichon>I would
+
+140
+00:11:27.520 --> 00:11:29.640
+<v Jonathan Perichon>say we have three main use cases.
+
+141
+00:11:29.940 --> 00:11:33.200
+<v Jonathan Perichon>We have large customers and, you know,
+
+142
+00:11:33.260 --> 00:11:36.460
+<v Jonathan Perichon>those companies often do API integration
+
+143
+00:11:37.420 --> 00:11:46.620
+<v Jonathan Perichon>because they want to build more custom flows, they want to have the integration from their mobile app or from their website.
+
+144
+00:11:46.960 --> 00:11:50.700
+<v Jonathan Perichon>So for example, applicants don't have to enter their information twice.
+
+145
+00:11:51.380 --> 00:11:57.740
+<v Jonathan Perichon>So we see a lot of API usage there for companies that have the bigger scale.
+
+146
+00:11:58.060 --> 00:12:00.080
+<v Jonathan Perichon>Then you have smaller companies.
+
+147
+00:12:00.080 --> 00:12:06.120
+<v Jonathan Perichon>We have actually a long tail of smaller businesses and mid-market.
+
+148
+00:12:06.500 --> 00:12:12.600
+<v Jonathan Perichon>And for those companies, typically they don't have an engineering team dedicated on background
+
+149
+00:12:12.600 --> 00:12:13.100
+<v Jonathan Perichon>checks.
+
+150
+00:12:13.460 --> 00:12:18.320
+<v Jonathan Perichon>So they like to use our UI solutions and don't build against the API.
+
+151
+00:12:18.700 --> 00:12:20.780
+<v Jonathan Perichon>But it's still important even...
+
+152
+00:12:20.780 --> 00:12:28.200
+<v Jonathan Perichon>So the API is really useful to request background checks, but then we have very strong kind
+
+153
+00:12:30.320 --> 00:12:31.460
+<v Jonathan Perichon>adjudication workflows.
+
+154
+00:12:32.140 --> 00:12:33.620
+<v Jonathan Perichon>Those live in our dashboard
+
+155
+00:12:33.620 --> 00:12:35.240
+<v Jonathan Perichon>and even our largest customers
+
+156
+00:12:35.240 --> 00:12:37.980
+<v Jonathan Perichon>use those in our own dashboard.
+
+157
+00:12:38.360 --> 00:12:40.580
+<v Noah Labhart>What do you think is the biggest
+
+158
+00:12:41.260 --> 00:12:43.440
+<v Noah Labhart>differentiating factor for Checkr?
+
+159
+00:12:43.560 --> 00:12:45.180
+<v Noah Labhart>There's a handful of, you know,
+
+160
+00:12:45.180 --> 00:12:46.780
+<v Noah Labhart>background check vendors out there.
+
+161
+00:12:46.880 --> 00:12:48.420
+<v Noah Labhart>Some of them have some APIs,
+
+162
+00:12:48.620 --> 00:12:50.520
+<v Noah Labhart>but what makes Checkr,
+
+163
+00:12:50.620 --> 00:12:52.300
+<v Noah Labhart>in your mind, in your pitch,
+
+164
+00:12:52.480 --> 00:12:53.940
+<v Noah Labhart>what makes Checkr the best one out there?
+
+165
+00:12:54.440 --> 00:12:55.920
+<v Jonathan Perichon>I mean, at heart,
+
+166
+00:12:55.960 --> 00:12:57.260
+<v Jonathan Perichon>we are a technology company.
+
+167
+00:12:57.680 --> 00:12:59.860
+<v Jonathan Perichon>Every challenge is in the industry.
+
+168
+00:13:00.080 --> 00:13:03.340
+<v Jonathan Perichon>we tackled it with technology-first approach,
+
+169
+00:13:03.660 --> 00:13:07.420
+<v Jonathan Perichon>which I think is the approach that makes us really appealing.
+
+170
+00:13:08.920 --> 00:13:14.180
+<v Jonathan Perichon>For example, most of our competition really look at every single criminal record
+
+171
+00:13:14.180 --> 00:13:18.800
+<v Jonathan Perichon>that comes in and being reported to classify.
+
+172
+00:13:19.220 --> 00:13:23.720
+<v Jonathan Perichon>And, you know, they have offshore teams to look at them, which have delays.
+
+173
+00:13:23.720 --> 00:13:25.660
+<v Jonathan Perichon>you can have error mistakes,
+
+174
+00:13:25.660 --> 00:13:27.900
+<v Jonathan Perichon>where for us,
+
+175
+00:13:27.900 --> 00:13:29.820
+<v Jonathan Perichon>we use best in class ML
+
+176
+00:13:29.820 --> 00:13:31.820
+<v Jonathan Perichon>to classify charges
+
+177
+00:13:31.820 --> 00:13:34.120
+<v Jonathan Perichon>and move forward
+
+178
+00:13:34.120 --> 00:13:35.980
+<v Jonathan Perichon>faster, like almost instantly,
+
+179
+00:13:35.980 --> 00:13:37.460
+<v Jonathan Perichon>with the results.
+
+180
+00:13:37.460 --> 00:13:39.200
+<v Jonathan Perichon>That's one use case.
+
+181
+00:13:39.200 --> 00:13:42.060
+<v Jonathan Perichon>I think overall, because we are
+
+182
+00:13:42.060 --> 00:13:42.920
+<v Jonathan Perichon>a technology company,
+
+183
+00:13:42.920 --> 00:13:45.960
+<v Jonathan Perichon>we focus on
+
+184
+00:13:45.960 --> 00:13:46.560
+<v Jonathan Perichon>accuracy
+
+185
+00:13:46.560 --> 00:13:49.000
+<v Jonathan Perichon>of the data,
+
+186
+00:13:49.000 --> 00:13:51.840
+<v Jonathan Perichon>we focus on time and automation
+
+187
+00:13:53.940 --> 00:14:00.540
+<v Jonathan Perichon>go down and things are more automated and I think that's kind of the broader approach.
+
+188
+00:14:01.520 --> 00:14:07.460
+<v Noah Labhart>How did you go about building your team? So start out, you and Daniel, and then, you know, you grew, you
+
+189
+00:14:07.460 --> 00:14:11.880
+<v Noah Labhart>had success, I'm sure. You got to a point where you're like, oh my gosh, we need people to help us.
+
+190
+00:14:11.880 --> 00:14:15.000
+<v Noah Labhart>How did you choose the right people to come and join you?
+
+191
+00:14:16.160 --> 00:14:18.580
+<v Jonathan Perichon>I'm laughing because so with Daniel it
+
+192
+00:14:18.580 --> 00:14:21.120
+<v Jonathan Perichon>It was our first time being managers.
+
+193
+00:14:22.260 --> 00:14:26.340
+<v Jonathan Perichon>So you can imagine we made our own mistakes there.
+
+194
+00:14:27.190 --> 00:14:31.280
+<v Jonathan Perichon>Overall, when we started to hire people,
+
+195
+00:14:31.440 --> 00:14:35.020
+<v Jonathan Perichon>I think we are pretty good at designing interviews.
+
+196
+00:14:35.700 --> 00:14:41.420
+<v Jonathan Perichon>The most important was to hire a great culture fit,
+
+197
+00:14:42.030 --> 00:14:43.820
+<v Jonathan Perichon>especially on the humility side.
+
+198
+00:14:44.300 --> 00:14:46.820
+<v Jonathan Perichon>You know, we had a small team.
+
+199
+00:14:48.580 --> 00:14:54.620
+<v Jonathan Perichon>you want really humble people that have grit, at least that was our view on it.
+
+200
+00:14:56.400 --> 00:15:02.940
+<v Jonathan Perichon>So humility was important and and grit was important, so that we work well as a small team.
+
+201
+00:15:03.760 --> 00:15:13.660
+<v Jonathan Perichon>And so initially, so that was our kind of criteria. So no a star star all, even if you're the the best
+
+202
+00:15:13.660 --> 00:15:20.520
+<v Jonathan Perichon>engineer, best in class. If you're not humble and not nice, you wouldn't be training the team.
+
+203
+00:15:21.160 --> 00:15:26.000
+<v Jonathan Perichon>Now you have to think at scale, you know, like initially we were interviewing everyone so that
+
+204
+00:15:26.000 --> 00:15:33.300
+<v Jonathan Perichon>was easier and then you have to kind of put in place frameworks so that team, that other people
+
+205
+00:15:33.950 --> 00:15:40.720
+<v Jonathan Perichon>have the same approach. And I think scaling the culture is the definitely the most
+
+206
+00:15:42.100 --> 00:15:45.820
+<v Jonathan Perichon>difficult, yet the most impactful for the company.
+
+207
+00:15:46.060 --> 00:15:48.740
+<v Jonathan Perichon>And I think we've done fairly well.
+
+208
+00:15:50.000 --> 00:15:50.820
+<v Noah Labhart>That's interesting.
+
+209
+00:15:51.120 --> 00:15:57.160
+<v Noah Labhart>So you mentioned scaling the culture being a challenge and really important.
+
+210
+00:15:57.440 --> 00:16:02.080
+<v Noah Labhart>You know, there's two things, obviously, in the tech startup, scaling the technology and
+
+211
+00:16:02.080 --> 00:16:02.880
+<v Noah Labhart>scaling the culture.
+
+212
+00:16:03.100 --> 00:16:07.160
+<v Noah Labhart>So I would ask, how did you go about both of those things, starting with the culture,
+
+213
+00:16:07.260 --> 00:16:08.320
+<v Noah Labhart>since you just mentioned that?
+
+214
+00:16:08.320 --> 00:16:11.240
+<v Noah Labhart>but then also how did you build the technology to scale?
+
+215
+00:16:12.120 --> 00:16:16.380
+<v Jonathan Perichon>So on culture, I think the biggest move for us
+
+216
+00:16:16.380 --> 00:16:22.140
+<v Jonathan Perichon>was going from us interviewing everyone for any rec
+
+217
+00:16:22.140 --> 00:16:26.720
+<v Jonathan Perichon>to really sitting down with the team,
+
+218
+00:16:26.920 --> 00:16:28.840
+<v Jonathan Perichon>defining our culture and core values,
+
+219
+00:16:29.760 --> 00:16:36.720
+<v Jonathan Perichon>and designing kind of how we evaluate for these core values during interview,
+
+220
+00:16:38.320 --> 00:16:42.460
+<v Jonathan Perichon>our performance and management process.
+
+221
+00:16:43.000 --> 00:16:45.980
+<v Jonathan Perichon>And so I think compared to a lot of companies,
+
+222
+00:16:46.140 --> 00:16:50.720
+<v Jonathan Perichon>we learn from mistakes that other companies have done.
+
+223
+00:16:51.410 --> 00:16:53.940
+<v Jonathan Perichon>One of the recurrent mistakes is not setting,
+
+224
+00:16:54.670 --> 00:16:58.000
+<v Jonathan Perichon>defining your culture early enough.
+
+225
+00:16:58.200 --> 00:17:01.440
+<v Jonathan Perichon>And I think that's something we've done pretty early on,
+
+226
+00:17:01.500 --> 00:17:04.260
+<v Jonathan Perichon>like defining what are our core values
+
+227
+00:17:04.260 --> 00:17:07.700
+<v Jonathan Perichon>and really implementing evaluation of those
+
+228
+00:17:08.320 --> 00:17:09.700
+<v Jonathan Perichon>our interview process.
+
+229
+00:17:10.780 --> 00:17:14.440
+<v Jonathan Perichon>So that was one of the most impactful things
+
+230
+00:17:14.440 --> 00:17:18.660
+<v Jonathan Perichon>that we've done for the company to scale the culture.
+
+231
+00:17:19.580 --> 00:17:21.880
+<v Jonathan Perichon>On the technology side,
+
+232
+00:17:23.320 --> 00:17:26.040
+<v Jonathan Perichon>it's hard to get a one-line answer on this one.
+
+233
+00:17:28.120 --> 00:17:33.040
+<v Jonathan Perichon>One of the biggest challenges for us at Checkr
+
+234
+00:17:33.040 --> 00:17:35.560
+<v Jonathan Perichon>is kind of the domain complexity.
+
+235
+00:17:35.560 --> 00:17:41.460
+<v Jonathan Perichon>city. So the background check, you know, from an end user perspective, it should be simple.
+
+236
+00:17:41.540 --> 00:17:49.180
+<v Jonathan Perichon>It should be input and I get an output, which is a report. But behind the scene, we have
+
+237
+00:17:49.180 --> 00:17:55.260
+<v Jonathan Perichon>to hide a lot of complex requirements, a lot of complex workflows, a lot of domain logic,
+
+238
+00:17:55.520 --> 00:18:01.460
+<v Jonathan Perichon>you know, and sometimes it's different for a specific city, for a specific county, for
+
+239
+00:18:01.460 --> 00:18:03.180
+<v Jonathan Perichon>for a specific type of customer.
+
+240
+00:18:03.660 --> 00:18:06.180
+<v Jonathan Perichon>And so I would say for us,
+
+241
+00:18:06.240 --> 00:18:08.080
+<v Jonathan Perichon>the biggest challenge is really to make
+
+242
+00:18:09.020 --> 00:18:12.240
+<v Jonathan Perichon>all this complexity as simple as we can,
+
+243
+00:18:12.870 --> 00:18:14.340
+<v Jonathan Perichon>which is not always easy.
+
+244
+00:18:14.970 --> 00:18:16.160
+<v Jonathan Perichon>And so, for example,
+
+245
+00:18:16.300 --> 00:18:18.420
+<v Jonathan Perichon>we have to be super thoughtful
+
+246
+00:18:18.420 --> 00:18:20.940
+<v Jonathan Perichon>about what do we want to be able to customize
+
+247
+00:18:22.280 --> 00:18:23.880
+<v Jonathan Perichon>versus not customized.
+
+248
+00:18:24.540 --> 00:18:28.480
+<v Jonathan Perichon>And how do we design our software and workflow
+
+249
+00:18:28.480 --> 00:18:33.900
+<v Jonathan Perichon>so that we anticipate future requirements, future workflows.
+
+250
+00:18:34.760 --> 00:18:37.000
+<v Jonathan Perichon>I would say that's definitely
+
+251
+00:18:37.380 --> 00:18:39.960
+<v Jonathan Perichon>one of the biggest challenge for us.
+
+252
+00:18:40.120 --> 00:18:42.040
+<v Jonathan Perichon>I think in terms of pure scale,
+
+253
+00:18:42.240 --> 00:18:45.820
+<v Jonathan Perichon>so you know what I like to say to engineers,
+
+254
+00:18:46.620 --> 00:18:49.460
+<v Jonathan Perichon>you know, we don't have peta scale,
+
+255
+00:18:49.620 --> 00:18:54.180
+<v Jonathan Perichon>like some of the largest tech companies in the Bay Area,
+
+256
+00:18:54.180 --> 00:19:01.980
+<v Jonathan Perichon>But we have enough scale to be present and we have to be thoughtful about it for everything we do.
+
+257
+00:19:02.140 --> 00:19:05.260
+<v Jonathan Perichon>We do millions of background checks every month.
+
+258
+00:19:06.060 --> 00:19:09.960
+<v Jonathan Perichon>We have hundreds of millions of criminal records.
+
+259
+00:19:10.440 --> 00:19:12.680
+<v Jonathan Perichon>We have to design around it.
+
+260
+00:19:12.880 --> 00:19:20.660
+<v Jonathan Perichon>But I think the most challenging is really how do we scale and simplify the business logic and the domain.
+
+261
+00:19:21.020 --> 00:19:23.760
+<v Noah Labhart>Tell me about some of the mistakes you made along the way.
+
+262
+00:19:24.180 --> 00:19:25.800
+<v Noah Labhart>How did you react to them? What did you learn?
+
+263
+00:19:26.260 --> 00:19:28.520
+<v Jonathan Perichon>We've done a fair amount of mistakes.
+
+264
+00:19:29.080 --> 00:19:33.220
+<v Jonathan Perichon>I think if you don't make mistakes, that means you don't go fast enough.
+
+265
+00:19:33.660 --> 00:19:37.440
+<v Jonathan Perichon>At the end of the day, you're a man, so you're still going to make mistakes anyway.
+
+266
+00:19:38.020 --> 00:19:40.940
+<v Jonathan Perichon>We made some early mistakes.
+
+267
+00:19:41.440 --> 00:19:51.560
+<v Jonathan Perichon>Some early mistakes where we chose to use MongoDB as main data store for all our data models.
+
+268
+00:19:51.560 --> 00:19:56.740
+<v Jonathan Perichon>We quickly found out that it was not working well,
+
+269
+00:19:56.960 --> 00:20:01.560
+<v Jonathan Perichon>like the usage of MongoDB was not the right fit for all.
+
+270
+00:20:01.760 --> 00:20:03.460
+<v Jonathan Perichon>It was great for some use cases,
+
+271
+00:20:03.740 --> 00:20:07.600
+<v Jonathan Perichon>but for some more relational use cases,
+
+272
+00:20:07.720 --> 00:20:09.400
+<v Jonathan Perichon>it was really not working and not scaling.
+
+273
+00:20:10.460 --> 00:20:16.020
+<v Jonathan Perichon>So we had to quickly migrate some of the things over on the MySQL side.
+
+274
+00:20:16.300 --> 00:20:20.740
+<v Jonathan Perichon>That was like a first design mistake, I would say.
+
+275
+00:20:21.560 --> 00:20:26.340
+<v Jonathan Perichon>And I can think of mistakes we've done in terms of prioritization.
+
+276
+00:20:26.760 --> 00:20:31.980
+<v Jonathan Perichon>And those are painful because, you know, as you scale the team,
+
+277
+00:20:32.160 --> 00:20:38.320
+<v Jonathan Perichon>I mean, we are still understaffed, but we are even more understaffed back then.
+
+278
+00:20:38.580 --> 00:20:44.720
+<v Jonathan Perichon>And so prioritization mistakes really bites you on how fast you can go.
+
+279
+00:20:45.580 --> 00:20:49.460
+<v Jonathan Perichon>And so, for example, us building the full API first
+
+280
+00:20:49.460 --> 00:20:55.440
+<v Jonathan Perichon>and not building the UI was kind of eye-opening
+
+281
+00:20:55.440 --> 00:20:58.080
+<v Jonathan Perichon>because we built what we wanted to build
+
+282
+00:20:58.080 --> 00:21:00.440
+<v Jonathan Perichon>and not what the customer wanted.
+
+283
+00:21:01.940 --> 00:21:05.240
+<v Jonathan Perichon>And so I think we learned that.
+
+284
+00:21:06.020 --> 00:21:09.860
+<v Jonathan Perichon>I mean, the good thing is early mistakes,
+
+285
+00:21:10.640 --> 00:21:13.960
+<v Jonathan Perichon>most of the time you can fix pretty quickly.
+
+286
+00:21:14.900 --> 00:21:17.820
+<v Jonathan Perichon>But then the more the product grows,
+
+287
+00:21:19.460 --> 00:21:22.820
+<v Jonathan Perichon>the harder it gets, I think.
+
+288
+00:21:22.960 --> 00:21:26.040
+<v Jonathan Perichon>I think now we are pretty customer-centric
+
+289
+00:21:27.500 --> 00:21:29.820
+<v Jonathan Perichon>and we spend a lot of time with customers.
+
+290
+00:21:29.940 --> 00:21:33.520
+<v Jonathan Perichon>So I don't think a mistake like this can happen again.
+
+291
+00:21:33.900 --> 00:21:37.780
+<v Noah Labhart>What does the future look like for the product and for the team?
+
+292
+00:21:38.120 --> 00:21:38.640
+<v Jonathan Perichon>For
+
+293
+00:21:38.640 --> 00:21:43.400
+<v Jonathan Perichon>the team, I mean, overall, our business is going really well.
+
+294
+00:21:43.760 --> 00:21:45.340
+<v Jonathan Perichon>We have tremendous growth.
+
+295
+00:21:45.340 --> 00:21:49.660
+<v Jonathan Perichon>We have a lot of interested potential customers.
+
+296
+00:21:50.180 --> 00:21:52.400
+<v Jonathan Perichon>We have a lot of customers coming on board.
+
+297
+00:21:52.780 --> 00:21:54.720
+<v Jonathan Perichon>Our existing customers are growing.
+
+298
+00:21:55.280 --> 00:21:58.760
+<v Jonathan Perichon>So overall, there's a lot of business traction.
+
+299
+00:21:59.160 --> 00:22:07.000
+<v Jonathan Perichon>And so our current focus is really to scale our initial insight that we apply to most
+
+300
+00:22:07.000 --> 00:22:12.640
+<v Jonathan Perichon>on-demand companies to the mainstream industry of enterprise in the US.
+
+301
+00:22:12.640 --> 00:22:24.360
+<v Jonathan Perichon>So really going enterprise is our focus, which means for our product, we have some kind of stopgap capabilities that we are building.
+
+302
+00:22:24.900 --> 00:22:31.160
+<v Jonathan Perichon>So, you know, like at scale, you need to build SSO and there's not much to do about it.
+
+303
+00:22:31.840 --> 00:22:36.760
+<v Jonathan Perichon>And so one big focus is really being product ready for the enterprise.
+
+304
+00:22:36.760 --> 00:22:42.480
+<v Jonathan Perichon>And on the flip side of that is keep innovating in the industry.
+
+305
+00:22:42.740 --> 00:22:46.180
+<v Jonathan Perichon>As a tech company, that's how we make the most difference.
+
+306
+00:22:46.660 --> 00:22:53.760
+<v Jonathan Perichon>And we want to make sure to make progress on both innovation and product capabilities for go-to-market strategy.
+
+307
+00:22:54.540 --> 00:22:59.700
+<v Jonathan Perichon>To do that, we are scaling the team. We are doubling every year pretty much.
+
+308
+00:22:59.700 --> 00:23:03.340
+<v Jonathan Perichon>You know, we're opening up an office in Denver this year.
+
+309
+00:23:04.060 --> 00:23:07.060
+<v Jonathan Perichon>So I'm personally excited about this one.
+
+310
+00:23:07.620 --> 00:23:12.320
+<v Jonathan Perichon>Yeah, I mean, on my end, I don't write code anymore.
+
+311
+00:23:12.540 --> 00:23:20.120
+<v Jonathan Perichon>And so it's really about helping to scale the team and a lot of recruiting so that we can achieve our mission.
+
+312
+00:23:20.680 --> 00:23:22.540
+<v Noah Labhart>You said your hands are out of the code now.
+
+313
+00:23:23.420 --> 00:23:25.060
+<v Noah Labhart>You're doing more leadership now.
+
+314
+00:23:25.440 --> 00:23:26.820
+<v Noah Labhart>What's next for you personally?
+
+315
+00:23:26.820 --> 00:23:27.560
+<v Jonathan Perichon>Yeah,
+
+316
+00:23:27.680 --> 00:23:33.840
+<v Jonathan Perichon>so I mean, at Checkr, I think it will resonate with a lot of technical founders.
+
+317
+00:23:34.280 --> 00:23:40.180
+<v Jonathan Perichon>As a technical founder, your role really changes as the company grows.
+
+318
+00:23:40.740 --> 00:23:50.700
+<v Jonathan Perichon>And so you go from, at least I went from, you know, writing every single product features
+
+319
+00:23:50.700 --> 00:23:55.500
+<v Jonathan Perichon>to do half of the features and building the team.
+
+320
+00:23:56.820 --> 00:24:03.740
+<v Jonathan Perichon>becoming a first time manager to tapping, building features all together and starting
+
+321
+00:24:03.740 --> 00:24:07.700
+<v Jonathan Perichon>to manage managers, then to manage directors.
+
+322
+00:24:08.280 --> 00:24:19.220
+<v Jonathan Perichon>And so I had to scale with the organization and that's really rewarding personally because
+
+323
+00:24:19.220 --> 00:24:23.300
+<v Jonathan Perichon>because I learn a ton every day,
+
+324
+00:24:24.020 --> 00:24:26.640
+<v Jonathan Perichon>which is, I think, key for me.
+
+325
+00:24:26.700 --> 00:24:28.200
+<v Jonathan Perichon>Like, the day I don't learn anymore,
+
+326
+00:24:28.380 --> 00:24:31.580
+<v Jonathan Perichon>I think it's probably not a good sign.
+
+327
+00:24:32.060 --> 00:24:33.800
+<v Jonathan Perichon>I cannot switch, personally,
+
+328
+00:24:33.920 --> 00:24:37.560
+<v Jonathan Perichon>between leadership and management
+
+329
+00:24:37.560 --> 00:24:39.380
+<v Jonathan Perichon>and technical leadership.
+
+330
+00:24:40.080 --> 00:24:42.140
+<v Jonathan Perichon>I think, I mean, personally,
+
+331
+00:24:42.260 --> 00:24:46.940
+<v Jonathan Perichon>I really enjoy technical aspects of things,
+
+332
+00:24:47.020 --> 00:24:48.820
+<v Jonathan Perichon>so I like to be involved in architecture
+
+333
+00:24:49.220 --> 00:24:53.320
+<v Jonathan Perichon>and designing our system for the long run.
+
+334
+00:24:53.540 --> 00:24:56.480
+<v Jonathan Perichon>And so in the past five years,
+
+335
+00:24:56.520 --> 00:24:59.620
+<v Jonathan Perichon>I've been back and forth in full-time managers
+
+336
+00:24:59.620 --> 00:25:01.680
+<v Jonathan Perichon>and doing 10 interviews a day
+
+337
+00:25:01.680 --> 00:25:07.220
+<v Jonathan Perichon>to more hands-on and more architect-type function.
+
+338
+00:25:07.640 --> 00:25:10.020
+<v Jonathan Perichon>I mean, at the end of the day, I like doing both.
+
+339
+00:25:10.380 --> 00:25:14.360
+<v Jonathan Perichon>I think it's good for me to go a bit back and forth
+
+340
+00:25:14.360 --> 00:25:17.660
+<v Jonathan Perichon>and really help the company and the organization
+
+341
+00:25:19.300 --> 00:25:24.020
+<v Jonathan Perichon>impactful. I can do anything as long as I can be impactful, I will be happy.
+
+342
+00:25:25.420 --> 00:25:29.840
+<v Noah Labhart>If you could go back to the beginning when you started, what would you do differently?
+
+343
+00:25:29.960 --> 00:25:33.320
+<v Noah Labhart>Or what sort of different avenue would you consider taking?
+
+344
+00:25:33.600 --> 00:25:38.780
+<v Jonathan Perichon>As a company, because we have done fairly well, I don't know if it's a big thing, but
+
+345
+00:25:38.780 --> 00:25:47.940
+<v Jonathan Perichon>I go back in time and if anything, it's more as us, with Daniel as being founder of the company,
+
+346
+00:25:49.220 --> 00:25:56.500
+<v Jonathan Perichon>I think finding the roles that are really required and really important to get right early on
+
+347
+00:25:56.500 --> 00:25:58.960
+<v Jonathan Perichon>and find the right people for those roles.
+
+348
+00:25:59.920 --> 00:26:02.360
+<v Jonathan Perichon>I think we are a bit slow on this front.
+
+349
+00:26:02.660 --> 00:26:07.860
+<v Jonathan Perichon>And so, for example, it took us a while to hire our first product manager.
+
+350
+00:26:08.180 --> 00:26:10.860
+<v Jonathan Perichon>And I think it took us a bit too long,
+
+351
+00:26:10.980 --> 00:26:16.740
+<v Jonathan Perichon>which kind of made the product evolution slow down during this period of search.
+
+352
+00:26:16.740 --> 00:26:19.440
+<v Jonathan Perichon>And so I think as founders,
+
+353
+00:26:19.440 --> 00:26:21.840
+<v Jonathan Perichon>you really have to be super mindful
+
+354
+00:26:21.840 --> 00:26:24.980
+<v Jonathan Perichon>about when the company is ready to scale,
+
+355
+00:26:24.980 --> 00:26:28.440
+<v Jonathan Perichon>like, when can you hire
+
+356
+00:26:28.440 --> 00:26:31.220
+<v Jonathan Perichon>to replace something
+
+357
+00:26:31.220 --> 00:26:32.900
+<v Jonathan Perichon>that you're doing as a founder.
+
+358
+00:26:32.900 --> 00:26:34.620
+<v Jonathan Perichon>I think even me personally,
+
+359
+00:26:34.620 --> 00:26:37.020
+<v Jonathan Perichon>you know, I love writing code
+
+360
+00:26:37.020 --> 00:26:38.380
+<v Jonathan Perichon>and building products,
+
+361
+00:26:38.380 --> 00:26:40.980
+<v Jonathan Perichon>and I think I need to think more and more
+
+362
+00:26:40.980 --> 00:26:42.180
+<v Jonathan Perichon>about how to scale myself
+
+363
+00:26:42.180 --> 00:26:45.720
+<v Jonathan Perichon>and really mentor the team
+
+364
+00:26:46.740 --> 00:26:50.420
+<v Jonathan Perichon>I cannot review every single pull request, for example.
+
+365
+00:26:50.620 --> 00:26:52.320
+<v Jonathan Perichon>This is just not reasonable.
+
+366
+00:26:53.040 --> 00:26:57.480
+<v Jonathan Perichon>So how do I scale myself to educate the team,
+
+367
+00:26:57.580 --> 00:26:59.400
+<v Jonathan Perichon>to put the right tools in place?
+
+368
+00:27:00.580 --> 00:27:02.860
+<v Jonathan Perichon>I think really about scaling.
+
+369
+00:27:03.240 --> 00:27:06.040
+<v Jonathan Perichon>I think we've done some good learnings there.
+
+370
+00:27:06.580 --> 00:27:11.680
+<v Noah Labhart>Who do you look up to as far as a CTO, architect, or tech person?
+
+371
+00:27:11.940 --> 00:27:13.480
+<v Noah Labhart>And why do you look up to them?
+
+372
+00:27:13.480 --> 00:27:14.140
+<v Jonathan Perichon>I
+
+373
+00:27:14.140 --> 00:27:19.720
+<v Jonathan Perichon>think, I mean, I'm really a big fan of Werner Vogels, the CTO of Amazon.
+
+374
+00:27:20.060 --> 00:27:26.040
+<v Jonathan Perichon>I don't know him personally, but just I think he really changed the industry.
+
+375
+00:27:28.260 --> 00:27:33.840
+<v Jonathan Perichon>AWS, I think that, I mean, the change that he brought to his industry is so drastic.
+
+376
+00:27:34.180 --> 00:27:35.840
+<v Jonathan Perichon>I'm a big fan of him.
+
+377
+00:27:35.920 --> 00:27:42.160
+<v Jonathan Perichon>And also I really like his presence during, you know, when he does talks and at conference.
+
+378
+00:27:42.460 --> 00:27:43.240
+<v Jonathan Perichon>So, yeah.
+
+379
+00:27:43.480 --> 00:27:45.260
+<v Jonathan Perichon>I would say that's my number one.
+
+380
+00:27:45.500 --> 00:27:49.180
+<v Jonathan Perichon>And, you know, he's great because he's super technical,
+
+381
+00:27:49.640 --> 00:27:50.560
+<v Jonathan Perichon>super charismatic,
+
+382
+00:27:52.940 --> 00:27:56.680
+<v Jonathan Perichon>and he's brought a ton to this industry as well.
+
+383
+00:27:56.920 --> 00:28:00.020
+<v Noah Labhart>If you could go back or if you could give some advice
+
+384
+00:28:00.020 --> 00:28:03.760
+<v Noah Labhart>to someone who's just starting out where you started
+
+385
+00:28:03.760 --> 00:28:07.640
+<v Noah Labhart>or is a little bit earlier on in their tech career
+
+386
+00:28:07.640 --> 00:28:10.560
+<v Noah Labhart>or startup career, what advice would you give them?
+
+387
+00:28:10.560 --> 00:28:11.300
+<v Jonathan Perichon>For
+
+388
+00:28:11.300 --> 00:28:20.060
+<v Jonathan Perichon>us, one thing that was super key is really to go as fast as we could on everything we are doing.
+
+389
+00:28:20.380 --> 00:28:31.740
+<v Jonathan Perichon>I mean, the right pendulum is to go as fast as you can go without causing issues or without causing pain in the product.
+
+390
+00:28:32.040 --> 00:28:37.640
+<v Jonathan Perichon>But really trying to know what corners to cut was really important.
+
+391
+00:28:37.640 --> 00:28:44.860
+<v Jonathan Perichon>I think typically technical founders are perfectionists about the product they built.
+
+392
+00:28:45.040 --> 00:28:54.240
+<v Jonathan Perichon>And so it's important to be okay with not being 100% perfect and be confident that 90%
+
+393
+00:28:54.240 --> 00:29:01.120
+<v Jonathan Perichon>perfect is still better than previous existing solutions and going with customers and really
+
+394
+00:29:01.120 --> 00:29:02.680
+<v Jonathan Perichon>evolving with customers' feedback.
+
+395
+00:29:02.680 --> 00:29:14.720
+<v Jonathan Perichon>My point is, if you spend too much, you know, bidding perfection on your own, what you're missing are the world customer validation, which is the most important.
+
+396
+00:29:15.020 --> 00:29:25.760
+<v Jonathan Perichon>So, you know, being super iterative, not being afraid of not being 100% and really, really taking customer feedback.
+
+397
+00:29:26.780 --> 00:29:29.880
+<v Noah Labhart>Jonathan, thank you for being on Code Story today.
+
+398
+00:29:30.000 --> 00:29:31.080
+<v Noah Labhart>Thank you for being on the show.
+
+399
+00:29:32.680 --> 00:29:33.180
+<v Jonathan Perichon>Thanks,
+
+400
+00:29:33.180 --> 00:29:34.960
+<v Jonathan Perichon>Noah. I enjoyed our chat.
+
+401
+00:29:35.680 --> 00:29:38.900
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+402
+00:29:43.520 --> 00:29:49.200
+<v Noah Labhart>Code Story is a production of TouchTap LLC and is hosted and produced by Noah Labhart.
+
+403
+00:29:49.720 --> 00:29:52.480
+<v Noah Labhart>Co-produced and edited by George Mocharko.
+
+404
+00:29:53.360 --> 00:29:58.380
+<v Noah Labhart>Special thanks to Deanna Chapman and Stephanie Campisi for their promotional support.
+
+405
+00:29:58.380 --> 00:30:05.440
+<v Noah Labhart>Be sure to subscribe on iTunes, Google Play, Breaker, or the podcasting app of your choice.
+
+406
+00:30:05.980 --> 00:30:13.520
+<v Noah Labhart>Make sure to check us out at codestory.co or follow us on Facebook, Instagram, Twitter, or LinkedIn.

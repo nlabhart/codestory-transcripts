@@ -1,0 +1,1255 @@
+WEBVTT
+
+NOTE S8 E14: Beyond Static DORA Dashboards: Deploying Real-Time Git Metadata Parsing and Policy-as-Code Engines with Dan Lines of LinearB
+
+1
+00:00:01.380 --> 00:00:04.880
+<v Dan Lines>We've gone through a few different, let's call it go-to-market motions,
+
+2
+00:00:05.480 --> 00:00:10.740
+<v Dan Lines>PLG motions, you know, who can come in and use the product for free. And one of the things
+
+3
+00:00:10.740 --> 00:00:16.800
+<v Dan Lines>that we tried really, really, really early on in the company was having a free tool of
+
+4
+00:00:16.800 --> 00:00:22.040
+<v Dan Lines>LinearB, let's say that was for engineering managers. And they would come in and they
+
+5
+00:00:22.040 --> 00:00:27.040
+<v Dan Lines>get their metrics. And we actually were able to get, you know, thousands of teams using
+
+6
+00:00:27.040 --> 00:00:32.860
+<v Dan Lines>using that free tool. But as we learned, there's kind of a cap to that go-to-market motion. And
+
+7
+00:00:32.860 --> 00:00:38.660
+<v Dan Lines>what we learned is that actually what we need to do is provide this free tool for developers.
+
+8
+00:00:39.480 --> 00:00:42.940
+<v Dan Lines>I'm Dan Lines, and I'm the co-founder and COO at LinearB.
+
+9
+00:00:42.940 --> 00:00:52.880
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries. Six months
+
+10
+00:00:52.880 --> 00:00:57.040
+<v Noah Labhart>moonlighting. There's nothing on the back end. Who share what it takes
+
+11
+00:00:57.040 --> 00:00:58.080
+<v Noah Labhart>to change an industry.
+
+12
+00:00:58.280 --> 00:01:00.220
+<v Clip>I don't exactly know what to do next.
+
+13
+00:01:00.220 --> 00:01:01.220
+<v Clip>It took many goes to get right.
+
+14
+00:01:01.860 --> 00:01:04.480
+<v Noah Labhart>Who built the teams that have their back.
+
+15
+00:01:04.780 --> 00:01:06.100
+<v Clip>The company is its people.
+
+16
+00:01:06.120 --> 00:01:07.400
+<v Clip>The teams help each other achieve.
+
+17
+00:01:07.440 --> 00:01:08.580
+<v Clip>I was proud of our team.
+
+18
+00:01:08.880 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+19
+00:01:11.480 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+20
+00:01:12.860 --> 00:01:14.200
+<v Clip>Yes, we've been fighting it as a group.
+
+21
+00:01:14.440 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+22
+00:01:15.540 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+23
+00:01:18.240 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, Michael.
+
+24
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took off the shelf and dusted it off and tried to begin.
+
+25
+00:01:22.460 --> 00:01:25.860
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+26
+00:01:27.040 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+27
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+28
+00:01:32.520 --> 00:01:34.160
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+29
+00:01:34.280 --> 00:01:43.320
+<v Noah Labhart>And today, how Dan Lines is giving you a way to streamline your operations and align your team and your resources.
+
+30
+00:01:47.680 --> 00:01:51.280
+<v Noah Labhart>Dan Lines is married with a three-year-old daughter and a baby on the way.
+
+31
+00:01:51.280 --> 00:01:57.920
+<v Noah Labhart>He has lived all over the U.S., seven years in Boston, five years in L.A., and he now lives in upstate New York.
+
+32
+00:01:59.100 --> 00:02:10.220
+<v Noah Labhart>He's always been into the creation of things, being the kid in high school burning and selling CDs, building computers on the side, or creating an early sports streaming platform before streaming was a thing.
+
+33
+00:02:12.340 --> 00:02:19.940
+<v Noah Labhart>Before Dan founded his current company with his co-founder Ori, he was an engineering leader with 100 engineers reporting to him.
+
+34
+00:02:21.280 --> 00:02:24.540
+<v Noah Labhart>cataloged all of the pains he felt as a VP of engineering.
+
+35
+00:02:25.120 --> 00:02:27.180
+<v Noah Labhart>Post-acquisition of that company,
+
+36
+00:02:27.340 --> 00:02:30.360
+<v Noah Labhart>he decided to build a system to solve those pains.
+
+37
+00:02:32.020 --> 00:02:35.340
+<v Noah Labhart>This is the creation story of LinearB.
+
+38
+00:02:40.900 --> 00:02:44.880
+<v Dan Lines>So LinearB is a software delivery management system.
+
+39
+00:02:45.180 --> 00:02:47.280
+<v Dan Lines>It's used by engineering teams,
+
+40
+00:02:47.360 --> 00:02:49.920
+<v Dan Lines>usually brought in by a VP of engineering.
+
+41
+00:02:51.280 --> 00:02:56.900
+<v Dan Lines>three things, and this was an evolution over time that I think we'll touch on in the pod here.
+
+42
+00:02:57.100 --> 00:03:03.740
+<v Dan Lines>But the first thing it does is allow engineering leaders to create a metrics program for their
+
+43
+00:03:03.740 --> 00:03:10.780
+<v Dan Lines>software organization that usually focuses on workflow efficiency. So effectively, how easy
+
+44
+00:03:10.780 --> 00:03:17.920
+<v Dan Lines>and streamlined is it for us to go from coding to release? Now, we've expanded over the last few
+
+45
+00:03:17.920 --> 00:03:23.780
+<v Dan Lines>few years as we become more successful. We now have project and resource allocation and project
+
+46
+00:03:23.780 --> 00:03:29.880
+<v Dan Lines>delivery estimations, as well as automation tools focused on the pull request or merge requests,
+
+47
+00:03:30.160 --> 00:03:35.660
+<v Dan Lines>making that more efficient, more streamlined and controlling some CI processes. So that's the type
+
+48
+00:03:35.660 --> 00:03:41.940
+<v Dan Lines>of stuff that LinearB does. I think I got started even before I founded the company.
+
+49
+00:03:41.940 --> 00:03:49.560
+<v Dan Lines>Before I founded LinearB with my co-founder Ori, Ori's amazing, Ori's the CEO of the company.
+
+50
+00:03:49.740 --> 00:03:54.000
+<v Dan Lines>I was an engineering leader and so was Ori at a startup company.
+
+51
+00:03:54.220 --> 00:03:56.180
+<v Dan Lines>I was the second engineer hired.
+
+52
+00:03:56.460 --> 00:04:02.780
+<v Dan Lines>I grew to have about 100 engineers reporting to me as a VP of engineering.
+
+53
+00:04:03.040 --> 00:04:11.400
+<v Dan Lines>And I was all the roles that you would expect in between a front-end developer, a full-stack developer, a team leader, a manager, a director.
+
+54
+00:04:11.940 --> 00:04:21.700
+<v Dan Lines>And it actually got started in that journey and all of the pains that I felt of being a VP of engineering of a semi-large organization.
+
+55
+00:04:21.940 --> 00:04:23.960
+<v Dan Lines>We were acquired by Cisco Systems.
+
+56
+00:04:24.060 --> 00:04:25.480
+<v Dan Lines>So that's where that journey ended.
+
+57
+00:04:25.880 --> 00:04:28.740
+<v Dan Lines>And a few years after that, I founded LinearB.
+
+58
+00:04:28.880 --> 00:04:32.580
+<v Dan Lines>So those pains are really where I got started.
+
+59
+00:04:34.840 --> 00:04:36.480
+<v Noah Labhart>Let's dive into LinearB then.
+
+60
+00:04:36.480 --> 00:04:38.360
+<v Noah Labhart>And tell me about the MVP.
+
+61
+00:04:38.800 --> 00:04:43.920
+<v Noah Labhart>So that first version of the product you built, how long did it take to build and what sort
+
+62
+00:04:43.920 --> 00:04:45.760
+<v Noah Labhart>of tools did you use to bring it to life?
+
+63
+00:04:47.640 --> 00:04:51.120
+<v Dan Lines>MVP, what an amazing word, you know, it's like, what does that mean?
+
+64
+00:04:51.160 --> 00:04:56.820
+<v Dan Lines>The thing that's interesting about that, when I think about an MVP, is we actually go through
+
+65
+00:04:56.820 --> 00:04:58.860
+<v Dan Lines>many stages of an MVP.
+
+66
+00:04:59.000 --> 00:05:01.720
+<v Dan Lines>And I think you want to hone in on kind of the first one.
+
+67
+00:05:01.800 --> 00:05:03.880
+<v Dan Lines>So I'll break it down into two stages.
+
+68
+00:05:03.880 --> 00:05:17.400
+<v Dan Lines>So stage one, it was just Ori and myself. I don't even think we had maybe we had a contract like a developer contractor with us. At this time, we didn't have any financial backing to the company. We were bootstrapping ourselves.
+
+69
+00:05:17.400 --> 00:05:25.860
+<v Dan Lines>ourselves, and Ori was kind of the hands-on developer genius working on collecting engineering
+
+70
+00:05:25.860 --> 00:05:32.940
+<v Dan Lines>metrics from engineering organizations. We would hook up to GitHub or GitLab or Bitbucket, whatever
+
+71
+00:05:32.940 --> 00:05:39.660
+<v Dan Lines>it was, and he wrote scripts, you know, pull the APIs and get interesting information like cycle time,
+
+72
+00:05:39.660 --> 00:05:47.160
+<v Dan Lines>release frequency, cyclomatic complexity of the code, PR size, that type of stuff. And this was
+
+73
+00:05:47.400 --> 00:05:52.960
+<v Dan Lines>all on the back end. And he would send me the information and I would take that information
+
+74
+00:05:52.960 --> 00:05:58.740
+<v Dan Lines>and put it into a slide deck for our first few, I don't even know if you would call them customers,
+
+75
+00:05:58.940 --> 00:06:04.540
+<v Dan Lines>but we had about 10 to 15, let's say design partners. And I would present back to them
+
+76
+00:06:04.540 --> 00:06:10.180
+<v Dan Lines>in slides, this is the information about your engineering organization. And that stage one
+
+77
+00:06:10.180 --> 00:06:14.720
+<v Dan Lines>really gave us the validation because the feedback was amazing from those customers.
+
+78
+00:06:14.720 --> 00:06:34.060
+<v Dan Lines>Wow, I never had this information before. Could you give me this other metric? Could you deliver me this report in another two weeks? That really gave us a lot of, I would say, confidence to then move to stage two, which was a full-fledged SaaS platform as you would know it today.
+
+79
+00:06:34.320 --> 00:06:43.140
+<v Dan Lines>Log into a website, see this data update in real time. That took us about six months and we started to sell after that.
+
+80
+00:06:45.020 --> 00:07:09.120
+<v Noah Labhart>Well, stay on the MVP for a minute. I want to talk through some decisions and trade-offs you had to make in maybe both of those phases or the first phase, really wherever you want to take it. And I'm curious about some of the decisions and trade-offs you had to make in building that. And that can be like feature cut, technical debt acceptance, limiting the process to very manual in the beginning. Dive into those decisions for me and how you coped with those decisions.
+
+81
+00:07:10.220 --> 00:07:16.040
+<v Dan Lines>what any founder goes through. And again, it's not just in like your original MVP, but I think
+
+82
+00:07:16.040 --> 00:07:22.360
+<v Dan Lines>anywhere along like the process of a successful company, you have finite resources, right? You cannot
+
+83
+00:07:22.360 --> 00:07:28.680
+<v Dan Lines>do everything. So it's always that challenge in the short term to say, at least for us, do we
+
+84
+00:07:28.680 --> 00:07:33.520
+<v Dan Lines>want to do something new or should we kind of stick with what we, you know, first came out with
+
+85
+00:07:33.520 --> 00:07:39.700
+<v Dan Lines>with the MVP. We came out with just those slides, that deck with a bunch of metrics on them.
+
+86
+00:07:39.920 --> 00:07:45.040
+<v Dan Lines>I was reaching out to other engineering leaders on LinkedIn saying, hey, we have this,
+
+87
+00:07:45.060 --> 00:07:50.320
+<v Dan Lines>would love to show you it for your organization. They were saying yes. You're at this decision
+
+88
+00:07:50.320 --> 00:07:56.240
+<v Dan Lines>point where you say, is the feedback that I'm getting telling me, hey, you're on the right
+
+89
+00:07:56.240 --> 00:08:03.660
+<v Dan Lines>track and just continue to invest in that area? Or are you getting feedback that's telling you,
+
+90
+00:08:03.720 --> 00:08:08.840
+<v Dan Lines>you need to make it like another, I would say, brave step and go in a different direction?
+
+91
+00:08:09.200 --> 00:08:14.660
+<v Dan Lines>For us, we got a lot of great feedback. Hey, you're on the right track. Stay in this area.
+
+92
+00:08:14.900 --> 00:08:21.120
+<v Dan Lines>Build this into something that's like real time for me, SaaS solution. And so we went full out
+
+93
+00:08:21.120 --> 00:08:22.940
+<v Dan Lines>into this world of engineering metrics.
+
+94
+00:08:24.620 --> 00:08:25.120
+<v Dan Lines>So
+
+95
+00:08:25.060 --> 00:08:27.080
+<v Noah Labhart>you've got your MVP, it's working,
+
+96
+00:08:27.180 --> 00:08:28.020
+<v Noah Labhart>you're gaining some traction,
+
+97
+00:08:28.100 --> 00:08:30.080
+<v Noah Labhart>you've proven the idea, you're ready to roll.
+
+98
+00:08:30.260 --> 00:08:33.280
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+99
+00:08:33.360 --> 00:08:34.580
+<v Noah Labhart>And I think what I'm curious about there
+
+100
+00:08:34.580 --> 00:08:37.040
+<v Noah Labhart>is how you went about building your roadmap
+
+101
+00:08:37.040 --> 00:08:40.240
+<v Noah Labhart>and deciding, okay, this is the next most important thing
+
+102
+00:08:40.240 --> 00:08:42.440
+<v Noah Labhart>to build or to address with LinearB?
+
+103
+00:08:44.160 --> 00:08:46.140
+<v Dan Lines>The most important thing you can do
+
+104
+00:08:46.140 --> 00:08:47.400
+<v Dan Lines>is listen to your customers.
+
+105
+00:08:47.640 --> 00:08:49.060
+<v Dan Lines>And if you're in a situation
+
+106
+00:08:49.060 --> 00:08:54.900
+<v Dan Lines>that you don't have customers or you're not getting feedback, ask yourself why. Is it because
+
+107
+00:08:54.900 --> 00:08:59.200
+<v Dan Lines>no one's interested? Is it because I'm not reaching out enough? Or is it because I'm doing
+
+108
+00:08:59.200 --> 00:09:04.820
+<v Dan Lines>something so innovative that I can't even talk to someone about it? And I think there's very
+
+109
+00:09:04.820 --> 00:09:11.320
+<v Dan Lines>few companies that can succeed like that. I can tell you the way that we think about our roadmap
+
+110
+00:09:11.320 --> 00:09:18.780
+<v Dan Lines>at LinearB, and it's probably like a two-thirds, one-third thing. Two-thirds of our roadmap is to
+
+111
+00:09:19.060 --> 00:09:26.140
+<v Dan Lines>to enhance the great feature set that we have today and make sure that we're nailing the
+
+112
+00:09:26.140 --> 00:09:33.200
+<v Dan Lines>experience with our customers. We're showing betas. We're showing designs. We are doing
+
+113
+00:09:33.200 --> 00:09:39.540
+<v Dan Lines>interactive usability sessions. We're taking what's going really, really well for us and
+
+114
+00:09:39.540 --> 00:09:44.920
+<v Dan Lines>enhancing that. That's probably two-thirds of the roadmap. One-third of the roadmap is that other
+
+115
+00:09:44.920 --> 00:09:49.360
+<v Dan Lines>side that I talked to you about, which is around innovation. You know, we're probably spending
+
+116
+00:09:49.360 --> 00:09:57.420
+<v Dan Lines>one third, you know, about 33% in a new idea that we have a really good feeling about. We have a few
+
+117
+00:09:57.420 --> 00:10:03.360
+<v Dan Lines>prospects that want to try it and we bring them in on as design partners. So yeah, probably like
+
+118
+00:10:03.360 --> 00:10:06.060
+<v Dan Lines>two thirds enhancement, one third innovation.
+
+119
+00:10:08.220 --> 00:10:11.360
+<v Noah Labhart>Okay. How did you go about building your team?
+
+120
+00:10:11.360 --> 00:10:14.220
+<v Noah Labhart>and I'm curious about what you'd look for in those people
+
+121
+00:10:14.220 --> 00:10:16.700
+<v Noah Labhart>to indicate that they are the winning horses to join you.
+
+122
+00:10:17.740 --> 00:10:19.940
+<v Dan Lines>This is an art, first and foremost.
+
+123
+00:10:20.460 --> 00:10:22.600
+<v Dan Lines>And I think about it a lot.
+
+124
+00:10:22.660 --> 00:10:24.300
+<v Dan Lines>There's no scientific form.
+
+125
+00:10:24.380 --> 00:10:25.860
+<v Dan Lines>I mean, we're talking about people here, right?
+
+126
+00:10:25.900 --> 00:10:28.160
+<v Dan Lines>There's no formula that I can give.
+
+127
+00:10:28.520 --> 00:10:30.800
+<v Dan Lines>So I think about it as an art.
+
+128
+00:10:30.860 --> 00:10:34.740
+<v Dan Lines>But there are a few characteristics that we've looked for that work.
+
+129
+00:10:34.920 --> 00:10:37.680
+<v Dan Lines>So first and foremost, they got to have the right character
+
+130
+00:10:37.680 --> 00:10:41.120
+<v Dan Lines>because the truth is there's going to be a lot of successes.
+
+131
+00:10:41.580 --> 00:10:43.160
+<v Dan Lines>There's going to be a lot of failures.
+
+132
+00:10:43.400 --> 00:10:45.380
+<v Dan Lines>There's going to be tough times in the business.
+
+133
+00:10:45.480 --> 00:10:47.540
+<v Dan Lines>There's going to be great times in the business.
+
+134
+00:10:47.900 --> 00:10:50.400
+<v Dan Lines>And when things are getting tough, which they will,
+
+135
+00:10:50.500 --> 00:10:52.080
+<v Dan Lines>character really comes out.
+
+136
+00:10:52.200 --> 00:10:57.160
+<v Dan Lines>Now, some of the things about the character is how resilient is the person?
+
+137
+00:10:57.320 --> 00:10:58.140
+<v Dan Lines>Are they willing?
+
+138
+00:10:58.280 --> 00:11:01.500
+<v Dan Lines>And do they have the ability to adapt to change?
+
+139
+00:11:01.780 --> 00:11:04.960
+<v Dan Lines>Those are a few things that we test for in the interview process.
+
+140
+00:11:04.960 --> 00:11:13.480
+<v Dan Lines>And the other way that we look at it is myself and Ori could say we're more, I guess, technical or product founders, right?
+
+141
+00:11:13.540 --> 00:11:16.780
+<v Dan Lines>That's where we grew our careers prior to LinearB.
+
+142
+00:11:17.300 --> 00:11:23.560
+<v Dan Lines>If we did have a weakness or an area of inexpertise, it would be on the go-to-market side.
+
+143
+00:11:23.740 --> 00:11:29.520
+<v Dan Lines>So what we did was we brought in a bunch of people that we trust from our past,
+
+144
+00:11:29.520 --> 00:11:33.120
+<v Dan Lines>people that we worked with like our VP of engineering we worked with that
+
+145
+00:11:33.120 --> 00:11:38.320
+<v Dan Lines>person our CTO we worked with that person our head of people in HR we worked
+
+146
+00:11:38.320 --> 00:11:42.700
+<v Dan Lines>with that person so we brought in a few people that we trust and then on the go
+
+147
+00:11:42.700 --> 00:11:46.860
+<v Dan Lines>to market side so we're thinking sales and marketing we had to bring in some
+
+148
+00:11:46.860 --> 00:11:51.680
+<v Dan Lines>people that we didn't know in those areas we looked for innovation are you
+
+149
+00:11:51.680 --> 00:11:55.580
+<v Dan Lines>able to innovate in your own area are you able to innovate in sales are you
+
+150
+00:11:55.580 --> 00:11:59.860
+<v Dan Lines>you're able to innovate in marketing. And we found kind of that combination was a good
+
+151
+00:11:59.860 --> 00:12:03.940
+<v Dan Lines>supplement to the founding strength of the company.
+
+152
+00:12:08.480 --> 00:12:13.300
+<v Noah Labhart>So let's flip to scalability. And this is always interesting to me because honestly,
+
+153
+00:12:13.420 --> 00:12:18.500
+<v Noah Labhart>the answers I get are all over the map. But did you build this to scale efficiently from day one?
+
+154
+00:12:18.700 --> 00:12:25.460
+<v Noah Labhart>Maybe this is phase two. Or have you been fighting this as you grow and gain traction in any sort of
+
+155
+00:12:25.580 --> 00:12:26.080
+<v Noah Labhart>capacity.
+
+156
+00:12:27.480 --> 00:12:32.380
+<v Dan Lines>I think one part of scalability is since we were just talking about people like
+
+157
+00:12:32.380 --> 00:12:37.920
+<v Dan Lines>scalability growth on the people side, and one has to do with product and solution on the people
+
+158
+00:12:37.920 --> 00:12:42.360
+<v Dan Lines>side, how many people you're hiring, what your growth path is and your run rate and all of that.
+
+159
+00:12:42.580 --> 00:12:51.180
+<v Dan Lines>We took an approach that we were aggressive, but responsible. We definitely always tried to push,
+
+160
+00:12:51.180 --> 00:12:57.720
+<v Dan Lines>you know, the limit of, okay, how many people do we need versus the pipeline coming in versus what
+
+161
+00:12:57.720 --> 00:13:03.620
+<v Dan Lines>we want to generate versus our goals. But we didn't get into a situation where we overgrew.
+
+162
+00:13:03.820 --> 00:13:08.620
+<v Dan Lines>And you'll see a lot of companies right now, because the economy is tough, having to scale
+
+163
+00:13:08.620 --> 00:13:14.100
+<v Dan Lines>back, having to lay people off, do things like that. We haven't had to do that in any way,
+
+164
+00:13:14.160 --> 00:13:18.920
+<v Dan Lines>shape or form. And I think it's because of that kind of like responsible nature to our growth
+
+165
+00:13:18.920 --> 00:13:24.440
+<v Dan Lines>with people. And on the product side, the way that we think about it, definitely early on,
+
+166
+00:13:24.520 --> 00:13:30.180
+<v Dan Lines>I don't think it's a good idea to say, I'm going to create a product that's endlessly scalable
+
+167
+00:13:30.180 --> 00:13:36.940
+<v Dan Lines>because the type of customer that is coming in, at least for us, changes at each stage of the
+
+168
+00:13:36.940 --> 00:13:42.720
+<v Dan Lines>company. Early on, our customer base was engineering organizations that maybe had
+
+169
+00:13:42.720 --> 00:13:49.360
+<v Dan Lines>had 20 to 50 engineers. And to create a great product experience for if you have 20 to 50
+
+170
+00:13:49.360 --> 00:13:55.120
+<v Dan Lines>engineers is way different than what we're seeing now. Now we have some of the largest
+
+171
+00:13:55.120 --> 00:14:00.300
+<v Dan Lines>organizations in the world that are using LinearB. They have thousands and thousands of engineers.
+
+172
+00:14:00.520 --> 00:14:05.920
+<v Dan Lines>So we never took the philosophy of from day one, let's make this endlessly scalable,
+
+173
+00:14:06.020 --> 00:14:10.560
+<v Dan Lines>because that would be, I think, mismatching the persona in the type of company that was
+
+174
+00:14:10.560 --> 00:14:17.040
+<v Dan Lines>using LinearB, we always took a very progressive approach as our customer base started getting
+
+175
+00:14:17.040 --> 00:14:17.900
+<v Dan Lines>larger and larger.
+
+176
+00:14:20.160 --> 00:14:24.680
+<v Noah Labhart>So as you step out on the balcony and you look across all that you've
+
+177
+00:14:24.680 --> 00:14:26.220
+<v Noah Labhart>built, what are you most proud of?
+
+178
+00:14:28.160 --> 00:14:32.160
+<v Dan Lines>Honestly, the thing that I'm most proud of is the team of people
+
+179
+00:14:32.160 --> 00:14:37.580
+<v Dan Lines>and the culture that we created at LinearB. That's where I get my energy from. It's who I'm
+
+180
+00:14:37.580 --> 00:14:40.640
+<v Dan Lines>working with and us all coming together on a mission.
+
+181
+00:14:40.900 --> 00:14:46.840
+<v Dan Lines>There's two things that are at the core, I think, of LinearB culture that I'm really proud of.
+
+182
+00:14:46.900 --> 00:14:51.740
+<v Dan Lines>One is we do have a lot of transparency within our company.
+
+183
+00:14:51.940 --> 00:14:55.200
+<v Dan Lines>From founding level down, we talk about our run rate.
+
+184
+00:14:55.360 --> 00:14:56.580
+<v Dan Lines>How is the funding looking?
+
+185
+00:14:56.800 --> 00:15:02.880
+<v Dan Lines>We're making sure we're at least doing biweekly meetings where myself or Ori are communicating with the entire company.
+
+186
+00:15:04.200 --> 00:15:17.700
+<v Dan Lines>The second one is we have this other side of the culture around like nothing is beneath you, meaning just because you're a founder doesn't mean you shouldn't be doing X, Y and Z or just because you're a VP doesn't mean you shouldn't be doing X, Y or Z.
+
+187
+00:15:18.280 --> 00:15:23.120
+<v Dan Lines>For me, yeah, I'll get on some of the biggest, you know, sales calls that we have, for example.
+
+188
+00:15:23.120 --> 00:15:28.940
+<v Dan Lines>example, but if we have someone that's, uh, pouring this on a Friday, for example, on Monday I have a
+
+189
+00:15:28.940 --> 00:15:35.520
+<v Dan Lines>call with, you know, one of our junior sales associates for a small deal. I'm on that call.
+
+190
+00:15:35.520 --> 00:15:41.180
+<v Dan Lines>I'm there, I'm helping, you know, helping make sure that they can do their job well. So yeah, team and culture
+
+191
+00:15:41.180 --> 00:15:46.060
+<v Dan Lines>is what I'm most proud of. And then I would say the second thing is just our customer base. We have an
+
+192
+00:15:46.060 --> 00:15:51.520
+<v Dan Lines>amazing group of customers, and, you know, they have real pain when they come to LinearB not having
+
+193
+00:15:53.120 --> 00:15:58.920
+<v Dan Lines>tricks and it's just great to see them have that pain solved. So people and customers.
+
+194
+00:16:01.380 --> 00:16:05.220
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made
+
+195
+00:16:05.220 --> 00:16:07.560
+<v Noah Labhart>and how you and your team responded to it.
+
+196
+00:16:08.960 --> 00:16:15.480
+<v Dan Lines>I'll try to choose one that's like pretty impactful and how our team handle it. And it
+
+197
+00:16:15.480 --> 00:16:20.820
+<v Dan Lines>relates back to the question that you were asking about like the type of people that you're hiring.
+
+198
+00:16:22.200 --> 00:16:28.280
+<v Dan Lines>we've gone through a few different, let's call it, go-to-market motions, PLG motions, you know, who can
+
+199
+00:16:28.280 --> 00:16:33.400
+<v Dan Lines>come in and use the product for free. And one of the things that we tried really, really, really
+
+200
+00:16:33.400 --> 00:16:40.260
+<v Dan Lines>early on in the company was having a free tool of LinearB, let's say that was for engineering
+
+201
+00:16:40.260 --> 00:16:45.940
+<v Dan Lines>managers. And they would come in and they get their metrics. And we actually were able to get, you know,
+
+202
+00:16:45.940 --> 00:16:52.140
+<v Dan Lines>thousands of teams using that free tool. But as we learned, there's kind of a cap to that go to
+
+203
+00:16:52.140 --> 00:16:58.540
+<v Dan Lines>market motion. And what we learned is that actually what we need to do is provide this free tool for
+
+204
+00:16:58.540 --> 00:17:03.960
+<v Dan Lines>developers, which is a different persona, right? There's millions and millions, I think, I don't
+
+205
+00:17:03.960 --> 00:17:09.840
+<v Dan Lines>know, 32 to 50 million developers out there. You know, there's not as many managers. So what we
+
+206
+00:17:09.840 --> 00:17:15.320
+<v Dan Lines>did was actually change our bottom up motion to say, okay, let's not only serve the manager,
+
+207
+00:17:15.940 --> 00:17:21.280
+<v Dan Lines>provide something for developers. Now, if you have a lot of people in your company and you're
+
+208
+00:17:21.280 --> 00:17:26.220
+<v Dan Lines>in a growth situation, that's actually a fair, it might sound small in this conversation, but it's
+
+209
+00:17:26.220 --> 00:17:30.740
+<v Dan Lines>actually a really big change, changing personas. Who's going to be the first person to touch your
+
+210
+00:17:30.740 --> 00:17:37.840
+<v Dan Lines>product? And we actually shifted over to developers. And what I learned from that is there's a lot of
+
+211
+00:17:37.840 --> 00:17:43.020
+<v Dan Lines>change that's involved. And so who you hire, the conversation that we just had really, really
+
+212
+00:17:43.020 --> 00:17:49.500
+<v Dan Lines>really matters. We were able to bring in people that are resilient to change. And like I said
+
+213
+00:17:49.500 --> 00:17:54.680
+<v Dan Lines>before, testing kind of in that interview process, what are you able to innovate in your own area?
+
+214
+00:17:55.020 --> 00:17:59.020
+<v Dan Lines>So yeah, of course, it's a shock with the change. But then what we saw is, okay,
+
+215
+00:17:59.100 --> 00:18:04.600
+<v Dan Lines>sales is now innovating. BDRs are reaching out to the developers. They're coming up with their
+
+216
+00:18:04.600 --> 00:18:12.220
+<v Dan Lines>own talk track now. Product is able to adapt. Marketing is able to adapt. Although that change
+
+217
+00:18:13.060 --> 00:18:17.020
+<v Dan Lines>tough. The type of people that we had in the company, because it's all of them that actually
+
+218
+00:18:17.020 --> 00:18:20.860
+<v Dan Lines>makes this stuff happen, not just me and Ori, matters a lot.
+
+219
+00:18:22.860 --> 00:18:27.660
+<v Noah Labhart>What does the future look like for LinearB, the product, and for your team?
+
+220
+00:18:28.600 --> 00:18:35.140
+<v Dan Lines>The future looks bright. And I'm actually taking that quote. We do something at LinearB. We do a
+
+221
+00:18:35.140 --> 00:18:40.660
+<v Dan Lines>bi-weekly product session with the entire company. So everyone in the company come in,
+
+222
+00:18:40.660 --> 00:18:41.740
+<v Dan Lines>We do product demos.
+
+223
+00:18:41.920 --> 00:18:43.520
+<v Dan Lines>We show the latest and greatest.
+
+224
+00:18:43.620 --> 00:18:45.620
+<v Dan Lines>Sometimes we show like our innovative ideas.
+
+225
+00:18:46.060 --> 00:18:51.600
+<v Dan Lines>And the last one that we had two weeks ago was probably one of my most proud moment because
+
+226
+00:18:51.600 --> 00:18:57.160
+<v Dan Lines>people were just blowing up with excitement in the chat saying, wow, I like love everything
+
+227
+00:18:57.160 --> 00:18:58.360
+<v Dan Lines>that you're innovating on.
+
+228
+00:18:58.460 --> 00:18:59.860
+<v Dan Lines>I'm so excited for this.
+
+229
+00:19:00.000 --> 00:19:03.060
+<v Dan Lines>And that's how I know that we're working on something really great.
+
+230
+00:19:03.200 --> 00:19:08.800
+<v Dan Lines>And there's two areas to that, that LinearB continues to innovate on that's getting
+
+231
+00:19:08.800 --> 00:19:09.860
+<v Dan Lines>everyone excited.
+
+232
+00:19:10.660 --> 00:19:14.640
+<v Dan Lines>One of them is in that developer pipeline or the developer workflow.
+
+233
+00:19:14.960 --> 00:19:19.640
+<v Dan Lines>And a lot of companies right now, especially tech companies, are focused on DevEx.
+
+234
+00:19:19.860 --> 00:19:23.700
+<v Dan Lines>They'll talk about developer experience and how important that is.
+
+235
+00:19:23.880 --> 00:19:32.720
+<v Dan Lines>And we have a tool right now that's actually helping with that developer experience to make sure all PRs are getting merged in the fastest way possible.
+
+236
+00:19:32.720 --> 00:19:40.660
+<v Dan Lines>And we're starting to see some cost savings with that tool now that it can extend into continuous integration and what tests are run there.
+
+237
+00:19:40.880 --> 00:19:43.960
+<v Dan Lines>So that's probably one area that's really, really bright for us.
+
+238
+00:19:44.260 --> 00:19:59.660
+<v Dan Lines>And the other thing that's bright that I was telling you earlier in the conversation, now that we're working with these Fortune 500 companies, some of the largest companies in the world, the work that we're doing to scale up to support that level of company is really exciting.
+
+239
+00:19:59.660 --> 00:20:02.820
+<v Dan Lines>because they have engineering teams all over the world
+
+240
+00:20:02.820 --> 00:20:06.280
+<v Dan Lines>and thousands of developers and different business units
+
+241
+00:20:06.280 --> 00:20:08.880
+<v Dan Lines>and the requirements of what they need to report
+
+242
+00:20:08.880 --> 00:20:11.220
+<v Dan Lines>to their board around their resource allocation
+
+243
+00:20:11.220 --> 00:20:13.580
+<v Dan Lines>is kind of above and beyond anything
+
+244
+00:20:13.580 --> 00:20:15.300
+<v Dan Lines>that we saw earlier in the company.
+
+245
+00:20:15.600 --> 00:20:17.760
+<v Dan Lines>And if you combine these two things together
+
+246
+00:20:17.760 --> 00:20:19.560
+<v Dan Lines>of this pipeline work
+
+247
+00:20:19.560 --> 00:20:21.660
+<v Dan Lines>that's creating a great developer experience
+
+248
+00:20:21.660 --> 00:20:23.280
+<v Dan Lines>and then the work that we're doing
+
+249
+00:20:23.280 --> 00:20:24.980
+<v Dan Lines>for these really large organization
+
+250
+00:20:24.980 --> 00:20:26.200
+<v Dan Lines>with resource allocation,
+
+251
+00:20:26.540 --> 00:20:29.120
+<v Dan Lines>that's the stuff that gets me and our team excited.
+
+252
+00:20:31.240 --> 00:20:36.260
+<v Noah Labhart>let's switch to you dan who influences the way that you work name a person or many persons
+
+253
+00:20:36.800 --> 00:20:38.600
+<v Noah Labhart>or something you look up to and why
+
+254
+00:20:38.600 --> 00:20:43.280
+<v Dan Lines>i learned something actually this this has evolved for me
+
+255
+00:20:43.280 --> 00:20:49.480
+<v Dan Lines>when i was a little bit younger let's say when i was in my teens and when i was in my 20s
+
+256
+00:20:49.480 --> 00:20:55.000
+<v Dan Lines>you know for example like i really love steve wozniak that's the type of person i would say
+
+257
+00:20:55.000 --> 00:21:01.760
+<v Dan Lines>early on. But what I learned in the area that I evolved is don't look up to people that you don't
+
+258
+00:21:01.760 --> 00:21:08.120
+<v Dan Lines>know, because you don't really know the real story behind that person that what you hear from,
+
+259
+00:21:08.120 --> 00:21:12.060
+<v Dan Lines>you know, the media or something that you read is always like a curated version.
+
+260
+00:21:12.460 --> 00:21:19.440
+<v Dan Lines>So there's two people that I look up to now. One is my co-founding and CEO partner, Ori. Ori has
+
+261
+00:21:19.440 --> 00:21:27.120
+<v Dan Lines>has this amazing attribute about him that he can break down a large vision into lean solutions.
+
+262
+00:21:27.680 --> 00:21:31.800
+<v Dan Lines>Because as you know, when you're in this world of startup, it's always like, what can we deliver
+
+263
+00:21:31.800 --> 00:21:37.000
+<v Dan Lines>this quarter? What can we deliver this month? So he can take like a really, really large vision
+
+264
+00:21:37.000 --> 00:21:42.020
+<v Dan Lines>and say, hey, this is like a creative way so we can get something out in two weeks. I love that.
+
+265
+00:21:42.700 --> 00:21:48.300
+<v Dan Lines>And the other one that I would say is my wife, Lauren. She has this ability where she tries
+
+266
+00:21:49.440 --> 00:21:55.960
+<v Dan Lines>different adventures. So she has done stuff within tech support all the way to Chinese medicine and
+
+267
+00:21:55.960 --> 00:22:01.860
+<v Dan Lines>acupuncture. And actually, this is similar to Woz. And what she's able to do is take all these
+
+268
+00:22:01.860 --> 00:22:08.460
+<v Dan Lines>different experiences that you think are disparate and actually put them together into a product or
+
+269
+00:22:08.460 --> 00:22:13.060
+<v Dan Lines>innovative solution that takes all of those attributes that she learned and come up with
+
+270
+00:22:13.060 --> 00:22:16.520
+<v Dan Lines>it's something new. So those are the two, Ori and my wife, Lauren.
+
+271
+00:22:18.640 --> 00:22:22.660
+<v Noah Labhart>So we talked about a mistake earlier. This is a little different spin. If you could go back to
+
+272
+00:22:22.660 --> 00:22:26.080
+<v Noah Labhart>the beginning, what would you do different? Or where would you consider taking a different
+
+273
+00:22:26.080 --> 00:22:29.880
+<v Noah Labhart>approach? It doesn't have to be, you know, a mistake. It could have been something that worked,
+
+274
+00:22:29.940 --> 00:22:31.040
+<v Noah Labhart>but maybe you tweak it a little bit.
+
+275
+00:22:31.980 --> 00:22:34.480
+<v Dan Lines>To be honest with you, sometimes I find myself
+
+276
+00:22:34.480 --> 00:22:39.200
+<v Dan Lines>thinking about that situation. Oh, if I could go back in time, like what would I do different?
+
+277
+00:22:39.200 --> 00:22:43.180
+<v Dan Lines>and I could have done this better, I could have done that better.
+
+278
+00:22:43.500 --> 00:22:48.500
+<v Dan Lines>And honestly, when I'm in that situation, I actually try to snap myself out of it.
+
+279
+00:22:48.600 --> 00:22:50.040
+<v Dan Lines>There is no going back.
+
+280
+00:22:50.240 --> 00:22:52.020
+<v Dan Lines>That's the truth, right?
+
+281
+00:22:52.320 --> 00:22:57.860
+<v Dan Lines>So I usually try to actually flip that and say, okay, all I can do now is iterate on going forward.
+
+282
+00:22:58.380 --> 00:23:01.020
+<v Dan Lines>And I don't know, it might sound a little lame.
+
+283
+00:23:01.080 --> 00:23:02.000
+<v Dan Lines>I wouldn't change anything.
+
+284
+00:23:02.220 --> 00:23:07.260
+<v Dan Lines>If you go back and change something that you think would make you more successful,
+
+285
+00:23:09.240 --> 00:23:14.580
+<v Dan Lines>a failure that actually changed the company for the better. And that one small thing that you
+
+286
+00:23:14.580 --> 00:23:19.260
+<v Dan Lines>changed to make it a success, it might have actually led you to a situation where the
+
+287
+00:23:19.260 --> 00:23:24.640
+<v Dan Lines>company actually didn't go in the right direction. So I like to think more about iterating on the
+
+288
+00:23:24.640 --> 00:23:26.120
+<v Dan Lines>future than like changing the past.
+
+289
+00:23:27.280 --> 00:23:29.940
+<v Noah Labhart>Okay, Dan, last question. So you're getting on a plane,
+
+290
+00:23:29.980 --> 00:23:34.220
+<v Noah Labhart>and you're sitting next to a young entrepreneur who's built the next big thing. They're jazzed
+
+291
+00:23:34.220 --> 00:23:37.420
+<v Noah Labhart>about it. They can't wait to show it off to the world. Can we show it off to you right there on
+
+292
+00:23:39.200 --> 00:23:41.240
+<v Noah Labhart>to give that person, having gone down this road a bit.
+
+293
+00:23:42.540 --> 00:23:44.780
+<v Dan Lines>You know, you might have something that's taking off
+
+294
+00:23:44.780 --> 00:23:45.820
+<v Dan Lines>and it's really exciting.
+
+295
+00:23:46.180 --> 00:23:48.980
+<v Dan Lines>I would just say like stay humble and stay level-headed.
+
+296
+00:23:49.460 --> 00:23:51.700
+<v Dan Lines>There's gonna be times that you think
+
+297
+00:23:51.700 --> 00:23:52.820
+<v Dan Lines>things are going amazing.
+
+298
+00:23:53.140 --> 00:23:55.240
+<v Dan Lines>There's gonna be times that you think
+
+299
+00:23:55.240 --> 00:23:56.780
+<v Dan Lines>things aren't going so well.
+
+300
+00:23:56.920 --> 00:23:59.620
+<v Dan Lines>And what I learned is it's like a very, it's a long journey.
+
+301
+00:23:59.820 --> 00:24:03.240
+<v Dan Lines>So like my advice would be when things are going great,
+
+302
+00:24:03.360 --> 00:24:05.920
+<v Dan Lines>you're actually not doing as well as you think you are.
+
+303
+00:24:05.980 --> 00:24:06.600
+<v Dan Lines>Keep going.
+
+304
+00:24:06.760 --> 00:24:08.420
+<v Dan Lines>And when things are going bad,
+
+305
+00:24:09.200 --> 00:24:14.900
+<v Dan Lines>are going bad, they're actually not as bad as they seem. So stay humble and stay level-headed.
+
+306
+00:24:15.180 --> 00:24:15.680
+<v Dan Lines>Couldn't
+
+307
+00:24:15.600 --> 00:24:19.760
+<v Noah Labhart>agree more. That's fantastic advice. Well, Dan, thank you for being on the show today.
+
+308
+00:24:19.860 --> 00:24:22.860
+<v Noah Labhart>And thank you for telling the creation story of LinearB.
+
+309
+00:24:23.040 --> 00:24:24.400
+<v Dan Lines>Cool, Noah. Thanks for having me.
+
+310
+00:24:26.340 --> 00:24:29.140
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+311
+00:24:32.320 --> 00:24:38.220
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+312
+00:24:39.200 --> 00:24:44.900
+<v Noah Labhart>app of your choice. And when you get a chance, leave us a review. Both things help us out
+
+313
+00:24:44.900 --> 00:24:49.760
+<v Noah Labhart>tremendously. And thanks again for listening.

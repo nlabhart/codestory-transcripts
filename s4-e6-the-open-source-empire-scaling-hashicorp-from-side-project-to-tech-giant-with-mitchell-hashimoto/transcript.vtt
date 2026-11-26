@@ -1,0 +1,1431 @@
+WEBVTT
+
+NOTE S4 E6: The Open-Source Empire: Scaling HashiCorp From Side Project to Tech Giant with Mitchell Hashimoto
+
+1
+00:00:01.360 --> 00:00:07.960
+<v Mitchell Hashimoto>You know, I had no intention, like literally zero intention of ever building a business
+
+2
+00:00:07.960 --> 00:00:13.340
+<v Mitchell Hashimoto>around these tools. I thought they were just going to be open source and free and at best
+
+3
+00:00:13.340 --> 00:00:18.020
+<v Mitchell Hashimoto>they would help my resume to get a better job. Like that was going through my mind as
+
+4
+00:00:18.020 --> 00:00:23.900
+<v Mitchell Hashimoto>a, you know, in college. And so I didn't try to build this mega generic tool that solved
+
+5
+00:00:23.900 --> 00:00:31.460
+<v Mitchell Hashimoto>everyone's problems. I built Vagrant and my MVP was I want a really awesome VM-based development
+
+6
+00:00:31.460 --> 00:00:36.860
+<v Mitchell Hashimoto>workflow for Ruby on Rails because that's what I do every day. And that's sort of how it formed.
+
+7
+00:00:38.720 --> 00:00:42.480
+<v Mitchell Hashimoto>I'm Mitchell Hashimoto. I'm the founder and CTO of HashiCorp.
+
+8
+00:00:47.660 --> 00:00:53.020
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:53.900 --> 00:00:57.220
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+10
+00:00:57.220 --> 00:01:00.960
+<v Noah Labhart>and build and lead a team that has your back.
+
+11
+00:01:02.360 --> 00:01:04.080
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+12
+00:01:04.200 --> 00:01:07.880
+<v Noah Labhart>and today, how Mitchell Hashimoto created the tool set
+
+13
+00:01:07.880 --> 00:01:11.940
+<v Noah Labhart>to create consistent workflows across your infrastructure.
+
+14
+00:01:13.560 --> 00:01:16.060
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:21.140 --> 00:01:23.760
+<v Noah Labhart>Mitchell Hashimoto started programming
+
+16
+00:01:23.900 --> 00:01:28.420
+<v Noah Labhart>in middle school, teaching himself how to code through open source libraries and zip files he
+
+17
+00:01:28.420 --> 00:01:33.980
+<v Noah Labhart>could download on the internet. He's a pilot and owns his own plane, which happens to be a Cirrus,
+
+18
+00:01:34.140 --> 00:01:39.760
+<v Noah Labhart>and he spends an hour a day studying or practicing flying, and even takes his wife and dog up every
+
+19
+00:01:39.760 --> 00:01:45.360
+<v Noah Labhart>now and then, when there's something worth flying to, and they can make the oxygen work for the dog.
+
+20
+00:01:46.460 --> 00:01:51.380
+<v Noah Labhart>He attended college at the University of Washington in Seattle, which was located
+
+21
+00:01:51.380 --> 00:01:55.800
+<v Noah Labhart>equidistance from Amazon, Google, Microsoft, and other cloud-focused
+
+22
+00:01:55.800 --> 00:02:00.720
+<v Noah Labhart>infrastructure companies. As you can imagine, there was a huge focus on this
+
+23
+00:02:00.720 --> 00:02:04.860
+<v Noah Labhart>topic while he was at school, and he was able to gain access to vast resources
+
+24
+00:02:04.860 --> 00:02:10.340
+<v Noah Labhart>through his computer lab and research projects. It was these projects that put
+
+25
+00:02:10.340 --> 00:02:14.820
+<v Noah Labhart>the ideas in his head on what he could make in order for infrastructure to work
+
+26
+00:02:14.820 --> 00:02:15.320
+<v Noah Labhart>work better.
+
+27
+00:02:16.820 --> 00:02:19.760
+<v Noah Labhart>This is the creation story of HashiCorp.
+
+28
+00:02:22.080 --> 00:02:28.960
+<v Mitchell Hashimoto>So HashiCorp is a company that builds a portfolio of tools based in open source aimed at cloud
+
+29
+00:02:28.960 --> 00:02:33.860
+<v Mitchell Hashimoto>adoption, multi cloud, and just in general, like infrastructure automation and getting
+
+30
+00:02:33.860 --> 00:02:35.320
+<v Mitchell Hashimoto>more out of your infrastructure.
+
+31
+00:02:35.600 --> 00:02:42.140
+<v Mitchell Hashimoto>The way I sort of got into that was during college, I went to college at University of
+
+32
+00:02:42.140 --> 00:02:48.380
+<v Mitchell Hashimoto>Washington in Seattle. And being there, I was sort of equidistant more or less from Amazon,
+
+33
+00:02:48.760 --> 00:02:53.520
+<v Mitchell Hashimoto>Microsoft, and Google. And then that office actually became the Google Cloud Office eventually.
+
+34
+00:02:54.200 --> 00:03:00.260
+<v Mitchell Hashimoto>And there was a huge sort of infrastructure mindset during the time I was there. EC2,
+
+35
+00:03:00.460 --> 00:03:07.080
+<v Mitchell Hashimoto>AWS had just announced EC2 and S3 about a year prior to me going to college. And because of that,
+
+36
+00:03:07.160 --> 00:03:11.580
+<v Mitchell Hashimoto>I sort of had access to all that through our computer science program and some research
+
+37
+00:03:12.140 --> 00:03:19.140
+<v Mitchell Hashimoto>I was on. So I just sort of dipped my toes in that and realized how difficult certain aspects
+
+38
+00:03:19.140 --> 00:03:24.160
+<v Mitchell Hashimoto>of the cloud were, especially, you know, at that time, AWS literally had two products. Yeah, that
+
+39
+00:03:24.160 --> 00:03:29.000
+<v Mitchell Hashimoto>sort of motivated me and got me into the cloud space and got a bunch of ideas in my head of what
+
+40
+00:03:29.000 --> 00:03:35.960
+<v Mitchell Hashimoto>to build. I think the benefit of being in college is that you aren't, in some sense, you're ignorant
+
+41
+00:03:35.960 --> 00:03:41.900
+<v Mitchell Hashimoto>about how the real world works. And so, you know, everyone was convinced in academia in my little
+
+42
+00:03:42.140 --> 00:03:46.440
+<v Mitchell Hashimoto>that cloud was sort of the future. And then when I tried to use it, I was like, well, there's,
+
+43
+00:03:46.440 --> 00:03:51.620
+<v Mitchell Hashimoto>it's missing a ton of things. And as I graduated and went into sort of industry, I realized
+
+44
+00:03:51.620 --> 00:03:56.760
+<v Mitchell Hashimoto>startups were basically trying to use cloud still and still struggling. And so that's when I really
+
+45
+00:03:56.760 --> 00:04:00.300
+<v Mitchell Hashimoto>started to work on these with, with earnest.
+
+46
+00:04:01.620 --> 00:04:04.740
+<v Noah Labhart>Well, let's step into the MVP and this will be
+
+47
+00:04:04.740 --> 00:04:09.960
+<v Noah Labhart>interesting to hear what was the first MVP. So tell me about that MVP, you know, how long it
+
+48
+00:04:09.960 --> 00:04:13.280
+<v Noah Labhart>it took you to build and what sort of tools you use to get it off the ground?
+
+49
+00:04:13.820 --> 00:04:18.000
+<v Mitchell Hashimoto>Yeah, it's a little bit tricky to answer in the case of HashiCorp because we are a portfolio
+
+50
+00:04:18.000 --> 00:04:23.820
+<v Mitchell Hashimoto>company. So we have eight to 10 products, depending how you count. The first one I built
+
+51
+00:04:23.820 --> 00:04:29.680
+<v Mitchell Hashimoto>was called Vagrant, which was a VM based development tool. And that was still while I was in college.
+
+52
+00:04:29.820 --> 00:04:35.880
+<v Mitchell Hashimoto>And I have this whole ethos where just I choose to only work on problems that I have myself.
+
+53
+00:04:35.880 --> 00:04:39.740
+<v Mitchell Hashimoto>self. That's just something I love to do. I like to solve my own problems and I like to
+
+54
+00:04:39.740 --> 00:04:44.960
+<v Mitchell Hashimoto>be motivated. That motivates me in particular about stuff I'm working on. And so products sort
+
+55
+00:04:44.960 --> 00:04:49.840
+<v Mitchell Hashimoto>of followed this order of the challenges that I saw more or less early on. And the first one was
+
+56
+00:04:49.840 --> 00:04:50.420
+<v Mitchell Hashimoto>Vagrant.
+
+57
+00:04:50.840 --> 00:04:54.400
+<v Noah Labhart>It's interesting. So I didn't know that Vagrant was the first one. When you're building
+
+58
+00:04:54.400 --> 00:05:01.360
+<v Noah Labhart>that first product, what sort of tools did you have to use? And when you're building that first
+
+59
+00:05:01.360 --> 00:05:05.340
+<v Noah Labhart>product too, there's trade-offs and decisions, right? You have to make, you're trying to get
+
+60
+00:05:05.880 --> 00:05:10.300
+<v Noah Labhart>there that works, that solves a problem, and I love it that solves a problem for you. Tell me
+
+61
+00:05:10.300 --> 00:05:13.260
+<v Noah Labhart>about those trade-offs and decisions and what sort of tools you were using.
+
+62
+00:05:13.500 --> 00:05:14.700
+<v Mitchell Hashimoto>To give you context at
+
+63
+00:05:14.700 --> 00:05:20.240
+<v Mitchell Hashimoto>the time, I was a Ruby on Rails web developer, like junior web developer, just, you know,
+
+64
+00:05:20.260 --> 00:05:24.740
+<v Mitchell Hashimoto>getting started in industry. I was probably in my, between my second and third year in college, so
+
+65
+00:05:24.740 --> 00:05:31.540
+<v Mitchell Hashimoto>very junior. And so I used Ruby to build Vagrant. It's the only HashiCorp tool that we ended up
+
+66
+00:05:31.540 --> 00:05:38.000
+<v Mitchell Hashimoto>using Ruby for. And I also, you know, had very little money as a college student. So I knew I
+
+67
+00:05:38.000 --> 00:05:42.880
+<v Mitchell Hashimoto>wanted to use VMs and dig into that. But I couldn't use cloud based ones because they cost money like
+
+68
+00:05:42.880 --> 00:05:48.620
+<v Mitchell Hashimoto>EC2 cost money, and I didn't want to pay for it. And the only free sort of hypervisor was Virtual
+
+69
+00:05:48.620 --> 00:05:54.320
+<v Mitchell Hashimoto>Box, which was owned by Sun at the time, and it's now Oracle. And so I built Vagrant around Virtual
+
+70
+00:05:54.320 --> 00:05:59.200
+<v Mitchell Hashimoto>Box for that reason. I think as I got older and met more people using Vagrant, they always asked
+
+71
+00:05:59.200 --> 00:06:03.240
+<v Mitchell Hashimoto>me like, why did you choose this to do that? And it's kind of funny because it wasn't so much a
+
+72
+00:06:03.240 --> 00:06:07.840
+<v Mitchell Hashimoto>decision. It was just, I didn't have money. That was the only option I had, but it ended up working
+
+73
+00:06:07.840 --> 00:06:13.600
+<v Mitchell Hashimoto>out. And, and you asked about sort of constraints and focusing the problem in that MVP. And for me,
+
+74
+00:06:13.600 --> 00:06:19.540
+<v Mitchell Hashimoto>the MVP for Vagrant was really focused around my own use case. You know, I had no intention,
+
+75
+00:06:19.840 --> 00:06:25.340
+<v Mitchell Hashimoto>like literally zero intention of ever building a business around these tools. I thought they
+
+76
+00:06:25.340 --> 00:06:27.000
+<v Mitchell Hashimoto>They were just going to be open source and free.
+
+77
+00:06:27.240 --> 00:06:31.720
+<v Mitchell Hashimoto>And at best, they would help my resume to get a better job.
+
+78
+00:06:31.840 --> 00:06:34.560
+<v Mitchell Hashimoto>That was going through my mind in college.
+
+79
+00:06:34.860 --> 00:06:40.040
+<v Mitchell Hashimoto>And so I didn't try to build this mega generic tool that solved everyone's problems.
+
+80
+00:06:40.260 --> 00:06:49.080
+<v Mitchell Hashimoto>I built Vagrant and my MVP was I want a really awesome VM-based development workflow for Ruby on Rails because that's what I do every day.
+
+81
+00:06:49.180 --> 00:06:50.920
+<v Mitchell Hashimoto>And that's sort of how it formed.
+
+82
+00:06:51.940 --> 00:06:54.340
+<v Noah Labhart>So you have an MVP built.
+
+83
+00:06:55.340 --> 00:06:57.100
+<v Noah Labhart>Ruby, it's solving a problem for you.
+
+84
+00:06:57.160 --> 00:06:59.320
+<v Noah Labhart>You had no intention to build a business around it.
+
+85
+00:06:59.440 --> 00:07:01.740
+<v Noah Labhart>How did the product progress from there?
+
+86
+00:07:01.860 --> 00:07:02.980
+<v Noah Labhart>How did you mature it?
+
+87
+00:07:03.060 --> 00:07:07.100
+<v Noah Labhart>And what sort of caused you and helped you shape the roadmap?
+
+88
+00:07:07.600 --> 00:07:08.100
+<v Mitchell Hashimoto>So
+
+89
+00:07:08.080 --> 00:07:10.720
+<v Mitchell Hashimoto>the first year of Vagrant, no one really used it.
+
+90
+00:07:10.800 --> 00:07:13.300
+<v Mitchell Hashimoto>There was very few downloads the entire year.
+
+91
+00:07:13.540 --> 00:07:17.980
+<v Mitchell Hashimoto>And I was a little bummed about that because I did think I built something pretty cool.
+
+92
+00:07:18.160 --> 00:07:20.540
+<v Mitchell Hashimoto>And it felt like people were telling me that I didn't.
+
+93
+00:07:20.540 --> 00:07:24.500
+<v Mitchell Hashimoto>And after about a year, things started picking up.
+
+94
+00:07:24.560 --> 00:07:29.960
+<v Mitchell Hashimoto>And I started meeting people at meetups and stuff who were excited about Vagrant, which surprised me.
+
+95
+00:07:30.020 --> 00:07:31.440
+<v Mitchell Hashimoto>And I started learning more.
+
+96
+00:07:31.600 --> 00:07:41.320
+<v Mitchell Hashimoto>And that sort of motivated me to focus more on this and start building features for other people, not just myself, into the product.
+
+97
+00:07:41.500 --> 00:07:43.740
+<v Mitchell Hashimoto>Over the next couple of years, I did that for free.
+
+98
+00:07:44.020 --> 00:07:45.920
+<v Mitchell Hashimoto>Still didn't plan to build a business.
+
+99
+00:07:45.920 --> 00:08:00.800
+<v Mitchell Hashimoto>But that sort of gave me the foundation of the community as well as the minimal sort of industry, I don't know, experience or respect or whatever you want to call it that I needed to start the next thing, the next product and build a company around it.
+
+100
+00:08:00.800 --> 00:08:17.640
+<v Noah Labhart>So let's double back a little bit then and back to another MVP story. So tell me maybe about like Terraform or Vault. Tell me about those, the inception stories. Vagrant was the only one built in Ruby. So what'd you build Terraform in and how long did it take you to get kind of an MVP out there?
+
+101
+00:08:17.640 --> 00:08:24.480
+<v Mitchell Hashimoto>So everything else is written in Go, so we switched to Go. Um, and sort of as the transition here from
+
+102
+00:08:24.480 --> 00:08:28.260
+<v Mitchell Hashimoto>Vagrant to Terraform and Vault, I think what's funny is for the first few years of the company,
+
+103
+00:08:28.260 --> 00:08:32.660
+<v Mitchell Hashimoto>people just, you know, didn't call us HashiCorp or anything. They just called us like sort of the
+
+104
+00:08:32.660 --> 00:08:37.440
+<v Mitchell Hashimoto>Vagrant company. And then at a certain point, probably four or five years ago now, we were
+
+105
+00:08:37.440 --> 00:08:40.660
+<v Mitchell Hashimoto>fighting that, fighting that, fighting that. And then at a certain point it switched, and now we're sort
+
+106
+00:08:40.660 --> 00:08:46.080
+<v Mitchell Hashimoto>of like the Terraform Vault company, which is nice in some ways. And then it's a different challenge.
+
+107
+00:08:47.640 --> 00:08:53.660
+<v Mitchell Hashimoto>Terraform and Vault now, which were very popular. And let me think. I mean, I think Terraform is
+
+108
+00:08:53.660 --> 00:08:57.420
+<v Mitchell Hashimoto>sort of interesting to talk about the MVP. Funny enough, Vault doesn't go back to college, but
+
+109
+00:08:57.420 --> 00:09:02.180
+<v Mitchell Hashimoto>Terraform does go back to college. I wrote a blog post in college when CloudFormation was announced
+
+110
+00:09:02.180 --> 00:09:10.200
+<v Mitchell Hashimoto>from AWS. And I reposted this on in a gist, a public gist. But basically, I said, you know,
+
+111
+00:09:10.240 --> 00:09:14.580
+<v Mitchell Hashimoto>I'm super excited about CloudFormation. I think it's pretty limited how it is now. I think they're
+
+112
+00:09:14.580 --> 00:09:19.300
+<v Mitchell Hashimoto>are going to iterate really well. But I'd really love to see like an open source alternative that
+
+113
+00:09:19.300 --> 00:09:23.740
+<v Mitchell Hashimoto>worked with multiple cloud platforms and stuff. And I posted that four years before I ever built
+
+114
+00:09:23.740 --> 00:09:28.080
+<v Mitchell Hashimoto>Terraform. And so when we swung back around to Terraform, I already had that idea a long time
+
+115
+00:09:28.080 --> 00:09:31.500
+<v Mitchell Hashimoto>ago. I just thought someone else would build it. I didn't think it was going to be me. It had to
+
+116
+00:09:31.500 --> 00:09:36.600
+<v Mitchell Hashimoto>be me who built it. And I rediscovered, not rediscovered, I was just getting hit with that
+
+117
+00:09:36.600 --> 00:09:41.800
+<v Mitchell Hashimoto>problem again and looked around and thought like, no, my God, we still only have CloudFormation.
+
+118
+00:09:41.800 --> 00:09:44.560
+<v Mitchell Hashimoto>And even if you like CloudFormation, it's AWS only.
+
+119
+00:09:44.760 --> 00:09:47.000
+<v Mitchell Hashimoto>Like, what are we, what's the state of things?
+
+120
+00:09:47.140 --> 00:09:53.320
+<v Mitchell Hashimoto>And so that led to the creation of Terraform, which really the MVP for me was build a better
+
+121
+00:09:53.320 --> 00:09:54.520
+<v Mitchell Hashimoto>CloudFormation for AWS.
+
+122
+00:09:54.760 --> 00:09:59.780
+<v Mitchell Hashimoto>But like sort of on the foundation, knowing that beyond the MVP was going to be a bunch
+
+123
+00:09:59.780 --> 00:10:04.440
+<v Mitchell Hashimoto>more cloud providers and different types of things you could manage as code.
+
+124
+00:10:04.640 --> 00:10:05.140
+<v Noah Labhart>So
+
+125
+00:10:05.100 --> 00:10:06.820
+<v Noah Labhart>same question as Vagrant then.
+
+126
+00:10:06.820 --> 00:10:11.840
+<v Noah Labhart>So as you were building that, what sort of decisions and trade-offs did you have to make?
+
+127
+00:10:12.120 --> 00:10:12.620
+<v Mitchell Hashimoto>I
+
+128
+00:10:12.520 --> 00:10:30.800
+<v Mitchell Hashimoto>think the biggest risk to Terraform, the biggest trade-off we had to make was we felt it would be very difficult to support everything in AWS, especially because they were just really AWS was just starting the inflection point where they started shipping a ton of services.
+
+129
+00:10:31.080 --> 00:10:34.260
+<v Mitchell Hashimoto>I think when we started Terraform, it was still pretty manageable.
+
+130
+00:10:34.260 --> 00:10:38.880
+<v Mitchell Hashimoto>Like I think you could take any infrastructure person, they could probably name like every AWS service.
+
+131
+00:10:38.980 --> 00:10:39.920
+<v Mitchell Hashimoto>It was still at that point.
+
+132
+00:10:40.040 --> 00:10:43.020
+<v Mitchell Hashimoto>And we're just about to lose control of that.
+
+133
+00:10:43.180 --> 00:10:50.280
+<v Mitchell Hashimoto>And so the biggest risk was how do we build something like CloudFormation and support all the features of AWS because it's huge.
+
+134
+00:10:50.560 --> 00:10:52.680
+<v Mitchell Hashimoto>You know, we looked at machine generation and stuff.
+
+135
+00:10:52.840 --> 00:10:58.420
+<v Mitchell Hashimoto>And it just, a big motivator of Terraform was to build this more human-oriented tooling.
+
+136
+00:10:58.640 --> 00:11:02.560
+<v Mitchell Hashimoto>You could sort of tell CloudFormation was like machine-generated clients and stuff.
+
+137
+00:11:04.260 --> 00:11:06.320
+<v Mitchell Hashimoto>like writing the API in JSON.
+
+138
+00:11:06.480 --> 00:11:07.120
+<v Mitchell Hashimoto>It didn't feel good.
+
+139
+00:11:07.320 --> 00:11:10.260
+<v Mitchell Hashimoto>And we wanted to sort of build something that felt better.
+
+140
+00:11:10.440 --> 00:11:13.960
+<v Mitchell Hashimoto>And so we decided to handwrite every single resource
+
+141
+00:11:13.960 --> 00:11:17.520
+<v Mitchell Hashimoto>and customize it, even if it didn't match the API one-to-one.
+
+142
+00:11:17.680 --> 00:11:21.020
+<v Mitchell Hashimoto>And that was a trade-off sort of we decided to make,
+
+143
+00:11:21.080 --> 00:11:24.980
+<v Mitchell Hashimoto>saying we believe that 90% of people
+
+144
+00:11:24.980 --> 00:11:28.760
+<v Mitchell Hashimoto>use less than 10% of Amazon's resources out there
+
+145
+00:11:28.760 --> 00:11:30.540
+<v Mitchell Hashimoto>for the most part, something like that.
+
+146
+00:11:30.720 --> 00:11:32.360
+<v Mitchell Hashimoto>That wasn't based on data or anything.
+
+147
+00:11:34.260 --> 00:11:39.640
+<v Mitchell Hashimoto>a guess and that's how we ship Terraform, and that worked for a really long time. That
+
+148
+00:11:39.640 --> 00:11:40.140
+<v Noah Labhart>assumption
+
+149
+00:11:39.920 --> 00:11:46.240
+<v Noah Labhart>makes a ton of sense, especially you look, you gaze upon AWS and you see its complexities. Yeah,
+
+150
+00:11:46.240 --> 00:11:46.740
+<v Mitchell Hashimoto>and
+
+151
+00:11:46.500 --> 00:11:52.040
+<v Mitchell Hashimoto>it's a funny thing because even to this day, you know, Terraform supports a huge surface area of
+
+152
+00:11:52.040 --> 00:11:57.860
+<v Mitchell Hashimoto>AWS now. But even to this day, the reaction from folks who use something like Terraform, uh, if it
+
+153
+00:11:57.860 --> 00:12:01.580
+<v Mitchell Hashimoto>doesn't support one thing that they need if it supports like let's say they're building the
+
+154
+00:12:01.580 --> 00:12:06.480
+<v Mitchell Hashimoto>infrastructure and it supports 50 things they need, but the 51st thing is not supported.
+
+155
+00:12:06.860 --> 00:12:13.320
+<v Mitchell Hashimoto>It's amazing how useless feeling the tool becomes in that moment. You know, that's what people say,
+
+156
+00:12:13.420 --> 00:12:17.600
+<v Mitchell Hashimoto>and it's a bit hyperbolic to say it's useless, but really like if that's a cornerstone piece
+
+157
+00:12:17.600 --> 00:12:21.040
+<v Mitchell Hashimoto>of your infrastructure and you can't automate that, the whole idea of infrastructure as code
+
+158
+00:12:21.040 --> 00:12:26.880
+<v Mitchell Hashimoto>breaks down. We really sprinted right away after Terraform's release into supporting as much as we
+
+159
+00:12:26.880 --> 00:12:32.520
+<v Mitchell Hashimoto>we can. And now that there's so many, you know, more esoteric features of AWS, we really just
+
+160
+00:12:32.520 --> 00:12:37.960
+<v Mitchell Hashimoto>wait until a community member says, you know, I need this weird thing. And then we add support.
+
+161
+00:12:38.600 --> 00:12:44.480
+<v Noah Labhart>So then as a whole, HashiCorp, how did you go about building your team? So it started out,
+
+162
+00:12:44.520 --> 00:12:50.380
+<v Noah Labhart>you built Vagrant, but then you started, you know, getting some success with that. And then you start
+
+163
+00:12:50.380 --> 00:12:55.560
+<v Noah Labhart>growing into portfolio products. So how did you go about building your team? And what did you look
+
+164
+00:12:56.880 --> 00:12:59.980
+<v Noah Labhart>to indicate that they were the winning horses to join you?
+
+165
+00:13:00.300 --> 00:13:04.100
+<v Mitchell Hashimoto>I think this answer would change depending on the phase of the company.
+
+166
+00:13:04.260 --> 00:13:09.420
+<v Mitchell Hashimoto>I think picking, as you put them, winning horses for an early stage startup
+
+167
+00:13:09.420 --> 00:13:14.000
+<v Mitchell Hashimoto>versus middle and late stages, they're very different types of people.
+
+168
+00:13:14.200 --> 00:13:18.920
+<v Mitchell Hashimoto>I think that's one of the reasons that you rarely see people stick through all these different phases
+
+169
+00:13:18.920 --> 00:13:23.540
+<v Mitchell Hashimoto>because you sort of need different people for each one and people don't adapt as well.
+
+170
+00:13:23.540 --> 00:13:29.480
+<v Mitchell Hashimoto>But early on, it was pretty straightforward for us. We wanted to find people that were passionate
+
+171
+00:13:29.480 --> 00:13:35.240
+<v Mitchell Hashimoto>about the ideas we had and could accept a little bit of uncertainty at a job, given we were early
+
+172
+00:13:35.240 --> 00:13:40.360
+<v Mitchell Hashimoto>stage. And the people we tapped for that and asked if they're interested were all the people that
+
+173
+00:13:40.360 --> 00:13:45.220
+<v Mitchell Hashimoto>contributed regularly to our open source projects. So we just went through GitHub and literally
+
+174
+00:13:45.220 --> 00:13:51.300
+<v Mitchell Hashimoto>opened, well, we actually just literally sorted by commit count, reverse, you know, descending.
+
+175
+00:13:51.300 --> 00:13:53.600
+<v Mitchell Hashimoto>And this is before GitHub did this for you.
+
+176
+00:13:53.660 --> 00:13:57.360
+<v Mitchell Hashimoto>So we just did it on the command line and started emailing these people based on the
+
+177
+00:13:57.360 --> 00:13:58.560
+<v Mitchell Hashimoto>email they had in their Git commits.
+
+178
+00:13:58.900 --> 00:14:03.820
+<v Mitchell Hashimoto>You know, it's funny to look back on it now, especially because I was much younger and
+
+179
+00:14:03.820 --> 00:14:08.960
+<v Mitchell Hashimoto>much more naive about companies and also the commitment that I was asking these people
+
+180
+00:14:08.960 --> 00:14:09.740
+<v Mitchell Hashimoto>and stuff like that.
+
+181
+00:14:09.860 --> 00:14:11.580
+<v Mitchell Hashimoto>You know, the emails were so casual.
+
+182
+00:14:11.720 --> 00:14:15.500
+<v Mitchell Hashimoto>I look back and some of the people that are still at the company, I literally sent them
+
+183
+00:14:15.500 --> 00:14:16.560
+<v Mitchell Hashimoto>a two sentence email.
+
+184
+00:14:16.620 --> 00:14:18.980
+<v Mitchell Hashimoto>It's like, hey, I started a company around this thing.
+
+185
+00:14:19.120 --> 00:14:20.200
+<v Mitchell Hashimoto>Do you want to work on it full time?
+
+186
+00:14:20.440 --> 00:14:20.940
+<v Mitchell Hashimoto>Done.
+
+187
+00:14:21.300 --> 00:14:25.280
+<v Mitchell Hashimoto>no other detail. And it's kind of strange, but it worked out really well.
+
+188
+00:14:25.420 --> 00:14:28.220
+<v Noah Labhart>How many people did you hire just off of commits, if you remember?
+
+189
+00:14:28.760 --> 00:14:29.260
+<v Mitchell Hashimoto>I
+
+190
+00:14:29.040 --> 00:14:31.980
+<v Mitchell Hashimoto>don't know the exact count, but I'll say it's probably like 15 to 20 people.
+
+191
+00:14:32.040 --> 00:14:34.380
+<v Noah Labhart>That's a large amount. That's a really cool
+
+192
+00:14:34.380 --> 00:14:34.880
+<v Noah Labhart>story.
+
+193
+00:14:34.960 --> 00:14:39.600
+<v Mitchell Hashimoto>Yeah. And I mean, we don't need to get into this, but that sort of led into why our company is now
+
+194
+00:14:39.600 --> 00:14:42.840
+<v Mitchell Hashimoto>remote, right? We were remote from the beginning and that was sort of a big part of it.
+
+195
+00:14:44.420 --> 00:14:49.260
+<v Noah Labhart>I think I know the answer to this, given the nature of the product and the portfolio that
+
+196
+00:14:49.260 --> 00:14:55.220
+<v Noah Labhart>you've built, but how does scalability factor into how you approach things? I assume it factors
+
+197
+00:14:55.220 --> 00:15:01.160
+<v Noah Labhart>into everything, but even from the early days of Vagrant, maybe Terraform too or any of the other
+
+198
+00:15:01.160 --> 00:15:07.200
+<v Noah Labhart>products, how did you go about thinking about this and making sure that the products are
+
+199
+00:15:07.200 --> 00:15:11.640
+<v Noah Labhart>scalable themselves, even though they're tools around scalability?
+
+200
+00:15:12.480 --> 00:15:18.140
+<v Mitchell Hashimoto>You know, this isn't a formal differentiation we make, but it is a differentiation I like to make,
+
+201
+00:15:19.400 --> 00:15:23.180
+<v Mitchell Hashimoto>I call them sort of the runtime tools and then more of the pipeline tools.
+
+202
+00:15:23.300 --> 00:15:26.120
+<v Mitchell Hashimoto>The runtime tools are the ones that run sort of on the server side.
+
+203
+00:15:26.220 --> 00:15:30.060
+<v Mitchell Hashimoto>That would be like Vault and Consul and Nomad and those server side components.
+
+204
+00:15:30.300 --> 00:15:35.460
+<v Mitchell Hashimoto>And the pipeline tools are more the ones you'd run on your desktop, which are like Vagrant and Packer and Terraform.
+
+205
+00:15:35.720 --> 00:15:43.840
+<v Mitchell Hashimoto>I like to break those up because the properties we've learned over the years that we need to build to make those scalable really fall into those two categories.
+
+206
+00:15:44.020 --> 00:15:48.120
+<v Mitchell Hashimoto>The stuff you do for Terraform doesn't really make sense for Vault and vice versa.
+
+207
+00:15:49.260 --> 00:16:02.780
+<v Mitchell Hashimoto>Early on, we made this bet, which was kind of scary at the time, but we made this bet on distributed systems and Raft and looking at things like Vault and realizing these are core infrastructure components.
+
+208
+00:16:03.160 --> 00:16:06.880
+<v Mitchell Hashimoto>These are things that you don't gracefully degrade if they go down.
+
+209
+00:16:06.980 --> 00:16:08.320
+<v Mitchell Hashimoto>This brings down your infrastructure.
+
+210
+00:16:08.780 --> 00:16:12.880
+<v Mitchell Hashimoto>And so we optimized uptime over everything else at the beginning.
+
+211
+00:16:12.880 --> 00:16:19.040
+<v Mitchell Hashimoto>We wrote, you know, one of the first Raft libraries for Go that we still use to this day, and a lot of
+
+212
+00:16:19.040 --> 00:16:24.380
+<v Mitchell Hashimoto>other products use that. Like, I think GitHub's database charter thing uses our Raft library, for
+
+213
+00:16:24.380 --> 00:16:31.500
+<v Mitchell Hashimoto>example. We sort of just built into that. I think something we think about with scaling is, you know,
+
+214
+00:16:31.500 --> 00:16:37.200
+<v Mitchell Hashimoto>try to run through your head what has to happen for each request and, and where are the hot spots,
+
+215
+00:16:37.200 --> 00:16:41.020
+<v Mitchell Hashimoto>and don't optimize them. Just like, think about it, just know it's there. And we don't optimize it.
+
+216
+00:16:42.880 --> 00:16:47.380
+<v Mitchell Hashimoto>Think about it that way, you could realize like, oh, this is, if we expect this to be a thousand
+
+217
+00:16:47.380 --> 00:16:50.880
+<v Mitchell Hashimoto>requests per second, this is going to suck, and things like that. And when we think about Vault,
+
+218
+00:16:50.980 --> 00:16:53.240
+<v Mitchell Hashimoto>we really think hard about that sort of element.
+
+219
+00:16:54.200 --> 00:16:57.480
+<v Noah Labhart>So as you step out on the balcony and you look
+
+220
+00:16:57.480 --> 00:17:01.340
+<v Noah Labhart>across all you've built at HashiCorp, what are you most proud of?
+
+221
+00:17:02.080 --> 00:17:04.300
+<v Mitchell Hashimoto>I think I'm most proud of two
+
+222
+00:17:04.740 --> 00:17:08.480
+<v Mitchell Hashimoto>things and I'll get more specific with one of them, but there's the tech side and the people
+
+223
+00:17:08.480 --> 00:17:28.300
+<v Mitchell Hashimoto>I mean, I think the tech side, I'm really most proud of the impact that these ended up having. Because like I said, at the beginning, I never thought we'd build a business around it or that many people would use it. And, you know, HashiCorp as a company now has a significant number of the Fortune 500 using our tools. And that's just not what I ever expected.
+
+224
+00:17:28.300 --> 00:17:34.040
+<v Mitchell Hashimoto>did. But more specifically on the tech, I mean, I think Terraform probably is the one that I think
+
+225
+00:17:34.040 --> 00:17:39.180
+<v Mitchell Hashimoto>changed sort of a mindset of representing things as code, more things as code. And having that
+
+226
+00:17:39.180 --> 00:17:43.420
+<v Mitchell Hashimoto>pick up and be successful is really, really cool. But I do want to mention the people side because
+
+227
+00:17:43.420 --> 00:17:49.940
+<v Mitchell Hashimoto>I'm an engineer. You know, I write the code early on, stuff like that. So I fixated on my goals
+
+228
+00:17:49.940 --> 00:17:54.740
+<v Mitchell Hashimoto>around the code and I never stepped back and thought about it until it already happened.
+
+229
+00:17:54.740 --> 00:17:57.340
+<v Mitchell Hashimoto>and the human impact that the company would have.
+
+230
+00:17:57.460 --> 00:17:59.460
+<v Mitchell Hashimoto>And just to be able to look and see,
+
+231
+00:17:59.500 --> 00:18:01.080
+<v Mitchell Hashimoto>the company's over a thousand people now
+
+232
+00:18:01.080 --> 00:18:03.500
+<v Mitchell Hashimoto>that a thousand people get their paycheck
+
+233
+00:18:03.500 --> 00:18:05.200
+<v Mitchell Hashimoto>and pay their bills and live their lives
+
+234
+00:18:05.200 --> 00:18:08.540
+<v Mitchell Hashimoto>partially thanks to this software that we wrote.
+
+235
+00:18:08.740 --> 00:18:11.100
+<v Mitchell Hashimoto>And that's really cool that we could have
+
+236
+00:18:11.100 --> 00:18:13.680
+<v Mitchell Hashimoto>both the industry impact through the technology
+
+237
+00:18:13.680 --> 00:18:16.740
+<v Mitchell Hashimoto>and the human impact of having a set of people
+
+238
+00:18:16.740 --> 00:18:18.040
+<v Mitchell Hashimoto>that are really happy in their jobs
+
+239
+00:18:18.040 --> 00:18:19.880
+<v Mitchell Hashimoto>and being able to do this for money.
+
+240
+00:18:20.040 --> 00:18:20.880
+<v Mitchell Hashimoto>I mean, that's pretty cool.
+
+241
+00:18:22.260 --> 00:18:24.120
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+242
+00:18:24.740 --> 00:18:28.700
+<v Noah Labhart>a mistake you made and how you and your team responded to it?
+
+243
+00:18:29.360 --> 00:18:30.800
+<v Mitchell Hashimoto>Yeah, there's a lot of mistakes.
+
+244
+00:18:31.080 --> 00:18:36.420
+<v Mitchell Hashimoto>I want to mention, I guess, a big one. And the biggest one I could think of is our first
+
+245
+00:18:36.420 --> 00:18:42.940
+<v Mitchell Hashimoto>commercial product out of HashiCorp. It was a total failure. We scratched it, pivoted the company
+
+246
+00:18:42.940 --> 00:18:48.460
+<v Mitchell Hashimoto>commercially, pivoted the company, and it sort of defined what HashiCorp is today. And so early on,
+
+247
+00:18:48.480 --> 00:18:54.300
+<v Mitchell Hashimoto>we had this portfolio of open source products. And our first commercial product, the thesis we
+
+248
+00:18:54.740 --> 00:18:57.320
+<v Mitchell Hashimoto>was our community uses most of these products.
+
+249
+00:18:57.540 --> 00:18:59.940
+<v Mitchell Hashimoto>They're looking for a way to unify them
+
+250
+00:18:59.940 --> 00:19:02.160
+<v Mitchell Hashimoto>and have sort of a single management interface
+
+251
+00:19:02.160 --> 00:19:03.120
+<v Mitchell Hashimoto>to all of them.
+
+252
+00:19:03.240 --> 00:19:05.660
+<v Mitchell Hashimoto>And so that was our first commercial product.
+
+253
+00:19:05.880 --> 00:19:07.640
+<v Mitchell Hashimoto>And it was a total miss.
+
+254
+00:19:07.800 --> 00:19:09.920
+<v Mitchell Hashimoto>Like if you read any sort of like,
+
+255
+00:19:10.040 --> 00:19:11.780
+<v Mitchell Hashimoto>whatever lean startup type books,
+
+256
+00:19:11.960 --> 00:19:14.680
+<v Mitchell Hashimoto>we broke every rule and paid the price because of it,
+
+257
+00:19:14.700 --> 00:19:16.120
+<v Mitchell Hashimoto>because we didn't really talk to customers.
+
+258
+00:19:16.360 --> 00:19:20.000
+<v Mitchell Hashimoto>We were building a product for a problem we didn't have.
+
+259
+00:19:20.200 --> 00:19:22.480
+<v Mitchell Hashimoto>And so we stepped out of that box and that bit us.
+
+260
+00:19:22.480 --> 00:19:28.220
+<v Mitchell Hashimoto>and we built the whole thing and started selling it before you know we started getting more feedback
+
+261
+00:19:28.220 --> 00:19:33.920
+<v Mitchell Hashimoto>so we didn't iterate really and what we ended up building was something nobody wanted and then we
+
+262
+00:19:33.920 --> 00:19:37.880
+<v Mitchell Hashimoto>got into the sunk cost thing where we started selling it and we weren't listening to what
+
+263
+00:19:37.880 --> 00:19:43.540
+<v Mitchell Hashimoto>people were telling us and it wasn't until maybe six months of very difficult sales we closed a
+
+264
+00:19:43.540 --> 00:19:49.700
+<v Mitchell Hashimoto>few sales but very difficult sales that we looked at the notes and thought about the meetings we had
+
+265
+00:19:49.700 --> 00:19:51.600
+<v Mitchell Hashimoto>and realized, oh my God,
+
+266
+00:19:51.760 --> 00:19:53.860
+<v Mitchell Hashimoto>our customers are telling us the answer,
+
+267
+00:19:54.020 --> 00:19:56.020
+<v Mitchell Hashimoto>which is, we'd go into these meetings
+
+268
+00:19:56.020 --> 00:19:57.880
+<v Mitchell Hashimoto>and pitch this product for like half an hour.
+
+269
+00:19:58.000 --> 00:20:00.020
+<v Mitchell Hashimoto>And they would be like, okay, thanks.
+
+270
+00:20:00.120 --> 00:20:01.620
+<v Mitchell Hashimoto>Is there a commercial version of Vault?
+
+271
+00:20:01.800 --> 00:20:03.560
+<v Mitchell Hashimoto>That would be what they said.
+
+272
+00:20:03.700 --> 00:20:05.780
+<v Mitchell Hashimoto>Like they would dismiss the presentation immediately.
+
+273
+00:20:06.420 --> 00:20:08.540
+<v Mitchell Hashimoto>And it's so obvious in hindsight.
+
+274
+00:20:08.660 --> 00:20:11.480
+<v Mitchell Hashimoto>It's so funny how clouded we could get as humans
+
+275
+00:20:11.480 --> 00:20:12.460
+<v Mitchell Hashimoto>and what we built.
+
+276
+00:20:12.560 --> 00:20:14.200
+<v Mitchell Hashimoto>But when we looked back, we realized,
+
+277
+00:20:14.360 --> 00:20:16.520
+<v Mitchell Hashimoto>okay, we're not making a lot of money.
+
+278
+00:20:16.780 --> 00:20:19.260
+<v Mitchell Hashimoto>The sales process is really painful.
+
+279
+00:20:19.700 --> 00:20:25.460
+<v Mitchell Hashimoto>where customers are asking for single product commercial versions. And the people who want to
+
+280
+00:20:25.460 --> 00:20:30.180
+<v Mitchell Hashimoto>pay us are big businesses is what we also found out. Because at the time, we had this thesis that
+
+281
+00:20:30.180 --> 00:20:34.500
+<v Mitchell Hashimoto>anybody could buy this. You swipe a credit card and anybody could buy this. But it just doesn't
+
+282
+00:20:34.500 --> 00:20:40.480
+<v Mitchell Hashimoto>work that way. And so the wake up moment was we had this very difficult board meeting. And we
+
+283
+00:20:40.480 --> 00:20:45.840
+<v Mitchell Hashimoto>weren't like chastised or anything. It's more of like when your parents don't say you did anything
+
+284
+00:20:45.840 --> 00:20:49.820
+<v Mitchell Hashimoto>wrong, but you could tell you did something wrong. It was sort of like that. We left the board
+
+285
+00:20:49.820 --> 00:20:54.540
+<v Mitchell Hashimoto>meeting and me and my co-founder were silent on the entire drive back to San Francisco.
+
+286
+00:20:54.900 --> 00:21:00.340
+<v Mitchell Hashimoto>The board meeting was south of San Francisco. And when we got into our office, we sort of sat there
+
+287
+00:21:00.340 --> 00:21:04.600
+<v Mitchell Hashimoto>as like a Friday night and we were sitting in the office and we said, you know, okay, that didn't go
+
+288
+00:21:04.600 --> 00:21:09.860
+<v Mitchell Hashimoto>well. And we decided just as a thought experiment, if we could clean slate everything, if we could
+
+289
+00:21:09.860 --> 00:21:15.760
+<v Mitchell Hashimoto>start over and there was no sunk cost or anything, what would we do differently? And we drew out on
+
+290
+00:21:15.840 --> 00:21:20.920
+<v Mitchell Hashimoto>whiteboard per product commercial versions, what features would that have? How would we package it,
+
+291
+00:21:20.960 --> 00:21:25.640
+<v Mitchell Hashimoto>sell it only to enterprises, you know, build a team around that. We looked at this whiteboard
+
+292
+00:21:25.640 --> 00:21:31.440
+<v Mitchell Hashimoto>and luckily, you know, startups, you know, we're like 30 people at a time. It was Friday night and
+
+293
+00:21:31.440 --> 00:21:37.580
+<v Mitchell Hashimoto>we said, let's do it. And so Monday morning we called our board, we put together an all hands
+
+294
+00:21:37.580 --> 00:21:43.360
+<v Mitchell Hashimoto>and we said, we're, we're switching strategies. We're now an enterprise company. This product we
+
+295
+00:21:43.360 --> 00:21:48.120
+<v Mitchell Hashimoto>we had, we're sunsetting it. Sales of that are going to stop immediately. And we're going to
+
+296
+00:21:48.120 --> 00:21:52.940
+<v Mitchell Hashimoto>go full focus on one product. And the first product is going to be Vault Enterprise. And then,
+
+297
+00:21:52.960 --> 00:22:00.060
+<v Mitchell Hashimoto>you know, it'll go from there. And that one decision informed us on, we hired a CEO, VP of
+
+298
+00:22:00.060 --> 00:22:04.960
+<v Mitchell Hashimoto>sales, you know, it made it really clear who we're hiring after that. And it set the stage for the
+
+299
+00:22:04.960 --> 00:22:11.860
+<v Mitchell Hashimoto>company. And so and that's what we continue to do today. So that was, that was a huge mistake. And I
+
+300
+00:22:13.360 --> 00:22:15.080
+<v Mitchell Hashimoto>company ending at a certain point.
+
+301
+00:22:17.200 --> 00:22:20.240
+<v Noah Labhart>So who influences the way that you work? You know,
+
+302
+00:22:20.240 --> 00:22:27.340
+<v Noah Labhart>a CEO, CTO, an architect, really any person who influences the way that you work and who do you
+
+303
+00:22:27.340 --> 00:22:29.200
+<v Noah Labhart>look up to and why? There's
+
+304
+00:22:29.200 --> 00:22:32.700
+<v Mitchell Hashimoto>a lot of a lot of people, depending on what I'm, you know, what
+
+305
+00:22:32.700 --> 00:22:37.840
+<v Mitchell Hashimoto>what area I'm focusing on. I think as an engineer, this has changed over time. But the person today
+
+306
+00:22:37.840 --> 00:22:42.680
+<v Mitchell Hashimoto>that as an engineer, I just respect so much and read everything they write.
+
+307
+00:22:42.880 --> 00:22:48.460
+<v Mitchell Hashimoto>And all that is Russ Cox, who's one of the core Go people currently,
+
+308
+00:22:48.640 --> 00:22:50.340
+<v Mitchell Hashimoto>but his resume is impressive.
+
+309
+00:22:50.920 --> 00:22:53.300
+<v Mitchell Hashimoto>I think he's the project lead for Go.
+
+310
+00:22:53.420 --> 00:22:59.300
+<v Mitchell Hashimoto>But I just love how he's a very measure-twice-cut-once kind of person.
+
+311
+00:22:59.920 --> 00:23:03.920
+<v Mitchell Hashimoto>And the way he communicates is very thoughtful and kind and inclusive.
+
+312
+00:23:03.920 --> 00:23:08.100
+<v Mitchell Hashimoto>and the code he writes and the technology he makes is just amazing.
+
+313
+00:23:08.480 --> 00:23:11.980
+<v Mitchell Hashimoto>And so, you know, I like to try to learn from that
+
+314
+00:23:11.980 --> 00:23:14.580
+<v Mitchell Hashimoto>and try to be similar in that way.
+
+315
+00:23:14.760 --> 00:23:16.760
+<v Mitchell Hashimoto>And yeah, really impressive guy.
+
+316
+00:23:17.920 --> 00:23:19.120
+<v Noah Labhart>Well, last question, Mitchell.
+
+317
+00:23:19.800 --> 00:23:23.280
+<v Noah Labhart>You're getting on a plane and you're sitting next to a young entrepreneur
+
+318
+00:23:23.280 --> 00:23:25.280
+<v Noah Labhart>who's built the next big thing.
+
+319
+00:23:25.540 --> 00:23:26.880
+<v Noah Labhart>They're jazzed about it.
+
+320
+00:23:26.900 --> 00:23:28.580
+<v Noah Labhart>They can't wait to show it off to you.
+
+321
+00:23:28.680 --> 00:23:30.240
+<v Noah Labhart>Can't wait to show it off to the world.
+
+322
+00:23:30.740 --> 00:23:33.240
+<v Noah Labhart>Maybe they're in college and they just heard about a new, you know,
+
+323
+00:23:33.920 --> 00:23:37.980
+<v Noah Labhart>out and they're jazzed to build something, you know, something for it. What advice do you give
+
+324
+00:23:37.980 --> 00:23:39.880
+<v Noah Labhart>that person having gone down this road?
+
+325
+00:23:40.820 --> 00:23:44.080
+<v Mitchell Hashimoto>I almost have this situation happening right now, except I
+
+326
+00:23:44.080 --> 00:23:49.340
+<v Mitchell Hashimoto>don't know if they have the next big thing yet. But I have a cousin in college who's just discovering
+
+327
+00:23:49.340 --> 00:23:56.180
+<v Mitchell Hashimoto>startups and technology and is super hyped about it. And I had to think about what I say, sort of.
+
+328
+00:23:56.240 --> 00:24:01.200
+<v Mitchell Hashimoto>And I think the advice I would give people is that, you know, you know a lot less than you
+
+329
+00:24:01.200 --> 00:24:06.060
+<v Mitchell Hashimoto>you think and that's okay it's actually probably a really good thing but to make up for that you
+
+330
+00:24:06.060 --> 00:24:12.980
+<v Mitchell Hashimoto>really have to surround yourself with people who are good at what they do and interested in helping
+
+331
+00:24:12.980 --> 00:24:18.300
+<v Mitchell Hashimoto>you learn you know i at the time you know 10 years ago when we started HashiCorp you know you don't
+
+332
+00:24:18.300 --> 00:24:24.080
+<v Mitchell Hashimoto>know what you don't know and it turns out that i didn't know a lot there was a lot i had to learn
+
+333
+00:24:24.080 --> 00:24:30.720
+<v Mitchell Hashimoto>but i you know got lucky got introduced the right people and and got the right investors and stuff
+
+334
+00:24:31.200 --> 00:24:35.280
+<v Mitchell Hashimoto>out. And there's a difference between, you know, someone who's going to give you a check or get
+
+335
+00:24:35.280 --> 00:24:40.340
+<v Mitchell Hashimoto>involved because of ego or just wanting to put you on a resume or whatever. And they just want
+
+336
+00:24:40.340 --> 00:24:44.920
+<v Mitchell Hashimoto>to stand back and let you do your thing versus someone who is getting involved, doesn't have an
+
+337
+00:24:44.920 --> 00:24:49.680
+<v Mitchell Hashimoto>ego and just genuinely wants you to succeed. And those are the people you want to be around
+
+338
+00:24:49.680 --> 00:24:53.500
+<v Mitchell Hashimoto>because they're going to nudge you in the right direction and teach you things.
+
+339
+00:24:53.780 --> 00:24:56.840
+<v Mitchell Hashimoto>And so that's what I would tell people is, you know, you can't do it alone.
+
+340
+00:24:56.840 --> 00:24:59.940
+<v Mitchell Hashimoto>find advisors, find folks that could help you
+
+341
+00:24:59.940 --> 00:25:03.220
+<v Mitchell Hashimoto>and don't chase names, don't chase fame
+
+342
+00:25:03.220 --> 00:25:05.660
+<v Mitchell Hashimoto>none of that stuff. Success will come
+
+343
+00:25:05.660 --> 00:25:08.160
+<v Mitchell Hashimoto>if you just focus on sort of
+
+344
+00:25:08.160 --> 00:25:09.800
+<v Mitchell Hashimoto>building the fundamentals.
+
+345
+00:25:10.540 --> 00:25:11.520
+<v Noah Labhart>That's great advice
+
+346
+00:25:11.520 --> 00:25:13.920
+<v Noah Labhart>Well Mitchell, thank you for being on the show today
+
+347
+00:25:13.920 --> 00:25:17.580
+<v Noah Labhart>Thank you for being on Code Story and telling the creation story
+
+348
+00:25:17.580 --> 00:25:20.620
+<v Noah Labhart>or the inception story of HashiCorp
+
+349
+00:25:20.620 --> 00:25:21.220
+<v Mitchell Hashimoto>No
+
+350
+00:25:21.220 --> 00:25:22.120
+<v Mitchell Hashimoto>problem, it was really fun
+
+351
+00:25:22.960 --> 00:25:26.200
+<v Noah Labhart>And this concludes another chapter of Code Story
+
+352
+00:25:30.720 --> 00:25:37.280
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify, or
+
+353
+00:25:37.280 --> 00:25:43.220
+<v Noah Labhart>the podcasting app of your choice. Support the show on Patreon.com slash Code Story for just
+
+354
+00:25:43.220 --> 00:25:48.600
+<v Noah Labhart>five to ten bucks a month. And when you get a chance, leave us a review. Both things help us
+
+355
+00:25:48.600 --> 00:25:49.300
+<v Noah Labhart>out tremendously.
+
+356
+00:25:49.300 --> 00:25:51.980
+<v Noah Labhart>and
+
+357
+00:25:51.980 --> 00:25:53.440
+<v Noah Labhart>thanks again for listening

@@ -1,0 +1,1183 @@
+WEBVTT
+
+NOTE S10 E15: Merging Code-First End-to-End Testing with Modern Synthetics and Agentic Root-Cause Analysis with Hannes Lenke, Co-Founder & CEO of Checkly
+
+1
+00:00:00.000 --> 00:00:06.600
+<v Hannes Lenke>We had this vision of monitoring as code in mind from the start, but Checkly got early traction.
+
+2
+00:00:06.840 --> 00:00:11.960
+<v Hannes Lenke>So we had paying customers that came to us without even supporting monitoring as code.
+
+3
+00:00:12.220 --> 00:00:19.240
+<v Hannes Lenke>We started to solve their problems for four months without even investing time into our vision.
+
+4
+00:00:19.480 --> 00:00:28.140
+<v Hannes Lenke>After almost two years, actually, we took a step back thinking about, okay, that's cool that we're having customers, that we're having paying customers,
+
+5
+00:00:30.000 --> 00:00:34.780
+<v Hannes Lenke>we want to solve and really thought about, okay, we need to invest time into monitoring as code.
+
+6
+00:00:34.920 --> 00:00:38.600
+<v Hannes Lenke>And that's what we did. The first iteration wasn't great, to be honest.
+
+7
+00:00:38.900 --> 00:00:43.700
+<v Hannes Lenke>My name is Hannes Lenke. I'm co-founder and CEO of Checkly.
+
+8
+00:00:46.700 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+9
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+10
+00:00:53.760 --> 00:00:55.320
+<v Clip>There's nothing like the backhands.
+
+11
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+12
+00:01:01.140 --> 00:01:04.560
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:01:08.680 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+14
+00:01:15.200 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+15
+00:01:18.260 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+16
+00:01:22.120 --> 00:01:22.800
+<v Clip>Dry
+
+17
+00:01:22.800 --> 00:01:25.840
+<v Noah Labhart>the ups and downs of the startup life.
+
+18
+00:01:26.940 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+19
+00:01:30.000 --> 00:01:38.100
+<v Noah Labhart>on Code Story. I'm your host Noah Labhart and today Hannes Lenke is helping you detect and
+
+20
+00:01:38.100 --> 00:01:43.520
+<v Noah Labhart>resolve your issues 10x faster using code first synthetic monitoring.
+
+21
+00:01:48.980 --> 00:01:53.880
+<v Noah Labhart>Hannes Lenke was born in East Germany. He started tinkering with computers at an early age and
+
+22
+00:01:53.880 --> 00:01:59.240
+<v Noah Labhart>became interested in making games at the age of 10. Once the browsers came out he quickly dove
+
+23
+00:02:00.000 --> 00:02:04.640
+<v Noah Labhart>to web development. He also has a background in trading stocks, which he started when he was 14,
+
+24
+00:02:04.760 --> 00:02:09.580
+<v Noah Labhart>along with software development consulting for enterprise. Outside of tech, he's married with
+
+25
+00:02:09.580 --> 00:02:14.660
+<v Noah Labhart>two daughters. He lives in a small town close to Berlin and enjoys running, rowing, and cooking out
+
+26
+00:02:14.660 --> 00:02:22.500
+<v Noah Labhart>on his grill. In 2010, Hannes founded a startup centered around testing. Post-exit, he noticed
+
+27
+00:02:22.500 --> 00:02:28.020
+<v Noah Labhart>that more and more businesses were using end-to-end testing, and the world was changing toward DevOps
+
+28
+00:02:30.000 --> 00:02:34.300
+<v Noah Labhart>He decided that a new tool needed to be made along the lines of synthetic monitoring.
+
+29
+00:02:36.140 --> 00:02:38.740
+<v Noah Labhart>This is the creation story of Checkly.
+
+30
+00:02:42.600 --> 00:02:50.600
+<v Hannes Lenke>We at Checkly, we help companies to keep their websites, services, APIs reliable and fast.
+
+31
+00:02:50.860 --> 00:02:52.700
+<v Hannes Lenke>And actually also error-free, right?
+
+32
+00:02:52.760 --> 00:02:56.060
+<v Hannes Lenke>So we ensure that a website works from an end-user perspective.
+
+33
+00:02:56.060 --> 00:03:03.600
+<v Hannes Lenke>We believe that developers should understand how the services that they're building are doing on production.
+
+34
+00:03:03.800 --> 00:03:06.920
+<v Hannes Lenke>And they should get paged about issues quickly.
+
+35
+00:03:07.380 --> 00:03:10.880
+<v Hannes Lenke>We're applying pretty much testing in production.
+
+36
+00:03:11.120 --> 00:03:17.700
+<v Hannes Lenke>So we're helping our customers to develop automated test scripts and run them against their production system continuously.
+
+37
+00:03:18.340 --> 00:03:21.680
+<v Hannes Lenke>And there's a word for it, which is synthetic monitoring.
+
+38
+00:03:22.120 --> 00:03:23.220
+<v Hannes Lenke>That's what we do.
+
+39
+00:03:23.220 --> 00:03:39.540
+<v Hannes Lenke>We call it even more monitoring as code because essentially we allow our customers to use real code from within their code repositories and upload them to our monitoring platform where our CLI or other mechanisms like Terraform, etc.
+
+40
+00:03:39.820 --> 00:03:49.620
+<v Hannes Lenke>And then run these tests from 20 different data centers worldwide to really ensure that their applications, APIs and services are running like a charm.
+
+41
+00:03:49.620 --> 00:03:57.400
+<v Hannes Lenke>I founded one startup in 2010 in testing, mobile testing, and back then we helped
+
+42
+00:03:57.400 --> 00:04:01.620
+<v Hannes Lenke>test automation people and test automation engineers to ensure that
+
+43
+00:04:01.620 --> 00:04:06.100
+<v Hannes Lenke>their mobile apps are working on production and on staging. We sold that
+
+44
+00:04:06.100 --> 00:04:11.220
+<v Hannes Lenke>business to Sauce Labs end of 2016 and what we've seen there, what I've seen
+
+45
+00:04:11.220 --> 00:04:16.100
+<v Hannes Lenke>there is lots of companies that are developing end-to-end tests are using
+
+46
+00:04:16.100 --> 00:04:20.560
+<v Hannes Lenke>using these tests to really understand how their applications are doing on production.
+
+47
+00:04:20.760 --> 00:04:24.460
+<v Hannes Lenke>So really making sure that they capture problems there.
+
+48
+00:04:25.040 --> 00:04:31.260
+<v Hannes Lenke>Realizing that in 2019, I thought, okay, the world is changing towards cross-functional
+
+49
+00:04:31.260 --> 00:04:32.800
+<v Hannes Lenke>teams, DevOps teams, et cetera.
+
+50
+00:04:33.180 --> 00:04:39.660
+<v Hannes Lenke>On the other side, you already have companies realizing what we do in production monitoring
+
+51
+00:04:40.190 --> 00:04:41.400
+<v Hannes Lenke>doesn't fit our processes.
+
+52
+00:04:41.400 --> 00:04:50.500
+<v Hannes Lenke>We need to use end-to-end tests to really understand if our website, APIs, etc. are up or down.
+
+53
+00:04:50.780 --> 00:04:57.660
+<v Hannes Lenke>I figured, okay, we need a new tool that is really made for developers, made for that use case, because there wasn't a tool back then.
+
+54
+00:04:57.860 --> 00:05:03.260
+<v Hannes Lenke>I tried to find solutions on the internet that are really solving that kind of problem.
+
+55
+00:05:03.260 --> 00:05:12.200
+<v Hannes Lenke>I recognized that there was a Dutch guy living in Berlin, like two kilometers away from me, creating a side project called Checkly back then.
+
+56
+00:05:12.820 --> 00:05:15.240
+<v Hannes Lenke>Tim became our co-founder in 2020.
+
+57
+00:05:15.740 --> 00:05:28.380
+<v Hannes Lenke>Long story short, we took that side project, made it a real company beginning of 2020, and since then grew to thousands of users, thousand paying customers, etc.
+
+58
+00:05:31.140 --> 00:05:33.200
+<v Noah Labhart>Let's dive into the MVP then.
+
+59
+00:05:33.260 --> 00:05:38.620
+<v Noah Labhart>So that first version of the product you built, how long did it take to build and what sort of tools were you using to bring it to life?
+
+60
+00:05:40.520 --> 00:05:49.740
+<v Hannes Lenke>Tim, my co-founder, he started to write the first code in 2018, end of 2018, and really built Checkly in public.
+
+61
+00:05:50.120 --> 00:05:57.300
+<v Hannes Lenke>He built it as an indie hacker project or project aimed to help indie hackers to really to understand how their applications are doing.
+
+62
+00:05:57.300 --> 00:06:00.260
+<v Hannes Lenke>and then started to talk about it, right?
+
+63
+00:06:00.320 --> 00:06:01.760
+<v Hannes Lenke>He started to talk about numbers,
+
+64
+00:06:01.980 --> 00:06:03.560
+<v Hannes Lenke>so revenue numbers, et cetera,
+
+65
+00:06:04.080 --> 00:06:05.760
+<v Hannes Lenke>but also about the technology
+
+66
+00:06:05.760 --> 00:06:08.840
+<v Hannes Lenke>that he applied to develop Checkly, right?
+
+67
+00:06:09.220 --> 00:06:11.660
+<v Hannes Lenke>And the first version was a very simple version
+
+68
+00:06:11.660 --> 00:06:13.880
+<v Hannes Lenke>hosted on Heroku, right?
+
+69
+00:06:13.960 --> 00:06:15.580
+<v Hannes Lenke>So it was a Postgres DB.
+
+70
+00:06:15.780 --> 00:06:18.380
+<v Hannes Lenke>It was a very simple UI
+
+71
+00:06:18.380 --> 00:06:21.220
+<v Hannes Lenke>and enabled you to monitor APIs
+
+72
+00:06:21.220 --> 00:06:25.020
+<v Hannes Lenke>and later on also UIs, so websites,
+
+73
+00:06:25.020 --> 00:06:27.880
+<v Hannes Lenke>with a framework back then called Puppeteer.
+
+74
+00:06:28.380 --> 00:06:31.700
+<v Hannes Lenke>Tim was very vocal on Twitter about what he did,
+
+75
+00:06:31.760 --> 00:06:34.720
+<v Hannes Lenke>and that attracted the first users, really.
+
+76
+00:06:34.960 --> 00:06:37.840
+<v Hannes Lenke>And then we started, beginning of 2020,
+
+77
+00:06:38.120 --> 00:06:41.260
+<v Hannes Lenke>to iterate very quickly on the user feedback that we got
+
+78
+00:06:41.260 --> 00:06:43.240
+<v Hannes Lenke>and adding more features,
+
+79
+00:06:43.720 --> 00:06:47.280
+<v Hannes Lenke>adding a framework that is called Playwright for test automation,
+
+80
+00:06:47.560 --> 00:06:50.500
+<v Hannes Lenke>which is now our prime framework that we're using
+
+81
+00:06:50.500 --> 00:06:53.560
+<v Hannes Lenke>to enable our users really to create tests.
+
+82
+00:06:55.020 --> 00:06:56.220
+<v Noah Labhart>Let's stay on that MVP for a minute.
+
+83
+00:06:56.300 --> 00:07:00.900
+<v Noah Labhart>And there's a couple of things that you said that really kind of drives this question home.
+
+84
+00:07:01.000 --> 00:07:02.760
+<v Noah Labhart>It's around decisions and trade-offs, right?
+
+85
+00:07:02.920 --> 00:07:13.340
+<v Noah Labhart>When you're building an MVP, you've got to make decisions and trade-offs around feature cut, around how you're going to move forward, what sort of technical debt you're going to accept, all those things, right?
+
+86
+00:07:13.480 --> 00:07:17.460
+<v Noah Labhart>I'm curious about some of those you had to work through and how you cope with the decisions.
+
+87
+00:07:18.700 --> 00:07:20.820
+<v Hannes Lenke>Building an MVP never stops, right?
+
+88
+00:07:20.900 --> 00:07:22.980
+<v Hannes Lenke>So you're building new features, et cetera.
+
+89
+00:07:22.980 --> 00:07:31.500
+<v Hannes Lenke>And what we try to achieve is always speed, release features to customers fast and get their feedback really fast.
+
+90
+00:07:31.720 --> 00:07:38.180
+<v Hannes Lenke>So we always try to identify who's a potential early adopter of these features.
+
+91
+00:07:38.420 --> 00:07:42.080
+<v Hannes Lenke>What is the actual core problem that they want to solve?
+
+92
+00:07:42.240 --> 00:07:43.740
+<v Hannes Lenke>And can we make trade-offs there?
+
+93
+00:07:44.000 --> 00:07:52.740
+<v Hannes Lenke>Are there a set of users that want to solve one problem with a subset of the whole feature set that we could potentially build?
+
+94
+00:07:52.980 --> 00:08:02.860
+<v Hannes Lenke>And once we understand that, we're going to release a minimal version of this feature set to users in an RFR with a feature flag.
+
+95
+00:08:03.160 --> 00:08:09.440
+<v Hannes Lenke>Then we're interviewing these users, trying to understand, okay, is that a potential fit for what they really need?
+
+96
+00:08:09.560 --> 00:08:11.060
+<v Hannes Lenke>Or is it maybe not?
+
+97
+00:08:11.200 --> 00:08:12.880
+<v Hannes Lenke>Do we need to go back to the drawing board?
+
+98
+00:08:13.080 --> 00:08:18.560
+<v Hannes Lenke>And this iteration can happen actually and should happen in four weeks, sometimes eight weeks.
+
+99
+00:08:18.560 --> 00:08:21.420
+<v Hannes Lenke>so that we really fast try to understand,
+
+100
+00:08:21.600 --> 00:08:23.160
+<v Hannes Lenke>okay, is that what we're building here
+
+101
+00:08:23.160 --> 00:08:27.120
+<v Hannes Lenke>solving actual customer problems or maybe not?
+
+102
+00:08:28.480 --> 00:08:30.120
+<v Noah Labhart>Okay, so let's move forward then
+
+103
+00:08:30.120 --> 00:08:31.700
+<v Noah Labhart>into how you're iterating
+
+104
+00:08:31.700 --> 00:08:35.020
+<v Noah Labhart>and how you're progressing and maturing the product.
+
+105
+00:08:35.120 --> 00:08:36.440
+<v Noah Labhart>I'm curious about that progression
+
+106
+00:08:36.440 --> 00:08:38.820
+<v Noah Labhart>and I'm also curious about how you build your roadmap,
+
+107
+00:08:38.940 --> 00:08:42.360
+<v Noah Labhart>how you decide what the next most important thing is
+
+108
+00:08:42.360 --> 00:08:44.360
+<v Noah Labhart>to build or to address with Checkly.
+
+109
+00:08:45.700 --> 00:08:48.280
+<v Hannes Lenke>Building out your roadmap is really hard
+
+110
+00:08:48.560 --> 00:08:50.860
+<v Hannes Lenke>because you constantly have to make trade-offs.
+
+111
+00:08:51.280 --> 00:08:54.800
+<v Hannes Lenke>Essentially, there are four lists of voices
+
+112
+00:08:54.800 --> 00:08:56.080
+<v Hannes Lenke>that are influencing the roadmap.
+
+113
+00:08:56.640 --> 00:08:59.360
+<v Hannes Lenke>First of all, what are customers asking for?
+
+114
+00:08:59.720 --> 00:09:01.480
+<v Hannes Lenke>We have a public roadmap for this,
+
+115
+00:09:01.580 --> 00:09:06.280
+<v Hannes Lenke>where you can upvote and hand in special feature requests.
+
+116
+00:09:07.160 --> 00:09:09.180
+<v Hannes Lenke>So we're constantly asking our customers
+
+117
+00:09:09.180 --> 00:09:10.920
+<v Hannes Lenke>to look at that public roadmap,
+
+118
+00:09:11.080 --> 00:09:13.160
+<v Hannes Lenke>and if they require a certain feature,
+
+119
+00:09:13.800 --> 00:09:14.840
+<v Hannes Lenke>please do submit it there.
+
+120
+00:09:15.720 --> 00:09:22.480
+<v Hannes Lenke>The second piece here is since we grew a lot and have quite some customers and have responsible
+
+121
+00:09:23.080 --> 00:09:23.940
+<v Hannes Lenke>salespeople for it.
+
+122
+00:09:24.040 --> 00:09:26.740
+<v Hannes Lenke>So what are all salespeople asking for?
+
+123
+00:09:26.920 --> 00:09:29.680
+<v Hannes Lenke>What are they hearing from customers, listening to customers?
+
+124
+00:09:29.960 --> 00:09:36.860
+<v Hannes Lenke>I also try to be part of the customer conversations like daily to really understand, okay, what
+
+125
+00:09:36.860 --> 00:09:42.500
+<v Hannes Lenke>are my existing customers that are maybe using us on a larger volume really asking for rent?
+
+126
+00:09:42.500 --> 00:09:45.360
+<v Hannes Lenke>So that's the second piece of influence on our roadmap.
+
+127
+00:09:46.140 --> 00:09:50.300
+<v Hannes Lenke>There's another piece, which is what are our engineers asking for?
+
+128
+00:09:50.480 --> 00:09:53.560
+<v Hannes Lenke>Is there technical debt that we need to address?
+
+129
+00:09:54.020 --> 00:09:58.860
+<v Hannes Lenke>Are there things that we really should improve that our customers are not even recognizing yet,
+
+130
+00:09:59.040 --> 00:10:02.360
+<v Hannes Lenke>but we might need to work on some scaling, etc.?
+
+131
+00:10:02.980 --> 00:10:06.980
+<v Hannes Lenke>Last but not least, a very important piece here is what is our vision?
+
+132
+00:10:07.080 --> 00:10:08.300
+<v Hannes Lenke>Where do we want to go?
+
+133
+00:10:08.300 --> 00:10:11.540
+<v Hannes Lenke>and we have a list of things that we want to accomplish
+
+134
+00:10:11.540 --> 00:10:13.600
+<v Hannes Lenke>and we will talk about that later in the future.
+
+135
+00:10:14.040 --> 00:10:16.120
+<v Hannes Lenke>So how do we carve out time for that?
+
+136
+00:10:16.320 --> 00:10:19.300
+<v Hannes Lenke>So essentially, we have these four items.
+
+137
+00:10:19.440 --> 00:10:23.260
+<v Hannes Lenke>Again, customers, then what are our sales people telling us?
+
+138
+00:10:23.300 --> 00:10:24.860
+<v Hannes Lenke>What are our engineers telling us?
+
+139
+00:10:24.940 --> 00:10:26.140
+<v Hannes Lenke>And then what is our vision?
+
+140
+00:10:26.620 --> 00:10:32.580
+<v Hannes Lenke>We try to assign 25% of our teams to these four lists.
+
+141
+00:10:33.440 --> 00:10:35.780
+<v Noah Labhart>This will be interesting and you kind of teed it up perfectly.
+
+142
+00:10:35.780 --> 00:10:38.260
+<v Noah Labhart>I'm curious about team, right?
+
+143
+00:10:38.320 --> 00:10:41.020
+<v Noah Labhart>So those people that you're assigning to those 25%,
+
+144
+00:10:41.020 --> 00:10:43.960
+<v Noah Labhart>the 25% assigned to those lists, how do you find them?
+
+145
+00:10:43.980 --> 00:10:45.260
+<v Noah Labhart>What do you look for in those people?
+
+146
+00:10:45.460 --> 00:10:46.640
+<v Noah Labhart>How do you build that team?
+
+147
+00:10:46.720 --> 00:10:48.220
+<v Noah Labhart>What do you look for in those people to indicate
+
+148
+00:10:48.220 --> 00:10:49.860
+<v Noah Labhart>that they're the winning horses to join you?
+
+149
+00:10:51.080 --> 00:10:55.100
+<v Hannes Lenke>As a startup, we want to have the best people in the world working for us.
+
+150
+00:10:55.420 --> 00:10:57.340
+<v Hannes Lenke>Checkly is a remote-first company.
+
+151
+00:10:57.520 --> 00:11:02.800
+<v Hannes Lenke>So we have right now 45 people in 14 countries worldwide.
+
+152
+00:11:02.800 --> 00:11:07.800
+<v Hannes Lenke>The early team members, mostly people that we knew from before.
+
+153
+00:11:08.060 --> 00:11:13.860
+<v Hannes Lenke>We were lucky enough so that they joined an early stage company even though they were
+
+154
+00:11:13.860 --> 00:11:14.700
+<v Hannes Lenke>very senior.
+
+155
+00:11:14.940 --> 00:11:20.360
+<v Hannes Lenke>And now it's all about finding people that are having a similar mindset, that are hungry
+
+156
+00:11:20.360 --> 00:11:23.180
+<v Hannes Lenke>for success, that want to win.
+
+157
+00:11:23.480 --> 00:11:29.380
+<v Hannes Lenke>They have the motivation pretty much to help us move Checkly forward and bring Checkly
+
+158
+00:11:29.380 --> 00:11:31.800
+<v Hannes Lenke>to even more users worldwide.
+
+159
+00:11:32.580 --> 00:11:36.920
+<v Hannes Lenke>First of all, we are very transparent, also in hiring.
+
+160
+00:11:37.060 --> 00:11:39.340
+<v Hannes Lenke>So we have a hiring playbook, which is public.
+
+161
+00:11:39.440 --> 00:11:40.260
+<v Hannes Lenke>It's a Notion page.
+
+162
+00:11:40.640 --> 00:11:43.560
+<v Hannes Lenke>We're publicly talking about our salary ranges.
+
+163
+00:11:43.740 --> 00:11:44.940
+<v Hannes Lenke>So you can look that up.
+
+164
+00:11:45.020 --> 00:11:47.140
+<v Hannes Lenke>Actually, we have a salary calculator.
+
+165
+00:11:47.520 --> 00:11:50.120
+<v Hannes Lenke>But we are also internally very transparent, right?
+
+166
+00:11:50.160 --> 00:11:54.660
+<v Hannes Lenke>So we're sharing KPIs, company KPIs, transparently,
+
+167
+00:11:54.840 --> 00:11:56.700
+<v Hannes Lenke>talk about problems very transparently.
+
+168
+00:11:56.700 --> 00:12:01.160
+<v Hannes Lenke>We want to find people that are picking this up and solving the problems for us.
+
+169
+00:12:02.000 --> 00:12:08.180
+<v Hannes Lenke>Another thing that we're continuing to do is I'm interviewing every candidate still.
+
+170
+00:12:08.380 --> 00:12:11.680
+<v Hannes Lenke>We try to understand, okay, is that candidate a culture fit?
+
+171
+00:12:11.840 --> 00:12:14.840
+<v Hannes Lenke>Is he hungry? Does he want to win? Et cetera.
+
+172
+00:12:15.060 --> 00:12:16.340
+<v Hannes Lenke>Is there enough valuation?
+
+173
+00:12:16.720 --> 00:12:21.240
+<v Hannes Lenke>And in the end, to summarize that, will that person up-level us?
+
+174
+00:12:21.380 --> 00:12:24.040
+<v Hannes Lenke>Will that help us? Will that help the existing team? Et cetera.
+
+175
+00:12:24.040 --> 00:12:28.520
+<v Hannes Lenke>So we're spending a lot of time in really finding the right people there.
+
+176
+00:12:28.660 --> 00:12:32.820
+<v Hannes Lenke>And I think we have done a really great job so far.
+
+177
+00:12:36.100 --> 00:12:38.020
+<v Noah Labhart>Let's move forward to scalability.
+
+178
+00:12:38.280 --> 00:12:43.700
+<v Noah Labhart>Given what you've built, scalability is critical and who you're building it for is a very opinionated group.
+
+179
+00:12:43.900 --> 00:12:46.840
+<v Noah Labhart>So I'm curious about how you approach scalability.
+
+180
+00:12:47.060 --> 00:12:52.720
+<v Noah Labhart>Was it built to scale from day one or with scale in mind, like abstractions, architecture, things like that?
+
+181
+00:12:54.040 --> 00:12:55.920
+<v Noah Labhart>interesting areas where you've had to fight it as you've grown?
+
+182
+00:12:57.340 --> 00:13:01.100
+<v Hannes Lenke>To be honest with you, we're constantly fighting scalability, right?
+
+183
+00:13:01.220 --> 00:13:03.140
+<v Hannes Lenke>And the more we grow, we are fighting scalability.
+
+184
+00:13:03.520 --> 00:13:08.740
+<v Hannes Lenke>Obviously, we're trying to think about how to scale our architecture moving forward.
+
+185
+00:13:08.920 --> 00:13:11.940
+<v Hannes Lenke>But then in the end, customers are surprising us, right?
+
+186
+00:13:12.020 --> 00:13:17.780
+<v Hannes Lenke>So customers coming with hundreds of users are then surprising us about certain edge cases.
+
+187
+00:13:18.300 --> 00:13:22.660
+<v Hannes Lenke>So I think about it in a way that we make it work, make it right, make it fast,
+
+188
+00:13:24.040 --> 00:13:30.500
+<v Hannes Lenke>in the end. Checkly is built to scale right now, but the truth is that we're constantly working on
+
+189
+00:13:30.500 --> 00:13:36.960
+<v Hannes Lenke>scaling these services and helping our customers pretty much to use Checkly with a larger workload
+
+190
+00:13:37.680 --> 00:13:44.260
+<v Hannes Lenke>and rethinking certain features constantly. Because in the end, starting a startup, you can
+
+191
+00:13:44.260 --> 00:13:51.400
+<v Hannes Lenke>never really plan for the scale that will hit you. You might need to optimize for a certain amount of
+
+192
+00:13:51.400 --> 00:13:58.120
+<v Hannes Lenke>workload you might need to optimize for hundreds of users etc and it's really hard to implement
+
+193
+00:13:58.120 --> 00:14:05.400
+<v Hannes Lenke>any product in a scalable way from the start there's always time set aside to help services
+
+194
+00:14:05.400 --> 00:14:06.220
+<v Hannes Lenke>scale even better
+
+195
+00:14:06.220 --> 00:14:12.320
+<v Noah Labhart>so as you step out on the balcony look across all that you've built with
+
+196
+00:14:12.320 --> 00:14:15.660
+<v Noah Labhart>checkly what are you most proud of first
+
+197
+00:14:15.660 --> 00:14:19.160
+<v Hannes Lenke>of all the team really building a company with such a
+
+198
+00:14:19.160 --> 00:14:25.140
+<v Hannes Lenke>a great team seeing the individuals in our team grow this is really amazing right seeing them over
+
+199
+00:14:25.140 --> 00:14:32.300
+<v Hannes Lenke>years constantly growing because the company is constantly changing but also having lots of
+
+200
+00:14:32.300 --> 00:14:38.960
+<v Hannes Lenke>customers having thousand customers that are paying you is a great milestone to achieve to be honest
+
+201
+00:14:38.960 --> 00:14:45.380
+<v Hannes Lenke>and as a european founder i also have to say that us being able to open an office in new york
+
+202
+00:14:45.380 --> 00:14:52.000
+<v Hannes Lenke>which we did this summer is you know a great achievement as well last but not least and maybe
+
+203
+00:14:52.000 --> 00:14:57.620
+<v Hannes Lenke>even more important here is we called what we are doing monitoring as code i said that earlier
+
+204
+00:14:57.620 --> 00:15:03.300
+<v Hannes Lenke>and this is a category now so our competition is talking about monitoring as code as well
+
+205
+00:15:03.300 --> 00:15:09.220
+<v Hannes Lenke>even Gartner and customers are coming to us because they want to adapt monitoring as code
+
+206
+00:15:09.220 --> 00:15:13.300
+<v Hannes Lenke>That's really an achievement I'm very proud of.
+
+207
+00:15:14.460 --> 00:15:20.540
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+208
+00:15:21.660 --> 00:15:22.220
+<v Noah Labhart>We
+
+209
+00:15:22.220 --> 00:15:25.420
+<v Hannes Lenke>had this vision of monitoring as code in mind from the start.
+
+210
+00:15:25.880 --> 00:15:32.640
+<v Hannes Lenke>And we knew that this is how we enable developers in the end at scale to monitor their products.
+
+211
+00:15:34.380 --> 00:15:36.320
+<v Hannes Lenke>But, Checkly got early traction.
+
+212
+00:15:36.620 --> 00:15:41.680
+<v Hannes Lenke>So, we had paying customers that came to us without even supporting monitoring as code.
+
+213
+00:15:42.120 --> 00:15:49.100
+<v Hannes Lenke>We started to solve their problems for four months without even investing time into our vision.
+
+214
+00:15:49.400 --> 00:15:53.980
+<v Hannes Lenke>After almost two years, actually, we took a step back thinking about,
+
+215
+00:15:54.100 --> 00:15:58.000
+<v Hannes Lenke>okay, that's cool that we're having customers, that we're having paying customers,
+
+216
+00:15:58.200 --> 00:16:00.460
+<v Hannes Lenke>but what is the bigger problem that we actually want to solve?
+
+217
+00:16:00.460 --> 00:16:03.020
+<v Hannes Lenke>So we want to bring monitoring to developers.
+
+218
+00:16:03.320 --> 00:16:04.120
+<v Hannes Lenke>How can we do that?
+
+219
+00:16:04.300 --> 00:16:10.200
+<v Hannes Lenke>And we took that step back and really thought about, okay, we need to invest time into monitoring
+
+220
+00:16:10.200 --> 00:16:10.700
+<v Hannes Lenke>as code.
+
+221
+00:16:10.840 --> 00:16:14.220
+<v Hannes Lenke>So we need to set time aside really to work on our vision.
+
+222
+00:16:14.380 --> 00:16:15.440
+<v Hannes Lenke>And that's what we did.
+
+223
+00:16:15.760 --> 00:16:18.380
+<v Hannes Lenke>The first iteration wasn't great, to be honest.
+
+224
+00:16:18.900 --> 00:16:20.400
+<v Hannes Lenke>No one started using it.
+
+225
+00:16:20.720 --> 00:16:26.100
+<v Hannes Lenke>We kept iterating and it took us a whole year to get a monitoring as code version out to
+
+226
+00:16:26.100 --> 00:16:31.680
+<v Hannes Lenke>the market a command line interface that enables you to do all these things in the end i think our
+
+227
+00:16:31.680 --> 00:16:38.300
+<v Hannes Lenke>mistake was to not pushing the vision hard enough not implementing fast enough kind of what we had
+
+228
+00:16:38.300 --> 00:16:44.060
+<v Hannes Lenke>in mind to implement because lots of customers came to us without even supporting that vision
+
+229
+00:16:47.880 --> 00:16:52.960
+<v Noah Labhart>so and you kind of are leading into this a little bit in the last part of your answer but i'm
+
+230
+00:16:52.960 --> 00:16:54.680
+<v Noah Labhart>I'm curious what the future looks like, right?
+
+231
+00:16:54.740 --> 00:16:57.240
+<v Noah Labhart>So you mentioned this earlier, some things that you want to go accomplish.
+
+232
+00:16:57.540 --> 00:17:00.260
+<v Noah Labhart>What does that future look like for the product and for your team?
+
+233
+00:17:00.900 --> 00:17:02.380
+<v Hannes Lenke>So what's our mission, right?
+
+234
+00:17:02.460 --> 00:17:07.140
+<v Hannes Lenke>So in the end, we help the developers to detect and resolve issues 10x faster.
+
+235
+00:17:07.520 --> 00:17:13.060
+<v Hannes Lenke>I'm waking you up in the middle of the night, tell you that your service is down, and that's pretty much it, right?
+
+236
+00:17:13.200 --> 00:17:15.160
+<v Hannes Lenke>I wake you up, and then you have a look.
+
+237
+00:17:15.160 --> 00:17:27.240
+<v Hannes Lenke>What we want to achieve is we want to wake you up, but also right at that split second, tell you where the problem actually comes from, help you to remediate the issue faster.
+
+238
+00:17:27.700 --> 00:17:37.360
+<v Hannes Lenke>And that's pretty much the next Checkly product evolution that we're working on right now, helping you to understand, okay, there's a problem that's coming from my slow database.
+
+239
+00:17:37.600 --> 00:17:43.480
+<v Hannes Lenke>I have to look at this in the middle of the night to actually resolve the incident faster.
+
+240
+00:17:45.160 --> 00:17:53.240
+<v Hannes Lenke>The piece is we have customers around the world, lots of customers coming from the U.S. right now, and we're expanding the team there.
+
+241
+00:17:53.620 --> 00:17:58.300
+<v Hannes Lenke>So we're investing lots of energy there to help the customers on the ground.
+
+242
+00:17:59.080 --> 00:18:00.520
+<v Noah Labhart>Okay, let's switch to you, Hannes.
+
+243
+00:18:00.620 --> 00:18:02.680
+<v Noah Labhart>Who influences the way that you work?
+
+244
+00:18:02.860 --> 00:18:05.740
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+245
+00:18:06.440 --> 00:18:09.140
+<v Hannes Lenke>I don't have an ideal, to be honest, right?
+
+246
+00:18:09.140 --> 00:18:13.540
+<v Hannes Lenke>Right. So there's not that one famous person that I look up to.
+
+247
+00:18:13.800 --> 00:18:19.140
+<v Hannes Lenke>But I'm influenced by my parents who were incredible, hardworking.
+
+248
+00:18:19.380 --> 00:18:21.600
+<v Hannes Lenke>And I'm influenced by their values, I would say.
+
+249
+00:18:21.740 --> 00:18:23.400
+<v Hannes Lenke>Right. So I still have that in mind.
+
+250
+00:18:23.900 --> 00:18:32.300
+<v Hannes Lenke>And then I really admire people that are showing up consistently, that are putting the hard work in, you know, trying to get better every day.
+
+251
+00:18:32.360 --> 00:18:35.620
+<v Hannes Lenke>Right. Maybe just a tiny bit and grow with the journey.
+
+252
+00:18:35.820 --> 00:18:38.900
+<v Hannes Lenke>And that's what I look up for, up to.
+
+253
+00:18:39.140 --> 00:18:45.260
+<v Hannes Lenke>could be a team member but this could also be another founder that that influences me on a
+
+254
+00:18:45.260 --> 00:18:52.240
+<v Hannes Lenke>daily basis this is saying that the startups are a marathon and i truly believe that what else
+
+255
+00:18:52.240 --> 00:18:58.680
+<v Hannes Lenke>influences me is pretty much athletes putting their hard work in to to succeed over time so
+
+256
+00:18:58.680 --> 00:19:06.320
+<v Hannes Lenke>i really enjoy watching world-class runners and athletes and it really inspires me how much work
+
+257
+00:19:06.320 --> 00:19:09.680
+<v Hannes Lenke>they put in to, in the end, win a certain race.
+
+258
+00:19:11.220 --> 00:19:15.180
+<v Noah Labhart>On this last question, so you're getting on a plane and you're sitting next to a young
+
+259
+00:19:15.180 --> 00:19:17.080
+<v Noah Labhart>entrepreneur who's built the next big thing.
+
+260
+00:19:17.320 --> 00:19:18.480
+<v Noah Labhart>They're jazzed about it.
+
+261
+00:19:18.520 --> 00:19:21.500
+<v Noah Labhart>They can't wait to show it off to the world and can't wait to show it off to you right
+
+262
+00:19:21.500 --> 00:19:22.000
+<v Noah Labhart>there on the plane.
+
+263
+00:19:22.360 --> 00:19:25.300
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+264
+00:19:26.260 --> 00:19:29.660
+<v Hannes Lenke>So first of all, it's all about getting started, right?
+
+265
+00:19:29.680 --> 00:19:33.840
+<v Hannes Lenke>So I'm talking to lots of potential founders, et cetera, and lots of people always have
+
+266
+00:19:33.840 --> 00:19:34.340
+<v Hannes Lenke>ideas.
+
+267
+00:19:34.320 --> 00:19:35.980
+<v Hannes Lenke>I think you've got to get started.
+
+268
+00:19:36.320 --> 00:19:39.780
+<v Hannes Lenke>In the end, this is the most important step building a startup.
+
+269
+00:19:40.320 --> 00:19:43.680
+<v Hannes Lenke>Second piece is, and I just mentioned it, it's a marathon.
+
+270
+00:19:44.080 --> 00:19:50.240
+<v Hannes Lenke>Everything takes time and it takes sometimes longer than you or I would think, right?
+
+271
+00:19:50.340 --> 00:19:52.220
+<v Hannes Lenke>That's true for lots of businesses.
+
+272
+00:19:52.560 --> 00:19:59.100
+<v Hannes Lenke>And we always hear these success stories of a startup achieving 100 million ARR in two years, etc.
+
+273
+00:19:59.600 --> 00:20:01.500
+<v Hannes Lenke>That's the exception to the rule, right?
+
+274
+00:20:01.540 --> 00:20:04.440
+<v Hannes Lenke>So it really takes time, takes a lot of effort.
+
+275
+00:20:06.400 --> 00:20:10.460
+<v Hannes Lenke>is especially early, if you want to do something remarkable,
+
+276
+00:20:11.070 --> 00:20:13.460
+<v Hannes Lenke>then most people will not believe in your vision.
+
+277
+00:20:13.640 --> 00:20:15.600
+<v Hannes Lenke>They will just not believe in it.
+
+278
+00:20:15.700 --> 00:20:16.800
+<v Hannes Lenke>And this is normal.
+
+279
+00:20:17.000 --> 00:20:20.380
+<v Hannes Lenke>You have to keep executing and maybe convince some early adopters,
+
+280
+00:20:20.540 --> 00:20:21.960
+<v Hannes Lenke>really forward-thinking people.
+
+281
+00:20:22.120 --> 00:20:27.540
+<v Hannes Lenke>99% of your potential future users might not even believe
+
+282
+00:20:27.540 --> 00:20:29.480
+<v Hannes Lenke>that this is a problem that they need to solve.
+
+283
+00:20:29.680 --> 00:20:33.200
+<v Hannes Lenke>In the end, maybe I could summarize it as it's hard work, right?
+
+284
+00:20:33.200 --> 00:20:37.400
+<v Hannes Lenke>Right. And then it's all about consistency and staying committed to the mission.
+
+285
+00:20:37.640 --> 00:20:38.680
+<v Noah Labhart>That's fantastic advice.
+
+286
+00:20:38.960 --> 00:20:40.860
+<v Noah Labhart>Well, Hannes, thank you for being on the show today.
+
+287
+00:20:40.980 --> 00:20:43.360
+<v Noah Labhart>And thank you for telling the creation story of Checkly.
+
+288
+00:20:43.680 --> 00:20:44.180
+<v Noah Labhart>Thank
+
+289
+00:20:44.160 --> 00:20:44.860
+<v Hannes Lenke>you for inviting me.
+
+290
+00:20:46.900 --> 00:20:49.660
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+291
+00:20:54.760 --> 00:20:57.400
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+292
+00:20:57.560 --> 00:21:02.320
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+293
+00:21:03.200 --> 00:21:05.140
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+294
+00:21:05.440 --> 00:21:07.340
+<v Noah Labhart>Both things help us out tremendously.
+
+295
+00:21:10.280 --> 00:21:11.780
+<v Noah Labhart>And thanks again for listening.

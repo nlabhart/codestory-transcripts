@@ -1,0 +1,1387 @@
+WEBVTT
+
+NOTE S7 Bonus: The Twilio for PDFs: Converting Messy Business Documents into Developer APIs with Josh Lewis, Co-Founder & CEO of Sensible
+
+1
+00:00:01.220 --> 00:00:08.060
+<v Josh Lewis>One of the things that actually attracted me to this PDF problem is that it's what you might call embarrassingly parallel, right?
+
+2
+00:00:08.160 --> 00:00:10.080
+<v Josh Lewis>Or it's task parallel.
+
+3
+00:00:10.380 --> 00:00:18.860
+<v Josh Lewis>Every single PDF extraction that we're doing in that live API environment is completely isolated from every other one, right?
+
+4
+00:00:18.940 --> 00:00:21.300
+<v Josh Lewis>And you can consider them totally independently.
+
+5
+00:00:21.540 --> 00:00:23.760
+<v Josh Lewis>There's no shared state or anything like that.
+
+6
+00:00:23.760 --> 00:00:29.980
+<v Josh Lewis>So that meant that we could build our platform from day one in a way that just
+
+7
+00:00:29.980 --> 00:00:34.720
+<v Josh Lewis>took advantage of that and was completely horizontally scalable out the
+
+8
+00:00:34.720 --> 00:00:39.780
+<v Josh Lewis>gate. That means that we've never really had scaling problems. My name is
+
+9
+00:00:39.780 --> 00:00:42.480
+<v Josh Lewis>Josh Lewis. I'm the co-founder and CEO at Sensible.
+
+10
+00:00:47.540 --> 00:00:52.900
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+11
+00:00:52.900 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+12
+00:00:57.120 --> 00:01:04.800
+<v Noah Labhart>and build and lead a team that has your back. I'm your host, Noah Labhart, and today,
+
+13
+00:01:04.800 --> 00:01:12.000
+<v Noah Labhart>See how Josh Lewis built a way for you to be fast and flexible with extracting data from your documents.
+
+14
+00:01:13.300 --> 00:01:15.840
+<v Noah Labhart>All this and more on Code Story.
+
+15
+00:01:20.220 --> 00:01:24.360
+<v Noah Labhart>Josh Lewis was fascinated by computers in the late 80s and early 90s.
+
+16
+00:01:24.620 --> 00:01:29.400
+<v Noah Labhart>In the early days, he was the neighborhood tech support fixing people's computers around the block.
+
+17
+00:01:29.900 --> 00:01:36.460
+<v Noah Labhart>He quickly moved into programming, but moved off from technology in college, targeting philosophy and going to grad school.
+
+18
+00:01:36.700 --> 00:01:42.760
+<v Noah Labhart>In doing research with the computer science component, he was pulled back into technology and went to work in Palo Alto.
+
+19
+00:01:43.460 --> 00:01:46.520
+<v Noah Labhart>Outside of tech, he's a dad taking care of his young family.
+
+20
+00:01:46.680 --> 00:01:51.680
+<v Noah Labhart>And also, he plays competitive drafts of Magic the Gathering, along with some tennis.
+
+21
+00:01:53.420 --> 00:02:04.360
+<v Noah Labhart>At his last company, Josh experienced a recurring problem in spades, where account managers were spending large amounts of time with data entry of standardized forms and information.
+
+22
+00:02:05.460 --> 00:02:11.580
+<v Noah Labhart>When he looked for the Twilio for PDFs, he couldn't find a tool to solve his problem.
+
+23
+00:02:13.160 --> 00:02:16.260
+<v Noah Labhart>This is the creation story of Sensible.
+
+24
+00:02:19.640 --> 00:02:25.280
+<v Josh Lewis>Sensible is developer tools for turning PDFs into structured, useful data.
+
+25
+00:02:25.600 --> 00:02:33.240
+<v Josh Lewis>So it's primarily an API product, like you give us the bytes of a PDF and we give you back JSON telling you what's in the PDF.
+
+26
+00:02:33.920 --> 00:02:38.480
+<v Josh Lewis>And the approach that we've taken to it is by building a query language for documents.
+
+27
+00:02:38.480 --> 00:02:47.580
+<v Josh Lewis>So it's a set of primitives where you can easily describe how to go into a document and pull different pieces of information out of that document.
+
+28
+00:02:47.840 --> 00:02:53.200
+<v Josh Lewis>And we have a whole user interface that lets you configure all that and publish the API endpoints and so forth.
+
+29
+00:02:53.200 --> 00:03:09.380
+<v Josh Lewis>And so our customers are a lot of these mature industries like insurance or financial services or logistics, where documents function almost as de facto API calls between businesses, like a carrier gives a brokerage an insurance quote.
+
+30
+00:03:09.380 --> 00:03:19.340
+<v Josh Lewis>And that's how I got into this is my last company I was working at Newfront Insurance, which was a commercial insurance brokerage plus technology startup.
+
+31
+00:03:19.440 --> 00:03:22.940
+<v Josh Lewis>I was one of the first few employees there working in engineering and product.
+
+32
+00:03:22.940 --> 00:03:28.660
+<v Josh Lewis>product, we had this problem in spades where we had these trained, licensed staff called
+
+33
+00:03:28.660 --> 00:03:33.720
+<v Josh Lewis>account managers, kind of like back office operations for an insurance brokerage, who
+
+34
+00:03:33.720 --> 00:03:38.380
+<v Josh Lewis>by our measurements were spending a lot of their time doing data entry on documents that
+
+35
+00:03:38.380 --> 00:03:39.460
+<v Josh Lewis>we were getting back from carriers.
+
+36
+00:03:40.100 --> 00:03:44.300
+<v Josh Lewis>We said to ourselves, okay, we should be able to automate this, use software to pull that
+
+37
+00:03:44.300 --> 00:03:48.700
+<v Josh Lewis>out and have our account managers working on things that are more important to our clients,
+
+38
+00:03:48.840 --> 00:03:51.180
+<v Josh Lewis>these higher touch, higher impact activities.
+
+39
+00:03:52.940 --> 00:03:57.660
+<v Josh Lewis>at the time, I thought, okay, well, surely there's great SaaS for this. I'm going to go out and find
+
+40
+00:03:57.660 --> 00:04:04.040
+<v Josh Lewis>the Twilio for PDFs and solve this in a week. And we really didn't find that. There's a lot of
+
+41
+00:04:04.040 --> 00:04:08.240
+<v Josh Lewis>heavy enterprise stuff. There was a lot of verticalized stuff where they wanted to do
+
+42
+00:04:08.240 --> 00:04:13.140
+<v Josh Lewis>workflow facilitation and be the system of record. And that's not what we wanted. We just wanted a
+
+43
+00:04:13.140 --> 00:04:20.080
+<v Josh Lewis>tool. So we ended up rolling our own and I built a good chunk of that and took this query language
+
+44
+00:04:20.080 --> 00:04:24.820
+<v Josh Lewis>language approach implicitly and how we went about building it internally. And so that just stuck
+
+45
+00:04:24.820 --> 00:04:30.500
+<v Josh Lewis>with me. Fast forwarding two years, I had recently left Newfront and this was like right before the
+
+46
+00:04:30.500 --> 00:04:35.220
+<v Josh Lewis>start of the pandemic and was thinking back on that time. What did I see that was a really
+
+47
+00:04:35.220 --> 00:04:41.800
+<v Josh Lewis>gnarly problem to solve? And this one stood out. So I went back and looked at the market again,
+
+48
+00:04:41.900 --> 00:04:46.460
+<v Josh Lewis>has someone started doing this in the past two years? Still didn't see the type of thing that I
+
+49
+00:04:46.460 --> 00:04:49.300
+<v Josh Lewis>I wanted to buy as a developer at Newfront.
+
+50
+00:04:49.840 --> 00:04:53.280
+<v Josh Lewis>And that was really the inspiration for Sensible.
+
+51
+00:04:53.420 --> 00:04:58.700
+<v Josh Lewis>And then my co-founder, Ming, she and I both shared this desire to go find some really
+
+52
+00:04:58.700 --> 00:05:03.000
+<v Josh Lewis>gnarly B2B SaaS problem and just grind it to the ground.
+
+53
+00:05:03.140 --> 00:05:06.720
+<v Josh Lewis>And you don't get gnarlier than PDFs.
+
+54
+00:05:06.840 --> 00:05:11.180
+<v Josh Lewis>So it fit with what we kind of saw ourselves as working on as founders.
+
+55
+00:05:13.920 --> 00:05:15.260
+<v Noah Labhart>Well, tell me about the MVP.
+
+56
+00:05:16.460 --> 00:05:20.480
+<v Noah Labhart>first product you built? How long did it take to build and what sort of tools did you use to bring
+
+57
+00:05:20.480 --> 00:05:20.980
+<v Noah Labhart>it to life?
+
+58
+00:05:22.800 --> 00:05:30.620
+<v Josh Lewis>It started off super simple with just a pure API product, no UI, no nothing.
+
+59
+00:05:31.080 --> 00:05:40.040
+<v Josh Lewis>And we started working on that product in earnest in October 2020. So we had decided to work
+
+60
+00:05:40.040 --> 00:05:45.340
+<v Josh Lewis>together, Ming and I, in August of that year and then built like a prototype and raised a pre-seed
+
+61
+00:05:46.460 --> 00:05:50.600
+<v Josh Lewis>and closed that in October and then started building the initial product in earnest.
+
+62
+00:05:51.360 --> 00:05:57.240
+<v Josh Lewis>It took us about two months, actually, to go from starting building to having our first two paying customers.
+
+63
+00:05:57.840 --> 00:06:00.960
+<v Josh Lewis>And we did that by doing two things.
+
+64
+00:06:01.100 --> 00:06:03.200
+<v Josh Lewis>One, again, being API only.
+
+65
+00:06:03.380 --> 00:06:08.000
+<v Josh Lewis>So this was just a service that people could use programmatically, and there's no UI, no nothing.
+
+66
+00:06:08.040 --> 00:06:11.120
+<v Josh Lewis>We had the world's, like, we had, like, you know, one line of text on our website.
+
+67
+00:06:11.420 --> 00:06:14.500
+<v Josh Lewis>And then the second thing we did, I mentioned this query language approach.
+
+68
+00:06:16.460 --> 00:06:20.800
+<v Josh Lewis>problem with starting in something like this, which is like, well, what's the world of PDFs
+
+69
+00:06:20.800 --> 00:06:25.860
+<v Josh Lewis>that are out there that businesses actually use? What are the different data representations that
+
+70
+00:06:25.860 --> 00:06:31.580
+<v Josh Lewis>you find in those PDFs? And therefore, what are the primitives that you need in a query language
+
+71
+00:06:31.580 --> 00:06:36.500
+<v Josh Lewis>to go fetch those data that you're trying to pull out? And you don't know that at the outset.
+
+72
+00:06:36.640 --> 00:06:43.080
+<v Josh Lewis>It's hard to get a large data set of real world insurance policy data or something like that.
+
+73
+00:06:43.080 --> 00:06:48.680
+<v Josh Lewis>So what we did is we said, hey, look, just share the documents that you need structured data out of.
+
+74
+00:06:48.920 --> 00:06:56.620
+<v Josh Lewis>And in a week or two, we're going to give you an API endpoint where you give us one of those documents to that endpoint and you'll get back the data that you want.
+
+75
+00:06:56.720 --> 00:06:59.840
+<v Josh Lewis>So we did it as a total like white glove service.
+
+76
+00:07:00.280 --> 00:07:05.100
+<v Josh Lewis>But in the background, what we were doing is building out this query language to do it.
+
+77
+00:07:05.160 --> 00:07:07.740
+<v Josh Lewis>So we were doing it in this very generalized way under the hood.
+
+78
+00:07:07.740 --> 00:07:13.560
+<v Josh Lewis>and that was setting us up to ultimately have a much more fleshed out product down the line.
+
+79
+00:07:15.280 --> 00:07:20.200
+<v Noah Labhart>With the MVP, you have to make certain decisions and trade-offs around feature cut,
+
+80
+00:07:20.520 --> 00:07:23.600
+<v Noah Labhart>technical debt, like accepting how you're going to build something.
+
+81
+00:07:24.240 --> 00:07:28.840
+<v Noah Labhart>Tell me about some of those that you had to work through and how you cope with those decisions.
+
+82
+00:07:29.600 --> 00:07:35.200
+<v Josh Lewis>One of the bigger trade-offs was not exposing that query language right out the gate.
+
+83
+00:07:35.200 --> 00:07:38.680
+<v Josh Lewis>And we were forced into that because it was so immature.
+
+84
+00:07:39.340 --> 00:07:51.160
+<v Josh Lewis>And then I guess the other thing that I look at in retrospect is we've since done SOC 2 Type 2 security compliance and a lot of I dotting and T crossing.
+
+85
+00:07:51.160 --> 00:08:07.160
+<v Josh Lewis>We never did anything that was like obviously insecure, but we didn't put in the legwork out the gate to do like all the encryption at rest and all these things that you do in AWS to comply with those standards.
+
+86
+00:08:07.900 --> 00:08:12.540
+<v Josh Lewis>So I could see that as another form of a shortcut in the MVP.
+
+87
+00:08:14.840 --> 00:08:19.020
+<v Noah Labhart>So from that point then, how did you progress the product and mature it?
+
+88
+00:08:19.020 --> 00:08:29.380
+<v Noah Labhart>And I think what I'm interested in a little more context around how you built your roadmap and how you decided and decide today, you know, this is the next most important thing to build.
+
+89
+00:08:30.440 --> 00:08:46.220
+<v Josh Lewis>The end goal that we were shooting for, and we knew this at the outset, is we wanted to get to the place where someone could come to our website, sign up for Sensible and get their document onboarded and supported by a live API endpoint in the course of an afternoon.
+
+90
+00:08:46.220 --> 00:08:53.360
+<v Josh Lewis>noon. We had to do two main things. The first thing we needed to do was make this query language
+
+91
+00:08:53.360 --> 00:09:00.300
+<v Josh Lewis>available to our users. And that meant building a whole almost like IDE, like developer UI for
+
+92
+00:09:00.300 --> 00:09:05.600
+<v Josh Lewis>writing in this language. And then the second thing we needed to do is all the stuff around
+
+93
+00:09:05.600 --> 00:09:11.960
+<v Josh Lewis>self-serve, you know, the ability to sign up and the ability to pay us and the ability to do volume
+
+94
+00:09:11.960 --> 00:09:16.420
+<v Josh Lewis>billing and all this kind of stuff because all of our early customers were more like enterprise
+
+95
+00:09:16.880 --> 00:09:20.800
+<v Josh Lewis>sales deals, essentially, where we signed a contract and then we did manual billing for them.
+
+96
+00:09:21.160 --> 00:09:26.080
+<v Josh Lewis>So that was the North Star is how do we get to this point where people don't even need to talk
+
+97
+00:09:26.080 --> 00:09:33.640
+<v Josh Lewis>to us to use Sensible? The next step post this API product was building out that UI,
+
+98
+00:09:33.860 --> 00:09:39.740
+<v Josh Lewis>building a true website, and kind of putting a better face forward to the world. So we have that
+
+99
+00:09:39.740 --> 00:09:44.860
+<v Josh Lewis>at Northstar, but then there's a lot of nuts and bolts, right? Like what particular features do we
+
+100
+00:09:44.860 --> 00:09:50.420
+<v Josh Lewis>build into the product? What documents do we try to handle versus which ones do we say, hey,
+
+101
+00:09:50.500 --> 00:09:56.580
+<v Josh Lewis>not now? I think the main tension that we run into as a company when we're doing product
+
+102
+00:09:56.580 --> 00:10:02.280
+<v Josh Lewis>development is that tension between explore and exploit, right? Like, are we trying to do things
+
+103
+00:10:02.280 --> 00:10:09.580
+<v Josh Lewis>that are new things adjacent to the core product? And examples of that might be, oh, a UI for human
+
+104
+00:10:09.740 --> 00:10:16.320
+<v Josh Lewis>reviewers to check the machine extraction or fancy features for doing data extraction from free text,
+
+105
+00:10:17.100 --> 00:10:21.780
+<v Josh Lewis>validation layers, document generation instead of getting data out of documents. There's this whole
+
+106
+00:10:21.780 --> 00:10:29.140
+<v Josh Lewis>world of adjacent things that we know could be valuable for our customers but aren't super duper
+
+107
+00:10:29.140 --> 00:10:35.040
+<v Josh Lewis>related to the core product. And then the exploit side is just making that core product better and
+
+108
+00:10:35.040 --> 00:10:40.160
+<v Josh Lewis>better and better, like better primitives in the query language, better experience in the
+
+109
+00:10:40.160 --> 00:10:45.900
+<v Josh Lewis>management interface and in the editor. And so that's really the challenge. I think we've leaned
+
+110
+00:10:45.900 --> 00:10:52.020
+<v Josh Lewis>towards the latter and been guided by our customers. What's great about working in this
+
+111
+00:10:52.020 --> 00:10:56.520
+<v Josh Lewis>problem space is that people just bring the problems to you, right? They bring a difficult
+
+112
+00:10:56.520 --> 00:11:02.240
+<v Josh Lewis>document to you. And so you have this steady stream from the real world of almost like problem
+
+113
+00:11:02.240 --> 00:11:09.840
+<v Josh Lewis>statements that turn into roadmap. In the early 2021, let's say, when we were developing the UI
+
+114
+00:11:09.840 --> 00:11:15.220
+<v Josh Lewis>and all that, it was still the case that many new documents that we got, we had to build new things
+
+115
+00:11:15.220 --> 00:11:19.780
+<v Josh Lewis>into the query language in order to support those documents and successfully extract them.
+
+116
+00:11:20.100 --> 00:11:25.980
+<v Josh Lewis>Fast forward to today, it is extremely rare that there's a document that we can't just handle with
+
+117
+00:11:25.980 --> 00:11:32.000
+<v Josh Lewis>what we've already built out of the box. And so that's a result of listening to the market or
+
+118
+00:11:32.240 --> 00:11:38.020
+<v Josh Lewis>listening to the data set, so to speak, as we've become more and more knowledgeable about the world
+
+119
+00:11:38.020 --> 00:11:39.920
+<v Josh Lewis>of possible documents out there.
+
+120
+00:11:41.080 --> 00:11:44.440
+<v Noah Labhart>Okay, well then let's switch to team. So how did you go about
+
+121
+00:11:44.440 --> 00:11:48.840
+<v Noah Labhart>building your team and what did you look for in those people to indicate that they are the winning
+
+122
+00:11:48.840 --> 00:11:49.820
+<v Noah Labhart>horses to join you?
+
+123
+00:11:50.940 --> 00:11:56.820
+<v Josh Lewis>I'm a big believer in life is long and careers are long and you definitely want
+
+124
+00:11:56.820 --> 00:12:01.900
+<v Josh Lewis>to build up that group of people that you've enjoyed working with and they've likewise enjoyed
+
+125
+00:12:02.240 --> 00:12:08.080
+<v Josh Lewis>working with you. Fully a third of the folks that work at Sensible are people that I've worked with
+
+126
+00:12:08.080 --> 00:12:13.840
+<v Josh Lewis>in the past, and in one case, multiple times. So I think that's a part of the fact that there's
+
+127
+00:12:13.840 --> 00:12:21.700
+<v Josh Lewis>this kind of clubby, networky nature to the Bay Area tech scene. But it's also a real superpower,
+
+128
+00:12:21.920 --> 00:12:27.720
+<v Josh Lewis>if you know folks that are great people to work with and who do good work.
+
+129
+00:12:27.720 --> 00:12:34.740
+<v Josh Lewis>The flip side of that is you need to be able to find people that will be those people in the future for you, right?
+
+130
+00:12:35.720 --> 00:12:36.860
+<v Josh Lewis>We've done a couple things.
+
+131
+00:12:37.040 --> 00:12:46.000
+<v Josh Lewis>I mean, one thing I did at Newfront is we started working with a recruiter who specializes in finding talent in Latin America.
+
+132
+00:12:46.440 --> 00:12:53.480
+<v Josh Lewis>And we hired two amazing engineers from Chile while I was at Newfront that are still there.
+
+133
+00:12:53.480 --> 00:13:07.280
+<v Josh Lewis>And so I worked with the same company, Matilda Explorations, with Sensible, and we've hired a couple awesome folks from Argentina, including one of the, I've worked with a lot of talented engineers over the years, and this person's like 95th percentile plus.
+
+134
+00:13:08.180 --> 00:13:22.220
+<v Josh Lewis>That's an opportunity to broaden the horizons of where you're searching for talent, and then creating a very positive experience for folks that are coming from different backgrounds and aren't part of the Bay Area scene.
+
+135
+00:13:23.480 --> 00:13:29.620
+<v Josh Lewis>I think with engineering hiring, we're kind of lucky because there's at least relatively quantitative ways to evaluate folks.
+
+136
+00:13:30.060 --> 00:13:34.320
+<v Josh Lewis>And I know this is kind of frowned upon in some circles, but we do this little take-home thing.
+
+137
+00:13:34.540 --> 00:13:40.320
+<v Josh Lewis>And we see it as bidirectional because you're implementing stuff that we implemented at the very beginning of the platform.
+
+138
+00:13:40.640 --> 00:13:48.380
+<v Josh Lewis>And so not only do we see how you think, but you learn what it's actually like to build software that's sensible and the real kinds of problems that we solve.
+
+139
+00:13:48.920 --> 00:13:52.980
+<v Josh Lewis>I think that helps too when you're trying to identify new talent in engineering is that
+
+140
+00:13:52.980 --> 00:13:56.140
+<v Josh Lewis>you can do it in these very quantitative, realistic ways.
+
+141
+00:13:56.560 --> 00:14:01.480
+<v Josh Lewis>When you move outside to like marketing or customer success or other roles within the
+
+142
+00:14:01.480 --> 00:14:05.420
+<v Josh Lewis>company, then it's a little bit more challenging because it tends to be a little bit more
+
+143
+00:14:05.420 --> 00:14:07.180
+<v Josh Lewis>qualitative of an evaluation.
+
+144
+00:14:07.820 --> 00:14:11.800
+<v Josh Lewis>But I always look at, hey, am I loving talking to this person?
+
+145
+00:14:11.900 --> 00:14:17.040
+<v Josh Lewis>Do I feel like I'm having new ideas or building up energy by talking to this person?
+
+146
+00:14:18.380 --> 00:14:20.080
+<v Josh Lewis>that they've historically done great work
+
+147
+00:14:20.080 --> 00:14:22.120
+<v Josh Lewis>are all things that I think about.
+
+148
+00:14:25.900 --> 00:14:27.800
+<v Noah Labhart>So let's flip to scalability.
+
+149
+00:14:28.180 --> 00:14:31.080
+<v Noah Labhart>So did you build this to scale efficiently from day one,
+
+150
+00:14:31.220 --> 00:14:34.100
+<v Noah Labhart>or are you fighting this as you grow and gain traction?
+
+151
+00:14:35.940 --> 00:14:39.040
+<v Josh Lewis>So one thing that I was playing around with
+
+152
+00:14:39.040 --> 00:14:42.220
+<v Josh Lewis>in the time between Newfront and starting Sensible
+
+153
+00:14:42.220 --> 00:14:46.400
+<v Josh Lewis>was just like AWS infrastructure stuff
+
+154
+00:14:48.620 --> 00:14:54.340
+<v Josh Lewis>and I had built a little prototype project for another startup that I was considering building.
+
+155
+00:14:55.500 --> 00:15:02.300
+<v Josh Lewis>One of the things that actually attracted me to this PDF problem is that it's what you might call embarrassingly parallel, right?
+
+156
+00:15:02.420 --> 00:15:04.280
+<v Josh Lewis>Like it's, or it's task parallel.
+
+157
+00:15:04.460 --> 00:15:13.100
+<v Josh Lewis>Every single PDF extraction that we're doing in that like live API environment is completely isolated from every other one, right?
+
+158
+00:15:13.180 --> 00:15:15.560
+<v Josh Lewis>And you can, you can consider them totally independently.
+
+159
+00:15:15.780 --> 00:15:18.000
+<v Josh Lewis>There's no shared state or anything like that.
+
+160
+00:15:18.380 --> 00:15:29.220
+<v Josh Lewis>So that meant that we could build our platform from day one in a way that just took advantage of that and was completely horizontally scalable out the gate.
+
+161
+00:15:29.380 --> 00:15:40.440
+<v Josh Lewis>So technology-wise, we're fundamentally like API gateway in front of Lambdas backing onto a combination of S3 and DynamoDB.
+
+162
+00:15:40.940 --> 00:15:44.500
+<v Josh Lewis>And that means that we've never really had scaling problems.
+
+163
+00:15:44.500 --> 00:15:50.840
+<v Josh Lewis>I think the way that we've gotten bitten by scaling problems is getting rate limited by downstream stuff.
+
+164
+00:15:51.100 --> 00:15:55.720
+<v Josh Lewis>So we don't do our own OCR, which makes a ton of sense, right?
+
+165
+00:15:55.760 --> 00:15:59.600
+<v Josh Lewis>If you think about it, the document data extraction problem, there's kind of two layers to it.
+
+166
+00:15:59.680 --> 00:16:01.880
+<v Josh Lewis>One is what is the text that's in the document?
+
+167
+00:16:02.180 --> 00:16:05.000
+<v Josh Lewis>And then the second is what does that text mean, right?
+
+168
+00:16:05.180 --> 00:16:07.300
+<v Josh Lewis>And so we're very focused on that latter case.
+
+169
+00:16:07.480 --> 00:16:09.460
+<v Josh Lewis>Like how do you get structure out of the raw text?
+
+170
+00:16:09.740 --> 00:16:11.640
+<v Josh Lewis>And most PDFs are true PDFs.
+
+171
+00:16:11.640 --> 00:16:13.120
+<v Josh Lewis>You don't even need to do OCR.
+
+172
+00:16:13.120 --> 00:16:14.060
+<v Josh Lewis>You just pull the text out.
+
+173
+00:16:14.680 --> 00:16:23.120
+<v Josh Lewis>So we use these third-party OCR services, actually all of Google, Amazon, and Microsoft's, and they will rate limit you.
+
+174
+00:16:23.340 --> 00:16:33.580
+<v Josh Lewis>And so we've had moments where we've had to do just smarter exponential back-off stuff so that we don't get rate limited downstream, and then that impacts our customers.
+
+175
+00:16:33.960 --> 00:16:37.020
+<v Josh Lewis>Otherwise, we've never run into...
+
+176
+00:16:37.020 --> 00:16:42.080
+<v Josh Lewis>We've had people accidentally run really gnarly scripts against us and send us insane volume.
+
+177
+00:16:42.080 --> 00:16:45.120
+<v Josh Lewis>volume because of the way that we built it from the start. It's not really a problem.
+
+178
+00:16:46.700 --> 00:16:51.640
+<v Noah Labhart>As you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+179
+00:16:52.100 --> 00:16:56.280
+<v Josh Lewis>Well, we're still early on here. I mean, I don't know if I'm on the balcony. I'm more like on the
+
+180
+00:16:56.280 --> 00:16:58.480
+<v Josh Lewis>battlefield looking left and right.
+
+181
+00:16:59.380 --> 00:17:00.780
+<v Noah Labhart>But I
+
+182
+00:17:00.780 --> 00:17:04.820
+<v Josh Lewis>think the thing that's most satisfying to me is seeing
+
+183
+00:17:04.820 --> 00:17:11.020
+<v Josh Lewis>customers just get core value out of the product. And one proxy for that is just people using the
+
+184
+00:17:12.080 --> 00:17:20.080
+<v Josh Lewis>So I remember when we first set this up, I think our first week of having any customer using us, we got like eight API calls.
+
+185
+00:17:20.460 --> 00:17:21.760
+<v Josh Lewis>And that was all exciting.
+
+186
+00:17:21.900 --> 00:17:26.840
+<v Josh Lewis>I went in and I saw the log from like the two calls or whatever, you know.
+
+187
+00:17:27.060 --> 00:17:31.580
+<v Josh Lewis>And now I can just dip into AWS at any moment.
+
+188
+00:17:31.640 --> 00:17:37.360
+<v Josh Lewis>And there's just like data streaming through and customers getting back 200 codes.
+
+189
+00:17:37.580 --> 00:17:39.720
+<v Josh Lewis>I'm just like, oh, man, it's beautiful, right?
+
+190
+00:17:39.720 --> 00:17:54.360
+<v Josh Lewis>Right. So that right now is the most exciting thing to me is just seeing the system that we built and that it used to just be crickets now serving dozens of customers and thousands and thousands of live extractions.
+
+191
+00:17:54.360 --> 00:17:56.480
+<v Josh Lewis>It's very, very rewarding.
+
+192
+00:17:57.880 --> 00:18:03.880
+<v Noah Labhart>Let's flip the script a little bit. So tell me about a mistake you made and how you and your team responded to it.
+
+193
+00:18:03.880 --> 00:18:04.780
+<v Noah Labhart>When
+
+194
+00:18:04.780 --> 00:18:10.220
+<v Josh Lewis>I think of mistakes that we've made, I think mainly of things that you put in the bucket of product.
+
+195
+00:18:10.720 --> 00:18:13.820
+<v Josh Lewis>It's possible to make engineering mistakes.
+
+196
+00:18:14.540 --> 00:18:18.020
+<v Josh Lewis>I normally try to think of those from a process perspective.
+
+197
+00:18:18.440 --> 00:18:30.720
+<v Josh Lewis>So if we have an outage, when that happens, it's really not a question of like, oh, someone made a programming error or the reviewer didn't catch it.
+
+198
+00:18:31.400 --> 00:18:37.100
+<v Josh Lewis>it's a lot more about the processes that we have in place to like test and review something before
+
+199
+00:18:37.100 --> 00:18:42.660
+<v Josh Lewis>it goes to production and we do just extensive testing right we've got like multiple forms of
+
+200
+00:18:42.660 --> 00:18:48.000
+<v Josh Lewis>testing unit tests end-to-end tests we have these uh what we call golden extractions where we have
+
+201
+00:18:48.500 --> 00:18:54.300
+<v Josh Lewis>hundreds of pdfs where we know what the output of those pdfs should be so if we make a change to the
+
+202
+00:18:54.300 --> 00:18:58.800
+<v Josh Lewis>core engine we notice immediately if that what we could you know quote-unquote jitters the goldens
+
+203
+00:19:00.720 --> 00:19:03.480
+<v Josh Lewis>for us to ship something that unintentionally breaks our customers.
+
+204
+00:19:03.880 --> 00:19:09.480
+<v Josh Lewis>So there are potential engineering failures, but I always see those as process failures.
+
+205
+00:19:10.960 --> 00:19:20.200
+<v Josh Lewis>From more of a mistake standpoint, I turn it more back to product, building the wrong thing or building the right thing at the wrong time.
+
+206
+00:19:20.560 --> 00:19:29.800
+<v Josh Lewis>And that also goes back to what I mentioned earlier with explore versus exploit, where I think we did some exploration that didn't really net us any value.
+
+207
+00:19:30.720 --> 00:19:39.860
+<v Josh Lewis>We took a reasonable amount of time to build some beta document generation tech because we had heard this as an ask from some of our customers.
+
+208
+00:19:40.120 --> 00:19:43.400
+<v Josh Lewis>And we haven't been able to find a lot of commercial traction with that.
+
+209
+00:19:43.480 --> 00:19:54.300
+<v Josh Lewis>I know that there's a market for that, but the amount of effort that we need to put in, and despite it being the flip side of the coin from pulling data out of documents, it's technically completely dissimilar.
+
+210
+00:19:54.300 --> 00:20:02.320
+<v Josh Lewis>I just don't know that it's worth it for us to go and find the commercial traction there versus doing things that are more adjacent to what we're already doing.
+
+211
+00:20:03.160 --> 00:20:05.120
+<v Josh Lewis>There's a couple of examples of that.
+
+212
+00:20:05.220 --> 00:20:12.600
+<v Josh Lewis>I mean, one that I pushed for was adding a flexible validation layer on top of the extractions.
+
+213
+00:20:12.800 --> 00:20:20.500
+<v Josh Lewis>And it's great from a sales demo standpoint, but I don't know that that many of our customers really like actively using or actively getting value out of it.
+
+214
+00:20:20.500 --> 00:20:29.080
+<v Josh Lewis>And so these are the kind of things that I look at as, in retrospect, they're product mistakes because we could have used those engineering resources to do something more valuable.
+
+215
+00:20:29.300 --> 00:20:32.540
+<v Josh Lewis>That said, you can't just do no exploration.
+
+216
+00:20:32.640 --> 00:20:37.780
+<v Josh Lewis>And definitionally, the exploration stuff is going to be less likely to find immediate traction.
+
+217
+00:20:38.800 --> 00:20:40.580
+<v Josh Lewis>So we have to have a comfort level with that.
+
+218
+00:20:40.640 --> 00:20:43.040
+<v Josh Lewis>But that is what I think about when I think about mistakes thus far.
+
+219
+00:20:45.840 --> 00:20:50.480
+<v Noah Labhart>So what does the future look like for the Sensible product and for your team?
+
+220
+00:20:51.400 --> 00:21:11.240
+<v Josh Lewis>The immediate future for us that I'm excited about is one thing we've learned from looking at the search traffic that ends up pointing towards us and talking to a certain group of our customers is that getting from PDF, not just to JSON, getting to JSON in a structured way is very useful to an engineer.
+
+221
+00:21:13.040 --> 00:21:18.560
+<v Josh Lewis>more in like an operations role, getting to a spreadsheet is actually quite valuable. There's
+
+222
+00:21:18.560 --> 00:21:24.040
+<v Josh Lewis>use cases in insurance, for example, there's something called a loss run, which is a history
+
+223
+00:21:24.040 --> 00:21:28.480
+<v Josh Lewis>of all the claims that you've made against the insurance policy over the years. And it's very
+
+224
+00:21:28.480 --> 00:21:32.900
+<v Josh Lewis>important in underwriting a risk, like if you're switching carriers or something like that, they
+
+225
+00:21:32.900 --> 00:21:38.000
+<v Josh Lewis>want to see your historical loss runs. There are very complex documents that can have dozens,
+
+226
+00:21:38.000 --> 00:21:41.640
+<v Josh Lewis>hundreds, even low thousands of data elements that you need to pull out.
+
+227
+00:21:43.180 --> 00:21:46.660
+<v Josh Lewis>And each carrier generates them in their own format.
+
+228
+00:21:46.900 --> 00:21:52.920
+<v Josh Lewis>It would be tremendously valuable to ops folks to be able to take these things,
+
+229
+00:21:52.980 --> 00:21:54.660
+<v Josh Lewis>regardless of which carrier they came from,
+
+230
+00:21:54.780 --> 00:21:57.720
+<v Josh Lewis>and just put them in a spreadsheet format for analysis.
+
+231
+00:21:58.060 --> 00:21:59.420
+<v Josh Lewis>And now that's a little bit less technical.
+
+232
+00:21:59.540 --> 00:22:01.640
+<v Josh Lewis>It's a little bit less developer-focused.
+
+233
+00:22:01.860 --> 00:22:04.300
+<v Josh Lewis>But it's something where, to do that,
+
+234
+00:22:04.440 --> 00:22:07.700
+<v Josh Lewis>you need to solve the extremely hard problem that we've already solved,
+
+235
+00:22:08.000 --> 00:22:12.240
+<v Josh Lewis>is how do you go from the PDF to structured data. And so there's not a lot
+
+236
+00:22:12.240 --> 00:22:15.960
+<v Josh Lewis>of good solutions for that out there. So I'm pretty enthusiastic about that as a
+
+237
+00:22:15.960 --> 00:22:21.340
+<v Josh Lewis>very near-term feature for us that solves a problem in the real world that
+
+238
+00:22:21.340 --> 00:22:28.060
+<v Josh Lewis>again is pretty uncool, but people I believe experience acutely. Looking more
+
+239
+00:22:28.060 --> 00:22:33.840
+<v Josh Lewis>broadly, what we're doing as a company is we're bringing software closer to the
+
+240
+00:22:33.840 --> 00:22:39.280
+<v Josh Lewis>the way that people work every day. I think one thing, if you're a technologist that comes into
+
+241
+00:22:39.280 --> 00:22:45.560
+<v Josh Lewis>these mature industries like insurance, like healthcare, like logistics, you have this boggle
+
+242
+00:22:45.560 --> 00:22:49.860
+<v Josh Lewis>moment where you're like, wait a second, why is it that these industries are still passing
+
+243
+00:22:49.860 --> 00:22:55.380
+<v Josh Lewis>documents around? We have the technology for decades to move folks over to more of like an
+
+244
+00:22:55.380 --> 00:23:03.080
+<v Josh Lewis>API-based way of interacting with one another. And what that misses is the real work the documents
+
+245
+00:23:03.840 --> 00:23:10.400
+<v Josh Lewis>and beyond what an API can do for these incumbents in mature industries. So if you're back to the
+
+246
+00:23:10.400 --> 00:23:14.740
+<v Josh Lewis>insurance carrier, if you're an insurance carrier, one of the ways that you innovate as a company
+
+247
+00:23:14.740 --> 00:23:20.860
+<v Josh Lewis>is by offering coverage that's different in some way from your competitors. Like it has this cool
+
+248
+00:23:20.860 --> 00:23:24.540
+<v Josh Lewis>new coverage, or it doesn't have this weird exclusion, or it does have some other weird
+
+249
+00:23:24.540 --> 00:23:30.200
+<v Josh Lewis>exclusion, but it's cheaper or whatever. If you don't control the data model, like if you're using
+
+250
+00:23:30.200 --> 00:23:37.860
+<v Josh Lewis>some centralized API within the industry, you are constrained in your own ability to innovate.
+
+251
+00:23:38.580 --> 00:23:44.420
+<v Josh Lewis>The things that are preventing companies from mass migrating in these mature industries to APIs,
+
+252
+00:23:44.600 --> 00:23:50.360
+<v Josh Lewis>it's not just people being Luddites or a lack of technical skill or a lack of the technology being
+
+253
+00:23:50.360 --> 00:23:56.540
+<v Josh Lewis>available. It's that that approach to doing business to business transactions doesn't
+
+254
+00:23:56.540 --> 00:24:01.380
+<v Josh Lewis>provide the same affordances that you get with documents, this ability to control the data model,
+
+255
+00:24:01.580 --> 00:24:06.880
+<v Josh Lewis>to control the presentation layer, to have a very clear source of truth relationship to like legal
+
+256
+00:24:06.880 --> 00:24:13.360
+<v Josh Lewis>reality. And so I almost flipped that question of like, it's not how do we get these industries to
+
+257
+00:24:13.360 --> 00:24:19.400
+<v Josh Lewis>move to APIs? It's how do we bring software closer to the way that they all already work?
+
+258
+00:24:19.500 --> 00:24:23.680
+<v Josh Lewis>That's what we should be doing as technologists is taking these, the way that these businesses
+
+259
+00:24:23.680 --> 00:24:27.540
+<v Josh Lewis>work, things like documents, and making them transparently accessible to software.
+
+260
+00:24:27.860 --> 00:24:34.240
+<v Josh Lewis>And that brings us into this future that we all know is coming and partially here, which
+
+261
+00:24:34.240 --> 00:24:36.620
+<v Josh Lewis>is operations as software, right?
+
+262
+00:24:36.700 --> 00:24:41.240
+<v Josh Lewis>Like all these business workflows, these are things that really need to be software mediated.
+
+263
+00:24:41.360 --> 00:24:48.060
+<v Josh Lewis>And it takes technology like Sensible's, again, kind of like low to the ground, slightly gnarly
+
+264
+00:24:48.060 --> 00:24:50.300
+<v Josh Lewis>software to really accomplish that.
+
+265
+00:24:50.300 --> 00:24:55.460
+<v Josh Lewis>because you're not going to accomplish it by building some techno utopia api and magically
+
+266
+00:24:55.460 --> 00:24:59.700
+<v Josh Lewis>having all these incumbents migrate to it so
+
+267
+00:24:59.700 --> 00:25:02.520
+<v Noah Labhart>let's switch to you who influences the way that you work
+
+268
+00:25:02.520 --> 00:25:08.660
+<v Noah Labhart>you know name a ceo cto architect really any person you look up to and why so
+
+269
+00:25:08.660 --> 00:25:10.480
+<v Josh Lewis>i'll go slightly
+
+270
+00:25:10.480 --> 00:25:17.340
+<v Josh Lewis>off script and go with a politician not to make you nervous here but a local politician so in san
+
+271
+00:25:17.340 --> 00:25:22.040
+<v Josh Lewis>San Francisco, our state senator is Scott Wiener.
+
+272
+00:25:22.220 --> 00:25:27.420
+<v Josh Lewis>He is interesting to me among politicians because he's taken a very pragmatic approach,
+
+273
+00:25:27.600 --> 00:25:31.900
+<v Josh Lewis>and I don't know all his positions on all issues, but to very real problems that we
+
+274
+00:25:31.900 --> 00:25:33.040
+<v Josh Lewis>have in the Bay Area.
+
+275
+00:25:33.200 --> 00:25:38.480
+<v Josh Lewis>So he's one of the main proponents behind streamlining the ability to build dense housing
+
+276
+00:25:38.480 --> 00:25:40.120
+<v Josh Lewis>near transit.
+
+277
+00:25:41.000 --> 00:25:46.520
+<v Josh Lewis>He's worked on and I think successfully passed a bill for the state of California to make
+
+278
+00:25:47.340 --> 00:25:52.660
+<v Josh Lewis>the state to put people who are experiencing mental illness, severe mental illness, or severe
+
+279
+00:25:52.660 --> 00:25:58.540
+<v Josh Lewis>substance abuse problems into conservatorship. He's trying to get last call pushback from 2 a.m.
+
+280
+00:25:58.540 --> 00:26:05.360
+<v Josh Lewis>to 4 a.m. So he just, he takes these problems, these very real problems that we have as a society
+
+281
+00:26:05.360 --> 00:26:13.060
+<v Josh Lewis>and as a region, and approaches them in a very pragmatic, almost kind of boring way, right? Like
+
+282
+00:26:13.060 --> 00:26:15.920
+<v Josh Lewis>like legislating in some ways is deeply boring.
+
+283
+00:26:16.040 --> 00:26:19.640
+<v Josh Lewis>That's one of the challenges with it in a democracy.
+
+284
+00:26:20.740 --> 00:26:22.180
+<v Josh Lewis>And I really appreciate that, right?
+
+285
+00:26:22.240 --> 00:26:24.640
+<v Josh Lewis>Because a lot of politics is about politics itself
+
+286
+00:26:24.640 --> 00:26:26.500
+<v Josh Lewis>as opposed to legislating
+
+287
+00:26:26.500 --> 00:26:28.740
+<v Josh Lewis>and as opposed to solving real problems for constituents.
+
+288
+00:26:29.200 --> 00:26:31.020
+<v Josh Lewis>So again, not some sort of endorsement,
+
+289
+00:26:31.020 --> 00:26:33.320
+<v Josh Lewis>but just say, you know, when I try to think about,
+
+290
+00:26:33.400 --> 00:26:35.320
+<v Josh Lewis>oh man, what would it be like to be in politics?
+
+291
+00:26:35.520 --> 00:26:36.880
+<v Josh Lewis>I'd want to be that type of person
+
+292
+00:26:36.880 --> 00:26:39.680
+<v Josh Lewis>that is just trying to solve real problems.
+
+293
+00:26:39.680 --> 00:26:52.120
+<v Josh Lewis>And you can take that back to as a leader in a company, staying grounded to like, hey, are you moving the company closer to its goal of solving real problems for its customers?
+
+294
+00:26:52.260 --> 00:26:55.320
+<v Josh Lewis>Or are you getting caught up in all the stuff around it?
+
+295
+00:26:56.660 --> 00:27:00.460
+<v Noah Labhart>We talked about a mistake earlier, but a little bit different spin, and it may be similar.
+
+296
+00:27:00.680 --> 00:27:03.460
+<v Noah Labhart>But if you could go back to the beginning, what would you do different?
+
+297
+00:27:03.540 --> 00:27:05.620
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+298
+00:27:06.240 --> 00:27:24.920
+<v Josh Lewis>If you point sample me right now, the thing that we're very focused on and we've made a lot of progress on and maybe we could have done it even sooner is like that enterprise angle where we did a really great job out the gate of building software and working with a whole bunch of different startups.
+
+299
+00:27:24.920 --> 00:27:30.800
+<v Josh Lewis>startups. And it's important for us as a business to find those use cases also where there are true
+
+300
+00:27:30.800 --> 00:27:35.720
+<v Josh Lewis>enterprise use cases, right? And people are doing, you know, as an individual entity, you know,
+
+301
+00:27:35.720 --> 00:27:40.040
+<v Josh Lewis>hundreds of thousands of documents a month or something like that. And so there's a lot of
+
+302
+00:27:40.040 --> 00:27:47.140
+<v Josh Lewis>features like we recently launched the ability to deploy Sensible to any AWS region of your
+
+303
+00:27:47.140 --> 00:27:53.500
+<v Josh Lewis>choosing. We've done custom retention policies. We can do custom SLAs. We've got our SOC 2 Type 2
+
+304
+00:27:55.680 --> 00:28:00.720
+<v Josh Lewis>we've done a lot of I dotting and T crossing. We're working on an SSO. I might go back and,
+
+305
+00:28:00.740 --> 00:28:06.880
+<v Josh Lewis>and move that stuff forward. It's tough to do that because there's a lot of overhead
+
+306
+00:28:06.880 --> 00:28:12.960
+<v Josh Lewis>to building enterprise features. And you kind of are in this state where you're like, I want to,
+
+307
+00:28:12.960 --> 00:28:18.460
+<v Josh Lewis>I want to prove out that what we're building is valuable before I prematurely build out a bunch
+
+308
+00:28:18.460 --> 00:28:21.480
+<v Josh Lewis>of enterprise stuff. Right. Cause that's a, that's a colossal waste of time. If you build
+
+309
+00:28:21.480 --> 00:28:25.440
+<v Josh Lewis>a bunch of enterprise features around something that's actually doesn't have product market fit.
+
+310
+00:28:25.920 --> 00:28:30.720
+<v Josh Lewis>But then you get to where we are now, where you've got dozens of customers and you're trying to
+
+311
+00:28:31.620 --> 00:28:36.140
+<v Josh Lewis>aggressively fill out the top of the funnel market. Then you're like, man, if we could have
+
+312
+00:28:36.140 --> 00:28:43.260
+<v Josh Lewis>pulled forward some of those efforts, it would have been good just from a progress and timeline
+
+313
+00:28:43.260 --> 00:28:45.180
+<v Josh Lewis>perspective. So that's one thing to think about.
+
+314
+00:28:46.340 --> 00:28:48.720
+<v Noah Labhart>Well, last question, Josh. So you're getting on
+
+315
+00:28:48.720 --> 00:28:52.340
+<v Noah Labhart>on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+316
+00:28:53.120 --> 00:28:56.280
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world. Can't wait to show it to you
+
+317
+00:28:56.280 --> 00:29:00.320
+<v Noah Labhart>right there on the plane. Their gnarly problem that they went out and solved.
+
+318
+00:29:01.160 --> 00:29:04.280
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+319
+00:29:05.620 --> 00:29:11.760
+<v Josh Lewis>I first learned this in retrospect about grad school. So I was in academia for a while. And
+
+320
+00:29:11.760 --> 00:29:16.180
+<v Josh Lewis>in retrospect, at the time, I thought this is just the battle of ideas. It's the battle of
+
+321
+00:29:16.180 --> 00:29:22.200
+<v Josh Lewis>who can like come up with the coolest stuff or the most surprising stuff when really it was also
+
+322
+00:29:22.200 --> 00:29:26.740
+<v Josh Lewis>about your own personal brand and like getting your name out there and networking at conferences
+
+323
+00:29:26.740 --> 00:29:30.640
+<v Josh Lewis>and I was a little bit more of you know I'm just writing my papers and I'd give my talk at a
+
+324
+00:29:30.640 --> 00:29:36.960
+<v Josh Lewis>conference or whatever but I wasn't seeing it as this brand building exercise and similarly if
+
+325
+00:29:36.960 --> 00:29:42.700
+<v Josh Lewis>you're someone who is building something I just always say hey pay attention to that like sales
+
+326
+00:29:42.700 --> 00:29:46.320
+<v Josh Lewis>and marketing side of it as well and get experience with that if possible.
+
+327
+00:29:46.640 --> 00:29:52.340
+<v Josh Lewis>My first job out of grad school at Ayasdi, I was very lucky to be identified as someone
+
+328
+00:29:52.340 --> 00:29:57.760
+<v Josh Lewis>to be brought along on sales calls and get put into situations where I'm helping to pitch
+
+329
+00:29:57.760 --> 00:30:03.280
+<v Josh Lewis>the prospect and get some exposure to that sales part of the industry.
+
+330
+00:30:03.400 --> 00:30:04.380
+<v Josh Lewis>And that has been invaluable.
+
+331
+00:30:04.780 --> 00:30:09.460
+<v Josh Lewis>Again, as someone who since middle school has been extremely rounded in more of the
+
+332
+00:30:09.460 --> 00:30:11.480
+<v Josh Lewis>technology and the software side of it all.
+
+333
+00:30:12.700 --> 00:30:18.920
+<v Josh Lewis>give is don't sleep on the soft side of building a company or building a product and value those
+
+334
+00:30:18.920 --> 00:30:24.480
+<v Josh Lewis>sales and marketing skills. Find partners, find mentors around that and build up your own skills.
+
+335
+00:30:25.440 --> 00:30:30.080
+<v Noah Labhart>Fantastic advice. Well, Josh, thanks for being on the show today. Thanks for telling the creation
+
+336
+00:30:30.080 --> 00:30:31.260
+<v Noah Labhart>story of Sensible.
+
+337
+00:30:31.500 --> 00:30:32.320
+<v Josh Lewis>Awesome. Thanks, Noah.
+
+338
+00:30:34.520 --> 00:30:37.200
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+339
+00:30:37.200 --> 00:30:37.700
+<v Noah Labhart>Code Story.
+
+340
+00:30:42.560 --> 00:30:45.140
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+341
+00:30:45.300 --> 00:30:50.060
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+342
+00:30:50.520 --> 00:30:55.560
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+343
+00:30:55.960 --> 00:30:58.140
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+344
+00:30:58.440 --> 00:31:00.320
+<v Noah Labhart>Both things help us out tremendously.
+
+345
+00:31:02.000 --> 00:31:04.260
+<v Noah Labhart>and thanks again for listening
+
+346
+00:31:13.760 --> 00:31:16.560
+<v Josh Lewis>Thank you.

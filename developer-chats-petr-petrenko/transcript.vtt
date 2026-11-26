@@ -1,0 +1,787 @@
+WEBVTT
+
+NOTE Developer Chats - Petr Petrenko
+
+1
+00:00:00.000 --> 00:00:26.080
+<v Noah Labhart>Hello, listeners. Today we are continuing our series entitled Developer Chats, hearing from the large-scale system builders themselves. In this episode, we are talking with Petr Petrenko, senior PHP backend engineer. Petr will take us through his developer journey and working on large-scale backends, managing the tension between stability and innovation, and designing systems to interact with culturally different economies.
+
+2
+00:00:26.080 --> 00:00:32.360
+<v Noah Labhart>economies. Well, Petr, thank you for being on the show today. Thanks for being on Code Story.
+
+3
+00:00:32.560 --> 00:00:33.060
+<v Petr Petrenko>Thanks
+
+4
+00:00:32.940 --> 00:00:34.900
+<v Petr Petrenko>for having me. Excited to chat today.
+
+5
+00:00:35.420 --> 00:00:40.180
+<v Noah Labhart>I'm excited to dive into all of your experience and where you can enlighten us on supporting
+
+6
+00:00:40.180 --> 00:00:43.860
+<v Noah Labhart>large-scale systems and all the things in your experience. But before we do,
+
+7
+00:00:44.100 --> 00:00:46.840
+<v Noah Labhart>tell me and my audience a little bit more about you.
+
+8
+00:00:47.140 --> 00:00:52.600
+<v Petr Petrenko>I am in the camp for about 15 years, most focusing on high-level systems. That's something I really
+
+9
+00:00:52.600 --> 00:00:57.340
+<v Petr Petrenko>really enjoy. Before that, I spent around 10 years building providers' networks as a network
+
+10
+00:00:57.340 --> 00:01:01.960
+<v Petr Petrenko>administrator. I think that experience gave me a solid foundation for understanding how
+
+11
+00:01:01.960 --> 00:01:06.260
+<v Petr Petrenko>a coupling system works at each level. It also told me something really valuable,
+
+12
+00:01:06.460 --> 00:01:10.720
+<v Petr Petrenko>that using a result solution can be just as important as creating new ones. You know,
+
+13
+00:01:10.860 --> 00:01:15.740
+<v Petr Petrenko>when you're an admin, you don't usually write new code, you work with what you already have.
+
+14
+00:01:16.080 --> 00:01:21.760
+<v Petr Petrenko>And that mindset really helps me with legacy projects. You try to get the most out of what
+
+15
+00:01:22.600 --> 00:01:25.860
+<v Petr Petrenko>have. In my free time, I enjoy DIY electronics projects.
+
+16
+00:01:26.560 --> 00:01:28.680
+<v Noah Labhart>Very cool. I appreciate that overview.
+
+17
+00:01:29.000 --> 00:01:33.860
+<v Noah Labhart>Let's dive into it then. So you've worked on large-scale backends that serve millions of users.
+
+18
+00:01:34.060 --> 00:01:38.500
+<v Noah Labhart>At what point do systems start to outgrow the teams that built them?
+
+19
+00:01:38.860 --> 00:01:40.200
+<v Petr Petrenko>I think problems usually
+
+20
+00:01:40.200 --> 00:01:45.420
+<v Petr Petrenko>start when the team stops really understanding what they are really doing. They kind of lose
+
+21
+00:01:45.420 --> 00:01:49.780
+<v Petr Petrenko>focus on the main goal and start implementing things that don't really make sense together.
+
+22
+00:01:49.780 --> 00:01:54.700
+<v Petr Petrenko>So in most cases, it's actually more of product issues than a technical one.
+
+23
+00:01:55.060 --> 00:01:59.520
+<v Petr Petrenko>Another big challenge comes when the original people who are designing the system leave the team.
+
+24
+00:01:59.760 --> 00:02:05.280
+<v Petr Petrenko>It's really hard to pass on the deep conceptual understanding of how the architecture works
+
+25
+00:02:05.280 --> 00:02:08.280
+<v Petr Petrenko>and how the project should evolve in the future.
+
+26
+00:02:08.600 --> 00:02:10.700
+<v Noah Labhart>Yeah, I've experienced those things as well.
+
+27
+00:02:10.860 --> 00:02:16.460
+<v Noah Labhart>So at some point, every mature backend reaches a stage where rewriting is no longer realistic.
+
+28
+00:02:16.460 --> 00:02:19.900
+<v Noah Labhart>How do you recognize when a system has crossed that line?
+
+29
+00:02:20.080 --> 00:02:21.860
+<v Noah Labhart>And what's the right way to handle it?
+
+30
+00:02:22.300 --> 00:02:23.940
+<v Petr Petrenko>Rewriting is always possible.
+
+31
+00:02:24.100 --> 00:02:28.880
+<v Petr Petrenko>But the real question is why are you doing it and how much it is going to cost.
+
+32
+00:02:29.120 --> 00:02:32.180
+<v Petr Petrenko>For me, rewriting should always be the last resort.
+
+33
+00:02:32.460 --> 00:02:34.580
+<v Petr Petrenko>It only makes sense in two cases.
+
+34
+00:02:34.920 --> 00:02:38.480
+<v Petr Petrenko>The first, when you just can't move forward with the current setup
+
+35
+00:02:38.480 --> 00:02:40.960
+<v Petr Petrenko>and need to change the whole tech stack,
+
+36
+00:02:41.180 --> 00:02:44.600
+<v Petr Petrenko>like moving from a web app to a native mobile app.
+
+37
+00:02:46.460 --> 00:02:53.200
+<v Petr Petrenko>has drifted too far from the original requirements. In other cases, good refactoring and cleanup are
+
+38
+00:02:53.200 --> 00:02:59.120
+<v Petr Petrenko>almost always a better option. I've had situations where people wanted to rewrite everything because
+
+39
+00:02:59.120 --> 00:03:04.580
+<v Petr Petrenko>the code was messy and hard to maintain, but they still needed to keep all the business logic.
+
+40
+00:03:04.880 --> 00:03:10.740
+<v Petr Petrenko>I managed to convince them to start with refactoring and documentation, and after that,
+
+41
+00:03:10.740 --> 00:03:13.900
+<v Petr Petrenko>everyone agreed the system was fine to work with.
+
+42
+00:03:14.080 --> 00:03:16.780
+<v Petr Petrenko>One of the best examples was a legacy project
+
+43
+00:03:16.780 --> 00:03:19.740
+<v Petr Petrenko>where we handled it on outsourcing.
+
+44
+00:03:19.960 --> 00:03:22.460
+<v Petr Petrenko>It was all about generation reports,
+
+45
+00:03:23.120 --> 00:03:25.660
+<v Petr Petrenko>and each one took 10 to 30 minutes.
+
+46
+00:03:26.060 --> 00:03:28.620
+<v Petr Petrenko>The project was more than 10 years,
+
+47
+00:03:28.900 --> 00:03:31.880
+<v Petr Petrenko>and the owner was ready to pay for a full rewrite.
+
+48
+00:03:32.500 --> 00:03:34.480
+<v Petr Petrenko>But after analyzing the system,
+
+49
+00:03:34.760 --> 00:03:37.560
+<v Petr Petrenko>I found the real issue, an outdated database.
+
+50
+00:03:37.800 --> 00:03:39.520
+<v Petr Petrenko>The queries were too heavy,
+
+51
+00:03:40.740 --> 00:03:47.140
+<v Petr Petrenko>optimize them. We couldn't just upgrade the database, so we fixed the queries, and in two
+
+52
+00:03:47.140 --> 00:03:54.560
+<v Petr Petrenko>weeks, reports went from 30 minutes to 10 seconds. If we had rewrite everything, it would take a last
+
+53
+00:03:54.560 --> 00:04:00.220
+<v Petr Petrenko>half of year. The owner was super happy as they fixed cost less than 10% of planning budget.
+
+54
+00:04:00.580 --> 00:04:04.740
+<v Petr Petrenko>So it is really important to stay focused on solving real problems,
+
+55
+00:04:05.080 --> 00:04:09.000
+<v Petr Petrenko>not just experimenting with new tech for fun.
+
+56
+00:04:10.740 --> 00:04:16.380
+<v Noah Labhart>tension between stability and innovation. How do you decide when a system needs refactoring versus
+
+57
+00:04:16.380 --> 00:04:19.120
+<v Noah Labhart>when you just need to live with the technical debt?
+
+58
+00:04:19.500 --> 00:04:21.420
+<v Petr Petrenko>When you are working on a live project,
+
+59
+00:04:21.600 --> 00:04:26.640
+<v Petr Petrenko>there will always be some technical debt. That is normal. The important thing is to keep it
+
+60
+00:04:26.640 --> 00:04:32.120
+<v Petr Petrenko>under control so it doesn't cause real problems. Like I said before, it's all about clearly
+
+61
+00:04:32.120 --> 00:04:37.440
+<v Petr Petrenko>understanding what issue you are actively solving. For example, if your project is growing really
+
+62
+00:04:37.440 --> 00:04:41.680
+<v Petr Petrenko>really fast, but onboarding a new employee takes two years, that is a serious bottleneck.
+
+63
+00:04:41.860 --> 00:04:46.000
+<v Petr Petrenko>But if you have a project with a lot of technical debt with a small 30-minute
+
+64
+00:04:46.000 --> 00:04:51.400
+<v Petr Petrenko>but fix each half year, maybe you don't need to touch it all. Innovation should always come
+
+65
+00:04:51.400 --> 00:04:57.280
+<v Petr Petrenko>from user needs, not from your personal desire to try a new technology or add something to your CV.
+
+66
+00:04:57.420 --> 00:05:03.780
+<v Petr Petrenko>I actually gave a talk recently about how to unjustify its use of FII caused a lot of issue
+
+67
+00:05:03.780 --> 00:05:04.780
+<v Petr Petrenko>in one project.
+
+68
+00:05:05.000 --> 00:05:09.520
+<v Noah Labhart>Very good. Let's talk about the human side of legacy systems. What have you learned
+
+69
+00:05:09.520 --> 00:05:15.860
+<v Noah Labhart>about culture, documentation, and knowledge transfer that keeps old systems alive and reliable?
+
+70
+00:05:16.340 --> 00:05:21.680
+<v Petr Petrenko>In any fast-growing project, there is always a problem with documentation. It's either incomplete
+
+71
+00:05:21.680 --> 00:05:28.400
+<v Petr Petrenko>or outdated. On one of my projects, we ever had a joke that the most completed and up-to-date
+
+72
+00:05:28.400 --> 00:05:34.100
+<v Petr Petrenko>documentation could only be found in a smoking area. Not many people enjoy writing documentation,
+
+73
+00:05:34.280 --> 00:05:40.060
+<v Petr Petrenko>but almost everyone is happy to share details about their component. So it's really important
+
+74
+00:05:40.060 --> 00:05:41.980
+<v Petr Petrenko>to stay in touch with your teammates.
+
+75
+00:05:42.360 --> 00:05:45.260
+<v Noah Labhart>No doubt, staying in touch with your teammates is absolutely
+
+76
+00:05:45.260 --> 00:05:50.340
+<v Noah Labhart>critical. You've also built and maintained complex payment systems for global users.
+
+77
+00:05:50.520 --> 00:05:55.000
+<v Noah Labhart>What's something most engineers underestimate about cross-border transactions?
+
+78
+00:05:55.000 --> 00:05:55.640
+<v Noah Labhart>Oh,
+
+79
+00:05:55.800 --> 00:06:00.480
+<v Petr Petrenko>that is one of those situations where you can't really tell how much money you actually
+
+80
+00:06:00.480 --> 00:06:01.020
+<v Petr Petrenko>made today.
+
+81
+00:06:01.280 --> 00:06:06.780
+<v Petr Petrenko>A transaction happens with one exchange rate, the payment is processed with another and
+
+82
+00:06:06.780 --> 00:06:08.760
+<v Petr Petrenko>the conversion used a third one.
+
+83
+00:06:09.060 --> 00:06:13.540
+<v Petr Petrenko>In such cases it becomes really hard to detect anomalies or fraud.
+
+84
+00:06:14.290 --> 00:06:20.020
+<v Petr Petrenko>I once worked on a project that had grown quite critically before I joined it.
+
+85
+00:06:20.020 --> 00:06:24.560
+<v Petr Petrenko>The developers had not been very careful with rounding and currency conversion.
+
+86
+00:06:25.260 --> 00:06:30.800
+<v Petr Petrenko>At first it wasn't a big deal, but as the project grew, the delta in reports reached
+
+87
+00:06:30.800 --> 00:06:32.800
+<v Petr Petrenko>$100 and $1,000.
+
+88
+00:06:33.620 --> 00:06:39.200
+<v Petr Petrenko>The problem of this system is that they are usually built for a single country of market,
+
+89
+00:06:39.320 --> 00:06:41.220
+<v Petr Petrenko>because that is what was needed.
+
+90
+00:06:41.500 --> 00:06:45.120
+<v Petr Petrenko>Other logic is designed to route the entry specific to that market.
+
+91
+00:06:45.120 --> 00:06:45.620
+<v Petr Petrenko>market.
+
+92
+00:06:45.400 --> 00:06:51.340
+<v Petr Petrenko>Then, after someone decides to expand the system to other countries or use cases, management
+
+93
+00:06:51.340 --> 00:06:54.040
+<v Petr Petrenko>expects it to be fast and simple.
+
+94
+00:06:54.180 --> 00:06:59.740
+<v Petr Petrenko>That is when ugly workarounds appear, breaking the logic and slow down future development.
+
+95
+00:07:00.100 --> 00:07:05.100
+<v Petr Petrenko>For example, imagine you built a system for selling digital services, subscriptions or
+
+96
+00:07:05.100 --> 00:07:07.480
+<v Petr Petrenko>consumables all in whole numbers.
+
+97
+00:07:07.740 --> 00:07:13.540
+<v Petr Petrenko>But then suddenly you are running a marketplace where prices are per kilogram and products
+
+98
+00:07:15.120 --> 00:07:18.300
+<v Petr Petrenko>By the way, I have a funny story about one B2B marketplace.
+
+99
+00:07:18.860 --> 00:07:24.820
+<v Petr Petrenko>Someone a long time ago had a rule in the code that order item couldn't cost more than $1 million.
+
+100
+00:07:25.720 --> 00:07:31.100
+<v Petr Petrenko>Everything worked fine, until one day a customer tried to buy an Pilatus Saffron.
+
+101
+00:07:31.620 --> 00:07:37.900
+<v Petr Petrenko>That's about a ton of the most expensive spice, which can cost from $2 to $10 per 1 gram.
+
+102
+00:07:38.480 --> 00:07:42.060
+<v Petr Petrenko>Of course, the system just refused the order until the team fixed it.
+
+103
+00:07:42.640 --> 00:07:45.120
+<v Petr Petrenko>That's a pretty common situation in a successful project.
+
+104
+00:07:45.420 --> 00:07:48.180
+<v Petr Petrenko>You never really know what will break next.
+
+105
+00:07:48.540 --> 00:07:52.060
+<v Petr Petrenko>My main advice is always be careful with numbers.
+
+106
+00:07:52.320 --> 00:07:57.140
+<v Petr Petrenko>If you find even in one cent difference, track it down and fix it.
+
+107
+00:07:57.320 --> 00:07:59.460
+<v Noah Labhart>No doubt, you can't leave those things lingering.
+
+108
+00:07:59.980 --> 00:08:04.580
+<v Noah Labhart>When you're designing systems that deal with different currencies, laws, and tax regulations,
+
+109
+00:08:04.900 --> 00:08:07.480
+<v Noah Labhart>how do you balance the technical with the ethical?
+
+110
+00:08:07.680 --> 00:08:10.800
+<v Noah Labhart>For example, user privacy or data sovereignty?
+
+111
+00:08:12.060 --> 00:08:18.120
+<v Petr Petrenko>is quite well regulated by law, we just follow the rules. For example, GDPR gives very clear rules
+
+112
+00:08:18.120 --> 00:08:24.040
+<v Petr Petrenko>on what information can store, when and how. You just need to understand it properly and stick to
+
+113
+00:08:24.040 --> 00:08:29.920
+<v Petr Petrenko>the requirements. A lot of issue comes from user hotel. Let's imagine you have a user registered
+
+114
+00:08:29.920 --> 00:08:36.980
+<v Petr Petrenko>in Europe and accepted EU terms and conditions, but he is in Japan and buy a service for Asian
+
+115
+00:08:36.980 --> 00:08:40.540
+<v Petr Petrenko>market, and he pays with an American payment method.
+
+116
+00:08:40.780 --> 00:08:43.940
+<v Petr Petrenko>All these kind of cases need to be careful through in advance.
+
+117
+00:08:44.380 --> 00:08:50.020
+<v Petr Petrenko>Laws that require storing user data only within a specific country also make things more complicated.
+
+118
+00:08:50.340 --> 00:08:54.680
+<v Petr Petrenko>In such conditions, it's really easy to break some rules without even realizing it.
+
+119
+00:08:54.720 --> 00:08:59.040
+<v Petr Petrenko>And sooner or later, almost everyone ends up a paying a fine.
+
+120
+00:08:59.300 --> 00:09:03.440
+<v Petr Petrenko>But overall, the industry has learned how to handle these challenges pretty well.
+
+121
+00:09:03.440 --> 00:09:07.940
+<v Petr Petrenko>Most companies are now much more responsible and take data protection seriously.
+
+122
+00:09:08.900 --> 00:09:14.300
+<v Noah Labhart>So for the engineers listening who want to build something durable, not just fast,
+
+123
+00:09:14.580 --> 00:09:19.620
+<v Noah Labhart>what advice would you give about writing code that will still make sense years from now?
+
+124
+00:09:19.940 --> 00:09:23.740
+<v Petr Petrenko>I think the idea to build something durable is actually a mistake.
+
+125
+00:09:24.060 --> 00:09:27.720
+<v Petr Petrenko>Our real goal is to create a product that users need right now.
+
+126
+00:09:28.330 --> 00:09:30.560
+<v Petr Petrenko>I have seen small teams with big ambitions.
+
+127
+00:09:30.560 --> 00:09:37.820
+<v Petr Petrenko>They think they are building the next Google, but they overcomplicated everything, trying
+
+128
+00:09:37.820 --> 00:09:40.260
+<v Petr Petrenko>to predict what will happen after 10 years.
+
+129
+00:09:40.580 --> 00:09:45.020
+<v Petr Petrenko>In the end, they run out of budget, and the project gets shut down.
+
+130
+00:09:45.360 --> 00:09:50.260
+<v Petr Petrenko>You can just create universal code that will work perfectly in every possible future scenario.
+
+131
+00:09:50.910 --> 00:09:55.720
+<v Petr Petrenko>Of course, you shouldn't go to other extreme ether, when the whole project becomes a collection
+
+132
+00:09:55.720 --> 00:09:58.600
+<v Petr Petrenko>of hacks and quick fixes that no one really understands.
+
+133
+00:10:00.560 --> 00:10:04.920
+<v Petr Petrenko>an universal answer on how to find the right balance. Because every situation is different.
+
+134
+00:10:05.160 --> 00:10:10.300
+<v Petr Petrenko>But what really helps is taking part in all kinds of projects. It gives you a perspective and helps
+
+135
+00:10:10.300 --> 00:10:14.920
+<v Petr Petrenko>you see the long-term result in different decisions. Learn from others, don't refrain
+
+136
+00:10:14.920 --> 00:10:19.260
+<v Petr Petrenko>the contributor open source projects, and of course, build your own pet projects.
+
+137
+00:10:19.880 --> 00:10:24.160
+<v Noah Labhart>That's very good advice. One of your most impressive projects is a high-performance
+
+138
+00:10:24.160 --> 00:10:30.040
+<v Noah Labhart>image matching system you built yourself, capable of scanning tens of millions of images with
+
+139
+00:10:30.560 --> 00:10:35.660
+<v Noah Labhart>second results. Can you walk us through the moment you realized you needed to redesign the system,
+
+140
+00:10:35.740 --> 00:10:39.960
+<v Noah Labhart>and what engineering choices made that level of performance possible?
+
+141
+00:10:40.380 --> 00:10:45.000
+<v Petr Petrenko>That was an amazing project. It was about external validation of real estate ads.
+
+142
+00:10:45.240 --> 00:10:49.660
+<v Petr Petrenko>The whole system was built around comparing photos, even after they had been modified,
+
+143
+00:10:49.920 --> 00:10:55.060
+<v Petr Petrenko>things like cropping, rotation, or local edits. Fuzzy image matching is a real problem for
+
+144
+00:10:55.060 --> 00:10:59.860
+<v Petr Petrenko>computer science. We could have limited it to just one or a few cities, but we want to check
+
+145
+00:11:00.560 --> 00:11:07.320
+<v Petr Petrenko>on the platform. That meant up to 150,000 photos every 24 hours. The database could contain more
+
+146
+00:11:07.320 --> 00:11:12.940
+<v Petr Petrenko>than 100 million photos after a few years. So, the requirement was to able to search an average
+
+147
+00:11:12.940 --> 00:11:18.540
+<v Petr Petrenko>two photos per second across a database of 100 million photos. That set back pretty high right
+
+148
+00:11:18.540 --> 00:11:23.900
+<v Petr Petrenko>from the start, and I needed to find a solution that was also financially reasonable. It took
+
+149
+00:11:23.900 --> 00:11:30.280
+<v Petr Petrenko>quite a lot of time to build a working prototype. I had a special test database of 1 million photos
+
+150
+00:11:30.560 --> 00:11:32.480
+<v Petr Petrenko>that I used to compare different approaches.
+
+151
+00:11:32.880 --> 00:11:35.860
+<v Petr Petrenko>The first one was a simple linear search algorithm.
+
+152
+00:11:36.180 --> 00:11:38.640
+<v Petr Petrenko>Search 1.14 database of 1 million
+
+153
+00:11:38.640 --> 00:11:40.680
+<v Petr Petrenko>took about 4.5 hours.
+
+154
+00:11:41.060 --> 00:11:42.900
+<v Petr Petrenko>Obviously, it was not acceptable.
+
+155
+00:11:43.300 --> 00:11:45.700
+<v Petr Petrenko>Then I tried many other methods like
+
+156
+00:11:45.700 --> 00:11:49.300
+<v Petr Petrenko>H-engine, VP trees, and very special engines.
+
+157
+00:11:50.020 --> 00:11:52.840
+<v Petr Petrenko>I implemented almost all of them in PHP.
+
+158
+00:11:53.360 --> 00:11:54.820
+<v Petr Petrenko>That is my main language.
+
+159
+00:11:55.320 --> 00:11:58.000
+<v Petr Petrenko>But the problem wasn't the performance of the language.
+
+160
+00:11:58.000 --> 00:12:00.460
+<v Petr Petrenko>It was the algorithm complex of the task itself.
+
+161
+00:12:00.960 --> 00:12:03.480
+<v Petr Petrenko>No amount of optimization could fix that.
+
+162
+00:12:03.800 --> 00:12:08.220
+<v Petr Petrenko>Finally I found the interesting data structure that helped me reach the performance I needed.
+
+163
+00:12:08.560 --> 00:12:12.860
+<v Petr Petrenko>I built a prototype in PHP, it worked well, but I knew it could be faster.
+
+164
+00:12:13.340 --> 00:12:18.920
+<v Petr Petrenko>So I wrote core on the C and added multithreading support that gave me the required performance.
+
+165
+00:12:19.600 --> 00:12:24.860
+<v Petr Petrenko>After that I added a lot of additional optimization, like non-blocking updates when adding new
+
+166
+00:12:24.860 --> 00:12:25.860
+<v Petr Petrenko>photos to the database.
+
+167
+00:12:25.860 --> 00:12:32.660
+<v Petr Petrenko>base. And memory optimization. The system requires a huge amount of RAM. About 5 gigabytes per million
+
+168
+00:12:32.660 --> 00:12:40.060
+<v Petr Petrenko>photos. Before optimization, it was more than 10 gigabytes. To achieve this result, I had, firstly,
+
+169
+00:12:40.200 --> 00:12:45.360
+<v Petr Petrenko>definitely clear performance requirements with measurable metrics. Secondly, do research on
+
+170
+00:12:45.360 --> 00:12:51.260
+<v Petr Petrenko>suitable algorithms, including review academic papers. Thirdly, build a testing environment to
+
+171
+00:12:51.260 --> 00:12:51.820
+<v Petr Petrenko>check solutions.
+
+172
+00:12:52.380 --> 00:12:57.080
+<v Noah Labhart>Okay, one more question. You've also worked on billing systems and fraud mitigation
+
+173
+00:12:57.080 --> 00:13:02.040
+<v Noah Labhart>at scale. Was there ever a moment when you had to choose between a technically quote-unquote
+
+174
+00:13:02.040 --> 00:13:07.440
+<v Noah Labhart>clean solution and a solution that better protected users or the business? And really,
+
+175
+00:13:07.660 --> 00:13:09.980
+<v Noah Labhart>what I'm looking for is, how did you make that call? To
+
+176
+00:13:09.980 --> 00:13:11.760
+<v Petr Petrenko>be honest, your question sounds a bit
+
+177
+00:13:11.760 --> 00:13:17.260
+<v Petr Petrenko>strange to me. Data protection has always been my top priority. If I see a technical clean solution
+
+178
+00:13:17.260 --> 00:13:23.160
+<v Petr Petrenko>that isn't secure, I will do everything I can to stop it from going to production until all the
+
+179
+00:13:23.160 --> 00:13:29.740
+<v Petr Petrenko>security issues are fixed. And of course, it would pass an internal audit anyway. I think that mindset
+
+180
+00:13:29.740 --> 00:13:35.880
+<v Petr Petrenko>is pretty standard for engineers who work with billing systems. Users can forgive a lot of things,
+
+181
+00:13:36.000 --> 00:13:41.840
+<v Petr Petrenko>but they will never forgive losing their money. So security is the number one priority for all
+
+182
+00:13:41.840 --> 00:13:45.740
+<v Petr Petrenko>my colleague as well. And honestly, anyone who will think
+
+183
+00:13:45.740 --> 00:13:48.020
+<v Petr Petrenko>differently doesn't stay in this field for long.
+
+184
+00:13:48.320 --> 00:13:51.980
+<v Noah Labhart>Well, I certainly agree with that. Well, Petr, thank you for being on the show today
+
+185
+00:13:51.980 --> 00:13:55.600
+<v Noah Labhart>and highlighting your experience. You've built some amazing things around
+
+186
+00:13:55.600 --> 00:13:59.580
+<v Noah Labhart>large-scale backends that serve millions of users, processing images,
+
+187
+00:13:59.760 --> 00:14:04.060
+<v Noah Labhart>and I appreciate you walking through how you made those decisions. I think the engineers tuning in
+
+188
+00:14:04.060 --> 00:14:07.520
+<v Noah Labhart>will really give value out of learning from your approaches
+
+189
+00:14:07.520 --> 00:14:13.000
+<v Noah Labhart>approaches to these systems, whether it be new builds, legacy systems, payments, all the things,
+
+190
+00:14:13.080 --> 00:14:18.280
+<v Noah Labhart>and how important security is to factor in throughout the whole process. Thanks again
+
+191
+00:14:18.280 --> 00:14:19.140
+<v Noah Labhart>for being on the show today.
+
+192
+00:14:20.040 --> 00:14:21.880
+<v Petr Petrenko>Thanks, Noah. I enjoyed it.
+
+193
+00:14:22.580 --> 00:14:26.540
+<v Noah Labhart>As you can see, Petr knows his stuff. The way that he approaches large-scale systems,
+
+194
+00:14:26.880 --> 00:14:30.840
+<v Noah Labhart>keeping them highly performant, secure, and awesome is quite impressive.
+
+195
+00:14:32.820 --> 00:14:36.600
+<v Noah Labhart>If you'd like to connect with Petr, check the show notes for all the appropriate links.
+
+196
+00:14:38.640 --> 00:14:39.900
+<v Noah Labhart>And thanks again for listening.

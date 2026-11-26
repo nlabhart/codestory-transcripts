@@ -1,0 +1,1787 @@
+WEBVTT
+
+NOTE S9 E24: The Data Streaming Renaissance: Bypassing JVM Bloat and Squeezing 10x Performance From Modern Hardware Engines with Alex Gallego, Founder & CEO of Redpanda Data
+
+1
+00:00:01.320 --> 00:00:04.280
+<v Alex Gallego>I've always been obsessed with making things fast.
+
+2
+00:00:04.420 --> 00:00:06.860
+<v Alex Gallego>Probably this is just the DNA of the company.
+
+3
+00:00:07.240 --> 00:00:10.080
+<v Alex Gallego>And so I started just wanting to understand,
+
+4
+00:00:10.420 --> 00:00:14.340
+<v Alex Gallego>hey, if you remove the things that as software engineers we've made up,
+
+5
+00:00:14.400 --> 00:00:16.600
+<v Alex Gallego>basically all of the abstractions are just made up.
+
+6
+00:00:16.640 --> 00:00:19.500
+<v Alex Gallego>They exist in your brain and they're there to help you be more productive
+
+7
+00:00:19.500 --> 00:00:20.700
+<v Alex Gallego>or understand the hardware.
+
+8
+00:00:20.780 --> 00:00:23.540
+<v Alex Gallego>But if you get as close as you can to the hardware,
+
+9
+00:00:23.620 --> 00:00:26.240
+<v Alex Gallego>if you design it for what the real platform is,
+
+10
+00:00:26.240 --> 00:00:33.240
+<v Alex Gallego>which is these multi-core CPUs with this high bandwidth memory and gigabit per second NVMe devices.
+
+11
+00:00:33.460 --> 00:00:34.640
+<v Alex Gallego>What would you do differently?
+
+12
+00:00:34.860 --> 00:00:38.300
+<v Alex Gallego>So sometimes I like to say you get to reinvent the wheel when the road changes.
+
+13
+00:00:38.780 --> 00:00:43.420
+<v Alex Gallego>My name is Alex Gallego. I am the Founder &amp; CEO of Redpanda.
+
+14
+00:00:46.360 --> 00:00:54.440
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share
+
+15
+00:00:56.180 --> 00:00:58.560
+<v Noah Labhart>what it takes to change an industry, who
+
+16
+00:00:58.560 --> 00:01:02.520
+<v Clip>built
+
+17
+00:01:02.520 --> 00:01:04.900
+<v Noah Labhart>the teams that have their back, who are
+
+18
+00:01:04.900 --> 00:01:07.560
+<v Clip>the
+
+19
+00:01:09.180 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+20
+00:01:11.440 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+21
+00:01:12.880 --> 00:01:14.220
+<v Clip>Yes, we've been fighting it as a group.
+
+22
+00:01:14.440 --> 00:01:15.280
+<v Clip>Total waste of time.
+
+23
+00:01:15.560 --> 00:01:17.800
+<v Noah Labhart>The stories you don't read in the headlines.
+
+24
+00:01:18.300 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, Mike.
+
+25
+00:01:20.020 --> 00:01:22.080
+<v Clip>Took it off the shelf and dusted it off and tried to begin.
+
+26
+00:01:22.800 --> 00:01:25.860
+<v Noah Labhart>Derive the ups and downs of the startup life.
+
+27
+00:01:26.120 --> 00:01:27.600
+<v Clip>You need to really want it.
+
+28
+00:01:27.620 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+29
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+30
+00:01:32.480 --> 00:01:33.920
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+31
+00:01:33.920 --> 00:01:43.000
+<v Noah Labhart>And today, how Alex Gallego has built the next generation of data streaming that's simple, powerful, and cost-efficient.
+
+32
+00:01:49.380 --> 00:01:51.920
+<v Noah Labhart>Alex Gallego was born and raised in Colombia.
+
+33
+00:01:52.240 --> 00:02:01.400
+<v Noah Labhart>He is always identified as a builder, and as a kid, he would help his uncle rebuild dirt bike engines and was the kid that would take apart his friend's computer when they weren't looking.
+
+34
+00:02:02.320 --> 00:02:07.700
+<v Noah Labhart>Once he arrived in the U.S., his dad got a computer, which started his love for tech and cryptography.
+
+35
+00:02:07.960 --> 00:02:15.340
+<v Noah Labhart>But outside of tech, he's married with three boys, so his time is consumed with being present with his boys, to which he stated he loves being a dad.
+
+36
+00:02:15.860 --> 00:02:20.300
+<v Noah Labhart>Beyond that, he enjoys mentally resetting by doing mountain biking and road cycling.
+
+37
+00:02:22.460 --> 00:02:26.280
+<v Noah Labhart>Alex was working with a large data set in ad tech with a startup.
+
+38
+00:02:26.280 --> 00:02:33.320
+<v Noah Labhart>And after this startup did well, he was hooked, and he went on to build a computing framework, which eventually sold to Akamai.
+
+39
+00:02:33.920 --> 00:02:39.260
+<v Noah Labhart>During his time at that company, he started playing with squeezing every bit of compute out of hardware,
+
+40
+00:02:39.400 --> 00:02:43.700
+<v Noah Labhart>and decided to combine this in order to optimize storage.
+
+41
+00:02:46.540 --> 00:02:49.160
+<v Noah Labhart>This is the creation story of Redpanda.
+
+42
+00:02:54.240 --> 00:02:54.740
+<v Noah Labhart>The
+
+43
+00:02:54.680 --> 00:03:00.660
+<v Alex Gallego>story of Redpanda is one in my mind with my personal story.
+
+44
+00:03:00.900 --> 00:03:03.780
+<v Alex Gallego>There isn't like the story of the company and Alex's story.
+
+45
+00:03:04.240 --> 00:03:07.120
+<v Alex Gallego>When you're the founder and you're the person that writes the code,
+
+46
+00:03:07.220 --> 00:03:10.820
+<v Alex Gallego>it's just my life story is one thing and the company is just part of it.
+
+47
+00:03:10.820 --> 00:03:20.980
+<v Alex Gallego>I had started working with this large real-time, air quotes, data in ad tech in New York in 2011 or so.
+
+48
+00:03:21.080 --> 00:03:25.600
+<v Alex Gallego>Small startup back then, also backed by Google Ventures called Yieldmo.
+
+49
+00:03:25.720 --> 00:03:32.700
+<v Alex Gallego>And so the idea there was that we wanted to work on ads for mobile phones and wanted to compete with Google.
+
+50
+00:03:32.780 --> 00:03:34.340
+<v Alex Gallego>And that company did well.
+
+51
+00:03:34.340 --> 00:03:38.800
+<v Alex Gallego>It had 100% of some of the largest publishers' traffic at some point,
+
+52
+00:03:38.880 --> 00:03:41.600
+<v Alex Gallego>with the New York Times, Forbes, Reuters, MSNBC, and so on.
+
+53
+00:03:41.940 --> 00:03:43.460
+<v Alex Gallego>And frankly, I got hooked.
+
+54
+00:03:43.580 --> 00:03:47.580
+<v Alex Gallego>I was like, wow, this is super fun to be able to make money in these interactions.
+
+55
+00:03:47.760 --> 00:03:49.200
+<v Alex Gallego>But I also didn't want to work in ad tech.
+
+56
+00:03:49.380 --> 00:03:52.180
+<v Alex Gallego>I left there, went on to build a computing framework company.
+
+57
+00:03:53.420 --> 00:03:56.220
+<v Alex Gallego>Streaming in general, it's really two concepts.
+
+58
+00:03:56.400 --> 00:03:58.640
+<v Alex Gallego>It's a little bit of compute with a little bit of storage.
+
+59
+00:03:58.920 --> 00:03:59.600
+<v Alex Gallego>That's kind of it.
+
+60
+00:03:59.680 --> 00:04:01.400
+<v Alex Gallego>And so you chain these things together.
+
+61
+00:04:01.400 --> 00:04:06.100
+<v Alex Gallego>and at the end of the day you get something useful like fraud detection
+
+62
+00:04:06.100 --> 00:04:11.480
+<v Alex Gallego>like anomaly detection or whatever it's interactivity or a Twitter timeline and
+
+63
+00:04:11.480 --> 00:04:15.180
+<v Alex Gallego>so on but by and large is this idea of a little bit of compute with a little bit
+
+64
+00:04:15.180 --> 00:04:20.920
+<v Alex Gallego>of storage and so Concord was on the compute side and I sold that in 2016 to
+
+65
+00:04:20.920 --> 00:04:26.380
+<v Alex Gallego>to Akamai who is one of our customers now and then I became one of the
+
+66
+00:04:26.380 --> 00:04:30.200
+<v Alex Gallego>youngest principal engineers in the history of that company and I had a lot
+
+67
+00:04:31.400 --> 00:04:34.700
+<v Alex Gallego>So I've always been obsessed with performance and making things fast.
+
+68
+00:04:34.860 --> 00:04:42.420
+<v Alex Gallego>And when I was there, I started playing with this idea of squeezing every ounce of performance of hardware.
+
+69
+00:04:42.740 --> 00:04:46.440
+<v Alex Gallego>And so Redpanda really started from a deeply technical roots.
+
+70
+00:04:46.540 --> 00:04:47.680
+<v Alex Gallego>I was a principal engineer there.
+
+71
+00:04:47.860 --> 00:04:50.120
+<v Alex Gallego>And I just wanted to write something for me.
+
+72
+00:04:50.180 --> 00:04:51.800
+<v Alex Gallego>So I left Akamai in 2019.
+
+73
+00:04:52.040 --> 00:04:53.700
+<v Alex Gallego>I was living in Miami back then.
+
+74
+00:04:53.980 --> 00:04:57.040
+<v Alex Gallego>And I just opened up a Lenovo P50 laptop.
+
+75
+00:04:57.040 --> 00:05:02.820
+<v Alex Gallego>up and Emacs and GCC, I just started writing the code for what eventually became Redpanda.
+
+76
+00:05:02.940 --> 00:05:06.120
+<v Alex Gallego>So Redpanda is this native C++ single binary.
+
+77
+00:05:06.780 --> 00:05:11.060
+<v Alex Gallego>For some of the listeners that are in the big data space, it's 100% with the Kafka API
+
+78
+00:05:11.060 --> 00:05:17.320
+<v Alex Gallego>protocol and have customers like, whatever, largest electric car company, largest CDN,
+
+79
+00:05:17.400 --> 00:05:22.200
+<v Alex Gallego>largest ISP, largest bank in the US, largest company by market cap and so on.
+
+80
+00:05:24.360 --> 00:05:29.500
+<v Noah Labhart>tell me about the mvp for red panda so that first version of the product you built those
+
+81
+00:05:29.500 --> 00:05:34.680
+<v Noah Labhart>early days where you started building what became red panda how long did it take you
+
+82
+00:05:34.680 --> 00:05:39.180
+<v Noah Labhart>building what sort of tools were you using to bring it to life i heard you mentioned c++ but
+
+83
+00:05:39.180 --> 00:05:41.540
+<v Noah Labhart>give me the overview there i
+
+84
+00:05:41.540 --> 00:05:47.280
+<v Alex Gallego>bought these two computers off of craigslist from a data center
+
+85
+00:05:47.280 --> 00:05:50.620
+<v Alex Gallego>So this was five years ago now or so.
+
+86
+00:05:50.760 --> 00:05:56.740
+<v Alex Gallego>They had like pretty fast enterprise level NVMe devices and had 25 gigabit networking cards.
+
+87
+00:05:57.020 --> 00:06:02.500
+<v Alex Gallego>And the reason I wanted to get access to physical machines as opposed to renting it on Amazon or whatever,
+
+88
+00:06:02.660 --> 00:06:08.080
+<v Alex Gallego>was because I wanted to see how far I can push down, how close to the metal I could push down.
+
+89
+00:06:08.860 --> 00:06:12.380
+<v Alex Gallego>I started playing with this idea of a thread per core architecture.
+
+90
+00:06:12.380 --> 00:06:21.940
+<v Alex Gallego>And so like when you start application in sort of a data, like a database style project, you have to really make a couple of foundational, fundamental decisions.
+
+91
+00:06:22.160 --> 00:06:25.800
+<v Alex Gallego>One is the threading model. Second one is the memory model. And they often go hand in hand.
+
+92
+00:06:26.120 --> 00:06:31.640
+<v Alex Gallego>I've always been obsessed with making things fast. Probably this is just the DNA of the company.
+
+93
+00:06:31.900 --> 00:06:38.500
+<v Alex Gallego>We're about actually to release microsecond. Yesterday, in fact, we released microsecond level latencies for the Kafka API, which is pretty cool.
+
+94
+00:06:38.500 --> 00:06:42.720
+<v Alex Gallego>And so for context, the blink of your eye is roughly around 130 milliseconds.
+
+95
+00:06:43.060 --> 00:06:46.320
+<v Alex Gallego>When you're in the microsecond space, you're at least 100x faster.
+
+96
+00:06:46.680 --> 00:06:56.040
+<v Alex Gallego>And so I started just wanting to understand, hey, if you remove the things that as software engineers we've made up, basically all of the abstractions are just made up.
+
+97
+00:06:56.100 --> 00:07:00.120
+<v Alex Gallego>They exist in your brain and they're there to help you be more productive or understand the hardware.
+
+98
+00:07:00.120 --> 00:07:14.060
+<v Alex Gallego>But if you get as close as you can to the hardware, if you design it for what the real platform is, which is this multi-core CPUs with this high bandwidth memory and gigabit per second NVMe devices, what would you do differently?
+
+99
+00:07:14.280 --> 00:07:17.800
+<v Alex Gallego>So sometimes I like to say you get to reinvent the wheel when the road changes.
+
+100
+00:07:18.000 --> 00:07:21.260
+<v Alex Gallego>And if you were to start from scratch, what would be possible?
+
+101
+00:07:21.460 --> 00:07:24.940
+<v Alex Gallego>And so that was the true genesis of the ideas.
+
+102
+00:07:24.940 --> 00:07:26.860
+<v Alex Gallego>as if you had no restriction.
+
+103
+00:07:27.020 --> 00:07:27.860
+<v Alex Gallego>And obviously I was lucky
+
+104
+00:07:27.860 --> 00:07:28.820
+<v Alex Gallego>because I had a little bit of funds
+
+105
+00:07:28.820 --> 00:07:30.640
+<v Alex Gallego>from the Concord acquisition
+
+106
+00:07:30.640 --> 00:07:33.280
+<v Alex Gallego>to just have fun and play around with it.
+
+107
+00:07:33.320 --> 00:07:36.600
+<v Alex Gallego>I started the company via a couple of Twitter rants
+
+108
+00:07:36.600 --> 00:07:39.700
+<v Alex Gallego>on just how large the gap was
+
+109
+00:07:39.700 --> 00:07:41.560
+<v Alex Gallego>between the state of the art at the time,
+
+110
+00:07:41.580 --> 00:07:42.460
+<v Alex Gallego>which was Apache Kafka
+
+111
+00:07:42.460 --> 00:07:44.640
+<v Alex Gallego>and what hardware was capable of doing.
+
+112
+00:07:44.740 --> 00:07:45.940
+<v Alex Gallego>No surprises, by the way,
+
+113
+00:07:45.940 --> 00:07:47.260
+<v Alex Gallego>to people that were working in HFT
+
+114
+00:07:47.260 --> 00:07:49.180
+<v Alex Gallego>or any form of low latency software.
+
+115
+00:07:49.760 --> 00:07:50.880
+<v Alex Gallego>That was the genesis.
+
+116
+00:07:50.960 --> 00:07:52.420
+<v Alex Gallego>And we make a couple of pretty,
+
+117
+00:07:52.500 --> 00:07:54.540
+<v Alex Gallego>at the time, controversial choices.
+
+118
+00:07:54.940 --> 00:07:56.960
+<v Alex Gallego>No startup was building software in C++.
+
+119
+00:07:57.100 --> 00:08:00.680
+<v Alex Gallego>Now with LLMs, of course, there's a bunch of a startup building things in C++.
+
+120
+00:08:00.800 --> 00:08:03.000
+<v Alex Gallego>But five years ago, it was extremely unpopular.
+
+121
+00:08:03.400 --> 00:08:04.640
+<v Alex Gallego>We started at thread per core.
+
+122
+00:08:04.860 --> 00:08:06.940
+<v Alex Gallego>We wrote our own drivers and so on.
+
+123
+00:08:07.020 --> 00:08:09.500
+<v Alex Gallego>And so that's how the idea got started.
+
+124
+00:08:10.940 --> 00:08:12.780
+<v Noah Labhart>So then you got it started.
+
+125
+00:08:12.840 --> 00:08:13.460
+<v Noah Labhart>It's working.
+
+126
+00:08:13.580 --> 00:08:14.420
+<v Noah Labhart>You're building something.
+
+127
+00:08:14.520 --> 00:08:17.540
+<v Noah Labhart>You're making some controversial decisions, but you move forward.
+
+128
+00:08:17.660 --> 00:08:20.340
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+129
+00:08:20.400 --> 00:08:23.560
+<v Noah Labhart>I think to wrap it in a box a little bit, what I'm looking for is how do you build your
+
+130
+00:08:23.560 --> 00:08:24.060
+<v Noah Labhart>roadmap?
+
+131
+00:08:24.940 --> 00:08:29.440
+<v Noah Labhart>deciding, okay, this is the next most important thing to build or to address with Redpanda.
+
+132
+00:08:31.080 --> 00:08:37.340
+<v Alex Gallego>When I wrote Redpanda and I started tweeting and talking about it, really on Twitter,
+
+133
+00:08:37.460 --> 00:08:41.820
+<v Alex Gallego>companies, some of the world's largest companies DM me on Twitter. Some of the engineers are like,
+
+134
+00:08:41.880 --> 00:08:47.040
+<v Alex Gallego>hey, these ideas resonate with me, would love to try it. I was like, okay, I have this Docker
+
+135
+00:08:47.040 --> 00:08:50.120
+<v Alex Gallego>image, download it and try it. There's no license, there's no restriction.
+
+136
+00:08:50.120 --> 00:08:57.120
+<v Alex Gallego>we went from zero to some of the largest workloads in the world that used to run the Kafka API so
+
+137
+00:08:57.120 --> 00:09:02.760
+<v Alex Gallego>in bytes per second that is like going from zero to multiple gigabytes per second sustained traffic
+
+138
+00:09:02.760 --> 00:09:08.300
+<v Alex Gallego>right so this is like always on firehose business critical and people went to production with it
+
+139
+00:09:08.300 --> 00:09:12.640
+<v Alex Gallego>frankly I was very lucky like I wouldn't have gone to production with the software I wrote in a year
+
+140
+00:09:12.640 --> 00:09:17.420
+<v Alex Gallego>but what it did tell me is it was a very clear by the way I wasn't charging these people they just
+
+141
+00:09:17.420 --> 00:09:22.580
+<v Alex Gallego>I put this app on GitHub and some of these companies started using it and started pushing it.
+
+142
+00:09:22.660 --> 00:09:26.740
+<v Alex Gallego>And my obsession early on was not with monetization.
+
+143
+00:09:27.060 --> 00:09:31.180
+<v Alex Gallego>I wanted to charge people for a different reason than making money.
+
+144
+00:09:31.280 --> 00:09:38.300
+<v Alex Gallego>I wanted to charge people because I wanted to prove to myself that there was real commercial value in the things that I was creating,
+
+145
+00:09:38.460 --> 00:09:40.820
+<v Alex Gallego>not because I was interested in making money.
+
+146
+00:09:41.000 --> 00:09:43.020
+<v Alex Gallego>And so there was basically a threshold.
+
+147
+00:09:43.020 --> 00:09:47.740
+<v Alex Gallego>they say can someone pay a few hundred thousand dollars a year for this software and can they run
+
+148
+00:09:47.740 --> 00:09:52.500
+<v Alex Gallego>mission critical soft workloads only and so the way we designed the roadmap was some of these
+
+149
+00:09:52.500 --> 00:09:58.160
+<v Alex Gallego>companies early on took a huge bet on us they were either friends that i had worked with that went to
+
+150
+00:09:58.160 --> 00:10:02.740
+<v Alex Gallego>work with other companies in position of leadership and they knew that they liked the software that i
+
+151
+00:10:02.740 --> 00:10:07.400
+<v Alex Gallego>had built or there were people that followed me on twitter or i saw it i did a talk track or whatever
+
+152
+00:10:07.400 --> 00:10:12.920
+<v Alex Gallego>it was we were just friendly in like the nerd sphere and so they just went to production with
+
+153
+00:10:12.920 --> 00:10:17.120
+<v Alex Gallego>it and it was very clear they're like hey these are the things that we need okay the base Kafka
+
+154
+00:10:17.120 --> 00:10:23.320
+<v Alex Gallego>API protocol works but you don't have transactions you don't have a UI you don't have connectors you
+
+155
+00:10:23.320 --> 00:10:28.080
+<v Alex Gallego>don't have tiered storage you don't have whatever you don't have multi-az like you don't have all
+
+156
+00:10:28.080 --> 00:10:31.840
+<v Alex Gallego>of this you don't have audit logging and Kerberos and blah blah blah and so they're like we need
+
+157
+00:10:31.840 --> 00:10:38.200
+<v Alex Gallego>this to add more use cases by and large except with the development of one or two features in
+
+158
+00:10:38.200 --> 00:10:43.220
+<v Alex Gallego>which we push the market forward it has been all customer demand i didn't know that starting the
+
+159
+00:10:43.220 --> 00:10:48.140
+<v Alex Gallego>company as a as an engineer like i was very proficient at writing code and getting things
+
+160
+00:10:48.140 --> 00:10:52.780
+<v Alex Gallego>to production but i had no idea truly what it was the whole product development process finding
+
+161
+00:10:52.780 --> 00:10:57.560
+<v Alex Gallego>product market fit etc as an engineer you think of maybe you'll build software one day that'll
+
+162
+00:10:57.560 --> 00:10:58.600
+<v Alex Gallego>It'll change how the world is built.
+
+163
+00:10:58.700 --> 00:11:00.520
+<v Alex Gallego>And then sometimes that happens.
+
+164
+00:11:00.640 --> 00:11:04.720
+<v Alex Gallego>And really, customer pulled us in the directions of which we are.
+
+165
+00:11:04.880 --> 00:11:07.240
+<v Alex Gallego>And we decided to build a company.
+
+166
+00:11:07.300 --> 00:11:11.860
+<v Alex Gallego>We're like, OK, we probably need to make a few customers super happy in production.
+
+167
+00:11:12.760 --> 00:11:17.500
+<v Alex Gallego>And more importantly to me, the thing that drove all of this was a single thread, which
+
+168
+00:11:17.500 --> 00:11:21.300
+<v Alex Gallego>was if Redpanda crashes, will their business suffer?
+
+169
+00:11:21.720 --> 00:11:25.460
+<v Alex Gallego>Is this a true tier zero mission critical software?
+
+170
+00:11:25.460 --> 00:11:30.860
+<v Alex Gallego>software, this must be up for them to make money. Their business must rely on it. That was the drive.
+
+171
+00:11:30.900 --> 00:11:35.340
+<v Alex Gallego>That still continues to be the driving thread for me at this company. It's like, that is the type of
+
+172
+00:11:35.340 --> 00:11:40.160
+<v Alex Gallego>software that I want to build. I don't want to build this like nice to have. I don't want to
+
+173
+00:11:40.160 --> 00:11:44.200
+<v Alex Gallego>build applications. I don't want to build widgets. And there's nothing wrong with it. But for my
+
+174
+00:11:44.200 --> 00:11:49.560
+<v Alex Gallego>personality, for the software that I want to focus on in my lifetime, I only want to build software
+
+175
+00:11:49.560 --> 00:11:52.380
+<v Alex Gallego>that is mission critical to a business.
+
+176
+00:11:53.760 --> 00:11:55.360
+<v Noah Labhart>So then I hear you saying we.
+
+177
+00:11:55.500 --> 00:11:57.100
+<v Noah Labhart>Tell me about how you built your team
+
+178
+00:11:57.100 --> 00:11:58.940
+<v Noah Labhart>and what did you look for in those people
+
+179
+00:11:58.940 --> 00:12:01.520
+<v Noah Labhart>to indicate that they were the winning horses to join you?
+
+180
+00:12:02.400 --> 00:12:04.040
+<v Alex Gallego>I would be remiss if I don't mention
+
+181
+00:12:04.040 --> 00:12:06.200
+<v Alex Gallego>that I don't think that there is a recipe here.
+
+182
+00:12:06.800 --> 00:12:08.600
+<v Alex Gallego>Largely in part, those were the people
+
+183
+00:12:08.600 --> 00:12:11.320
+<v Alex Gallego>that were directly connected to me and available.
+
+184
+00:12:11.600 --> 00:12:16.300
+<v Alex Gallego>But looking back, I would say high level quality is intensity.
+
+185
+00:12:16.300 --> 00:12:19.680
+<v Alex Gallego>Intensity is something that I really value in people.
+
+186
+00:12:20.120 --> 00:12:22.440
+<v Alex Gallego>There's many ways of thinking about this,
+
+187
+00:12:22.500 --> 00:12:25.240
+<v Alex Gallego>but it's like when somebody latches on to that idea,
+
+188
+00:12:25.280 --> 00:12:26.480
+<v Alex Gallego>that person does not let go.
+
+189
+00:12:26.620 --> 00:12:28.920
+<v Alex Gallego>Whatever it is, they're going to take it through the finish line,
+
+190
+00:12:29.040 --> 00:12:30.720
+<v Alex Gallego>super, super focused.
+
+191
+00:12:31.000 --> 00:12:33.340
+<v Alex Gallego>It could be grit, it could be another word to be used.
+
+192
+00:12:33.480 --> 00:12:37.060
+<v Alex Gallego>I think grit gets misused by the productivity,
+
+193
+00:12:37.800 --> 00:12:39.080
+<v Alex Gallego>obsessive people of the industry.
+
+194
+00:12:39.700 --> 00:12:42.380
+<v Alex Gallego>But I like the word intensity more.
+
+195
+00:12:42.380 --> 00:12:49.440
+<v Alex Gallego>I generally like to work with people that are super focused on the right things, on the end goal.
+
+196
+00:12:49.520 --> 00:12:52.060
+<v Alex Gallego>Because at the end of the day, it doesn't matter who does the work.
+
+197
+00:12:52.400 --> 00:12:54.920
+<v Alex Gallego>It doesn't matter who merged the code, who reviewed the code.
+
+198
+00:12:55.080 --> 00:12:56.420
+<v Alex Gallego>What matters is art.
+
+199
+00:12:56.660 --> 00:12:57.780
+<v Alex Gallego>Customers happy in production.
+
+200
+00:12:58.000 --> 00:13:00.260
+<v Alex Gallego>It's the only thing that matters when building a company.
+
+201
+00:13:00.400 --> 00:13:03.680
+<v Alex Gallego>I recruited people accidentally that had that.
+
+202
+00:13:03.780 --> 00:13:06.840
+<v Alex Gallego>I wish I had that framework of mine and perhaps clarity.
+
+203
+00:13:06.980 --> 00:13:09.780
+<v Alex Gallego>Five years later with thousands and thousands of interviews.
+
+204
+00:13:09.780 --> 00:13:21.680
+<v Alex Gallego>Those people, if you talk to Mija and Noah and some of the early folks that joined the company and Juan from Colombia, they were all friends of friends or direct connections.
+
+205
+00:13:22.160 --> 00:13:25.960
+<v Alex Gallego>And I would ask people, I was like, would you enthusiastically hire this person?
+
+206
+00:13:26.120 --> 00:13:28.120
+<v Alex Gallego>And the answer has to be absolutely yes.
+
+207
+00:13:28.280 --> 00:13:33.540
+<v Alex Gallego>I don't have a leadership position for this person or, hey, this person is someone I would take a bet on.
+
+208
+00:13:33.640 --> 00:13:35.420
+<v Alex Gallego>And I would just go and recruit them.
+
+209
+00:13:35.460 --> 00:13:37.440
+<v Alex Gallego>I was like, hey, I'm working on this idea.
+
+210
+00:13:37.440 --> 00:13:39.980
+<v Alex Gallego>I think it has the, I don't know if it's going to work out.
+
+211
+00:13:40.080 --> 00:13:42.460
+<v Alex Gallego>I've always been super honest about that kind of thinking.
+
+212
+00:13:42.620 --> 00:13:47.740
+<v Alex Gallego>But we have a chance at changing how these data-intensive applications are built for the world.
+
+213
+00:13:47.860 --> 00:13:52.340
+<v Alex Gallego>At worst, we built a state-of-the-art system in replication and latency and performance.
+
+214
+00:13:53.520 --> 00:13:57.820
+<v Alex Gallego>And so I would guarantee their salary for the first year and they decided to join.
+
+215
+00:13:57.900 --> 00:13:59.500
+<v Alex Gallego>And those people had a phenomenal network.
+
+216
+00:13:59.740 --> 00:14:05.020
+<v Alex Gallego>Then their friends joined and just the idea of smart people, no smart people, or good people, no good people, same concept.
+
+217
+00:14:05.020 --> 00:14:07.460
+<v Alex Gallego>The company today is roughly around 200 people.
+
+218
+00:14:07.560 --> 00:14:12.200
+<v Alex Gallego>We got to the first 100 people strictly through friends of friends and friends of friends.
+
+219
+00:14:14.720 --> 00:14:21.040
+<v Noah Labhart>Okay, Alex, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+220
+00:14:22.460 --> 00:14:24.420
+<v Alex Gallego>100% the team. No question.
+
+221
+00:14:24.580 --> 00:14:30.740
+<v Alex Gallego>I feel true to myself saying this anywhere to anyone.
+
+222
+00:14:30.740 --> 00:14:34.120
+<v Alex Gallego>is the team that we've been able to put together
+
+223
+00:14:34.120 --> 00:14:35.720
+<v Alex Gallego>is the thing I'm most proud of.
+
+224
+00:14:35.800 --> 00:14:37.200
+<v Alex Gallego>I think the same group of people
+
+225
+00:14:37.200 --> 00:14:38.520
+<v Alex Gallego>could build so many things.
+
+226
+00:14:38.680 --> 00:14:39.900
+<v Alex Gallego>We could ship in software.
+
+227
+00:14:39.900 --> 00:14:41.280
+<v Alex Gallego>It's just a byproduct of the organization.
+
+228
+00:14:41.920 --> 00:14:44.020
+<v Alex Gallego>We've managed to change companies entirely.
+
+229
+00:14:44.140 --> 00:14:45.140
+<v Alex Gallego>We've managed to onboard
+
+230
+00:14:45.140 --> 00:14:46.860
+<v Alex Gallego>some of the world's market makers.
+
+231
+00:14:46.960 --> 00:14:47.740
+<v Alex Gallego>There are seven of them.
+
+232
+00:14:47.820 --> 00:14:49.660
+<v Alex Gallego>Basically people that provide total liquidity
+
+233
+00:14:49.660 --> 00:14:51.440
+<v Alex Gallego>to the world of illiquid assets.
+
+234
+00:14:51.620 --> 00:14:55.060
+<v Alex Gallego>We power many of the seven top market makers
+
+235
+00:14:55.060 --> 00:14:55.660
+<v Alex Gallego>for the world.
+
+236
+00:14:55.700 --> 00:14:57.460
+<v Alex Gallego>We power space exploration.
+
+237
+00:14:57.720 --> 00:14:59.000
+<v Alex Gallego>We power oil and gas.
+
+238
+00:14:59.100 --> 00:14:59.800
+<v Alex Gallego>We power retail.
+
+239
+00:15:00.740 --> 00:15:06.040
+<v Alex Gallego>the largest excuse my language badass workloads in the world in throughput or in latency or whatever
+
+240
+00:15:06.040 --> 00:15:11.560
+<v Alex Gallego>it is and that's really just a byproduct of the people that we've hired and I feel so proud just
+
+241
+00:15:11.560 --> 00:15:17.340
+<v Alex Gallego>being able to be their peer and being able to work alongside them they're just so talented and smart
+
+242
+00:15:17.340 --> 00:15:23.800
+<v Alex Gallego>in detail and specific ways whether it's like my performance team being able to like debug all the
+
+243
+00:15:23.800 --> 00:15:29.960
+<v Alex Gallego>way down to assembly line and unroll loops so that we get latency we get like a 25 latency improvements
+
+244
+00:15:30.740 --> 00:15:35.460
+<v Alex Gallego>or whatever it is, the application team or my product team or my head of people or my head of sales, etc.
+
+245
+00:15:36.040 --> 00:15:42.600
+<v Alex Gallego>Over time, the thing I feel the most proud of is being able to work alongside with the people that are my peers
+
+246
+00:15:42.600 --> 00:15:44.660
+<v Alex Gallego>and obviously everyone in the company.
+
+247
+00:15:46.120 --> 00:15:47.520
+<v Noah Labhart>Let's flip the script a little bit.
+
+248
+00:15:47.640 --> 00:15:51.280
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+249
+00:15:52.040 --> 00:15:56.480
+<v Alex Gallego>I would say probably the top mistake that we corrected pretty early on
+
+250
+00:15:56.480 --> 00:16:00.480
+<v Alex Gallego>was to not have clarity of the company's core values.
+
+251
+00:16:00.740 --> 00:16:04.040
+<v Alex Gallego>which is three to that, being a good human, customer obsession, and winning as a team.
+
+252
+00:16:04.880 --> 00:16:07.660
+<v Alex Gallego>Those are just basically nothing.
+
+253
+00:16:07.900 --> 00:16:09.220
+<v Alex Gallego>They're just words on a paper.
+
+254
+00:16:09.280 --> 00:16:14.620
+<v Alex Gallego>But for internally, for the culture, they serve as a framework so that, one, we would
+
+255
+00:16:14.620 --> 00:16:15.560
+<v Alex Gallego>hold ourselves accountable.
+
+256
+00:16:15.620 --> 00:16:18.880
+<v Alex Gallego>And two, we would express to the world, like, this is the kind of people that we want in
+
+257
+00:16:18.880 --> 00:16:19.380
+<v Alex Gallego>the company.
+
+258
+00:16:19.480 --> 00:16:23.040
+<v Alex Gallego>And so to give you an example, I am a Latino CEO born and raised in Colombia.
+
+259
+00:16:23.200 --> 00:16:24.960
+<v Alex Gallego>English is my second language and so on.
+
+260
+00:16:25.280 --> 00:16:30.160
+<v Alex Gallego>And early on, we hired someone famous in the computing world that was racist.
+
+261
+00:16:30.740 --> 00:16:32.260
+<v Alex Gallego>And that was terrible, right?
+
+262
+00:16:32.300 --> 00:16:33.820
+<v Alex Gallego>So I think he lasted a week.
+
+263
+00:16:33.940 --> 00:16:37.100
+<v Alex Gallego>And obviously we did back channels and this person is super famous.
+
+264
+00:16:37.160 --> 00:16:40.780
+<v Alex Gallego>And if you touch a computer, you'll probably work with the output of this computer scientist
+
+265
+00:16:41.260 --> 00:16:43.020
+<v Alex Gallego>that, you know, with systems that he touched.
+
+266
+00:16:43.180 --> 00:16:45.280
+<v Alex Gallego>Very meaningful way, like he's a famous person.
+
+267
+00:16:45.560 --> 00:16:50.640
+<v Alex Gallego>And I was just like, how is it possible for a person who is racist to work for a Latino CEO?
+
+268
+00:16:50.960 --> 00:16:53.080
+<v Alex Gallego>I think this was super early on.
+
+269
+00:16:53.120 --> 00:16:57.280
+<v Alex Gallego>Six months into the company, I was like, okay, we have to define what the culture is explicitly.
+
+270
+00:16:57.500 --> 00:16:59.220
+<v Alex Gallego>And we have to go and filter for those things.
+
+271
+00:17:00.740 --> 00:17:03.960
+<v Alex Gallego>Personas, probably one of the best lessons learned for me.
+
+272
+00:17:04.060 --> 00:17:06.760
+<v Alex Gallego>And you don't know, like you're an engineer,
+
+273
+00:17:07.000 --> 00:17:10.060
+<v Alex Gallego>you're like talented at perhaps at building some systems
+
+274
+00:17:10.060 --> 00:17:11.360
+<v Alex Gallego>that the world powers,
+
+275
+00:17:11.500 --> 00:17:14.400
+<v Alex Gallego>but building a company is a fundamentally different skill.
+
+276
+00:17:14.480 --> 00:17:16.640
+<v Alex Gallego>And so it's trial by fire in many ways,
+
+277
+00:17:16.780 --> 00:17:18.780
+<v Alex Gallego>especially the job of the CEO is,
+
+278
+00:17:18.820 --> 00:17:20.220
+<v Alex Gallego>it's a goalpost that keeps moving.
+
+279
+00:17:20.340 --> 00:17:21.880
+<v Alex Gallego>Every quarter you have to do something new
+
+280
+00:17:21.880 --> 00:17:24.080
+<v Alex Gallego>that the company's not ready for by definition of the job.
+
+281
+00:17:24.160 --> 00:17:25.380
+<v Alex Gallego>You're the person that has the most context
+
+282
+00:17:25.380 --> 00:17:28.300
+<v Alex Gallego>and least skilled and competent in some particular things.
+
+283
+00:17:28.480 --> 00:17:29.420
+<v Alex Gallego>What are the process?
+
+284
+00:17:29.540 --> 00:17:30.180
+<v Alex Gallego>Who are the personas?
+
+285
+00:17:30.740 --> 00:17:35.000
+<v Alex Gallego>this get done and then over time you learn those things and then you get someone who's world-class
+
+286
+00:17:35.000 --> 00:17:39.340
+<v Alex Gallego>at it like Clint who's my head of revenue or you deal with people things and then you get Jen or
+
+287
+00:17:39.340 --> 00:17:44.560
+<v Alex Gallego>you get marketing and you get Mike and so on and thankfully that happened early on when we were
+
+288
+00:17:44.560 --> 00:17:50.320
+<v Alex Gallego>like six people and I think we had an incident with this person and I think by Saturday this
+
+289
+00:17:50.320 --> 00:17:55.060
+<v Alex Gallego>happened like Friday night the person got drunk and then Saturday morning he was fired and we
+
+290
+00:17:55.060 --> 00:17:58.780
+<v Alex Gallego>took action because that wasn't the company that we wanted to build and what that did is it sent a
+
+291
+00:18:00.740 --> 00:18:06.580
+<v Alex Gallego>of us, and we were able to build on those cultural pillars on the kind of people that we wanted to be.
+
+292
+00:18:09.020 --> 00:18:14.860
+<v Noah Labhart>This will be fun to hear what you have to say. So tell me what the future looks like for Red
+
+293
+00:18:14.860 --> 00:18:16.380
+<v Noah Labhart>Panda, the product, and for your team.
+
+294
+00:18:17.260 --> 00:18:19.820
+<v Alex Gallego>The future for me as an individual,
+
+295
+00:18:20.840 --> 00:18:25.540
+<v Alex Gallego>it's very directly attached to how the company thinks about it today. I think a different CEO
+
+296
+00:18:25.540 --> 00:18:32.600
+<v Alex Gallego>I would have a different view. And for me, I want to change fundamentally how the future of data
+
+297
+00:18:32.600 --> 00:18:38.560
+<v Alex Gallego>intensive applications are built. Let me use different words here. The classical analytics
+
+298
+00:18:38.560 --> 00:18:43.080
+<v Alex Gallego>space has always been done using this idea of batch, which is just a group of events.
+
+299
+00:18:43.280 --> 00:18:48.080
+<v Alex Gallego>And so for those of us that have played around with Unix systems, it's like you put everything
+
+300
+00:18:48.080 --> 00:18:52.580
+<v Alex Gallego>on a file and then you pipe it to the next command. And so you cat the file, then you sort it,
+
+301
+00:18:52.580 --> 00:18:58.040
+<v Alex Gallego>then you get the unix and then you do the count right so this idea of a stage basically
+
+302
+00:18:58.040 --> 00:19:05.400
+<v Alex Gallego>discretization of points via stages when big data came into play those same concepts like the unix
+
+303
+00:19:05.400 --> 00:19:10.360
+<v Alex Gallego>philosophy of this like composable stages or pipes effectively became true at large scale
+
+304
+00:19:10.360 --> 00:19:15.120
+<v Alex Gallego>and snowflake is probably the best version of this where it is the best they call it data warehouse, lakehouses, it doesn't really matter but the ideas are the same the idea is that you process some
+
+305
+00:19:15.120 --> 00:19:19.260
+<v Alex Gallego>like houses it doesn't really matter but the ideas are the same the idea is that you process some
+
+306
+00:19:19.260 --> 00:19:23.340
+<v Alex Gallego>them events then you stage them and put them on a on your data warehouse which is just an s3 bucket
+
+307
+00:19:23.340 --> 00:19:27.660
+<v Alex Gallego>often and then you do the next stage and you put them on s3 bucket and the reason for that it was
+
+308
+00:19:27.660 --> 00:19:32.860
+<v Alex Gallego>both mentally simple and really cost effective there wasn't a list there wasn't and like the
+
+309
+00:19:32.860 --> 00:19:37.500
+<v Alex Gallego>rise for all of this data warehousing needs is that relative to the cost of everything else
+
+310
+00:19:37.500 --> 00:19:44.240
+<v Alex Gallego>it is the most cost effective way to get a starter or was and so when i build the company and i have
+
+311
+00:19:44.240 --> 00:19:46.960
+<v Alex Gallego>to give context so i can tell you where we're heading with the future we're going to tackle
+
+312
+00:19:46.960 --> 00:19:53.420
+<v Alex Gallego>those two things directly, both cost and complexity. And so if I give you a tool that is a superset of
+
+313
+00:19:53.420 --> 00:19:59.520
+<v Alex Gallego>both bounded and unbounded data, and it's just as cost effective and easy to use, like why wouldn't
+
+314
+00:19:59.520 --> 00:20:07.680
+<v Alex Gallego>you use this tool to build a future? For me, the future is about continuing to lower the bar for
+
+315
+00:20:07.680 --> 00:20:14.520
+<v Alex Gallego>people both in cost and complexity to be able to onboard streaming technologies. And that's like a
+
+316
+00:20:14.520 --> 00:20:19.840
+<v Alex Gallego>a very specific, I think, but it's to change how the future is built for anyone that has any form
+
+317
+00:20:19.840 --> 00:20:25.460
+<v Alex Gallego>of data intensive applications. And it's pretty exciting for me. That means this is a long time
+
+318
+00:20:25.460 --> 00:20:32.160
+<v Alex Gallego>roadmap. I don't think that'll stop, like I think forever. And the way we get there is first, we
+
+319
+00:20:32.160 --> 00:20:37.600
+<v Alex Gallego>build a relationship with people like we talked about. We run their mission critical, like ring
+
+320
+00:20:37.600 --> 00:20:43.900
+<v Alex Gallego>zero applications with Redpanda. And what it does is that it changes the relationship of the
+
+321
+00:20:44.520 --> 00:20:48.200
+<v Alex Gallego>and Redpanda to that of an advisory role because we make them successful.
+
+322
+00:20:48.400 --> 00:20:53.000
+<v Alex Gallego>All future products that we build have a phenomenal penetration rate on our customers,
+
+323
+00:20:53.140 --> 00:20:57.220
+<v Alex Gallego>not from just like a commercial perspective because that's a byproduct, but because they
+
+324
+00:20:57.220 --> 00:20:58.040
+<v Alex Gallego>trust us.
+
+325
+00:20:58.160 --> 00:21:02.480
+<v Alex Gallego>They see Redpanda and they see us as the company building the future of how they want
+
+326
+00:21:02.480 --> 00:21:03.380
+<v Alex Gallego>to continue building.
+
+327
+00:21:03.600 --> 00:21:07.860
+<v Alex Gallego>And so that advisor relationship allows us to, I think in my opinion, change how the
+
+328
+00:21:07.860 --> 00:21:08.920
+<v Alex Gallego>future is going to be built.
+
+329
+00:21:10.480 --> 00:21:11.900
+<v Noah Labhart>Let's switch to you, Alex.
+
+330
+00:21:12.020 --> 00:21:13.800
+<v Noah Labhart>Who influences the way that you work?
+
+331
+00:21:14.520 --> 00:21:16.800
+<v Noah Labhart>person or many persons or something you look up to and why?
+
+332
+00:21:17.920 --> 00:21:21.620
+<v Alex Gallego>I have an aversion to the ideas of
+
+333
+00:21:21.620 --> 00:21:28.100
+<v Alex Gallego>heroes from a storyline perspective and I like the idea of the heroine journey and like strictly
+
+334
+00:21:28.680 --> 00:21:35.900
+<v Alex Gallego>speaking about literature. My wife is a writer and so she's taught me ways to articulate the way I
+
+335
+00:21:35.900 --> 00:21:41.400
+<v Alex Gallego>think about this. But the hero story is this idea that often a guy in books or literature it's like
+
+336
+00:21:41.400 --> 00:21:47.000
+<v Alex Gallego>born and there's like a destiny and then he dies alone. It's like the story of Superman or Lord of
+
+337
+00:21:47.000 --> 00:21:51.520
+<v Alex Gallego>the Rings and so on. It's like this personal sacrifice to the nth degree. Whereas the heroine
+
+338
+00:21:51.520 --> 00:21:56.900
+<v Alex Gallego>story is this idea of community building. It's this idea that, hey, often female characters
+
+339
+00:21:56.900 --> 00:22:02.380
+<v Alex Gallego>are helped along by the community. And so with that, to answer the question directly is,
+
+340
+00:22:02.380 --> 00:22:06.880
+<v Alex Gallego>is I like characteristics about particular individuals
+
+341
+00:22:06.880 --> 00:22:12.560
+<v Alex Gallego>that have in a real tangible way changed the world.
+
+342
+00:22:12.720 --> 00:22:14.980
+<v Alex Gallego>I think the iPhone is a great example
+
+343
+00:22:14.980 --> 00:22:17.200
+<v Alex Gallego>or electric cars is a great example.
+
+344
+00:22:17.340 --> 00:22:20.260
+<v Alex Gallego>But I also find it extremely easy
+
+345
+00:22:20.260 --> 00:22:22.180
+<v Alex Gallego>and disagree fundamentally
+
+346
+00:22:22.180 --> 00:22:24.800
+<v Alex Gallego>with the wholeness of people's characters.
+
+347
+00:22:24.900 --> 00:22:25.840
+<v Alex Gallego>And to say that, obviously,
+
+348
+00:22:25.860 --> 00:22:27.980
+<v Alex Gallego>I find the ability for Steve Jobs
+
+349
+00:22:27.980 --> 00:22:31.140
+<v Alex Gallego>to have seen the future in the way that he did
+
+350
+00:22:32.380 --> 00:22:37.640
+<v Alex Gallego>together an inspiring thing and I I really appreciate the way Amazon went about building
+
+351
+00:22:37.640 --> 00:22:42.020
+<v Alex Gallego>their business and the idea of setting expectations that we're always building the future and so it's
+
+352
+00:22:42.020 --> 00:22:46.980
+<v Alex Gallego>like it's always seven years for them it's always seven years in the future it's always day two for
+
+353
+00:22:46.980 --> 00:22:52.220
+<v Alex Gallego>them and so like that type of mentality I really appreciate I was like I love the idea of always
+
+354
+00:22:52.220 --> 00:22:55.740
+<v Alex Gallego>building for the future it's like as long as I'm alive it's not like I want to run out of ideas
+
+355
+00:22:55.740 --> 00:23:00.100
+<v Alex Gallego>and the more things you learn and the more things that come out you're always going to be there
+
+356
+00:23:00.100 --> 00:23:04.340
+<v Alex Gallego>fine tweaking their ideas it's like impossible for me to go back and look at any essay I've written
+
+357
+00:23:04.340 --> 00:23:09.840
+<v Alex Gallego>and say I would write it the same I would always re-edit this podcast for like ad infinitum if I
+
+358
+00:23:09.840 --> 00:23:13.200
+<v Alex Gallego>ever had the chance to go back and re-edit these things it's just my personality type
+
+359
+00:23:13.200 --> 00:23:19.160
+<v Alex Gallego>and so that idea of continuous improvement is something I deeply value and from mentorship
+
+360
+00:23:19.160 --> 00:23:25.760
+<v Alex Gallego>perspective too I think it's useful as of you know as a CEO in specific to have people that
+
+361
+00:23:25.760 --> 00:23:31.740
+<v Alex Gallego>that have done this, not for the superficial reason that it's like, oh, I need tactical advice
+
+362
+00:23:31.740 --> 00:23:39.740
+<v Alex Gallego>to know how to sell into a Fortune 10 company or, hey, you sold to this CEO and this finance
+
+363
+00:23:39.740 --> 00:23:44.960
+<v Alex Gallego>department and this procurement department. It's for perspective. And the way I think about this
+
+364
+00:23:44.960 --> 00:23:49.620
+<v Alex Gallego>is that my two-year-old, the first time that he fell backwards on top of the coffee table downstairs,
+
+365
+00:23:50.040 --> 00:23:55.300
+<v Alex Gallego>he panicked. It was the worst thing that had ever happened to him. And so you comfort him. It's
+
+366
+00:23:55.760 --> 00:23:58.120
+<v Alex Gallego>okay, the social pass, you're going to be fine.
+
+367
+00:23:58.240 --> 00:23:59.160
+<v Alex Gallego>You're not hurt, whatever.
+
+368
+00:23:59.300 --> 00:24:01.040
+<v Alex Gallego>And as a startup journey,
+
+369
+00:24:01.260 --> 00:24:02.720
+<v Alex Gallego>so many things are new
+
+370
+00:24:02.720 --> 00:24:05.340
+<v Alex Gallego>because of the hyper-specific context
+
+371
+00:24:05.340 --> 00:24:08.440
+<v Alex Gallego>and the industry and the people
+
+372
+00:24:08.440 --> 00:24:10.220
+<v Alex Gallego>and the talent and the money
+
+373
+00:24:10.220 --> 00:24:13.400
+<v Alex Gallego>and like macro resources and so on
+
+374
+00:24:13.400 --> 00:24:15.800
+<v Alex Gallego>that sometimes you just need someone to say,
+
+375
+00:24:15.920 --> 00:24:19.980
+<v Alex Gallego>clearly I haven't fallen from that specific coffee table,
+
+376
+00:24:20.100 --> 00:24:22.020
+<v Alex Gallego>but I can tell myself it's going to be okay.
+
+377
+00:24:22.100 --> 00:24:23.560
+<v Alex Gallego>In a similar way,
+
+378
+00:24:23.560 --> 00:24:29.540
+<v Alex Gallego>I appreciate advisors and people that have done this before to say, hey, this thing that you think
+
+379
+00:24:29.540 --> 00:24:35.720
+<v Alex Gallego>is very difficult, that's normal. It's going to be okay. This too shall pass. As I look at my journey
+
+380
+00:24:35.720 --> 00:24:41.760
+<v Alex Gallego>and the company's journey, I feel that I've evolved the characters and the things that I look for in
+
+381
+00:24:41.760 --> 00:24:45.940
+<v Alex Gallego>people. One, because I've incorporated some of those things early on that I thought were valuable.
+
+382
+00:24:46.420 --> 00:24:51.580
+<v Alex Gallego>But two, because like my personal journey is so different every year. That was a long-winded way
+
+383
+00:24:54.020 --> 00:24:59.420
+<v Alex Gallego>specific traits of people that would be considered world figures. But for most of them,
+
+384
+00:24:59.440 --> 00:25:03.000
+<v Alex Gallego>I also don't think that they would be holistic people that I look up to.
+
+385
+00:25:04.440 --> 00:25:09.220
+<v Noah Labhart>Alex, last question. So you're getting on a plane and you're sitting next to a young entrepreneur
+
+386
+00:25:09.220 --> 00:25:12.820
+<v Noah Labhart>who's built the next big thing. They're jazzed about it. They can't wait to show it off to the
+
+387
+00:25:12.820 --> 00:25:16.160
+<v Noah Labhart>world. They can't wait to show it off to you right there on the plane. What advice do you give that
+
+388
+00:25:16.160 --> 00:25:17.940
+<v Noah Labhart>person having gone down this road a bit?
+
+389
+00:25:18.960 --> 00:25:22.140
+<v Alex Gallego>As an immigrant, I would offer advice that
+
+390
+00:25:23.740 --> 00:25:35.000
+<v Alex Gallego>If the person is in the U.S. and the context is something that I could share, I think I would have a lot more to advise than if someone were in Europe or in Colombia or Mexico or whatever it is.
+
+391
+00:25:35.100 --> 00:25:52.280
+<v Alex Gallego>Just because the macroeconomics, the people, the funding, the ability to believe in yourself, it's so deeply ingrained in cultures that I do not think I would have access to the opportunities that I've had in any other place in the world.
+
+392
+00:25:53.620 --> 00:25:57.020
+<v Alex Gallego>and it had to be in a specific, I had to kick this off in San Francisco.
+
+393
+00:25:57.140 --> 00:26:01.020
+<v Alex Gallego>I don't think I could have built what I've built in any other place in the world.
+
+394
+00:26:01.920 --> 00:26:07.020
+<v Alex Gallego>So without context, if the person has the ability to take a bet on themselves,
+
+395
+00:26:07.200 --> 00:26:08.160
+<v Alex Gallego>I would always say take it.
+
+396
+00:26:08.280 --> 00:26:12.460
+<v Alex Gallego>I think I've regretted the things that I haven't done more than the things that I've done.
+
+397
+00:26:12.660 --> 00:26:15.480
+<v Alex Gallego>And obviously the caveat there is that for a lot of immigrants,
+
+398
+00:26:15.720 --> 00:26:17.740
+<v Alex Gallego>the people back home depend on your earnings.
+
+399
+00:26:17.980 --> 00:26:21.240
+<v Alex Gallego>If you are a salaryman in some large company,
+
+400
+00:26:21.240 --> 00:26:26.520
+<v Alex Gallego>company I guarantee or at least I know firsthand from some of my friends that they send money home
+
+401
+00:26:26.520 --> 00:26:32.080
+<v Alex Gallego>to a bunch of people right you are the person to go to if your cousin third cousin has a kid and
+
+402
+00:26:32.080 --> 00:26:38.940
+<v Alex Gallego>doesn't have diapers it is immaterial to your finances but you are a pillar to a family now
+
+403
+00:26:38.940 --> 00:26:42.880
+<v Alex Gallego>if a person is from the U.S. the family's here they have a financial background they probably
+
+404
+00:26:42.880 --> 00:26:48.000
+<v Alex Gallego>went to a good school or I just think it would have to be super specific but in general the
+
+405
+00:26:48.000 --> 00:26:49.260
+<v Alex Gallego>the guidance that I would give people.
+
+406
+00:26:49.460 --> 00:26:50.120
+<v Alex Gallego>Try it.
+
+407
+00:26:50.200 --> 00:26:50.900
+<v Alex Gallego>Time box it.
+
+408
+00:26:50.960 --> 00:26:51.740
+<v Alex Gallego>Try it for two weeks.
+
+409
+00:26:51.840 --> 00:26:52.700
+<v Alex Gallego>Try it for four weeks.
+
+410
+00:26:52.900 --> 00:26:53.400
+<v Alex Gallego>Save money.
+
+411
+00:26:53.520 --> 00:26:57.560
+<v Alex Gallego>I think most people that have the skills to build a company are probably well-paid in
+
+412
+00:26:57.560 --> 00:26:58.060
+<v Alex Gallego>tech.
+
+413
+00:26:57.900 --> 00:27:01.600
+<v Alex Gallego>Usually they come from product managers or engineering backgrounds or some sales background,
+
+414
+00:27:01.720 --> 00:27:06.480
+<v Alex Gallego>and they're often smart and sophisticated and have the ability to save.
+
+415
+00:27:07.040 --> 00:27:11.940
+<v Alex Gallego>By and large, these people have the ability to just go and chase their dreams.
+
+416
+00:27:12.020 --> 00:27:15.680
+<v Alex Gallego>And I would have regretted every day if I hadn't done this.
+
+417
+00:27:15.680 --> 00:27:19.880
+<v Alex Gallego>In fact, when I chose to build Redpanda, I asked my wife, Sarah, who's a saint.
+
+418
+00:27:19.920 --> 00:27:23.320
+<v Alex Gallego>I said, I'm either going to build this now or when the kids are five years old.
+
+419
+00:27:23.440 --> 00:27:24.920
+<v Alex Gallego>And she was super supportive.
+
+420
+00:27:25.100 --> 00:27:30.420
+<v Alex Gallego>And like her one advice was at the time was like, she's like, you will not be a happy
+
+421
+00:27:30.420 --> 00:27:32.020
+<v Alex Gallego>person if you don't, if you don't try this.
+
+422
+00:27:32.180 --> 00:27:37.660
+<v Alex Gallego>And so super biased because I've seen success and I've had a little bit of success in powering
+
+423
+00:27:37.660 --> 00:27:38.820
+<v Alex Gallego>some of the world's largest companies.
+
+424
+00:27:39.020 --> 00:27:43.180
+<v Alex Gallego>But also I am in the US and I went to school and I was able to save money.
+
+425
+00:27:43.180 --> 00:27:46.920
+<v Alex Gallego>And I have the context that some people don't have.
+
+426
+00:27:47.060 --> 00:27:50.600
+<v Alex Gallego>And in the US, it's incredibly favorable to start a company.
+
+427
+00:27:50.720 --> 00:27:51.580
+<v Alex Gallego>People will take bets.
+
+428
+00:27:51.700 --> 00:27:56.080
+<v Alex Gallego>They will leave their jobs as some of the world's paying companies, whether it's like Google
+
+429
+00:27:56.080 --> 00:27:59.580
+<v Alex Gallego>or Snowflake or Facebook, to take a chance at a startup.
+
+430
+00:27:59.800 --> 00:28:03.360
+<v Alex Gallego>And that culture, I think, is really hard to replicate any other places.
+
+431
+00:28:04.060 --> 00:28:05.720
+<v Alex Gallego>Contextually, I say people, try it.
+
+432
+00:28:05.760 --> 00:28:06.260
+<v Alex Gallego>It's fun.
+
+433
+00:28:06.120 --> 00:28:07.220
+<v Alex Gallego>I think you'll regret not trying.
+
+434
+00:28:07.440 --> 00:28:08.560
+<v Noah Labhart>I couldn't agree more.
+
+435
+00:28:08.640 --> 00:28:09.600
+<v Noah Labhart>That's fantastic advice.
+
+436
+00:28:09.880 --> 00:28:12.200
+<v Noah Labhart>Well, Alex, thank you for being on the show today.
+
+437
+00:28:13.180 --> 00:28:14.560
+<v Noah Labhart>the creation story of Redpanda.
+
+438
+00:28:14.700 --> 00:28:15.200
+<v Noah Labhart>Thanks
+
+439
+00:28:14.980 --> 00:28:15.520
+<v Alex Gallego>for having me.
+
+440
+00:28:18.120 --> 00:28:20.760
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+441
+00:28:25.740 --> 00:28:28.780
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+442
+00:28:28.920 --> 00:28:31.560
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+443
+00:28:31.760 --> 00:28:33.700
+<v Noah Labhart>or the podcasting app of your choice.
+
+444
+00:28:34.300 --> 00:28:36.520
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+445
+00:28:36.800 --> 00:28:38.740
+<v Noah Labhart>Both things help us out tremendously.
+
+446
+00:28:38.740 --> 00:28:43.160
+<v Noah Labhart>tremendously. And thanks again for listening.

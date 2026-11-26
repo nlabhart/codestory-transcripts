@@ -1,0 +1,2239 @@
+WEBVTT
+
+NOTE S6 Bonus: The API for Everything: Scaling a $175M+ Universal Communications Engine with Christine Spang of Nylas
+
+1
+00:00:00.000 --> 00:00:05.180
+<v Christine Spang>I remember I was like terrified to flip the private to public button on GitHub.
+
+2
+00:00:06.000 --> 00:00:11.120
+<v Christine Spang>Turns out that like if you just switch a repo to public on GitHub and you're like
+
+3
+00:00:11.120 --> 00:00:14.860
+<v Christine Spang>some tiny startup that no one's ever heard of, people don't find it. Like
+
+4
+00:00:14.860 --> 00:00:19.160
+<v Christine Spang>literally nothing happened until we went out you know got boots on the ground and
+
+5
+00:00:19.160 --> 00:00:23.860
+<v Christine Spang>like really started pushing and talking about it to draw attention to it. No one
+
+6
+00:00:23.860 --> 00:00:26.860
+<v Christine Spang>even discovered the repo on their own. We shouldn't have been worried about that.
+
+7
+00:00:26.860 --> 00:00:29.700
+<v Christine Spang>You know, the response we got seemed pretty positive.
+
+8
+00:00:30.040 --> 00:00:37.740
+<v Christine Spang>You know, the next step was like, okay, how do we build, you know, an infrastructure service for this and get it launched as quickly as possible?
+
+9
+00:00:38.400 --> 00:00:42.200
+<v Christine Spang>My name is Christine Spang, and I'm the founder and CTO at Nylas.
+
+10
+00:00:47.540 --> 00:00:52.880
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries
+
+11
+00:00:52.880 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+12
+00:00:57.100 --> 00:01:00.800
+<v Noah Labhart>and build and lead a team that has your back.
+
+13
+00:01:02.240 --> 00:01:03.880
+<v Noah Labhart>I'm your host, Noah Labhart,
+
+14
+00:01:04.000 --> 00:01:08.200
+<v Noah Labhart>and today, how Christine Spang created the Communications API
+
+15
+00:01:08.200 --> 00:01:12.660
+<v Noah Labhart>so you can unlock the power of your comms data.
+
+16
+00:01:13.630 --> 00:01:15.820
+<v Noah Labhart>All this and more on Code Story.
+
+17
+00:01:19.200 --> 00:01:22.260
+<v Noah Labhart>According to Christine Spang, she is secretly Canadian.
+
+18
+00:01:22.880 --> 00:01:27.960
+<v Noah Labhart>being born in Toronto. Early on in life, she moved to upstate New York and grew up there.
+
+19
+00:01:28.260 --> 00:01:33.600
+<v Noah Labhart>She came from a family of engineers and entrepreneurs. After getting into an RPG
+
+20
+00:01:33.600 --> 00:01:38.680
+<v Noah Labhart>game based on Lord of the Rings, she had to learn to code, run Linux, and fell in love with software.
+
+21
+00:01:39.120 --> 00:01:43.780
+<v Noah Labhart>In high school, she was a band geek and was super into fantasy reading. These days,
+
+22
+00:01:43.780 --> 00:01:47.380
+<v Noah Labhart>she tends to focus more on hobbies that get her out and moving in the world,
+
+23
+00:01:47.380 --> 00:01:49.320
+<v Noah Labhart>specifically rock climbing and plants.
+
+24
+00:01:50.380 --> 00:01:53.740
+<v Noah Labhart>Christine was working for a startup that ended up being sold to Oracle.
+
+25
+00:01:54.280 --> 00:01:57.640
+<v Noah Labhart>At that point, she was considering what was next for her.
+
+26
+00:01:58.060 --> 00:02:02.200
+<v Noah Labhart>And the timing was fortuitous, as her friend from MIT was starting up something
+
+27
+00:02:02.200 --> 00:02:05.260
+<v Noah Labhart>around extracting information from email.
+
+28
+00:02:06.420 --> 00:02:09.360
+<v Noah Labhart>This is the creation story of Nylas.
+
+29
+00:02:15.860 --> 00:02:24.180
+<v Christine Spang>Nylas is a software platform that makes it easy for developers to build apps that can connect to communications data
+
+30
+00:02:24.180 --> 00:02:28.960
+<v Christine Spang>and to help people drive action from the insights from that communications data.
+
+31
+00:02:29.240 --> 00:02:36.300
+<v Christine Spang>In its simplest form, this can mean that folks can use our APIs to bring communications data into other tools
+
+32
+00:02:36.300 --> 00:02:39.560
+<v Christine Spang>so that people don't have to context switch all the time to get things done.
+
+33
+00:02:40.060 --> 00:02:43.020
+<v Christine Spang>We also work with companies to do higher level things,
+
+34
+00:02:43.120 --> 00:02:46.500
+<v Christine Spang>to essentially sort through and filter that communications data,
+
+35
+00:02:46.660 --> 00:02:52.040
+<v Christine Spang>to structure or to extract structured information from that communications data.
+
+36
+00:02:52.240 --> 00:02:55.660
+<v Christine Spang>For example, one of the channels that we connect to is email,
+
+37
+00:02:55.760 --> 00:03:00.380
+<v Christine Spang>and there's all sorts of really useful and interesting things in email
+
+38
+00:03:00.380 --> 00:03:04.420
+<v Christine Spang>that other software might want to take actions on.
+
+39
+00:03:06.300 --> 00:03:13.620
+<v Christine Spang>real-time order information from a mailbox and provide that in a nice easy to consume form that
+
+40
+00:03:13.620 --> 00:03:18.600
+<v Christine Spang>other apps can use to essentially make their experience better by knowing what kinds of
+
+41
+00:03:18.600 --> 00:03:24.100
+<v Christine Spang>things people are buying or use it to do you know real-time notifications about packages and things
+
+42
+00:03:24.100 --> 00:03:30.240
+<v Christine Spang>like that so that's just an example of you know a use case where you know we're able to take that
+
+43
+00:03:30.240 --> 00:03:35.760
+<v Christine Spang>communications data and help apps build things that make use of it when you think of it at a
+
+44
+00:03:36.300 --> 00:03:56.020
+<v Christine Spang>All sorts of work today is essentially knowledge work. People get things done by collaborating and communicating with other people. So Nylas essentially helps connect the data that's generated through all this communication to software. And software is a lever. Software is a way to make people more productive.
+
+45
+00:03:56.020 --> 00:04:07.220
+<v Christine Spang>and we're kind of the translation layer that makes this communication data something that machines can help us action.
+
+46
+00:04:07.830 --> 00:04:10.240
+<v Christine Spang>So I went to university at MIT.
+
+47
+00:04:10.740 --> 00:04:14.540
+<v Christine Spang>One of the people that I met was the original person that I started the company with,
+
+48
+00:04:14.700 --> 00:04:19.780
+<v Christine Spang>and essentially the idea sparked from his undergraduate thesis.
+
+49
+00:04:19.780 --> 00:04:27.820
+<v Christine Spang>He wanted to essentially build like a customized email client that layered on metadata about who you were talking to.
+
+50
+00:04:28.420 --> 00:04:42.220
+<v Christine Spang>He started trying to build this email client and just found that the basic technology, the basic sort of plumbing of getting access to that data and working with it ended up being way more difficult than he expected it to be.
+
+51
+00:04:42.220 --> 00:04:54.640
+<v Christine Spang>This was 2012-ish, and even then, the expectations of a developer was that most data you can access through some sort of REST API.
+
+52
+00:04:55.460 --> 00:04:57.340
+<v Christine Spang>That wasn't the case at all for email.
+
+53
+00:04:57.580 --> 00:05:00.900
+<v Christine Spang>You had to use this old protocol called IMAP.
+
+54
+00:05:01.040 --> 00:05:02.640
+<v Christine Spang>The learning curve was really big.
+
+55
+00:05:02.800 --> 00:05:05.620
+<v Christine Spang>Just doing basic things was really difficult.
+
+56
+00:05:05.620 --> 00:05:21.580
+<v Christine Spang>And the takeaway from this was that maybe the reason that despite the fact that email as a communications channel had even then been around for 40 plus years, been growing a ton year over year, and it kind of become this basic infrastructure of the Internet.
+
+57
+00:05:21.800 --> 00:05:32.840
+<v Christine Spang>And maybe people weren't building apps that connected to that information and helped make use of it because just the barrier to development and to entry was too high.
+
+58
+00:05:32.840 --> 00:05:39.760
+<v Christine Spang>So I guess I would say that the company idea started with this problem around email.
+
+59
+00:05:39.960 --> 00:05:53.000
+<v Christine Spang>And then once we sort of got started building, essentially my friend graduated from MIT and I was working at this other startup at the time and kind of went through a whole startup life cycle.
+
+60
+00:05:53.280 --> 00:05:55.300
+<v Christine Spang>I joined the company when it was independent.
+
+61
+00:05:56.080 --> 00:05:57.860
+<v Christine Spang>We grew the company for a while.
+
+62
+00:05:57.960 --> 00:06:00.040
+<v Christine Spang>The founders ended up selling the company to Oracle.
+
+63
+00:06:01.020 --> 00:06:06.140
+<v Christine Spang>Honestly, I felt working at a huge older company to be pretty constraining.
+
+64
+00:06:06.580 --> 00:06:11.080
+<v Christine Spang>I started thinking about what I was going to do next, and the timing lined up really
+
+65
+00:06:11.080 --> 00:06:15.500
+<v Christine Spang>well to just dive into this wild idea with this friend of mine from MIT.
+
+66
+00:06:16.000 --> 00:06:18.600
+<v Christine Spang>It was a natural transition point in my life.
+
+67
+00:06:18.740 --> 00:06:21.600
+<v Christine Spang>Just decided to throw in all the cards.
+
+68
+00:06:21.780 --> 00:06:26.880
+<v Christine Spang>I moved to the Bay Area, Silicon Valley as kind of like this hub of startups.
+
+69
+00:06:26.880 --> 00:06:34.180
+<v Christine Spang>You know, it was a place that, you know, if I looked back from me as like an old lady on her deathbed,
+
+70
+00:06:34.380 --> 00:06:40.940
+<v Christine Spang>I would regret not having gone to check out a place that really seemed like the center of the software universe at the time.
+
+71
+00:06:40.960 --> 00:06:46.700
+<v Christine Spang>And so, you know, I packed up all my stuff into boxes and shipped it across the country
+
+72
+00:06:46.700 --> 00:06:50.040
+<v Christine Spang>and just sort of showed up at my friend's doorstep.
+
+73
+00:06:50.040 --> 00:06:54.620
+<v Christine Spang>He was already living here at the time and got started on this idea.
+
+74
+00:06:56.880 --> 00:07:00.800
+<v Noah Labhart>Let's dive into the MVP then, that first version of the product.
+
+75
+00:07:01.000 --> 00:07:04.780
+<v Noah Labhart>How long did it take to build and what sort of tools did you use to bring it to life?
+
+76
+00:07:05.140 --> 00:07:11.000
+<v Christine Spang>I would say that the first few sort of iterations of ideas, you know, we probably ended up throwing those away completely.
+
+77
+00:07:11.000 --> 00:07:37.280
+<v Christine Spang>When we really got started and sort of coalesced around this idea of essentially building an API wrapper first around all of the different email providers so that you could build an app that quickly and easily could connect to a mailbox and do things with the data in that mailbox, no matter what email provider that user was on, whether it was Google, whether it was Microsoft, whether it was Yahoo.
+
+78
+00:07:37.280 --> 00:07:42.640
+<v Christine Spang>all of those different mailbox providers use like a completely different protocol. And so
+
+79
+00:07:42.640 --> 00:07:51.940
+<v Christine Spang>we decided first, we are going to integrate with Google, the open source mailbox protocol that
+
+80
+00:07:51.940 --> 00:07:56.960
+<v Christine Spang>is called IMAP. And at the time when we were getting started building, this was early 2014.
+
+81
+00:07:57.440 --> 00:08:02.920
+<v Christine Spang>Those actually use the same protocol. This was before Google launched a REST API for Gmail.
+
+82
+00:08:02.920 --> 00:08:12.780
+<v Christine Spang>And so we decided to build an integration with that protocol that exposed a nice modern REST semantics API for connecting to those mailboxes.
+
+83
+00:08:12.800 --> 00:08:22.560
+<v Christine Spang>And then we would try to get developers out there to build apps that connected to that data and did things, especially building productivity tools on top of mailboxes.
+
+84
+00:08:22.980 --> 00:08:30.000
+<v Christine Spang>You know, the question that you should always have when you're starting a company is, does anybody want what it is that I want to build?
+
+85
+00:08:30.000 --> 00:08:38.600
+<v Christine Spang>You essentially want to optimize for discovering whether or not there's a market and demand for the thing that you're trying to build.
+
+86
+00:08:38.880 --> 00:08:42.400
+<v Christine Spang>Our strategy was a couple of different things.
+
+87
+00:08:42.540 --> 00:08:47.480
+<v Christine Spang>One is we scoped down kind of the MVP to be, we're just going to build up IMAP protocol.
+
+88
+00:08:47.740 --> 00:08:50.960
+<v Christine Spang>And then what we chose to do was two things.
+
+89
+00:08:51.100 --> 00:08:58.200
+<v Christine Spang>One was that we launched that first integration as like a really minimal open source app.
+
+90
+00:09:00.000 --> 00:09:01.000
+<v Christine Spang>could really run in production.
+
+91
+00:09:01.380 --> 00:09:06.840
+<v Christine Spang>And the way that we sort of got the word out and tried to get some feedback was that my
+
+92
+00:09:06.840 --> 00:09:12.320
+<v Christine Spang>friend had essentially run this startup talk series at MIT.
+
+93
+00:09:12.560 --> 00:09:17.180
+<v Christine Spang>So he had some connections into startup media and press.
+
+94
+00:09:17.540 --> 00:09:22.560
+<v Christine Spang>We worked with that media to essentially put out some articles to get on Hacker News, things
+
+95
+00:09:22.560 --> 00:09:27.660
+<v Christine Spang>like that, to get an article in TechCrunch about the APIs that we were building around
+
+96
+00:09:27.660 --> 00:09:32.540
+<v Christine Spang>email to expose our thesis to the world that people would build a lot more tools
+
+97
+00:09:32.540 --> 00:09:36.400
+<v Christine Spang>that connected to email if it were easier to work with and to see if that
+
+98
+00:09:36.400 --> 00:09:41.760
+<v Christine Spang>made sense to other people. I remember I was like terrified to flip the private
+
+99
+00:09:41.760 --> 00:09:46.500
+<v Christine Spang>to public button on github and we did that before we put out any press or
+
+100
+00:09:46.500 --> 00:09:51.180
+<v Christine Spang>posted it anywhere and it turns out that like if you just switch a repo to
+
+101
+00:09:51.180 --> 00:09:55.120
+<v Christine Spang>public on github and you're like some tiny startup that no one's ever heard of
+
+102
+00:09:55.120 --> 00:10:00.040
+<v Christine Spang>people don't find it. Like literally nothing happened after we made it public.
+
+103
+00:10:00.440 --> 00:10:03.920
+<v Christine Spang>Until we went out, you know, got boots on the ground and like really started
+
+104
+00:10:03.920 --> 00:10:08.260
+<v Christine Spang>pushing and talking about it to draw attention to it. No one even discovered
+
+105
+00:10:08.260 --> 00:10:10.540
+<v Christine Spang>the repo on their own. We should have been worried about that.
+
+106
+00:10:10.840 --> 00:10:15.340
+<v Christine Spang>You know, the response we got seemed pretty positive. People resonated with the idea
+
+107
+00:10:15.340 --> 00:10:21.180
+<v Christine Spang>and so then, you know, the next step was like, okay, how do we build, you know, an
+
+108
+00:10:21.180 --> 00:10:24.700
+<v Christine Spang>infrastructure service for this and get it launched as quickly as possible.
+
+109
+00:10:25.380 --> 00:10:32.300
+<v Christine Spang>We chose to build things out using Python as a programming language just to iterate super fast.
+
+110
+00:10:32.600 --> 00:10:37.460
+<v Christine Spang>You know, we're still in the stage where we need to figure out what the product looked like. And
+
+111
+00:10:38.100 --> 00:10:42.580
+<v Christine Spang>there's more to getting product market fit than getting some early feedback of like,
+
+112
+00:10:42.700 --> 00:10:47.700
+<v Christine Spang>oh yeah, that's an interesting idea. I have that problem. Second step is like, okay, you need to
+
+113
+00:10:47.700 --> 00:10:52.780
+<v Christine Spang>build a product that can solve that problem and figure out the right form of that. And then there's
+
+114
+00:10:52.780 --> 00:10:57.500
+<v Christine Spang>a lot of other things you need to figure out along the way to having a production-ready product that
+
+115
+00:10:57.500 --> 00:11:03.400
+<v Christine Spang>people will pay for. We tried to get to a launch point as quickly as possible, but we decided that
+
+116
+00:11:03.400 --> 00:11:10.300
+<v Christine Spang>in order to have that MVP, we needed to have support not only for Google and the open protocol
+
+117
+00:11:10.300 --> 00:11:16.040
+<v Christine Spang>IMAP mailboxes, but we also needed to have support from Microsoft. We were researching the different
+
+118
+00:11:17.700 --> 00:11:24.900
+<v Christine Spang>implement to do Microsoft. And we decided that to have maximum compatibility with all the different
+
+119
+00:11:24.900 --> 00:11:31.420
+<v Christine Spang>accounts out there, you know, there's lots of on-premise Exchange servers. If we were going to
+
+120
+00:11:31.420 --> 00:11:37.340
+<v Christine Spang>eventually move to like more enterprise type of audiences, we need to have really broad support
+
+121
+00:11:37.340 --> 00:11:44.520
+<v Christine Spang>on that side. So we built out like a reverse engineered protocol implementation of this
+
+122
+00:11:44.520 --> 00:11:50.020
+<v Christine Spang>protocol called Exchange ActiveSync. This is a long time ago at this point, so I feel like I
+
+123
+00:11:50.020 --> 00:11:57.160
+<v Christine Spang>can freely say that our v1 of that implementation did not really work at all. But we managed to
+
+124
+00:11:57.160 --> 00:12:06.620
+<v Christine Spang>launch the early platform and luckily most folks would test using Google accounts first. So we kind
+
+125
+00:12:06.620 --> 00:12:12.700
+<v Christine Spang>of got away with saying we have support from Microsoft, but it not really being very good.
+
+126
+00:12:14.520 --> 00:12:20.360
+<v Christine Spang>It was like we had to get people to actually build on the platform and use it in order to continue iterating.
+
+127
+00:12:20.580 --> 00:12:21.900
+<v Christine Spang>We were in the Bay Area.
+
+128
+00:12:22.140 --> 00:12:29.960
+<v Christine Spang>We tried to find startups and companies that could even come to our office and work on building to get people using the platform.
+
+129
+00:12:30.220 --> 00:12:33.100
+<v Christine Spang>And I think it was in terms of how long it took.
+
+130
+00:12:33.260 --> 00:12:38.280
+<v Christine Spang>And we launched the open source version in like June of 2014.
+
+131
+00:12:38.520 --> 00:12:41.320
+<v Christine Spang>And then we launched the host of platform in October.
+
+132
+00:12:41.320 --> 00:12:58.680
+<v Christine Spang>And then I think we didn't really get our first paying customer until about January. So I would say it was about a year end to end from when we put down the first few lines of code to like a paying customer. But obviously, there were lots of little milestones in between that 12 month period.
+
+133
+00:13:00.060 --> 00:13:03.420
+<v Noah Labhart>So you kind of touched on a few of these on the way, but I want to dive into them a little bit.
+
+134
+00:13:03.480 --> 00:13:12.160
+<v Noah Labhart>Tell me about the decisions and tradeoffs you had to make, whether it be around, you know, the protocols you had to support, the Microsoft stuff that you had to support.
+
+135
+00:13:12.400 --> 00:13:17.220
+<v Noah Labhart>Tell me about some of those decisions you had to make in the early days and how you coped with them.
+
+136
+00:13:17.940 --> 00:13:28.780
+<v Christine Spang>One of the biggest challenges was, you know, the fact that like a REST style of API that a web developer expected had very different semantics.
+
+137
+00:13:29.280 --> 00:13:32.500
+<v Christine Spang>We didn't want to compromise on the API design.
+
+138
+00:13:32.760 --> 00:13:35.300
+<v Christine Spang>We wanted it to be as simple as possible.
+
+139
+00:13:35.420 --> 00:13:41.460
+<v Christine Spang>We wanted it to be responsive, you know, be something that was intuitive to use for like a modern web developer.
+
+140
+00:13:41.460 --> 00:13:48.020
+<v Christine Spang>We weren't really sure whether or not we could sort of like hot-fetch the data translating
+
+141
+00:13:48.020 --> 00:13:55.220
+<v Christine Spang>from some API request that had a certain expectation of what data it was going to return.
+
+142
+00:13:55.980 --> 00:14:00.520
+<v Christine Spang>One thing that we had to decide was, are we going to proxy these API requests?
+
+143
+00:14:00.820 --> 00:14:08.540
+<v Christine Spang>And when someone connects to our API on the fly, make a call back out to Google or whoever
+
+144
+00:14:08.540 --> 00:14:11.000
+<v Christine Spang>on the back end and fetch the data and return it?
+
+145
+00:14:11.420 --> 00:14:14.380
+<v Christine Spang>Or should we make some sort of asynchronous process
+
+146
+00:14:14.380 --> 00:14:17.220
+<v Christine Spang>that essentially created a cache of data on our end
+
+147
+00:14:17.220 --> 00:14:18.980
+<v Christine Spang>that we could then use to serve the API?
+
+148
+00:14:19.920 --> 00:14:23.180
+<v Christine Spang>The advantage of doing this sort of proxy pattern
+
+149
+00:14:23.180 --> 00:14:25.500
+<v Christine Spang>was that it would be a lot cheaper to build.
+
+150
+00:14:25.900 --> 00:14:29.400
+<v Christine Spang>But the downside was that we might have been constrained
+
+151
+00:14:29.400 --> 00:14:32.820
+<v Christine Spang>in terms of how powerful we could make the APIs,
+
+152
+00:14:32.980 --> 00:14:35.500
+<v Christine Spang>and that also it would be a lot slower
+
+153
+00:14:35.500 --> 00:14:38.160
+<v Christine Spang>because there's more points of failure
+
+154
+00:14:38.540 --> 00:14:40.360
+<v Christine Spang>and there's more work that had to be done
+
+155
+00:14:40.360 --> 00:14:44.240
+<v Christine Spang>within a single API request in order to return that data.
+
+156
+00:14:45.140 --> 00:14:48.080
+<v Christine Spang>We decided to make an asynchronous process
+
+157
+00:14:48.080 --> 00:14:51.220
+<v Christine Spang>that actually cached the data on our platform
+
+158
+00:14:51.220 --> 00:14:54.600
+<v Christine Spang>that would then serve to the users.
+
+159
+00:14:55.160 --> 00:14:58.620
+<v Christine Spang>And this had a lot of implications down the line.
+
+160
+00:14:58.800 --> 00:15:00.960
+<v Christine Spang>And I think it was like a fine decision
+
+161
+00:15:00.960 --> 00:15:03.940
+<v Christine Spang>in terms of like getting the MVP out the door.
+
+162
+00:15:04.260 --> 00:15:07.300
+<v Christine Spang>We cached the entire mailbox data
+
+163
+00:15:08.540 --> 00:15:12.520
+<v Christine Spang>making it configurable or having some sort of complex fallback.
+
+164
+00:15:12.760 --> 00:15:16.220
+<v Christine Spang>This wasn't something that was optimal in terms of cost scaling
+
+165
+00:15:16.220 --> 00:15:18.680
+<v Christine Spang>or a lot of operational constraints,
+
+166
+00:15:18.820 --> 00:15:23.400
+<v Christine Spang>but the simplest possible way at the time to really focus on the API design.
+
+167
+00:15:23.760 --> 00:15:27.020
+<v Christine Spang>So that was a pretty major decision around trade-offs
+
+168
+00:15:27.020 --> 00:15:29.420
+<v Christine Spang>that we made early on in the day that was pretty significant.
+
+169
+00:15:31.420 --> 00:15:32.980
+<v Noah Labhart>You've got your MVP then.
+
+170
+00:15:33.120 --> 00:15:36.960
+<v Noah Labhart>How did you progress the product from there and mature it?
+
+171
+00:15:38.540 --> 00:15:43.700
+<v Noah Labhart>in or kind of wrap that question in a box is how you built your roadmap, how you decided,
+
+172
+00:15:43.980 --> 00:15:47.420
+<v Noah Labhart>okay, this is the next most important thing to build.
+
+173
+00:15:48.440 --> 00:15:54.060
+<v Christine Spang>This is really an iterative process that came out of interacting with a lot of the early
+
+174
+00:15:54.060 --> 00:15:56.460
+<v Christine Spang>folks that were building on top of the platform.
+
+175
+00:15:56.920 --> 00:16:00.180
+<v Christine Spang>You know, a lot of folks in the early days, what they were trying to do is essentially
+
+176
+00:16:00.180 --> 00:16:05.380
+<v Christine Spang>bring email data into their applications so that they could, you know, build tools on
+
+177
+00:16:05.380 --> 00:16:08.460
+<v Christine Spang>on top of that, whether they're automating outreach
+
+178
+00:16:08.930 --> 00:16:11.700
+<v Christine Spang>or surfacing up potential different actions
+
+179
+00:16:11.700 --> 00:16:13.740
+<v Christine Spang>that you might wanna do depending on
+
+180
+00:16:13.740 --> 00:16:16.280
+<v Christine Spang>what kind of communication you got back.
+
+181
+00:16:16.580 --> 00:16:19.560
+<v Christine Spang>And doing that all without switching back and forth
+
+182
+00:16:19.560 --> 00:16:24.380
+<v Christine Spang>between your mailbox and whatever app you were using
+
+183
+00:16:24.380 --> 00:16:25.340
+<v Christine Spang>to get things done.
+
+184
+00:16:25.900 --> 00:16:29.280
+<v Christine Spang>As a part of working through with these early folks
+
+185
+00:16:29.280 --> 00:16:30.600
+<v Christine Spang>who were building on the platform,
+
+186
+00:16:30.960 --> 00:16:32.900
+<v Christine Spang>we not only got to see what they were trying
+
+187
+00:16:32.900 --> 00:16:37.760
+<v Christine Spang>to accomplish today but we could ask questions about what other problems that they were trying
+
+188
+00:16:37.760 --> 00:16:43.900
+<v Christine Spang>to solve. Pretty soon this surfaced up a lot of common patterns. You know one big thing was that
+
+189
+00:16:43.900 --> 00:16:50.560
+<v Christine Spang>people wanted to to schedule meetings as well and to interact with calendars and to look at that
+
+190
+00:16:50.560 --> 00:16:55.800
+<v Christine Spang>data and bring that into their applications as well and that was a kind of a natural iteration
+
+191
+00:16:55.800 --> 00:17:02.520
+<v Christine Spang>and expansion of the product. We essentially built out a calendar and scheduling API and
+
+192
+00:17:02.900 --> 00:17:05.920
+<v Christine Spang>launched it side by side alongside the email integration.
+
+193
+00:17:06.380 --> 00:17:10.680
+<v Christine Spang>So I went from just email to email and calendars.
+
+194
+00:17:11.820 --> 00:17:20.360
+<v Christine Spang>The kind of overarching vision in the early days was that we didn't want to just build out this infrastructure and sell that.
+
+195
+00:17:20.500 --> 00:17:25.100
+<v Christine Spang>That was something that we focused on a lot more after a few years.
+
+196
+00:17:25.100 --> 00:17:39.240
+<v Christine Spang>In the early days, we actually wanted to build our own sort of customized email client that, you know, essentially could be really extensible, could have all of these extensions that would integrate other products into it.
+
+197
+00:17:39.360 --> 00:17:45.100
+<v Christine Spang>And so we built the API infrastructure as like a step one to getting there.
+
+198
+00:17:45.420 --> 00:17:49.000
+<v Christine Spang>There's kind of like multiple different things that were happening.
+
+199
+00:17:49.000 --> 00:17:53.040
+<v Christine Spang>One is that we were selling the infrastructure and we were getting feedback from the people
+
+200
+00:17:53.040 --> 00:17:54.040
+<v Christine Spang>that were building this infrastructure.
+
+201
+00:17:54.460 --> 00:18:00.460
+<v Christine Spang>Two is that we also hired a couple application engineers who were building internally stuff
+
+202
+00:18:00.460 --> 00:18:05.120
+<v Christine Spang>on top of the APIs, working towards this full-fledged email client.
+
+203
+00:18:05.400 --> 00:18:12.080
+<v Christine Spang>And they ran into problems like, how do we do contact autocomplete when you're composing
+
+204
+00:18:12.080 --> 00:18:12.600
+<v Christine Spang>an email?
+
+205
+00:18:12.880 --> 00:18:17.680
+<v Christine Spang>And so that's what led us to add a support for connecting to address books.
+
+206
+00:18:19.000 --> 00:18:25.980
+<v Christine Spang>calendars and contacts were kind of like the trifecta of sort of baseline data types that we
+
+207
+00:18:25.980 --> 00:18:32.880
+<v Christine Spang>integrate integrated with for a number of years and the internal email client that we were building
+
+208
+00:18:32.880 --> 00:18:39.120
+<v Christine Spang>ended up being a very bad product direction for us to go into so eventually we we shut that down
+
+209
+00:18:39.120 --> 00:18:44.100
+<v Christine Spang>and sort of spun it off as an open source product and just really focused on the infrastructure
+
+210
+00:18:44.100 --> 00:18:56.160
+<v Christine Spang>which was not only growing and thriving, but just had some really poor metrics that were really positive that made us feel really confident in just sort of betting the future of the business on it.
+
+211
+00:18:56.340 --> 00:19:12.400
+<v Christine Spang>So from there, in terms of like iterating on the product, you know, it's it's again really goes back to that interaction with customers and having a lot of conversations with folks that were using the product for different things.
+
+212
+00:19:14.180 --> 00:19:20.560
+<v Christine Spang>The way that we've come to think about what do we build is one, what are like
+
+213
+00:19:20.560 --> 00:19:25.220
+<v Christine Spang>table stakes things that a lot of our customers are trying to build that we
+
+214
+00:19:25.220 --> 00:19:28.920
+<v Christine Spang>could make much easier for them to build and get to market more quickly by
+
+215
+00:19:28.920 --> 00:19:34.020
+<v Christine Spang>providing you know API's that are specific to getting that thing done. Some
+
+216
+00:19:34.020 --> 00:19:40.080
+<v Christine Spang>early examples are doing link tracking in emails. You know if they wanted to
+
+217
+00:19:40.080 --> 00:19:43.920
+<v Christine Spang>provide a great experience for those customers they had to provide it. So we
+
+218
+00:19:44.100 --> 00:19:51.440
+<v Christine Spang>We tried to see the patterns and get the feedback about what of those things could we offload from our customers' plates and put onto ours,
+
+219
+00:19:51.660 --> 00:19:55.960
+<v Christine Spang>and just make it much easier for people to launch the things that they were trying to launch.
+
+220
+00:19:56.180 --> 00:20:03.460
+<v Christine Spang>And we found that a lot of people had to spend a lot of time building the front-end part of,
+
+221
+00:20:03.640 --> 00:20:08.400
+<v Christine Spang>say you're trying to embed a scheduling workflow into your app,
+
+222
+00:20:08.400 --> 00:20:12.740
+<v Christine Spang>and you want to show a calendar view,
+
+223
+00:20:13.060 --> 00:20:16.880
+<v Christine Spang>you want to show slots that someone can book a meeting instantly.
+
+224
+00:20:17.260 --> 00:20:21.240
+<v Christine Spang>All of that stuff is, maybe it's not rocket science to build,
+
+225
+00:20:21.380 --> 00:20:25.700
+<v Christine Spang>but it takes time and it takes expensive engineers.
+
+226
+00:20:26.120 --> 00:20:28.740
+<v Christine Spang>And we're the scheduling experts here.
+
+227
+00:20:28.860 --> 00:20:32.080
+<v Christine Spang>Can we actually just provide a pre-integrated component
+
+228
+00:20:32.080 --> 00:20:36.480
+<v Christine Spang>that people can customize and embed into their product
+
+229
+00:20:38.100 --> 00:20:44.280
+<v Christine Spang>plate. That's what led us to launch our scheduling app. Today we have a whole
+
+230
+00:20:44.280 --> 00:20:47.600
+<v Christine Spang>bunch of different components that you can just drop into your application to
+
+231
+00:20:47.600 --> 00:20:53.320
+<v Christine Spang>add a schedule view or an email composer. None of these ideas really come
+
+232
+00:20:53.320 --> 00:20:58.640
+<v Christine Spang>from us meditating in a corner and trying to think of what can we,
+
+233
+00:20:58.740 --> 00:21:02.300
+<v Christine Spang>Nylas, bestow upon the world as our gift to humanity. It's
+
+234
+00:21:02.940 --> 00:21:07.160
+<v Christine Spang>really about asking people and observing what people are trying to do
+
+235
+00:21:08.400 --> 00:21:09.620
+<v Christine Spang>how we can help them.
+
+236
+00:21:11.320 --> 00:21:12.420
+<v Noah Labhart>Let's switch to team.
+
+237
+00:21:12.620 --> 00:21:14.800
+<v Noah Labhart>So how did you go about building your team?
+
+238
+00:21:14.980 --> 00:21:16.480
+<v Noah Labhart>And what did you look for in those people
+
+239
+00:21:16.480 --> 00:21:19.040
+<v Noah Labhart>to indicate they were the winning horses to join you?
+
+240
+00:21:19.780 --> 00:21:22.120
+<v Christine Spang>In the early days of starting the company,
+
+241
+00:21:22.300 --> 00:21:24.160
+<v Christine Spang>you know, the early team, me and my co-founder,
+
+242
+00:21:24.240 --> 00:21:26.760
+<v Christine Spang>we just went out and pitched literally
+
+243
+00:21:26.760 --> 00:21:28.920
+<v Christine Spang>every single one of our smartest friends
+
+244
+00:21:28.920 --> 00:21:32.720
+<v Christine Spang>on joining the company because we were pretty young.
+
+245
+00:21:32.760 --> 00:21:34.580
+<v Christine Spang>I was 24 when I started this company.
+
+246
+00:21:34.840 --> 00:21:37.620
+<v Christine Spang>And joining like a three-person company
+
+247
+00:21:38.700 --> 00:21:41.440
+<v Christine Spang>seems like a pretty risky trade-off.
+
+248
+00:21:41.960 --> 00:21:46.060
+<v Christine Spang>We found that having some sort of connection to the people
+
+249
+00:21:46.060 --> 00:21:49.200
+<v Christine Spang>was pretty important for getting people to kind of take the leap,
+
+250
+00:21:49.320 --> 00:21:52.980
+<v Christine Spang>especially in the early days when we had only raised a little bit of money.
+
+251
+00:21:53.040 --> 00:21:55.360
+<v Christine Spang>We couldn't pay anywhere near market salaries.
+
+252
+00:21:55.760 --> 00:21:58.780
+<v Christine Spang>And I think one of the advantages of having gone through school at MIT
+
+253
+00:21:58.780 --> 00:22:02.140
+<v Christine Spang>was that we knew all these really sharp engineers,
+
+254
+00:22:02.380 --> 00:22:06.900
+<v Christine Spang>and your 20s is also a really great time to do something
+
+255
+00:22:08.400 --> 00:22:13.580
+<v Christine Spang>risky just because it seems like it would be fun. So that's really how we hired in the early days.
+
+256
+00:22:15.260 --> 00:22:20.680
+<v Christine Spang>Today, I'm super excited and proud of the fact that like literally every single person we hire
+
+257
+00:22:20.680 --> 00:22:26.560
+<v Christine Spang>is more experienced and better than, you know, myself and the early team at, you know, whatever
+
+258
+00:22:26.560 --> 00:22:32.160
+<v Christine Spang>it is that they're being hired to do. And that's a really amazing place to be. And one of the most
+
+259
+00:22:32.160 --> 00:22:37.220
+<v Christine Spang>exciting things about scaling and seeing success, getting that product market fit, you know, getting
+
+260
+00:22:38.400 --> 00:22:43.400
+<v Christine Spang>back the company is that like we're going out and hiring a VP of sales you
+
+261
+00:22:43.400 --> 00:22:47.520
+<v Christine Spang>know chief marketing officer things like that and then you know I get to learn
+
+262
+00:22:47.520 --> 00:22:53.840
+<v Christine Spang>from all of those people you know about how do we be world-class at X so I think
+
+263
+00:22:53.840 --> 00:22:56.900
+<v Christine Spang>there's a lot of different things that we look for when we're hiring core
+
+264
+00:22:56.900 --> 00:23:01.020
+<v Christine Spang>components of our culture that I don't really wouldn't really say that we look
+
+265
+00:23:01.020 --> 00:23:06.120
+<v Christine Spang>for culture fit more of like like what is this person gonna add to the company
+
+266
+00:23:06.120 --> 00:23:28.800
+<v Christine Spang>We have a really collaborative company. We win and lose as a team. I really want people to feel that way and to lead that way. We think it's really important to have a merit-based advancement. People should succeed according to their contribution, not because of whatever they look like or their gender or race, things like that.
+
+267
+00:23:28.800 --> 00:23:31.360
+<v Christine Spang>And so we really look for values alignment there.
+
+268
+00:23:31.720 --> 00:23:34.620
+<v Christine Spang>Everyone we hire is a builder in some way.
+
+269
+00:23:34.760 --> 00:23:36.920
+<v Christine Spang>That doesn't necessarily mean that you're an engineer,
+
+270
+00:23:37.120 --> 00:23:38.260
+<v Christine Spang>cranking out code.
+
+271
+00:23:38.800 --> 00:23:41.780
+<v Christine Spang>Operations is building out the infrastructure
+
+272
+00:23:41.780 --> 00:23:43.360
+<v Christine Spang>for running the company.
+
+273
+00:23:43.660 --> 00:23:46.160
+<v Christine Spang>We all need to be running off of the same data.
+
+274
+00:23:46.340 --> 00:23:48.900
+<v Christine Spang>We need to build a lightweight process
+
+275
+00:23:48.900 --> 00:23:51.620
+<v Christine Spang>that allows us to align and scale.
+
+276
+00:23:51.920 --> 00:23:53.180
+<v Christine Spang>People are building teams.
+
+277
+00:23:54.060 --> 00:23:56.440
+<v Christine Spang>So there's all sorts of building and creating.
+
+278
+00:23:56.440 --> 00:23:59.720
+<v Christine Spang>and we look for folks that are really excited to do that
+
+279
+00:23:59.720 --> 00:24:03.440
+<v Christine Spang>because it's not an easy thing to do to be at a startup
+
+280
+00:24:03.440 --> 00:24:06.100
+<v Christine Spang>and it can be stressful, it can be chaotic
+
+281
+00:24:06.100 --> 00:24:10.360
+<v Christine Spang>and it's really important to set expectations with folks
+
+282
+00:24:10.360 --> 00:24:11.860
+<v Christine Spang>about what they're getting into.
+
+283
+00:24:13.260 --> 00:24:15.080
+<v Christine Spang>When you do find the right person,
+
+284
+00:24:16.080 --> 00:24:19.480
+<v Christine Spang>they can move super fast and grow a lot.
+
+285
+00:24:19.680 --> 00:24:21.840
+<v Christine Spang>I'm really proud of the fact that, for example,
+
+286
+00:24:21.960 --> 00:24:26.220
+<v Christine Spang>we have, I think, three VPs at Nylas now today
+
+287
+00:24:26.440 --> 00:24:31.080
+<v Christine Spang>who joined early on in their careers, in some cases, like entry-level roles,
+
+288
+00:24:31.200 --> 00:24:37.040
+<v Christine Spang>and have grown with the company by focusing on that impact and what they can do.
+
+289
+00:24:37.560 --> 00:24:40.380
+<v Christine Spang>That's something that's super exciting and meaningful for me.
+
+290
+00:24:43.920 --> 00:24:46.500
+<v Noah Labhart>So let's flip to scalability a little bit.
+
+291
+00:24:46.720 --> 00:24:50.460
+<v Noah Labhart>So did you build this to scale efficiently from day one,
+
+292
+00:24:50.600 --> 00:24:53.160
+<v Noah Labhart>or have you been fighting this as you've grown?
+
+293
+00:24:53.160 --> 00:25:00.260
+<v Christine Spang>own. There's people out there that built to scale from day one. I want to meet them because I think
+
+294
+00:25:00.260 --> 00:25:07.740
+<v Christine Spang>for 99% of people, that's not how it works. Building for scalability is hard and it takes
+
+295
+00:25:07.740 --> 00:25:15.540
+<v Christine Spang>a long time. You know, the first version of our products absolutely would not handle the scale
+
+296
+00:25:15.540 --> 00:25:21.960
+<v Christine Spang>that we're at today. And, you know, one rule of thumb that I use is that every 10x amount of
+
+297
+00:25:23.160 --> 00:25:27.380
+<v Christine Spang>product, there's some part of it you're probably going to have to just completely replace and
+
+298
+00:25:27.380 --> 00:25:34.020
+<v Christine Spang>rewrite. Constraints change. People might be using your product in a different way. There might be
+
+299
+00:25:34.020 --> 00:25:38.740
+<v Christine Spang>different components that become the bottlenecks. You know, for example, I think in the early days,
+
+300
+00:25:39.000 --> 00:25:47.100
+<v Christine Spang>Slack chose to scale their product by sharding or splitting up the traffic by team. And that
+
+301
+00:25:47.100 --> 00:25:50.720
+<v Christine Spang>worked great for a while, but eventually, you know, their business changed. They started
+
+302
+00:25:50.720 --> 00:25:56.900
+<v Christine Spang>selling to larger companies, more enterprise type businesses, which is a natural progression that
+
+303
+00:25:56.900 --> 00:26:02.360
+<v Christine Spang>often happens in SaaS businesses. But, you know, they ended up having teams that didn't fit on a
+
+304
+00:26:02.360 --> 00:26:08.000
+<v Christine Spang>single shard and the performance was really bad for them. But I don't think that Slack did it
+
+305
+00:26:08.000 --> 00:26:13.200
+<v Christine Spang>wrong to have chosen that particular pattern for, you know, where their product was in the early
+
+306
+00:26:13.200 --> 00:26:19.000
+<v Christine Spang>days versus trying to predict way into the future what things might look like. A certain architecture
+
+307
+00:26:20.720 --> 00:26:22.460
+<v Christine Spang>at least a couple of years, hopefully.
+
+308
+00:26:22.980 --> 00:26:24.900
+<v Christine Spang>I guess if you're growing really fast,
+
+309
+00:26:25.000 --> 00:26:26.880
+<v Christine Spang>you might just be in this constant treadmill
+
+310
+00:26:26.880 --> 00:26:29.220
+<v Christine Spang>of rewriting things all over the time.
+
+311
+00:26:29.420 --> 00:26:31.700
+<v Christine Spang>I'm sure my team today kind of feels like
+
+312
+00:26:31.700 --> 00:26:33.500
+<v Christine Spang>it's just endless migrations,
+
+313
+00:26:33.500 --> 00:26:36.620
+<v Christine Spang>replacing components and rewriting things.
+
+314
+00:26:37.000 --> 00:26:39.760
+<v Christine Spang>But yeah, I mean, we've been going through
+
+315
+00:26:39.760 --> 00:26:43.700
+<v Christine Spang>like a big platform transition over the past year or so,
+
+316
+00:26:43.840 --> 00:26:46.640
+<v Christine Spang>and we're still in the middle of upgrading
+
+317
+00:26:46.640 --> 00:26:48.260
+<v Christine Spang>a lot of the different systems.
+
+318
+00:26:48.720 --> 00:26:54.120
+<v Christine Spang>you have more resources to build things in different ways once you get a certain amount
+
+319
+00:26:54.120 --> 00:26:58.840
+<v Christine Spang>of traction and so I don't want to build something that's going to last you know five years or ten
+
+320
+00:26:58.840 --> 00:27:02.300
+<v Christine Spang>years at this company we don't we don't know what the company's going to need then we don't know
+
+321
+00:27:02.300 --> 00:27:05.300
+<v Christine Spang>what the customers are going to look like we don't know how they're going to be using the product
+
+322
+00:27:05.300 --> 00:27:11.420
+<v Christine Spang>in that amount of time our goal is to get us through the next five to ten x of of traffic
+
+323
+00:27:11.420 --> 00:27:16.220
+<v Christine Spang>scale that will just get us to the point where we can take a look at things again and see what's
+
+324
+00:27:16.220 --> 00:27:17.880
+<v Christine Spang>changed and what we have to do differently now.
+
+325
+00:27:18.440 --> 00:27:21.720
+<v Noah Labhart>So with the platform transformation you're going
+
+326
+00:27:21.720 --> 00:27:26.280
+<v Noah Labhart>through right now, what sort of architecture is it towards? Is it microservice? Is it mini
+
+327
+00:27:26.280 --> 00:27:31.160
+<v Noah Labhart>monoliths? Is it, you know, everybody's got their own flavor, right? But what do you choose?
+
+328
+00:27:31.680 --> 00:27:32.220
+<v Noah Labhart>So
+
+329
+00:27:32.220 --> 00:27:37.600
+<v Christine Spang>we started out building everything in Python and it started out kind of as a monolith,
+
+330
+00:27:37.660 --> 00:27:44.900
+<v Christine Spang>but eventually we wanted to have different services that were essentially scaled separately.
+
+331
+00:27:46.220 --> 00:27:51.560
+<v Christine Spang>Things kind of evolved towards what I've heard jokingly called a distributed monolith over time,
+
+332
+00:27:51.700 --> 00:27:57.200
+<v Christine Spang>which is all of the downsides of distributed systems, but you know sort of in the shape
+
+333
+00:27:57.200 --> 00:28:02.500
+<v Christine Spang>or pretending that it's still a monolith and that you know we have had the same code repo,
+
+334
+00:28:02.780 --> 00:28:08.560
+<v Christine Spang>we sort of had a lot of shared code between different services, but different services
+
+335
+00:28:08.560 --> 00:28:14.380
+<v Christine Spang>were talking to the same databases and things like that. A big part of this platform transition
+
+336
+00:28:16.220 --> 00:28:21.140
+<v Christine Spang>through and work on decoupling things into services that are more loosely coupled.
+
+337
+00:28:21.420 --> 00:28:26.840
+<v Christine Spang>You might call it a microservices architecture, and I think people have a lot of different
+
+338
+00:28:26.840 --> 00:28:32.660
+<v Christine Spang>opinions on what's the right size and scope of different services, but the main thing
+
+339
+00:28:32.660 --> 00:28:37.700
+<v Christine Spang>is how do you separate the interactions of the different services.
+
+340
+00:28:38.510 --> 00:28:43.360
+<v Christine Spang>We've also been moving from Python as our primary language to Golang.
+
+341
+00:28:43.360 --> 00:28:48.060
+<v Christine Spang>I don't think it was at all the wrong decision to start out using Python.
+
+342
+00:28:48.720 --> 00:28:55.160
+<v Christine Spang>We may have never have made it to this point in time if we hadn't been able to iterate quickly
+
+343
+00:28:55.160 --> 00:29:00.480
+<v Christine Spang>and really take advantage of Python's huge array of developer libraries
+
+344
+00:29:00.480 --> 00:29:06.600
+<v Christine Spang>and things you can just drop in to connect to different data types and APIs and things like that.
+
+345
+00:29:07.300 --> 00:29:13.240
+<v Christine Spang>You know, today we're operating at a scale where we just need a new level of performance.
+
+346
+00:29:13.620 --> 00:29:25.180
+<v Christine Spang>And we found that doing a ground up rewrite for some of our core components using Golang just really gave us a ton more performance and allowed us to make the product a lot cheaper.
+
+347
+00:29:26.740 --> 00:29:32.700
+<v Noah Labhart>Well, Christine, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+348
+00:29:32.700 --> 00:29:33.880
+<v Noah Labhart>I
+
+349
+00:29:33.880 --> 00:29:40.180
+<v Christine Spang>think that comes to mind most quickly is the team. The thing that makes the most difference
+
+350
+00:29:40.180 --> 00:29:45.220
+<v Christine Spang>over time if you're thinking about building companies that really make an impact on the
+
+351
+00:29:45.220 --> 00:29:52.380
+<v Christine Spang>world, you know, they have to have a sustained output and a sustained innovation over decades.
+
+352
+00:29:52.800 --> 00:29:59.160
+<v Christine Spang>And the foundation to that is really building a team and a culture that creates an environment
+
+353
+00:29:59.160 --> 00:30:04.380
+<v Christine Spang>where people can do their best work. I'm really proud of the fact that our
+
+354
+00:30:04.380 --> 00:30:10.520
+<v Christine Spang>executive team today is a mix of both people that we've brought in with really
+
+355
+00:30:10.520 --> 00:30:16.900
+<v Christine Spang>great extensive experience building products teams elsewhere but also
+
+356
+00:30:16.900 --> 00:30:23.020
+<v Christine Spang>long-term Nylas sort of OG folks who've been with the team for years at this
+
+357
+00:30:23.020 --> 00:30:27.420
+<v Christine Spang>point. In many cases you know they started as individual contributors on
+
+358
+00:30:29.280 --> 00:30:37.440
+<v Christine Spang>VPs running entire teams and parts of the company. That's the thing that motivates me to come to work
+
+359
+00:30:37.440 --> 00:30:44.200
+<v Christine Spang>every day, having that connection to people that are doing great work. And it's the thing that
+
+360
+00:30:44.200 --> 00:30:49.100
+<v Christine Spang>will enable us to keep building great products over the course of the years to come.
+
+361
+00:30:50.160 --> 00:30:50.800
+<v Christine Spang>I
+
+362
+00:30:50.800 --> 00:30:57.740
+<v Noah Labhart>hear most often that from builders, from founders, that they are most proud of the team,
+
+363
+00:30:59.160 --> 00:31:03.980
+<v Noah Labhart>most rewarding thing is the culture that they've built. And I just, I never get tired of hearing
+
+364
+00:31:03.980 --> 00:31:10.420
+<v Noah Labhart>it and relate to it personally. So let's flip the script a little bit. So tell me about a mistake
+
+365
+00:31:10.420 --> 00:31:13.100
+<v Noah Labhart>you made and how you and your team responded to it.
+
+366
+00:31:14.440 --> 00:31:16.840
+<v Christine Spang>A kind of interesting story I wanted to share
+
+367
+00:31:16.840 --> 00:31:26.040
+<v Christine Spang>is that the original name of this company was not Nylas. It was actually Inbox. Because
+
+368
+00:31:26.040 --> 00:31:31.340
+<v Christine Spang>because in the beginning we were building an API that helped people access mail data
+
+369
+00:31:31.340 --> 00:31:37.400
+<v Christine Spang>and we were also building an email client which didn't end up working well as a business
+
+370
+00:31:37.400 --> 00:31:43.580
+<v Christine Spang>and we eventually stopped working on, but we chose this name Inbox because it was very
+
+371
+00:31:43.580 --> 00:31:49.240
+<v Christine Spang>focused on this sort of email data access and accessing your mailbox and doing things
+
+372
+00:31:49.240 --> 00:31:49.740
+<v Christine Spang>with it.
+
+373
+00:31:49.740 --> 00:31:55.380
+<v Christine Spang>At a certain point in time, Google released a new mobile app that was an email client
+
+374
+00:31:56.040 --> 00:31:59.700
+<v Christine Spang>and so we had to change the name of the company.
+
+375
+00:32:00.120 --> 00:32:03.760
+<v Christine Spang>Luckily, this was only two years in or something like that,
+
+376
+00:32:03.880 --> 00:32:07.340
+<v Christine Spang>so we had to go through all of our code base
+
+377
+00:32:07.340 --> 00:32:09.840
+<v Christine Spang>and change the name everywhere, change the domain,
+
+378
+00:32:10.120 --> 00:32:12.900
+<v Christine Spang>and we implement an OAuth flow
+
+379
+00:32:12.900 --> 00:32:15.820
+<v Christine Spang>for folks that are connecting accounts to our platform
+
+380
+00:32:15.820 --> 00:32:18.360
+<v Christine Spang>to make their data available through the platform,
+
+381
+00:32:18.520 --> 00:32:21.400
+<v Christine Spang>and so it involves a series of redirects
+
+382
+00:32:21.400 --> 00:32:24.840
+<v Christine Spang>that kind of go between our site
+
+383
+00:32:26.040 --> 00:32:27.760
+<v Christine Spang>as well as someone's domain.
+
+384
+00:32:28.060 --> 00:32:30.480
+<v Christine Spang>And so they have to redirect to our URL
+
+385
+00:32:30.480 --> 00:32:31.900
+<v Christine Spang>and then we redirect back.
+
+386
+00:32:32.180 --> 00:32:35.980
+<v Christine Spang>And so we needed to make sure that the flow didn't break
+
+387
+00:32:35.980 --> 00:32:39.180
+<v Christine Spang>as we were moving to the new domain.
+
+388
+00:32:39.820 --> 00:32:42.780
+<v Christine Spang>We tested this all the first time around.
+
+389
+00:32:42.980 --> 00:32:45.520
+<v Christine Spang>And the first time we flipped the switch live,
+
+390
+00:32:45.740 --> 00:32:48.100
+<v Christine Spang>of course, we broke a bunch of different apps.
+
+391
+00:32:48.500 --> 00:32:52.840
+<v Christine Spang>We had to quickly go in there and patch that on the fly
+
+392
+00:32:52.840 --> 00:32:54.620
+<v Christine Spang>and work with these early customers
+
+393
+00:32:56.040 --> 00:32:57.400
+<v Christine Spang>their apps were working properly.
+
+394
+00:32:57.780 --> 00:33:01.580
+<v Christine Spang>Two months later, we found that people couldn't really pronounce
+
+395
+00:33:01.580 --> 00:33:05.880
+<v Christine Spang>the name of the company with the spelling that we had chosen for Nylas.
+
+396
+00:33:06.000 --> 00:33:08.020
+<v Christine Spang>It was actually Nilas with an I at first.
+
+397
+00:33:08.360 --> 00:33:12.820
+<v Christine Spang>And so we decided on the fly to change the spelling of Nylas
+
+398
+00:33:12.820 --> 00:33:14.600
+<v Christine Spang>to sub the I for Y.
+
+399
+00:33:14.920 --> 00:33:16.660
+<v Christine Spang>And so we had to do this whole thing over again.
+
+400
+00:33:17.100 --> 00:33:19.320
+<v Christine Spang>And I'm very proud to say that the second time around,
+
+401
+00:33:19.400 --> 00:33:20.240
+<v Christine Spang>we didn't break anything.
+
+402
+00:33:20.800 --> 00:33:25.360
+<v Christine Spang>The big lessons from this are, one, like, you're going to break things.
+
+403
+00:33:26.040 --> 00:33:32.620
+<v Christine Spang>You don't want your team to operate with a degree of fear of breaking things, especially early on in the days.
+
+404
+00:33:33.040 --> 00:33:36.400
+<v Christine Spang>You're working with people who are building software themselves.
+
+405
+00:33:36.480 --> 00:33:41.880
+<v Christine Spang>They know mistakes happen, and the important things are, one, do the right thing.
+
+406
+00:33:42.180 --> 00:33:44.700
+<v Christine Spang>Fix the problem as fast as you can.
+
+407
+00:33:44.880 --> 00:33:47.120
+<v Christine Spang>Get in front of customers who are having problems.
+
+408
+00:33:47.200 --> 00:33:54.840
+<v Christine Spang>Make sure that you're really responsive and are owning the mistake and the fix all the way through, and then learn from it.
+
+409
+00:33:56.040 --> 00:34:00.040
+<v Christine Spang>you know obviously you're not getting better over time and I really come back
+
+410
+00:34:00.040 --> 00:34:04.760
+<v Christine Spang>to thinking about that a lot in that you know companies can ossify over time if
+
+411
+00:34:04.760 --> 00:34:11.220
+<v Christine Spang>you overreact to making mistakes and sort of drive out any sort of risk
+
+412
+00:34:11.220 --> 00:34:16.480
+<v Christine Spang>taking and especially for engineering being able to take calculated risks to
+
+413
+00:34:16.480 --> 00:34:23.280
+<v Christine Spang>move quickly is is is oxygen to making change happen it's obviously a delicate
+
+414
+00:34:23.280 --> 00:34:27.780
+<v Christine Spang>delicate balance and the stakes grow larger as you have more people depending on the platform.
+
+415
+00:34:28.060 --> 00:34:33.940
+<v Christine Spang>And hopefully you also have more resources to implement better testing systems that allow you
+
+416
+00:34:33.940 --> 00:34:40.060
+<v Christine Spang>to keep moving fast. Just want to make sure that the team owns it, solves it, and learns from it.
+
+417
+00:34:40.200 --> 00:34:42.280
+<v Christine Spang>At the end of the day, those are the big things that matter.
+
+418
+00:34:44.020 --> 00:34:48.520
+<v Noah Labhart>So what does the future look like for Nylas, the product and for your team?
+
+419
+00:34:48.520 --> 00:35:06.020
+<v Christine Spang>I mean, at the highest level, what Nylas, the platform, enables is that we connect to data from different communication channels and we help people drive action from the information in those communications.
+
+420
+00:35:06.680 --> 00:35:10.600
+<v Christine Spang>People all over the world, everywhere, talk to each other to get things done.
+
+421
+00:35:10.600 --> 00:35:25.720
+<v Christine Spang>I really feel like we're just scratching the tip of the iceberg in terms of what kinds of channels that we can connect to and what kinds of actions that we can help drive from all of the insights in this communication data.
+
+422
+00:35:25.720 --> 00:35:33.640
+<v Christine Spang>data. A big trend that obviously we're really involved in is artificial intelligence and
+
+423
+00:35:33.640 --> 00:35:40.380
+<v Christine Spang>the ability to take unstructured text and both structure it, but also, I think in the
+
+424
+00:35:40.380 --> 00:35:45.940
+<v Christine Spang>future, the way that we're thinking about how do we drive value for people is we should
+
+425
+00:35:45.940 --> 00:35:49.880
+<v Christine Spang>be helping them build things that they're trying to build much more quickly than they
+
+426
+00:35:49.880 --> 00:35:54.920
+<v Christine Spang>could do it on their own. We have sort of a pyramid of needs. Like number
+
+427
+00:35:55.820 --> 00:36:01.640
+<v Christine Spang>connectivity to all these different channels and normalization across, you know, different email
+
+428
+00:36:01.640 --> 00:36:07.080
+<v Christine Spang>providers, different calendar providers, things like that. Nobody wants to have to go and read
+
+429
+00:36:07.080 --> 00:36:11.560
+<v Christine Spang>5,000 different manuals in order to get, you know, whatever they're trying to do done. So,
+
+430
+00:36:11.620 --> 00:36:17.260
+<v Christine Spang>you know, we take care of that and, you know, provide great documentation and guides for people
+
+431
+00:36:17.260 --> 00:36:24.200
+<v Christine Spang>to build what they're trying to build. A layer on top of that is pattern matching amongst what
+
+432
+00:36:25.720 --> 00:36:29.420
+<v Christine Spang>and thinking about what kinds of additional building blocks can we
+
+433
+00:36:29.420 --> 00:36:35.740
+<v Christine Spang>provide for them that help them get that done faster whether that's an API that
+
+434
+00:36:36.400 --> 00:36:40.500
+<v Christine Spang>abstracts away something that people are trying to do that makes it so that they
+
+435
+00:36:40.500 --> 00:36:44.320
+<v Christine Spang>only have to call one API versus calling you know five different ones in sequence
+
+436
+00:36:44.320 --> 00:36:48.900
+<v Christine Spang>sometimes that's front-end code that comes pre-integrated that they can
+
+437
+00:36:48.900 --> 00:36:54.240
+<v Christine Spang>customize and drop into their app maybe that's simple code dedicated to getting
+
+438
+00:36:55.720 --> 00:37:01.600
+<v Christine Spang>use cases that a lot of people are trying to build that would just help to have a scaffold
+
+439
+00:37:01.600 --> 00:37:02.620
+<v Christine Spang>to build off of.
+
+440
+00:37:02.680 --> 00:37:07.420
+<v Christine Spang>It's so much easier to take something and edit it than to start from the ground up and
+
+441
+00:37:07.420 --> 00:37:11.880
+<v Christine Spang>have to have a blank page and put the first words on it.
+
+442
+00:37:12.220 --> 00:37:18.120
+<v Christine Spang>Those are kind of things that are happening today, as well as kind of data abstractions,
+
+443
+00:37:18.120 --> 00:37:25.280
+<v Christine Spang>things like advanced filtering to help people drill down into what communication data is
+
+444
+00:37:25.720 --> 00:37:32.820
+<v Christine Spang>to them. That's also code that people have to write on their end if they don't have a platform
+
+445
+00:37:32.820 --> 00:37:38.080
+<v Christine Spang>like Nylas. And it can be quite complicated. There can be a lot of infrastructure for doing
+
+446
+00:37:38.080 --> 00:37:43.840
+<v Christine Spang>that, especially in real time. So there's like these data abstractions and building blocks as
+
+447
+00:37:43.840 --> 00:37:50.600
+<v Christine Spang>well. The far future, I think we're going to see a lot more innovation in how people write code that
+
+448
+00:37:50.600 --> 00:37:57.040
+<v Christine Spang>will also apply to Nylas. Like imagine in the future, you know, someone can write in
+
+449
+00:37:57.040 --> 00:38:01.460
+<v Christine Spang>prose a description of what they're trying to do and we can provide tools
+
+450
+00:38:01.460 --> 00:38:04.720
+<v Christine Spang>that will just generate, you know, the code for the workflow that they're
+
+451
+00:38:04.720 --> 00:38:11.020
+<v Christine Spang>trying to automate. You know, there's also kind of the UI based low code, no code
+
+452
+00:38:11.020 --> 00:38:16.120
+<v Christine Spang>type things where, you know, people provide tools that allow you to drag and
+
+453
+00:38:16.120 --> 00:38:21.380
+<v Christine Spang>drop and sort of visually define the business logic for whatever you're trying to do.
+
+454
+00:38:21.560 --> 00:38:29.320
+<v Christine Spang>And I think the broad overall trend in the industry is that as software is powering more
+
+455
+00:38:29.320 --> 00:38:35.380
+<v Christine Spang>and more different things, more and more people need to be enabled with the leverage and empowerment
+
+456
+00:38:35.380 --> 00:38:36.600
+<v Christine Spang>that software provides.
+
+457
+00:38:36.820 --> 00:38:43.100
+<v Christine Spang>And they need to be able to do that with both less specialized training, but also even the
+
+458
+00:38:43.100 --> 00:38:48.200
+<v Christine Spang>The people that write code every day for a living can become more effective by having
+
+459
+00:38:48.200 --> 00:38:50.800
+<v Christine Spang>tools that reduce the amount of work that they have to do.
+
+460
+00:38:51.300 --> 00:38:58.200
+<v Christine Spang>We see this already today with the engineer who uses GitHub Copilot to write a third of
+
+461
+00:38:58.200 --> 00:39:04.040
+<v Christine Spang>the code that they need to write for work and just uses that as a jumping off point.
+
+462
+00:39:04.500 --> 00:39:09.100
+<v Christine Spang>We're going to see an order of magnitude in terms of the development of that kind of stuff
+
+463
+00:39:09.100 --> 00:39:12.300
+<v Christine Spang>as we go through the next five years and beyond.
+
+464
+00:39:13.420 --> 00:39:14.620
+<v Noah Labhart>Well, let's switch to you, Christine.
+
+465
+00:39:15.200 --> 00:39:17.400
+<v Noah Labhart>Who influences the way that you work?
+
+466
+00:39:17.600 --> 00:39:19.320
+<v Noah Labhart>Name a person that you look up to and why.
+
+467
+00:39:20.140 --> 00:39:22.740
+<v Christine Spang>A lot of people talk about famous people
+
+468
+00:39:22.740 --> 00:39:23.900
+<v Christine Spang>in these kinds of questions,
+
+469
+00:39:24.080 --> 00:39:26.820
+<v Christine Spang>but all I can think of is people
+
+470
+00:39:27.300 --> 00:39:29.940
+<v Christine Spang>that I have direct relationships with
+
+471
+00:39:29.940 --> 00:39:33.920
+<v Christine Spang>that have had huge positive impacts on me
+
+472
+00:39:33.920 --> 00:39:37.620
+<v Christine Spang>and that I learn from on a regular basis.
+
+473
+00:39:39.100 --> 00:39:42.960
+<v Christine Spang>like my co-founder, Webb, is a huge influence.
+
+474
+00:39:43.440 --> 00:39:46.360
+<v Christine Spang>We're very sort of very different people,
+
+475
+00:39:46.500 --> 00:39:48.080
+<v Christine Spang>very complementary in a lot of ways.
+
+476
+00:39:48.380 --> 00:39:52.820
+<v Christine Spang>He's a sales CEO and I'm a technical co-founder.
+
+477
+00:39:53.000 --> 00:39:56.560
+<v Christine Spang>And, you know, we've raised a number of rounds
+
+478
+00:39:56.560 --> 00:39:57.960
+<v Christine Spang>of funding together at this point.
+
+479
+00:39:58.020 --> 00:40:03.000
+<v Christine Spang>And I first learned the concept of a talk track from him.
+
+480
+00:40:03.180 --> 00:40:04.820
+<v Christine Spang>So you like try to iterate on it
+
+481
+00:40:04.820 --> 00:40:07.480
+<v Christine Spang>and measure sort of, you know,
+
+482
+00:40:09.100 --> 00:40:14.280
+<v Christine Spang>what's engaging and what's not. This sounds maybe really silly but
+
+483
+00:40:14.280 --> 00:40:20.100
+<v Christine Spang>I was a huge nerd growing up. I went to MIT, not known for people with
+
+484
+00:40:20.100 --> 00:40:26.200
+<v Christine Spang>amazing people skills. Being able to see this live and just learn by
+
+485
+00:40:26.200 --> 00:40:31.060
+<v Christine Spang>example has been really meaningful for me. Relationships are one of the
+
+486
+00:40:31.060 --> 00:40:37.040
+<v Christine Spang>biggest drivers of human behavior and so having a relationship that's supportive
+
+487
+00:40:37.040 --> 00:40:44.140
+<v Christine Spang>both ways that we're both learning from each other is something that's hugely important for me.
+
+488
+00:40:44.640 --> 00:40:49.320
+<v Christine Spang>I've also had a lot of coaches throughout the years of building this business.
+
+489
+00:40:50.080 --> 00:40:56.820
+<v Christine Spang>I think this is something that is underutilized when it comes to doing stuff that's really hard.
+
+490
+00:40:57.620 --> 00:40:59.060
+<v Christine Spang>Entrepreneurship is really hard.
+
+491
+00:40:59.260 --> 00:41:06.580
+<v Christine Spang>If you think about professional athletes, every player out on the field has a coach,
+
+492
+00:41:07.040 --> 00:41:12.360
+<v Christine Spang>have personal trainers, maybe they have nutritionist support, all these people that are going behind
+
+493
+00:41:12.360 --> 00:41:14.960
+<v Christine Spang>the scenes that are helping make that person successful.
+
+494
+00:41:15.340 --> 00:41:20.680
+<v Christine Spang>The same thing is true if you're in a high pressure role where you need to grow really
+
+495
+00:41:20.680 --> 00:41:23.780
+<v Christine Spang>quickly, having professional support can be super helpful.
+
+496
+00:41:24.060 --> 00:41:29.220
+<v Christine Spang>So I've had, I think, three different management and executive coaches at this point.
+
+497
+00:41:29.360 --> 00:41:36.720
+<v Christine Spang>They've all been like hugely influential on learning more about myself and using that
+
+498
+00:41:37.040 --> 00:41:43.140
+<v Christine Spang>to like be more effective in my role because you need self-awareness. You need to know what
+
+499
+00:41:43.140 --> 00:41:48.140
+<v Christine Spang>energizes you, what doesn't, you know, how to show up your best. You know, there's a lot of
+
+500
+00:41:48.140 --> 00:41:55.120
+<v Christine Spang>skills around bringing so many people together to accomplish a bigger goal that are really tough.
+
+501
+00:41:55.340 --> 00:42:01.460
+<v Christine Spang>You know, you see all sorts of wild human behavior when you're in a position of leadership
+
+502
+00:42:01.460 --> 00:42:05.840
+<v Christine Spang>in a fast-growing organization, and it's very confusing at times
+
+503
+00:42:05.840 --> 00:42:08.000
+<v Christine Spang>if you've never been in that situation before.
+
+504
+00:42:08.340 --> 00:42:12.020
+<v Christine Spang>And so I think it's really important to have that support network
+
+505
+00:42:12.020 --> 00:42:15.800
+<v Christine Spang>and trusted folks that, you know, maybe it's coaches.
+
+506
+00:42:15.820 --> 00:42:19.640
+<v Christine Spang>There's also a lot of advisors that you've had at the company
+
+507
+00:42:19.640 --> 00:42:24.460
+<v Christine Spang>that can give perspective and help you figure out the right thing to do.
+
+508
+00:42:25.200 --> 00:42:29.080
+<v Noah Labhart>We talked about a mistake earlier, but a little bit different spin.
+
+509
+00:42:29.080 --> 00:42:33.340
+<v Noah Labhart>in? Maybe if you could go back to the beginning, what would you do differently? Or where would you
+
+510
+00:42:33.340 --> 00:42:34.720
+<v Noah Labhart>consider taking a different approach?
+
+511
+00:42:36.320 --> 00:42:39.700
+<v Christine Spang>We're almost in year nine of Nylas when I got this started.
+
+512
+00:42:40.420 --> 00:42:45.240
+<v Christine Spang>And I can say that if I were starting this company today, I would definitely do a lot of things
+
+513
+00:42:45.240 --> 00:42:53.380
+<v Christine Spang>really differently. I have a much larger network today than I did back then. We probably spent the
+
+514
+00:42:53.380 --> 00:42:58.560
+<v Christine Spang>first four years of the company in this kind of and there's a phase of starting
+
+515
+00:42:58.560 --> 00:43:02.000
+<v Christine Spang>a company where you haven't found product market fit yet and it's kind of
+
+516
+00:43:02.000 --> 00:43:06.800
+<v Christine Spang>like like a random walk of experiments where you know you don't really know
+
+517
+00:43:06.800 --> 00:43:10.120
+<v Christine Spang>what's working and what's not working and you just have to try a lot of things
+
+518
+00:43:10.120 --> 00:43:15.240
+<v Christine Spang>and try to figure out what's what resonates I think we did a really good
+
+519
+00:43:15.240 --> 00:43:24.640
+<v Christine Spang>good job at scaling back and scaling down the basics of how do we get feedback as fast as
+
+520
+00:43:24.640 --> 00:43:29.800
+<v Christine Spang>possible on whether this idea is good. We're trying to validate without having a full-fledged
+
+521
+00:43:29.800 --> 00:43:34.420
+<v Christine Spang>product by engaging with the developer community, doing press, things like that.
+
+522
+00:43:34.900 --> 00:43:42.220
+<v Christine Spang>And we did a good job at bringing folks in to help them build on the early product.
+
+523
+00:43:42.220 --> 00:43:51.260
+<v Christine Spang>But I do think that like we sort of got stuck in this position of chasing something that really wasn't working for a long time.
+
+524
+00:43:51.380 --> 00:44:00.240
+<v Christine Spang>And definitely if I had to do it again, I have a much better sense now as to like how to take a step back and gauge like, is this working?
+
+525
+00:44:00.320 --> 00:44:06.000
+<v Christine Spang>Is this not working? Like, when should we when should we bring in management help?
+
+526
+00:44:06.000 --> 00:44:10.220
+<v Christine Spang>What are the things that I'm good at and what are the things that I'm not good at
+
+527
+00:44:10.220 --> 00:44:16.740
+<v Christine Spang>that I should just hire someone to do instead? Like for example I found that I
+
+528
+00:44:16.740 --> 00:44:21.840
+<v Christine Spang>really don't thrive managing a really large team. I'm totally fine and cool
+
+529
+00:44:21.840 --> 00:44:27.380
+<v Christine Spang>managing a small team like you know maybe up to like half a dozen folks. Just
+
+530
+00:44:27.380 --> 00:44:32.640
+<v Christine Spang>the way that my brain works is like I like to have a small group of people
+
+531
+00:44:32.640 --> 00:44:37.740
+<v Christine Spang>that I interact with a lot, but it's very challenging for me to work with just a
+
+532
+00:44:37.740 --> 00:44:43.240
+<v Christine Spang>huge amount of people on an everyday basis. So engaging, like going out and
+
+533
+00:44:43.240 --> 00:44:47.940
+<v Christine Spang>finding complementary people earlier on to, you know, people that are really
+
+534
+00:44:47.940 --> 00:44:54.580
+<v Christine Spang>excited about doing those things that are not my skill set or my strength. It's
+
+535
+00:44:54.580 --> 00:44:58.040
+<v Christine Spang>definitely something that I would do differently if I were doing this again.
+
+536
+00:45:00.060 --> 00:45:01.400
+<v Noah Labhart>So last question, Christine.
+
+537
+00:45:01.840 --> 00:45:03.160
+<v Noah Labhart>So you're getting on a plane.
+
+538
+00:45:03.240 --> 00:45:06.600
+<v Noah Labhart>You're sitting next to a young entrepreneur who's built the next big thing.
+
+539
+00:45:06.720 --> 00:45:08.880
+<v Noah Labhart>Maybe they're another 24-year-old just like you,
+
+540
+00:45:08.960 --> 00:45:13.060
+<v Noah Labhart>and they can't wait to show you what they've built right there on the plane.
+
+541
+00:45:13.340 --> 00:45:16.400
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+542
+00:45:18.020 --> 00:45:19.460
+<v Christine Spang>Showing up is half the battle.
+
+543
+00:45:19.580 --> 00:45:24.440
+<v Christine Spang>If you just refuse to quit, you're eventually going to figure out something that works.
+
+544
+00:45:24.680 --> 00:45:25.980
+<v Christine Spang>But you have to keep trying.
+
+545
+00:45:26.880 --> 00:45:27.780
+<v Noah Labhart>That's great advice.
+
+546
+00:45:28.040 --> 00:45:28.540
+<v Noah Labhart>I love it.
+
+547
+00:45:28.460 --> 00:45:29.340
+<v Noah Labhart>Direct and solid.
+
+548
+00:45:29.520 --> 00:45:31.700
+<v Noah Labhart>Well, Christine, thank you for being on the show today.
+
+549
+00:45:31.800 --> 00:45:34.420
+<v Noah Labhart>And thank you for telling the creation story of Nylas.
+
+550
+00:45:34.540 --> 00:45:35.100
+<v Christine Spang>Thank you.
+
+551
+00:45:35.360 --> 00:45:36.500
+<v Christine Spang>It's been great to be here.
+
+552
+00:45:37.740 --> 00:45:38.240
+<v Christine Spang>And
+
+553
+00:45:38.180 --> 00:45:40.600
+<v Noah Labhart>this concludes another chapter of Code Story.
+
+554
+00:45:44.060 --> 00:45:47.020
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+555
+00:45:47.200 --> 00:45:51.940
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+556
+00:45:52.420 --> 00:45:57.420
+<v Noah Labhart>Support the show on Patreon.com slash Code Story for just five to ten bucks a month.
+
+557
+00:45:58.040 --> 00:46:00.000
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+558
+00:46:00.240 --> 00:46:02.320
+<v Noah Labhart>Both things help us out tremendously.
+
+559
+00:46:04.580 --> 00:46:06.120
+<v Noah Labhart>And thanks again for listening.

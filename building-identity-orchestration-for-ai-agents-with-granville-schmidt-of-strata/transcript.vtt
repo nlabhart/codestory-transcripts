@@ -1,0 +1,1127 @@
+WEBVTT
+
+NOTE Building Identity Orchestration for AI Agents with Granville Schmidt of Strata
+
+1
+00:00:00.000 --> 00:00:29.720
+<v Noah Labhart>Hello, listeners. We are bringing you a special episode as our friends at Strata return to the podcast. You might remember our interview from season eight with Eric Olden, co-founder and CEO of the company. Eric took us through the creation story. But today, we'll be talking with Granville Schmidt, chief architect at Strata, who's been instrumental in architecting and building identity orchestration for AI agents from the ground up. In our chat, we're going to be discussing how the enterprises need to take advantage of
+
+2
+00:00:30.000 --> 00:00:35.580
+<v Noah Labhart>identity for agents and can do so seamlessly no matter their level of tech debt, disconnection,
+
+3
+00:00:35.580 --> 00:00:41.060
+<v Noah Labhart>or complex migration path. Granville, thank you for being on the show today. Thanks for being on
+
+4
+00:00:41.060 --> 00:00:41.560
+<v Noah Labhart>Code Story.
+
+5
+00:00:41.700 --> 00:00:43.560
+<v Granville Schmidt>Thank you so much. Super excited to be here.
+
+6
+00:00:43.920 --> 00:00:46.520
+<v Noah Labhart>Before we jump into all the things with
+
+7
+00:00:46.520 --> 00:00:51.320
+<v Noah Labhart>identity orchestration and all the things you've been architecting and working on, tell me in my
+
+8
+00:00:51.320 --> 00:00:54.420
+<v Noah Labhart>audience a little bit about you. Tell me about who you are.
+
+9
+00:00:54.520 --> 00:00:57.560
+<v Granville Schmidt>So I am the chief architect at Strata
+
+10
+00:00:57.560 --> 00:01:03.120
+<v Granville Schmidt>Identity, where I focus on building the future of identity and access management for humans and
+
+11
+00:01:03.120 --> 00:01:09.320
+<v Granville Schmidt>AI agents. Prior to Strata, I served in the office of the CTO at F5, and I was also the chair of
+
+12
+00:01:09.320 --> 00:01:15.480
+<v Granville Schmidt>JavaScript Security Task Group. Before that, I also served as a founding CTO at Seamless AI,
+
+13
+00:01:15.840 --> 00:01:20.860
+<v Granville Schmidt>and also was an early engineer at many other startups in the healthcare space and the
+
+14
+00:01:20.860 --> 00:01:27.040
+<v Granville Schmidt>telephony space. I also like to build robots, do extreme sports, and have a lot of fun.
+
+15
+00:01:27.980 --> 00:01:35.320
+<v Granville Schmidt>I love skydiving. I love snowboarding and I enjoy mountain biking, but I'm not very good. In fact,
+
+16
+00:01:35.320 --> 00:01:37.660
+<v Granville Schmidt>I'm not very good at any of the above, but. But
+
+17
+00:01:37.660 --> 00:01:39.340
+<v Noah Labhart>you enjoy it is the main thing. I don't
+
+18
+00:01:39.340 --> 00:01:43.480
+<v Noah Labhart>think anybody can be good at skydiving. I guess you can, probably takes a lot,
+
+19
+00:01:43.520 --> 00:01:45.160
+<v Noah Labhart>but it's a lot of falling, right?
+
+20
+00:01:45.580 --> 00:01:47.360
+<v Granville Schmidt>Yes. It's a lot of falling. Luckily,
+
+21
+00:01:47.460 --> 00:01:49.180
+<v Granville Schmidt>I'm good enough, right? Because I'm here.
+
+22
+00:01:49.860 --> 00:01:51.720
+<v Noah Labhart>That's right. That's right. I appreciate the
+
+23
+00:01:51.720 --> 00:01:55.740
+<v Noah Labhart>overview. It gives me kind of an idea of who I'm talking to. Let's dive into the meat of it then.
+
+24
+00:01:57.560 --> 00:02:01.040
+<v Noah Labhart>around obviously digging right into identity orchestration.
+
+25
+00:02:01.220 --> 00:02:03.880
+<v Noah Labhart>And I'd like to break that down for the audience a bit.
+
+26
+00:02:03.960 --> 00:02:09.820
+<v Noah Labhart>Can you explain what it is and walk us through maybe a real customer scenario where it made
+
+27
+00:02:09.820 --> 00:02:10.600
+<v Noah Labhart>a huge difference?
+
+28
+00:02:10.920 --> 00:02:15.960
+<v Granville Schmidt>I like to think about identity orchestration like being a universal translator at, say,
+
+29
+00:02:15.960 --> 00:02:18.240
+<v Granville Schmidt>the United Nations, but for identity systems.
+
+30
+00:02:18.600 --> 00:02:22.340
+<v Granville Schmidt>Imagine that every application speaks a different language.
+
+31
+00:02:22.600 --> 00:02:25.960
+<v Granville Schmidt>Some only understand SAML 2.0 from 2005.
+
+32
+00:02:27.560 --> 00:02:33.340
+<v Granville Schmidt>want modern OAuth or OIDC, and legacy apps might only recognize headers from the stone age of
+
+33
+00:02:33.340 --> 00:02:40.680
+<v Granville Schmidt>computing. Let me give you a real example. So we have a major enterprise that has hundreds of
+
+34
+00:02:40.680 --> 00:02:46.740
+<v Granville Schmidt>applications, everything from point-of-sale systems to supply chain management. They wanted to move
+
+35
+00:02:46.740 --> 00:02:51.600
+<v Granville Schmidt>from an on-prem identity system to the cloud, but they were quoted from their internal team
+
+36
+00:02:52.160 --> 00:02:57.900
+<v Granville Schmidt>millions of dollars and many years to rewrite their apps. That's a long time. And so with
+
+37
+00:02:57.900 --> 00:03:02.880
+<v Granville Schmidt>identity orchestration, we essentially created like an identity Babelfish. Have you ever seen
+
+38
+00:03:02.880 --> 00:03:05.120
+<v Granville Schmidt>Hitchhiker's Guide to the Galaxy or read it? I know
+
+39
+00:03:05.120 --> 00:03:07.360
+<v Noah Labhart>pieces of it. I haven't seen it officially.
+
+40
+00:03:07.460 --> 00:03:10.560
+<v Noah Labhart>I need to read the book first, but I'm aware of the story.
+
+41
+00:03:10.740 --> 00:03:11.240
+<v Noah Labhart>All right.
+
+42
+00:03:11.040 --> 00:03:15.940
+<v Granville Schmidt>So the Babelfish is like this fish that you put in your ear and it essentially
+
+43
+00:03:15.940 --> 00:03:21.000
+<v Granville Schmidt>essentially translates languages real time, right? And we essentially created the Babelfish
+
+44
+00:03:21.000 --> 00:03:26.900
+<v Granville Schmidt>for identity that sits between apps and the identity provider. So the apps continue to
+
+45
+00:03:26.900 --> 00:03:30.560
+<v Granville Schmidt>speak their old language, but we translate everything in real time. Super
+
+46
+00:03:30.560 --> 00:03:31.240
+<v Noah Labhart>cool. So if
+
+47
+00:03:31.240 --> 00:03:36.620
+<v Noah Labhart>we're taking the Babelfish example, it's like a translation layer in between, I guess, between
+
+48
+00:03:36.620 --> 00:03:40.580
+<v Noah Labhart>the agents and then whatever is calling the agents. Yeah, yeah,
+
+49
+00:03:40.640 --> 00:03:42.400
+<v Granville Schmidt>that's exactly it. One of the other
+
+50
+00:03:42.400 --> 00:03:48.040
+<v Granville Schmidt>interesting things here is in the identity ecosystem, sometimes you have very simple
+
+51
+00:03:48.040 --> 00:03:53.280
+<v Granville Schmidt>login flows, right? You might put in your email, your password, and then oftentimes you'll have
+
+52
+00:03:53.280 --> 00:03:59.920
+<v Granville Schmidt>MFA. And for some more complex or very sensitive systems and different types of environments,
+
+53
+00:04:00.200 --> 00:04:06.340
+<v Granville Schmidt>not only do you have MFA, maybe you need to have a liveness check, right? Verify that you
+
+54
+00:04:06.340 --> 00:04:10.560
+<v Granville Schmidt>You are human and you are who you say you are in addition to the MFA.
+
+55
+00:04:10.940 --> 00:04:15.800
+<v Granville Schmidt>And if you imagine having hundreds or thousands of applications like most of our customers
+
+56
+00:04:15.800 --> 00:04:20.140
+<v Granville Schmidt>do, imagine having to rewrite those flows for each one of those applications.
+
+57
+00:04:20.600 --> 00:04:21.720
+<v Granville Schmidt>It's a large pain.
+
+58
+00:04:21.880 --> 00:04:27.040
+<v Granville Schmidt>So we're able to sit in between, do that identity translation so the app's code doesn't
+
+59
+00:04:27.040 --> 00:04:27.700
+<v Granville Schmidt>have to change.
+
+60
+00:04:27.840 --> 00:04:32.780
+<v Granville Schmidt>And then we can also bring in all of those unique personalized flows anywhere you need
+
+61
+00:04:32.780 --> 00:04:33.280
+<v Granville Schmidt>them.
+
+62
+00:04:32.960 --> 00:04:55.980
+<v Noah Labhart>So this makes total sense to me. And obviously, a big problem that you're solving there, and it leads into my next question, with enterprises and their technical debt, specifically around identity, right? They've accumulated a lot, and enterprises have no shortage of technical debt, period, for the most part. But around identity in particular, what are the main problems that identity orchestration solves for these companies trying to modernize?
+
+63
+00:04:55.980 --> 00:05:03.420
+<v Noah Labhart>And I think I could probably, as an engineer, could extract from how you describe the universal translator from the prior question.
+
+64
+00:05:03.520 --> 00:05:07.080
+<v Noah Labhart>But I'm curious about specifically the problems that it's solving.
+
+65
+00:05:07.340 --> 00:05:14.540
+<v Granville Schmidt>Just like how there's the four horsemen of the apocalypse, I like to think that there's the three horsemen of identity tech debt.
+
+66
+00:05:14.680 --> 00:05:20.680
+<v Granville Schmidt>You have vendor lock-in, you have what we call the rewrite trap, and identity spaghetti.
+
+67
+00:05:21.040 --> 00:05:24.940
+<v Granville Schmidt>So for vendor lock-in, imagine you picked a vendor in 2010.
+
+68
+00:05:25.980 --> 00:05:30.760
+<v Granville Schmidt>And you have 500 applications at your organization that are hard-coded to work with them.
+
+69
+00:05:31.020 --> 00:05:34.300
+<v Granville Schmidt>Now, vendor A triples their prices or they get breached.
+
+70
+00:05:34.400 --> 00:05:35.800
+<v Granville Schmidt>You're now stuck, right?
+
+71
+00:05:36.080 --> 00:05:41.600
+<v Granville Schmidt>And so with identity orchestration, what we can do is we can make all of your apps vendor agnostic.
+
+72
+00:05:41.680 --> 00:05:49.180
+<v Granville Schmidt>So it allows you to be able to move those applications selectively or all at once to a different identity provider of your choice.
+
+73
+00:05:49.560 --> 00:05:52.300
+<v Granville Schmidt>And then second, you have the rewrite trap.
+
+74
+00:05:52.300 --> 00:05:58.380
+<v Granville Schmidt>companies have applications where say the last developer who understood the code may have retired
+
+75
+00:05:58.380 --> 00:06:05.260
+<v Granville Schmidt>in 2015. Now imagine an organization that has a critical trading app where touching the authentication
+
+76
+00:06:05.260 --> 00:06:10.880
+<v Granville Schmidt>code could cost millions of dollars in downtime. What we can do is we're able to wrap that
+
+77
+00:06:10.880 --> 00:06:17.940
+<v Granville Schmidt>application and wrap that identity layer and be able to swish it over without downtime. And then
+
+78
+00:06:17.940 --> 00:06:25.760
+<v Granville Schmidt>Then on like identity spaghetti, this is a real big pain point is organizations have a lot of apps,
+
+79
+00:06:25.880 --> 00:06:30.500
+<v Granville Schmidt>right? Some have thousands of applications and they may have been developed by different teams
+
+80
+00:06:30.500 --> 00:06:35.180
+<v Granville Schmidt>and they might all have their own way of doing authentication. Oftentimes you have applications
+
+81
+00:06:35.180 --> 00:06:41.320
+<v Granville Schmidt>that are like spun up quickly where say people store the credentials in a database. Other ones
+
+82
+00:06:41.320 --> 00:06:45.540
+<v Granville Schmidt>Ones might have people's credentials live in, say, Active Directory.
+
+83
+00:06:45.740 --> 00:06:50.600
+<v Granville Schmidt>And in other cases, you might have some ones that are a little bit more modern and using
+
+84
+00:06:50.600 --> 00:06:54.120
+<v Granville Schmidt>a cloud IDP like Okta or Auth0.
+
+85
+00:06:54.400 --> 00:07:00.280
+<v Granville Schmidt>And what's interesting here is that in all of those cases, the flows are radically different,
+
+86
+00:07:00.420 --> 00:07:00.920
+<v Granville Schmidt>right?
+
+87
+00:07:00.840 --> 00:07:04.740
+<v Granville Schmidt>You have some that have email and password, others that require a PIN, and you might even
+
+88
+00:07:04.740 --> 00:07:09.660
+<v Granville Schmidt>have some archaic things from 1999 that ask weird security questions, right?
+
+89
+00:07:11.320 --> 00:07:19.660
+<v Granville Schmidt>you can standardize all of those with SSO and be able to build out all of those more complex identity flows to achieve certain types of compliance.
+
+90
+00:07:19.880 --> 00:07:21.880
+<v Granville Schmidt>Again, without changing any of those apps.
+
+91
+00:07:22.100 --> 00:07:24.760
+<v Noah Labhart>That makes total sense. And it is a huge pain relief there.
+
+92
+00:07:24.840 --> 00:07:30.240
+<v Noah Labhart>As you're even describing those three horsemen there with vendor lock and rewrite trap and identity spaghetti,
+
+93
+00:07:30.600 --> 00:07:34.900
+<v Noah Labhart>like I can start sweating thinking about all three of those things as a CTO myself.
+
+94
+00:07:34.900 --> 00:07:40.840
+<v Noah Labhart>myself, but being able to deploy a platform that eases all three of those with identity orchestration,
+
+95
+00:07:40.980 --> 00:07:46.440
+<v Noah Labhart>it prevents a lot of pain there or removes a lot of pain. As we were emailing back and forth before,
+
+96
+00:07:46.620 --> 00:07:52.200
+<v Noah Labhart>you mentioned working with customers around DDIL environments, disconnected, disrupted,
+
+97
+00:07:52.660 --> 00:07:58.220
+<v Noah Labhart>intermittent, and limited bandwidth scenarios. And I also noticed that was really smart to call
+
+98
+00:07:58.220 --> 00:08:04.600
+<v Noah Labhart>that DDIL or DDIL because that's a mouthful. So can you help us understand, help me in the audience
+
+99
+00:08:04.900 --> 00:08:11.040
+<v Noah Labhart>in what these environments look like in practice and why identity becomes such a critical challenge
+
+100
+00:08:11.040 --> 00:08:15.820
+<v Noah Labhart>specifically in these. And again, like the prior questions, I think I could cherry pick,
+
+101
+00:08:15.960 --> 00:08:20.880
+<v Noah Labhart>but I'm really interested to hear where this term came from and what these environments look like.
+
+102
+00:08:21.100 --> 00:08:26.960
+<v Granville Schmidt>So DDIL sounds super technical, but imagine trying to keep a grocery store's, say, payment
+
+103
+00:08:26.960 --> 00:08:31.780
+<v Granville Schmidt>systems and registers running during a hurricane when the power grid is failing and internet
+
+104
+00:08:31.780 --> 00:08:38.380
+<v Granville Schmidt>connectivity is spotty at best. So imagine that a lot of these retail stores, they might be
+
+105
+00:08:38.380 --> 00:08:43.680
+<v Granville Schmidt>classified in a way that they need to stay open or they need to try to stay open so that residents
+
+106
+00:08:43.680 --> 00:08:50.540
+<v Granville Schmidt>can get critical supplies like water, food, medicine, batteries. But a lot of these stores
+
+107
+00:08:50.540 --> 00:08:57.300
+<v Granville Schmidt>may rely on cloud-based authentication and authorization. So what happens when the internet
+
+108
+00:08:57.300 --> 00:09:03.400
+<v Granville Schmidt>that goes down and people need to desperately get supplies, right? So you have your employees
+
+109
+00:09:03.400 --> 00:09:08.500
+<v Granville Schmidt>that need to be able to log into the registers, or you have these other systems that need to be
+
+110
+00:09:08.500 --> 00:09:14.700
+<v Granville Schmidt>able to authenticate certain types of requests. And we architected a platform that allows those
+
+111
+00:09:14.700 --> 00:09:20.060
+<v Granville Schmidt>systems to operate in fully disconnected mode from the authentication and authorization perspective.
+
+112
+00:09:20.060 --> 00:09:35.080
+<v Granville Schmidt>So when, say, a Category 5 hurricane hits, a retail chain can keep those stores operational and still allowing those cashiers to log in, process transactions, and most importantly, serve their community when it really matters the most.
+
+113
+00:09:35.080 --> 00:09:49.160
+<v Granville Schmidt>And another really interesting part about this, I can't really go too far into details, but you can imagine that the same capability is super critical for the defense industry, right? Where networks might get compromised or intentionally isolated.
+
+114
+00:09:49.160 --> 00:09:55.020
+<v Granville Schmidt>isolated. But yeah, so you can see there's a lot of interesting use cases for this, like ships
+
+115
+00:09:55.020 --> 00:10:01.440
+<v Granville Schmidt>leaving the harbor, but still need to be able to access certain systems and still be able to have
+
+116
+00:10:01.440 --> 00:10:06.720
+<v Granville Schmidt>the right traceability and auditability of those transactions. And so it's a really interesting
+
+117
+00:10:06.720 --> 00:10:12.120
+<v Granville Schmidt>opportunity where identity orchestration is uniquely positioned to solve those problems.
+
+118
+00:10:12.380 --> 00:10:16.540
+<v Noah Labhart>That's really interesting. And I'm picturing when you talk about defense and you talk about
+
+119
+00:10:16.540 --> 00:10:22.400
+<v Noah Labhart>about disconnected systems and picturing more of a kind of an embedded type of identity orchestration
+
+120
+00:10:22.400 --> 00:10:28.780
+<v Noah Labhart>or some sort of way to do that there. And I imagine that that's a complex problem to have to tackle.
+
+121
+00:10:28.900 --> 00:10:34.240
+<v Noah Labhart>It sounds like you guys are tackling it well. Does this apply to, say, like maybe a manufacturing
+
+122
+00:10:34.240 --> 00:10:41.020
+<v Noah Labhart>plant that's maybe in a more rural area with bad signal or maybe an offline type of plant?
+
+123
+00:10:41.100 --> 00:10:43.140
+<v Noah Labhart>Does it apply to those types of business scenarios as well?
+
+124
+00:10:43.140 --> 00:10:43.800
+<v Granville Schmidt>Absolutely.
+
+125
+00:10:44.200 --> 00:11:07.020
+<v Granville Schmidt>Imagine that you have a, maybe there's a manufacturing process that manufactures like very critical or sensitive materials, maybe for healthcare, where you have to have the correct audit trail from the initial part of manufacturing all the way to when it's finally delivered to the healthcare system.
+
+126
+00:11:07.020 --> 00:11:28.200
+<v Granville Schmidt>All of those machines have to go through very rigorous internal reviews, and they also all need to have their own identity. So you have to have a trail that says, hey, system A worked on this part, we know that it worked on this part from point A to point B, and then it's handed off to this other system.
+
+127
+00:11:28.200 --> 00:11:38.740
+<v Granville Schmidt>And so in those cases, if the internet goes down, those production lines also go down, and that can be costing some manufacturers millions of dollars per hour.
+
+128
+00:11:38.860 --> 00:11:39.360
+<v Granville Schmidt>No
+
+129
+00:11:38.980 --> 00:11:57.980
+<v Noah Labhart>doubt. Absolutely critical to have those communications still functioning. I imagine there's a lot of, and you tell me, I guess, is there a lot of applicability to the same sort of arena there? We talk about identity orchestration, but maybe even in the IoT or the industrial technology, the machines, things like that, I guess it would apply to that too. Is that correct?
+
+130
+00:11:58.200 --> 00:11:58.700
+<v Granville Schmidt>Yeah,
+
+131
+00:11:58.540 --> 00:12:10.440
+<v Granville Schmidt>absolutely. They have their own unique nuances there. At the end of the day, you have processes that need identities, you have humans that need identities, and as of late, you have AI agents that need identities.
+
+132
+00:12:10.440 --> 00:12:10.980
+<v Noah Labhart>Perfect
+
+133
+00:12:10.980 --> 00:12:32.560
+<v Noah Labhart>segue into my next question. So you got identity orchestration, right? And I understand the translation layer and how you're fighting the horsemen of the identity apocalypse there. You've also pioneered identity orchestration for AI agents, as you just mentioned. What was the moment you realized that AI agents needed a fundamentally different approach to identity management?
+
+134
+00:12:32.560 --> 00:12:44.840
+<v Noah Labhart>When I think about identity orchestration, it seems like they could slot in as a user or something like that or representative as a user in a similar way. But it sounds like you have a different approach there. What was the moment and what is the different approach?
+
+135
+00:12:44.840 --> 00:12:52.920
+<v Granville Schmidt>The light bulb moment really happened like several months ago for the co-founder and CEO of our company, Eric Olden.
+
+136
+00:12:53.040 --> 00:12:57.980
+<v Granville Schmidt>And he honestly, he tells the story so much better than I can tell it, but I'm going to give it a stab.
+
+137
+00:12:58.420 --> 00:13:03.960
+<v Granville Schmidt>There was a Fortune 500 executive that said something that stopped our entire team, right?
+
+138
+00:13:04.040 --> 00:13:13.580
+<v Granville Schmidt>They're like, hey, we're about to deploy thousands of AI agents that will start making more decisions in an hour than the entire workforce typically makes in a month.
+
+139
+00:13:14.840 --> 00:13:19.560
+<v Granville Schmidt>govern something that moves faster than we can even monitor. And when you start thinking about
+
+140
+00:13:19.560 --> 00:13:24.160
+<v Granville Schmidt>that, that's interesting. It's an interesting problem, right? Because when you go to an
+
+141
+00:13:24.160 --> 00:13:29.380
+<v Granville Schmidt>organization, typically you're going in for a given role. I'm an engineer, so I know typically
+
+142
+00:13:29.380 --> 00:13:35.280
+<v Granville Schmidt>it means I'm going in as some sort of developer, right? And when I go in as a developer, typically
+
+143
+00:13:35.280 --> 00:13:40.860
+<v Granville Schmidt>I need access to A, B, and C applications. I'm going to need access to GitHub. I'm going to
+
+144
+00:13:40.860 --> 00:13:48.580
+<v Granville Schmidt>need access to the CI CD tools, for instance. And these agents, they can have a predefined role,
+
+145
+00:13:48.720 --> 00:13:54.600
+<v Granville Schmidt>right? You could have a agent that serves as a developer, could have an agent that serves as a
+
+146
+00:13:54.600 --> 00:14:02.800
+<v Granville Schmidt>release manager. But these agents also have agency, right, where they could change their roles at a
+
+147
+00:14:02.800 --> 00:14:08.920
+<v Granville Schmidt>moment's notice to better serve the business. And another example could be that imagine that
+
+148
+00:14:10.860 --> 00:14:15.720
+<v Granville Schmidt>spins up more agents after it finds a given problem, right?
+
+149
+00:14:15.800 --> 00:14:18.320
+<v Granville Schmidt>So you have a system say, hey, we found a bug in production.
+
+150
+00:14:18.580 --> 00:14:23.760
+<v Granville Schmidt>I need to spin up an agent that can review the logs,
+
+151
+00:14:23.920 --> 00:14:27.020
+<v Granville Schmidt>an agent that's able to work on the fix,
+
+152
+00:14:27.120 --> 00:14:30.840
+<v Granville Schmidt>an agent that is able to verify the fix.
+
+153
+00:14:31.020 --> 00:14:37.320
+<v Granville Schmidt>And these are like very ephemeral agents that come and go at a moment's notice, right?
+
+154
+00:14:37.420 --> 00:14:40.280
+<v Granville Schmidt>Their role was determined at that moment.
+
+155
+00:14:40.860 --> 00:14:47.020
+<v Granville Schmidt>So the typical identity systems are meant for these static roles for humans, right?
+
+156
+00:14:47.100 --> 00:14:51.660
+<v Granville Schmidt>Where we come in and we're like, you're an engineer, you get access to A, B, and C systems.
+
+157
+00:14:51.960 --> 00:14:56.140
+<v Granville Schmidt>At no point in time does the organization think like, Granville is going to become a
+
+158
+00:14:56.140 --> 00:14:59.420
+<v Granville Schmidt>salesman and need access to Salesforce or HubSpot.
+
+159
+00:14:59.560 --> 00:15:06.560
+<v Granville Schmidt>And so it's really like imagining that, imagine giving AI agents diplomatic passports, right?
+
+160
+00:15:06.560 --> 00:15:13.320
+<v Granville Schmidt>They need papers to show who authorized them and what they're allowed to do and a clear chain of custody.
+
+161
+00:15:13.520 --> 00:15:19.200
+<v Granville Schmidt>Every action needs to trace back to a human decision, but without requiring humans to approve every step.
+
+162
+00:15:19.920 --> 00:15:23.440
+<v Granville Schmidt>It's really like, how do we orchestrate trust at machine speed?
+
+163
+00:15:23.720 --> 00:15:29.520
+<v Granville Schmidt>And I think this diplomatic passport metaphor really captures it because agents need to prove their credentials.
+
+164
+00:15:29.700 --> 00:15:34.820
+<v Granville Schmidt>They need to show their authorization and have their activities tracked across every system they touch.
+
+165
+00:15:36.700 --> 00:15:38.800
+<v Granville Schmidt>with the current tooling out there,
+
+166
+00:15:38.960 --> 00:15:41.580
+<v Granville Schmidt>it's not so straightforward on how to accomplish that.
+
+167
+00:15:41.780 --> 00:15:42.280
+<v Noah Labhart>Oh,
+
+168
+00:15:41.940 --> 00:15:43.180
+<v Noah Labhart>sure. I imagine it's not.
+
+169
+00:15:43.320 --> 00:15:45.380
+<v Noah Labhart>And it really rings true what you said.
+
+170
+00:15:45.420 --> 00:15:47.820
+<v Noah Labhart>These identity systems are made for more,
+
+171
+00:15:47.940 --> 00:15:50.280
+<v Noah Labhart>they're architected for more humans
+
+172
+00:15:50.280 --> 00:15:51.540
+<v Noah Labhart>or moving at the speed of humans.
+
+173
+00:15:51.660 --> 00:15:53.780
+<v Noah Labhart>But when we're moving at the speed of an agent
+
+174
+00:15:53.780 --> 00:15:56.400
+<v Noah Labhart>or the speed of a computer or a server
+
+175
+00:15:56.400 --> 00:16:00.060
+<v Noah Labhart>or any machine, it's a different problem.
+
+176
+00:16:00.180 --> 00:16:01.600
+<v Noah Labhart>It is an interesting problem,
+
+177
+00:16:01.720 --> 00:16:03.800
+<v Noah Labhart>very interesting problem from an engineering perspective
+
+178
+00:16:03.800 --> 00:16:05.820
+<v Noah Labhart>to be able to solve then.
+
+179
+00:16:06.560 --> 00:16:10.880
+<v Noah Labhart>Okay, so then let's go to more of a real world scenario based on what you just said.
+
+180
+00:16:11.180 --> 00:16:15.080
+<v Noah Labhart>We've got a company with a thousand employees, but 50,000 agents, right?
+
+181
+00:16:15.200 --> 00:16:16.580
+<v Noah Labhart>Basically what you're just talking about.
+
+182
+00:16:16.680 --> 00:16:19.580
+<v Noah Labhart>We've got 50,000 agents that have spun up autonomously.
+
+183
+00:16:20.100 --> 00:16:21.460
+<v Noah Labhart>They're doing different things.
+
+184
+00:16:21.800 --> 00:16:28.180
+<v Noah Labhart>How does your platform handle identity for all these agents differently than these traditional
+
+185
+00:16:28.180 --> 00:16:28.680
+<v Noah Labhart>systems?
+
+186
+00:16:29.260 --> 00:16:32.860
+<v Granville Schmidt>One of the first things that comes through like an engineer's mind is, oh, there's a
+
+187
+00:16:32.860 --> 00:16:33.880
+<v Granville Schmidt>bunch of load here.
+
+188
+00:16:34.060 --> 00:16:35.700
+<v Granville Schmidt>So maybe the problem is about load.
+
+189
+00:16:36.560 --> 00:16:40.940
+<v Granville Schmidt>discussed, the problem really isn't about what can be solved for. It's really about governing
+
+190
+00:16:40.940 --> 00:16:46.300
+<v Granville Schmidt>those ephemeral identities that can constantly change their roles and their permissions.
+
+191
+00:16:47.340 --> 00:16:52.620
+<v Granville Schmidt>And the traditional identity systems assume stable, long-lived accounts. AI agents,
+
+192
+00:16:52.720 --> 00:16:57.940
+<v Granville Schmidt>they're more like mayflies with security clearances, right, for example. So really where
+
+193
+00:16:57.940 --> 00:17:04.400
+<v Granville Schmidt>our platform sits in is that we treat this like air traffic control. Every agent gets a flight
+
+194
+00:17:04.400 --> 00:17:09.340
+<v Granville Schmidt>plan, their permissions, and their constraints. We're able to track their entire life cycle even
+
+195
+00:17:09.340 --> 00:17:14.760
+<v Granville Schmidt>after they're gone. So for sensitive operations, we can enforce human-in-the-loop controls where
+
+196
+00:17:14.760 --> 00:17:21.960
+<v Granville Schmidt>an agent can prepare everything but needs human approval to execute. So let me take a step back
+
+197
+00:17:21.960 --> 00:17:28.720
+<v Granville Schmidt>and let's give it a concrete example. So imagine that we have some sort of infrastructure
+
+198
+00:17:28.720 --> 00:17:35.800
+<v Granville Schmidt>infrastructure somewhere today right let's imagine that we have some clusters or yeah let's just say
+
+199
+00:17:35.800 --> 00:17:40.720
+<v Granville Schmidt>we have some clusters that are being spun up and typically from an infrastructure perspective you
+
+200
+00:17:40.720 --> 00:17:46.260
+<v Granville Schmidt>have what's known as these non-human identities right you're able to say hey this particular
+
+201
+00:17:46.260 --> 00:17:52.460
+<v Granville Schmidt>workload gets this particular set of roles right maybe they're able to call these cloud apis they're
+
+202
+00:17:52.460 --> 00:17:55.060
+<v Granville Schmidt>They're able to spin certain things up.
+
+203
+00:17:55.060 --> 00:17:55.880
+<v Granville Schmidt>They're able to spin down.
+
+204
+00:17:56.080 --> 00:17:57.720
+<v Granville Schmidt>But those are pre-prescribed.
+
+205
+00:17:58.100 --> 00:18:04.980
+<v Granville Schmidt>But now imagine that this system is in charge of managing production traffic.
+
+206
+00:18:05.220 --> 00:18:08.220
+<v Granville Schmidt>And imagine it's doing some sort of A-B test.
+
+207
+00:18:08.520 --> 00:18:14.920
+<v Granville Schmidt>But instead of this A-B test being set up by a user, right?
+
+208
+00:18:15.000 --> 00:18:20.880
+<v Granville Schmidt>Like instead of it being set up by a product team that says, hey, we have feature A, we have feature B.
+
+209
+00:18:22.460 --> 00:18:26.000
+<v Granville Schmidt>Now we want to see which one does better for our customers.
+
+210
+00:18:26.320 --> 00:18:30.660
+<v Granville Schmidt>Imagine that you have an agent there that is deciding, hey, I see these two features
+
+211
+00:18:30.660 --> 00:18:31.440
+<v Granville Schmidt>being worked on.
+
+212
+00:18:31.560 --> 00:18:33.260
+<v Granville Schmidt>What if I start getting feedback now?
+
+213
+00:18:33.440 --> 00:18:39.100
+<v Granville Schmidt>And so imagine this can be a very costly decision to be made.
+
+214
+00:18:39.260 --> 00:18:42.760
+<v Granville Schmidt>Not all features are ready for prime time, as we all know.
+
+215
+00:18:42.980 --> 00:18:48.400
+<v Granville Schmidt>And this seems like a silly example, but you could have systems that also might need to
+
+216
+00:18:48.400 --> 00:18:52.360
+<v Granville Schmidt>transfer money and you give agents this autonomy to transfer money.
+
+217
+00:18:53.020 --> 00:18:58.320
+<v Granville Schmidt>So what's super interesting here is if you think about current identity systems, it's
+
+218
+00:18:58.320 --> 00:19:03.940
+<v Granville Schmidt>about giving an identity with certain roles and capability permissions, if you will.
+
+219
+00:19:04.020 --> 00:19:11.900
+<v Granville Schmidt>But what happens if one of the tasks that it decides to do doing that A-B test could
+
+220
+00:19:11.900 --> 00:19:12.780
+<v Granville Schmidt>cost a lot of money?
+
+221
+00:19:12.840 --> 00:19:17.860
+<v Granville Schmidt>So you might, instead of saying, hey, here's a static set of roles and permissions, I may
+
+222
+00:19:18.400 --> 00:19:24.620
+<v Granville Schmidt>be able to say, hey, Noah, agent over here is trying to do this. Do you approve of this?
+
+223
+00:19:24.900 --> 00:19:29.960
+<v Granville Schmidt>And so we call this human in the loop and this happens out of band, right? So we're able to
+
+224
+00:19:29.960 --> 00:19:35.220
+<v Granville Schmidt>provide these out of band enforcement points that can be part of your fine grained policy.
+
+225
+00:19:35.480 --> 00:19:39.840
+<v Granville Schmidt>So instead of just being stuck with just basic things like, oh, this is its role. These are
+
+226
+00:19:39.840 --> 00:19:44.900
+<v Granville Schmidt>its attributes, make a decision. We're now able to do conditional things like, you know what,
+
+227
+00:19:44.900 --> 00:19:49.220
+<v Granville Schmidt>But based on the policy, this is approved, but we still need Noah's approval to do this.
+
+228
+00:19:49.520 --> 00:19:52.920
+<v Granville Schmidt>And one of the other challenges is around delegation.
+
+229
+00:19:53.800 --> 00:20:01.380
+<v Granville Schmidt>So imagine today you and I, maybe we're on Claude or ChatGPT or another chat agent that
+
+230
+00:20:01.380 --> 00:20:04.300
+<v Granville Schmidt>we use, and we ask it to go do something.
+
+231
+00:20:04.660 --> 00:20:09.240
+<v Granville Schmidt>Let's go imagine a case where we're like, hey, let's go buy tickets for this concert
+
+232
+00:20:09.240 --> 00:20:09.960
+<v Granville Schmidt>this weekend.
+
+233
+00:20:09.960 --> 00:20:37.880
+<v Granville Schmidt>You know, in typical systems, if you try to give that process or that agent its own permission, hey, you can go buy these tickets. That's great. But what happens if that system then makes its way over to a fictional company called Ticketmeister, right? Or Ticketmeister. Ticketmeister has its own identity system, right? And you may have your credit card on file for, say, American Express, right?
+
+234
+00:20:37.880 --> 00:20:48.740
+<v Granville Schmidt>This non-human identity isn't going to make its way all the way through Ticketmeister or to even American Express for you to allow that charge to happen.
+
+235
+00:20:48.900 --> 00:20:59.380
+<v Granville Schmidt>In this new world, you have what's known as delegation chain, where you, Noah, have asked this other entity to go do this thing on your behalf.
+
+236
+00:20:59.380 --> 00:21:15.160
+<v Granville Schmidt>And now we have to be able to track this from the start to the finish and also be able to get the right types of tokens for authentication and authorization to happen at all the points along the way.
+
+237
+00:21:15.840 --> 00:21:23.840
+<v Granville Schmidt>And if you can imagine, there's a bunch of standards being put together now, even existing standards that are being reused to try to solve this.
+
+238
+00:21:23.940 --> 00:21:32.180
+<v Granville Schmidt>But all of the agents and all of these downstream systems in your organization, they're going to need to be updated to support this.
+
+239
+00:21:32.300 --> 00:21:34.260
+<v Granville Schmidt>And that's a lot of work, right?
+
+240
+00:21:34.500 --> 00:21:37.860
+<v Granville Schmidt>And, you know, what happens when these protocols change?
+
+241
+00:21:38.120 --> 00:21:39.600
+<v Granville Schmidt>You have to change it all again.
+
+242
+00:21:39.600 --> 00:21:46.280
+<v Granville Schmidt>in. And so our platform is able to sit in and not only do those fine grained authorization decisions,
+
+243
+00:21:46.540 --> 00:21:53.460
+<v Granville Schmidt>do those delegated authorization chains, and also do the human in the loop, but we're able to do
+
+244
+00:21:53.460 --> 00:21:59.520
+<v Granville Schmidt>that and keep up with all of the changes that are happening every week in this space. And so your
+
+245
+00:21:59.520 --> 00:22:06.300
+<v Granville Schmidt>organization can just focus on what it does best and bring value to your customers by focusing on
+
+246
+00:22:06.300 --> 00:22:07.280
+<v Granville Schmidt>on your own business logic.
+
+247
+00:22:07.500 --> 00:22:11.360
+<v Noah Labhart>Oh, that is so complex as you're describing it. All of these things that
+
+248
+00:22:11.360 --> 00:22:16.640
+<v Noah Labhart>are going on essentially behind the hood and your identity orchestration, you're solving a really
+
+249
+00:22:16.640 --> 00:22:21.560
+<v Noah Labhart>hard problem for folks. And again, and you said at the very end, so they can essentially focus on
+
+250
+00:22:21.560 --> 00:22:26.960
+<v Noah Labhart>their core competency and not have to think about, you know, identity orchestration, authorization,
+
+251
+00:22:27.440 --> 00:22:31.640
+<v Noah Labhart>authentication, permissions, those types of things and how they're tracked all downstream.
+
+252
+00:22:31.640 --> 00:22:35.860
+<v Noah Labhart>stream. It makes sense. And it's interesting, you mentioned the delegation chains. When you
+
+253
+00:22:35.860 --> 00:22:40.720
+<v Noah Labhart>were talking about the human in the loop, I was about to ask, okay, how do you put a agent in the
+
+254
+00:22:40.720 --> 00:22:45.120
+<v Noah Labhart>loop? And it sounds like the delegation chains would accomplish that. Am I understanding that
+
+255
+00:22:45.120 --> 00:22:46.000
+<v Noah Labhart>correct? That's
+
+256
+00:22:46.000 --> 00:22:46.820
+<v Granville Schmidt>exactly it.
+
+257
+00:22:46.960 --> 00:22:49.880
+<v Noah Labhart>Well, thank you for being on the show today. This is really
+
+258
+00:22:49.880 --> 00:22:53.920
+<v Noah Labhart>interesting stuff. Obviously, you're a well-accomplished individual and you've built
+
+259
+00:22:53.920 --> 00:22:59.300
+<v Noah Labhart>this really great platform at Strata with identity orchestration. You're solving a big time problem
+
+260
+00:22:59.300 --> 00:23:05.100
+<v Noah Labhart>here with universal translation layer, handling all the many different formats and protocols around
+
+261
+00:23:05.100 --> 00:23:11.300
+<v Noah Labhart>authentication and authorization. And now not just for individuals, for agents and for the
+
+262
+00:23:11.300 --> 00:23:17.180
+<v Noah Labhart>quote unquote, I don't want to overload the word, but load or the massive amount of authentication
+
+263
+00:23:17.180 --> 00:23:22.760
+<v Noah Labhart>authorization checks for agents when they're running and being spun up autonomously. So a
+
+264
+00:23:22.760 --> 00:23:27.540
+<v Noah Labhart>very complex problem you're going out to solve, but obviously a massive win for the industry.
+
+265
+00:23:29.300 --> 00:23:34.000
+<v Noah Labhart>of building products and not just around identity. So appreciate you walking me through that. I feel
+
+266
+00:23:34.000 --> 00:23:40.840
+<v Noah Labhart>like I've learned a ton. Where can people go to learn more about Strata, obviously, but also around
+
+267
+00:23:40.840 --> 00:23:43.420
+<v Noah Labhart>the identity orchestration piece of Strata?
+
+268
+00:23:43.500 --> 00:23:47.120
+<v Granville Schmidt>Just head over to our website, strata.io. We also have
+
+269
+00:23:47.120 --> 00:23:52.220
+<v Granville Schmidt>some really awesome YouTube series called the Identity Heroes Podcast, where we bring in some
+
+270
+00:23:52.220 --> 00:23:59.620
+<v Granville Schmidt>some like exceptional people in the IAM space. And they like recount all of their just crazy
+
+271
+00:23:59.620 --> 00:24:04.640
+<v Granville Schmidt>stories from their careers. And I don't know, I think it's a really fascinating way to learn
+
+272
+00:24:04.640 --> 00:24:08.540
+<v Granville Schmidt>about the problems that exist in the space and the problems that Strata solves for.
+
+273
+00:24:08.900 --> 00:24:13.520
+<v Noah Labhart>Super cool. I will link those in the show notes and check out the Identity Heroes podcast. That
+
+274
+00:24:13.520 --> 00:24:16.280
+<v Noah Labhart>sounds really interesting. Granville, well, thank you again for being on the show today.
+
+275
+00:24:16.500 --> 00:24:18.640
+<v Granville Schmidt>Yeah, thank you so much, Noah. Really appreciate it.
+
+276
+00:24:20.640 --> 00:24:24.020
+<v Noah Labhart>This was a fascinating topic to dig into with Granville.
+
+277
+00:24:24.180 --> 00:24:31.580
+<v Noah Labhart>Strata is clearly solving a massive pain point for businesses with not only multiple authentication and authorization mediums,
+
+278
+00:24:31.580 --> 00:24:36.380
+<v Noah Labhart>but those expanding into agent deployment and the orchestration of their authentication.
+
+279
+00:24:37.480 --> 00:24:40.920
+<v Noah Labhart>If you'd like to learn more about Strata, go to strata.io.
+
+280
+00:24:41.240 --> 00:24:43.420
+<v Noah Labhart>Again, that's strata.io.
+
+281
+00:24:44.480 --> 00:24:46.020
+<v Noah Labhart>And thanks again for listening.

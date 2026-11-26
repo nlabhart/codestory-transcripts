@@ -1,0 +1,1411 @@
+WEBVTT
+
+NOTE S4 E20: The Code Deployed as You Type: Reimagining Backend Infrastructure with Dark’s Paul Biggar
+
+1
+00:00:01.440 --> 00:00:29.920
+<v Paul Biggar>Initially, actually, my idea was, you know, startups are hard. I don't know if I want to really do a startup on this. I wonder, I wonder, can I get someone at Amazon or Google or Microsoft to sort of like, you know, pony up the cash to do this at one of the big clouds. And those conversations went okay, but it didn't seem like they were they were going anywhere interesting. So in instead, I'm like, Alright, yeah, I'm gonna gonna raise money for this. And so I spent some time, you know, started raising money. So eventually, you raise like three and a half
+
+2
+00:00:30.000 --> 00:00:36.060
+<v Paul Biggar>million to do this. And in this time, all I had was 800 lines of Python and 1000 lines of Elm.
+
+3
+00:00:36.060 --> 00:00:42.700
+<v Paul Biggar>That was the entire product. I'm Paul Biggar. I'm founder and CEO of Dark, darklang.com.
+
+4
+00:00:47.520 --> 00:00:52.940
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+5
+00:00:52.940 --> 00:00:57.140
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+6
+00:00:57.140 --> 00:01:05.560
+<v Noah Labhart>and build and lead a team that has your back. I'm your host Noah Labhart and today how Paul
+
+7
+00:01:05.560 --> 00:01:11.740
+<v Noah Labhart>Biggar built the one-stop shop to remove the complexities from building modern day apps.
+
+8
+00:01:13.600 --> 00:01:16.020
+<v Noah Labhart>All this and more on Code Story.
+
+9
+00:01:20.060 --> 00:01:25.660
+<v Noah Labhart>Paul Biggar was born in Dublin, Ireland living there most of his life. When he was young his
+
+10
+00:01:27.140 --> 00:01:29.320
+<v Noah Labhart>where Paul could program in BASIC and LOGO.
+
+11
+00:01:29.980 --> 00:01:34.140
+<v Noah Labhart>In addition to these early introductions, he was into building his own machines
+
+12
+00:01:34.140 --> 00:01:37.960
+<v Noah Labhart>and tweaking their hardware settings to get the most optimal performance out of them.
+
+13
+00:01:38.560 --> 00:01:41.640
+<v Noah Labhart>He completed his CS undergrad along with his PhD
+
+14
+00:01:41.640 --> 00:01:44.700
+<v Noah Labhart>before heading off to Silicon Valley to do the tech startup thing.
+
+15
+00:01:45.100 --> 00:01:47.840
+<v Noah Labhart>He currently lives in New York, and during the pandemic,
+
+16
+00:01:47.920 --> 00:01:52.380
+<v Noah Labhart>his primary activity outside of tech and entrepreneurship is taking walks with friends.
+
+17
+00:01:53.180 --> 00:01:56.080
+<v Noah Labhart>In a past venture, he was the founder of CircleCI,
+
+18
+00:01:57.140 --> 00:02:00.540
+<v Noah Labhart>very popular continuous integration tool for engineering teams.
+
+19
+00:02:01.220 --> 00:02:03.060
+<v Noah Labhart>Building on his successes here,
+
+20
+00:02:03.220 --> 00:02:06.280
+<v Noah Labhart>he started to look at how difficult it was to deploy code,
+
+21
+00:02:06.460 --> 00:02:08.460
+<v Noah Labhart>to do infrastructure, to write code,
+
+22
+00:02:08.640 --> 00:02:12.520
+<v Noah Labhart>how teams interact, and many other friction points for the SDLC.
+
+23
+00:02:13.360 --> 00:02:17.160
+<v Noah Labhart>He set out to remove the complexities of how we build apps today.
+
+24
+00:02:18.360 --> 00:02:21.060
+<v Noah Labhart>This is the creation story of Dark.
+
+25
+00:02:24.280 --> 00:02:29.280
+<v Paul Biggar>Dark is a programming language combined with an editor, combined with infrastructure.
+
+26
+00:02:29.640 --> 00:02:35.020
+<v Paul Biggar>So you use our hosted platform, you write code in our app in the browser,
+
+27
+00:02:35.140 --> 00:02:37.160
+<v Paul Biggar>and you write in our proprietary language.
+
+28
+00:02:38.200 --> 00:02:41.140
+<v Paul Biggar>Okay, so if I've explained it like that, it sounds terrible.
+
+29
+00:02:41.300 --> 00:02:42.840
+<v Paul Biggar>It's like, why would anyone want to do this?
+
+30
+00:02:42.960 --> 00:02:46.880
+<v Paul Biggar>So let me go a little bit to the backstory and why.
+
+31
+00:02:46.880 --> 00:02:53.100
+<v Paul Biggar>why. What Dark is intended to be is a way of creating backend services that don't have all
+
+32
+00:02:53.100 --> 00:02:59.760
+<v Paul Biggar>of the complexity of how we build apps today. So it started from this idea of like looking at how
+
+33
+00:02:59.760 --> 00:03:07.700
+<v Paul Biggar>complicated it was to deploy code, to do infrastructure, to write codes, and much more
+
+34
+00:03:07.700 --> 00:03:13.420
+<v Paul Biggar>than that. You know, how teams interact, how maintenance on software teams works, even,
+
+35
+00:03:13.420 --> 00:03:17.060
+<v Paul Biggar>even how continuous delivery is a key part of it.
+
+36
+00:03:17.720 --> 00:03:21.240
+<v Paul Biggar>And so it basically made a giant list of all the problems.
+
+37
+00:03:21.520 --> 00:03:23.400
+<v Paul Biggar>There's this phrase, accidental complexity.
+
+38
+00:03:23.740 --> 00:03:27.200
+<v Paul Biggar>So you can divide complexity into essential complexity,
+
+39
+00:03:27.440 --> 00:03:31.380
+<v Paul Biggar>which is a core part of what you're trying to do for your business or whatever.
+
+40
+00:03:31.560 --> 00:03:35.020
+<v Paul Biggar>And then accidental complexity is all the bullshit you have to deal with along the way.
+
+41
+00:03:35.540 --> 00:03:39.240
+<v Paul Biggar>It made this huge list and tried to classify everything into,
+
+42
+00:03:39.320 --> 00:03:41.780
+<v Paul Biggar>is it accidental complexity or is it essential complexity?
+
+43
+00:03:43.420 --> 00:03:49.500
+<v Paul Biggar>basically invented a solution to writing backend software or cloud software that didn't have any
+
+44
+00:03:49.500 --> 00:03:55.460
+<v Paul Biggar>of that complexity. And that's what led me to this sort of like integrated, you know, clearly
+
+45
+00:03:55.460 --> 00:04:00.900
+<v Paul Biggar>we're hosting the infrastructure free. That's one large thing off your mind. But how do you get
+
+46
+00:04:00.900 --> 00:04:07.520
+<v Paul Biggar>to the deployment time down to like zero time at all? You know, that's the fastest thing you can
+
+47
+00:04:07.520 --> 00:04:13.980
+<v Paul Biggar>you can deploy code. So how do you do that? And we designed a language and an editor around
+
+48
+00:04:13.980 --> 00:04:19.920
+<v Paul Biggar>sort of safely creating code that's sort of in production, but in a safe way.
+
+49
+00:04:20.360 --> 00:04:23.700
+<v Paul Biggar>And that's how we ended up with all the three things tied together.
+
+50
+00:04:26.320 --> 00:04:31.880
+<v Noah Labhart>Tell me about the MVP. I guess we could call it that. I don't know what you'd call it when you're
+
+51
+00:04:31.880 --> 00:04:36.840
+<v Noah Labhart>building a language, building a product like this, which is really interesting. But tell me about that
+
+52
+00:04:37.520 --> 00:04:40.700
+<v Noah Labhart>how long it took to build, and what sort of tools you used to bring it to life.
+
+53
+00:04:42.920 --> 00:04:44.140
+<v Paul Biggar>It took a while.
+
+54
+00:04:44.700 --> 00:04:48.700
+<v Paul Biggar>So I initially started the, I initially came up with the idea,
+
+55
+00:04:48.780 --> 00:04:52.880
+<v Paul Biggar>or let's say decided that I was going to solve this in late 2016.
+
+56
+00:04:53.500 --> 00:04:56.500
+<v Paul Biggar>And the idea had sort of been brewing in my head for several years.
+
+57
+00:04:56.620 --> 00:05:01.060
+<v Paul Biggar>And the idea that I had, the thought that I had for how to solve this,
+
+58
+00:05:01.140 --> 00:05:04.740
+<v Paul Biggar>was it was a language that was like a visual language with sort of a,
+
+59
+00:05:04.740 --> 00:05:10.980
+<v Paul Biggar>you know, a graph and sort of nodes and edges in that graph. And so I built a prototype of a blog
+
+60
+00:05:10.980 --> 00:05:17.600
+<v Paul Biggar>and the blog fit, you know, basically in one like small image. I built a prototype in Python
+
+61
+00:05:17.600 --> 00:05:24.380
+<v Paul Biggar>on the back end and Elm on the front end and use that to sort of demo it. And it worked and,
+
+62
+00:05:24.420 --> 00:05:29.580
+<v Paul Biggar>you know, it actually did what it was supposed to do. Initially, actually, my idea was, you know,
+
+63
+00:05:29.640 --> 00:05:33.360
+<v Paul Biggar>startups are hard. I don't know if I want to really do a startup on this. I wonder,
+
+64
+00:05:34.740 --> 00:05:40.700
+<v Paul Biggar>someone at Amazon or Google or Microsoft to sort of like, you know, pony up the cash to do this
+
+65
+00:05:40.700 --> 00:05:45.600
+<v Paul Biggar>at one of the big clouds. And those conversations went okay, but it didn't seem like they were
+
+66
+00:05:45.600 --> 00:05:51.220
+<v Paul Biggar>going anywhere interesting. So instead, I'm like, all right, yeah, I'm going to raise money for
+
+67
+00:05:51.220 --> 00:05:55.660
+<v Paul Biggar>this. And so I spent some time, you know, started raising money. So eventually raised like three
+
+68
+00:05:55.660 --> 00:06:02.480
+<v Paul Biggar>and a half million to do this. And in this time, all I had was 800 lines of Python and a thousand
+
+69
+00:06:02.480 --> 00:06:08.860
+<v Paul Biggar>lines of Elm. That was the entire product. And then it came time to actually start to build
+
+70
+00:06:08.860 --> 00:06:14.340
+<v Paul Biggar>it. It was August 20, 2017. But by the time we really started to build the thing, spent a couple
+
+71
+00:06:14.340 --> 00:06:20.560
+<v Paul Biggar>of months just like trying to create this like good way of creating software. And we had a couple
+
+72
+00:06:20.560 --> 00:06:23.840
+<v Paul Biggar>of like different challenges. It's like, all right, you know, suppose that someone's writing
+
+73
+00:06:23.840 --> 00:06:28.460
+<v Paul Biggar>a Caesar cipher, which is like the way that children like do encryption. You know, you sort
+
+74
+00:06:28.460 --> 00:06:30.100
+<v Paul Biggar>So it's the letter A for M, that sort of thing.
+
+75
+00:06:30.600 --> 00:06:33.880
+<v Paul Biggar>So, all right, can we give someone a question?
+
+76
+00:06:34.080 --> 00:06:36.840
+<v Paul Biggar>And can a user come in, we give them a question,
+
+77
+00:06:36.920 --> 00:06:38.680
+<v Paul Biggar>and then they write the code to solve this
+
+78
+00:06:38.680 --> 00:06:40.080
+<v Paul Biggar>if we give them the algorithm.
+
+79
+00:06:40.300 --> 00:06:42.520
+<v Paul Biggar>It wasn't immediately obvious that we needed to give them the algorithm,
+
+80
+00:06:42.620 --> 00:06:45.260
+<v Paul Biggar>but it turns out that no one knows how to do modular arithmetic.
+
+81
+00:06:45.440 --> 00:06:47.880
+<v Paul Biggar>So we were way off in our expectations
+
+82
+00:06:47.880 --> 00:06:50.780
+<v Paul Biggar>of what code people would know how to do.
+
+83
+00:06:51.140 --> 00:06:52.600
+<v Paul Biggar>But we gave people the algorithm.
+
+84
+00:06:52.960 --> 00:06:54.480
+<v Paul Biggar>It was a real challenge.
+
+85
+00:06:54.480 --> 00:06:58.640
+<v Paul Biggar>And it's just like this idea of writing nodes and edges.
+
+86
+00:06:58.740 --> 00:07:03.160
+<v Paul Biggar>It was just like really complicated for people, even though we had like visual programming in there.
+
+87
+00:07:03.340 --> 00:07:08.260
+<v Paul Biggar>And we showed people the intermediate outputs of their computation so far.
+
+88
+00:07:08.340 --> 00:07:09.960
+<v Paul Biggar>And it just wasn't really working.
+
+89
+00:07:10.160 --> 00:07:14.120
+<v Paul Biggar>And we tried a bunch of different ways of sort of representing this.
+
+90
+00:07:14.240 --> 00:07:17.140
+<v Paul Biggar>We started getting people to write Fizzbuzz in it.
+
+91
+00:07:17.260 --> 00:07:22.820
+<v Paul Biggar>So Fizzbuzz is this like interview challenge that everyone got asked to do in like the 2000s.
+
+92
+00:07:24.480 --> 00:07:30.760
+<v Paul Biggar>you know, list out 100 numbers and if they're divisible by 3, write fizz, if they're divisible
+
+93
+00:07:30.760 --> 00:07:36.640
+<v Paul Biggar>by 5, write buzz, if they're divisible by 3 and 5, write fizzbuzz and otherwise write the number.
+
+94
+00:07:37.980 --> 00:07:44.880
+<v Paul Biggar>So there's a calculation in there that's basically, you know, if i modulo 3 equals 0 and,
+
+95
+00:07:44.880 --> 00:07:53.400
+<v Paul Biggar>you know, very simple arithmetic, but in our sort of nodes and edges language, just that was a
+
+96
+00:07:54.480 --> 00:07:59.800
+<v Paul Biggar>difficult challenge to get someone to like write that and to build it out between sort of infix
+
+97
+00:07:59.800 --> 00:08:06.700
+<v Paul Biggar>notation and like you know people being new to this so people eventually sometimes got it done
+
+98
+00:08:06.700 --> 00:08:12.220
+<v Paul Biggar>and the feedback was just terrible it's just like we cannot write like this and so we we decided to
+
+99
+00:08:12.220 --> 00:08:20.360
+<v Paul Biggar>ditch that that concept and instead tried to design the the core ideas that we had behind dark
+
+100
+00:08:20.360 --> 00:08:24.040
+<v Paul Biggar>and put them into something that looked a little bit more like traditional code,
+
+101
+00:08:24.120 --> 00:08:26.180
+<v Paul Biggar>that looked like, you know, sort of like textual code.
+
+102
+00:08:26.840 --> 00:08:29.240
+<v Paul Biggar>And so that was the next few months.
+
+103
+00:08:29.360 --> 00:08:32.480
+<v Paul Biggar>And it was trying to sort of like take these concepts.
+
+104
+00:08:32.660 --> 00:08:35.400
+<v Paul Biggar>So one of the concepts was we didn't want a parser.
+
+105
+00:08:35.420 --> 00:08:38.120
+<v Paul Biggar>We believe that parsers cause syntax errors.
+
+106
+00:08:38.540 --> 00:08:43.620
+<v Paul Biggar>And so can you write code in such a way that you cannot have a parser
+
+107
+00:08:43.620 --> 00:08:45.500
+<v Paul Biggar>or that you don't need a parser?
+
+108
+00:08:45.600 --> 00:08:47.280
+<v Paul Biggar>And so we have a way to do that.
+
+109
+00:08:47.340 --> 00:08:48.360
+<v Paul Biggar>It's called a structured editor.
+
+110
+00:08:50.360 --> 00:08:54.760
+<v Paul Biggar>the way basically of the structured editor feeling a lot more like writing code.
+
+111
+00:08:54.940 --> 00:08:59.220
+<v Paul Biggar>You know, you're writing roughly the same language, but it actually looks a lot more like code.
+
+112
+00:08:59.340 --> 00:09:04.220
+<v Paul Biggar>And with that, we were able to get people to write some code.
+
+113
+00:09:04.360 --> 00:09:07.240
+<v Paul Biggar>We were able to write programs that did things.
+
+114
+00:09:07.440 --> 00:09:15.020
+<v Paul Biggar>And so that was sort of the first point that we realized, okay, you know, we've got our real MVP now.
+
+115
+00:09:16.360 --> 00:09:28.320
+<v Noah Labhart>With any MVP, you've got to make certain decisions and trade-offs about, you know, I'm going to do things one way and it's going, you know, it's going to hurt in the short term, but it's going to be better because we're going to get it done faster or technical debt or things like that.
+
+116
+00:09:28.440 --> 00:09:31.480
+<v Noah Labhart>So you touched on a few of them, but dive into them a little more.
+
+117
+00:09:31.600 --> 00:09:35.840
+<v Noah Labhart>What sort of decisions and trade-offs did you have to make in the short term and how did you cope with them?
+
+118
+00:09:37.360 --> 00:09:39.780
+<v Paul Biggar>There was always the technical debt decision.
+
+119
+00:09:40.760 --> 00:09:43.160
+<v Paul Biggar>The initial version was written in Python.
+
+120
+00:09:45.020 --> 00:09:52.520
+<v Paul Biggar>We realized that Python was not a good language for the type of massive experimenting that
+
+121
+00:09:52.520 --> 00:09:53.920
+<v Paul Biggar>we were going to do.
+
+122
+00:09:54.140 --> 00:09:58.880
+<v Paul Biggar>And so we switched to this language called OCaml, which is a statically typed functional
+
+123
+00:09:58.880 --> 00:09:59.380
+<v Paul Biggar>language.
+
+124
+00:09:59.480 --> 00:10:02.820
+<v Paul Biggar>And statically typed functional languages are amazing for writing programming languages.
+
+125
+00:10:03.160 --> 00:10:08.580
+<v Paul Biggar>The static typing where a compiler is sort of telling you when you get code wrong really
+
+126
+00:10:08.580 --> 00:10:13.940
+<v Paul Biggar>allowed a huge amount of refactoring, which is what we needed to do a lot in the early
+
+127
+00:10:15.020 --> 00:10:16.240
+<v Paul Biggar>we refactored a huge amount.
+
+128
+00:10:16.420 --> 00:10:18.820
+<v Paul Biggar>We would write something, we'd realize it was all wrong.
+
+129
+00:10:19.020 --> 00:10:21.760
+<v Paul Biggar>We'd completely change a lot of implementations.
+
+130
+00:10:22.040 --> 00:10:24.320
+<v Paul Biggar>And so that was like one of the major ways
+
+131
+00:10:24.320 --> 00:10:26.460
+<v Paul Biggar>that we handled that sort of complexity
+
+132
+00:10:26.460 --> 00:10:29.780
+<v Paul Biggar>by having a statically typed functional language.
+
+133
+00:10:30.640 --> 00:10:33.100
+<v Paul Biggar>Other things we did is that we just assumed
+
+134
+00:10:33.100 --> 00:10:36.420
+<v Paul Biggar>that we were going to pile on the technical debt,
+
+135
+00:10:36.520 --> 00:10:38.180
+<v Paul Biggar>at least until MVP.
+
+136
+00:10:38.520 --> 00:10:40.760
+<v Paul Biggar>And we thought until product market fit,
+
+137
+00:10:40.820 --> 00:10:42.300
+<v Paul Biggar>but that's another story for later.
+
+138
+00:10:42.300 --> 00:10:48.280
+<v Paul Biggar>later. But yeah, we just took on a lot of debt and some of it is still being paid off.
+
+139
+00:10:50.220 --> 00:10:55.300
+<v Noah Labhart>Well then, so you've got your MVP, right? And you start to progress the product. How did you
+
+140
+00:10:55.300 --> 00:11:01.060
+<v Noah Labhart>go about that process of progressing and maturing the product? And then how did you go about building
+
+141
+00:11:01.060 --> 00:11:06.200
+<v Noah Labhart>your roadmap and figuring out, okay, this is the next most important thing to build or address
+
+142
+00:11:06.200 --> 00:11:07.060
+<v Noah Labhart>with Darklang.
+
+143
+00:11:08.660 --> 00:11:11.780
+<v Paul Biggar>At the start, we had a couple of example applications
+
+144
+00:11:11.780 --> 00:11:13.220
+<v Paul Biggar>that we wanted to build.
+
+145
+00:11:13.380 --> 00:11:15.220
+<v Paul Biggar>One is called the RealWorld app,
+
+146
+00:11:15.360 --> 00:11:17.320
+<v Paul Biggar>but it's basically a Medium clone.
+
+147
+00:11:17.700 --> 00:11:20.940
+<v Paul Biggar>And we were able to write a Medium clone,
+
+148
+00:11:21.140 --> 00:11:24.100
+<v Paul Biggar>and so it's like, okay, this actually works now,
+
+149
+00:11:24.160 --> 00:11:26.660
+<v Paul Biggar>even though it was horrendous, but it sort of worked.
+
+150
+00:11:27.360 --> 00:11:30.740
+<v Paul Biggar>Our next goal was we need to support somebody
+
+151
+00:11:30.740 --> 00:11:33.660
+<v Paul Biggar>who's not us being able to build an application here.
+
+152
+00:11:33.660 --> 00:11:37.320
+<v Paul Biggar>and we reached around for startups that wanted to do it
+
+153
+00:11:37.320 --> 00:11:38.600
+<v Paul Biggar>but it was a very big risk.
+
+154
+00:11:38.720 --> 00:11:40.780
+<v Paul Biggar>We didn't really know how to manage that risk
+
+155
+00:11:40.780 --> 00:11:42.780
+<v Paul Biggar>and eventually came up with the idea
+
+156
+00:11:42.780 --> 00:11:45.320
+<v Paul Biggar>that we would pay someone to do this.
+
+157
+00:11:45.680 --> 00:11:49.560
+<v Paul Biggar>And we posted, not exactly a job ad,
+
+158
+00:11:49.720 --> 00:11:53.800
+<v Paul Biggar>but we said, we will pay you $3,000 a month
+
+159
+00:11:53.800 --> 00:11:57.660
+<v Paul Biggar>to write your application in Dark.
+
+160
+00:11:57.800 --> 00:12:00.000
+<v Paul Biggar>And the idea was, you're a startup,
+
+161
+00:12:00.180 --> 00:12:02.520
+<v Paul Biggar>you're already writing your application in something,
+
+162
+00:12:03.660 --> 00:12:08.760
+<v Paul Biggar>Perhaps you're bootstrapped and $3,000 would help you out during the bootstrapping phase.
+
+163
+00:12:08.920 --> 00:12:15.920
+<v Paul Biggar>That actually got us about 30 applications and maybe two of them were like fairly appropriate.
+
+164
+00:12:16.200 --> 00:12:27.620
+<v Paul Biggar>And so we went with this guy, with this guy, Daniel, and he built this SaaS app for managing janitorial supplies that he that he had an existing customer base in an adjacent product.
+
+165
+00:12:27.720 --> 00:12:29.100
+<v Paul Biggar>And it just like connected to that.
+
+166
+00:12:29.100 --> 00:12:43.420
+<v Paul Biggar>And so he came into our office every day and there were weeks at a time where he couldn't actually code in it because we had to redo some fundamental part of how something scaled or re-architect a key part of things.
+
+167
+00:12:43.720 --> 00:12:49.420
+<v Paul Biggar>But for the most part, it was just him coming to the office and we worked on the thing.
+
+168
+00:12:49.480 --> 00:12:51.380
+<v Paul Biggar>And whenever he had problems, we worked to solve them.
+
+169
+00:12:52.760 --> 00:12:54.480
+<v Noah Labhart>So I'd like to switch to team.
+
+170
+00:12:54.640 --> 00:12:57.100
+<v Noah Labhart>How do you go about building a team?
+
+171
+00:12:59.100 --> 00:13:03.580
+<v Noah Labhart>to indicate that they're the right people to join you and the winning horses to join you?
+
+172
+00:13:04.860 --> 00:13:11.120
+<v Paul Biggar>Honestly, I'm not sure that there's any particular indicators that you can use. I think a lot of the
+
+173
+00:13:11.120 --> 00:13:15.760
+<v Paul Biggar>indicators that we've traditionally used as an industry have been really bad. You know, like,
+
+174
+00:13:15.820 --> 00:13:21.000
+<v Paul Biggar>did they go to an elite school or something like that? I don't think that they're very good.
+
+175
+00:13:21.480 --> 00:13:27.380
+<v Paul Biggar>You know, for the most part, we want to see, can people code and can we spend time with them?
+
+176
+00:13:29.100 --> 00:13:34.680
+<v Paul Biggar>are the most important things, the way we tend to look for that. We have an interesting interview
+
+177
+00:13:34.680 --> 00:13:41.140
+<v Paul Biggar>process, actually. The first interview is basically getting a list of everything that they say they
+
+178
+00:13:41.140 --> 00:13:48.160
+<v Paul Biggar>know how to do. So here's the areas that we care about. We care about being able to do front-end,
+
+179
+00:13:48.280 --> 00:13:52.560
+<v Paul Biggar>we care about being able to do back-end, we care about compilers, we care about functional
+
+180
+00:13:52.560 --> 00:13:57.600
+<v Paul Biggar>languages, we care about distributed systems. And you're not expected to know all those things,
+
+181
+00:13:59.520 --> 00:14:05.020
+<v Paul Biggar>we just want to list you know in in the area of front end are you good are you bad is this your
+
+182
+00:14:05.020 --> 00:14:10.740
+<v Paul Biggar>area of expertise is not and and we go through the the list of of six techs and you know often
+
+183
+00:14:10.740 --> 00:14:16.500
+<v Paul Biggar>people you know have one that that they're really the expert in and so what we're looking for is
+
+184
+00:14:16.500 --> 00:14:22.500
+<v Paul Biggar>the thing that this person is good at is that what our team needs and are they good at it in a way
+
+185
+00:14:22.500 --> 00:14:24.180
+<v Paul Biggar>that the team needs.
+
+186
+00:14:24.340 --> 00:14:28.580
+<v Paul Biggar>And then we do a one-day on-site interview,
+
+187
+00:14:28.800 --> 00:14:30.200
+<v Paul Biggar>which we pay people for.
+
+188
+00:14:30.400 --> 00:14:32.680
+<v Paul Biggar>We don't believe in wasting people's time.
+
+189
+00:14:32.760 --> 00:14:35.420
+<v Paul Biggar>So we have a standard $500 stipend
+
+190
+00:14:35.420 --> 00:14:39.980
+<v Paul Biggar>that we pay you to do the on-site.
+
+191
+00:14:40.320 --> 00:14:41.760
+<v Paul Biggar>Through the course of that,
+
+192
+00:14:41.900 --> 00:14:43.260
+<v Paul Biggar>it's making sure,
+
+193
+00:14:43.960 --> 00:14:47.560
+<v Paul Biggar>do you work well with the team?
+
+194
+00:14:47.740 --> 00:14:50.100
+<v Paul Biggar>The sort of thing that comes up is like,
+
+195
+00:14:50.100 --> 00:14:53.460
+<v Paul Biggar>Like, oh, this person was actually really condescending to the female engineers.
+
+196
+00:14:53.680 --> 00:14:54.640
+<v Paul Biggar>Hmm, that's a no.
+
+197
+00:14:55.800 --> 00:14:58.160
+<v Paul Biggar>That's the sort of thing that we fan.
+
+198
+00:14:58.300 --> 00:15:03.380
+<v Paul Biggar>But we haven't got any silver bullets for how we hire people, I think.
+
+199
+00:15:03.640 --> 00:15:04.140
+<v Noah Labhart>Did
+
+200
+00:15:04.040 --> 00:15:06.460
+<v Noah Labhart>you ever have anybody abusing the stipend?
+
+201
+00:15:07.000 --> 00:15:10.940
+<v Noah Labhart>Or was it not known to them before they accepted the interview?
+
+202
+00:15:11.360 --> 00:15:14.300
+<v Paul Biggar>We never had anyone abusing it at all.
+
+203
+00:15:14.300 --> 00:15:24.660
+<v Paul Biggar>You know, I think for people who are going for the kind of jobs that we're doing, you know, it takes a lot to have the skills to be able to do that.
+
+204
+00:15:25.020 --> 00:15:32.360
+<v Paul Biggar>And I don't think that the $500 is like a financially meaningful thing for anyone.
+
+205
+00:15:32.680 --> 00:15:39.720
+<v Paul Biggar>And of course, we also pay for them to fly out and put up their hotel and all that sort of thing on top of the $500.
+
+206
+00:15:39.720 --> 00:15:47.320
+<v Paul Biggar>But I think it's mostly a token to indicate we are not here to waste your time.
+
+207
+00:15:52.240 --> 00:15:54.760
+<v Noah Labhart>So I usually ask about scalability.
+
+208
+00:15:54.940 --> 00:15:58.180
+<v Noah Labhart>So I'm curious where you'll take this question.
+
+209
+00:15:58.360 --> 00:16:00.980
+<v Noah Labhart>But did you build this to scale efficiently from day one?
+
+210
+00:16:01.100 --> 00:16:02.980
+<v Noah Labhart>Or are you kind of fighting this as you grow?
+
+211
+00:16:04.540 --> 00:16:06.000
+<v Paul Biggar>We're fighting it as we grow.
+
+212
+00:16:06.700 --> 00:16:12.020
+<v Paul Biggar>We've definitely made some choices where it might have been better to sort of plan the scalability in advance.
+
+213
+00:16:12.340 --> 00:16:17.460
+<v Paul Biggar>So for example, we used some product that Google had.
+
+214
+00:16:17.620 --> 00:16:18.940
+<v Paul Biggar>We used Google Cloud.
+
+215
+00:16:19.140 --> 00:16:24.340
+<v Paul Biggar>We used one of their products that's vaguely Docker on one machine.
+
+216
+00:16:24.540 --> 00:16:29.000
+<v Paul Biggar>And that's the sort of thing where we might have been better to spend a day learning Kubernetes.
+
+217
+00:16:29.260 --> 00:16:33.600
+<v Paul Biggar>Because eventually we went to Kubernetes and then we had to do a migration.
+
+218
+00:16:33.600 --> 00:16:36.260
+<v Paul Biggar>And so there was a bunch of time wasted there.
+
+219
+00:16:36.460 --> 00:16:40.000
+<v Paul Biggar>But for the most part, we're believers in,
+
+220
+00:16:40.120 --> 00:16:43.820
+<v Paul Biggar>we actually don't know what problems we're going to have.
+
+221
+00:16:44.460 --> 00:16:46.260
+<v Paul Biggar>We don't know how to solve them in advance.
+
+222
+00:16:46.440 --> 00:16:51.320
+<v Paul Biggar>So just do the thing that works today and we can figure it out later.
+
+223
+00:16:52.680 --> 00:16:57.900
+<v Noah Labhart>So as you step out on the balcony and you look across all you've built with Dark,
+
+224
+00:16:58.120 --> 00:16:59.100
+<v Noah Labhart>what are you most proud of?
+
+225
+00:17:00.600 --> 00:17:03.700
+<v Paul Biggar>when we started Dark, and in particular,
+
+226
+00:17:03.900 --> 00:17:07.200
+<v Paul Biggar>I'm pitching all these people about the technical and product vision,
+
+227
+00:17:07.820 --> 00:17:10.420
+<v Paul Biggar>and most of them say that isn't possible.
+
+228
+00:17:10.840 --> 00:17:16.040
+<v Paul Biggar>Both technologists, really good engineers,
+
+229
+00:17:16.820 --> 00:17:19.880
+<v Paul Biggar>and investors, I'm telling them,
+
+230
+00:17:19.900 --> 00:17:25.820
+<v Paul Biggar>we're going to build this technology where you deploy in zero seconds.
+
+231
+00:17:27.640 --> 00:17:29.820
+<v Paul Biggar>They're like, nope, that cannot work.
+
+232
+00:17:30.020 --> 00:17:31.840
+<v Paul Biggar>People will not be able to code like that.
+
+233
+00:17:32.020 --> 00:17:34.040
+<v Paul Biggar>It just isn't possible to build.
+
+234
+00:17:34.560 --> 00:17:38.240
+<v Paul Biggar>And so even though today we're pre-product market fit,
+
+235
+00:17:38.380 --> 00:17:41.480
+<v Paul Biggar>some of the things that people said are not possible,
+
+236
+00:17:41.680 --> 00:17:43.760
+<v Paul Biggar>those were our first proof points.
+
+237
+00:17:43.920 --> 00:17:47.300
+<v Paul Biggar>We proved to ourselves that these are possible.
+
+238
+00:17:48.000 --> 00:17:51.600
+<v Paul Biggar>And I think that was a thing that just a lot of people thought
+
+239
+00:17:51.600 --> 00:17:52.860
+<v Paul Biggar>was not going to happen.
+
+240
+00:17:53.600 --> 00:17:55.620
+<v Noah Labhart>So let's flip the script a little bit.
+
+241
+00:17:55.760 --> 00:18:00.100
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+242
+00:18:01.780 --> 00:18:05.100
+<v Paul Biggar>We've made plenty of mistakes, mistakes all over the place.
+
+243
+00:18:05.880 --> 00:18:09.040
+<v Paul Biggar>You know, we're four years in and we haven't got product market fit.
+
+244
+00:18:09.160 --> 00:18:12.760
+<v Paul Biggar>I guess that's probably the major situation.
+
+245
+00:18:13.580 --> 00:18:16.180
+<v Paul Biggar>And I don't know if that's, is it a mistake?
+
+246
+00:18:16.340 --> 00:18:18.820
+<v Paul Biggar>I mean, lots of mistakes contributed to this,
+
+247
+00:18:18.820 --> 00:18:23.320
+<v Paul Biggar>but we definitely bit off a lot more than we could chew.
+
+248
+00:18:23.620 --> 00:18:25.320
+<v Paul Biggar>And we did that intentionally.
+
+249
+00:18:25.520 --> 00:18:28.180
+<v Paul Biggar>We just thought that it would be easier
+
+250
+00:18:28.180 --> 00:18:29.540
+<v Paul Biggar>to sort of like get through it.
+
+251
+00:18:30.080 --> 00:18:32.240
+<v Paul Biggar>So yeah, the building an editor,
+
+252
+00:18:32.380 --> 00:18:34.220
+<v Paul Biggar>building a programming language,
+
+253
+00:18:34.340 --> 00:18:36.840
+<v Paul Biggar>building infrastructure all at the same time
+
+254
+00:18:36.840 --> 00:18:38.420
+<v Paul Biggar>is quite a lot.
+
+255
+00:18:38.560 --> 00:18:41.100
+<v Paul Biggar>I'm struggling to define it as a mistake
+
+256
+00:18:41.100 --> 00:18:43.880
+<v Paul Biggar>but it's like, it's definitely the largest challenge
+
+257
+00:18:43.880 --> 00:18:47.740
+<v Paul Biggar>that we had and the one that, you know,
+
+258
+00:18:48.820 --> 00:18:49.320
+<v Paul Biggar>been overcome.
+
+259
+00:18:49.920 --> 00:18:54.540
+<v Noah Labhart>Sure. That makes sense. You're tackling a huge problem. It wasn't where you
+
+260
+00:18:54.540 --> 00:18:59.020
+<v Noah Labhart>were taking a bite out of the elephant one at a time or one bite at a time. You were eating the
+
+261
+00:18:59.020 --> 00:19:03.040
+<v Noah Labhart>elephant one bite at a time. You were just trying to eat it all at once. Yeah.
+
+262
+00:19:03.100 --> 00:19:04.060
+<v Paul Biggar>And we knew that.
+
+263
+00:19:04.480 --> 00:19:11.400
+<v Paul Biggar>I think that the speculation I had at the start was the way that the industry works is that
+
+264
+00:19:11.400 --> 00:19:15.940
+<v Paul Biggar>everyone makes an incremental solution. The problem is actually the incremental solution.
+
+265
+00:19:15.940 --> 00:19:20.680
+<v Paul Biggar>It's that we just keep adding technologies to the amount of things that people need to know.
+
+266
+00:19:20.780 --> 00:19:30.240
+<v Paul Biggar>And that the only way to be able to actually remove complexity is to remove technologies, remove products, remove steps from the whole thing.
+
+267
+00:19:30.340 --> 00:19:32.280
+<v Paul Biggar>And to do that, we need to build
+
+268
+00:19:32.280 --> 00:19:33.440
+<v Paul Biggar>all of it.
+
+269
+00:19:35.680 --> 00:19:41.300
+<v Paul Biggar>We expected that by building all of it, we don't have to integrate with anything else.
+
+270
+00:19:41.300 --> 00:19:49.060
+<v Paul Biggar>So it's not like, you know, if you're building VS Code, right, a popular editor, you have to have support for every language that's out there.
+
+271
+00:19:49.180 --> 00:19:55.540
+<v Paul Biggar>And you also have to have support for a ton of like editing modes and all of those intersect and it's complicated.
+
+272
+00:19:55.920 --> 00:20:02.600
+<v Paul Biggar>We're like, okay, well, we only need, you know, one editor to work for one language to deploy to one thing.
+
+273
+00:20:02.700 --> 00:20:08.740
+<v Paul Biggar>You know, there's not 100,000 tools or 100,000 different combinations of tools that we need to deal with.
+
+274
+00:20:08.800 --> 00:20:09.500
+<v Paul Biggar>There's just one.
+
+275
+00:20:11.300 --> 00:20:14.300
+<v Paul Biggar>really, really did help, but not nearly as much as we thought.
+
+276
+00:20:15.920 --> 00:20:20.840
+<v Noah Labhart>So what does the future look like for the product and for your team?
+
+277
+00:20:21.820 --> 00:20:24.840
+<v Paul Biggar>So hopefully the future looks like product market fit.
+
+278
+00:20:25.140 --> 00:20:27.660
+<v Paul Biggar>The team at the moment is down to just me.
+
+279
+00:20:28.420 --> 00:20:31.280
+<v Paul Biggar>We have still quite a bit of money.
+
+280
+00:20:32.140 --> 00:20:36.060
+<v Paul Biggar>So really what I'm working on at the moment is figuring out
+
+281
+00:20:36.060 --> 00:20:40.380
+<v Paul Biggar>the best way to leverage that to get our way to product market fit.
+
+282
+00:20:41.300 --> 00:20:53.260
+<v Paul Biggar>I think we know what that needs to look like, but there's a lot of, we built up a large amount of technical debt and a bunch of it, it turned out, was in our way of getting to product market fit.
+
+283
+00:20:53.420 --> 00:21:05.220
+<v Paul Biggar>So there's the sort of like fixing a good amount of technical debt, and then there's adding the features, primarily a package manager, that we need to get to product market fit.
+
+284
+00:21:05.220 --> 00:21:12.280
+<v Paul Biggar>it. I think that like those are those are like the main thing, but you know, every part of it has to be,
+
+285
+00:21:12.280 --> 00:21:17.720
+<v Paul Biggar>yeah, every part of of Dark, you know, at the moment is in maybe an alpha state. And so that there's
+
+286
+00:21:17.720 --> 00:21:25.220
+<v Paul Biggar>also a large amount of of trying to like figure out an ordering so that is it okay that this
+
+287
+00:21:25.220 --> 00:21:31.240
+<v Paul Biggar>particular thing is in an alpha state or does the does the fact that it's an alpha state actually
+
+288
+00:21:31.240 --> 00:21:35.220
+<v Paul Biggar>prevent people from getting into the product or believing that the product is good.
+
+289
+00:21:36.280 --> 00:21:40.580
+<v Paul Biggar>Those are the kind of trade-offs that I'm dealing with apart from the actual product
+
+290
+00:21:41.180 --> 00:21:44.780
+<v Paul Biggar>features required to get to product market fit.
+
+291
+00:21:48.680 --> 00:21:52.080
+<v Noah Labhart>So we talked about a mistake, maybe a little bit different spin.
+
+292
+00:21:52.380 --> 00:21:55.500
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+293
+00:21:55.620 --> 00:21:57.840
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+294
+00:21:59.540 --> 00:22:08.580
+<v Paul Biggar>I think we'd hire a little bit more slowly. We had the company at 10 people in July or a little before July last year.
+
+295
+00:22:08.940 --> 00:22:20.600
+<v Paul Biggar>And I think we overhired and overspent. I think that we could have gotten much further with a smaller team and sort of like the overhead of having a team.
+
+296
+00:22:20.600 --> 00:22:24.500
+<v Paul Biggar>it became more inefficient as the team grew.
+
+297
+00:22:25.260 --> 00:22:27.680
+<v Paul Biggar>So I think that was sort of like one mistake.
+
+298
+00:22:27.940 --> 00:22:30.540
+<v Paul Biggar>We sort of spent a lot on management overhead,
+
+299
+00:22:31.200 --> 00:22:35.380
+<v Paul Biggar>had a lot of people involved in product decisions.
+
+300
+00:22:35.580 --> 00:22:40.680
+<v Paul Biggar>I think one of the other mistakes is sort of like a cultural mistake that we made
+
+301
+00:22:40.680 --> 00:22:46.300
+<v Paul Biggar>where we sort of had these values that we were telling our team,
+
+302
+00:22:46.300 --> 00:22:51.920
+<v Paul Biggar>you know these are our values and they actually weren't compatible with with how i like to build
+
+303
+00:22:51.920 --> 00:22:58.380
+<v Paul Biggar>things so i think you know the sort of hired people in for something and then that actually
+
+304
+00:22:58.380 --> 00:23:04.900
+<v Paul Biggar>wasn't wasn't how it was this all sounds very vague but i'll be more specific i have a very
+
+305
+00:23:04.900 --> 00:23:11.160
+<v Paul Biggar>concrete vision for what dark is going to be that's what we're building and there there is
+
+306
+00:23:11.160 --> 00:23:20.460
+<v Paul Biggar>There's lots of room for people to solve many of the smaller issues within that, but it really has to fit in with what I'm building.
+
+307
+00:23:20.760 --> 00:23:23.040
+<v Paul Biggar>And that's not how everyone likes to work.
+
+308
+00:23:23.160 --> 00:23:27.600
+<v Paul Biggar>And that's also not how we were pitching the team on how the company worked.
+
+309
+00:23:27.840 --> 00:23:33.020
+<v Paul Biggar>And I think that led to a lot of problems with the team when we had the team.
+
+310
+00:23:35.660 --> 00:23:36.780
+<v Noah Labhart>Last question, Paul.
+
+311
+00:23:36.780 --> 00:23:41.560
+<v Noah Labhart>Paul. So you're getting on a plane and you're sitting next to a young entrepreneur who's built
+
+312
+00:23:41.560 --> 00:23:45.660
+<v Noah Labhart>the next big thing. They're jazzed about it. They can't wait to show it off to the world.
+
+313
+00:23:45.820 --> 00:23:50.340
+<v Noah Labhart>Can't wait to show it off to you right there on the plane. What advice do you give that person
+
+314
+00:23:50.340 --> 00:23:51.780
+<v Noah Labhart>having gone down this road a bit?
+
+315
+00:23:52.640 --> 00:23:56.140
+<v Paul Biggar>When I talk to sort of younger entrepreneurs,
+
+316
+00:23:56.320 --> 00:24:02.900
+<v Paul Biggar>I tend to ask them a lot of questions and I tend to really try to understand what it is that
+
+317
+00:24:02.900 --> 00:24:05.900
+<v Paul Biggar>that they're doing mostly to see if it's consistent,
+
+318
+00:24:06.140 --> 00:24:08.220
+<v Paul Biggar>to see if it's like internally consistent.
+
+319
+00:24:08.460 --> 00:24:10.620
+<v Paul Biggar>So, you know, an obvious example
+
+320
+00:24:10.620 --> 00:24:11.980
+<v Paul Biggar>is someone who's building a startup
+
+321
+00:24:11.980 --> 00:24:14.080
+<v Paul Biggar>that needs a huge amount of money
+
+322
+00:24:14.080 --> 00:24:15.800
+<v Paul Biggar>and they're not in a position
+
+323
+00:24:15.800 --> 00:24:17.560
+<v Paul Biggar>to be able to like raise a huge amount of money.
+
+324
+00:24:18.600 --> 00:24:21.100
+<v Paul Biggar>I'm usually the person who tells entrepreneurs
+
+325
+00:24:21.100 --> 00:24:23.140
+<v Paul Biggar>that like they're really fucking it up.
+
+326
+00:24:23.240 --> 00:24:26.420
+<v Paul Biggar>And often I'm the first person to ever tell an entrepreneur
+
+327
+00:24:26.420 --> 00:24:27.640
+<v Paul Biggar>that they're really fucking it up.
+
+328
+00:24:27.860 --> 00:24:30.280
+<v Paul Biggar>And I think that that's like the value added service
+
+329
+00:24:30.280 --> 00:24:32.740
+<v Paul Biggar>that I give to the younger entrepreneurs
+
+330
+00:24:32.900 --> 00:24:35.660
+<v Paul Biggar>usually it's very helpful for them to hear this
+
+331
+00:24:35.660 --> 00:24:37.720
+<v Paul Biggar>and often what I tell them is like
+
+332
+00:24:37.720 --> 00:24:40.240
+<v Paul Biggar>stop building that consumer product
+
+333
+00:24:40.240 --> 00:24:44.040
+<v Paul Biggar>and start building a nice B2B or something instead
+
+334
+00:24:44.040 --> 00:24:46.980
+<v Paul Biggar>things that are easier to bring to market
+
+335
+00:24:46.980 --> 00:24:50.760
+<v Paul Biggar>and things that are easier to succeed at
+
+336
+00:24:50.760 --> 00:24:51.760
+<v Paul Biggar>as a first time entrepreneur
+
+337
+00:24:51.760 --> 00:24:56.020
+<v Paul Biggar>so I guess what I tell them is very context specific
+
+338
+00:24:56.020 --> 00:24:59.220
+<v Paul Biggar>but it's usually the thing that you're building
+
+339
+00:24:59.220 --> 00:25:02.720
+<v Paul Biggar>is much wrong in some way
+
+340
+00:25:02.900 --> 00:25:06.120
+<v Paul Biggar>for the attributes that you have as a founder.
+
+341
+00:25:07.020 --> 00:25:08.640
+<v Noah Labhart>Got it. That's interesting advice.
+
+342
+00:25:09.760 --> 00:25:11.800
+<v Noah Labhart>Paul, thank you for being on the show today.
+
+343
+00:25:11.900 --> 00:25:14.860
+<v Noah Labhart>Thank you for telling me the creation story of Dark.
+
+344
+00:25:15.220 --> 00:25:15.720
+<v Paul Biggar>Yeah,
+
+345
+00:25:15.700 --> 00:25:16.660
+<v Paul Biggar>thank you. This has been great.
+
+346
+00:25:18.440 --> 00:25:21.220
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+347
+00:25:26.680 --> 00:25:29.780
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+348
+00:25:29.780 --> 00:25:34.900
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+349
+00:25:35.360 --> 00:25:40.420
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+350
+00:25:40.820 --> 00:25:43.000
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+351
+00:25:43.320 --> 00:25:45.220
+<v Noah Labhart>Both things help us out tremendously.
+
+352
+00:25:47.880 --> 00:25:49.360
+<v Noah Labhart>And thanks again for listening.

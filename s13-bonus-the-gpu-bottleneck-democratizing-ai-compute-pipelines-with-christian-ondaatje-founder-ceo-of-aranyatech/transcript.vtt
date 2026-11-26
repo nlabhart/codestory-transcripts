@@ -1,0 +1,1635 @@
+WEBVTT
+
+NOTE S13 Bonus: The GPU Bottleneck: Democratizing AI Compute Pipelines with Christian Ondaatje, Founder & CEO of Aranya.tech
+
+1
+00:00:00.000 --> 00:00:05.360
+<v Christian Ondaatje>The customer is the PM, right? The user is the PM. If someone that's using what
+
+2
+00:00:05.360 --> 00:00:10.120
+<v Christian Ondaatje>we've built says, hey, I'm using what you've built, I like it, here's one way in
+
+3
+00:00:10.120 --> 00:00:15.120
+<v Christian Ondaatje>which to be better. That to us is like our sprint planning. We had originally
+
+4
+00:00:15.120 --> 00:00:21.160
+<v Christian Ondaatje>been like building out with this roadmap of like early launch a web UI and then
+
+5
+00:00:21.160 --> 00:00:26.500
+<v Christian Ondaatje>just came to terms with the fact that 99% of compute transacts and is operated
+
+6
+00:00:26.500 --> 00:00:32.260
+<v Christian Ondaatje>over, you know, Slack, phone, Telegram, WhatsApp, iMessage, what have you, these text channels.
+
+7
+00:00:32.420 --> 00:00:35.140
+<v Christian Ondaatje>And that all predated the LLM era.
+
+8
+00:00:35.420 --> 00:00:39.120
+<v Christian Ondaatje>We made the call to embrace that.
+
+9
+00:00:39.360 --> 00:00:43.540
+<v Christian Ondaatje>My name is Christian Ondaatje, and I'm co-founder and CEO of Aranya.
+
+10
+00:00:46.500 --> 00:00:52.240
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+11
+00:00:52.360 --> 00:00:53.720
+<v Clip>Six months moonlighting.
+
+12
+00:00:53.780 --> 00:00:55.280
+<v Clip>There's nothing on the back end.
+
+13
+00:00:56.500 --> 00:00:58.100
+<v Noah Labhart>what it takes to change an industry.
+
+14
+00:00:58.280 --> 00:01:00.100
+<v Clip>I don't exactly know what to do next.
+
+15
+00:01:00.100 --> 00:01:01.240
+<v Clip>It took many goes to get right.
+
+16
+00:01:01.880 --> 00:01:04.480
+<v Noah Labhart>Who built the teams that have their back.
+
+17
+00:01:04.580 --> 00:01:06.140
+<v Clip>A company is its people.
+
+18
+00:01:06.140 --> 00:01:07.520
+<v Clip>The teams help each other achieve more.
+
+19
+00:01:07.520 --> 00:01:08.600
+<v Clip>Most proud of our team.
+
+20
+00:01:08.940 --> 00:01:11.220
+<v Noah Labhart>Keeping scalability top of mind.
+
+21
+00:01:11.500 --> 00:01:12.860
+<v Clip>All that infrastructure was a pain.
+
+22
+00:01:12.860 --> 00:01:14.340
+<v Clip>Yes, we've been fighting it as we've grown.
+
+23
+00:01:14.520 --> 00:01:15.320
+<v Clip>Total waste of time.
+
+24
+00:01:15.580 --> 00:01:17.840
+<v Noah Labhart>The stories you don't read in the headlines.
+
+25
+00:01:18.280 --> 00:01:20.040
+<v Clip>It's not an easy thing to achieve, my dear.
+
+26
+00:01:20.040 --> 00:01:22.120
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+27
+00:01:22.480 --> 00:01:25.860
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+28
+00:01:26.500 --> 00:01:27.580
+<v Clip>to really want it.
+
+29
+00:01:27.600 --> 00:01:28.980
+<v Clip>It's not just about technology.
+
+30
+00:01:29.100 --> 00:01:30.960
+<v Noah Labhart>All this and more on Code Story.
+
+31
+00:01:32.280 --> 00:01:33.780
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+32
+00:01:34.080 --> 00:01:36.120
+<v Noah Labhart>And today, how Christian Ondaatje
+
+33
+00:01:36.120 --> 00:01:39.220
+<v Noah Labhart>is enabling you to go bare metal to production
+
+34
+00:01:39.220 --> 00:01:43.600
+<v Noah Labhart>in 48 hours, optimized for your GPU workload.
+
+35
+00:01:49.180 --> 00:01:52.220
+<v Noah Labhart>Christian Ondaatje is originally from Los Angeles, California.
+
+36
+00:01:52.540 --> 00:01:55.420
+<v Noah Labhart>He got into GPUs as an underclassman in college,
+
+37
+00:01:56.500 --> 00:02:02.480
+<v Noah Labhart>in VR. He ended up starting an eGPU company in his CS program at Harvard, though it was shut down
+
+38
+00:02:02.480 --> 00:02:07.320
+<v Noah Labhart>through some cease and desist from Apple. Though he learned some hard startup lessons, his love for
+
+39
+00:02:07.320 --> 00:02:13.480
+<v Noah Labhart>GPUs was only fueled more. Outside of tech, he does a lot of sim racing. In fact, he has built his own
+
+40
+00:02:13.480 --> 00:02:18.980
+<v Noah Labhart>Linux VR racing simulator rig over a couple of years. He finds that the formal online competition
+
+41
+00:02:18.980 --> 00:02:25.440
+<v Noah Labhart>is very fun to participate in. As I mentioned, Christian was way into GPUs throughout many
+
+42
+00:02:26.500 --> 00:02:32.040
+<v Noah Labhart>in his life. He and his team recognized that while demand for AI inference and compute was at an
+
+43
+00:02:32.040 --> 00:02:37.260
+<v Noah Labhart>all-time high, setting up bare metal GPU infrastructure was still complex and slow.
+
+44
+00:02:37.680 --> 00:02:44.820
+<v Noah Labhart>So they set out to change it. This is the creation story of Aranya.
+
+45
+00:02:48.740 --> 00:02:55.140
+<v Christian Ondaatje>We bridge the gap from the reality of what modern private data centers offer, which is bare metal,
+
+46
+00:02:56.500 --> 00:03:00.860
+<v Christian Ondaatje>orchestrate that and build custom architectures on the fly
+
+47
+00:03:00.860 --> 00:03:06.380
+<v Christian Ondaatje>so that it matches very cleanly with what AI companies need, right?
+
+48
+00:03:06.460 --> 00:03:09.400
+<v Christian Ondaatje>So you have all these AI companies buying massive amounts of compute
+
+49
+00:03:09.400 --> 00:03:14.300
+<v Christian Ondaatje>that are coming from their testing grounds or career experience
+
+50
+00:03:14.300 --> 00:03:17.360
+<v Christian Ondaatje>in the hyperscalers, AWS, Azure, GCP, et cetera,
+
+51
+00:03:17.820 --> 00:03:24.360
+<v Christian Ondaatje>and then being pushed by necessity into the world of low-cost compute,
+
+52
+00:03:24.520 --> 00:03:26.100
+<v Christian Ondaatje>which is private bare metal data centers.
+
+53
+00:03:26.500 --> 00:03:40.160
+<v Christian Ondaatje>So their architecture needs usually some kind of managed layer, managed Kubernetes, some sort of pre-built orchestration layer that is able to span a massive amount of compute and make it seamless to run AI on top of it.
+
+54
+00:03:40.240 --> 00:03:47.240
+<v Christian Ondaatje>And that's not present in most of these modern data centers that are powering the AI run up in 2026 and beyond.
+
+55
+00:03:47.520 --> 00:03:55.900
+<v Christian Ondaatje>So we dropped in and our claim to fame is we can take any bare metal and turn it into a production ready inference cluster.
+
+56
+00:03:56.500 --> 00:04:04.180
+<v Christian Ondaatje>in 48 hours. So what that really translates to is us being able to help our customers
+
+57
+00:04:04.180 --> 00:04:08.560
+<v Christian Ondaatje>totally outscale their competition. And we've seen that play out this year already.
+
+58
+00:04:10.740 --> 00:04:15.500
+<v Noah Labhart>This will be interesting to hear where you start, but I'm curious about what you would consider the
+
+59
+00:04:15.500 --> 00:04:21.680
+<v Noah Labhart>MVP for Aranya, that first version of what you built with the operating system, how long it
+
+60
+00:04:21.680 --> 00:04:23.840
+<v Noah Labhart>took to build and what sort of tools were using to bring it to life?
+
+61
+00:04:24.760 --> 00:04:27.440
+<v Christian Ondaatje>The core technology is something I've been working on for quite a long time.
+
+62
+00:04:27.660 --> 00:04:34.340
+<v Christian Ondaatje>So as far back as 10 years ago, I had been designing these systems for orchestration
+
+63
+00:04:34.340 --> 00:04:39.700
+<v Christian Ondaatje>of heterogeneous compute into a cohesive whole. That evolved into an open source technology I
+
+64
+00:04:39.700 --> 00:04:44.060
+<v Christian Ondaatje>built called ClusterOS. This is when I was a founder of a company called Atoka. We were
+
+65
+00:04:44.640 --> 00:04:50.320
+<v Christian Ondaatje>cracking Bitcoin logs for people who had forgotten their passwords, using, aside from running the
+
+66
+00:04:50.320 --> 00:04:54.260
+<v Christian Ondaatje>the company and handling all a significant portion of the legal work, et cetera, I had
+
+67
+00:04:54.260 --> 00:04:57.020
+<v Christian Ondaatje>to orchestrate a data center's worth of compute as a solo founder.
+
+68
+00:04:57.200 --> 00:05:00.380
+<v Christian Ondaatje>And ClusterOS really arose from that necessity.
+
+69
+00:05:00.660 --> 00:05:05.560
+<v Christian Ondaatje>That was the crucible that produced the core of this technology, which then was open sourced,
+
+70
+00:05:05.620 --> 00:05:10.540
+<v Christian Ondaatje>built some other distributed operating systems on top of it in later parts of my career,
+
+71
+00:05:10.640 --> 00:05:17.540
+<v Christian Ondaatje>and then eventually transferred that IP to Aranya to form the core of our single cluster
+
+72
+00:05:17.540 --> 00:05:18.420
+<v Christian Ondaatje>engine, right?
+
+73
+00:05:20.320 --> 00:05:26.500
+<v Christian Ondaatje>allows us to go multi-cluster super seamlessly because each individual cluster becomes very clean
+
+74
+00:05:26.500 --> 00:05:32.900
+<v Christian Ondaatje>to orchestrate. So I would say that's probably what I would refer to as like the MVP was when
+
+75
+00:05:32.900 --> 00:05:38.560
+<v Christian Ondaatje>I started being able to like actually coherently manage that amount of compute as a solo. It really
+
+76
+00:05:38.560 --> 00:05:41.480
+<v Christian Ondaatje>clicked and was like, okay, that's the foundation of a multi-cluster operating system.
+
+77
+00:05:42.220 --> 00:05:47.360
+<v Noah Labhart>So that's the foundation. I'm curious about, and I could probably cherry pick a couple of things
+
+78
+00:05:47.360 --> 00:05:51.320
+<v Noah Labhart>from what you said, but tell me about a decision or trade-off you had to make in how you approached
+
+79
+00:05:52.060 --> 00:05:54.260
+<v Noah Labhart>creating it and how you coped with that decision.
+
+80
+00:05:55.080 --> 00:05:57.800
+<v Christian Ondaatje>It was very important to us that ClusterOS be
+
+81
+00:05:57.800 --> 00:06:02.460
+<v Christian Ondaatje>open source. And I know that's something that a lot of founders go back and forth with, or
+
+82
+00:06:02.460 --> 00:06:07.240
+<v Christian Ondaatje>a lot of open source communities push against there being a combination between enterprise
+
+83
+00:06:07.240 --> 00:06:11.720
+<v Christian Ondaatje>and open source. Open source is very near and dear to me. It's something that's been a very
+
+84
+00:06:11.720 --> 00:06:16.360
+<v Christian Ondaatje>big part of my life. It's something that I owe much, much of my capabilities as an engineer to
+
+85
+00:06:17.360 --> 00:06:21.580
+<v Christian Ondaatje>various open source communities that I've been a part of and benefited from. And so for us,
+
+86
+00:06:21.600 --> 00:06:29.660
+<v Christian Ondaatje>I think having seen the power of adoption and open source, the foundational shifts that are
+
+87
+00:06:29.660 --> 00:06:37.340
+<v Christian Ondaatje>possible when an open source technology is built to genuinely be useful for the community rather
+
+88
+00:06:37.340 --> 00:06:42.700
+<v Christian Ondaatje>than just being useful for the company that stewards it or even the organization that stewards
+
+89
+00:06:42.700 --> 00:06:45.720
+<v Christian Ondaatje>And we really hope that's the case with ClusterOS.
+
+90
+00:06:45.780 --> 00:06:58.620
+<v Christian Ondaatje>We're constantly adding new features that aren't necessarily the thing that like Aranya needs in that moment, but is something that we look around and see, OK, like self-hosted Prometheus is like a really good thing to do right now.
+
+91
+00:06:58.620 --> 00:07:16.820
+<v Christian Ondaatje>Now, if you want to run that on ClosedRest or like even a Minecraft server or self-hosted storage is tough and we can prepackage a lot of that and have it shipped out of the box in a way that, yeah, makes it feel a lot more like getting a laptop that's assembled versus getting a laptop in a thousand component parts.
+
+92
+00:07:17.080 --> 00:07:23.580
+<v Christian Ondaatje>So I think the decision to make something so powerful open source and keep it open source was a big one.
+
+93
+00:07:23.740 --> 00:07:25.900
+<v Christian Ondaatje>And that's definitely the thought that comes to mind.
+
+94
+00:07:27.340 --> 00:07:31.700
+<v Christian Ondaatje>It's in our opinion, though, like a prerequisite to proper adoption.
+
+95
+00:07:32.240 --> 00:07:35.760
+<v Christian Ondaatje>And you look at the scale out of Linux, the scale out of Kubernetes, right?
+
+96
+00:07:36.020 --> 00:07:43.280
+<v Christian Ondaatje>Those all came off of the back of this unique pattern of adoption that is totally specific to open source, right?
+
+97
+00:07:43.400 --> 00:07:45.440
+<v Christian Ondaatje>99% of compute in the world runs on Linux.
+
+98
+00:07:45.820 --> 00:07:51.860
+<v Christian Ondaatje>When you want to build a cluster, it is almost always going to be a Kubernetes cluster or can be a Kubernetes cluster.
+
+99
+00:07:51.860 --> 00:07:56.120
+<v Christian Ondaatje>or at least in this era, right, that that percentage is growing rapidly.
+
+100
+00:07:56.280 --> 00:08:03.700
+<v Christian Ondaatje>It is, I would say, the only way practically in this era to create a category killer,
+
+101
+00:08:03.860 --> 00:08:09.220
+<v Christian Ondaatje>to create a fundamental technology shift that will last not just for the lifespan of the company,
+
+102
+00:08:09.260 --> 00:08:11.280
+<v Christian Ondaatje>but like multiple generations, right?
+
+103
+00:08:11.380 --> 00:08:15.420
+<v Christian Ondaatje>Like you'd see in TCP IP and those kinds of early innovations.
+
+104
+00:08:15.740 --> 00:08:17.780
+<v Christian Ondaatje>I think that's something that's important to us.
+
+105
+00:08:17.780 --> 00:08:24.320
+<v Christian Ondaatje>And that was a big part of that decision was building technology that we can be proud of handing off to our kids and beyond.
+
+106
+00:08:26.540 --> 00:08:27.600
+<v Noah Labhart>Let's move forward then.
+
+107
+00:08:27.680 --> 00:08:32.580
+<v Noah Labhart>So you've got, you know, that built, the foundation of what you've built.
+
+108
+00:08:32.640 --> 00:08:38.360
+<v Noah Labhart>How have you progressed and matured it, you know, with the changes in industry and with, you know, it's happening fast.
+
+109
+00:08:38.580 --> 00:08:44.240
+<v Noah Labhart>And I think to wrap that in a box a little bit, I'm curious about how you build your roadmap.
+
+110
+00:08:44.240 --> 00:08:48.320
+<v Noah Labhart>How do you go about deciding that, okay, this is the next most important thing to build or to address?
+
+111
+00:08:50.140 --> 00:08:54.820
+<v Christian Ondaatje>One of the core things we say sometimes at the office is the customer is the PM, right?
+
+112
+00:08:54.880 --> 00:08:55.780
+<v Christian Ondaatje>The user is the PM.
+
+113
+00:08:56.100 --> 00:09:02.140
+<v Christian Ondaatje>So, of course, we adhere to good product management, sometimes not as well as we should, but keeps it fun and flexible.
+
+114
+00:09:02.720 --> 00:09:10.300
+<v Christian Ondaatje>I think the thing that really makes everyone sit up and pay attention at the company is if someone that's using what we've built says,
+
+115
+00:09:10.300 --> 00:09:12.320
+<v Christian Ondaatje>says, hey, I'm using what you've built.
+
+116
+00:09:12.440 --> 00:09:13.260
+<v Christian Ondaatje>I like it.
+
+117
+00:09:13.560 --> 00:09:15.020
+<v Christian Ondaatje>Here's one way in which it could be better.
+
+118
+00:09:15.560 --> 00:09:19.100
+<v Christian Ondaatje>That to us is like our sprint planning, right?
+
+119
+00:09:19.180 --> 00:09:22.720
+<v Christian Ondaatje>It's like, okay, this is what clearly the ecosystem or the product needs.
+
+120
+00:09:22.900 --> 00:09:28.680
+<v Christian Ondaatje>So what we saw and where that really, where the rubber meets the road in relation to that
+
+121
+00:09:28.680 --> 00:09:35.100
+<v Christian Ondaatje>concept is we had originally been like building out with this roadmap of like early launch
+
+122
+00:09:35.100 --> 00:09:37.460
+<v Christian Ondaatje>a web UI, early launch a web UI.
+
+123
+00:09:37.700 --> 00:09:41.480
+<v Christian Ondaatje>And then just came to terms with the fact that 99%
+
+124
+00:09:41.480 --> 00:09:45.420
+<v Christian Ondaatje>of compute transacts and is operated over email,
+
+125
+00:09:45.420 --> 00:09:48.340
+<v Christian Ondaatje>Slack, phone, Telegram, WhatsApp, iMessage, what have you,
+
+126
+00:09:48.780 --> 00:09:52.740
+<v Christian Ondaatje>these text channels, and that all predated the LLM era.
+
+127
+00:09:53.680 --> 00:09:56.840
+<v Christian Ondaatje>We made the call to embrace that.
+
+128
+00:09:56.960 --> 00:09:59.980
+<v Christian Ondaatje>I think a lot of tech companies kind of can be divided
+
+129
+00:09:59.980 --> 00:10:01.680
+<v Christian Ondaatje>into two categories.
+
+130
+00:10:01.800 --> 00:10:04.760
+<v Christian Ondaatje>You have the companies that see chaos and break out
+
+131
+00:10:05.100 --> 00:10:09.600
+<v Christian Ondaatje>ironing board and then you have companies that see chaos and break out a surfboard. Like we try to see
+
+132
+00:10:09.600 --> 00:10:17.440
+<v Christian Ondaatje>the chaos and just go with it and not try to fight it and that is what pushed us towards making the
+
+133
+00:10:17.440 --> 00:10:25.960
+<v Christian Ondaatje>primary interface for the multi-cluster operating system be in slack in email in the various text
+
+134
+00:10:25.960 --> 00:10:32.000
+<v Christian Ondaatje>channels that are really the way that like compute is operated at the human level and put our ai into
+
+135
+00:10:32.000 --> 00:10:33.540
+<v Christian Ondaatje>into that ecosystem first.
+
+136
+00:10:34.260 --> 00:10:36.800
+<v Christian Ondaatje>And it's been a really productive decision.
+
+137
+00:10:37.020 --> 00:10:39.540
+<v Christian Ondaatje>It allows us to meet people where they're at,
+
+138
+00:10:39.660 --> 00:10:40.840
+<v Christian Ondaatje>meet companies where they're at,
+
+139
+00:10:40.940 --> 00:10:42.360
+<v Christian Ondaatje>and build stuff that's useful to them
+
+140
+00:10:42.360 --> 00:10:45.580
+<v Christian Ondaatje>without pushing this adoption or behavior change.
+
+141
+00:10:47.340 --> 00:10:49.180
+<v Noah Labhart>I'm curious about team, right?
+
+142
+00:10:49.200 --> 00:10:50.460
+<v Noah Labhart>I hear you saying us and we.
+
+143
+00:10:50.560 --> 00:10:51.960
+<v Noah Labhart>Tell me about how you built that team.
+
+144
+00:10:52.060 --> 00:10:53.440
+<v Noah Labhart>What do you look for in those people
+
+145
+00:10:53.440 --> 00:10:56.060
+<v Noah Labhart>to indicate that they are the winning horses to join you?
+
+146
+00:10:56.940 --> 00:10:58.720
+<v Christian Ondaatje>I have two amazing co-founders.
+
+147
+00:10:58.900 --> 00:11:00.920
+<v Christian Ondaatje>Sasi is our CPO.
+
+148
+00:11:02.120 --> 00:11:08.280
+<v Christian Ondaatje>a department at Jaguar Land Rover from 20 to 300 people with a $12 million R&amp;D budget and
+
+149
+00:11:08.280 --> 00:11:15.500
+<v Christian Ondaatje>was in the process of building out this distributed car GPU cluster company when we met
+
+150
+00:11:15.500 --> 00:11:21.520
+<v Christian Ondaatje>and things just really clicked. Actually, our other co-founder introduced us. So Aria and I
+
+151
+00:11:21.520 --> 00:11:25.700
+<v Christian Ondaatje>have known each other for a very long time. We're married as well as being co-founders,
+
+152
+00:11:25.740 --> 00:11:30.540
+<v Christian Ondaatje>have known each other for almost nine years, have been married for six years, and she's been
+
+153
+00:11:32.000 --> 00:11:39.500
+<v Christian Ondaatje>level of venture capital, has been in decentralized compute, has been in AI operations, and then I
+
+154
+00:11:39.500 --> 00:11:46.500
+<v Christian Ondaatje>tagged along as she was getting her MBA at MIT. That's where we met Sasi and really clicked as a
+
+155
+00:11:46.500 --> 00:11:52.120
+<v Christian Ondaatje>unit and just have been incredibly fortunate to be working with both of them. The rest of the team,
+
+156
+00:11:52.160 --> 00:12:00.780
+<v Christian Ondaatje>we really took our time, I would say. We didn't make our first hire for almost, I think,
+
+157
+00:12:02.220 --> 00:12:07.600
+<v Christian Ondaatje>because we really wanted to focus on planting the seed of an amazing team
+
+158
+00:12:07.600 --> 00:12:13.000
+<v Christian Ondaatje>that was going to be full of people with that sort of spark and curiosity
+
+159
+00:12:13.000 --> 00:12:18.980
+<v Christian Ondaatje>and with that quality of being able to learn on the fly
+
+160
+00:12:18.980 --> 00:12:23.820
+<v Christian Ondaatje>and adapt to new problems as they arise live,
+
+161
+00:12:24.020 --> 00:12:25.520
+<v Christian Ondaatje>which is the reality of what we deal with, right?
+
+162
+00:12:25.620 --> 00:12:29.020
+<v Christian Ondaatje>We work with tens of small data centers,
+
+163
+00:12:29.020 --> 00:12:32.980
+<v Christian Ondaatje>and they're going to have, just by virtue of the numbers,
+
+164
+00:12:33.180 --> 00:12:34.840
+<v Christian Ondaatje>small instance every day, right?
+
+165
+00:12:34.900 --> 00:12:38.360
+<v Christian Ondaatje>A switch port goes down, or we've actually seen this,
+
+166
+00:12:38.460 --> 00:12:42.360
+<v Christian Ondaatje>a tornado takes out a backbone router in one data center.
+
+167
+00:12:42.560 --> 00:12:44.080
+<v Christian Ondaatje>And to figure out that happened,
+
+168
+00:12:44.140 --> 00:12:46.980
+<v Christian Ondaatje>you need a really creative kind of brilliant individual
+
+169
+00:12:46.980 --> 00:12:49.060
+<v Christian Ondaatje>on the line as that's going down.
+
+170
+00:12:49.220 --> 00:12:51.340
+<v Christian Ondaatje>And we were really lucky that Yofi Kwanzaa
+
+171
+00:12:51.340 --> 00:12:52.180
+<v Christian Ondaatje>and I had worked together,
+
+172
+00:12:52.280 --> 00:12:53.840
+<v Christian Ondaatje>and he's an incredible engineer.
+
+173
+00:12:53.940 --> 00:12:54.860
+<v Christian Ondaatje>He's our founding platform engineer.
+
+174
+00:12:54.980 --> 00:12:58.720
+<v Christian Ondaatje>He joined over accepting an offer at Together AI, actually.
+
+175
+00:12:59.020 --> 00:13:04.080
+<v Christian Ondaatje>which was a really, really great honor for him to make that move, especially when we're so early.
+
+176
+00:13:04.380 --> 00:13:08.320
+<v Christian Ondaatje>And he's been experienced in orchestrating hundreds of clusters at once
+
+177
+00:13:08.320 --> 00:13:12.660
+<v Christian Ondaatje>and has that curious character and on-the-fly personality
+
+178
+00:13:12.660 --> 00:13:15.700
+<v Christian Ondaatje>that has just been really great to continue to build a team around.
+
+179
+00:13:15.880 --> 00:13:21.480
+<v Christian Ondaatje>And then Lily joined shortly thereafter, really dynamic GTM lead with a math background.
+
+180
+00:13:21.660 --> 00:13:25.520
+<v Christian Ondaatje>And then we just really have been building the team from there
+
+181
+00:13:25.520 --> 00:13:31.220
+<v Christian Ondaatje>and have, yeah, continued to add really excellent platform engineers, SREs,
+
+182
+00:13:31.220 --> 00:13:34.900
+<v Christian Ondaatje>and really trying to maintain that quality of that bright curiosity
+
+183
+00:13:34.900 --> 00:13:40.500
+<v Christian Ondaatje>combined with a bit of grit that I think makes for really good automation plus on-call team.
+
+184
+00:13:41.440 --> 00:13:47.200
+<v Noah Labhart>So within the last year, Aranya has grown fast.
+
+185
+00:13:47.540 --> 00:13:49.140
+<v Noah Labhart>You've hit some major milestones.
+
+186
+00:13:49.380 --> 00:13:55.220
+<v Noah Labhart>As we've talked about how you go about your roadmap and how you've built your team,
+
+187
+00:13:55.520 --> 00:14:02.480
+<v Noah Labhart>curious about if you can touch on how Aranya has taken shape and grown so fast over the past year.
+
+188
+00:14:03.420 --> 00:14:09.600
+<v Christian Ondaatje>This is where we really just embrace being a technology, right? Even I was listening to some
+
+189
+00:14:09.600 --> 00:14:14.880
+<v Christian Ondaatje>of your podcasts, you had an ad about .tech domains, which I really enjoyed seeing because
+
+190
+00:14:14.880 --> 00:14:20.580
+<v Christian Ondaatje>we're Aranya.tech. And we just thought, hey, we're like, you know what? This is about technology.
+
+191
+00:14:20.580 --> 00:14:23.660
+<v Christian Ondaatje>we're going to be Aranya.tech and embrace that.
+
+192
+00:14:23.860 --> 00:14:28.900
+<v Christian Ondaatje>And the proof, in my opinion, of when you have a technology
+
+193
+00:14:28.900 --> 00:14:34.280
+<v Christian Ondaatje>is when you make an individual become immensely more capable
+
+194
+00:14:34.280 --> 00:14:37.180
+<v Christian Ondaatje>than they were before, right?
+
+195
+00:14:37.320 --> 00:14:41.620
+<v Christian Ondaatje>So for us, the way that's expressed is that already
+
+196
+00:14:42.240 --> 00:14:45.320
+<v Christian Ondaatje>we're operating $120 million of GPU infrastructure per engineer.
+
+197
+00:14:45.440 --> 00:14:47.360
+<v Christian Ondaatje>And that number is growing, right? That ratio is growing.
+
+198
+00:14:47.500 --> 00:14:50.360
+<v Christian Ondaatje>It's something that we pride ourselves on, we focus on.
+
+199
+00:14:50.580 --> 00:14:54.540
+<v Christian Ondaatje>as sort of evidence, okay, clearly we have a technology
+
+200
+00:14:54.540 --> 00:14:58.720
+<v Christian Ondaatje>because an individual is able to orchestrate
+
+201
+00:14:58.720 --> 00:15:00.600
+<v Christian Ondaatje>this massive amount of compute capital
+
+202
+00:15:00.600 --> 00:15:02.500
+<v Christian Ondaatje>that previously would have taken years
+
+203
+00:15:02.500 --> 00:15:04.700
+<v Christian Ondaatje>and many teams and departments.
+
+204
+00:15:05.060 --> 00:15:08.200
+<v Christian Ondaatje>And that's where we really, we sit up and take notice
+
+205
+00:15:08.200 --> 00:15:09.460
+<v Christian Ondaatje>and say, okay, we're building something
+
+206
+00:15:09.460 --> 00:15:11.480
+<v Christian Ondaatje>that's really effective here that is actually innovative.
+
+207
+00:15:11.760 --> 00:15:15.480
+<v Christian Ondaatje>And I think the thing that really catalyzes that
+
+208
+00:15:15.480 --> 00:15:18.180
+<v Christian Ondaatje>is like I mentioned earlier, embracing the chaos
+
+209
+00:15:18.180 --> 00:15:20.580
+<v Christian Ondaatje>us and just trying to surf it out.
+
+210
+00:15:20.680 --> 00:15:27.440
+<v Christian Ondaatje>And our core innovation of being multicluster native, of working with
+
+211
+00:15:28.420 --> 00:15:33.740
+<v Christian Ondaatje>scrappier data centers that are incredibly capable, but building with
+
+212
+00:15:33.740 --> 00:15:35.520
+<v Christian Ondaatje>less resources than the hyperscalers.
+
+213
+00:15:35.640 --> 00:15:41.440
+<v Christian Ondaatje>All of that is expressed in how high leverage our technology enables
+
+214
+00:15:41.440 --> 00:15:42.720
+<v Christian Ondaatje>each individual engineer to be.
+
+215
+00:15:42.720 --> 00:16:01.000
+<v Christian Ondaatje>And then that translates to us being able to dramatically reduce the cost of inference, not through cheaper hardware, but through taking and upgrading and making these bleeding edge data centers much, much more viable at scale and in aggregate.
+
+216
+00:16:01.220 --> 00:16:04.260
+<v Christian Ondaatje>And that all runs through the tech of Aranya.tech.
+
+217
+00:16:06.900 --> 00:16:09.160
+<v Noah Labhart>Let's move into scalability.
+
+218
+00:16:09.160 --> 00:16:18.100
+<v Noah Labhart>And this is baked into your bread and butter and the speed of how you launch bare metal to production-ready servers.
+
+219
+00:16:18.340 --> 00:16:19.820
+<v Noah Labhart>I'm curious about scale, though.
+
+220
+00:16:19.860 --> 00:16:22.000
+<v Noah Labhart>How did you approach it from the early days?
+
+221
+00:16:22.080 --> 00:16:25.340
+<v Noah Labhart>And has there been interesting areas where you've had to fight scale as you've grown?
+
+222
+00:16:26.840 --> 00:16:33.820
+<v Christian Ondaatje>I like this question because I think it plays to one of our strengths, which is we, from the get-go, built in a federated architecture.
+
+223
+00:16:33.820 --> 00:16:43.020
+<v Christian Ondaatje>So what that means is you have clusters of clusters from day one, rather than an individual Kubernetes cluster that your company runs on top of.
+
+224
+00:16:43.060 --> 00:16:47.460
+<v Christian Ondaatje>On a federated architecture, you have a management cluster and then lots of subclusters.
+
+225
+00:16:47.680 --> 00:16:58.620
+<v Christian Ondaatje>So we took that step, which maybe went against sort of conventional wisdom, which is that you want to just build the default architecture at first and then solve scaling problems as they come up.
+
+226
+00:16:58.720 --> 00:17:02.600
+<v Christian Ondaatje>Which I usually would adhere to and agree with.
+
+227
+00:17:03.820 --> 00:17:08.860
+<v Christian Ondaatje>given that the core of our business is tasked itself with scaling,
+
+228
+00:17:08.980 --> 00:17:10.180
+<v Christian Ondaatje>scaling is our business,
+
+229
+00:17:10.380 --> 00:17:13.500
+<v Christian Ondaatje>that was a decision we made early on that has really ended up paying dividends.
+
+230
+00:17:13.780 --> 00:17:20.220
+<v Christian Ondaatje>So for us, what scaling looks like is not adding nodes or servers to a cluster.
+
+231
+00:17:20.360 --> 00:17:23.060
+<v Christian Ondaatje>What scaling looks like is adding clusters to a federation,
+
+232
+00:17:23.280 --> 00:17:28.600
+<v Christian Ondaatje>which is a process that we've gotten to be almost as straightforward
+
+233
+00:17:28.600 --> 00:17:29.900
+<v Christian Ondaatje>as adding a node to a cluster.
+
+234
+00:17:29.900 --> 00:17:37.440
+<v Christian Ondaatje>right so what that allows us to do is we can like i said in under 48 hours we can throw in a whole
+
+235
+00:17:37.440 --> 00:17:41.720
+<v Christian Ondaatje>new cluster to our architecture and have it up and running and that number we're capable of bringing
+
+236
+00:17:41.720 --> 00:17:48.920
+<v Christian Ondaatje>down over the coming months as well so i would say scale from day one has been a very critical
+
+237
+00:17:48.920 --> 00:17:54.400
+<v Christian Ondaatje>focus and i think a lot of the conventional wisdom to be honest was developed in an era where a
+
+238
+00:17:54.400 --> 00:17:56.560
+<v Christian Ondaatje>a company would scale up over the course of a decade.
+
+239
+00:17:57.060 --> 00:17:59.380
+<v Christian Ondaatje>But just the way things are right now,
+
+240
+00:17:59.480 --> 00:18:01.660
+<v Christian Ondaatje>a company will scale up over the course of a couple months.
+
+241
+00:18:02.660 --> 00:18:04.200
+<v Christian Ondaatje>And that's something that we've seen
+
+242
+00:18:04.200 --> 00:18:06.460
+<v Christian Ondaatje>a lot of clients come to us to help with, right?
+
+243
+00:18:06.500 --> 00:18:09.860
+<v Christian Ondaatje>It's like, because of how scale native we are,
+
+244
+00:18:09.900 --> 00:18:11.300
+<v Christian Ondaatje>because of how multi-cluster native we are,
+
+245
+00:18:11.380 --> 00:18:16.280
+<v Christian Ondaatje>those types of scaling problems are very natural to us
+
+246
+00:18:16.280 --> 00:18:19.340
+<v Christian Ondaatje>and very downstream in our architecture
+
+247
+00:18:19.340 --> 00:18:21.880
+<v Christian Ondaatje>in a way that is atypical in the field, I would say.
+
+248
+00:18:24.580 --> 00:18:28.880
+<v Noah Labhart>So as you step out on the balcony, you look across all that you've built thus far with
+
+249
+00:18:28.880 --> 00:18:30.600
+<v Noah Labhart>Aranya, what are you most proud of?
+
+250
+00:18:31.160 --> 00:18:38.920
+<v Christian Ondaatje>There is this certain quality and I would even say aesthetic that spans departments
+
+251
+00:18:39.460 --> 00:18:45.800
+<v Christian Ondaatje>at Aranya that I genuinely think is the thing I feel most proud of.
+
+252
+00:18:45.920 --> 00:18:50.220
+<v Christian Ondaatje>And I think it's something that if you ask the other team members, they might allude
+
+253
+00:18:50.220 --> 00:18:50.740
+<v Christian Ondaatje>to as well.
+
+254
+00:18:50.840 --> 00:18:53.180
+<v Christian Ondaatje>But I don't know if we have a clear shared language for it.
+
+255
+00:18:54.400 --> 00:19:01.560
+<v Christian Ondaatje>some examples. So in all of our node names, most companies will give you like a hodgepodge of
+
+256
+00:19:02.700 --> 00:19:09.260
+<v Christian Ondaatje>numbers and letters or like UUIDs, right? And they will look like a hex code and that'll be
+
+257
+00:19:09.260 --> 00:19:13.140
+<v Christian Ondaatje>your server. And one of the things that very early on we decided was, okay, we're going to
+
+258
+00:19:13.140 --> 00:19:17.960
+<v Christian Ondaatje>have ours be human readable, right? We use, Canonical does this really well, that they
+
+259
+00:19:17.960 --> 00:19:22.420
+<v Christian Ondaatje>They have this library that generates human readable names for things like this.
+
+260
+00:19:22.580 --> 00:19:29.240
+<v Christian Ondaatje>And so we might have our nodes that say, you know, something like Leaning Giraffe is like going to be a node name.
+
+261
+00:19:29.440 --> 00:19:36.380
+<v Christian Ondaatje>And so you have this whole massive infrastructure, but it doesn't feel impersonal and it doesn't feel unapproachable.
+
+262
+00:19:36.540 --> 00:19:38.600
+<v Christian Ondaatje>And it clicks in your memory a little bit better.
+
+263
+00:19:38.660 --> 00:19:40.980
+<v Christian Ondaatje>And in fact, it clicks in AI's memory a little bit better.
+
+264
+00:19:40.980 --> 00:19:50.040
+<v Christian Ondaatje>Right. So just a little thing like that, that becomes the way that people recognize our clusters as having had that little extra bit of work.
+
+265
+00:19:50.160 --> 00:20:09.200
+<v Christian Ondaatje>And that is a quality that shows up in our company attire and merchandise that shows up in the plants at our office, that shows up in, of course, like our aesthetic on our website and our billboards and in the little Linux desktops that we give each engineer when they join.
+
+266
+00:20:10.980 --> 00:20:15.620
+<v Christian Ondaatje>certain quality that, and again, difficult to articulate exactly what it is, but I will say
+
+267
+00:20:15.620 --> 00:20:22.780
+<v Christian Ondaatje>credit where credit's due. I think the wellspring of this at the company would be Aria, our COO.
+
+268
+00:20:23.040 --> 00:20:28.220
+<v Christian Ondaatje>It's something that she really, throughout all of her career that I've seen, has brought to every
+
+269
+00:20:28.220 --> 00:20:32.380
+<v Christian Ondaatje>company she's worked with. And it changes the way everything gets built, right? If you just
+
+270
+00:20:32.380 --> 00:20:38.580
+<v Christian Ondaatje>put in that extra little thing where it just feels like a quality designer product anytime you use it.
+
+271
+00:20:41.020 --> 00:20:45.980
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+272
+00:20:46.820 --> 00:20:58.160
+<v Christian Ondaatje>This kind of goes back to what I was talking about where I had originally been hard charging for shipping the multi-cluster UI very early.
+
+273
+00:20:58.160 --> 00:21:02.840
+<v Christian Ondaatje>that was the vision that I had in my head of okay this is what it's going to be to look like and
+
+274
+00:21:02.840 --> 00:21:07.300
+<v Christian Ondaatje>it's going to have this totally on the fly generated interface that is custom to every user
+
+275
+00:21:07.300 --> 00:21:15.260
+<v Christian Ondaatje>that has an LLM in the loop of the way the actual experience is expressed visually and ultimately I
+
+276
+00:21:15.260 --> 00:21:22.600
+<v Christian Ondaatje>think the pace at which I had wanted to ship that was a mistake right it's something that is
+
+277
+00:21:22.600 --> 00:21:28.880
+<v Christian Ondaatje>definitely still very much like on the roadmap but i tend to find myself living in maybe an
+
+278
+00:21:28.880 --> 00:21:33.840
+<v Christian Ondaatje>over-optimistic world where we want to build for something that is going to be a reality in
+
+279
+00:21:34.470 --> 00:21:41.880
+<v Christian Ondaatje>maybe 10 years right maybe five years but where the people that are going to be new to this stuff
+
+280
+00:21:41.880 --> 00:21:50.040
+<v Christian Ondaatje>or are going to be in their daily lives are currently at is maybe a few months or a year
+
+281
+00:21:50.040 --> 00:21:54.820
+<v Christian Ondaatje>we were behind where the technology is that we could build that that isn't necessarily
+
+282
+00:21:54.820 --> 00:22:00.380
+<v Christian Ondaatje>those like that two, three steps ahead vision, but is that immediate next step, the very
+
+283
+00:22:01.580 --> 00:22:05.380
+<v Christian Ondaatje>practical approach to, Hey, exactly where are people at and how can we level them up
+
+284
+00:22:05.380 --> 00:22:12.860
+<v Christian Ondaatje>now? And that was, like I said earlier, the reason why we shipped first on text interfaces,
+
+285
+00:22:13.180 --> 00:22:17.420
+<v Christian Ondaatje>just meeting people where they're at. And that, I think again, like big credit to the
+
+286
+00:22:17.420 --> 00:22:24.600
+<v Christian Ondaatje>the team, Yofi was big on tech interfaces from day one. And I'm very lucky that there's many
+
+287
+00:22:24.600 --> 00:22:29.420
+<v Christian Ondaatje>people that balanced me out in that regard. We all know where the tech is going and what we're
+
+288
+00:22:29.420 --> 00:22:33.820
+<v Christian Ondaatje>going to build, and it's going to be mind-boggling, but here's where the immediate next step is,
+
+289
+00:22:34.400 --> 00:22:40.580
+<v Christian Ondaatje>taking people along that path up to what the world looks like in 10 years, one step at a time.
+
+290
+00:22:44.920 --> 00:22:46.580
+<v Noah Labhart>Okay, let's move forward then.
+
+291
+00:22:46.860 --> 00:22:48.860
+<v Noah Labhart>This is an exciting time.
+
+292
+00:22:49.020 --> 00:22:53.580
+<v Noah Labhart>Things are booming with AI, compute, and GPUs and all the things.
+
+293
+00:22:53.700 --> 00:22:55.760
+<v Noah Labhart>What does the future look like for Aranya?
+
+294
+00:22:55.900 --> 00:23:03.040
+<v Noah Labhart>For what you offer, for the products you offer, for how you build things, how you keep up with the industry, all the things.
+
+295
+00:23:04.700 --> 00:23:08.440
+<v Christian Ondaatje>The main mission, I would say, is that, and we have the capability to do this,
+
+296
+00:23:08.440 --> 00:23:13.280
+<v Christian Ondaatje>We want to make multi-cluster compute just as accessible and usable as like a laptop, right?
+
+297
+00:23:14.160 --> 00:23:24.260
+<v Christian Ondaatje>And it's tough to imagine right now, if you haven't experienced it, if you haven't used our multi-cluster operating system, to be able to sit down and say in English,
+
+298
+00:23:25.000 --> 00:23:32.060
+<v Christian Ondaatje>OK, I want to scale down this cluster in Delaware and move all the workloads to Iceland, right?
+
+299
+00:23:32.160 --> 00:23:37.880
+<v Christian Ondaatje>And you can say that in English and the Aranya multi-cluster operating system does that for you, right?
+
+300
+00:23:38.440 --> 00:23:42.600
+<v Christian Ondaatje>It's something that is pretty surreal to experience it working.
+
+301
+00:23:42.760 --> 00:23:44.460
+<v Christian Ondaatje>And that's a simple example, right?
+
+302
+00:23:44.520 --> 00:23:46.360
+<v Christian Ondaatje>There's so much more complicated stuff that it can do.
+
+303
+00:23:46.600 --> 00:23:52.100
+<v Christian Ondaatje>But to bring that power, the power of being able to orchestrate not just an individual
+
+304
+00:23:52.100 --> 00:23:56.580
+<v Christian Ondaatje>cluster, which of course it's more than capable of doing, but multiple clusters so seamlessly
+
+305
+00:23:57.040 --> 00:23:59.780
+<v Christian Ondaatje>is a really big part of what gets each of us excited.
+
+306
+00:24:00.120 --> 00:24:05.980
+<v Christian Ondaatje>And I think that is something that there are aspects of that, like I said, that are already
+
+307
+00:24:05.980 --> 00:24:06.480
+<v Christian Ondaatje>working.
+
+308
+00:24:06.280 --> 00:24:12.160
+<v Christian Ondaatje>And in some ways, I would say, like, honestly, easier than working with laptops, at least working with, like, Mac or Windows.
+
+309
+00:24:12.500 --> 00:24:16.120
+<v Christian Ondaatje>I'm a Linux desktop evangelist.
+
+310
+00:24:16.480 --> 00:24:21.840
+<v Christian Ondaatje>But there are aspects of the, like, definitely feel on the level of, like, personal computing, right?
+
+311
+00:24:21.880 --> 00:24:28.520
+<v Christian Ondaatje>We draw this comparison constantly at the office where you think about the rollout of personal computers in the 80s and 90s in the workplace.
+
+312
+00:24:28.640 --> 00:24:34.320
+<v Christian Ondaatje>And, like, that is happening right now in all the companies that we work with.
+
+313
+00:24:36.560 --> 00:24:39.320
+<v Christian Ondaatje>for what we're calling like personal clusters, right?
+
+314
+00:24:39.400 --> 00:24:41.340
+<v Christian Ondaatje>Not necessarily because they're used for personal workloads,
+
+315
+00:24:41.460 --> 00:24:44.440
+<v Christian Ondaatje>but because an individual can feel very capable
+
+316
+00:24:44.440 --> 00:24:45.880
+<v Christian Ondaatje>regardless of their technical background
+
+317
+00:24:45.880 --> 00:24:47.320
+<v Christian Ondaatje>of working with a cluster of compute
+
+318
+00:24:47.320 --> 00:24:48.780
+<v Christian Ondaatje>or multiple clusters worth of compute.
+
+319
+00:24:49.680 --> 00:24:53.620
+<v Christian Ondaatje>We have our office cluster in the mission at our office.
+
+320
+00:24:53.900 --> 00:24:57.540
+<v Christian Ondaatje>We've, all the engineers are running Linux desktops
+
+321
+00:24:57.540 --> 00:25:00.440
+<v Christian Ondaatje>that can be Kubernetes nodes and all that fun stuff.
+
+322
+00:25:00.540 --> 00:25:02.080
+<v Christian Ondaatje>It's just a really cool part of what we do
+
+323
+00:25:02.080 --> 00:25:03.800
+<v Christian Ondaatje>and what we build towards.
+
+324
+00:25:03.800 --> 00:25:13.240
+<v Christian Ondaatje>And the way that sort of looks and the way that we get there really goes through this open source technology, ClusterOS, to us, right?
+
+325
+00:25:13.320 --> 00:25:20.580
+<v Christian Ondaatje>The OS engine that we think can be under all AI infrastructure if we play our cards right just has a really great moment.
+
+326
+00:25:20.820 --> 00:25:28.160
+<v Christian Ondaatje>Like Linux has, like Kubernetes has, to be the thing that everyone in this enterprise community needs at the right moment.
+
+327
+00:25:28.160 --> 00:25:35.440
+<v Christian Ondaatje>And then, of course, we've got to be good open source stewards to make sure that goes out and it's useful to everyone and stable and we do our best there.
+
+328
+00:25:35.700 --> 00:25:42.940
+<v Christian Ondaatje>So I think the main goal, I would say, is access to compute, useful compute in a custom form factor, right?
+
+329
+00:25:43.000 --> 00:25:45.600
+<v Christian Ondaatje>Which is more and more possible now with the tools that we're building.
+
+330
+00:25:45.760 --> 00:25:54.440
+<v Christian Ondaatje>And all that happening on a day-to-day timeframe, not necessarily the year-to-year timeframe that you see with large-scale cluster build-out currently.
+
+331
+00:25:55.600 --> 00:26:12.520
+<v Noah Labhart>Okay, Christian, let's dive into another angle here. I'm really curious about for Aranya, you know, this amazing technology that you guys are building. Why is this the right time for this? You know, the industry is moving fast, it's changing day to day, but why is the way that you're approaching this the best way to approach it and the right time to do it?
+
+332
+00:26:12.520 --> 00:26:13.480
+<v Noah Labhart>you
+
+333
+00:26:13.480 --> 00:26:19.820
+<v Christian Ondaatje>have the single biggest scale up in infrastructure since the oil and gas boom.
+
+334
+00:26:19.960 --> 00:26:27.100
+<v Christian Ondaatje>I was there in the mining boom, crypto mining boom at Grusso and saw the way massive amounts
+
+335
+00:26:27.100 --> 00:26:34.360
+<v Christian Ondaatje>of compute and energy could move with the right macroeconomic moment. And this is the macroeconomic
+
+336
+00:26:34.360 --> 00:26:40.660
+<v Christian Ondaatje>moment that completely dwarfs even that scale of compute movement back in 2017 through 2021.
+
+337
+00:26:42.520 --> 00:26:48.560
+<v Christian Ondaatje>huge exodus from the hyperscalers where, you know, through speed and availability,
+
+338
+00:26:48.860 --> 00:26:56.900
+<v Christian Ondaatje>they're just not able to serve at a reasonable cost the explosion of inference specifically.
+
+339
+00:26:57.160 --> 00:27:02.700
+<v Christian Ondaatje>There's large amounts of training workloads and CPU and VM workloads, but by and large,
+
+340
+00:27:02.880 --> 00:27:09.840
+<v Christian Ondaatje>the vast majority of the compute expansion that we see is GPU-based inference. And it's
+
+341
+00:27:09.840 --> 00:27:16.500
+<v Christian Ondaatje>by necessity become multi-cluster because you have this sort of calf practically at least in the u.s
+
+342
+00:27:16.500 --> 00:27:22.300
+<v Christian Ondaatje>some other jurisdictions of around 20 megawatts where it's very difficult to build a data center
+
+343
+00:27:22.300 --> 00:27:31.180
+<v Christian Ondaatje>quickly over 20 megawatts which puts this fragmentation force on the topology of compute
+
+344
+00:27:31.180 --> 00:27:38.680
+<v Christian Ondaatje>so the way that expresses itself is that you have large companies that need to to stay alive and to
+
+345
+00:27:39.840 --> 00:27:45.700
+<v Christian Ondaatje>their customers are deserving, but demanding for them to scale, they need to take a gigawatt's
+
+346
+00:27:45.700 --> 00:27:52.540
+<v Christian Ondaatje>worth of compute and span it over multiple 20 megawatt or below data centers. That's where
+
+347
+00:27:52.540 --> 00:27:58.060
+<v Christian Ondaatje>basically, like, that's our bread and butter, right? Multi-cluster operating system means that
+
+348
+00:27:58.060 --> 00:28:04.080
+<v Christian Ondaatje>you can address multiple data centers worth of compute as if you were addressing a single
+
+349
+00:28:04.080 --> 00:28:09.840
+<v Christian Ondaatje>computer, right? And again, we do that in natural language by default, where you can say to that
+
+350
+00:28:09.840 --> 00:28:16.360
+<v Christian Ondaatje>entire fleet of clusters, hey, do X, Y, or Z. I need you to scale up Kimmy K3 this week because
+
+351
+00:28:16.360 --> 00:28:23.480
+<v Christian Ondaatje>it just came out and everyone's using it. Or I need you to shift the workloads from Texas,
+
+352
+00:28:23.620 --> 00:28:27.080
+<v Christian Ondaatje>North Dakota, because there's a heat wave and the cooling price is going to be outrageous.
+
+353
+00:28:27.240 --> 00:28:34.040
+<v Christian Ondaatje>That kind of thing that is very difficult to do, even with a large team, we've gotten it down to,
+
+354
+00:28:34.080 --> 00:28:41.140
+<v Christian Ondaatje>to the point where an individual CTO or even our operators in certain enterprise tiers
+
+355
+00:28:41.140 --> 00:28:44.160
+<v Christian Ondaatje>are able to jump in and do that kind of stuff on the fly in English.
+
+356
+00:28:44.260 --> 00:28:50.620
+<v Christian Ondaatje>And the multicluster operating system is powering that engine under the hood that is like the
+
+357
+00:28:50.620 --> 00:28:57.520
+<v Christian Ondaatje>critical factor to being able to expand compute the way that compute expansion is happening
+
+358
+00:28:57.520 --> 00:28:59.480
+<v Christian Ondaatje>realistically in the modern era.
+
+359
+00:29:00.660 --> 00:29:02.260
+<v Noah Labhart>Okay, let's switch to you, Christian.
+
+360
+00:29:02.360 --> 00:29:04.280
+<v Noah Labhart>Who influences the way that you work?
+
+361
+00:29:04.500 --> 00:29:07.960
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+362
+00:29:09.600 --> 00:29:11.260
+<v Christian Ondaatje>So I joined Caruso pretty early.
+
+363
+00:29:11.280 --> 00:29:14.640
+<v Christian Ondaatje>I was the third engineer and worked with Chari and Nithin.
+
+364
+00:29:14.760 --> 00:29:17.000
+<v Christian Ondaatje>I would say both incredible engineers.
+
+365
+00:29:17.120 --> 00:29:19.100
+<v Christian Ondaatje>I learned a ton off of Nithin,
+
+366
+00:29:19.740 --> 00:29:25.480
+<v Christian Ondaatje>specifically when it comes to really being a good craftsperson
+
+367
+00:29:25.480 --> 00:29:27.300
+<v Christian Ondaatje>and working with...
+
+368
+00:29:27.300 --> 00:29:46.340
+<v Christian Ondaatje>He was the one that introduced me to using a Linux laptop, using a split keyboard, being able to program your own keyboard, doing Emacs, a mashup of Vim and Emacs, KaleScale, a ton of technologies that I saw him taking and sharing and elevating his craft.
+
+369
+00:29:46.340 --> 00:29:54.520
+<v Christian Ondaatje>I definitely got a lot of insight and had a lot of his technological worldview rubbed off on me
+
+370
+00:29:54.520 --> 00:29:59.660
+<v Christian Ondaatje>in that time that we worked together. And it's definitely continued to affect the way I approach,
+
+371
+00:29:59.900 --> 00:30:04.580
+<v Christian Ondaatje>the way I work with technology, the way I think about picking up and using new tools to build
+
+372
+00:30:04.580 --> 00:30:09.320
+<v Christian Ondaatje>bigger things. So I would say, yeah, one person in name, I would say Niffin.
+
+373
+00:30:10.580 --> 00:30:14.820
+<v Noah Labhart>Okay, last question, Christian. So you're getting on a plane and you're sitting next to a young
+
+374
+00:30:16.340 --> 00:30:20.100
+<v Noah Labhart>big thing. They're jazzed about it. I can't wait to show it off to the world. And can we show it
+
+375
+00:30:20.100 --> 00:30:23.700
+<v Noah Labhart>off to you right there on the plane? What advice do you give that person having gone down this
+
+376
+00:30:23.700 --> 00:30:25.120
+<v Noah Labhart>road a bit, several different ways?
+
+377
+00:30:26.120 --> 00:30:30.460
+<v Christian Ondaatje>This one might be slightly non-consensus these days,
+
+378
+00:30:30.560 --> 00:30:37.620
+<v Christian Ondaatje>I'm sorry to say, but this is my fourth time being a founder, sixth startup, the times I've
+
+379
+00:30:37.620 --> 00:30:43.360
+<v Christian Ondaatje>been early engineers. I would say, especially to a lot of these young founders, don't talk about
+
+380
+00:30:43.360 --> 00:30:49.840
+<v Christian Ondaatje>996 don't go around telling people your company is 996 and they should expect to be working those
+
+381
+00:30:49.840 --> 00:30:55.840
+<v Christian Ondaatje>kinds of hours because first of all you're just not going to get a call back from the best like
+
+382
+00:30:55.840 --> 00:31:02.040
+<v Christian Ondaatje>talent in the valley or wherever you are the best talent in the valley that could put out a 996 level
+
+383
+00:31:02.040 --> 00:31:06.180
+<v Christian Ondaatje>of work in a single three-hour session right and they're just not going to call you back they're
+
+384
+00:31:06.180 --> 00:31:10.400
+<v Christian Ondaatje>not going to be interested in joining your company they're not going to have the respect that you're
+
+385
+00:31:10.400 --> 00:31:14.900
+<v Christian Ondaatje>We're not showing them in terms of here is how to make this a good place to work.
+
+386
+00:31:15.000 --> 00:31:17.120
+<v Christian Ondaatje>Here's how to have respect for each other's time.
+
+387
+00:31:17.460 --> 00:31:19.500
+<v Christian Ondaatje>Be 996 of the founder for sure.
+
+388
+00:31:19.720 --> 00:31:21.700
+<v Christian Ondaatje>Like that's for better or worse.
+
+389
+00:31:21.760 --> 00:31:22.360
+<v Christian Ondaatje>That's the expectation.
+
+390
+00:31:22.580 --> 00:31:24.580
+<v Christian Ondaatje>That's what it takes most of the time.
+
+391
+00:31:24.840 --> 00:31:30.700
+<v Christian Ondaatje>But yeah, a lot of these young founders especially are going out throwing that term around and
+
+392
+00:31:30.700 --> 00:31:32.100
+<v Christian Ondaatje>expecting to collect talent.
+
+393
+00:31:32.160 --> 00:31:33.300
+<v Christian Ondaatje>And it's just not going to happen.
+
+394
+00:31:33.380 --> 00:31:33.880
+<v Christian Ondaatje>I'm sorry to say.
+
+395
+00:31:34.060 --> 00:31:35.280
+<v Noah Labhart>Couldn't agree more with that.
+
+396
+00:31:35.360 --> 00:31:36.300
+<v Noah Labhart>That's fantastic advice.
+
+397
+00:31:36.700 --> 00:31:39.180
+<v Noah Labhart>Well, Christian, thank you for being on the show today.
+
+398
+00:31:40.400 --> 00:31:41.680
+<v Noah Labhart>creation story of Aranya.
+
+399
+00:31:42.120 --> 00:31:42.640
+<v Noah Labhart>Appreciate
+
+400
+00:31:42.640 --> 00:31:43.140
+<v Christian Ondaatje>it.
+
+401
+00:31:42.920 --> 00:31:44.800
+<v Christian Ondaatje>Yeah, really enjoyed being on the podcast.
+
+402
+00:31:44.920 --> 00:31:45.540
+<v Christian Ondaatje>Thank you for having me.
+
+403
+00:31:47.880 --> 00:31:50.660
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+404
+00:31:59.580 --> 00:32:02.680
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+405
+00:32:02.800 --> 00:32:05.480
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+406
+00:32:05.640 --> 00:32:07.600
+<v Noah Labhart>or the podcasting app of your choice.
+
+407
+00:32:07.600 --> 00:32:12.600
+<v Noah Labhart>and when you get a chance leave us a review both things help us out tremendously
+
+408
+00:32:15.200 --> 00:32:17.040
+<v Noah Labhart>and thanks again for listening

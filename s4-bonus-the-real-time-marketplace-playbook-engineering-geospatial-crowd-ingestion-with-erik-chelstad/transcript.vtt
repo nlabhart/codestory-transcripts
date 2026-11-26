@@ -1,0 +1,1819 @@
+WEBVTT
+
+NOTE S4 Bonus: The Real-Time Marketplace Playbook: Engineering Geospatial Crowd Ingestion with Erik Chelstad
+
+1
+00:00:00.780 --> 00:00:20.640
+<v Erik Chelstad>For us, it's really about designing for the scale. Eventually, everything will scale that we keep around. But you need to be able to design it with aspects of things like object-oriented design. We're using containerized microservices to try to scale one component at a time as needed.
+
+2
+00:00:21.240 --> 00:00:35.760
+<v Erik Chelstad>I would say that a lot of times, especially being an engineer, it's an internal fight between building something that's good enough for right now, not overengineering it, and making it that really amazing, cool thing that can scale to infinity.
+
+3
+00:00:37.500 --> 00:00:42.460
+<v Erik Chelstad>My name is Erik Chelstad, and I'm the CTO and co-founder of Observa.
+
+4
+00:00:47.380 --> 00:00:52.920
+<v Noah Labhart>This is Code Story, the podcast bringing you interviews with tech visionaries
+
+5
+00:00:52.920 --> 00:00:57.120
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+6
+00:00:57.120 --> 00:01:05.760
+<v Noah Labhart>and build and lead a team that has your back. I'm your host, Noah Labhart, and today, how Erik
+
+7
+00:01:05.760 --> 00:01:10.960
+<v Noah Labhart>Erik Chelstad built the platform to enable you to see what your customer sees.
+
+8
+00:01:13.680 --> 00:01:16.000
+<v Noah Labhart>All this and more on Code Story.
+
+9
+00:01:19.760 --> 00:01:22.140
+<v Noah Labhart>Erik Chelstad is a child of both coasts.
+
+10
+00:01:22.460 --> 00:01:27.240
+<v Noah Labhart>In his life, he spent a lot of time skiing and carried that activity into his adult life.
+
+11
+00:01:27.680 --> 00:01:30.660
+<v Noah Labhart>Funny enough, though, he's actually a better boarder than a skier.
+
+12
+00:01:31.200 --> 00:01:35.120
+<v Noah Labhart>He volunteers with the local avalanche centers and climbs mountains where he lives,
+
+13
+00:01:35.240 --> 00:01:37.840
+<v Noah Labhart>which is the Pacific Northwest near Mount Rainier.
+
+14
+00:01:38.440 --> 00:01:41.220
+<v Noah Labhart>He's married and just moved into a house outside of the city.
+
+15
+00:01:41.560 --> 00:01:46.800
+<v Noah Labhart>He has found a new hobby in being a homeowner, which he says is a new platform to play with.
+
+16
+00:01:47.520 --> 00:01:49.920
+<v Noah Labhart>Cameras, sensors, sprinkler systems, etc.
+
+17
+00:01:50.520 --> 00:01:53.480
+<v Noah Labhart>They have a dog, and if they are lucky enough to have kids one day,
+
+18
+00:01:53.620 --> 00:01:57.140
+<v Noah Labhart>Erik hopes it will be easier than having a dog, and that the kids won't bite him.
+
+19
+00:01:57.570 --> 00:02:00.580
+<v Noah Labhart>In a prior venture, Erik was the owner of bakeries.
+
+20
+00:02:00.880 --> 00:02:03.640
+<v Noah Labhart>In developing certain channels for distribution,
+
+21
+00:02:03.740 --> 00:02:09.200
+<v Noah Labhart>he ran into a problem where he didn't have visibility to his product at places he didn't control.
+
+22
+00:02:09.520 --> 00:02:15.900
+<v Noah Labhart>He figured out the answer was cell phones and a centralized location for entities to consume this type of information.
+
+23
+00:02:17.480 --> 00:02:20.260
+<v Noah Labhart>This is the creation story of Observa.
+
+24
+00:02:22.780 --> 00:02:26.740
+<v Erik Chelstad>Our company, we provide real-time analytics and actions.
+
+25
+00:02:27.140 --> 00:02:34.420
+<v Erik Chelstad>for brands at retail stores. The way I think about it is it's the initial information that we capture
+
+26
+00:02:34.420 --> 00:02:41.220
+<v Erik Chelstad>is an audit of the shelf at a retail location. That's kind of the base level thing that we do.
+
+27
+00:02:42.000 --> 00:02:48.180
+<v Erik Chelstad>And then that information comes back to us and our platform analyzes it, makes recommendations,
+
+28
+00:02:49.000 --> 00:02:53.620
+<v Erik Chelstad>and then if the entity that captured that information is capable, it can take those
+
+29
+00:02:53.620 --> 00:02:54.340
+<v Erik Chelstad>those actions right away.
+
+30
+00:02:54.620 --> 00:02:59.500
+<v Erik Chelstad>The reason I say entity there is that we have about 300,000
+
+31
+00:02:59.500 --> 00:03:02.940
+<v Erik Chelstad>people that we call observers that are out there using
+
+32
+00:03:02.940 --> 00:03:06.340
+<v Erik Chelstad>our apps and taking these observations or these audits.
+
+33
+00:03:07.180 --> 00:03:10.580
+<v Erik Chelstad>We partner with camera companies, drone companies,
+
+34
+00:03:10.760 --> 00:03:13.240
+<v Erik Chelstad>and robot companies as well to collect that information.
+
+35
+00:03:13.600 --> 00:03:16.540
+<v Erik Chelstad>So really we are this platform that does these analytics
+
+36
+00:03:16.540 --> 00:03:18.380
+<v Erik Chelstad>and then can recommend actions.
+
+37
+00:03:18.820 --> 00:03:21.200
+<v Erik Chelstad>Before our company existed, before our platform,
+
+38
+00:03:21.200 --> 00:03:28.960
+<v Erik Chelstad>our customers either didn't have the data or they had really ineffective ways to collect tiny pieces of it.
+
+39
+00:03:29.600 --> 00:03:34.360
+<v Erik Chelstad>I think one of our early customers, it's a soft drink company out of New York,
+
+40
+00:03:34.360 --> 00:03:40.300
+<v Erik Chelstad>and they used to actually send their cousins out and buy them bus tickets to go out and check
+
+41
+00:03:40.300 --> 00:03:44.400
+<v Erik Chelstad>and see how their products were doing on stores outside of their central New York area.
+
+42
+00:03:45.300 --> 00:03:50.820
+<v Erik Chelstad>So as I was mentioning at the beginning, one of my passions is skiing and backcountry climbing and skiing.
+
+43
+00:03:51.200 --> 00:03:56.120
+<v Erik Chelstad>I was volunteering with an organization called the Northwest Avalanche Center here.
+
+44
+00:03:56.820 --> 00:04:04.020
+<v Erik Chelstad>One of the things that came up was how can we get information, critical information from the field,
+
+45
+00:04:04.120 --> 00:04:09.660
+<v Erik Chelstad>so from people that are in the backcountry, and then distribute it out to people as they're planning their trips.
+
+46
+00:04:09.980 --> 00:04:13.800
+<v Erik Chelstad>So it's really kind of about safety, about collecting observations.
+
+47
+00:04:14.500 --> 00:04:19.620
+<v Erik Chelstad>In my professional life at the time, I actually owned some bakeries.
+
+48
+00:04:21.200 --> 00:04:28.140
+<v Erik Chelstad>I had is in creating a distribution channel to wholesale to grocery stores and the coffee shops
+
+49
+00:04:28.140 --> 00:04:34.620
+<v Erik Chelstad>was not knowing what was happening with my product on the shelves. You kind of have this happy
+
+50
+00:04:34.620 --> 00:04:41.400
+<v Erik Chelstad>meeting of how do we get observations from snowy mountains combining with how do I get observations
+
+51
+00:04:41.400 --> 00:04:48.480
+<v Erik Chelstad>from grocery stores and coffee shops at four in the morning. The answer was to use cell phones
+
+52
+00:04:48.480 --> 00:04:52.940
+<v Erik Chelstad>and collect this information and then get it back to a centralized platform
+
+53
+00:04:52.940 --> 00:04:55.420
+<v Erik Chelstad>for consumption by those people that need it.
+
+54
+00:04:55.540 --> 00:05:00.500
+<v Erik Chelstad>I think one of the interesting things is the backcountry and supermarkets have a lot of similarities.
+
+55
+00:05:00.900 --> 00:05:03.840
+<v Erik Chelstad>They both kind of have spotty network reception.
+
+56
+00:05:04.480 --> 00:05:09.400
+<v Erik Chelstad>So it was kind of interesting in the same way that the challenge of making sure that the information you collect
+
+57
+00:05:09.400 --> 00:05:14.320
+<v Erik Chelstad>can be sent back even though the network connection might be hours later.
+
+58
+00:05:17.140 --> 00:05:26.280
+<v Noah Labhart>Well, tell me about the MVP. Tell me about that first product you built and how it went, how long it took you to build and what sort of tools you used to bring it to life.
+
+59
+00:05:27.980 --> 00:05:33.540
+<v Erik Chelstad>So in creating Observa, there's really two main parts for us. There's a platform and an app.
+
+60
+00:05:33.800 --> 00:05:43.020
+<v Erik Chelstad>We built the app using cross-platform C++ compiler, basically wanted to be able to have as much coverage as possible for users.
+
+61
+00:05:44.320 --> 00:05:47.260
+<v Erik Chelstad>but also knowing how limited the resources were,
+
+62
+00:05:47.380 --> 00:05:50.000
+<v Erik Chelstad>that we needed to do something cross-platform
+
+63
+00:05:50.000 --> 00:05:51.920
+<v Erik Chelstad>so we could get that done and get that out there.
+
+64
+00:05:52.100 --> 00:05:53.740
+<v Erik Chelstad>It just so happened that C++,
+
+65
+00:05:54.460 --> 00:05:56.140
+<v Erik Chelstad>I was able to tap into my network
+
+66
+00:05:56.140 --> 00:05:57.660
+<v Erik Chelstad>and find people that knew C++.
+
+67
+00:05:58.340 --> 00:05:59.640
+<v Erik Chelstad>This was a few years ago,
+
+68
+00:05:59.760 --> 00:06:01.940
+<v Erik Chelstad>and there are other tools that have come along since,
+
+69
+00:06:02.100 --> 00:06:03.720
+<v Erik Chelstad>but that one was, it was really good.
+
+70
+00:06:04.000 --> 00:06:06.000
+<v Erik Chelstad>We built an MVP in under a month.
+
+71
+00:06:06.380 --> 00:06:08.500
+<v Erik Chelstad>The kind of part of the problem
+
+72
+00:06:08.500 --> 00:06:10.220
+<v Erik Chelstad>that we would have with an MVP
+
+73
+00:06:10.740 --> 00:06:13.360
+<v Erik Chelstad>is that Observa is essentially a marketplace
+
+74
+00:06:14.400 --> 00:06:20.380
+<v Erik Chelstad>we need observers and we need customers or you might think of it as we need things for the
+
+75
+00:06:20.380 --> 00:06:26.420
+<v Erik Chelstad>observers to do observations for them to go out and make so we had to build up this uh kind of
+
+76
+00:06:26.420 --> 00:06:35.020
+<v Erik Chelstad>the chicken and the egg and i i say that because as part of the mvp it's a little bit like we had
+
+77
+00:06:35.020 --> 00:06:43.200
+<v Erik Chelstad>to create a marketplace mvp as well we thought that we'd be able to start just locally and then
+
+78
+00:06:44.640 --> 00:06:49.360
+<v Erik Chelstad>expanding, you know, gently down the West Coast, that type of thing, being able to support it.
+
+79
+00:06:49.920 --> 00:06:55.260
+<v Erik Chelstad>I will say that our initial customers made us go nationwide almost immediately. Again,
+
+80
+00:06:55.360 --> 00:07:00.540
+<v Erik Chelstad>kind of part of the MVP was us building a crowd when we had kind of nothing to go off of yet.
+
+81
+00:07:00.880 --> 00:07:03.600
+<v Erik Chelstad>So from the tech side, C++.
+
+82
+00:07:05.860 --> 00:07:09.820
+<v Noah Labhart>That's interesting. You know, so and I hear you saying cross platform
+
+83
+00:07:09.820 --> 00:07:16.900
+<v Noah Labhart>and you use C++, what sort of IDE or compiler or framework or even,
+
+84
+00:07:17.440 --> 00:07:20.640
+<v Noah Labhart>if that's the right word, what are you using to create that?
+
+85
+00:07:21.360 --> 00:07:25.360
+<v Erik Chelstad>So on MVP, the library was Qt.
+
+86
+00:07:25.660 --> 00:07:30.980
+<v Erik Chelstad>I believe it may be called Troll Tech now, but Qt was the library.
+
+87
+00:07:31.080 --> 00:07:34.220
+<v Erik Chelstad>And it's cross-platform with Android, iOS,
+
+88
+00:07:34.380 --> 00:07:39.080
+<v Erik Chelstad>and you can build your apps into Windows or Linux as well.
+
+89
+00:07:40.020 --> 00:07:44.160
+<v Noah Labhart>With any MVP, you have to make certain decisions and trade-offs, right?
+
+90
+00:07:44.400 --> 00:07:47.860
+<v Noah Labhart>You know, either a feature cut or accepting technical debt.
+
+91
+00:07:48.120 --> 00:07:53.300
+<v Noah Labhart>Tell me about some of those decisions and trade-offs you had to make in that first MVP and how you coped with them.
+
+92
+00:07:54.900 --> 00:08:00.460
+<v Erik Chelstad>One of the things was, is that, as I mentioned, we did not dive in and make native apps.
+
+93
+00:08:00.760 --> 00:08:04.720
+<v Erik Chelstad>We immediately had some trade-offs there with the appearance of the app.
+
+94
+00:08:04.720 --> 00:08:07.500
+<v Erik Chelstad>and it wasn't going to look exactly like a native app
+
+95
+00:08:07.500 --> 00:08:10.940
+<v Erik Chelstad>because we had the cross-platform situation going on.
+
+96
+00:08:11.220 --> 00:08:13.500
+<v Erik Chelstad>Given that Observa is a marketplace,
+
+97
+00:08:13.820 --> 00:08:18.120
+<v Erik Chelstad>our initial intent was to have this very much a marketplace
+
+98
+00:08:18.120 --> 00:08:19.760
+<v Erik Chelstad>where our customers would come in
+
+99
+00:08:19.760 --> 00:08:24.280
+<v Erik Chelstad>and be able to build up their own kind of what we call campaigns
+
+100
+00:08:24.280 --> 00:08:26.300
+<v Erik Chelstad>to go out and collect this information.
+
+101
+00:08:26.660 --> 00:08:28.360
+<v Erik Chelstad>And they would do that work themselves,
+
+102
+00:08:28.620 --> 00:08:29.980
+<v Erik Chelstad>and they would even set their prices,
+
+103
+00:08:30.500 --> 00:08:33.140
+<v Erik Chelstad>what they'd be willing to pay the Observer crowd.
+
+104
+00:08:34.720 --> 00:08:43.700
+<v Erik Chelstad>We had to make some trade-offs because as most tech people know, building out a nice user interface is very challenging.
+
+105
+00:08:43.940 --> 00:08:47.060
+<v Erik Chelstad>And so we did not make it into a two-sided marketplace.
+
+106
+00:08:47.320 --> 00:08:54.600
+<v Erik Chelstad>And we did not make it into a self-service, easy to do thing for our customer via the web, if you will.
+
+107
+00:08:55.120 --> 00:08:58.460
+<v Erik Chelstad>What we had to do then was to cover and do that ourselves.
+
+108
+00:08:58.460 --> 00:09:10.280
+<v Erik Chelstad>It turned out to be fairly fortuitous because that enabled us to be the lead on creating these campaigns and creating the questions that would get asked to the observers.
+
+109
+00:09:11.280 --> 00:09:12.840
+<v Erik Chelstad>It actually worked out really well.
+
+110
+00:09:12.920 --> 00:09:14.140
+<v Erik Chelstad>Again, we learned about that.
+
+111
+00:09:14.260 --> 00:09:19.220
+<v Erik Chelstad>And we also learned along the way that our customers didn't necessarily want to do that.
+
+112
+00:09:19.360 --> 00:09:22.520
+<v Erik Chelstad>That was a tradeoff that we made, but it turned out okay.
+
+113
+00:09:22.520 --> 00:09:36.640
+<v Erik Chelstad>One of the other trade-offs we made was that right at the beginning is that our entire platform was running on a single Linux server on Linode, just a pretty inexpensive, cheap platform with a PHP front end and a MySQL database.
+
+114
+00:09:37.720 --> 00:09:41.160
+<v Erik Chelstad>The trade-off there was that it wasn't going to be infinitely scalable.
+
+115
+00:09:41.480 --> 00:09:49.900
+<v Erik Chelstad>But at the beginning, that wasn't too hard to deal with because we did not have many observers or customers at that point.
+
+116
+00:09:52.520 --> 00:10:05.480
+<v Noah Labhart>So you've got your MVP, you've worked through decisions and trade-offs, and you kind of touched on this in the beginning and talk about how some of your customers took you nationwide very quickly.
+
+117
+00:10:05.560 --> 00:10:08.360
+<v Noah Labhart>But how did you progress the product and mature it?
+
+118
+00:10:08.660 --> 00:10:16.060
+<v Noah Labhart>And I'm interested in how you built your roadmap and how you decided, okay, this is the next most important thing to build.
+
+119
+00:10:17.300 --> 00:10:21.020
+<v Erik Chelstad>As I mentioned, our customers wanted us to go nationwide immediately.
+
+120
+00:10:22.520 --> 00:10:27.960
+<v Erik Chelstad>out that they didn't have a lack of information about the stores right in their area as much as
+
+121
+00:10:27.960 --> 00:10:34.020
+<v Erik Chelstad>they had a lack of information across the entire United States from large metros to very small
+
+122
+00:10:34.020 --> 00:10:41.560
+<v Erik Chelstad>towns. And so we ended up scaling really quickly. We switched over to using, we're actually still
+
+123
+00:10:41.560 --> 00:10:47.840
+<v Erik Chelstad>using cross-platform, but we're using Meteor. And that's, it's mostly JavaScript and Mongo
+
+124
+00:10:47.840 --> 00:10:49.960
+<v Erik Chelstad>Mongo, combination of those things,
+
+125
+00:10:50.120 --> 00:10:53.900
+<v Erik Chelstad>that's actually saved us quite a bit of our resource consumption
+
+126
+00:10:53.900 --> 00:10:57.380
+<v Erik Chelstad>in that we don't have to maintain two code bases.
+
+127
+00:10:57.720 --> 00:10:59.380
+<v Erik Chelstad>And that's continued to work out well.
+
+128
+00:10:59.540 --> 00:11:02.240
+<v Erik Chelstad>But by using things like Mongo,
+
+129
+00:11:02.460 --> 00:11:05.820
+<v Erik Chelstad>we're able to scale that pretty easily and quickly.
+
+130
+00:11:06.440 --> 00:11:11.180
+<v Erik Chelstad>We also wound up moving our stuff off of a single Linux server,
+
+131
+00:11:11.280 --> 00:11:12.000
+<v Erik Chelstad>as you might imagine.
+
+132
+00:11:12.180 --> 00:11:15.400
+<v Erik Chelstad>And we're actually over on Azure now.
+
+133
+00:11:15.400 --> 00:11:18.760
+<v Erik Chelstad>that ended up being something that we had to do.
+
+134
+00:11:19.280 --> 00:11:20.620
+<v Erik Chelstad>You know, of course, everyone's,
+
+135
+00:11:20.620 --> 00:11:23.160
+<v Erik Chelstad>you're making a decision between cloud service providers
+
+136
+00:11:23.160 --> 00:11:24.480
+<v Erik Chelstad>when you start doing this.
+
+137
+00:11:24.620 --> 00:11:26.380
+<v Erik Chelstad>If you're going the cloud route,
+
+138
+00:11:26.520 --> 00:11:28.780
+<v Erik Chelstad>Azure, Microsoft is a good partner,
+
+139
+00:11:28.840 --> 00:11:30.840
+<v Erik Chelstad>but also being in the retail space,
+
+140
+00:11:31.140 --> 00:11:33.900
+<v Erik Chelstad>it's kind of interesting that not all retailers
+
+141
+00:11:33.900 --> 00:11:38.000
+<v Erik Chelstad>want to have their information existing on Amazon or AWS
+
+142
+00:11:38.000 --> 00:11:40.100
+<v Erik Chelstad>because of the potential competition.
+
+143
+00:11:40.880 --> 00:11:44.000
+<v Erik Chelstad>So I would say another thing that we've progressed on
+
+144
+00:11:45.400 --> 00:11:48.840
+<v Erik Chelstad>As we get more observers, we learned more about our observers.
+
+145
+00:11:49.080 --> 00:11:53.140
+<v Erik Chelstad>You know, again, we have 300,000 people out there as observers now.
+
+146
+00:11:53.600 --> 00:11:59.900
+<v Erik Chelstad>What we initially thought was that people were going to just do an observation maybe when they were shopping.
+
+147
+00:12:00.180 --> 00:12:02.860
+<v Erik Chelstad>You know, the average payout is about $5.
+
+148
+00:12:03.260 --> 00:12:10.320
+<v Erik Chelstad>So this idea that they could just, hey, I'm shopping, and they get a pop-up notification that lets them know that they could go do something.
+
+149
+00:12:10.320 --> 00:12:15.540
+<v Erik Chelstad>But what it turned out is that there are people that want to use the app in that way.
+
+150
+00:12:15.680 --> 00:12:22.760
+<v Erik Chelstad>But then there's another group of people that want to use the app and they want to plan a route and go do a bunch of observations in a day.
+
+151
+00:12:23.160 --> 00:12:28.480
+<v Erik Chelstad>And so we had to progress and move our app to accommodate both types of users.
+
+152
+00:12:28.840 --> 00:12:40.100
+<v Erik Chelstad>That was one of the nice things about using Meteor and JavaScript is because the coding on that turned out to be pretty quick and easy to do and make those changes and updates as we learn more about our crowd.
+
+153
+00:12:40.800 --> 00:12:51.460
+<v Erik Chelstad>I'd say the final thing is that our reporting, as we've progressed, we started with smaller customers and we've moved up into some of the largest brands in the world.
+
+154
+00:12:51.840 --> 00:13:01.560
+<v Erik Chelstad>As we've done that, we've had to make better and better reporting for them, including making interactive reports, which I'm super proud of and they're great.
+
+155
+00:13:01.860 --> 00:13:09.520
+<v Erik Chelstad>But it's definitely, it's something you have to invest resources in and you also really need to do that as you learn what your customers are looking for.
+
+156
+00:13:10.900 --> 00:13:18.920
+<v Erik Chelstad>So for our roadmap, what we tend to do, we're obviously listening to our customers and the partners that we have.
+
+157
+00:13:19.020 --> 00:13:28.100
+<v Erik Chelstad>We want to make all of our products and the features that we're building, we want to make them flexible so we can accommodate what's going on with our customers.
+
+158
+00:13:28.100 --> 00:13:34.620
+<v Erik Chelstad>customers, we actually see that as a differentiator for us in a way that we're able to be flexible
+
+159
+00:13:34.620 --> 00:13:39.420
+<v Erik Chelstad>and that we know that our platform is integrating with the platforms that they've already made
+
+160
+00:13:39.420 --> 00:13:45.460
+<v Erik Chelstad>investments in, their ERPs and their sales systems, inventory systems. And so we want to be part of
+
+161
+00:13:45.460 --> 00:13:52.180
+<v Erik Chelstad>that. We don't want to replace that. So with that in mind, we tend to do sort of a modified decision
+
+162
+00:13:52.180 --> 00:13:57.380
+<v Erik Chelstad>decision matrix, looking at the different attributes of the features and how they fit
+
+163
+00:13:57.380 --> 00:14:00.380
+<v Erik Chelstad>in with the different desires, if you will, of the company.
+
+164
+00:14:00.620 --> 00:14:04.640
+<v Erik Chelstad>So we're looking at things like, you know, what is the appeal to customers?
+
+165
+00:14:04.960 --> 00:14:06.700
+<v Erik Chelstad>What is the appeal to our observers?
+
+166
+00:14:07.020 --> 00:14:12.120
+<v Erik Chelstad>And of course, what is the impact to our revenue, our operating margins, how much engineering
+
+167
+00:14:12.120 --> 00:14:12.920
+<v Erik Chelstad>effort is required?
+
+168
+00:14:13.220 --> 00:14:15.340
+<v Erik Chelstad>And then basically putting that together and weighting it.
+
+169
+00:14:15.420 --> 00:14:20.180
+<v Erik Chelstad>You know, it's a fairly simple decision matrix, but by using that, it gives you some numerical
+
+170
+00:14:22.460 --> 00:14:27.480
+<v Erik Chelstad>everyone in the business or every aspect of the business a say in the decision making.
+
+171
+00:14:28.240 --> 00:14:33.920
+<v Noah Labhart>Well, let's switch to team. So how did you go about building your team? And I'm looking for,
+
+172
+00:14:34.060 --> 00:14:38.080
+<v Noah Labhart>you know, what did you look for in these people to indicate that they were the winning horses to
+
+173
+00:14:38.080 --> 00:14:38.580
+<v Noah Labhart>join you?
+
+174
+00:14:39.440 --> 00:14:43.940
+<v Erik Chelstad>When people talk about startups, especially startups, people often talk about
+
+175
+00:14:43.940 --> 00:14:48.700
+<v Erik Chelstad>how many hats they have to wear or, you know, wearing many hats is a pretty common expression.
+
+176
+00:14:48.700 --> 00:14:53.560
+<v Erik Chelstad>I often tell people that they're not going to have time to put on a hat.
+
+177
+00:14:54.060 --> 00:15:05.860
+<v Erik Chelstad>So when I think about who's going to join us, I look for people that just have this burning desire to continuously learn and explore as a team.
+
+178
+00:15:06.120 --> 00:15:09.600
+<v Erik Chelstad>It's really important because, again, we are a startup.
+
+179
+00:15:09.680 --> 00:15:15.620
+<v Erik Chelstad>We are moving fast and we're in a cutting or bleeding edge technology space.
+
+180
+00:15:15.920 --> 00:15:18.080
+<v Erik Chelstad>So we need to try everything out.
+
+181
+00:15:18.700 --> 00:15:26.680
+<v Erik Chelstad>A lot of times it's not going to work, but it's really important for us to try it and know quickly when it's going to work or not.
+
+182
+00:15:27.040 --> 00:15:37.960
+<v Erik Chelstad>I look at people and I see a key indicator for them as how do they apply their professional skills in their real life?
+
+183
+00:15:38.360 --> 00:15:44.120
+<v Erik Chelstad>I think an example are engineers that are, you know, maybe they're contributing back to the open source community.
+
+184
+00:15:44.120 --> 00:15:48.100
+<v Erik Chelstad>community, maybe they're building games in their free time, or even as I mentioned, maybe
+
+185
+00:15:48.100 --> 00:15:53.140
+<v Erik Chelstad>playing with their house as a platform. If there's somebody going and doing management,
+
+186
+00:15:53.340 --> 00:15:58.160
+<v Erik Chelstad>are they out there volunteering to help young women move into business careers? You know,
+
+187
+00:15:58.200 --> 00:16:02.120
+<v Erik Chelstad>these types of things that they're passionate about, it really shows through again, if they're
+
+188
+00:16:02.120 --> 00:16:07.420
+<v Erik Chelstad>doing that in their personal life as well. I think as a side note to that, it makes the interview
+
+189
+00:16:07.420 --> 00:16:12.100
+<v Erik Chelstad>process way more interesting because people are talking about the things that they are passionate
+
+190
+00:16:12.100 --> 00:16:19.480
+<v Erik Chelstad>about. I saw a study and I don't remember where it came from. And it was sort of, it was just
+
+191
+00:16:19.480 --> 00:16:25.440
+<v Erik Chelstad>self-reinforcement, but it's about how people that are coding now, they have to be familiar with
+
+192
+00:16:26.200 --> 00:16:32.940
+<v Erik Chelstad>much more code than somebody had to be familiar with 30 years ago. And I kind of think of if you
+
+193
+00:16:32.940 --> 00:16:39.220
+<v Erik Chelstad>were at a company, sort of a large company, and you're filling a function, the number of lines
+
+194
+00:16:39.220 --> 00:16:43.800
+<v Erik Chelstad>of code that you're going to be working with are probably small. You probably have an insanely deep
+
+195
+00:16:43.800 --> 00:16:51.380
+<v Erik Chelstad>knowledge about some particular aspect and that's really important for those roles. At a startup,
+
+196
+00:16:51.460 --> 00:16:56.840
+<v Erik Chelstad>again, we're pulling in as many new things as possible, trying them out, moving on to the next
+
+197
+00:16:56.840 --> 00:17:02.600
+<v Erik Chelstad>thing. A lot of this, I think of an analogy for this is sort of when you go to Home Depot, when
+
+198
+00:17:02.600 --> 00:17:08.800
+<v Erik Chelstad>you are buying things to build, say, a deck on your house, you're just the normal person can just go to
+
+199
+00:17:09.220 --> 00:17:14.340
+<v Erik Chelstad>now and go buy those things and kind of put them together and have a decent deck.
+
+200
+00:17:14.540 --> 00:17:20.780
+<v Erik Chelstad>They're not having to go out and cut down trees and mill the lumber and have blueprints
+
+201
+00:17:20.780 --> 00:17:22.540
+<v Erik Chelstad>for this deck project.
+
+202
+00:17:23.060 --> 00:17:25.480
+<v Erik Chelstad>I think what we have now is a lot of that.
+
+203
+00:17:25.640 --> 00:17:31.200
+<v Erik Chelstad>We have the ability to grab things and we can grab libraries of code, which are going
+
+204
+00:17:31.200 --> 00:17:35.620
+<v Erik Chelstad>to be like those pre-engineered deck components and put them together and try it out.
+
+205
+00:17:36.060 --> 00:17:37.560
+<v Erik Chelstad>So we can see how it goes.
+
+206
+00:17:37.660 --> 00:17:38.380
+<v Erik Chelstad>We can judge it.
+
+207
+00:17:39.220 --> 00:17:44.520
+<v Erik Chelstad>also need to be able to dive down and actually make a part or engineer something from scratch
+
+208
+00:17:44.520 --> 00:17:49.800
+<v Erik Chelstad>when it's necessary. So that's that kind of that trade-off I think with startups is use as much as
+
+209
+00:17:49.800 --> 00:17:55.560
+<v Erik Chelstad>you can because you're constantly building. So use what's out there, but know when it's time
+
+210
+00:17:55.560 --> 00:17:57.400
+<v Erik Chelstad>to make something yourself.
+
+211
+00:17:58.240 --> 00:18:02.380
+<v Noah Labhart>Totally relate to that. And it's hard to switch, I think,
+
+212
+00:18:02.400 --> 00:18:08.720
+<v Noah Labhart>at least in my experience, from the convenience of using what's out there to going to, okay,
+
+213
+00:18:09.220 --> 00:18:13.180
+<v Noah Labhart>I've got to recreate this thing that's working right now, but it's kind of a risk.
+
+214
+00:18:13.320 --> 00:18:14.800
+<v Noah Labhart>Have you run into those problems?
+
+215
+00:18:15.240 --> 00:18:17.020
+<v Erik Chelstad>Definitely in optimizing things.
+
+216
+00:18:17.200 --> 00:18:24.680
+<v Erik Chelstad>I feel that's where that kind of goes is when you're doing something like trying object detection on an image
+
+217
+00:18:24.680 --> 00:18:37.840
+<v Erik Chelstad>and you realize that you can actually optimize your compiled C code for the very specific GPU that you're using in your system, for instance.
+
+218
+00:18:39.220 --> 00:18:44.060
+<v Erik Chelstad>The risk is that the effort you're putting in isn't expandable when the next version of the GPU comes out.
+
+219
+00:18:45.300 --> 00:18:49.480
+<v Erik Chelstad>However, the tradeoff is the increased performance for the now.
+
+220
+00:18:50.260 --> 00:18:53.620
+<v Erik Chelstad>So, yes, you do have to make those decisions and those tradeoffs.
+
+221
+00:18:53.840 --> 00:18:59.220
+<v Erik Chelstad>And again, that's where it's important to not just it's good as a CTO to be able to make those decisions,
+
+222
+00:18:59.440 --> 00:19:06.620
+<v Erik Chelstad>but hopefully everyone on your team can and feels empowered to be able to make those decisions because they come up quite often.
+
+223
+00:19:12.260 --> 00:19:18.520
+<v Noah Labhart>we'll switch to scalability so did you build this in the beginning to scale efficiently or
+
+224
+00:19:18.520 --> 00:19:20.540
+<v Noah Labhart>were you fighting this as you grew
+
+225
+00:19:20.540 --> 00:19:24.800
+<v Erik Chelstad>so i don't want to give a flippant answer and just say no
+
+226
+00:19:24.800 --> 00:19:32.160
+<v Erik Chelstad>but but really no we did not build initially to scale it was designed for scale you know i i think
+
+227
+00:19:32.160 --> 00:19:38.840
+<v Erik Chelstad>of projects kind of going through three phases where there's a prototype a production and then
+
+228
+00:19:39.960 --> 00:19:42.380
+<v Erik Chelstad>and the eventual goal is always to get to scale.
+
+229
+00:19:42.820 --> 00:19:45.540
+<v Erik Chelstad>One, it's part of it is the business environment.
+
+230
+00:19:45.900 --> 00:19:47.180
+<v Erik Chelstad>Do you need to scale?
+
+231
+00:19:47.480 --> 00:19:49.100
+<v Erik Chelstad>Knowing that it's very expensive
+
+232
+00:19:49.100 --> 00:19:50.740
+<v Erik Chelstad>to get to the point of scale,
+
+233
+00:19:51.500 --> 00:19:54.520
+<v Erik Chelstad>have you proven out what you're doing?
+
+234
+00:19:54.660 --> 00:19:55.980
+<v Erik Chelstad>Is your MVP enough?
+
+235
+00:19:56.220 --> 00:19:58.140
+<v Erik Chelstad>Or do you need to keep going a little bit further
+
+236
+00:19:58.140 --> 00:20:00.360
+<v Erik Chelstad>to really dive into your customer needs
+
+237
+00:20:00.360 --> 00:20:02.620
+<v Erik Chelstad>and get through to your scale?
+
+238
+00:20:03.080 --> 00:20:05.720
+<v Erik Chelstad>I often, I think of it as kind of a step function
+
+239
+00:20:05.720 --> 00:20:08.780
+<v Erik Chelstad>more than a smooth line.
+
+240
+00:20:09.240 --> 00:20:10.580
+<v Erik Chelstad>It's more of a step function
+
+241
+00:20:10.580 --> 00:20:13.600
+<v Erik Chelstad>where some components go to scale
+
+242
+00:20:13.600 --> 00:20:16.280
+<v Erik Chelstad>and they go there a lot faster than others.
+
+243
+00:20:16.500 --> 00:20:18.780
+<v Erik Chelstad>And so for us,
+
+244
+00:20:18.820 --> 00:20:21.360
+<v Erik Chelstad>it's really about designing for the scale.
+
+245
+00:20:22.600 --> 00:20:24.520
+<v Erik Chelstad>Eventually, everything will scale
+
+246
+00:20:24.520 --> 00:20:25.540
+<v Erik Chelstad>that we keep around,
+
+247
+00:20:25.840 --> 00:20:28.260
+<v Erik Chelstad>but you need to be able to design it
+
+248
+00:20:28.260 --> 00:20:29.560
+<v Erik Chelstad>with aspects of things
+
+249
+00:20:29.560 --> 00:20:31.180
+<v Erik Chelstad>like object-oriented design.
+
+250
+00:20:31.960 --> 00:20:34.200
+<v Erik Chelstad>We're using containerized microservices
+
+251
+00:20:35.720 --> 00:20:39.300
+<v Erik Chelstad>able to scale one component at a time as needed.
+
+252
+00:20:39.640 --> 00:20:45.160
+<v Erik Chelstad>I would say that a lot of times, especially being an engineer, it's an internal fight
+
+253
+00:20:45.160 --> 00:20:50.600
+<v Erik Chelstad>between building something that's good enough for right now, not over-engineering it, and
+
+254
+00:20:50.600 --> 00:20:54.640
+<v Erik Chelstad>making it that really amazing, cool thing that can scale to infinity.
+
+255
+00:20:55.760 --> 00:21:00.840
+<v Noah Labhart>Well, as you step out on the balcony and you look across all you've built, what are you
+
+256
+00:21:00.840 --> 00:21:01.540
+<v Noah Labhart>most proud of?
+
+257
+00:21:03.100 --> 00:21:08.580
+<v Erik Chelstad>It's funny that you mentioned a balcony. Before COVID hit, we were actually in this really cool
+
+258
+00:21:08.580 --> 00:21:14.160
+<v Erik Chelstad>industrial kind of warehouse space. And the engineering team was in a loft and we actually
+
+259
+00:21:14.160 --> 00:21:19.840
+<v Erik Chelstad>had a balcony. And every time I looked out from there, I thought, it's a really long way to go
+
+260
+00:21:19.840 --> 00:21:24.580
+<v Erik Chelstad>down these stairs and get all the way to the bathroom. But I would say that what I'm most
+
+261
+00:21:24.580 --> 00:21:29.820
+<v Erik Chelstad>proud of from this company, really, it's being here. It's still being here. You know, most
+
+262
+00:21:32.100 --> 00:21:33.860
+<v Erik Chelstad>to the level we have.
+
+263
+00:21:35.280 --> 00:21:37.620
+<v Erik Chelstad>And it's continuing to grow the company,
+
+264
+00:21:37.800 --> 00:21:40.560
+<v Erik Chelstad>getting to 300,000 observers.
+
+265
+00:21:41.200 --> 00:21:43.120
+<v Erik Chelstad>That's the kind of thing I think about when I,
+
+266
+00:21:43.660 --> 00:21:44.800
+<v Erik Chelstad>again, before COVID,
+
+267
+00:21:45.000 --> 00:21:46.720
+<v Erik Chelstad>when you go to a sporting event
+
+268
+00:21:47.180 --> 00:21:49.140
+<v Erik Chelstad>or a concert of some sort
+
+269
+00:21:49.140 --> 00:21:51.200
+<v Erik Chelstad>and you see a lot of people
+
+270
+00:21:51.760 --> 00:21:53.780
+<v Erik Chelstad>and you think, wow, okay,
+
+271
+00:21:54.380 --> 00:21:57.980
+<v Erik Chelstad>we're able to get this many people to use our apps
+
+272
+00:21:57.980 --> 00:22:00.380
+<v Erik Chelstad>and actually help them out a little bit.
+
+273
+00:22:02.760 --> 00:22:03.280
+<v Erik Chelstad>people
+
+274
+00:22:03.280 --> 00:22:04.240
+<v Noah Labhart>that have
+
+275
+00:22:04.240 --> 00:22:09.720
+<v Erik Chelstad>you know that going through covid and going through economic uncertain times
+
+276
+00:22:10.280 --> 00:22:16.240
+<v Erik Chelstad>that our app has been able to help people out and so that's one of the things i'm extremely proud of
+
+277
+00:22:16.800 --> 00:22:22.220
+<v Erik Chelstad>the pandemic actually it casts a lot of uncertainty into the world of shopping and retail
+
+278
+00:22:24.340 --> 00:22:29.180
+<v Erik Chelstad>and we've been able to i'm proud of the fact that we've been able to come out stronger
+
+279
+00:22:29.180 --> 00:22:34.780
+<v Erik Chelstad>stronger because we've proven that our system is actually a critical component for our customers
+
+280
+00:22:34.780 --> 00:22:41.940
+<v Erik Chelstad>in operating efficiently and kind of navigating their way through omnichannel and e-commerce.
+
+281
+00:22:43.420 --> 00:22:47.440
+<v Noah Labhart>Let's flip the script a little bit, Erik. Tell me about a mistake you made
+
+282
+00:22:47.440 --> 00:22:51.760
+<v Noah Labhart>and how you and your team responded to it. I
+
+283
+00:22:51.760 --> 00:22:55.080
+<v Erik Chelstad>think a good example of a mistake, it's actually,
+
+284
+00:22:55.080 --> 00:23:00.800
+<v Erik Chelstad>It's kind of almost less of a mistake, but it's a product that we made that didn't go very far.
+
+285
+00:23:01.280 --> 00:23:11.200
+<v Erik Chelstad>And so right as COVID was coming down in the beginning of February, March 2020,
+
+286
+00:23:12.000 --> 00:23:15.640
+<v Erik Chelstad>we were trying to come up with something that we could do to help out.
+
+287
+00:23:16.400 --> 00:23:21.480
+<v Erik Chelstad>And so we created this product called Shelf Scout.
+
+288
+00:23:21.480 --> 00:23:37.340
+<v Erik Chelstad>And the idea of Shelf Scout was, hey, if you're out there shopping and you're going to stores, go ahead and submit some observations, take some photos and let us know how the critical products are doing on those shelves in that store.
+
+289
+00:23:37.340 --> 00:23:45.120
+<v Erik Chelstad>store. The idea was, as people couldn't find things like rice or toilet paper or soap,
+
+290
+00:23:46.260 --> 00:23:51.520
+<v Erik Chelstad>that they could go to our webpage that we had set up called Shelf Scout and be able
+
+291
+00:23:51.520 --> 00:23:52.020
+<v Erik Chelstad>to see,
+
+292
+00:23:52.040 --> 00:23:53.820
+<v Noah Labhart>can
+
+293
+00:23:53.820 --> 00:23:57.600
+<v Erik Chelstad>I go to my store or should I go to a different store to go try to find the
+
+294
+00:23:57.600 --> 00:24:05.000
+<v Erik Chelstad>thing that I need? Well, it turned out that this didn't really, it didn't take off. We
+
+295
+00:24:05.000 --> 00:24:06.220
+<v Erik Chelstad>We got people to participate.
+
+296
+00:24:06.480 --> 00:24:09.080
+<v Erik Chelstad>We got some good input from people
+
+297
+00:24:09.080 --> 00:24:12.380
+<v Erik Chelstad>and people were able to use it and see some information.
+
+298
+00:24:12.840 --> 00:24:16.220
+<v Erik Chelstad>But for a number of reasons, it didn't take off.
+
+299
+00:24:16.300 --> 00:24:18.320
+<v Erik Chelstad>There wasn't a need for it as much
+
+300
+00:24:18.320 --> 00:24:21.340
+<v Erik Chelstad>as retailers fairly quickly figured out the supply chains
+
+301
+00:24:21.340 --> 00:24:23.320
+<v Erik Chelstad>and got those things dialed in.
+
+302
+00:24:23.840 --> 00:24:29.360
+<v Erik Chelstad>And so it was something that we recognized was good
+
+303
+00:24:30.000 --> 00:24:32.720
+<v Erik Chelstad>that it wasn't happening, but for us and Shelf Scout,
+
+304
+00:24:32.880 --> 00:24:34.080
+<v Erik Chelstad>we had to shut that down.
+
+305
+00:24:35.000 --> 00:24:45.180
+<v Erik Chelstad>I think the mistake was, if you will, just launching something without really going through an MVP and talking to customers, enough of them.
+
+306
+00:24:45.520 --> 00:24:55.180
+<v Erik Chelstad>But how the team responded was to, you know, we saw this and we talked about it and we shut it down.
+
+307
+00:24:55.400 --> 00:24:58.100
+<v Erik Chelstad>And we all felt good about shutting it down.
+
+308
+00:24:58.220 --> 00:25:03.060
+<v Erik Chelstad>It was the right thing to do at the time to try something, but it was also right to shut it down.
+
+309
+00:25:05.000 --> 00:25:11.080
+<v Erik Chelstad>good job and walk away with our heads held high. So I think, you know, kind of that lesson we
+
+310
+00:25:11.080 --> 00:25:16.260
+<v Erik Chelstad>learned from the mistake is that you can't predict the markets entirely. And so it's
+
+311
+00:25:16.260 --> 00:25:18.120
+<v Erik Chelstad>really important to be able to fail gracefully.
+
+312
+00:25:18.700 --> 00:25:21.320
+<v Noah Labhart>Absolutely. That's super important. And it's
+
+313
+00:25:21.320 --> 00:25:25.480
+<v Noah Labhart>important to get out there in the beginning and talk to customers to do an MVP, but it's also
+
+314
+00:25:25.480 --> 00:25:31.120
+<v Noah Labhart>really hard when you have some intuition or you see something really valuable that maybe
+
+315
+00:25:31.120 --> 00:25:34.180
+<v Noah Labhart>Maybe your customers don't see, or maybe the market doesn't see.
+
+316
+00:25:34.260 --> 00:25:37.120
+<v Noah Labhart>And sometimes it works out, but a lot of times it doesn't.
+
+317
+00:25:38.560 --> 00:25:44.320
+<v Noah Labhart>So what does the future look like for the product of Observa and for the team?
+
+318
+00:25:45.680 --> 00:25:52.660
+<v Erik Chelstad>So for our future, we're becoming more of a critical component to our larger customers.
+
+319
+00:25:52.820 --> 00:25:58.880
+<v Erik Chelstad>So we're getting, again, I mentioned this before, but the biggest brands in the world are becoming our customers.
+
+320
+00:25:58.880 --> 00:26:01.640
+<v Erik Chelstad>and their needs are
+
+321
+00:26:01.640 --> 00:26:03.460
+<v Noah Labhart>driving
+
+322
+00:26:03.460 --> 00:26:04.660
+<v Erik Chelstad>us to scale.
+
+323
+00:26:05.280 --> 00:26:09.280
+<v Erik Chelstad>And that's great because every engineer wants to scale.
+
+324
+00:26:09.440 --> 00:26:12.920
+<v Erik Chelstad>We get to scale and we're scaling our internal capabilities
+
+325
+00:26:12.920 --> 00:26:16.560
+<v Erik Chelstad>in large part and becoming more of a partner
+
+326
+00:26:16.560 --> 00:26:19.660
+<v Erik Chelstad>that we're making these trusted recommendations to them.
+
+327
+00:26:20.080 --> 00:26:23.200
+<v Erik Chelstad>So for us, it means that we get to take on
+
+328
+00:26:23.200 --> 00:26:24.820
+<v Erik Chelstad>some of the cool challenges
+
+329
+00:26:24.820 --> 00:26:28.560
+<v Erik Chelstad>like auto-scaling infrastructure for our image processing,
+
+330
+00:26:29.920 --> 00:26:37.080
+<v Erik Chelstad>and we get to that means we're hiring more data engineers and finding new methods and techniques
+
+331
+00:26:37.080 --> 00:26:44.120
+<v Erik Chelstad>to both clean up our data makes that our data is good as we go forward so we're giving good
+
+332
+00:26:44.120 --> 00:26:50.260
+<v Erik Chelstad>recommendations and data to our customers but also being able to do that really fast across
+
+333
+00:26:50.260 --> 00:26:58.400
+<v Erik Chelstad>a diverse area you know and as we we start growing more outside the united states we get to
+
+334
+00:26:58.880 --> 00:27:04.540
+<v Erik Chelstad>continue to build things, interesting, fun challenges like currencies and languages
+
+335
+00:27:04.540 --> 00:27:11.600
+<v Erik Chelstad>that I know lots of companies are solving as we all appeal to different parts of the world.
+
+336
+00:27:11.680 --> 00:27:14.000
+<v Erik Chelstad>But it's a fun and interesting challenge.
+
+337
+00:27:14.800 --> 00:27:19.160
+<v Erik Chelstad>You know, we've got, I've mentioned that we have 300,000 observers out there
+
+338
+00:27:19.160 --> 00:27:22.080
+<v Erik Chelstad>and we're growing that number every day.
+
+339
+00:27:22.080 --> 00:27:36.820
+<v Erik Chelstad>And so one of the kind of the future is that we're going to be providing them with more opportunities and different types of opportunities than just the sort of the in-store audits and actions that we're doing right now.
+
+340
+00:27:36.940 --> 00:27:37.440
+<v Noah Labhart>Awesome.
+
+341
+00:27:37.480 --> 00:27:41.480
+<v Noah Labhart>Future sounds very bright. I really like what I'm seeing of the product.
+
+342
+00:27:41.620 --> 00:27:49.160
+<v Noah Labhart>And, you know, interesting question that I didn't actually get to ask earlier was how do you how do you get people to sign up as observers?
+
+343
+00:27:49.160 --> 00:27:52.620
+<v Noah Labhart>How do you get people to get on the app?
+
+344
+00:27:52.740 --> 00:27:56.240
+<v Noah Labhart>And you mentioned the marketplace aspect of it, but how did you go about that?
+
+345
+00:27:56.900 --> 00:27:57.880
+<v Erik Chelstad>That's a great question.
+
+346
+00:27:57.920 --> 00:28:05.000
+<v Erik Chelstad>And I think it's an important one for people who are trying to build up marketplaces like this.
+
+347
+00:28:05.120 --> 00:28:13.060
+<v Erik Chelstad>I recall initially when we started out and we were looking for some really early on investors and advice from people,
+
+348
+00:28:13.160 --> 00:28:16.820
+<v Erik Chelstad>we got a lot of the question about the chicken and the egg.
+
+349
+00:28:16.820 --> 00:28:19.940
+<v Erik Chelstad>and the idea that it's very difficult to start up a marketplace.
+
+350
+00:28:20.480 --> 00:28:29.180
+<v Erik Chelstad>And so what we did right from the beginning was to recognize the importance of not just our customer,
+
+351
+00:28:29.560 --> 00:28:32.640
+<v Erik Chelstad>but treat our observers and our crowd as a customer.
+
+352
+00:28:32.820 --> 00:28:39.960
+<v Erik Chelstad>And so recognizing that they have needs and not trying to just force a solution onto them constantly,
+
+353
+00:28:40.060 --> 00:28:42.600
+<v Erik Chelstad>but to evolve that solution for them.
+
+354
+00:28:42.600 --> 00:28:49.580
+<v Erik Chelstad>And so as part of that, it's making sure that they can trust us was important.
+
+355
+00:28:50.100 --> 00:28:55.260
+<v Erik Chelstad>Again, we are, you know, we're offering payment to people.
+
+356
+00:28:55.460 --> 00:28:58.800
+<v Erik Chelstad>And so kind of making it fun and easy and fast.
+
+357
+00:28:59.280 --> 00:29:01.880
+<v Erik Chelstad>So they would recommend us to their friends.
+
+358
+00:29:02.360 --> 00:29:07.360
+<v Erik Chelstad>Part of the reason that we, you know, we pay as fast as we can.
+
+359
+00:29:07.360 --> 00:29:21.960
+<v Erik Chelstad>And part of the reason we want to move quickly through our validation, which is making sure the information is correct, is not just to get that information to our customers quickly, but also so we can pay the observers quickly.
+
+360
+00:29:22.380 --> 00:29:32.920
+<v Erik Chelstad>You know, and that, again, inspires that trust, knowing if we can get somebody, it's pretty easy to get somebody to install an app that promises free money, basically.
+
+361
+00:29:32.920 --> 00:29:37.540
+<v Erik Chelstad>but it's, I shouldn't say free money, but we'll call it easy money.
+
+362
+00:29:38.140 --> 00:29:45.260
+<v Erik Chelstad>But then to actually provide that money for them in a way that they can see that come over very quickly was important.
+
+363
+00:29:45.580 --> 00:29:48.880
+<v Erik Chelstad>So we did things like referral programs and we still do.
+
+364
+00:29:49.600 --> 00:29:54.300
+<v Erik Chelstad>And we try to keep people engaged with little games and things for them to do
+
+365
+00:29:54.300 --> 00:29:58.240
+<v Erik Chelstad>when there isn't always something right next to them to go out and earn money with.
+
+366
+00:29:58.240 --> 00:29:58.960
+<v Erik Chelstad>it.
+
+367
+00:29:59.340 --> 00:30:05.580
+<v Noah Labhart>Coming from a marketplace or having experience in a marketplace, Observa is a marketplace. The
+
+368
+00:30:05.580 --> 00:30:11.340
+<v Noah Labhart>chicken, the egg problem is really interesting and how you get people on your platform and keep
+
+369
+00:30:11.340 --> 00:30:16.740
+<v Noah Labhart>them interested long enough to get the other party on the platform and then have them interact is,
+
+370
+00:30:16.760 --> 00:30:23.360
+<v Noah Labhart>is always really challenging. But, but when you do it, it's super fruitful and really rewarding.
+
+371
+00:30:23.580 --> 00:30:26.920
+<v Noah Labhart>And how many, how many observers do you have? I think you mentioned earlier,
+
+372
+00:30:28.300 --> 00:30:30.040
+<v Erik Chelstad>Yeah, it's about 300,000 right now.
+
+373
+00:30:30.500 --> 00:30:31.140
+<v Noah Labhart>That's amazing.
+
+374
+00:30:31.340 --> 00:30:33.680
+<v Noah Labhart>That's a huge number and something to be really proud of.
+
+375
+00:30:35.440 --> 00:30:36.560
+<v Noah Labhart>We'll switch to you, Erik.
+
+376
+00:30:36.720 --> 00:30:39.240
+<v Noah Labhart>So who influences the way that you work?
+
+377
+00:30:39.360 --> 00:30:42.620
+<v Noah Labhart>You know, CEO, CTO, architect, really any person.
+
+378
+00:30:42.720 --> 00:30:44.960
+<v Noah Labhart>Name a person that you look up to and why.
+
+379
+00:30:46.440 --> 00:30:50.200
+<v Erik Chelstad>There was a book called The Seven Habits of Highly Effective People.
+
+380
+00:30:50.640 --> 00:30:57.000
+<v Erik Chelstad>It's funny, and I'm going to answer this in a way, but I look up to the advice in that book in some ways.
+
+381
+00:30:58.240 --> 00:31:03.600
+<v Erik Chelstad>And just knowing that at this stage of a company, there are so many things for you to do.
+
+382
+00:31:03.840 --> 00:31:13.140
+<v Erik Chelstad>And trying to get down and figure out exactly what the right thing is to do for yourself and for your company and for your teams on a daily basis.
+
+383
+00:31:13.900 --> 00:31:21.900
+<v Erik Chelstad>I find inspiration in folks like that and people that are sharing their ways in which they do that.
+
+384
+00:31:21.900 --> 00:31:28.420
+<v Erik Chelstad>I would say another person that actually I do look up to is someone who used to be my boss.
+
+385
+00:31:29.000 --> 00:31:34.060
+<v Erik Chelstad>He was a co-founder of a company called Isilon that I worked at.
+
+386
+00:31:34.300 --> 00:31:38.400
+<v Erik Chelstad>And it was a good success story.
+
+387
+00:31:38.840 --> 00:31:41.500
+<v Erik Chelstad>And the co-founder's name is Paul Mikesell.
+
+388
+00:31:41.940 --> 00:31:51.380
+<v Erik Chelstad>And so the company succeeded, went public, eventually sold to EMC.
+
+389
+00:31:51.900 --> 00:31:58.940
+<v Erik Chelstad>Dell. But what I like is Paul was always, he kind of kept the level head and he continued to start
+
+390
+00:31:58.940 --> 00:32:08.040
+<v Erik Chelstad>new companies. He's now making AI enabled robots for farming. But along the way, he was always able
+
+391
+00:32:08.040 --> 00:32:16.360
+<v Erik Chelstad>to answer questions and mentor me as well as playing in bands with me. Like we would do the
+
+392
+00:32:16.360 --> 00:32:18.320
+<v Erik Chelstad>the annual Christmas party for Isilon.
+
+393
+00:32:20.000 --> 00:32:22.680
+<v Erik Chelstad>And we'd get everybody in and play music
+
+394
+00:32:22.680 --> 00:32:27.360
+<v Erik Chelstad>and have a company band and those types of things.
+
+395
+00:32:27.400 --> 00:32:30.120
+<v Erik Chelstad>It's like there's an interaction and a humility
+
+396
+00:32:30.120 --> 00:32:32.680
+<v Erik Chelstad>and also a vision towards the future
+
+397
+00:32:32.680 --> 00:32:35.900
+<v Erik Chelstad>and kind of sharing with other people that I really respect.
+
+398
+00:32:36.280 --> 00:32:37.320
+<v Noah Labhart>That's super cool.
+
+399
+00:32:37.400 --> 00:32:39.320
+<v Noah Labhart>What kind of music would you guys play in the band?
+
+400
+00:32:39.600 --> 00:32:40.100
+<v Noah Labhart>Well,
+
+401
+00:32:40.240 --> 00:32:42.960
+<v Erik Chelstad>we are in Seattle, so it was very grungy.
+
+402
+00:32:43.160 --> 00:32:43.680
+<v Erik Chelstad>Of
+
+403
+00:32:43.680 --> 00:32:44.180
+<v Noah Labhart>course.
+
+404
+00:32:44.380 --> 00:32:45.560
+<v Noah Labhart>Of course, you have to.
+
+405
+00:32:46.960 --> 00:32:51.300
+<v Noah Labhart>Well, we talked about a mistake earlier, but a little bit different spin.
+
+406
+00:32:51.580 --> 00:32:54.460
+<v Noah Labhart>If you could go back to the beginning, what would you do differently?
+
+407
+00:32:54.560 --> 00:32:57.000
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+408
+00:32:58.140 --> 00:33:05.160
+<v Erik Chelstad>I would consider that from a business perspective, and also what we did with our technology,
+
+409
+00:33:05.220 --> 00:33:11.880
+<v Erik Chelstad>is that we really set out at the beginning to, we wanted to get smaller customers to
+
+410
+00:33:11.880 --> 00:33:16.440
+<v Erik Chelstad>to really prove out our product and then build up into,
+
+411
+00:33:16.720 --> 00:33:19.380
+<v Erik Chelstad>you know, build our crowd, build that marketplace
+
+412
+00:33:19.380 --> 00:33:23.480
+<v Erik Chelstad>and do it in a way that didn't crush us
+
+413
+00:33:23.480 --> 00:33:24.100
+<v Erik Chelstad>right at the beginning.
+
+414
+00:33:24.480 --> 00:33:27.100
+<v Erik Chelstad>So we did go after smaller customers.
+
+415
+00:33:27.520 --> 00:33:29.920
+<v Erik Chelstad>And I think that if I was to do something differently,
+
+416
+00:33:30.040 --> 00:33:33.360
+<v Erik Chelstad>I would probably go after larger customers
+
+417
+00:33:34.000 --> 00:33:36.040
+<v Erik Chelstad>at the beginning, or at least much sooner.
+
+418
+00:33:37.020 --> 00:33:38.880
+<v Erik Chelstad>The question of course would be,
+
+419
+00:33:39.760 --> 00:33:43.720
+<v Erik Chelstad>would they have worked with us given that we didn't have much of a track record yet
+
+420
+00:33:44.600 --> 00:33:49.540
+<v Erik Chelstad>or that we didn't have you couldn't you know log into the app store and see that we had hundreds
+
+421
+00:33:49.540 --> 00:33:55.720
+<v Erik Chelstad>of thousands of downloads that so that's kind of the question but i i would have i think i would
+
+422
+00:33:55.720 --> 00:34:03.960
+<v Erik Chelstad>have liked to pursue that just to build up a larger kind of build for the larger customers
+
+423
+00:34:03.960 --> 00:34:08.500
+<v Erik Chelstad>customers and then begin to include the smaller customers as opposed to the opposite.
+
+424
+00:34:09.800 --> 00:34:13.940
+<v Noah Labhart>When you're getting on a plane and you're sitting next to a young entrepreneur who's built the next
+
+425
+00:34:13.940 --> 00:34:18.360
+<v Noah Labhart>big thing, they're jazzed about it. They can't wait to show it off to the world. They can't
+
+426
+00:34:18.360 --> 00:34:22.820
+<v Noah Labhart>wait to show it off to you right there on the plane. What advice do you give that person having
+
+427
+00:34:22.820 --> 00:34:24.120
+<v Noah Labhart>gone down this road a bit?
+
+428
+00:34:25.480 --> 00:34:29.340
+<v Erik Chelstad>I think the most important thing I would tell people like that is
+
+429
+00:34:29.340 --> 00:34:37.140
+<v Erik Chelstad>yes go for it i would say yes show it to me tell me all about it and uh and you know go for it
+
+430
+00:34:37.140 --> 00:34:45.160
+<v Erik Chelstad>it's not about i'd say don't be afraid of not becoming the elon musk gazillionaire success
+
+431
+00:34:45.160 --> 00:34:52.020
+<v Erik Chelstad>bod in the simulation like you you're gonna have your own measure of success and you're going to
+
+432
+00:34:52.020 --> 00:34:58.840
+<v Erik Chelstad>have a life it's kind of that old uh that that like curse or blessing what people would say
+
+433
+00:34:59.340 --> 00:35:04.720
+<v Erik Chelstad>I hope you have an interesting life. You will have an interesting life when you try this and
+
+434
+00:35:05.580 --> 00:35:10.860
+<v Erik Chelstad>go for it. And don't be afraid again. Don't be afraid to fail, but don't be afraid
+
+435
+00:35:11.880 --> 00:35:17.880
+<v Erik Chelstad>if you don't become insanely successful right away. Because part of the other thing is,
+
+436
+00:35:17.900 --> 00:35:21.520
+<v Erik Chelstad>I would say, just prepare and realize that everything's going to take,
+
+437
+00:35:22.140 --> 00:35:25.940
+<v Erik Chelstad>it's going to take longer than you thought and longer than you even planned for.
+
+438
+00:35:26.720 --> 00:35:33.520
+<v Erik Chelstad>so just be ready for that as part of your road to the success that that you're going to find
+
+439
+00:35:34.180 --> 00:35:41.360
+<v Erik Chelstad>and then i guess kind of lastly is like find find other people that share in your dream and your
+
+440
+00:35:41.360 --> 00:35:46.740
+<v Erik Chelstad>vision hopefully you don't have to do too much convincing but find them and when you find them
+
+441
+00:35:47.260 --> 00:35:51.880
+<v Erik Chelstad>hang on to them because they're going to be good at things that you're not good at
+
+442
+00:35:51.880 --> 00:35:59.480
+<v Erik Chelstad>and so you're going to need people that you can trust and that you can share sort of the burden
+
+443
+00:35:59.480 --> 00:36:05.820
+<v Erik Chelstad>but also the successes with so go for it and start building your team
+
+444
+00:36:05.820 --> 00:36:07.200
+<v Noah Labhart>That's great advice.
+
+445
+00:36:07.200 --> 00:36:11.860
+<v Noah Labhart>Well, Erik, thank you for being on the show today. Thank you for telling the creation story
+
+446
+00:36:11.860 --> 00:36:13.160
+<v Noah Labhart>of Observa.
+
+447
+00:36:13.160 --> 00:36:14.960
+<v Erik Chelstad>You're welcome, Noah. Thank you.
+
+448
+00:36:14.960 --> 00:36:18.960
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+449
+00:36:22.040 --> 00:36:25.140
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+450
+00:36:25.480 --> 00:36:30.300
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+451
+00:36:30.720 --> 00:36:35.760
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just $5 to $10 a month.
+
+452
+00:36:36.180 --> 00:36:38.380
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+453
+00:36:38.660 --> 00:36:40.700
+<v Noah Labhart>Both things help us out tremendously.
+
+454
+00:36:43.220 --> 00:36:44.720
+<v Noah Labhart>And thanks again for listening.

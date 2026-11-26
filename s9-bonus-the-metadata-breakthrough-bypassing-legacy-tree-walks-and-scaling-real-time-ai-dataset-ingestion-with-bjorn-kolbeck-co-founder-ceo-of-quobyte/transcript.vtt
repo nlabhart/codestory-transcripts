@@ -1,0 +1,1127 @@
+WEBVTT
+
+NOTE S9 Bonus: The Metadata Breakthrough: Bypassing Legacy Tree Walks and Scaling Real-Time AI Dataset Ingestion with Björn Kolbeck, Co-Founder & CEO of Quobyte
+
+1
+00:00:00.000 --> 00:00:12.920
+<v Björn Kolbeck>The scale is like security and reliability. If you don't build it in from the start, if you don't develop your algorithms and concepts with scale and resiliency in mind, you can't add it later on.
+
+2
+00:00:13.180 --> 00:00:22.800
+<v Björn Kolbeck>And it's also one of the things that is the hardest to describe when people ask me, so what's the secret sauce? The secret sauce is not necessarily one thing.
+
+3
+00:00:22.800 --> 00:00:28.760
+<v Björn Kolbeck>It's a hundred decisions and ways in how we design the architecture and the algorithms
+
+4
+00:00:28.760 --> 00:00:32.400
+<v Björn Kolbeck>to be scalable that makes a difference, that allowed us to scale.
+
+5
+00:00:32.620 --> 00:00:37.600
+<v Björn Kolbeck>If this had happened with the development of the MVP, I think we would still be in the
+
+6
+00:00:37.600 --> 00:00:38.100
+<v Björn Kolbeck>lab.
+
+7
+00:00:38.620 --> 00:00:39.740
+<v Björn Kolbeck>I'm Björn Kolbeck.
+
+8
+00:00:40.080 --> 00:00:43.320
+<v Björn Kolbeck>I'm a co-founder and CEO of Quobyte.
+
+9
+00:00:46.560 --> 00:00:52.180
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+10
+00:00:52.800 --> 00:00:53.700
+<v Noah Labhart>months moonlighting.
+
+11
+00:00:53.760 --> 00:00:54.820
+<v Björn Kolbeck>There's nothing like the
+
+12
+00:00:54.820 --> 00:00:57.740
+<v Noah Labhart>bedcams. Who share what it takes to change an
+
+13
+00:00:57.740 --> 00:01:03.780
+<v Noah Labhart>industry. I don't exactly know what to do next. It took many goes to get right. Who built the teams that have
+
+14
+00:01:03.780 --> 00:01:08.560
+<v Clip>their back. The company is its people. The teams help each other achieve. Most proud of our team.
+
+15
+00:01:08.880 --> 00:01:11.900
+<v Noah Labhart>Keeping scalability top of mind. All that
+
+16
+00:01:11.900 --> 00:01:13.320
+<v Björn Kolbeck>infrastructure was a pain. Yes, we've been
+
+17
+00:01:13.320 --> 00:01:14.000
+<v Björn Kolbeck>fighting it as a
+
+18
+00:01:14.000 --> 00:01:17.800
+<v Noah Labhart>group. Total waste of time. The stories you don't read in the headlines.
+
+19
+00:01:18.260 --> 00:01:22.080
+<v Clip>It's not an easy thing to achieve. Took it off the shelf and dusted it off and tried to begin.
+
+20
+00:01:22.800 --> 00:01:25.840
+<v Noah Labhart>to ride the ups and downs of the startup life.
+
+21
+00:01:26.080 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+22
+00:01:27.620 --> 00:01:28.880
+<v Clip>It's not just about technology.
+
+23
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+24
+00:01:32.760 --> 00:01:34.240
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+25
+00:01:34.440 --> 00:01:38.820
+<v Noah Labhart>And today, how Björn Kolbeck is enabling you to accelerate innovation
+
+26
+00:01:38.820 --> 00:01:43.540
+<v Noah Labhart>by giving you simple and powerful enterprise storage.
+
+27
+00:01:49.320 --> 00:01:51.640
+<v Noah Labhart>When asked about his life outside of tech,
+
+28
+00:01:52.800 --> 00:01:58.420
+<v Noah Labhart>stated, is there anything outside of tech? He has made his hobby into his job, being exposed to his
+
+29
+00:01:58.420 --> 00:02:03.020
+<v Noah Labhart>first computer at 11 and dreaming of being a programmer. But outside of tech, he's a father
+
+30
+00:02:03.020 --> 00:02:07.260
+<v Noah Labhart>of two kids. He loves going to the gym and traveling, which he mentioned was a luxury at
+
+31
+00:02:07.260 --> 00:02:12.320
+<v Noah Labhart>his current venture. For personal travel, he loved visiting Costa Rica as the people are friendly,
+
+32
+00:02:12.460 --> 00:02:19.680
+<v Noah Labhart>the country is beautiful, and it's safe. Björn started a PhD program and was part of a large
+
+33
+00:02:19.680 --> 00:02:23.940
+<v Noah Labhart>project with the goal to build a distributed version of Linux. Within this
+
+34
+00:02:23.940 --> 00:02:27.960
+<v Noah Labhart>program he met his now co-founder and they were responsible for a package
+
+35
+00:02:27.960 --> 00:02:33.300
+<v Noah Labhart>within that project surrounding data management. Little did they know that the
+
+36
+00:02:33.300 --> 00:02:37.540
+<v Noah Labhart>exciting part of the project would later turn into a separate distributed file
+
+37
+00:02:37.540 --> 00:02:42.680
+<v Noah Labhart>system. This is the creation story of Quobyte.
+
+38
+00:02:46.500 --> 00:02:49.780
+<v Björn Kolbeck>Quobyte is the name of the company and the product.
+
+39
+00:02:49.940 --> 00:02:54.140
+<v Björn Kolbeck>We do a parallel file system that's on software.
+
+40
+00:02:54.700 --> 00:02:57.920
+<v Björn Kolbeck>We like to call it the world's easiest parallel file system
+
+41
+00:02:57.920 --> 00:02:59.980
+<v Björn Kolbeck>because that's one of the things we focused on,
+
+42
+00:03:00.060 --> 00:03:01.940
+<v Björn Kolbeck>making it really easy and robust
+
+43
+00:03:01.940 --> 00:03:04.460
+<v Björn Kolbeck>so that people can use our software
+
+44
+00:03:04.460 --> 00:03:07.340
+<v Björn Kolbeck>to run large-scale storage infrastructures
+
+45
+00:03:07.340 --> 00:03:09.340
+<v Björn Kolbeck>when we talk about tens to hundreds of petabytes.
+
+46
+00:03:09.340 --> 00:03:14.280
+<v Björn Kolbeck>So lots of machines, lots of disks and flash drives that can fail.
+
+47
+00:03:14.440 --> 00:03:15.740
+<v Björn Kolbeck>So that's cool in a nutshell.
+
+48
+00:03:16.360 --> 00:03:22.340
+<v Björn Kolbeck>After I graduated from university, I was looking for interesting things to do
+
+49
+00:03:22.340 --> 00:03:26.220
+<v Björn Kolbeck>and came across a research institute in Berlin, the Zuse Institute,
+
+50
+00:03:26.520 --> 00:03:29.520
+<v Björn Kolbeck>where a group was doing research into distributed systems.
+
+51
+00:03:29.940 --> 00:03:33.060
+<v Björn Kolbeck>I started basically a PhD slash research program.
+
+52
+00:03:33.260 --> 00:03:37.100
+<v Björn Kolbeck>It was part of a large European project called XtreemOS,
+
+53
+00:03:37.100 --> 00:03:41.980
+<v Björn Kolbeck>So funded by the European Commission with partners from maybe 15 European partners.
+
+54
+00:03:42.340 --> 00:03:49.740
+<v Björn Kolbeck>And the goal was to build a distributed version of Linux for grid computing, as it was called back then.
+
+55
+00:03:49.820 --> 00:03:56.340
+<v Björn Kolbeck>So basically collaborators from different universities spread geographically and building a Linux distribution for them.
+
+56
+00:03:56.760 --> 00:04:02.680
+<v Björn Kolbeck>I joined them and this is how I met my co-founder, Felix Supfeld, because he was already working there as a PhD student.
+
+57
+00:04:02.760 --> 00:04:06.420
+<v Björn Kolbeck>And he basically hired me to work with him on that project.
+
+58
+00:04:07.100 --> 00:04:13.120
+<v Björn Kolbeck>As part of that project, we were responsible for a pack, they called it package, basically data management.
+
+59
+00:04:13.720 --> 00:04:17.120
+<v Björn Kolbeck>And the fun part was that this was very open-ended.
+
+60
+00:04:17.180 --> 00:04:22.300
+<v Björn Kolbeck>So we were supposed to do something exciting around data management for grid computing.
+
+61
+00:04:22.620 --> 00:04:32.340
+<v Björn Kolbeck>And in that package, we had Barcelona Supercomputing Center as a partner and NEC, their high-performance computing division in Stuttgart.
+
+62
+00:04:32.340 --> 00:04:38.480
+<v Björn Kolbeck>And so we started to develop ideas and came up with the idea of building a distributed
+
+63
+00:04:38.480 --> 00:04:39.500
+<v Björn Kolbeck>parallel file system.
+
+64
+00:04:39.980 --> 00:04:43.600
+<v Björn Kolbeck>Back then, I had no idea what that really meant.
+
+65
+00:04:43.780 --> 00:04:48.680
+<v Björn Kolbeck>But when you get those research projects, you have funding for three to five years to
+
+66
+00:04:48.680 --> 00:04:50.720
+<v Björn Kolbeck>really investigate and try out new ideas.
+
+67
+00:04:50.780 --> 00:04:54.860
+<v Björn Kolbeck>So we started figuring out how to distribute parallel file systems work, what's out there
+
+68
+00:04:54.860 --> 00:04:59.640
+<v Björn Kolbeck>in the market, what's interesting, what's not so interesting, what is software storage.
+
+69
+00:04:59.640 --> 00:05:04.320
+<v Björn Kolbeck>And that's how basically we started a project called XtreemFS.
+
+70
+00:05:04.580 --> 00:05:12.020
+<v Björn Kolbeck>So it distributed parallel file system for grid computing, really focused also on the high-performance computing aspect.
+
+71
+00:05:14.580 --> 00:05:16.520
+<v Noah Labhart>Let's dive into the MVP then.
+
+72
+00:05:16.600 --> 00:05:22.780
+<v Noah Labhart>So the first version of Quobyte that you built, how long did it take to build and what sort of tools were you using to bring it to life?
+
+73
+00:05:24.980 --> 00:05:29.520
+<v Björn Kolbeck>that's a bit hard when you do i guess infrastructure software in general but
+
+74
+00:05:29.520 --> 00:05:34.040
+<v Björn Kolbeck>especially storage your minimum viable product is actually a full product there isn't really
+
+75
+00:05:34.040 --> 00:05:39.160
+<v Björn Kolbeck>any corners you can cut storage has to work someone said i don't remember who it was that
+
+76
+00:05:39.160 --> 00:05:42.600
+<v Björn Kolbeck>storage is the only thing that has to work when the lights go off in the data center
+
+77
+00:05:42.600 --> 00:05:48.500
+<v Björn Kolbeck>you can rip out the networking you can rip out compute but storage has to always work if people
+
+78
+00:05:48.500 --> 00:05:53.500
+<v Björn Kolbeck>don't get their data back they get very angry so the minimum viable product was actually a
+
+79
+00:05:53.500 --> 00:06:01.080
+<v Björn Kolbeck>full file system so when we started Quobyte in late 2013 it took us about two and a half years
+
+80
+00:06:01.080 --> 00:06:08.720
+<v Björn Kolbeck>to build the first version of Quobyte that we could give to our launch customer to use for
+
+81
+00:06:08.720 --> 00:06:14.460
+<v Björn Kolbeck>a production environment we had the advantage that with XtreemFS we already knew what worked and
+
+82
+00:06:14.460 --> 00:06:15.700
+<v Björn Kolbeck>and what didn't work in terms of architecture.
+
+83
+00:06:16.040 --> 00:06:20.140
+<v Björn Kolbeck>So we could use that as a guideline for how to implement it.
+
+84
+00:06:20.200 --> 00:06:22.580
+<v Björn Kolbeck>So that's how we were able to start very quickly
+
+85
+00:06:22.580 --> 00:06:26.640
+<v Björn Kolbeck>and get to this working version within two and a half years.
+
+86
+00:06:26.800 --> 00:06:28.860
+<v Björn Kolbeck>But that's what it basically took.
+
+87
+00:06:29.940 --> 00:06:31.700
+<v Noah Labhart>So within that timeframe,
+
+88
+00:06:32.260 --> 00:06:34.580
+<v Noah Labhart>you've got to make certain decisions and trade-offs
+
+89
+00:06:34.580 --> 00:06:36.180
+<v Noah Labhart>to get a product out there, right?
+
+90
+00:06:36.260 --> 00:06:39.080
+<v Noah Labhart>And cutting scope, accepting technical debt,
+
+91
+00:06:39.220 --> 00:06:40.620
+<v Noah Labhart>all the sort of things, right?
+
+92
+00:06:40.700 --> 00:06:44.000
+<v Noah Labhart>And I imagine, you know, in having to build a total file system
+
+93
+00:06:44.460 --> 00:06:47.540
+<v Noah Labhart>MVP is different than just, you know, move fast and break things.
+
+94
+00:06:47.640 --> 00:06:48.420
+<v Noah Labhart>You've got to get it right.
+
+95
+00:06:48.660 --> 00:06:52.200
+<v Noah Labhart>You probably had to make some really interesting decisions and trade-offs.
+
+96
+00:06:52.260 --> 00:06:54.400
+<v Noah Labhart>Tell me about some of those and how you cope with those decisions.
+
+97
+00:06:56.140 --> 00:06:57.980
+<v Björn Kolbeck>File system reliability is key.
+
+98
+00:06:58.160 --> 00:07:04.080
+<v Björn Kolbeck>So the standard unit testing is nice and it's a must-have, but you have to go further than that.
+
+99
+00:07:04.240 --> 00:07:10.240
+<v Björn Kolbeck>So you have to use standard file system benchmark tools to regularly test the system against.
+
+100
+00:07:10.240 --> 00:07:38.320
+<v Björn Kolbeck>I think that was one of the first things after implementing the internal prototype, the first things one of our engineers did was building a distributed test platform where we can really automatically roll out the current master branch into a basically production cluster and then hammer it with homegrown test tools, but also the industry standard test tools that you find out there, including tools like FIO, spec SFS, and so on.
+
+101
+00:07:40.420 --> 00:07:45.480
+<v Björn Kolbeck>regressions in the software. So I think the testing aspect, doing that right from the start,
+
+102
+00:07:45.540 --> 00:07:47.100
+<v Björn Kolbeck>was probably the most important decision.
+
+103
+00:07:48.580 --> 00:07:51.460
+<v Noah Labhart>You've got the MVP, it's working. And you know,
+
+104
+00:07:51.480 --> 00:07:56.840
+<v Noah Labhart>MVP is relative here, right? You spent the two years, get the product up and running. I'm just
+
+105
+00:07:56.840 --> 00:08:02.280
+<v Noah Labhart>curious about how you progress the product from that point and how you matured it. And I think
+
+106
+00:08:02.280 --> 00:08:05.520
+<v Noah Labhart>to wrap that in a box a little bit, what I'm looking for is how you build your roadmap and
+
+107
+00:08:05.520 --> 00:08:10.040
+<v Noah Labhart>how you went about deciding, okay, this is the next most important thing to build or to address
+
+108
+00:08:10.240 --> 00:08:10.820
+<v Noah Labhart>with Quobyte.
+
+109
+00:08:12.180 --> 00:08:17.600
+<v Björn Kolbeck>The file system API looks very simple. If you look at the POSIX standard,
+
+110
+00:08:17.740 --> 00:08:22.000
+<v Björn Kolbeck>or if you look at the Linux man pages that define how a read and write should behave,
+
+111
+00:08:22.260 --> 00:08:26.660
+<v Björn Kolbeck>it looks pretty straightforward. But the devil is really in the detail of how applications
+
+112
+00:08:26.660 --> 00:08:32.680
+<v Björn Kolbeck>use it and are basically using semantics that works on Linux or works on NFS that isn't
+
+113
+00:08:32.680 --> 00:08:38.780
+<v Björn Kolbeck>necessarily documented. So for us, the challenge was then to expand the use cases. We started
+
+114
+00:08:40.540 --> 00:08:41.740
+<v Björn Kolbeck>OpenStack and virtual machines.
+
+115
+00:08:42.600 --> 00:08:46.340
+<v Björn Kolbeck>Late 2015, early 2016, OpenStack was all the rave.
+
+116
+00:08:46.480 --> 00:08:48.200
+<v Björn Kolbeck>Everyone wanted to build their own infrastructure,
+
+117
+00:08:48.500 --> 00:08:49.260
+<v Björn Kolbeck>cloud-like infrastructure.
+
+118
+00:08:49.640 --> 00:08:51.740
+<v Björn Kolbeck>So that's what we started with.
+
+119
+00:08:51.900 --> 00:08:54.780
+<v Björn Kolbeck>And then we started onboarding more use cases
+
+120
+00:08:54.780 --> 00:08:55.740
+<v Björn Kolbeck>with different applications.
+
+121
+00:08:55.900 --> 00:08:58.480
+<v Björn Kolbeck>And I think this is how our roadmap was shaped.
+
+122
+00:08:58.720 --> 00:09:00.460
+<v Björn Kolbeck>So doing one after the other,
+
+123
+00:09:00.540 --> 00:09:04.040
+<v Björn Kolbeck>discovering new semantics or certain behavior,
+
+124
+00:09:04.280 --> 00:09:05.620
+<v Björn Kolbeck>or also things at scale.
+
+125
+00:09:06.400 --> 00:09:08.800
+<v Björn Kolbeck>It's very different whether you run a cluster
+
+126
+00:09:10.240 --> 00:09:12.760
+<v Björn Kolbeck>or whether you run a cluster with 250 nodes,
+
+127
+00:09:12.840 --> 00:09:14.640
+<v Björn Kolbeck>you suddenly have very different problems
+
+128
+00:09:14.640 --> 00:09:15.740
+<v Björn Kolbeck>that come through scale.
+
+129
+00:09:16.620 --> 00:09:18.260
+<v Björn Kolbeck>So those are the two dimensions,
+
+130
+00:09:18.400 --> 00:09:21.600
+<v Björn Kolbeck>how we basically develop the roadmap for the product
+
+131
+00:09:21.600 --> 00:09:24.260
+<v Björn Kolbeck>or how the roadmap was driven by those two.
+
+132
+00:09:24.360 --> 00:09:27.020
+<v Björn Kolbeck>And then of course you add features to the product.
+
+133
+00:09:27.260 --> 00:09:29.780
+<v Björn Kolbeck>Some of them are, I would say for us,
+
+134
+00:09:29.820 --> 00:09:32.560
+<v Björn Kolbeck>features that are outside of the I.O. path.
+
+135
+00:09:32.920 --> 00:09:34.820
+<v Björn Kolbeck>So basically where applications to the end rights
+
+136
+00:09:34.820 --> 00:09:35.960
+<v Björn Kolbeck>are easier to implement,
+
+137
+00:09:37.220 --> 00:09:39.540
+<v Björn Kolbeck>while other features are more complex
+
+138
+00:09:40.240 --> 00:09:44.540
+<v Björn Kolbeck>this path because then you need to be more careful. You need to do more thorough testing.
+
+139
+00:09:44.880 --> 00:09:51.360
+<v Björn Kolbeck>You need to have a plan of how to roll that out to better customers before you basically make a GA.
+
+140
+00:09:52.940 --> 00:09:58.360
+<v Noah Labhart>I'm curious about team and how you went about deciding or what you looked for in people to
+
+141
+00:09:58.360 --> 00:10:03.260
+<v Noah Labhart>help you decide these are the right people to hire. These are the right horses to join the team,
+
+142
+00:10:03.360 --> 00:10:06.240
+<v Noah Labhart>right? So tell me about that process. How did you build your team?
+
+143
+00:10:07.920 --> 00:10:15.440
+<v Björn Kolbeck>we were lucky because we were able to basically hire some of our former co-workers from research
+
+144
+00:10:15.440 --> 00:10:21.040
+<v Björn Kolbeck>days because they already knew the project some of them have worked for us as research students
+
+145
+00:10:21.040 --> 00:10:25.620
+<v Björn Kolbeck>others have worked in the same department and we knew them and their style so they joined us early
+
+146
+00:10:25.620 --> 00:10:31.600
+<v Björn Kolbeck>on and have been with the company since then they needed minimal onboarding and they could hit the
+
+147
+00:10:31.600 --> 00:10:37.620
+<v Björn Kolbeck>the ground running. And then we look for people that fit in with the culture. Culture meaning in
+
+148
+00:10:37.620 --> 00:10:42.760
+<v Björn Kolbeck>that case that we have an outlier. We are not big fans of distributed teams for development.
+
+149
+00:10:43.080 --> 00:10:48.640
+<v Björn Kolbeck>We like to have everyone in the same room because it's just great for creativity and communication.
+
+150
+00:10:49.000 --> 00:10:55.080
+<v Björn Kolbeck>The team, we saw that things slow down when people are not in the office because communication is
+
+151
+00:10:55.080 --> 00:11:00.040
+<v Björn Kolbeck>just so much more difficult and you have to have a lot of meetings versus having everyone in a big
+
+152
+00:11:01.600 --> 00:11:03.760
+<v Björn Kolbeck>what the others say and add to their discussion
+
+153
+00:11:03.760 --> 00:11:05.780
+<v Björn Kolbeck>when you think that you know something they don't know
+
+154
+00:11:05.780 --> 00:11:08.340
+<v Björn Kolbeck>about your part of the system that you're working on.
+
+155
+00:11:08.440 --> 00:11:11.640
+<v Björn Kolbeck>Finding people that are willing to work on-site in Berlin
+
+156
+00:11:11.640 --> 00:11:14.280
+<v Björn Kolbeck>that know either distributed systems
+
+157
+00:11:14.280 --> 00:11:15.480
+<v Björn Kolbeck>or have a background in systems,
+
+158
+00:11:15.560 --> 00:11:17.480
+<v Björn Kolbeck>so for example, Linux kernel development,
+
+159
+00:11:17.840 --> 00:11:21.860
+<v Björn Kolbeck>good handle on distributed systems or key value stores,
+
+160
+00:11:22.080 --> 00:11:25.020
+<v Björn Kolbeck>finding those wasn't easy and still is not easy.
+
+161
+00:11:28.940 --> 00:11:30.960
+<v Noah Labhart>So this will be super interesting
+
+162
+00:11:31.600 --> 00:11:36.420
+<v Noah Labhart>us at your bread and butter. It has to be built into the product, but I'm curious about scale.
+
+163
+00:11:36.640 --> 00:11:41.520
+<v Noah Labhart>How do you think about scale when building Quobyte? How did you think about it? Was it
+
+164
+00:11:41.520 --> 00:11:47.520
+<v Noah Labhart>built to scale from day one in that two years MVP timeframe or with scale in mind? Or are there
+
+165
+00:11:47.520 --> 00:11:49.940
+<v Noah Labhart>interesting areas where you've had to fight it as you've grown?
+
+166
+00:11:51.180 --> 00:11:52.900
+<v Björn Kolbeck>I think this is where we had a huge
+
+167
+00:11:52.900 --> 00:11:59.920
+<v Björn Kolbeck>advantage that we were able to develop the ideas as part of a research project because scale is
+
+168
+00:12:01.620 --> 00:12:07.160
+<v Björn Kolbeck>or fault tolerance. If you don't build it in from the start, if you don't develop your algorithms and
+
+169
+00:12:07.160 --> 00:12:13.940
+<v Björn Kolbeck>concepts with scale and resiliency in mind, you can't add it later on. And you can see products
+
+170
+00:12:13.940 --> 00:12:19.160
+<v Björn Kolbeck>that really suffer from this because they weren't designed for scale. And then they start adding on
+
+171
+00:12:19.160 --> 00:12:23.420
+<v Björn Kolbeck>and then you end up with, what was it, Monty Python's Royal Society of Putting Things on Top
+
+172
+00:12:23.420 --> 00:12:28.820
+<v Björn Kolbeck>of Other Things. And we know what that means for software. So this is something, scale and
+
+173
+00:12:28.820 --> 00:12:34.460
+<v Björn Kolbeck>resiliency that you need to design into your algorithms and the architecture from the ground
+
+174
+00:12:34.460 --> 00:12:37.940
+<v Björn Kolbeck>up. And it's also one of the things that is the hardest to describe when people ask me,
+
+175
+00:12:37.980 --> 00:12:45.900
+<v Björn Kolbeck>so what's the secret sauce? The secret sauce is not necessarily one thing. It's a hundred decisions
+
+176
+00:12:45.900 --> 00:12:52.060
+<v Björn Kolbeck>and ways in how we design the architecture and the algorithms to be scalable that makes difference,
+
+177
+00:12:52.320 --> 00:12:58.240
+<v Björn Kolbeck>that allowed us to scale. If this had happened with the development of the MVP, I think we would
+
+178
+00:12:58.820 --> 00:13:01.340
+<v Björn Kolbeck>in the lab are trying to do that and struggle with scale.
+
+179
+00:13:02.260 --> 00:13:03.620
+<v Björn Kolbeck>Just to give you an example,
+
+180
+00:13:03.800 --> 00:13:08.020
+<v Björn Kolbeck>we have quorum replication at the core
+
+181
+00:13:08.300 --> 00:13:10.140
+<v Björn Kolbeck>of how we make data redundant.
+
+182
+00:13:10.600 --> 00:13:12.240
+<v Björn Kolbeck>When you do this kind of replication,
+
+183
+00:13:12.660 --> 00:13:15.260
+<v Björn Kolbeck>you have to agree on who's the leader
+
+184
+00:13:15.260 --> 00:13:16.940
+<v Björn Kolbeck>for a certain period of time, the primary.
+
+185
+00:13:17.140 --> 00:13:19.920
+<v Björn Kolbeck>And if you're designing this leader election process
+
+186
+00:13:19.920 --> 00:13:22.940
+<v Björn Kolbeck>is crucial, if you rely on a centralized component there,
+
+187
+00:13:23.000 --> 00:13:24.260
+<v Björn Kolbeck>you have a limit for scalability.
+
+188
+00:13:24.260 --> 00:13:31.800
+<v Björn Kolbeck>So part of what I did as my PhD thesis was how to develop an algorithm that can do this
+
+189
+00:13:31.800 --> 00:13:34.320
+<v Björn Kolbeck>peer-to-peer between the nodes that share the data.
+
+190
+00:13:34.460 --> 00:13:39.240
+<v Björn Kolbeck>And this allowed us to basically scale to thousands of data nodes without a problem
+
+191
+00:13:39.240 --> 00:13:43.660
+<v Björn Kolbeck>because they just talk to their peers that have the data and not a centralized component.
+
+192
+00:13:44.180 --> 00:13:47.680
+<v Björn Kolbeck>So it's decisions like that that you have to do from the start.
+
+193
+00:13:47.740 --> 00:13:50.920
+<v Björn Kolbeck>I think this is, in distributed systems, it is the key.
+
+194
+00:13:51.100 --> 00:13:53.760
+<v Björn Kolbeck>It's like trying to bolt on security.
+
+195
+00:13:54.260 --> 00:13:56.560
+<v Björn Kolbeck>You can't do it. You have to design it from the ground up.
+
+196
+00:13:57.920 --> 00:14:02.000
+<v Noah Labhart>Okay, Björn, as you step out on the balcony, look across all that you've built.
+
+197
+00:14:02.140 --> 00:14:03.400
+<v Noah Labhart>What are you most proud of?
+
+198
+00:14:04.060 --> 00:14:08.960
+<v Björn Kolbeck>I think I'm really proud of our product because we have been working on it for a long time.
+
+199
+00:14:09.140 --> 00:14:15.300
+<v Björn Kolbeck>And seeing it from having weird ideas in a room as a researcher that just gets started,
+
+200
+00:14:16.280 --> 00:14:22.660
+<v Björn Kolbeck>to developing something that's a research prototype, and then writing my PhD thesis,
+
+201
+00:14:24.260 --> 00:14:31.600
+<v Björn Kolbeck>But now when I visit customers, I see their Quobyte clusters with almost 100 petabytes in production.
+
+202
+00:14:32.180 --> 00:14:38.360
+<v Björn Kolbeck>I see what they build on top of our, or using our storage infrastructure, our software.
+
+203
+00:14:38.620 --> 00:14:40.500
+<v Björn Kolbeck>It's very satisfying, to be honest.
+
+204
+00:14:40.940 --> 00:14:47.400
+<v Björn Kolbeck>If I think back like 10, 15 years, it looked like something abstract and now it's happening.
+
+205
+00:14:47.620 --> 00:14:50.040
+<v Björn Kolbeck>So that is something that makes me proud.
+
+206
+00:14:50.880 --> 00:14:54.040
+<v Björn Kolbeck>And also looking at the team that built this.
+
+207
+00:14:54.260 --> 00:14:57.760
+<v Björn Kolbeck>I think we have a very efficient team when it comes to coding.
+
+208
+00:14:57.860 --> 00:15:01.360
+<v Björn Kolbeck>I'm always impressed how much they achieve in a short time frame.
+
+209
+00:15:01.780 --> 00:15:06.680
+<v Björn Kolbeck>So that this team has been with us for a long time and made this happen.
+
+210
+00:15:06.820 --> 00:15:09.320
+<v Björn Kolbeck>I think that's the two things I'm really proud of.
+
+211
+00:15:10.720 --> 00:15:12.460
+<v Noah Labhart>Okay, let's flip the script a little bit.
+
+212
+00:15:12.560 --> 00:15:16.120
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+213
+00:15:17.760 --> 00:15:23.260
+<v Björn Kolbeck>I think the more interesting ones are the ones where you think you're smarter than other people.
+
+214
+00:15:24.260 --> 00:15:32.960
+<v Björn Kolbeck>I definitely made a mistake when I thought that I could reduce latencies in the processing of certain operations that come via UDP packets.
+
+215
+00:15:33.280 --> 00:15:46.040
+<v Björn Kolbeck>And I thought that I could play with core pinning, basically instructing Linux that I have real-time priority and that I pin certain tasks to certain CPUs to reduce the latency because then the kernel might not move them around.
+
+216
+00:15:46.520 --> 00:15:52.460
+<v Björn Kolbeck>And in the end, I created a big mess where the kernel had a hard time scheduling my process at all.
+
+217
+00:15:54.260 --> 00:16:00.400
+<v Björn Kolbeck>like, I probably should have dug deeper to understand more about this before trying to
+
+218
+00:16:00.400 --> 00:16:03.080
+<v Björn Kolbeck>be smarter than the people that wrote the scheduler.
+
+219
+00:16:03.640 --> 00:16:06.240
+<v Björn Kolbeck>Maybe it's sometimes the lesson here is it's okay.
+
+220
+00:16:06.300 --> 00:16:08.720
+<v Björn Kolbeck>Other people are smarter than you when it comes to certain things.
+
+221
+00:16:08.780 --> 00:16:09.900
+<v Björn Kolbeck>And you should just accept that.
+
+222
+00:16:11.340 --> 00:16:15.960
+<v Noah Labhart>I'm excited to hear the passion and what you've built.
+
+223
+00:16:16.040 --> 00:16:19.580
+<v Noah Labhart>What does the future look like for Quobyte, the product and for your team?
+
+224
+00:16:21.300 --> 00:16:28.240
+<v Björn Kolbeck>we have a pretty good roadmap part of it is of course you mentioned the technical debt initially
+
+225
+00:16:28.240 --> 00:16:35.260
+<v Björn Kolbeck>every startup accumulates technical debt and then we spend the last two years cleaning up a lot of
+
+226
+00:16:35.260 --> 00:16:41.120
+<v Björn Kolbeck>that and it's sometimes a bit of a painful process because you push back features customers are
+
+227
+00:16:41.120 --> 00:16:46.180
+<v Björn Kolbeck>waiting for features and everyone loves announcements and so on but reducing the
+
+228
+00:16:46.180 --> 00:16:51.380
+<v Björn Kolbeck>technical debt, paying that back has come to fruition. So we are now reaping the benefits
+
+229
+00:16:51.380 --> 00:16:56.760
+<v Björn Kolbeck>of that. And it's, you come through this valley of tears, just pushing through. And I think it
+
+230
+00:16:56.760 --> 00:17:01.540
+<v Björn Kolbeck>was also painful for the developers because it's not the most fun thing. It's fun to do the 80%,
+
+231
+00:17:01.540 --> 00:17:08.460
+<v Björn Kolbeck>not the 20%. But we can see that now. And then I see how the agility improved for implementing
+
+232
+00:17:08.460 --> 00:17:15.040
+<v Björn Kolbeck>new features. So we have RDMA on the roadmap, we have the tiering to external cloud storage
+
+233
+00:17:16.180 --> 00:17:20.720
+<v Björn Kolbeck>soon. So all those things I'm fairly excited about. And then the stuff under the hood that
+
+234
+00:17:20.720 --> 00:17:24.920
+<v Björn Kolbeck>no one really sees, but that we see in terms of robustness and quality.
+
+235
+00:17:26.960 --> 00:17:31.220
+<v Noah Labhart>Okay, Björn, let's switch to you. Who influences the way that you work?
+
+236
+00:17:31.360 --> 00:17:34.480
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+237
+00:17:36.060 --> 00:17:42.120
+<v Björn Kolbeck>I'm always impressed by very creative people like artists, because creating,
+
+238
+00:17:42.220 --> 00:17:45.560
+<v Björn Kolbeck>you always stand on the shoulder of giants, as I say. There's stuff before.
+
+239
+00:17:46.180 --> 00:17:51.760
+<v Björn Kolbeck>I don't think I have one person I would say is my absolute role model.
+
+240
+00:17:52.120 --> 00:17:57.100
+<v Björn Kolbeck>I think there are people that I find impressive with their work, people you can relate to.
+
+241
+00:17:57.240 --> 00:18:07.440
+<v Björn Kolbeck>For example, just randomly, Stacey Abrams, how she worked to turn Georgia blue during the last elections.
+
+242
+00:18:07.560 --> 00:18:12.280
+<v Björn Kolbeck>I think it's just impressive that people can do this despite all the obstacles.
+
+243
+00:18:12.280 --> 00:18:16.660
+<v Björn Kolbeck>and you fall over, you stumble, you get punched so many times,
+
+244
+00:18:16.700 --> 00:18:18.720
+<v Björn Kolbeck>but you stand up again and again and you don't give up.
+
+245
+00:18:18.860 --> 00:18:21.860
+<v Björn Kolbeck>I should also say that like her, because she's a big Star Trek fan,
+
+246
+00:18:22.020 --> 00:18:24.300
+<v Björn Kolbeck>she even had her cameo in Star Trek Discovery.
+
+247
+00:18:24.620 --> 00:18:27.500
+<v Björn Kolbeck>And her favorite author is Haruki Murakami.
+
+248
+00:18:27.660 --> 00:18:29.660
+<v Björn Kolbeck>So I was like, oh yeah, I can relate to that.
+
+249
+00:18:29.780 --> 00:18:33.680
+<v Björn Kolbeck>But I think this ability to overcome adversity,
+
+250
+00:18:33.900 --> 00:18:37.480
+<v Björn Kolbeck>and even if everyone tells you no, you can't do it, just do it.
+
+251
+00:18:37.680 --> 00:18:38.860
+<v Björn Kolbeck>I find that impressive.
+
+252
+00:18:40.480 --> 00:18:41.440
+<v Noah Labhart>Björn, last question.
+
+253
+00:18:42.280 --> 00:18:46.040
+<v Noah Labhart>getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+254
+00:18:46.140 --> 00:18:49.620
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world and can't wait to show it off
+
+255
+00:18:49.620 --> 00:18:53.900
+<v Noah Labhart>to you right there on the plane. What advice do you give that person having gone down this road a bit?
+
+256
+00:18:54.620 --> 00:19:00.340
+<v Björn Kolbeck>If they're like me and our technical founder, don't underestimate marketing and sales. I think
+
+257
+00:19:00.340 --> 00:19:06.780
+<v Björn Kolbeck>this is one of the mistakes I made. Arrogance of a techie coming from Google. You know, tech is hard.
+
+258
+00:19:06.780 --> 00:19:08.860
+<v Björn Kolbeck>marketing and sales is easy.
+
+259
+00:19:08.980 --> 00:19:11.460
+<v Björn Kolbeck>Just put people into it and that's it.
+
+260
+00:19:11.580 --> 00:19:12.900
+<v Björn Kolbeck>But I would definitely say,
+
+261
+00:19:13.000 --> 00:19:15.120
+<v Björn Kolbeck>understand your customers very well.
+
+262
+00:19:15.300 --> 00:19:17.100
+<v Björn Kolbeck>I really love being in front of customers
+
+263
+00:19:17.100 --> 00:19:18.260
+<v Björn Kolbeck>because that's in the end,
+
+264
+00:19:18.640 --> 00:19:20.260
+<v Björn Kolbeck>when you talk to customers and prospects,
+
+265
+00:19:20.540 --> 00:19:21.680
+<v Björn Kolbeck>that's how you learn.
+
+266
+00:19:21.820 --> 00:19:23.240
+<v Björn Kolbeck>And you should always do that.
+
+267
+00:19:23.400 --> 00:19:27.060
+<v Björn Kolbeck>I'm always skeptical when the founders hide behind teams.
+
+268
+00:19:27.520 --> 00:19:30.800
+<v Björn Kolbeck>With marketing, you have to learn, you have to value it.
+
+269
+00:19:30.920 --> 00:19:32.920
+<v Björn Kolbeck>You have to learn how it works
+
+270
+00:19:32.920 --> 00:19:36.060
+<v Björn Kolbeck>unless you have a founder that understands marketing
+
+271
+00:19:36.780 --> 00:19:42.320
+<v Björn Kolbeck>well. You should try to understand it better and see how valuable and important it is. It's not all
+
+272
+00:19:42.320 --> 00:19:43.120
+<v Björn Kolbeck>about the tech.
+
+273
+00:19:43.360 --> 00:19:47.120
+<v Noah Labhart>I think that's fantastic advice. Well, Björn, thank you for being on the show
+
+274
+00:19:47.120 --> 00:19:49.960
+<v Noah Labhart>today. Thank you for telling the creation story of Quobyte.
+
+275
+00:19:50.320 --> 00:19:51.500
+<v Björn Kolbeck>Thank you for having me, Noah.
+
+276
+00:19:53.500 --> 00:19:56.300
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+277
+00:20:01.200 --> 00:20:06.620
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+278
+00:20:06.780 --> 00:20:08.740
+<v Noah Labhart>or the podcasting app of your choice.
+
+279
+00:20:09.400 --> 00:20:11.560
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+280
+00:20:11.920 --> 00:20:13.760
+<v Noah Labhart>Both things help us out tremendously.
+
+281
+00:20:16.760 --> 00:20:18.180
+<v Noah Labhart>And thanks again for listening.

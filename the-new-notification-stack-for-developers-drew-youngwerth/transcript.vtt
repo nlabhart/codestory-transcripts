@@ -1,0 +1,695 @@
+WEBVTT
+
+NOTE The New Notification Stack for Developers - Drew Youngwerth
+
+1
+00:00:02.160 --> 00:00:27.340
+<v Noah Labhart>Welcome back, listeners. Today we are continuing our series entitled The New Notification Stack for Developers, brought to you by our longtime friends and sponsors of the Code Story podcast, Courier. As a reminder, Courier is developer infrastructure for product notifications, making it easier to deliver the notification experience that your customers expect. Check out their product to learn more at courier.com.
+
+2
+00:00:28.260 --> 00:00:34.460
+<v Noah Labhart>Well, today I have another special guest on the Code Story podcast, Drew Youngwerth.
+
+3
+00:00:34.600 --> 00:00:39.920
+<v Noah Labhart>He's a senior software engineer at Courier and has spent the last 12, 13 years in software,
+
+4
+00:00:40.080 --> 00:00:45.340
+<v Noah Labhart>working robotics, working in motorsports, and is today working on the automations portions
+
+5
+00:00:45.340 --> 00:00:46.280
+<v Noah Labhart>of the Courier platform.
+
+6
+00:00:46.700 --> 00:00:48.700
+<v Noah Labhart>Drew, thank you for being on the show today.
+
+7
+00:00:48.880 --> 00:00:50.180
+<v Drew Youngwerth>Thanks so much for having me.
+
+8
+00:00:50.740 --> 00:00:51.260
+<v Noah Labhart>Absolutely.
+
+9
+00:00:51.260 --> 00:00:57.400
+<v Noah Labhart>Before we go too far into our topic for today, tell me and my audience a little bit more
+
+10
+00:00:57.400 --> 00:00:57.920
+<v Noah Labhart>about you.
+
+11
+00:00:58.100 --> 00:01:00.140
+<v Drew Youngwerth>I'm originally from Boise, Idaho.
+
+12
+00:01:00.540 --> 00:01:05.720
+<v Drew Youngwerth>My whole career started at a company called Recluse Motorsports, working on their inventory
+
+13
+00:01:05.720 --> 00:01:06.660
+<v Drew Youngwerth>management system.
+
+14
+00:01:07.060 --> 00:01:12.900
+<v Drew Youngwerth>And then from there, I was in robotics, automating small factories, helping robots make just
+
+15
+00:01:12.900 --> 00:01:17.340
+<v Drew Youngwerth>tiny parts that were made out of CNC aluminum and that sort of thing.
+
+16
+00:01:17.500 --> 00:01:20.420
+<v Drew Youngwerth>And now I live in San Francisco working for Courier.
+
+17
+00:01:21.260 --> 00:01:23.900
+<v Drew Youngwerth>I love to play video games, work out.
+
+18
+00:01:24.020 --> 00:01:26.900
+<v Drew Youngwerth>I have a dog that I love taking to the dog park.
+
+19
+00:01:27.140 --> 00:01:29.660
+<v Drew Youngwerth>And then I also code for fun, believe it or not.
+
+20
+00:01:30.240 --> 00:01:31.820
+<v Drew Youngwerth>I've got a few side projects.
+
+21
+00:01:31.900 --> 00:01:34.300
+<v Drew Youngwerth>I'm building a programming language and that sort of thing.
+
+22
+00:01:35.160 --> 00:01:35.660
+<v Noah Labhart>Awesome.
+
+23
+00:01:35.660 --> 00:01:37.440
+<v Noah Labhart>Well, let's dive into the meat of it a bit.
+
+24
+00:01:37.480 --> 00:01:38.640
+<v Noah Labhart>So you're an engineer.
+
+25
+00:01:38.720 --> 00:01:41.880
+<v Noah Labhart>You've got 12, 13 years experience being a software engineer.
+
+26
+00:01:42.380 --> 00:01:43.380
+<v Noah Labhart>Tell the audience.
+
+27
+00:01:43.480 --> 00:01:47.600
+<v Noah Labhart>So how much of an engineer's job is automating processes?
+
+28
+00:01:48.260 --> 00:01:50.960
+<v Drew Youngwerth>Oh, it's a huge portion of our job.
+
+29
+00:01:51.260 --> 00:01:55.960
+<v Drew Youngwerth>So one side of things is just making user interfaces that look pretty.
+
+30
+00:01:56.120 --> 00:02:02.800
+<v Drew Youngwerth>And I wouldn't call that automation, but I'd say pretty much everything else is automating
+
+31
+00:02:02.800 --> 00:02:03.300
+<v Drew Youngwerth>processes.
+
+32
+00:02:03.520 --> 00:02:10.320
+<v Drew Youngwerth>So in my current project, Automations, we're taking common repeated tasks and trying to
+
+33
+00:02:10.320 --> 00:02:15.160
+<v Drew Youngwerth>break down the amount of work needed to accomplish those tasks.
+
+34
+00:02:15.500 --> 00:02:20.260
+<v Drew Youngwerth>So for example, we're introducing a feature called Digests, where you'd probably need
+
+35
+00:02:21.320 --> 00:02:28.500
+<v Drew Youngwerth>engineers to introduce a feature like Digest. And we're breaking that down to just a couple of nodes
+
+36
+00:02:28.500 --> 00:02:36.080
+<v Drew Youngwerth>in a user interface. And that's the sort of thing that I'd say most software engineers do. They find
+
+37
+00:02:36.080 --> 00:02:42.500
+<v Drew Youngwerth>things that require a lot of work, and they try to break it down into simple pieces and present it
+
+38
+00:02:42.500 --> 00:02:44.940
+<v Drew Youngwerth>into users in a friendly way.
+
+39
+00:02:45.180 --> 00:02:48.940
+<v Noah Labhart>That makes a ton of sense. And I totally get that split there between,
+
+40
+00:02:48.940 --> 00:02:56.300
+<v Noah Labhart>between processes and then UI, UX. With engineering, with building things, especially
+
+41
+00:02:56.300 --> 00:03:01.720
+<v Noah Labhart>nowadays with no-code, low-code, things like that, there are a level of abstractions that enable
+
+42
+00:03:01.720 --> 00:03:08.600
+<v Noah Labhart>you to move faster. How are Courier and automations the right level of abstractions
+
+43
+00:03:08.600 --> 00:03:11.740
+<v Noah Labhart>for specifically notifications? So
+
+44
+00:03:11.740 --> 00:03:16.740
+<v Drew Youngwerth>Courier was founded on a realization that software startups
+
+45
+00:03:16.740 --> 00:03:22.140
+<v Drew Youngwerth>and software services were building the same thing over and over again.
+
+46
+00:03:22.380 --> 00:03:25.920
+<v Drew Youngwerth>They were starting with maybe one or two notification channels,
+
+47
+00:03:26.060 --> 00:03:29.620
+<v Drew Youngwerth>and then they'd have more and more channels added over time.
+
+48
+00:03:29.840 --> 00:03:33.220
+<v Drew Youngwerth>They'd have more features like localization added over time
+
+49
+00:03:33.220 --> 00:03:39.700
+<v Drew Youngwerth>that eventually their company needed to scale up to an entire engineering team to build.
+
+50
+00:03:39.700 --> 00:03:47.800
+<v Drew Youngwerth>And so Courier was built on those patterns so that Courier could be that notification engineering team.
+
+51
+00:03:48.040 --> 00:03:54.900
+<v Drew Youngwerth>But there's only so much Courier can do alone to build a good notifications experience.
+
+52
+00:03:55.300 --> 00:04:03.440
+<v Drew Youngwerth>And at some level, you're going to need to make a smart notification experience that's tailored for your specific product.
+
+53
+00:04:03.440 --> 00:04:09.380
+<v Drew Youngwerth>product. But even then, there are still really common patterns like checking whether a message
+
+54
+00:04:09.380 --> 00:04:15.560
+<v Drew Youngwerth>was delivered or if a user has completed some sort of event. Like maybe you want to send a
+
+55
+00:04:15.560 --> 00:04:22.160
+<v Drew Youngwerth>notification reminding them that they have a cart full of stuff in your e-commerce site and you want
+
+56
+00:04:22.160 --> 00:04:28.200
+<v Drew Youngwerth>to remind them to check out or clear the cart. Well, Courier Automations makes designing experiences
+
+57
+00:04:28.200 --> 00:04:33.160
+<v Drew Youngwerth>like sending out those reminders or not sending out those reminders if the cart has been checked
+
+58
+00:04:33.440 --> 00:04:40.340
+<v Drew Youngwerth>out. Super simple, something that scales to all skill levels. So maybe even a non-engineer can
+
+59
+00:04:40.340 --> 00:04:42.020
+<v Drew Youngwerth>design those sort of experiences.
+
+60
+00:04:42.520 --> 00:04:46.900
+<v Noah Labhart>It brings up a thought for me from my side. So I'm CTO and
+
+61
+00:04:46.900 --> 00:04:53.500
+<v Noah Labhart>co-founder at Variable. And we have notifications in our platform like any sort of SaaS platform
+
+62
+00:04:53.500 --> 00:05:01.100
+<v Noah Labhart>today, right? And we notify our operators, we call them, our workers, when they are paid,
+
+63
+00:05:01.100 --> 00:05:03.760
+<v Noah Labhart>when there are new opportunities available.
+
+64
+00:05:03.960 --> 00:05:07.540
+<v Noah Labhart>And those are a little bit more loose types of notifications
+
+65
+00:05:07.540 --> 00:05:09.040
+<v Noah Labhart>as far as timing.
+
+66
+00:05:09.120 --> 00:05:10.880
+<v Noah Labhart>But then there are other that are more timing critical,
+
+67
+00:05:11.080 --> 00:05:12.700
+<v Noah Labhart>like you have an op coming up,
+
+68
+00:05:12.760 --> 00:05:14.440
+<v Noah Labhart>you have a work opportunity coming up.
+
+69
+00:05:14.520 --> 00:05:16.300
+<v Noah Labhart>Is that kind of what this is?
+
+70
+00:05:16.480 --> 00:05:19.680
+<v Noah Labhart>Is that what you're referring to when you say automations?
+
+71
+00:05:20.200 --> 00:05:20.700
+<v Noah Labhart>Yeah,
+
+72
+00:05:20.800 --> 00:05:23.320
+<v Drew Youngwerth>so that is actually one of our big use cases.
+
+73
+00:05:23.540 --> 00:05:27.080
+<v Drew Youngwerth>So we have made it in such a way
+
+74
+00:05:27.080 --> 00:05:29.180
+<v Drew Youngwerth>that scheduling a notification
+
+75
+00:05:31.100 --> 00:05:36.940
+<v Drew Youngwerth>schedule an event in a calendar app where we took inspiration from the event creation in Google
+
+76
+00:05:36.940 --> 00:05:44.180
+<v Drew Youngwerth>Calendar because that is basically at the heart of what an engineer would do when they're building
+
+77
+00:05:44.180 --> 00:05:49.500
+<v Drew Youngwerth>a notification scheduler. So yeah, that's a huge use case for automations. We have a whole schedule
+
+78
+00:05:49.500 --> 00:05:52.060
+<v Drew Youngwerth>trigger that's designed just for that.
+
+79
+00:05:52.280 --> 00:05:54.840
+<v Noah Labhart>Really interesting because the scheduling aspect is
+
+80
+00:05:54.840 --> 00:06:00.380
+<v Noah Labhart>critical and really important to even notify the people at the right time. How else are you seeing
+
+81
+00:06:01.100 --> 00:06:03.360
+<v Noah Labhart>users and customers using automations?
+
+82
+00:06:03.840 --> 00:06:09.140
+<v Drew Youngwerth>There's a whole class of use cases that we're already seeing a lot of.
+
+83
+00:06:09.340 --> 00:06:15.500
+<v Drew Youngwerth>You know, one of our biggest use cases is segment customers who intake segment events
+
+84
+00:06:15.500 --> 00:06:19.500
+<v Drew Youngwerth>based on a user's action or what they're doing in their own product.
+
+85
+00:06:19.740 --> 00:06:25.080
+<v Drew Youngwerth>And the best example, which I kind of alluded to earlier, is an e-commerce website that
+
+86
+00:06:25.080 --> 00:06:27.140
+<v Drew Youngwerth>has a checkout experience.
+
+87
+00:06:27.140 --> 00:06:38.700
+<v Drew Youngwerth>And, you know, when you add products to your cart, Segment might send an event and our customers can easily say, hey, I just got this event.
+
+88
+00:06:38.980 --> 00:06:43.400
+<v Drew Youngwerth>I want to send this notification based on that event that we just received.
+
+89
+00:06:43.600 --> 00:06:48.780
+<v Drew Youngwerth>They added that product to their cart and we think they might like these products, too.
+
+90
+00:06:48.880 --> 00:06:52.220
+<v Drew Youngwerth>So we'll send them a notification using automations.
+
+91
+00:06:52.220 --> 00:07:00.900
+<v Drew Youngwerth>And maybe they want to not send a notification every single time they add a product to their cart.
+
+92
+00:07:00.980 --> 00:07:09.620
+<v Drew Youngwerth>So they can do something as simple as drag over the batching or the digest node and say, hey, here's all the products that they added to their cart.
+
+93
+00:07:09.860 --> 00:07:11.780
+<v Drew Youngwerth>Maybe we want to perform some work.
+
+94
+00:07:11.900 --> 00:07:19.140
+<v Drew Youngwerth>And after, you know, the end of the week, we'll send them a list of a few other products that they might find interesting.
+
+95
+00:07:19.140 --> 00:07:33.980
+<v Drew Youngwerth>And so that is something that Courier has abstracted out in such a way that we hope a user experience designer or a product designer can build out with a visual designer that we constructed.
+
+96
+00:07:34.360 --> 00:07:35.640
+<v Noah Labhart>Oh, that's brilliant. I love it.
+
+97
+00:07:35.640 --> 00:07:37.000
+<v Noah Labhart>But yeah, you mentioned Segment.
+
+98
+00:07:37.280 --> 00:07:41.900
+<v Noah Labhart>After speaking with Seth and Ben a couple weeks ago or a week ago,
+
+99
+00:07:42.410 --> 00:07:47.880
+<v Noah Labhart>it was really brought to light the power of the integration that Courier and Segment have
+
+100
+00:07:47.880 --> 00:07:54.540
+<v Noah Labhart>and how existing Segment users and existing Courier users or new users for both
+
+101
+00:07:54.540 --> 00:07:58.760
+<v Noah Labhart>can get up and running and connecting both of those platforms super easy.
+
+102
+00:07:58.800 --> 00:07:59.980
+<v Noah Labhart>It's very, very powerful.
+
+103
+00:07:59.980 --> 00:08:06.620
+<v Noah Labhart>I heard you previously had a version of automations that didn't really work out super well.
+
+104
+00:08:06.860 --> 00:08:10.260
+<v Noah Labhart>What are some of the challenges you faced in implementing that?
+
+105
+00:08:10.440 --> 00:08:12.520
+<v Noah Labhart>And how is this new version different?
+
+106
+00:08:12.840 --> 00:08:13.600
+<v Drew Youngwerth>We did.
+
+107
+00:08:13.740 --> 00:08:15.440
+<v Drew Youngwerth>We had an earlier version.
+
+108
+00:08:15.980 --> 00:08:22.220
+<v Drew Youngwerth>I think it took one of the goals of the automations product a little bit too seriously.
+
+109
+00:08:22.220 --> 00:08:30.660
+<v Drew Youngwerth>And that is to design an experience that scales across all skill levels from the non-technical to the very technical.
+
+110
+00:08:30.860 --> 00:08:40.380
+<v Drew Youngwerth>But they kind of focused on the non-technical to the point that it made what you could deliver with automations very restrictive.
+
+111
+00:08:40.600 --> 00:08:43.060
+<v Drew Youngwerth>You could only add sequential steps.
+
+112
+00:08:43.220 --> 00:08:48.760
+<v Drew Youngwerth>So you could say, all right, send a notification, wait five days and then send the next notification.
+
+113
+00:08:48.760 --> 00:08:52.260
+<v Drew Youngwerth>but it was really difficult to break out of that box.
+
+114
+00:08:52.580 --> 00:09:01.640
+<v Drew Youngwerth>So our next version, we wanted it to truly deliver on the scalability across all skill levels,
+
+115
+00:09:01.720 --> 00:09:03.840
+<v Drew Youngwerth>but also all experiences.
+
+116
+00:09:04.100 --> 00:09:07.820
+<v Drew Youngwerth>We took inspiration from what's out there today.
+
+117
+00:09:08.520 --> 00:09:15.840
+<v Drew Youngwerth>The earliest example that I can think of that I have seen a UI or a flow-based programming system
+
+118
+00:09:15.840 --> 00:09:20.120
+<v Drew Youngwerth>that we've now implemented was a game called LittleBigPlanet.
+
+119
+00:09:20.200 --> 00:09:21.240
+<v Drew Youngwerth>When I was in eighth grade,
+
+120
+00:09:22.060 --> 00:09:25.280
+<v Drew Youngwerth>it had a flow-based visual programming environment.
+
+121
+00:09:25.540 --> 00:09:29.220
+<v Drew Youngwerth>And as an eighth grader, I could build my own levels
+
+122
+00:09:29.220 --> 00:09:31.740
+<v Drew Youngwerth>in a video game that were really cool
+
+123
+00:09:31.740 --> 00:09:35.460
+<v Drew Youngwerth>and responded to the character interacting with the environment.
+
+124
+00:09:35.720 --> 00:09:39.620
+<v Drew Youngwerth>And then we see other products like Blender or Unity
+
+125
+00:09:39.620 --> 00:09:44.620
+<v Drew Youngwerth>who use node flow-based visual programming editors.
+
+126
+00:09:45.840 --> 00:09:51.360
+<v Drew Youngwerth>their users have a lot of success, even if they're not familiar with code or comfortable coding.
+
+127
+00:09:51.560 --> 00:09:59.660
+<v Drew Youngwerth>And so we've taken basically this mature visual language of building smart interactive experiences,
+
+128
+00:10:00.000 --> 00:10:05.820
+<v Drew Youngwerth>and we've applied it to the notifications abstraction that we've been talking about.
+
+129
+00:10:05.980 --> 00:10:12.360
+<v Drew Youngwerth>And so now that game that I played as an eighth grader has carried over into helping customers
+
+130
+00:10:12.360 --> 00:10:16.160
+<v Drew Youngwerth>built really advanced notifications experiences.
+
+131
+00:10:16.940 --> 00:10:17.840
+<v Noah Labhart>That's brilliant.
+
+132
+00:10:17.960 --> 00:10:20.180
+<v Noah Labhart>And I think it makes a lot of sense.
+
+133
+00:10:20.280 --> 00:10:23.560
+<v Noah Labhart>But also at the same time, that sounds like a ton of work.
+
+134
+00:10:23.760 --> 00:10:26.240
+<v Noah Labhart>What does it take to develop something like that?
+
+135
+00:10:26.320 --> 00:10:29.540
+<v Noah Labhart>Can you give me a little bit of an insight into the journey there?
+
+136
+00:10:30.160 --> 00:10:36.300
+<v Drew Youngwerth>Yeah, we really started with looking at prior art to see if there's any open source libraries
+
+137
+00:10:36.820 --> 00:10:38.460
+<v Drew Youngwerth>out there that can assist us.
+
+138
+00:10:38.460 --> 00:10:53.200
+<v Drew Youngwerth>And while we didn't find a whole lot in terms of the back end, we did find a really great library on the front end called React Flow that gives you really the foundation that you need to build a flow-based visual editor.
+
+139
+00:10:53.480 --> 00:10:56.580
+<v Drew Youngwerth>So that gave us a huge head start.
+
+140
+00:10:56.720 --> 00:11:05.100
+<v Drew Youngwerth>And then we also took advantage of really great AWS services like Step Functions, AWS Lambda, and Dynamo, and S3.
+
+141
+00:11:05.100 --> 00:11:09.880
+<v Drew Youngwerth>And we kind of pieced those all together into a really scalable product.
+
+142
+00:11:10.400 --> 00:11:16.620
+<v Drew Youngwerth>So I would say a good portion of our time spent was just research on what's out there.
+
+143
+00:11:16.940 --> 00:11:18.620
+<v Drew Youngwerth>And then the rest was implementation.
+
+144
+00:11:18.920 --> 00:11:20.880
+<v Drew Youngwerth>But it has been a wild ride for sure.
+
+145
+00:11:22.040 --> 00:11:27.000
+<v Noah Labhart>Being a software engineer for 12, 13 years, you know, you've done a lot of work.
+
+146
+00:11:27.100 --> 00:11:28.940
+<v Noah Labhart>You've written a lot of code.
+
+147
+00:11:29.060 --> 00:11:34.180
+<v Noah Labhart>And you're building something for engineers, which has got to be super rewarding.
+
+148
+00:11:35.100 --> 00:11:41.000
+<v Noah Labhart>little bit about what is the most rewarding thing for you as being an engineer at Courier?
+
+149
+00:11:41.340 --> 00:11:48.220
+<v Drew Youngwerth>Oh, man, there's so much. I love going into the office and getting to hang out with like-minded
+
+150
+00:11:48.220 --> 00:11:55.580
+<v Drew Youngwerth>engineers or even not like-minded engineers that give you a different perspective on how to tackle
+
+151
+00:11:55.580 --> 00:12:02.140
+<v Drew Youngwerth>a problem. I found that super rewarding. And then, you know, working together with all of
+
+152
+00:12:02.140 --> 00:12:08.100
+<v Drew Youngwerth>of our differences building up a product at this scale. This is probably the single largest product
+
+153
+00:12:08.100 --> 00:12:17.220
+<v Drew Youngwerth>I've ever worked on. And, you know, I learned a ton. And we launched the initial version of this
+
+154
+00:12:17.220 --> 00:12:24.660
+<v Drew Youngwerth>earlier in the month. And the reaction has been amazing. You know, we've gotten a lot of good
+
+155
+00:12:24.660 --> 00:12:31.560
+<v Drew Youngwerth>feedback. And it's really cool to see the light in people's eyes and see, hey, you know, I think
+
+156
+00:12:32.140 --> 00:12:38.620
+<v Drew Youngwerth>something with this. And then we'll get feedback like, hey, we want to build this feature using
+
+157
+00:12:38.620 --> 00:12:43.560
+<v Drew Youngwerth>automations. How would you do that? And we'd walk them through, but also at the same time,
+
+158
+00:12:43.580 --> 00:12:50.160
+<v Drew Youngwerth>realize that there's more opportunity, more room for improvement and more things that we can make
+
+159
+00:12:50.160 --> 00:12:51.860
+<v Drew Youngwerth>a lot easier for our users.
+
+160
+00:12:52.280 --> 00:12:56.100
+<v Noah Labhart>That's amazing. Well, Drew, I really appreciate you being on the show
+
+161
+00:12:56.100 --> 00:13:01.640
+<v Noah Labhart>today. I couldn't be more excited about the automations aspect and how it links in and
+
+162
+00:13:02.140 --> 00:13:05.860
+<v Noah Labhart>provides the right level of abstraction for notifications through Courier.
+
+163
+00:13:06.020 --> 00:13:08.780
+<v Noah Labhart>Great job on the product and I really appreciate you being on the show.
+
+164
+00:13:09.080 --> 00:13:10.540
+<v Drew Youngwerth>Yeah, thanks so much for having me.
+
+165
+00:13:11.300 --> 00:13:13.000
+<v Noah Labhart>Wow, this is super exciting.
+
+166
+00:13:13.140 --> 00:13:14.700
+<v Noah Labhart>Courier releasing automation,
+
+167
+00:13:15.240 --> 00:13:17.960
+<v Noah Labhart>so automating the processes that need to happen
+
+168
+00:13:17.960 --> 00:13:19.620
+<v Noah Labhart>when you need to send a notification,
+
+169
+00:13:20.020 --> 00:13:22.760
+<v Noah Labhart>enabling builders of all experience levels
+
+170
+00:13:22.760 --> 00:13:25.440
+<v Noah Labhart>to get what they need out of their notifications.
+
+171
+00:13:28.080 --> 00:13:31.320
+<v Noah Labhart>As a reminder, Courier makes it easier for you to deliver
+
+172
+00:13:32.140 --> 00:13:37.380
+<v Noah Labhart>notification experience that your customers expect. To learn more about their product and
+
+173
+00:13:37.380 --> 00:13:42.840
+<v Noah Labhart>get started today, check out courier.com. And thanks again for listening.

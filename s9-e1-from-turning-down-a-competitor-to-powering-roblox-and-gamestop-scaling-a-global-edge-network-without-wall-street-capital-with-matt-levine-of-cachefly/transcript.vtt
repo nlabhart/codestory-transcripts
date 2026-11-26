@@ -1,0 +1,1631 @@
+WEBVTT
+
+NOTE S9 E1: From Turning Down a Competitor to Powering Roblox and GameStop: Scaling a Global Edge Network Without Wall Street Capital with Matt Levine of CacheFly
+
+1
+00:00:01.520 --> 00:00:19.080
+<v Matt Levine>So I have a friend, Richard, and if anybody knows Raz, they'll appreciate the story, but I would basically just message him four lines of code over AOL Instant Messenger every day, and then he would tell me how bad it is, and I gamified making him rewrite the program four lines of code at a time.
+
+2
+00:00:19.660 --> 00:00:28.800
+<v Matt Levine>And at the end of it, I had a working load balancer, but I really just sent terrible code to Richard, and he would be like, you're an idiot, do this. And I was like, what about this? He's like, oh my god, that's the worst thing I've ever seen, do this instead.
+
+3
+00:00:30.000 --> 00:00:30.520
+<v Matt Levine>I'm Matt Levine.
+
+4
+00:00:30.560 --> 00:00:32.400
+<v Matt Levine>I'm the founder and CTO at CacheFly.
+
+5
+00:00:36.240 --> 00:00:41.860
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+6
+00:00:41.960 --> 00:00:43.320
+<v Clip>Six months moonlighting.
+
+7
+00:00:43.360 --> 00:00:44.860
+<v Clip>There's nothing on the back end.
+
+8
+00:00:45.100 --> 00:00:45.600
+<v Clip>Who
+
+9
+00:00:45.520 --> 00:00:47.700
+<v Noah Labhart>share what it takes to change an industry.
+
+10
+00:00:47.940 --> 00:00:49.860
+<v Clip>I don't exactly know what to do next.
+
+11
+00:00:49.880 --> 00:00:50.880
+<v Clip>It took many goes to get right.
+
+12
+00:00:51.480 --> 00:00:54.100
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:00:54.460 --> 00:00:55.740
+<v Clip>The company is its people.
+
+14
+00:00:55.760 --> 00:00:57.040
+<v Clip>The teams help each other achieve.
+
+15
+00:00:57.060 --> 00:00:58.200
+<v Clip>Most proud of our team.
+
+16
+00:01:00.000 --> 00:01:03.900
+<v Clip>top of mind. All that infrastructure was a pain. Yes, we've been fighting it as we grow.
+
+17
+00:01:04.080 --> 00:01:07.460
+<v Noah Labhart>Total waste of time. The stories you don't read in the headlines.
+
+18
+00:01:07.920 --> 00:01:11.740
+<v Clip>It's not an easy thing to achieve, mind you. Took it off the shelf and dusted it off and tried to begin.
+
+19
+00:01:12.140 --> 00:01:15.480
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+20
+00:01:15.660 --> 00:01:19.320
+<v Clip>You need to really want it. It's not just about technology. All this and more
+
+21
+00:01:19.320 --> 00:01:23.800
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart,
+
+22
+00:01:23.900 --> 00:01:27.860
+<v Noah Labhart>and today I'm Matt Levine, built a tailored CDN for your
+
+23
+00:01:27.860 --> 00:01:33.000
+<v Noah Labhart>dynamic content with superior throughput and unmatched versatility.
+
+24
+00:01:36.920 --> 00:01:42.320
+<v Noah Labhart>Matt Levine grew up in Toronto, played sports as a baseball catcher. During his teens, he got
+
+25
+00:01:42.320 --> 00:01:46.920
+<v Noah Labhart>injured and had to sit out for a season. And during that time, he started to dig into computers and
+
+26
+00:01:46.920 --> 00:01:53.020
+<v Noah Labhart>became hooked. He started several businesses in high school and later founded eFront. But outside
+
+27
+00:01:53.020 --> 00:01:55.520
+<v Noah Labhart>Outside of tech, he's married with a couple of kids and likes to play golf.
+
+28
+00:01:56.640 --> 00:02:00.920
+<v Noah Labhart>While working in Arizona, Matt was approached by a now competitor called Limelight.
+
+29
+00:02:01.140 --> 00:02:05.980
+<v Noah Labhart>He knew the founders and he was approached to become a team member, specifically to help start a network.
+
+30
+00:02:06.240 --> 00:02:08.440
+<v Noah Labhart>He felt that it wasn't a good time to do that.
+
+31
+00:02:08.980 --> 00:02:12.000
+<v Noah Labhart>But it was a good time to start and build a CDN.
+
+32
+00:02:13.800 --> 00:02:16.380
+<v Noah Labhart>This is the creation story of CacheFly.
+
+33
+00:02:20.240 --> 00:02:24.460
+<v Matt Levine>So CacheFly, we help people deliver web content faster.
+
+34
+00:02:25.100 --> 00:02:30.820
+<v Matt Levine>So the most obvious example I can probably give in this scenario is the download of this podcast.
+
+35
+00:02:31.340 --> 00:02:35.160
+<v Matt Levine>We basically offload people's typically media files, but it can be anything.
+
+36
+00:02:35.360 --> 00:02:41.100
+<v Matt Levine>And we cache a copy of those files in, I think we're now in 68 cities all over the world.
+
+37
+00:02:41.740 --> 00:02:44.800
+<v Matt Levine>The reason we're doing that is we're trying to cheat the speed of light.
+
+38
+00:02:46.380 --> 00:02:50.260
+<v Matt Levine>certain physics component to how fast something can download. So there's two parts, basically.
+
+39
+00:02:50.340 --> 00:02:56.580
+<v Matt Levine>One is how wide your bandwidth is. So whether you have a 10 meg connection at home or a 50 meg or
+
+40
+00:02:56.580 --> 00:03:02.400
+<v Matt Levine>100 meg connection, that's the maximum limit. And then the other part of how fast it downloads
+
+41
+00:03:02.400 --> 00:03:08.080
+<v Matt Levine>is basically how quickly the computers can talk to each other. And that is bound by the speed of
+
+42
+00:03:08.080 --> 00:03:13.240
+<v Matt Levine>light. All things being equal, you will download something faster from a server in Texas than you
+
+43
+00:03:13.240 --> 00:03:18.600
+<v Matt Levine>you will in Australia. Like any good idea, I stole it. I was working in Arizona at the time,
+
+44
+00:03:18.600 --> 00:03:24.640
+<v Matt Levine>and there was a company that still exists today, a competitor. And I knew three out of the four
+
+45
+00:03:24.640 --> 00:03:28.420
+<v Matt Levine>founders, and they approached me, and I think I would have been employee number five or six.
+
+46
+00:03:28.560 --> 00:03:34.680
+<v Matt Levine>And there's a 500-pound gorilla at the time in our space called Akamai. And Akamai had a history
+
+47
+00:03:34.680 --> 00:03:39.940
+<v Matt Levine>of either buying competitors or suing competitors, not necessarily in that order. So there was a
+
+48
+00:03:39.940 --> 00:03:44.880
+<v Matt Levine>a company called Speedera, who's the number two. Akamai was in the process of suing slash buying
+
+49
+00:03:44.880 --> 00:03:51.260
+<v Matt Levine>them. The folks at Limelight had built a backbone network previously. They'd sold it to a company
+
+50
+00:03:51.260 --> 00:03:55.660
+<v Matt Levine>called Global Crossing, and their non-compete was up, and they wanted to build another network.
+
+51
+00:03:55.840 --> 00:04:02.820
+<v Matt Levine>And their view was that CDN, especially with this opportunity of there not being a number two in the
+
+52
+00:04:02.820 --> 00:04:08.860
+<v Matt Levine>space, was a great way to get bits onto a network. So there was lots of ways you could provide people
+
+53
+00:04:09.960 --> 00:04:11.880
+<v Matt Levine>CDN was this new way they thought that'd be a great way.
+
+54
+00:04:12.400 --> 00:04:13.780
+<v Matt Levine>And I remember being in the room still.
+
+55
+00:04:13.880 --> 00:04:15.560
+<v Matt Levine>They said, CDN is the new cross-connect.
+
+56
+00:04:15.720 --> 00:04:18.720
+<v Matt Levine>And I remember my brain being like, I'm pretty sure CDN is the new CDN.
+
+57
+00:04:18.880 --> 00:04:20.920
+<v Matt Levine>And I don't think you want to be a network.
+
+58
+00:04:21.000 --> 00:04:22.020
+<v Matt Levine>I think you want to be a CDN.
+
+59
+00:04:22.420 --> 00:04:23.800
+<v Matt Levine>And they were like, no, we want to be a network.
+
+60
+00:04:24.020 --> 00:04:24.600
+<v Matt Levine>We want to do this.
+
+61
+00:04:24.600 --> 00:04:25.100
+<v Matt Levine>We want to do that.
+
+62
+00:04:25.880 --> 00:04:27.280
+<v Matt Levine>At the end of the day, I turned them down.
+
+63
+00:04:27.380 --> 00:04:29.560
+<v Matt Levine>Like I said, I think I would have been employee number five or six.
+
+64
+00:04:29.700 --> 00:04:33.560
+<v Matt Levine>But then in the back of my brain, I was like, but it is a good time to start a CDN.
+
+65
+00:04:34.160 --> 00:04:35.960
+<v Matt Levine>I started building it, the POC.
+
+66
+00:04:36.180 --> 00:04:38.520
+<v Matt Levine>I always found the network technology stuff interesting.
+
+67
+00:04:39.940 --> 00:04:44.220
+<v Matt Levine>there was a company way back then called UltraDNS that was the first commercial service that used
+
+68
+00:04:44.220 --> 00:04:48.280
+<v Matt Levine>Anycast where you could ping one IP address and depending on where you were in the world,
+
+69
+00:04:48.340 --> 00:04:52.540
+<v Matt Levine>it went to a different pop. And that at the time blew my mind. So I wondered if I could build
+
+70
+00:04:52.540 --> 00:04:56.580
+<v Matt Levine>something using this Anycast thing that could be a CDN. And at the time, everybody said, no,
+
+71
+00:04:56.620 --> 00:05:00.800
+<v Matt Levine>you could never use Anycast for that because Anycast is meant for short-lived things and
+
+72
+00:05:00.800 --> 00:05:04.360
+<v Matt Levine>content or long-lived connections. It's going to break, yada, yada, yada. So it was basically like
+
+73
+00:05:04.360 --> 00:05:08.200
+<v Matt Levine>like a friends and family kind of beta for the first year and a half, two years.
+
+74
+00:05:09.280 --> 00:05:10.880
+<v Matt Levine>And built it, got it going.
+
+75
+00:05:10.940 --> 00:05:14.480
+<v Matt Levine>And it turns out you can build a CDN on Anycast.
+
+76
+00:05:14.700 --> 00:05:17.620
+<v Matt Levine>And so I gave a presentation with my friend Barrett,
+
+77
+00:05:17.700 --> 00:05:20.440
+<v Matt Levine>who was doing the same thing at the time with a different company,
+
+78
+00:05:20.560 --> 00:05:23.720
+<v Matt Levine>that told me, like, basically, I think the title of the presentation was like,
+
+79
+00:05:23.820 --> 00:05:26.960
+<v Matt Levine>Anycast, stop spreading FUD, or something like that,
+
+80
+00:05:27.580 --> 00:05:31.040
+<v Matt Levine>at an event called NANOG, which is Network Industry Get Together in North America.
+
+81
+00:05:31.980 --> 00:05:32.720
+<v Matt Levine>That was it.
+
+82
+00:05:34.360 --> 00:05:40.800
+<v Matt Levine>So probably two and a half years after that got built, we launched CacheFly as the sort of retail brand.
+
+83
+00:05:42.440 --> 00:05:52.800
+<v Matt Levine>For whatever reason, I find it, I don't know if offensive is the word, but I find it troubling slash offensive when like the only person you can buy something from is a giant corporation.
+
+84
+00:05:53.700 --> 00:05:59.240
+<v Matt Levine>And so like I found it offensive that the only way to buy CDN, and now that we're talking 2005,
+
+85
+00:05:59.240 --> 00:06:04.300
+<v Matt Levine>five, the only way you could host something well on the internet was by being this like big
+
+86
+00:06:04.300 --> 00:06:10.320
+<v Matt Levine>enterprise company. And so CacheFly, we set out to make that as like
+
+87
+00:06:10.320 --> 00:06:15.560
+<v Matt Levine>the great equalizer, if you will, you could sign up with a credit card that you could for 15 bucks
+
+88
+00:06:15.560 --> 00:06:22.260
+<v Matt Levine>was the cheapest plan. The plans were like $15.99 to $99. And at the time, it probably cost Akamai
+
+89
+00:06:22.260 --> 00:06:27.200
+<v Matt Levine>$1,000 on their side just to print an invoice. Like I think it was probably a $10,000 entry
+
+90
+00:06:27.200 --> 00:06:30.140
+<v Matt Levine>point. And you had to go through an enterprise sales process. There was no way you could self
+
+91
+00:06:30.140 --> 00:06:36.320
+<v Matt Levine>provision. Yeah. So that was the startup phase was seeing that market opportunity that limelight
+
+92
+00:06:36.320 --> 00:06:40.460
+<v Matt Levine>saw. And then taking a little bit different approach, they went for that enterprise market
+
+93
+00:06:40.460 --> 00:06:46.540
+<v Matt Levine>as well. And we were kinder, gentler, small business friendly, but also big business friendly.
+
+94
+00:06:46.580 --> 00:06:52.760
+<v Matt Levine>In the first three, four years, we probably had three or 4,000 customers. And it was the largest
+
+95
+00:06:52.760 --> 00:06:57.940
+<v Matt Levine>just gamut possible. So it was everybody from small mom and pop, not even small mom and pop,
+
+96
+00:06:58.000 --> 00:07:03.580
+<v Matt Levine>from some person's website that was just their personal homepage up to somebody like a Procter
+
+97
+00:07:03.580 --> 00:07:09.040
+<v Matt Levine>and Gamble. The timing was good because we also got into podcasting right when podcasting started.
+
+98
+00:07:09.620 --> 00:07:13.540
+<v Matt Levine>So it was at the point where when Apple in the podcast store would feature somebody
+
+99
+00:07:14.040 --> 00:07:17.920
+<v Matt Levine>on the homepage, it's let you know a week in advance, hey, we're going to feature you in the
+
+100
+00:07:17.920 --> 00:07:22.020
+<v Matt Levine>podcast store. Who do you use for hosting? And if it's not CacheFly, you should call CacheFly.
+
+101
+00:07:24.400 --> 00:07:29.540
+<v Noah Labhart>Let's dive into the MVP of CacheFly. So that first version of the product you built, how long did it
+
+102
+00:07:29.540 --> 00:07:33.280
+<v Noah Labhart>take to build, and what sort of tools did you use to bring something like this to life?
+
+103
+00:07:35.120 --> 00:07:40.820
+<v Matt Levine>MVP for CacheFly was that retail thing, but the MVP of the CDN, which kind of preceded that,
+
+104
+00:07:40.820 --> 00:07:47.180
+<v Matt Levine>like I said, today we're 68 POPs. The MVP of the CDN was two. Then we got to have West Coast, East
+
+105
+00:07:47.180 --> 00:07:51.380
+<v Matt Levine>East Coast. That's the first thing. So we were in Palo Alto and New Jersey was the,
+
+106
+00:07:51.420 --> 00:07:58.060
+<v Matt Levine>that first version. It needed to have statistics and reporting. The original one I built using
+
+107
+00:07:58.500 --> 00:08:04.780
+<v Matt Levine>a web server that, no, it still exists, a web server called lighttpd, which lost the web
+
+108
+00:08:04.780 --> 00:08:08.740
+<v Matt Levine>server battles for the most part. But it was the first, sort of a precursor to Nginx, which today
+
+109
+00:08:08.740 --> 00:08:13.520
+<v Matt Levine>is the big one that people use in open source. But Lighty preceded Nginx and we were using FreeBSD.
+
+110
+00:08:14.240 --> 00:08:20.460
+<v Matt Levine>This is way too geeky, but I wrote the kq implementation that for Lighty for FreeBSD,
+
+111
+00:08:20.460 --> 00:08:26.200
+<v Matt Levine>and anybody who knows me should know that should be terrifying to anybody that ever used lighttpd,
+
+112
+00:08:26.200 --> 00:08:32.680
+<v Matt Levine>because I did not know C, still do not know C, and yet cobbled together a kq handler for it so we
+
+113
+00:08:32.680 --> 00:08:38.820
+<v Matt Levine>could actually scale it under load. So C was never my thing, but we also needed to scale horizontally
+
+114
+00:08:38.820 --> 00:08:42.740
+<v Matt Levine>horizontally within each of those data centers, East and West. And there wasn't a whole lot of
+
+115
+00:08:42.740 --> 00:08:50.140
+<v Matt Levine>load balancing technology available back then. So I also wrote a BPF based load balancer that would
+
+116
+00:08:50.140 --> 00:08:56.500
+<v Matt Levine>receive a frame, rewrite the MAC address to the destination server based on the weighted
+
+117
+00:08:56.500 --> 00:09:01.520
+<v Matt Levine>round robin and keep the state table and all these things. And I was not capable of writing that.
+
+118
+00:09:01.840 --> 00:09:07.880
+<v Matt Levine>So I have a friend, I would basically just message him four lines of code over AOL instant messenger
+
+119
+00:09:08.820 --> 00:09:10.220
+<v Matt Levine>And he would tell me how bad it is.
+
+120
+00:09:10.340 --> 00:09:14.060
+<v Matt Levine>And I gamified making him rewrite the program four lines of code at a time.
+
+121
+00:09:14.700 --> 00:09:16.920
+<v Matt Levine>And at the end of it, I had a working load balancer.
+
+122
+00:09:17.020 --> 00:09:19.200
+<v Matt Levine>But I really just sent terrible code to Richard.
+
+123
+00:09:19.280 --> 00:09:20.120
+<v Matt Levine>And he would be like, you're an idiot.
+
+124
+00:09:20.220 --> 00:09:20.720
+<v Matt Levine>Do this.
+
+125
+00:09:20.720 --> 00:09:21.700
+<v Matt Levine>And I was like, what about this?
+
+126
+00:09:21.780 --> 00:09:23.260
+<v Matt Levine>He's like, oh, my God, that's the worst thing I've ever seen.
+
+127
+00:09:23.320 --> 00:09:23.820
+<v Matt Levine>Do this instead.
+
+128
+00:09:24.020 --> 00:09:30.120
+<v Matt Levine>That was the two things we needed to make it work from like an MVP of a can we deliver people's content at scale.
+
+129
+00:09:30.260 --> 00:09:35.260
+<v Matt Levine>And so our first two MVP users would have been my friend Nate's website.
+
+130
+00:09:35.380 --> 00:09:36.760
+<v Matt Levine>So a site called Betanews.com.
+
+131
+00:09:36.760 --> 00:09:43.120
+<v Matt Levine>And at the time, one of the most popular, if not the most popular, instant messaging clients at the time
+
+132
+00:09:43.120 --> 00:09:47.680
+<v Matt Levine>was software called Trillian, one of the first multi-IM clients where you could be on AOL and
+
+133
+00:09:47.680 --> 00:09:52.580
+<v Matt Levine>ICQ and all these things that don't exist anymore. So Trillian was also an MVP, so we hosted all the
+
+134
+00:09:52.580 --> 00:09:58.380
+<v Matt Levine>Trillian downloads and software updates and stuff like that. The actual portal interface was PHP,
+
+135
+00:09:58.380 --> 00:10:04.860
+<v Matt Levine>MySQL, that traditional LAMP stack, and I guess we're FreeBSD, a FAMP stack, but we were probably
+
+136
+00:10:06.760 --> 00:10:11.660
+<v Matt Levine>portal. It was just lighttpd on the delivery side. And the weirdest thing about it all actually
+
+137
+00:10:11.660 --> 00:10:17.920
+<v Matt Levine>is so a traditional CDN is a cache that sits in front of your web server. It would be we get a
+
+138
+00:10:17.920 --> 00:10:22.440
+<v Matt Levine>request. If we don't have it, we go ask for it from somewhere else where somewhere else is your
+
+139
+00:10:22.440 --> 00:10:28.280
+<v Matt Levine>origin. Then we cache it. Back then it was a push thing. So there was a Trillian update. They would
+
+140
+00:10:28.280 --> 00:10:32.800
+<v Matt Levine>FTP it to us or rsync it or something. And then we would push the files out to the pop.
+
+141
+00:10:32.800 --> 00:10:40.080
+<v Matt Levine>So it wasn't even a cache, the MVP. It was actually just distributed web servers, and the caching became something we really dove into later.
+
+142
+00:10:40.480 --> 00:10:53.160
+<v Matt Levine>The MVP was really just distributed web servers, syncing files between them, a little bit of a reporting interface, and some really well-written code by Richard for the load balancer that started as really poorly written code by me.
+
+143
+00:10:55.100 --> 00:11:02.320
+<v Noah Labhart>So you've got the MVP. It's working. You've got it to a stable point. You're getting some traction. Tell me about how you progressed and matured it from there.
+
+144
+00:11:02.800 --> 00:11:12.500
+<v Noah Labhart>And I'm curious about how you formulated or put together your roadmap and how you went about deciding, OK, this is the next most important thing to build or to address with CacheFly.
+
+145
+00:11:13.620 --> 00:11:16.040
+<v Matt Levine>There really was no roadmap for friends and family, right?
+
+146
+00:11:16.080 --> 00:11:18.140
+<v Matt Levine>It was like make it work and then question mark.
+
+147
+00:11:18.300 --> 00:11:23.900
+<v Matt Levine>And so we filled in that first blank of question mark with we should make it so people can sign up regardless of how big they are.
+
+148
+00:11:24.280 --> 00:11:25.620
+<v Matt Levine>That was like the first thing.
+
+149
+00:11:25.620 --> 00:11:30.720
+<v Matt Levine>So then the roadmap, right before we launched, quickly switched into,
+
+150
+00:11:30.900 --> 00:11:33.400
+<v Matt Levine>okay, how do we make this something that's self-provisionable?
+
+151
+00:11:33.720 --> 00:11:36.400
+<v Matt Levine>Because at the time, provisioning was you write Matt an email,
+
+152
+00:11:36.580 --> 00:11:40.640
+<v Matt Levine>Matt types SQL into a SQL server and edits configs manually and things like that.
+
+153
+00:11:40.760 --> 00:11:44.880
+<v Matt Levine>So the first step was how do we make it when you sign up and click,
+
+154
+00:11:45.020 --> 00:11:49.380
+<v Matt Levine>by the time you push a file, everything exists everywhere and seamless.
+
+155
+00:11:49.760 --> 00:11:53.160
+<v Matt Levine>So the first part of the roadmap was making the self-provisioning seamless
+
+156
+00:11:53.160 --> 00:11:57.540
+<v Matt Levine>so that nobody noticed that it took a while to sync configs east and west and things like that.
+
+157
+00:11:58.420 --> 00:12:01.560
+<v Matt Levine>And then the second thing was east and west could only last for so long.
+
+158
+00:12:01.740 --> 00:12:08.320
+<v Matt Levine>So the real first part of the roadmap was, okay, Akamai had 8,000 networks at the time,
+
+159
+00:12:08.360 --> 00:12:13.240
+<v Matt Levine>or 8,000 pops. We had two. So we needed to figure out how to, and we were never,
+
+160
+00:12:13.320 --> 00:12:16.940
+<v Matt Levine>the goal was never to get to 8,000, but the goal was to be like, okay, how can we mirror
+
+161
+00:12:16.940 --> 00:12:21.760
+<v Matt Levine>that performance, but way more efficiently? So some of the roadmap was where are we going
+
+162
+00:12:23.160 --> 00:12:28.240
+<v Matt Levine>on the delivery side. On the product side, it was totally user-driven because there was nothing we
+
+163
+00:12:28.240 --> 00:12:32.440
+<v Matt Levine>could model, right? So today, if you said, okay, I'm going to start a CDN today, you log into
+
+164
+00:12:33.100 --> 00:12:37.540
+<v Matt Levine>somebody's control panel and you go, okay, we need this. And that's how you at least build your
+
+165
+00:12:37.540 --> 00:12:42.040
+<v Matt Levine>roadmap and then you'd sort it based on who you were going after. We had the first mover advantage
+
+166
+00:12:42.040 --> 00:12:46.460
+<v Matt Levine>and the first mover disadvantage. And so the roadmap was really built just based on customer
+
+167
+00:12:46.460 --> 00:12:52.280
+<v Matt Levine>feedback and tickets and support issues and things like that. The roadmap just looked like,
+
+168
+00:12:53.160 --> 00:12:57.740
+<v Matt Levine>this week that would allow one more person to use us. And then behind that one, that was the
+
+169
+00:12:57.740 --> 00:13:03.720
+<v Matt Levine>vocal one, there was 20 or 40 or 100 silent users who didn't open a support ticket and just went
+
+170
+00:13:03.720 --> 00:13:08.000
+<v Matt Levine>somewhere else or stopped trying to build a CDN, use a CDN or whatever it was. If there's anything
+
+171
+00:13:08.000 --> 00:13:13.120
+<v Matt Levine>that I learned early on, it was that for every one user who complains, there's really at least 10x,
+
+172
+00:13:13.160 --> 00:13:17.300
+<v Matt Levine>probably 100x people that have that problem, but they don't complain. They just leave. They're not
+
+173
+00:13:17.300 --> 00:13:20.840
+<v Matt Levine>going to take the time to write a really well-structured support ticket and tell you why
+
+174
+00:13:20.840 --> 00:13:24.160
+<v Matt Levine>and how it would benefit them and yada, yada, yada, and what they'd pay.
+
+175
+00:13:24.580 --> 00:13:27.460
+<v Matt Levine>It just became trying to curate that list and go,
+
+176
+00:13:27.560 --> 00:13:31.380
+<v Matt Levine>okay, where do we think the biggest leverage is behind the scenes that we don't know about?
+
+177
+00:13:31.520 --> 00:13:35.900
+<v Matt Levine>Who would this be for and how many people would this unlock, if you will, if we built it?
+
+178
+00:13:36.640 --> 00:13:40.300
+<v Matt Levine>And around that time, so this is maybe late 2005, early 2006,
+
+179
+00:13:40.600 --> 00:13:44.140
+<v Matt Levine>the time I was building everything myself and I said, okay, that's not going to work.
+
+180
+00:13:44.200 --> 00:13:48.400
+<v Matt Levine>If we're going to roll out two, three, one even features a week, I can't do it all.
+
+181
+00:13:48.400 --> 00:13:56.020
+<v Matt Levine>so we actually outsourced the portal development to a dev shop who was in Poland and they did a
+
+182
+00:13:56.020 --> 00:14:01.080
+<v Matt Levine>very good job of I'd like to say building in a vacuum they were arm's length away from the actual
+
+183
+00:14:01.080 --> 00:14:05.880
+<v Matt Levine>end user they were arm lengths away from the direct feedback from customers weren't really
+
+184
+00:14:05.880 --> 00:14:11.520
+<v Matt Levine>involved in the company roadmap and scaling and all those sorts of things so actually did a very
+
+185
+00:14:11.520 --> 00:14:16.060
+<v Matt Levine>good job all things considered there was no method to the madness for the roadmap it was just whatever
+
+186
+00:14:16.060 --> 00:14:19.620
+<v Matt Levine>Whatever the newest thing to pop up that seems shiniest got built first.
+
+187
+00:14:21.020 --> 00:14:23.800
+<v Noah Labhart>So then how did you go about building your team?
+
+188
+00:14:23.920 --> 00:14:28.180
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+189
+00:14:29.320 --> 00:14:33.180
+<v Matt Levine>We're an engineering-driven organization, I think would be the way I would describe it.
+
+190
+00:14:33.620 --> 00:14:36.340
+<v Matt Levine>And it's in our core value statement today.
+
+191
+00:14:36.500 --> 00:14:40.920
+<v Matt Levine>So today it's an obvious answer, but as I look back over time, it wasn't quite that codified.
+
+192
+00:14:40.920 --> 00:14:46.900
+<v Matt Levine>but the number one thing we looked for with people was a value that I like to call clueful.
+
+193
+00:14:47.640 --> 00:14:54.380
+<v Matt Levine>That was the nicest compliment a geek could give another geek on IRC in 1997. Raz was the most
+
+194
+00:14:54.380 --> 00:14:58.660
+<v Matt Levine>clueful person I knew when it came to building C code. That's the way you would look for help,
+
+195
+00:14:58.760 --> 00:15:02.840
+<v Matt Levine>right? So you'd be on, you'd be in a channel on IRC and you'd say, Hey, I'm, I'm trying to
+
+196
+00:15:02.840 --> 00:15:07.220
+<v Matt Levine>configure a Juniper router. You would just say, Hey, who who's around right now that has Juniper
+
+197
+00:15:08.280 --> 00:15:11.760
+<v Matt Levine>I've struggled to find the definition of clueful over the years.
+
+198
+00:15:11.820 --> 00:15:20.360
+<v Matt Levine>The time I'm most looking for somebody clueful is when I'm calling my internet provider or my telephone provider or an airline's call center.
+
+199
+00:15:20.520 --> 00:15:27.560
+<v Matt Levine>All I'm trying to gauge in the first one minute is whether that person I got connected with is clueful, like AKA can work the system.
+
+200
+00:15:27.940 --> 00:15:30.640
+<v Matt Levine>Sometimes it's not polished on a resume.
+
+201
+00:15:31.040 --> 00:15:33.780
+<v Matt Levine>Sometimes it's not something that they can easily communicate.
+
+202
+00:15:33.780 --> 00:15:38.900
+<v Matt Levine>but when you find them in their area of expertise and they're just so easily able to answer
+
+203
+00:15:38.900 --> 00:15:44.360
+<v Matt Levine>questions that that should be challenging or they're able to quickly get in the zone they
+
+204
+00:15:44.360 --> 00:15:48.920
+<v Matt Levine>just get stuff done and so that's mostly what we look for is people that you could just throw in a
+
+205
+00:15:48.920 --> 00:15:54.880
+<v Matt Levine>situation and at the most basic level clueful is at each fork in the road if you have the decision
+
+206
+00:15:54.880 --> 00:15:58.300
+<v Matt Levine>of doing something smart in this situation or doing something stupid in the situation
+
+207
+00:15:58.300 --> 00:16:03.940
+<v Matt Levine>you choose to do the smart thing. So it was people that could navigate unforeseen waters and just go,
+
+208
+00:16:04.040 --> 00:16:07.500
+<v Matt Levine>I'm gonna do this seems smarter so I'm gonna do that and this seems smarter so I'm gonna keep
+
+209
+00:16:07.500 --> 00:16:12.780
+<v Matt Levine>going this direction. And we were never a process driven or a well documented or I've never been
+
+210
+00:16:12.780 --> 00:16:17.800
+<v Matt Levine>worried that somebody at CacheFly has been over trained. So it's a lot of people getting thrown
+
+211
+00:16:17.800 --> 00:16:24.000
+<v Matt Levine>in the fire and you got a clue for people thrive in that situation and I think that's what we've
+
+212
+00:16:24.000 --> 00:16:26.620
+<v Matt Levine>always had success with is finding people that can do that.
+
+213
+00:16:29.940 --> 00:16:35.260
+<v Noah Labhart>Let's talk about scalability. This is your bread and butter, I'm sure. But I'm curious if, you know,
+
+214
+00:16:35.260 --> 00:16:39.120
+<v Noah Labhart>was this built to scale efficiently from day one? Or was there anywhere where you
+
+215
+00:16:39.120 --> 00:16:41.040
+<v Noah Labhart>kind of had to fight it as you grew?
+
+216
+00:16:42.540 --> 00:16:48.640
+<v Matt Levine>If it was scalable from day one, it wasn't by design. That would have been accidental.
+
+217
+00:16:48.640 --> 00:16:54.560
+<v Matt Levine>dental. There was no timeline for the business, but if you went back to 2002 me and told him that
+
+218
+00:16:54.560 --> 00:16:59.780
+<v Matt Levine>you'd be doing an interview about CacheFly in 2023, he'd be very confused because it was probably like
+
+219
+00:16:59.780 --> 00:17:04.800
+<v Matt Levine>a five to eight year time horizon in my brain. We'll flip this and move on to something else.
+
+220
+00:17:05.200 --> 00:17:11.220
+<v Matt Levine>Where we run into scalability challenges tends to be around people. I like to say that we grow
+
+221
+00:17:11.220 --> 00:17:19.320
+<v Matt Levine>grow to hire. We don't hire to grow. Sometimes that puts you right along the knife's edge as
+
+222
+00:17:19.320 --> 00:17:23.860
+<v Matt Levine>to what you should be doing in any given time. I don't know that we've always had that. We've
+
+223
+00:17:23.860 --> 00:17:27.660
+<v Matt Levine>always prided ourselves on being efficient in terms of headcount. Again, part of that being
+
+224
+00:17:27.660 --> 00:17:33.300
+<v Matt Levine>like the, we don't want to be the giant enterprise. That's what we always, we were the anti-value for
+
+225
+00:17:33.300 --> 00:17:39.660
+<v Matt Levine>that. So we've always tried to have a small team. I have no doubt that we have the best team today
+
+226
+00:17:41.220 --> 00:17:42.160
+<v Matt Levine>for what we're delivering.
+
+227
+00:17:42.360 --> 00:17:44.660
+<v Matt Levine>But the question in terms of scalability is always,
+
+228
+00:17:44.820 --> 00:17:46.900
+<v Matt Levine>but could we be moving faster if we had more
+
+229
+00:17:47.360 --> 00:17:49.160
+<v Matt Levine>or would more be slowing us down?
+
+230
+00:17:49.260 --> 00:17:50.800
+<v Matt Levine>Because there's that training hurdle,
+
+231
+00:17:50.920 --> 00:17:52.060
+<v Matt Levine>there's getting people on board.
+
+232
+00:17:52.420 --> 00:17:55.440
+<v Matt Levine>And so sometimes you have to move slow now
+
+233
+00:17:55.440 --> 00:17:56.300
+<v Matt Levine>to move fast later.
+
+234
+00:17:56.660 --> 00:17:58.620
+<v Matt Levine>And sometimes you just need to move fast now.
+
+235
+00:18:00.100 --> 00:18:02.440
+<v Matt Levine>On the flip side, the actual scalability challenge
+
+236
+00:18:02.440 --> 00:18:03.320
+<v Matt Levine>we had was during COVID.
+
+237
+00:18:03.900 --> 00:18:05.420
+<v Matt Levine>We were one of those businesses
+
+238
+00:18:05.420 --> 00:18:09.040
+<v Matt Levine>that happened to be on the good side of growth during COVID.
+
+239
+00:18:09.180 --> 00:18:11.000
+<v Matt Levine>Like our traffic went through the roof.
+
+240
+00:18:11.440 --> 00:18:16.320
+<v Matt Levine>So as soon as the world was stuck in their house, we got a lot of traffic in terms of growth and not a lot of time.
+
+241
+00:18:17.560 --> 00:18:21.660
+<v Matt Levine>And normally that's okay because we're a technology company and it's pretty straightforward.
+
+242
+00:18:21.860 --> 00:18:28.280
+<v Matt Levine>But for that, eventually we need to add servers, we need to add hardware, we need to get it deployed in data centers, and we need to get it turned on and plugged in.
+
+243
+00:18:29.340 --> 00:18:36.480
+<v Matt Levine>And when that growth started to happen, we found the supply chain gap from China because of their COVID lockdowns.
+
+244
+00:18:36.480 --> 00:18:38.940
+<v Matt Levine>So we couldn't buy new equipment and the lead time was too long.
+
+245
+00:18:38.940 --> 00:18:42.600
+<v Matt Levine>We eventually found used equipment that we could buy quickly.
+
+246
+00:18:42.780 --> 00:18:50.120
+<v Matt Levine>But if we could find that, then FedEx and UPS couldn't actually pick it up or deliver it in any sane delivery window.
+
+247
+00:18:50.440 --> 00:18:56.860
+<v Matt Levine>And if they did deliver it on time, then most data centers weren't letting people in to rack new equipment because of COVID.
+
+248
+00:18:57.820 --> 00:19:04.580
+<v Matt Levine>We became a logistics company for two months, trying to figure out that part of scalability, which was challenging.
+
+249
+00:19:04.720 --> 00:19:08.520
+<v Matt Levine>But we were successful and it was actually a very good growth period for us.
+
+250
+00:19:08.940 --> 00:19:14.120
+<v Matt Levine>lot of headcount during COVID. It served us well moving forward as now we know that we can do those
+
+251
+00:19:14.120 --> 00:19:18.320
+<v Matt Levine>logistics things better than we used to be able to. And that was one of the reasons we scaled.
+
+252
+00:19:18.440 --> 00:19:23.100
+<v Matt Levine>Like I think coming out of COVID, we might've been in 35 locations and now we're in just short of 70.
+
+253
+00:19:23.500 --> 00:19:27.760
+<v Matt Levine>And one of the reasons is we found some scalability and maybe confidence in our
+
+254
+00:19:27.760 --> 00:19:33.440
+<v Matt Levine>ability to do things in shipping, receiving, customs brokerage, vendor selection, all those
+
+255
+00:19:33.440 --> 00:19:38.320
+<v Matt Levine>things. If you're in a cloud world, that's why you're paying a cloud premium for,
+
+256
+00:19:38.940 --> 00:19:43.800
+<v Matt Levine>all that stuff. The non-differentiated heavy lifting, to quote AWS. For us, we have to do
+
+257
+00:19:43.800 --> 00:19:49.080
+<v Matt Levine>our own non-differentiated heavy lifting. And it's something that's easy to avoid or was easy
+
+258
+00:19:49.080 --> 00:19:54.340
+<v Matt Levine>to avoid. And then when we got some reps in pretty fast, it turns out we could scale that way pretty
+
+259
+00:19:54.340 --> 00:19:54.840
+<v Matt Levine>well.
+
+260
+00:19:56.320 --> 00:20:01.500
+<v Noah Labhart>All right, Matt. So as you step out on the balcony and you look across all that you've built,
+
+261
+00:20:01.560 --> 00:20:02.500
+<v Noah Labhart>what are you most proud of?
+
+262
+00:20:04.240 --> 00:20:08.160
+<v Matt Levine>That we're still here. 20 years is a long time, especially
+
+263
+00:20:08.940 --> 00:20:12.240
+<v Matt Levine>Most recently, like in the last two weeks, two of our competitors have literally said,
+
+264
+00:20:12.300 --> 00:20:14.720
+<v Matt Levine>we're getting out of the CDN business, can't do it.
+
+265
+00:20:15.100 --> 00:20:20.600
+<v Matt Levine>And they're just a two in a long line of 30 that have come and gone probably since we started.
+
+266
+00:20:20.780 --> 00:20:23.500
+<v Matt Levine>So the longevity, I think, is something to be proud of.
+
+267
+00:20:24.260 --> 00:20:27.040
+<v Matt Levine>Again, 21-year-old me would have been like, what are you talking about?
+
+268
+00:20:27.140 --> 00:20:29.000
+<v Matt Levine>What do you mean you're going to be here in 20 years doing the same thing?
+
+269
+00:20:29.680 --> 00:20:32.540
+<v Matt Levine>But I think that's a testament to the people, though.
+
+270
+00:20:32.540 --> 00:20:39.580
+<v Matt Levine>So I'm still impressed with how much we do now that I'm not involved in.
+
+271
+00:20:39.980 --> 00:20:41.520
+<v Matt Levine>And that's a recent change.
+
+272
+00:20:41.960 --> 00:20:43.440
+<v Matt Levine>That's probably in the last five years.
+
+273
+00:20:43.680 --> 00:20:48.640
+<v Matt Levine>But that's what I'm most impressed by is how self-sufficient most of the organization is now.
+
+274
+00:20:48.740 --> 00:20:52.220
+<v Matt Levine>Getting us there really today doesn't really involve me a whole lot.
+
+275
+00:20:54.920 --> 00:20:56.840
+<v Noah Labhart>Okay, well, let's flip the script a little bit.
+
+276
+00:20:56.900 --> 00:21:01.000
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+277
+00:21:02.540 --> 00:21:08.020
+<v Matt Levine>off self signups for five years. What really changed is who entered the space was Amazon,
+
+278
+00:21:08.260 --> 00:21:14.860
+<v Matt Levine>Microsoft, Google, because each of their clouds have a CDN component. Akamai is the 500 pound
+
+279
+00:21:14.860 --> 00:21:20.740
+<v Matt Levine>gorilla was a $10 billion company. Now we're talking about trillions in market cap playing
+
+280
+00:21:20.740 --> 00:21:28.060
+<v Matt Levine>in the space. And so we early on, when cloud started getting some traction, we basically
+
+281
+00:21:28.060 --> 00:21:32.800
+<v Matt Levine>went to a pay-as-you-go model, which is what you get with a CloudFront or a Google CDN or a
+
+282
+00:21:32.800 --> 00:21:37.880
+<v Matt Levine>Microsoft Azure CDN, is you can sign up in your cloud portal, push one byte, doesn't cost you anything.
+
+283
+00:21:38.200 --> 00:21:42.760
+<v Matt Levine>So we went pay-as-you-go and we were just flooded with support requests because we were not built
+
+284
+00:21:42.760 --> 00:21:47.060
+<v Matt Levine>to handle people, for lack of a better term, that didn't know what they were doing.
+
+285
+00:21:47.160 --> 00:21:51.540
+<v Matt Levine>Our documentation wasn't for, hey, you've never used a CDN before. You have no idea what this is.
+
+286
+00:21:51.840 --> 00:21:57.320
+<v Matt Levine>You've just committed four cents to setting up your account. Here you go. We just got so many
+
+287
+00:21:58.060 --> 00:22:01.700
+<v Matt Levine>overwhelmed us from a support perspective. The team's reaction was like, what the hell are we
+
+288
+00:22:01.700 --> 00:22:07.120
+<v Matt Levine>doing? My gut reaction was like, okay, this is crazy. We need to turn this off.
+
+289
+00:22:08.820 --> 00:22:13.280
+<v Matt Levine>And we continued to go after larger customers, which was the way we'd been growing anyway.
+
+290
+00:22:13.740 --> 00:22:19.700
+<v Matt Levine>And then six, seven months ago, we went back to, we do need to allow people to not have to go
+
+291
+00:22:19.700 --> 00:22:22.920
+<v Matt Levine>through an enterprise sales gauntlet in order to get an account signed up. Because actually,
+
+292
+00:22:22.980 --> 00:22:27.980
+<v Matt Levine>that's the value. That was our anti-value. That's where the world was in 2005, when we said,
+
+293
+00:22:28.060 --> 00:22:33.720
+<v Matt Levine>this is stupid. We should build a way for people to onboard themselves. The team's reaction this
+
+294
+00:22:33.720 --> 00:22:36.940
+<v Matt Levine>time around was quite different. Instead of being like, oh my God, what a support headache,
+
+295
+00:22:37.220 --> 00:22:43.440
+<v Matt Levine>everybody really moved towards a way more permanent solution to things that had previously
+
+296
+00:22:43.440 --> 00:22:47.940
+<v Matt Levine>been temporary. So things we used to just enable for enterprise customers because they said, hey,
+
+297
+00:22:47.960 --> 00:22:51.700
+<v Matt Levine>I need this. We'd go, of course, it's on for you. That just happened in their POC cycle.
+
+298
+00:22:51.960 --> 00:22:56.960
+<v Matt Levine>We started automating and turning into things that you could make an API call for that were
+
+299
+00:22:58.060 --> 00:23:02.800
+<v Matt Levine>could turn on yourself in the portal. The team's reaction the second time around to my mistake
+
+300
+00:23:02.800 --> 00:23:08.720
+<v Matt Levine>has definitely been a lot more productive for both us and our customers. And even the people
+
+301
+00:23:08.720 --> 00:23:14.380
+<v Matt Levine>that are in the sort of quote unquote enterprise world are benefiting from that, from having those
+
+302
+00:23:14.380 --> 00:23:18.720
+<v Matt Levine>things that they can self-provision. And it's a lot less manual handholding today than it used to be.
+
+303
+00:23:22.100 --> 00:23:25.940
+<v Noah Labhart>Okay, this will be fun. What does the future look like for CacheFly,
+
+304
+00:23:25.940 --> 00:23:28.320
+<v Noah Labhart>for the product and for your team?
+
+305
+00:23:30.080 --> 00:23:33.480
+<v Matt Levine>For the team, it still looks like we have to be clueful.
+
+306
+00:23:33.740 --> 00:23:35.720
+<v Matt Levine>We still need to keep that efficiency.
+
+307
+00:23:36.260 --> 00:23:39.000
+<v Matt Levine>So it's still always going to look like a small team.
+
+308
+00:23:39.420 --> 00:23:41.400
+<v Matt Levine>And today I think we have a big team,
+
+309
+00:23:41.460 --> 00:23:43.900
+<v Matt Levine>but it's a small team for where we are in terms of,
+
+310
+00:23:43.920 --> 00:23:46.280
+<v Matt Levine>let's say customer count or revenue or bandwidth
+
+311
+00:23:46.280 --> 00:23:47.740
+<v Matt Levine>or whatever you want to slice it along.
+
+312
+00:23:48.060 --> 00:23:50.140
+<v Matt Levine>So it's more the efficiency number.
+
+313
+00:23:50.560 --> 00:23:52.660
+<v Matt Levine>So there's a numerator and there's a divisor.
+
+314
+00:23:52.660 --> 00:23:58.420
+<v Matt Levine>And I just always want to be considered a small, efficient,
+
+315
+00:23:59.020 --> 00:24:01.840
+<v Matt Levine>clueful team for whatever it is that we're doing.
+
+316
+00:24:02.140 --> 00:24:05.800
+<v Matt Levine>And then what it looks like for the product, it's more on that automation side.
+
+317
+00:24:05.960 --> 00:24:11.860
+<v Matt Levine>It's getting back into where we were 20 years ago of how do we make it so people
+
+318
+00:24:11.860 --> 00:24:15.520
+<v Matt Levine>can do all this themselves and never have to go through the pain, heartache,
+
+319
+00:24:15.520 --> 00:24:18.360
+<v Matt Levine>and frustration of having to talk to a sales rep to get what you want.
+
+320
+00:24:18.500 --> 00:24:20.120
+<v Matt Levine>So a lot on the automation side.
+
+321
+00:24:20.120 --> 00:24:31.100
+<v Matt Levine>And then what the product looks like on the delivery side, like the actual CDN, I think we're hitting an inflection point on there's like a whole bunch of things coming together.
+
+322
+00:24:31.280 --> 00:24:33.840
+<v Matt Levine>We're going to have 8K video content as a standard.
+
+323
+00:24:34.040 --> 00:24:35.720
+<v Matt Levine>We've got 5G rolling out.
+
+324
+00:24:35.780 --> 00:24:38.800
+<v Matt Levine>There's this sort of push towards the edge, if you will.
+
+325
+00:24:39.320 --> 00:24:47.120
+<v Matt Levine>And so the overall premise of a CDN, we go in front of your content and we cache it all at the edge and it makes it faster.
+
+326
+00:24:47.120 --> 00:24:53.000
+<v Matt Levine>faster in practice what happens is we go in front of your content we cache almost none of it and it
+
+327
+00:24:53.000 --> 00:24:59.460
+<v Matt Levine>makes it faster and that's only going to accelerate but like the size of customer libraries has been
+
+328
+00:24:59.460 --> 00:25:05.300
+<v Matt Levine>larger than the cdn can cache for them for 25 years but we don't talk about it that way it's
+
+329
+00:25:05.300 --> 00:25:11.500
+<v Matt Levine>like the dirty little secret and as a result if you're doing a cdn performance test even if you're
+
+330
+00:25:11.500 --> 00:25:15.480
+<v Matt Levine>trying to do quote unquote real user monitoring if you're trying to bake off between cdns it's
+
+331
+00:25:17.120 --> 00:25:23.360
+<v Matt Levine>or an HTTP fight. It's just like, how fast can our server in Equinix, Los Angeles,
+
+332
+00:25:24.100 --> 00:25:32.720
+<v Matt Levine>serve a user on AT&amp;T or formerly AT&amp;T DSL line, as opposed to Akamai's server in Equinix in Los
+
+333
+00:25:32.720 --> 00:25:38.280
+<v Matt Levine>Angeles, as opposed to Fastly's server that has it in RAM in Equinix, Los Angeles. We keep talking
+
+334
+00:25:38.280 --> 00:25:43.100
+<v Matt Levine>about the challenges and customers keep perceiving the challenges as how quickly can you serve a
+
+335
+00:25:43.100 --> 00:25:49.320
+<v Matt Levine>file from cache. And it's the wrong question today. And it's definitely going to be the wrong
+
+336
+00:25:49.320 --> 00:25:54.900
+<v Matt Levine>question in the next five years or so. I think the bigger question is, what's the difference in
+
+337
+00:25:54.900 --> 00:26:00.140
+<v Matt Levine>the user experience when a file is served from cache from when it's not? Because there's only
+
+338
+00:26:00.140 --> 00:26:05.360
+<v Matt Levine>going to be more and more served not from cache. Today, we're we talked about cache misses versus
+
+339
+00:26:05.360 --> 00:26:10.560
+<v Matt Levine>cache hits. I think cat and today, all anybody cares about is cache hit performance, because
+
+340
+00:26:10.560 --> 00:26:12.680
+<v Matt Levine>Because there's sort of an implication that everything will be a hit.
+
+341
+00:26:12.760 --> 00:26:15.820
+<v Matt Levine>And the reality is it's not today and it's definitely not going to be in the future.
+
+342
+00:26:15.940 --> 00:26:26.420
+<v Matt Levine>So I think product-wise, the focus will be on cache miss performance and demonstrating how well or how much we can help people when something isn't in cache.
+
+343
+00:26:27.900 --> 00:26:28.960
+<v Noah Labhart>Let's switch to you, Matt.
+
+344
+00:26:29.100 --> 00:26:30.940
+<v Noah Labhart>Who influences the way that you work?
+
+345
+00:26:31.140 --> 00:26:34.040
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+346
+00:26:35.200 --> 00:26:35.700
+<v Matt Levine>I
+
+347
+00:26:35.600 --> 00:26:39.500
+<v Matt Levine>would like to say it's Andy Grove and High Output Management, but I don't think it is.
+
+348
+00:26:40.560 --> 00:26:47.300
+<v Matt Levine>I would say if I wanted to have a management style, it would probably look like that.
+
+349
+00:26:47.360 --> 00:26:48.800
+<v Matt Levine>But I don't think that's what we do.
+
+350
+00:26:49.300 --> 00:26:53.940
+<v Matt Levine>I do like to read a lot of business management books and frameworks and things like that.
+
+351
+00:26:54.280 --> 00:27:01.920
+<v Matt Levine>And I treat them a little bit like religion, which is like tune into the things that resonate with you and you tend to ignore most of the rest of the document.
+
+352
+00:27:02.600 --> 00:27:04.000
+<v Matt Levine>That's where I'm at today.
+
+353
+00:27:04.000 --> 00:27:11.420
+<v Matt Levine>day is I don't know that I'm, I have any one person that I'm trying to model per se, but I'm
+
+354
+00:27:11.420 --> 00:27:16.520
+<v Matt Levine>trying to take the best that works for us out of every framework. Because I've also found that
+
+355
+00:27:16.520 --> 00:27:22.580
+<v Matt Levine>it's not the idea. It's like where you are or where the business is in its life cycle when
+
+356
+00:27:22.580 --> 00:27:26.960
+<v Matt Levine>you're implementing it. So the right idea at the wrong time is way worse than not having the idea
+
+357
+00:27:26.960 --> 00:27:32.640
+<v Matt Levine>at all. So there's a component to that sticks in my brain that I'm always trying to find the right
+
+358
+00:27:34.000 --> 00:27:39.520
+<v Matt Levine>need now. There's no book that's ever perfectly written for what my business needs right now.
+
+359
+00:27:39.660 --> 00:27:45.020
+<v Matt Levine>That's always something you have to synthesize from all the inputs. But I like all the classic
+
+360
+00:27:45.020 --> 00:27:49.300
+<v Matt Levine>business authors. I'd have a hard time highlighting anybody other than High Output Management.
+
+361
+00:27:49.500 --> 00:27:54.100
+<v Matt Levine>There's something for everybody and everything. I can't remember whose quote it is, but somebody
+
+362
+00:27:54.100 --> 00:27:57.460
+<v Matt Levine>said, if you think the last book you read has the best ideas, you haven't read enough books.
+
+363
+00:27:58.660 --> 00:28:03.220
+<v Noah Labhart>Matt, last question. You're getting on a plane, sitting next to a young entrepreneur who's built
+
+364
+00:28:03.880 --> 00:28:07.200
+<v Noah Labhart>thing. They're jazzed about it. They can't wait to show it off to the world. Can't wait to show
+
+365
+00:28:07.200 --> 00:28:10.840
+<v Noah Labhart>it off to you right there on the plane. What advice do you give that person having gone down
+
+366
+00:28:10.840 --> 00:28:12.020
+<v Noah Labhart>this road a bit for a while?
+
+367
+00:28:13.460 --> 00:28:17.040
+<v Matt Levine>For somebody who's a new startup, I don't know that I have great
+
+368
+00:28:17.040 --> 00:28:21.680
+<v Matt Levine>business advice for them. I think I have good technical advice for them. Like I said, we're
+
+369
+00:28:21.680 --> 00:28:25.260
+<v Matt Levine>an engineering company at our core. If we were going to write a book, it would be a lot more
+
+370
+00:28:25.260 --> 00:28:30.820
+<v Matt Levine>about our engineering principles than our business principles. But the first thing I would say on the
+
+371
+00:28:30.820 --> 00:28:37.280
+<v Matt Levine>The technical side is it would be crazy not to build whatever it is you're building on some sort of cloud infrastructure.
+
+372
+00:28:38.140 --> 00:28:43.020
+<v Matt Levine>But you need a plan to get off of it as soon as you hit traction.
+
+373
+00:28:43.640 --> 00:28:47.920
+<v Matt Levine>That's the only way you get leverage, A, on your capital and B, on your competition.
+
+374
+00:28:48.120 --> 00:28:54.040
+<v Matt Levine>And C, that's the way you don't give whoever that cloud provider is a crazy amount of margin on your business.
+
+375
+00:28:54.180 --> 00:28:55.400
+<v Matt Levine>But you have to use it when you're small.
+
+376
+00:28:56.240 --> 00:29:01.700
+<v Matt Levine>but where I see most companies fail on the technical side is not having an exit strategy
+
+377
+00:29:01.700 --> 00:29:07.680
+<v Matt Levine>because realistically once you're at scale that's the first thing you need to do is get those cogs
+
+378
+00:29:07.680 --> 00:29:12.100
+<v Matt Levine>under control and the only way to do that in a cloud world is to figure out what you can either
+
+379
+00:29:12.100 --> 00:29:16.460
+<v Matt Levine>move off totally or build a hybrid environment something like that so that's my technical advice
+
+380
+00:29:16.460 --> 00:29:20.940
+<v Matt Levine>is absolutely build on cloud but everything you're building make sure your engineers your
+
+381
+00:29:20.940 --> 00:29:25.140
+<v Matt Levine>developers everybody is thinking about and what would this look like when we're ready to move
+
+382
+00:29:25.680 --> 00:29:28.540
+<v Matt Levine>But the good news is that's only a problem you have when you're successful.
+
+383
+00:29:28.760 --> 00:29:32.600
+<v Matt Levine>There's no unsuccessful businesses that shouldn't have been on the cloud when they failed.
+
+384
+00:29:33.500 --> 00:29:43.360
+<v Matt Levine>On the business side, I think the thing I would tell them today is if they don't have a co-founder, which I didn't when I started CacheFly, get a strong number two as best you can.
+
+385
+00:29:43.360 --> 00:29:56.220
+<v Matt Levine>Like all the success I'm talking about recently in terms of people and not being involved day to day, all of that is only because I found somebody who is unbelievably amazing at running the day to day so that I don't have to.
+
+386
+00:29:56.860 --> 00:30:08.900
+<v Matt Levine>I don't think there's a large cross section of skills of you're an amazing founder who can build a product from nowhere and figure out how to pitch it to investors and first customers and market it.
+
+387
+00:30:08.980 --> 00:30:12.760
+<v Matt Levine>And you also love enforcing that people on your team are following a checklist.
+
+388
+00:30:13.360 --> 00:30:17.860
+<v Matt Levine>also love managing the budget and you're going to do a great job at it better than somebody else.
+
+389
+00:30:18.860 --> 00:30:23.800
+<v Matt Levine>You got to find a way where all those jobs that you're doing day one because you're the only one
+
+390
+00:30:23.800 --> 00:30:28.260
+<v Matt Levine>there goes to people who are better at it than you. And you should only be doing stuff you're
+
+391
+00:30:28.260 --> 00:30:33.820
+<v Matt Levine>better at than everybody else, which again is in no way unique or new advice. I think it's
+
+392
+00:30:33.820 --> 00:30:37.360
+<v Matt Levine>every business book I would have cited if I built the list basically says that.
+
+393
+00:30:37.480 --> 00:30:42.920
+<v Matt Levine>Find where the leverage is on your time, but more importantly, make sure you only have to delegate
+
+394
+00:30:43.360 --> 00:30:47.820
+<v Matt Levine>that once. Like you've got your number two, you've got that person who can focus on operations
+
+395
+00:30:47.820 --> 00:30:53.200
+<v Matt Levine>and you say, here's where it needs to be. Go make that happen. So you're not the one making it
+
+396
+00:30:53.200 --> 00:30:57.500
+<v Matt Levine>happen every day. I think that would be the advice I wish I had given, somebody had given to me
+
+397
+00:30:58.020 --> 00:31:00.960
+<v Matt Levine>and or that I had listened when somebody gave it to me sooner.
+
+398
+00:31:01.300 --> 00:31:04.940
+<v Noah Labhart>That's fantastic advice. Well, Matt, thank you for being on the show today.
+
+399
+00:31:05.120 --> 00:31:07.500
+<v Noah Labhart>Thank you for telling the creation story of CacheFly.
+
+400
+00:31:08.080 --> 00:31:09.400
+<v Matt Levine>Thanks for having me, Noah. This was great.
+
+401
+00:31:10.840 --> 00:31:14.180
+<v Noah Labhart>and this concludes another chapter of Code Story
+
+402
+00:31:18.020 --> 00:31:21.220
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart
+
+403
+00:31:21.220 --> 00:31:23.960
+<v Noah Labhart>be sure to subscribe on Apple Podcasts, Spotify
+
+404
+00:31:23.960 --> 00:31:26.120
+<v Noah Labhart>or the podcasting app of your choice
+
+405
+00:31:26.120 --> 00:31:28.940
+<v Noah Labhart>and when you get a chance, leave us a review
+
+406
+00:31:28.940 --> 00:31:31.140
+<v Noah Labhart>both things help us out tremendously
+
+407
+00:31:33.580 --> 00:31:35.560
+<v Noah Labhart>and thanks again for listening

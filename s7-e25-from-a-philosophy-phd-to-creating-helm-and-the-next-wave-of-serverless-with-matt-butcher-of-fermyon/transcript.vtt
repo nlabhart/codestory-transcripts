@@ -1,0 +1,2167 @@
+WEBVTT
+
+NOTE S7 E25: From a Philosophy PhD to Creating Helm and the Next Wave of Serverless with Matt Butcher of Fermyon
+
+1
+00:00:00.000 --> 00:00:07.740
+<v Matt Butcher>And I think the technology was just a little too early when we did pitch it internally and we just did not get much interest and uptake.
+
+2
+00:00:08.180 --> 00:00:12.060
+<v Matt Butcher>You know, and to his credit, Brendan Burns, who's my boss, was very encouraging to me.
+
+3
+00:00:12.140 --> 00:00:15.400
+<v Matt Butcher>He encouraged me to think about other ways to pursue this level of passion.
+
+4
+00:00:15.500 --> 00:00:21.480
+<v Matt Butcher>And I got to talking to a few VC friends and as soon as I said WebAssembly and next generation of cloud computing,
+
+5
+00:00:22.080 --> 00:00:28.300
+<v Matt Butcher>I realized that we were on to something bigger than I had thought and that people were actively looking into that space.
+
+6
+00:00:30.000 --> 00:00:33.520
+<v Matt Butcher>the awkward after work hours kind of thing where I'm like,
+
+7
+00:00:33.580 --> 00:00:36.500
+<v Matt Butcher>hey, team, you know that idea we had about WebAssembly?
+
+8
+00:00:36.620 --> 00:00:37.600
+<v Matt Butcher>Let's go start a company.
+
+9
+00:00:38.960 --> 00:00:42.460
+<v Matt Butcher>I'm Matt Butcher, the CEO and co-founder of Fermyon.
+
+10
+00:00:47.620 --> 00:00:49.300
+<v Noah Labhart>This is Code Story,
+
+11
+00:00:49.540 --> 00:00:52.880
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries
+
+12
+00:00:52.880 --> 00:00:57.100
+<v Noah Labhart>who share in the critical moments of what it takes to change an industry
+
+13
+00:00:57.100 --> 00:01:04.800
+<v Noah Labhart>streak and build and lead a team that has your back. I'm your host, Noah Labhart, and today,
+
+14
+00:01:04.880 --> 00:01:10.400
+<v Noah Labhart>how Matt Butcher created the fastest path from your blinking cursor to a deployed app
+
+15
+00:01:10.400 --> 00:01:15.740
+<v Noah Labhart>in less than two minutes. All this and more on Code Story.
+
+16
+00:01:19.700 --> 00:01:23.560
+<v Noah Labhart>Matt Butcher was always intending to be a philosopher in the early days.
+
+17
+00:01:24.040 --> 00:01:27.060
+<v Noah Labhart>His dad informed him at some point he would need to get a job, though.
+
+18
+00:01:27.440 --> 00:01:31.920
+<v Noah Labhart>After he interviewed at a local utility company, he was thrust into learning the World Wide Web.
+
+19
+00:01:32.380 --> 00:01:38.540
+<v Noah Labhart>He continued programming his way through college, getting his PhD in philosophy, but eventually moved solely into tech.
+
+20
+00:01:39.320 --> 00:01:44.000
+<v Noah Labhart>He has contributed to multiple open source projects and was one of the original creators of Helm.
+
+21
+00:01:44.600 --> 00:01:49.340
+<v Noah Labhart>Outside of tech, he's a coffee snob with more coffee tooling in his kitchen than plates or silverware.
+
+22
+00:01:51.120 --> 00:01:56.700
+<v Noah Labhart>Matt and his team started to explore the things they couldn't do with their current tooling at Microsoft
+
+23
+00:01:56.700 --> 00:01:58.800
+<v Noah Labhart>and landed on the power of WebAssembly.
+
+24
+00:01:58.980 --> 00:02:02.900
+<v Noah Labhart>In attempting to speed up the startup time of servers and containers,
+
+25
+00:02:03.100 --> 00:02:06.040
+<v Noah Labhart>alongside the rising popularity of serverless,
+
+26
+00:02:06.240 --> 00:02:10.240
+<v Noah Labhart>he and his team stumbled onto something during a post-offsite dinner.
+
+27
+00:02:12.520 --> 00:02:15.220
+<v Noah Labhart>This is the creation story of Fermyon.
+
+28
+00:02:19.060 --> 00:02:21.880
+<v Matt Butcher>Fermyon is pioneering the next wave of cloud computing.
+
+29
+00:02:22.020 --> 00:02:24.280
+<v Matt Butcher>And that's the way we kind of articulate in a nutshell.
+
+30
+00:02:24.620 --> 00:02:27.840
+<v Matt Butcher>The entire Fermyon team has worked in cloud for quite a while.
+
+31
+00:02:27.980 --> 00:02:35.100
+<v Matt Butcher>And at some point, we started to notice that there were some things we couldn't figure out clever and good ways to accomplish in cloud computing.
+
+32
+00:02:35.300 --> 00:02:38.500
+<v Matt Butcher>And so we started to look for technologies that could help us do this better.
+
+33
+00:02:38.500 --> 00:02:43.360
+<v Matt Butcher>and WebAssembly kind of bubbled right up to the top right away as a technology that really enabled
+
+34
+00:02:43.360 --> 00:02:48.820
+<v Matt Butcher>a lot of use cases and features for the cloud that we couldn't figure out how to do with containers
+
+35
+00:02:48.820 --> 00:02:54.220
+<v Matt Butcher>and virtual machines. So we've begun by building an open source tool called Spin that's designed
+
+36
+00:02:54.220 --> 00:02:58.200
+<v Matt Butcher>and targeted for developers to be able to write these new kind of WebAssembly applications for
+
+37
+00:02:58.200 --> 00:03:03.120
+<v Matt Butcher>the cloud. And then, you know, late in October last year, we launched Fermyon Cloud, which is
+
+38
+00:03:03.120 --> 00:03:08.400
+<v Matt Butcher>our hosted platform so that developers can quickly kind of run these applications, share them with
+
+39
+00:03:08.500 --> 00:03:10.660
+<v Matt Butcher>their friends and begin building cool applications.
+
+40
+00:03:12.200 --> 00:03:16.100
+<v Matt Butcher>This is the kind of time when I wish, you know, every one of the 10 of us who started
+
+41
+00:03:16.100 --> 00:03:18.480
+<v Matt Butcher>this could be on here and give their own version of this story.
+
+42
+00:03:18.580 --> 00:03:23.700
+<v Matt Butcher>Because it's just, you know, you got 10 of us left Microsoft on the same day to start
+
+43
+00:03:23.700 --> 00:03:24.200
+<v Matt Butcher>Fermyon.
+
+44
+00:03:24.320 --> 00:03:28.520
+<v Matt Butcher>A lot of us came in through an acquisition into Microsoft, a company called Deis, which
+
+45
+00:03:28.520 --> 00:03:30.420
+<v Matt Butcher>was very early in the Kubernetes space.
+
+46
+00:03:30.820 --> 00:03:34.760
+<v Matt Butcher>We were building Helm and we wrote the original version of the Illustrated Children's Guide
+
+47
+00:03:34.760 --> 00:03:35.260
+<v Matt Butcher>to Kubernetes.
+
+48
+00:03:35.120 --> 00:03:38.700
+<v Matt Butcher>And we attracted Microsoft's attention because we were doing this.
+
+49
+00:03:38.740 --> 00:03:45.620
+<v Matt Butcher>Brendan Burns, who was the creator of Kubernetes, had recently hired on at Microsoft and was building the ideal Kubernetes team was what they wanted to build.
+
+50
+00:03:45.700 --> 00:03:47.280
+<v Matt Butcher>Right. And I was fortunate enough.
+
+51
+00:03:47.320 --> 00:03:52.520
+<v Matt Butcher>We were fortunate enough at Deis to be considered desirable enough that we got acquired by Microsoft.
+
+52
+00:03:52.580 --> 00:03:56.560
+<v Matt Butcher>And it honestly, you know, I've been through a number of acquisitions before.
+
+53
+00:03:56.660 --> 00:03:58.980
+<v Matt Butcher>The Deis Microsoft acquisition was amazing.
+
+54
+00:03:59.300 --> 00:04:00.540
+<v Matt Butcher>I mean, it was just fantastic.
+
+55
+00:04:00.540 --> 00:04:07.120
+<v Matt Butcher>And my team at Deis became sort of like the open source containers team within Microsoft Azure.
+
+56
+00:04:07.680 --> 00:04:21.020
+<v Matt Butcher>And our mandate was build cool stuff based on, you know, container technology, Kubernetes, solve problems that were coming up in the community or through customers or even internally from other Azure teams.
+
+57
+00:04:21.020 --> 00:04:24.400
+<v Matt Butcher>and then push as much as possible into the open source world,
+
+58
+00:04:24.580 --> 00:04:26.960
+<v Matt Butcher>particularly to like Cloud Native Computing Foundation
+
+59
+00:04:26.960 --> 00:04:28.880
+<v Matt Butcher>and other similar organizations.
+
+60
+00:04:29.260 --> 00:04:32.600
+<v Matt Butcher>So that, you know, in addition to solving problems,
+
+61
+00:04:32.740 --> 00:04:33.280
+<v Matt Butcher>we could be good.
+
+62
+00:04:33.380 --> 00:04:35.840
+<v Matt Butcher>Microsoft could be a good citizen in the open source world.
+
+63
+00:04:35.920 --> 00:04:38.660
+<v Matt Butcher>A bunch of us kind of got working on a wide variety of projects,
+
+64
+00:04:38.840 --> 00:04:41.880
+<v Matt Butcher>ranging from Helm package manager for Kubernetes
+
+65
+00:04:41.880 --> 00:04:43.660
+<v Matt Butcher>through a bunch of more experimental projects
+
+66
+00:04:43.660 --> 00:04:47.620
+<v Matt Butcher>like Brigade and Draft and on into even some things
+
+67
+00:04:47.620 --> 00:04:49.960
+<v Matt Butcher>that kind of started to move to the very boundaries
+
+68
+00:04:51.020 --> 00:04:56.480
+<v Matt Butcher>ecosystem like CNAB. And it was just fun. But along the way, because we had this kind of
+
+69
+00:04:56.480 --> 00:05:01.960
+<v Matt Butcher>unprecedented level of access, both to internal Azure teams, like the compute or the HoloLens or
+
+70
+00:05:01.960 --> 00:05:08.820
+<v Matt Butcher>the .NET team, and access to customers and this like full on, you know, full send community
+
+71
+00:05:08.820 --> 00:05:14.940
+<v Matt Butcher>engagement, we got to hear a lot of input and really got sort of like the frontline experience
+
+72
+00:05:14.940 --> 00:05:20.320
+<v Matt Butcher>of what people were frustrated with. And sometimes we would hit upon something that a large number of
+
+73
+00:05:21.440 --> 00:05:25.620
+<v Matt Butcher>requested, but that we couldn't figure out how to do in containers or even figure out how to do in
+
+74
+00:05:25.620 --> 00:05:30.080
+<v Matt Butcher>virtual machines. The startup time for a virtual machine tends to be clocked in at minutes.
+
+75
+00:05:30.400 --> 00:05:37.660
+<v Matt Butcher>Startup time for containers tends to be clocked up in seconds. Yet we were seeing the rise of
+
+76
+00:05:37.660 --> 00:05:42.500
+<v Matt Butcher>popularity of serverless kinds of infrastructure. Well, serverless functions in particular, right?
+
+77
+00:05:42.540 --> 00:05:47.760
+<v Matt Butcher>Like Lambda and Azure functions and that whole Google functions, that whole litany of compact
+
+78
+00:05:47.760 --> 00:05:52.860
+<v Matt Butcher>unpacked code executable artifacts that you can kind of push up and have them execute per request.
+
+79
+00:05:53.380 --> 00:05:56.660
+<v Matt Butcher>And developers are telling us, oh, we love functions as a service. I mean, there are some
+
+80
+00:05:56.660 --> 00:06:00.040
+<v Matt Butcher>issues with it. We'd like a better developer experience. We'd like, you know, these kinds
+
+81
+00:06:00.040 --> 00:06:03.800
+<v Matt Butcher>of features. We'd like to not be locked into a vendor, but we like the developer experience.
+
+82
+00:06:04.140 --> 00:06:07.920
+<v Matt Butcher>Meanwhile, the platform operators, and again, you know, this was an excellent thing about being
+
+83
+00:06:07.920 --> 00:06:13.100
+<v Matt Butcher>inside of Microsoft. The platform operators at the compute team are telling us, well, here's how it
+
+84
+00:06:13.100 --> 00:06:17.820
+<v Matt Butcher>it works. You know, we have to pre-spin up this stuff and keep this warm virtual machine image
+
+85
+00:06:17.820 --> 00:06:23.280
+<v Matt Butcher>around and it's expensive. So we started hearing problems like these, right? And we started
+
+86
+00:06:23.280 --> 00:06:28.160
+<v Matt Butcher>collecting these kinds of little nuggets of, I don't know, desire or frustration or whatever,
+
+87
+00:06:28.280 --> 00:06:32.900
+<v Matt Butcher>whatever these are nuggets of. And at some point we decided to sit down and have a conversation
+
+88
+00:06:32.900 --> 00:06:38.040
+<v Matt Butcher>about them. And so I remember very vividly this conversation because we had all flown into
+
+89
+00:06:38.040 --> 00:06:42.280
+<v Matt Butcher>to Vancouver Island to do our team onsite.
+
+90
+00:06:42.900 --> 00:06:44.820
+<v Matt Butcher>And so we all got together, you know,
+
+91
+00:06:44.820 --> 00:06:46.760
+<v Matt Butcher>kind of took over a couple of hotel conference rooms,
+
+92
+00:06:46.840 --> 00:06:47.780
+<v Matt Butcher>spent the day planning.
+
+93
+00:06:47.920 --> 00:06:49.340
+<v Matt Butcher>It's a very exhausting process.
+
+94
+00:06:49.500 --> 00:06:51.460
+<v Matt Butcher>And at the end of the day, we'd unwind by having dinner.
+
+95
+00:06:51.740 --> 00:06:54.480
+<v Matt Butcher>And we're just kind of sitting around after dinner.
+
+96
+00:06:54.620 --> 00:06:56.260
+<v Matt Butcher>You know, the table's largely been cleared.
+
+97
+00:06:56.360 --> 00:06:58.960
+<v Matt Butcher>We're finishing up our drinks and we're kind of exhausted.
+
+98
+00:06:59.100 --> 00:07:02.580
+<v Matt Butcher>And you know how sometimes the bit just flips, right?
+
+99
+00:07:02.740 --> 00:07:04.480
+<v Matt Butcher>And you go from sort of like this mode
+
+100
+00:07:04.480 --> 00:07:06.140
+<v Matt Butcher>where you've been hyper engaged
+
+101
+00:07:08.040 --> 00:07:12.300
+<v Matt Butcher>reasoning process of how are we going to schedule this stuff to this kind of free-flowing creative
+
+102
+00:07:12.300 --> 00:07:15.960
+<v Matt Butcher>mode. And I'm totally not attributing this in any way to the Canadian whiskey we were drinking.
+
+103
+00:07:16.240 --> 00:07:20.900
+<v Matt Butcher>We kind of got into this mode where we were going like, what is the next wave of cloud computing?
+
+104
+00:07:21.060 --> 00:07:26.560
+<v Matt Butcher>All along, we've been trying to shoehorn all of our problems into the patterns of virtual machines
+
+105
+00:07:26.560 --> 00:07:31.880
+<v Matt Butcher>and containers, but maybe there's something else out there, some other undiscovered technology
+
+106
+00:07:31.880 --> 00:07:36.440
+<v Matt Butcher>that if we plugged it in in the cloud context would start solving these problems for us.
+
+107
+00:07:38.040 --> 00:07:41.760
+<v Matt Butcher>session, you know, we tossed out a couple of ideas, but we just decided, well, you know,
+
+108
+00:07:41.780 --> 00:07:46.400
+<v Matt Butcher>on our Friday afternoons, when we're doing our research time, maybe we'll look around and see
+
+109
+00:07:46.400 --> 00:07:51.340
+<v Matt Butcher>kind of what bubbles up to the surface. And it didn't take long for WebAssembly to be kind of
+
+110
+00:07:51.340 --> 00:07:56.680
+<v Matt Butcher>that thing. So, you know, a couple of us spent a few Fridays here and there kind of researching it,
+
+111
+00:07:56.740 --> 00:08:00.700
+<v Matt Butcher>playing around with it, finding some inspiration. I mean, it really did seem like a good fit.
+
+112
+00:08:01.420 --> 00:08:06.900
+<v Matt Butcher>But then along came COVID. And, you know, we were a remote team already. And to some degree,
+
+113
+00:08:08.040 --> 00:08:12.080
+<v Matt Butcher>helped us a lot over teams that had to go from in-person to remote.
+
+114
+00:08:12.460 --> 00:08:16.100
+<v Matt Butcher>But even so, you know, once we were on lockdowns and things like that,
+
+115
+00:08:16.180 --> 00:08:18.240
+<v Matt Butcher>the morale on the team really took a hit.
+
+116
+00:08:18.600 --> 00:08:23.320
+<v Matt Butcher>And we decided we were going to just refocus our energy.
+
+117
+00:08:23.440 --> 00:08:26.500
+<v Matt Butcher>Let's spend some time refocusing on the mental health of the team
+
+118
+00:08:26.500 --> 00:08:30.800
+<v Matt Butcher>and a little less on the roadmap and just kind of opened up a space.
+
+119
+00:08:31.620 --> 00:08:35.560
+<v Matt Butcher>Kind of ended up putting us in an interesting creative space again.
+
+120
+00:08:35.560 --> 00:08:39.400
+<v Matt Butcher>And you never really know what's going to kick you into the creative, what's going to flip the creative bit.
+
+121
+00:08:39.540 --> 00:08:44.360
+<v Matt Butcher>Right. But, you know, people started to desire to do something that was going to be energizing.
+
+122
+00:08:44.400 --> 00:08:46.260
+<v Matt Butcher>So it wasn't just avoiding work that was draining.
+
+123
+00:08:46.400 --> 00:08:49.020
+<v Matt Butcher>It was like, can we get engaged in something that's going to be energizing?
+
+124
+00:08:49.120 --> 00:08:53.840
+<v Matt Butcher>And so the whole team started playing around on Fridays with WebAssembly and what can we build?
+
+125
+00:08:53.960 --> 00:08:58.000
+<v Matt Butcher>And then, you know, Research Friday became Research Thursday and Friday.
+
+126
+00:08:58.160 --> 00:09:02.980
+<v Matt Butcher>And the team really just dove all in and we built some really cool technology previews.
+
+127
+00:09:02.980 --> 00:09:07.180
+<v Matt Butcher>So we built this system called Krustlet that could execute WebAssembly inside of Kubernetes.
+
+128
+00:09:07.780 --> 00:09:11.220
+<v Matt Butcher>And, you know, at the outcome of this, we're like, OK, well, let's pitch this, right?
+
+129
+00:09:11.300 --> 00:09:13.100
+<v Matt Butcher>Surely Microsoft is going to love this.
+
+130
+00:09:14.240 --> 00:09:18.680
+<v Matt Butcher>And I think the technology was just a little too early when we did pitch it internally.
+
+131
+00:09:18.940 --> 00:09:22.000
+<v Matt Butcher>And we just did not get much interest and uptake.
+
+132
+00:09:22.460 --> 00:09:29.400
+<v Matt Butcher>You know, and to his credit, Brendan Burns, who's my boss, was very encouraging to me and said, you know, you may actually be on to something.
+
+133
+00:09:29.400 --> 00:09:33.400
+<v Matt Butcher>It's just not something that Microsoft is finding a lot of interest in right now.
+
+134
+00:09:33.740 --> 00:09:37.140
+<v Matt Butcher>He encouraged me to think about other ways to pursue this level of passion.
+
+135
+00:09:37.260 --> 00:09:39.680
+<v Matt Butcher>And I got to talking to a few VC friends.
+
+136
+00:09:39.920 --> 00:09:52.400
+<v Matt Butcher>And as soon as I said WebAssembly and next generation of cloud computing, I realized that we were on to something bigger than I had thought and that people were actively looking into that space to see who was doing what.
+
+137
+00:09:52.400 --> 00:10:00.660
+<v Matt Butcher>But you can probably imagine the awkward after work hours kind of thing where I'm like, hey, team, you know that idea we had about WebAssembly?
+
+138
+00:10:00.780 --> 00:10:01.760
+<v Matt Butcher>Let's go start a company.
+
+139
+00:10:02.800 --> 00:10:06.960
+<v Matt Butcher>And, you know, we took a weekend to think about it, came back on Monday and everybody's like, we are all in.
+
+140
+00:10:07.100 --> 00:10:11.440
+<v Matt Butcher>And a couple of weeks later, we turned in our notice at Microsoft, all 10 of us on the same day.
+
+141
+00:10:11.500 --> 00:10:15.100
+<v Matt Butcher>I really feel bad for the HR person who had to process all of that.
+
+142
+00:10:15.380 --> 00:10:16.740
+<v Matt Butcher>And we started Fermyon.
+
+143
+00:10:17.280 --> 00:10:20.580
+<v Matt Butcher>And then a month later, you know, closed our series Seed of Investment.
+
+144
+00:10:24.320 --> 00:10:30.240
+<v Noah Labhart>running. So let's dive into the MVP then. So you left Microsoft or you've built this, you pitched
+
+145
+00:10:30.240 --> 00:10:36.500
+<v Noah Labhart>it, you're ready to jump out on your own and pursue it. Maybe the MVP is that one you just
+
+146
+00:10:36.500 --> 00:10:40.960
+<v Noah Labhart>described, but maybe even a little bit further after you jumped out, that MVP, you're going to
+
+147
+00:10:40.960 --> 00:10:45.740
+<v Noah Labhart>go commercialize, right? Tell me about that. How long did it take you to build or make it so,
+
+148
+00:10:45.940 --> 00:10:50.880
+<v Noah Labhart>right? If you've already kind of had Fermyon tools prior to that, and what sort of tools did you use
+
+149
+00:10:52.400 --> 00:10:52.940
+<v Noah Labhart>come to life.
+
+150
+00:10:54.440 --> 00:11:00.260
+<v Matt Butcher>So I kind of think about it as if we had two waves of MVP after Fermyon started its
+
+151
+00:11:00.260 --> 00:11:06.000
+<v Matt Butcher>lifetime, right? After we got started. So on the first day that we launched Fermyon,
+
+152
+00:11:06.220 --> 00:11:11.240
+<v Matt Butcher>Radu and I kind of laid out to the team a vision for the very first thing we wanted to do.
+
+153
+00:11:11.340 --> 00:11:16.040
+<v Matt Butcher>And it was, we want to prove to the world that WebAssembly is useful in a cloud context.
+
+154
+00:11:16.640 --> 00:11:23.900
+<v Matt Butcher>and we want to do that by running our own web presence on top of a a Fermyon built web assembly
+
+155
+00:11:23.900 --> 00:11:28.260
+<v Matt Butcher>stack we don't have to release any of this publicly right we just have to build it so we
+
+156
+00:11:28.260 --> 00:11:32.940
+<v Matt Butcher>kind of set out to do that and this was actually turned out to be a really amazing way to galvanize
+
+157
+00:11:32.940 --> 00:11:36.980
+<v Matt Butcher>the team because there's a very straightforward mission right by february we want to launch a
+
+158
+00:11:36.980 --> 00:11:42.280
+<v Matt Butcher>website and that means we need web serverry kinds of stuff we need a way to serve files we need to
+
+159
+00:11:42.280 --> 00:11:45.200
+<v Matt Butcher>and we want to have like killer, amazing, awesome performance.
+
+160
+00:11:45.660 --> 00:11:47.560
+<v Matt Butcher>And so we all kind of got going on that.
+
+161
+00:11:47.620 --> 00:11:51.400
+<v Matt Butcher>We built kind of platform that, you know, if I were to be honest,
+
+162
+00:11:51.540 --> 00:11:56.180
+<v Matt Butcher>I would say was, you know, 50% code and 50% marshmallows and toothpicks
+
+163
+00:11:56.180 --> 00:11:57.420
+<v Matt Butcher>to kind of hold it all together.
+
+164
+00:11:58.240 --> 00:12:00.340
+<v Matt Butcher>It was like that eighth grade, you know,
+
+165
+00:12:00.340 --> 00:12:02.840
+<v Matt Butcher>build a house with marshmallow and toothpicks kind of thing, but it worked.
+
+166
+00:12:03.020 --> 00:12:06.160
+<v Matt Butcher>And on February 7th of 2022, we launched a website.
+
+167
+00:12:06.900 --> 00:12:10.400
+<v Matt Butcher>It was built entirely on Fermyon WebAssembly's stack.
+
+168
+00:12:12.280 --> 00:12:23.060
+<v Matt Butcher>We wrote our own CMS system in Rust that compiles to WebAssembly and it runs inside of WebAssembly execution context, running, you know, being scheduled, but orchestrated by HashiCorp's Nomad Orchestrator.
+
+169
+00:12:23.140 --> 00:12:28.300
+<v Matt Butcher>And we were really proud of this whole kind of stack that we had put together in such a short period of time.
+
+170
+00:12:28.500 --> 00:12:35.700
+<v Matt Butcher>But then, you know, the second real challenge is, well, OK, it's well and good for us to be, you know, exhibiting what we think we can do.
+
+171
+00:12:35.780 --> 00:12:41.880
+<v Matt Butcher>But we've got to start building tooling that people are going to be able to use themselves, right, and be able to build their own applications.
+
+172
+00:12:42.460 --> 00:12:46.060
+<v Matt Butcher>And at this point, we knew what it took us to develop the system.
+
+173
+00:12:46.160 --> 00:12:51.640
+<v Matt Butcher>And we knew what the easy parts were and what the hard parts were, with the hardest part really being that we needed a deployment model.
+
+174
+00:12:51.940 --> 00:12:57.520
+<v Matt Butcher>But other hard parts being WebAssembly stacks are a little bit tricky to install the first time and a little bit tricky to manage.
+
+175
+00:12:57.680 --> 00:13:02.960
+<v Matt Butcher>And so we said, all right, Docker did an excellent job of building a tool that got developers excited about building containers.
+
+176
+00:13:02.960 --> 00:13:14.180
+<v Matt Butcher>And we know as developers, as this is a pain point for us in WebAssembly, let's build something sort of along the lines of the early Docker command line, but geared toward developers who want to build WebAssembly workloads.
+
+177
+00:13:14.400 --> 00:13:17.400
+<v Matt Butcher>Only a few months later, we released the first version of Spin.
+
+178
+00:13:17.660 --> 00:13:21.240
+<v Matt Butcher>And Spin is our open source developer tool for WebAssembly.
+
+179
+00:13:21.380 --> 00:13:27.320
+<v Matt Butcher>And it makes it easy to scaffold out a new project and get it compiling and locally run it and test it.
+
+180
+00:13:27.620 --> 00:13:29.820
+<v Matt Butcher>And that was kind of the first MVP.
+
+181
+00:13:29.820 --> 00:13:33.980
+<v Matt Butcher>So we released Spin on March 31st for one and only reason.
+
+182
+00:13:34.060 --> 00:13:36.960
+<v Matt Butcher>And that was that we were getting up to where we wanted to release it.
+
+183
+00:13:37.020 --> 00:13:39.880
+<v Matt Butcher>And I'm like, we are not releasing this product on April Fool's Day.
+
+184
+00:13:39.960 --> 00:13:42.600
+<v Matt Butcher>Whatever it takes to release it before April Fool's Day.
+
+185
+00:13:42.780 --> 00:13:47.160
+<v Matt Butcher>I don't want anybody to think that this is like, you know, Google Moon or one of those April Fool's jokes.
+
+186
+00:13:47.520 --> 00:13:51.500
+<v Matt Butcher>So we got it out on March 31st, which I think was a Thursday or Friday or something like that.
+
+187
+00:13:51.900 --> 00:13:53.360
+<v Matt Butcher>And, you know, it's the end of a sprint.
+
+188
+00:13:53.440 --> 00:13:57.000
+<v Matt Butcher>We were all exhausted, all kind of left for the weekend, came back on Monday.
+
+189
+00:13:57.000 --> 00:14:01.020
+<v Matt Butcher>day and there were, I don't know, 1100 GitHub stars or something on our project.
+
+190
+00:14:01.200 --> 00:14:02.360
+<v Matt Butcher>And we're like, wait, what?
+
+191
+00:14:02.480 --> 00:14:05.920
+<v Matt Butcher>You know, Helm took a year and a half to get to 1100 stars.
+
+192
+00:14:06.120 --> 00:14:07.220
+<v Matt Butcher>What's going on?
+
+193
+00:14:07.380 --> 00:14:10.860
+<v Matt Butcher>And discovered that we had sort of trended on Hacker News and a number of people had
+
+194
+00:14:10.860 --> 00:14:13.280
+<v Matt Butcher>really kind of found this project really interesting and engaging.
+
+195
+00:14:13.680 --> 00:14:18.920
+<v Matt Butcher>And so it was like, it was a really rewarding way to get to the end of what was really our
+
+196
+00:14:18.920 --> 00:14:24.620
+<v Matt Butcher>first MVP and say, OK, well, it's minimal and it's a product, but people are telling
+
+197
+00:14:24.620 --> 00:14:25.660
+<v Matt Butcher>us that it's also viable.
+
+198
+00:14:27.000 --> 00:14:31.680
+<v Matt Butcher>because I think you could get to the end of an MVP and discover that it's actually an MP with no V at all in it.
+
+199
+00:14:32.960 --> 00:14:34.620
+<v Matt Butcher>So that was a really exciting moment.
+
+200
+00:14:34.740 --> 00:14:36.960
+<v Matt Butcher>And from there, that kind of got the whole team rallied around.
+
+201
+00:14:37.040 --> 00:14:41.480
+<v Matt Butcher>Okay, well, now that we've got something that's showing the first signs of success, you know, sky's the limit.
+
+202
+00:14:41.540 --> 00:14:42.200
+<v Matt Butcher>What do we do next?
+
+203
+00:14:44.880 --> 00:14:48.380
+<v Noah Labhart>How did you progress the product from that point and mature it?
+
+204
+00:14:48.400 --> 00:14:49.340
+<v Noah Labhart>So everybody's stoked.
+
+205
+00:14:49.480 --> 00:14:52.840
+<v Noah Labhart>You're getting the viable part, the good feedback from the market.
+
+206
+00:14:52.960 --> 00:14:54.480
+<v Noah Labhart>How did you progress it and mature it?
+
+207
+00:14:55.480 --> 00:15:00.060
+<v Noah Labhart>a little bit, what I'm curious about is how you built your roadmap and how you went about deciding,
+
+208
+00:15:00.380 --> 00:15:03.960
+<v Noah Labhart>okay, this is the next most important thing to build or to address.
+
+209
+00:15:05.620 --> 00:15:11.420
+<v Matt Butcher>One thing that I feel very fortunate about in the colleagues that have come along from Microsoft and
+
+210
+00:15:11.420 --> 00:15:16.100
+<v Matt Butcher>the people who have joined since is the sort of dedication to the idea that if we plan,
+
+211
+00:15:16.160 --> 00:15:23.680
+<v Matt Butcher>and we plan really well, and we plan realistically, then execution is merely walking a path that's
+
+212
+00:15:25.480 --> 00:15:30.880
+<v Matt Butcher>Instead of having to carve your way through a jungle, you're just following the path that you laid out.
+
+213
+00:15:31.580 --> 00:15:38.000
+<v Matt Butcher>Really, at the point at which we had launched the website, we knew in February of 2022, we've got to have a developer tool.
+
+214
+00:15:38.720 --> 00:15:45.620
+<v Matt Butcher>As an MVP, we know that this is going to scratch a couple of itches, but that it's going to leave people wanting a lot more features.
+
+215
+00:15:45.880 --> 00:15:47.720
+<v Matt Butcher>We need to figure out what those features are.
+
+216
+00:15:47.720 --> 00:15:57.760
+<v Matt Butcher>And the other thing we knew is it's one thing to show people how to locally develop and run microservices and web application backends written in WebAssembly with that kind of function as a service field.
+
+217
+00:15:57.960 --> 00:16:02.500
+<v Matt Butcher>But to be blunt, who cares if you can run a facsimile of a cloud service locally?
+
+218
+00:16:02.600 --> 00:16:09.880
+<v Matt Butcher>The whole idea of the cloud service is that you have somewhere in the cloud to push that workload and then have it execute in a production-grade environment.
+
+219
+00:16:09.880 --> 00:16:19.260
+<v Matt Butcher>We need to figure out how to continue moving Spin along and continue to add the features that people are asking for and continue to broaden the language support for Spin.
+
+220
+00:16:19.440 --> 00:16:21.620
+<v Matt Butcher>And the second part was to build a cloud.
+
+221
+00:16:22.260 --> 00:16:31.420
+<v Matt Butcher>We sat down and went, OK, well, RedMonk publishes this top 20 language rankings every, well, they publish the top language rankings every six months.
+
+222
+00:16:31.480 --> 00:16:32.760
+<v Matt Butcher>I think it is six-ish months.
+
+223
+00:16:32.760 --> 00:16:40.540
+<v Matt Butcher>And the top 20 of those really kind of represent the lion's share of what programming languages people are using in production environment.
+
+224
+00:16:41.580 --> 00:16:51.280
+<v Matt Butcher>Let's just say, you know, for every language where there is a plausible WebAssembly story, let's say we want to go after the top 20 languages in a year.
+
+225
+00:16:51.280 --> 00:17:00.160
+<v Matt Butcher>And let's say, you know, we want to be able to add backing data services like key value storage and features like domain mapping and things like that onto the spin project.
+
+226
+00:17:00.240 --> 00:17:04.240
+<v Matt Butcher>And we want to be able to do things with Redis and listen and publish and subscribe on queues.
+
+227
+00:17:04.340 --> 00:17:14.560
+<v Matt Butcher>And we set out, you know, a fairly ambitious roadmap that we knew would take us really will take us through the end of this first quarter of this year as we've been kind of rolling out these features a few at a time.
+
+228
+00:17:14.560 --> 00:17:31.740
+<v Matt Butcher>And then the second part was the cloud one saying, okay, well, we know we need a production style cloud environment where you can experience this kind of like you write code in serverless functions model, much like you would with Lambda, but have it built into WebAssembly and then deployed onto this cloud platform.
+
+229
+00:17:32.020 --> 00:17:35.860
+<v Matt Butcher>And the whole experience start to finish is just easy and delightful for developers.
+
+230
+00:17:36.000 --> 00:17:39.660
+<v Matt Butcher>Again, this was like the inspiration from Docker for us has always been.
+
+231
+00:17:39.800 --> 00:17:43.680
+<v Matt Butcher>They made it so easy to be a developer and to care about infrastructure.
+
+232
+00:17:44.560 --> 00:17:48.720
+<v Matt Butcher>same thing. They made it so easy to be a developer and go, hey, I can do this,
+
+233
+00:17:48.720 --> 00:17:53.740
+<v Matt Butcher>you know, self-service deployment thing. And I think in the Kubernetes ecosystem, and again,
+
+234
+00:17:53.860 --> 00:17:57.220
+<v Matt Butcher>I'm speaking as, you know, someone who's played the platform engineer and the systems developer,
+
+235
+00:17:57.700 --> 00:18:03.360
+<v Matt Butcher>we lost sight of that particular user group. You know, we really lost sight of what the average
+
+236
+00:18:03.360 --> 00:18:07.000
+<v Matt Butcher>developer experience was like in those environments. And so this was a chance to sort of
+
+237
+00:18:07.000 --> 00:18:11.860
+<v Matt Butcher>get back to the basics of what makes a really profoundly good end-to-end developer experience.
+
+238
+00:18:11.860 --> 00:18:17.940
+<v Matt Butcher>So for the entirety of 2022, we said, all right, we're going to identify one key user story.
+
+239
+00:18:18.140 --> 00:18:22.680
+<v Matt Butcher>And we absolutely 100% must nail that one key user story.
+
+240
+00:18:22.880 --> 00:18:29.500
+<v Matt Butcher>And the key user story was, as a developer, I can go from a blinking cursor to a deployed application in two minutes or less.
+
+241
+00:18:30.180 --> 00:18:31.700
+<v Matt Butcher>But that was, I mean, that was it.
+
+242
+00:18:31.760 --> 00:18:34.040
+<v Matt Butcher>We were just like ruthlessly focused on that.
+
+243
+00:18:34.040 --> 00:18:43.420
+<v Matt Butcher>Because if we could hit, if we could solve the problem that we were hearing from developers through all of our Microsoft years, you know, stretching back to the early days of Kubernetes, that was a big opening for us.
+
+244
+00:18:43.520 --> 00:18:48.020
+<v Matt Butcher>And no, we're not, we don't see ourselves as competing with Kubernetes or solving this problem for Kubernetes.
+
+245
+00:18:48.300 --> 00:18:55.160
+<v Matt Butcher>We just see ourselves as trying to find where the developers' needs are now and then kind of streamline their story.
+
+246
+00:18:55.480 --> 00:19:02.120
+<v Matt Butcher>And really for us, I think along the way, we learned that the serverless functions world was really where developers want to be, right?
+
+247
+00:19:04.040 --> 00:19:09.940
+<v Matt Butcher>class of computing and a whole microservice and web application backend pattern that works really
+
+248
+00:19:09.940 --> 00:19:14.340
+<v Matt Butcher>well with serverless. But it's been gated by the fact that the existing technologies were slow.
+
+249
+00:19:14.420 --> 00:19:19.760
+<v Matt Butcher>And they were slow because they were built on virtual machine technology or container technology
+
+250
+00:19:19.760 --> 00:19:26.140
+<v Matt Butcher>and consequently had to swallow kind of that slow startup cost. And that was one of the areas
+
+251
+00:19:26.140 --> 00:19:31.820
+<v Matt Butcher>where WebAssembly really can shine. You know, our goal was to be able to do per request handling of
+
+252
+00:19:31.820 --> 00:19:33.640
+<v Matt Butcher>of around 100 milliseconds per request.
+
+253
+00:19:33.800 --> 00:19:35.280
+<v Matt Butcher>And that would be from cold start
+
+254
+00:19:35.280 --> 00:19:37.880
+<v Matt Butcher>to executing the first user instruction, 100 milliseconds.
+
+255
+00:19:38.140 --> 00:19:40.660
+<v Matt Butcher>We're currently under one millisecond for that.
+
+256
+00:19:40.780 --> 00:19:44.460
+<v Matt Butcher>And we just vastly underestimated how fast WebAssembly is
+
+257
+00:19:44.460 --> 00:19:47.760
+<v Matt Butcher>if you pay attention to all the little knobs and dials
+
+258
+00:19:47.760 --> 00:19:50.720
+<v Matt Butcher>and really tuned for your specific use case.
+
+259
+00:19:50.860 --> 00:19:53.060
+<v Matt Butcher>So it has been really exciting to see that.
+
+260
+00:19:53.160 --> 00:19:55.300
+<v Matt Butcher>I think we've closed in on telling
+
+261
+00:19:55.300 --> 00:19:57.440
+<v Matt Butcher>the rudimentary story that we want
+
+262
+00:19:57.440 --> 00:20:00.240
+<v Matt Butcher>and having gone from an MVP with early spin
+
+263
+00:20:01.820 --> 00:20:05.560
+<v Matt Butcher>this kind of open beta platform for me on cloud that we launched in October.
+
+264
+00:20:06.820 --> 00:20:08.260
+<v Noah Labhart>So let's switch to team then.
+
+265
+00:20:08.320 --> 00:20:11.760
+<v Noah Labhart>So you told me that a lot of people came over from Microsoft, right?
+
+266
+00:20:11.820 --> 00:20:12.580
+<v Noah Labhart>And I get that.
+
+267
+00:20:12.720 --> 00:20:14.520
+<v Noah Labhart>That's how part of that started.
+
+268
+00:20:14.660 --> 00:20:18.860
+<v Noah Labhart>But I'm curious about that still and also how you build your team today.
+
+269
+00:20:19.040 --> 00:20:23.200
+<v Noah Labhart>What do you look for in those people to indicate that they're the winning horses to join you?
+
+270
+00:20:24.160 --> 00:20:27.420
+<v Matt Butcher>So I said that 10 of us left Microsoft and that we started with 11.
+
+271
+00:20:27.640 --> 00:20:29.660
+<v Matt Butcher>So who's the mystery number 11, right?
+
+272
+00:20:29.660 --> 00:20:36.960
+<v Matt Butcher>And that was Tim Enwall, who's a multi-time CEO, friend of mine, has been a mentor of mine for a long time.
+
+273
+00:20:37.120 --> 00:20:39.560
+<v Matt Butcher>Years ago, I worked at one of his companies called Revolve.
+
+274
+00:20:39.620 --> 00:20:44.120
+<v Matt Butcher>More recently, he had been involved at Misty Robotics, which is a really cool robotics company.
+
+275
+00:20:44.240 --> 00:20:45.220
+<v Matt Butcher>He was the CEO of that.
+
+276
+00:20:45.580 --> 00:20:55.760
+<v Matt Butcher>And after finishing up at Misty, he came on initially consulting with us and just kind of helping us find our footing and helping us get finances in order.
+
+277
+00:20:55.760 --> 00:21:04.640
+<v Matt Butcher>And the more we worked together, the more Tim and I and Radu and Mikkel worked together, the more we realized we just love collaborating.
+
+278
+00:21:05.420 --> 00:21:12.360
+<v Matt Butcher>A lot of the kind of early decisions we made about how we were going to hire and how we were going to build the team were informed by Tim's expertise.
+
+279
+00:21:12.360 --> 00:21:17.340
+<v Matt Butcher>expertise and one of the things that he said to us i very very early on probably first week or two
+
+280
+00:21:17.340 --> 00:21:24.040
+<v Matt Butcher>was you know we used to have very regimented hiring process that included having an organizational
+
+281
+00:21:24.040 --> 00:21:30.420
+<v Matt Butcher>psychologist do our values interviews and i kind of laughed i mean yeah that's that's interesting
+
+282
+00:21:30.420 --> 00:21:36.480
+<v Matt Butcher>and he said well you know this guy is great adam's great we should bring in adam and have him do a
+
+283
+00:21:36.480 --> 00:21:41.400
+<v Matt Butcher>couple like lunch and learn kinds of sessions with the team on how to handle conflict and how to how
+
+284
+00:21:42.360 --> 00:21:44.740
+<v Matt Butcher>on resolving problems rather than letting them fester.
+
+285
+00:21:44.860 --> 00:21:48.380
+<v Matt Butcher>And, you know, in a number of kind of early organizational kinds of things.
+
+286
+00:21:48.480 --> 00:21:53.220
+<v Matt Butcher>And I'm going, okay, I mean, for paying for an hour of, you know,
+
+287
+00:21:53.220 --> 00:21:55.140
+<v Matt Butcher>external consultant time, that seems reasonable.
+
+288
+00:21:55.680 --> 00:22:00.380
+<v Matt Butcher>From the end of the first session with Adam, I understood why Tim was enthusiastic.
+
+289
+00:22:00.920 --> 00:22:05.620
+<v Matt Butcher>Adam presented material that was designed specifically to help us avoid
+
+290
+00:22:05.620 --> 00:22:08.200
+<v Matt Butcher>a lot of the pitfalls that early startups do.
+
+291
+00:22:08.360 --> 00:22:11.640
+<v Matt Butcher>You hit the storming period and personalities come into conflict.
+
+292
+00:22:12.360 --> 00:22:15.700
+<v Matt Butcher>You know, research says that a number of startups, you know, fail right there.
+
+293
+00:22:16.800 --> 00:22:18.520
+<v Matt Butcher>We didn't want to be that startup, right?
+
+294
+00:22:18.880 --> 00:22:24.040
+<v Matt Butcher>And so these kind of early sessions with Adam were really oriented around, you know, yeah,
+
+295
+00:22:24.100 --> 00:22:28.400
+<v Matt Butcher>I know you've all worked together as a team before, but let's talk really bluntly and
+
+296
+00:22:28.400 --> 00:22:31.600
+<v Matt Butcher>honestly about what are the ways that you can take feedback?
+
+297
+00:22:31.700 --> 00:22:35.220
+<v Matt Butcher>You know, when somebody needs to tell you you did something wrong, what kinds of language
+
+298
+00:22:35.220 --> 00:22:35.760
+<v Matt Butcher>do you use?
+
+299
+00:22:36.380 --> 00:22:39.880
+<v Matt Butcher>And all of these things that, you know, in hindsight, as I'm saying now, are like, well,
+
+300
+00:22:39.900 --> 00:22:40.400
+<v Matt Butcher>yeah, of course.
+
+301
+00:22:42.360 --> 00:22:44.020
+<v Matt Butcher>It seems like an obvious thing to do.
+
+302
+00:22:44.100 --> 00:22:47.480
+<v Matt Butcher>But at the time, I realized I had never, never really done that before.
+
+303
+00:22:47.640 --> 00:22:50.660
+<v Matt Butcher>And a lot of times we were kind of glossing over when things were irritating us.
+
+304
+00:22:50.740 --> 00:23:03.600
+<v Matt Butcher>So it gave us a way to really sort of rethink how we could be a high functioning team by being a team that is excellent at communication internally, excellent at talking to each other, and then excellent at resolving conflict.
+
+305
+00:23:04.180 --> 00:23:07.740
+<v Matt Butcher>When two people have a really good idea, they each have a really good idea.
+
+306
+00:23:07.780 --> 00:23:12.180
+<v Matt Butcher>You really want to do the diligence to figure out which one is going to be the idea you go with.
+
+307
+00:23:12.360 --> 00:23:18.200
+<v Matt Butcher>You don't want that conflict to turn into thrown toasters and, you know, slammed computers and things like that.
+
+308
+00:23:18.720 --> 00:23:20.420
+<v Matt Butcher>And so that ended up being really good.
+
+309
+00:23:20.480 --> 00:23:21.680
+<v Matt Butcher>We ended up early on.
+
+310
+00:23:21.720 --> 00:23:27.180
+<v Matt Butcher>We identified what we felt like were our core values, curiosity, humility, inclusivity and passion.
+
+311
+00:23:27.360 --> 00:23:27.860
+<v Matt Butcher>Chip.
+
+312
+00:23:27.680 --> 00:23:28.580
+<v Matt Butcher>We called them our chip values.
+
+313
+00:23:29.100 --> 00:23:32.320
+<v Matt Butcher>And we realized that we didn't know how to interview for those things.
+
+314
+00:23:32.400 --> 00:23:33.960
+<v Matt Butcher>How do you interview somebody for curiosity?
+
+315
+00:23:34.280 --> 00:23:37.800
+<v Matt Butcher>So, again, we contracted Adam and said, you know, how do we interview for this?
+
+316
+00:23:37.800 --> 00:23:46.220
+<v Matt Butcher>And then we said, well, wait a minute, you know, the great thing about working with an organizational psychologist is someone who's really gifted and skilled in this is they learn to read people.
+
+317
+00:23:46.380 --> 00:23:48.420
+<v Matt Butcher>So he ended up starting our interview process.
+
+318
+00:23:48.480 --> 00:24:06.160
+<v Matt Butcher>At this point, he works 30 hours a week for me on doing everything from continuing on this kind of training to helping us refine our interviewing process and understand the psychological impact of, say, economic downturns, you know, and people, peers and friends getting laid off from other companies.
+
+319
+00:24:07.800 --> 00:24:11.640
+<v Matt Butcher>there to say, hey, let's navigate this together and let's treat this as something that we can,
+
+320
+00:24:11.780 --> 00:24:16.280
+<v Matt Butcher>that we should talk about and we should be honest with each other about and be maybe a little bit
+
+321
+00:24:16.280 --> 00:24:21.140
+<v Matt Butcher>more vulnerable, but also in a proper work context. So Adam, I think has been sort of our secret
+
+322
+00:24:21.140 --> 00:24:27.440
+<v Matt Butcher>weapon as far as how we've done the hiring process here at Fermyon. Spent a lot of time saying, okay,
+
+323
+00:24:27.460 --> 00:24:31.520
+<v Matt Butcher>how do we do the right kind of technical interviews? How do we project out what kinds of
+
+324
+00:24:31.520 --> 00:24:36.240
+<v Matt Butcher>hires we need to do and how do we make those hires in a timely manner? But all of those, I think,
+
+325
+00:24:37.800 --> 00:24:51.500
+<v Matt Butcher>The thing that I learned from Tim and I'm happy to have reinforced daily with Adam's contributions is this idea that if you really, truly care about a high functioning startup culture, you have to do a lot of legwork to do that communication part.
+
+326
+00:24:51.500 --> 00:25:07.680
+<v Matt Butcher>And it really does behoove you to stick to values and figure out how to make values a real actual part of culture and one that you can start at the interview and identify the right people at the interview and then reinforce those values every day in the company.
+
+327
+00:25:11.920 --> 00:25:13.380
+<v Noah Labhart>Let's flip to scalability.
+
+328
+00:25:13.540 --> 00:25:16.960
+<v Noah Labhart>And this will be interesting, giving the context of the product you're building.
+
+329
+00:25:17.060 --> 00:25:20.780
+<v Noah Labhart>So I'm going to ask it like we haven't talked for the past 30 minutes.
+
+330
+00:25:21.500 --> 00:25:24.820
+<v Noah Labhart>Did you build this to scale efficiently from day one?
+
+331
+00:25:25.040 --> 00:25:28.080
+<v Noah Labhart>Or are you fighting this as you grow in any capacity?
+
+332
+00:25:29.580 --> 00:25:32.460
+<v Matt Butcher>I think people was the one that was the harder for us, right?
+
+333
+00:25:32.800 --> 00:25:36.980
+<v Matt Butcher>When you start a company during pandemic where every office around is closed,
+
+334
+00:25:37.800 --> 00:25:41.000
+<v Matt Butcher>one question that never comes up is, should we have an office?
+
+335
+00:25:41.220 --> 00:25:43.460
+<v Matt Butcher>Or even, should we all live in the same city?
+
+336
+00:25:43.840 --> 00:25:45.560
+<v Matt Butcher>And it turns out, I mean, at this point, Fermyon,
+
+337
+00:25:45.660 --> 00:25:49.840
+<v Matt Butcher>I think we've got people in five different continents that are working for Fermyon.
+
+338
+00:25:51.500 --> 00:25:55.640
+<v Matt Butcher>Being entirely virtually both has a lot of strengths and some surprising weaknesses.
+
+339
+00:25:56.140 --> 00:26:00.100
+<v Matt Butcher>We were probably the first DevOps team and, well, I shouldn't say that.
+
+340
+00:26:00.200 --> 00:26:05.300
+<v Matt Butcher>I like to think of us as potentially the first DevOps team ever that had 24-7 coverage with
+
+341
+00:26:05.300 --> 00:26:09.320
+<v Matt Butcher>a DevOps team of three because we just so happened to be spread out around the globe
+
+342
+00:26:09.320 --> 00:26:12.520
+<v Matt Butcher>such that, you know, everybody was, the time zones were.
+
+343
+00:26:12.980 --> 00:26:18.780
+<v Matt Butcher>We very quickly had to get good at asynchronous communication and start to learn how to not
+
+344
+00:26:18.780 --> 00:26:24.600
+<v Matt Butcher>accidentally create silos where information was shared narrowly and not broadly.
+
+345
+00:26:25.380 --> 00:26:30.520
+<v Matt Butcher>As we start building a marketing team, is the marketing team able to communicate with
+
+346
+00:26:30.520 --> 00:26:34.240
+<v Matt Butcher>engineering and all the areas they want to communicate with engineering and communicate
+
+347
+00:26:34.240 --> 00:26:38.560
+<v Matt Butcher>product to product and all the areas they want to communicate with product, but without
+
+348
+00:26:38.560 --> 00:26:42.940
+<v Matt Butcher>getting completely overwhelmed by things that do not matter to them, like what is this Rust
+
+349
+00:26:42.940 --> 00:26:46.540
+<v Matt Butcher>error or how do I install this compiler?
+
+350
+00:26:46.540 --> 00:26:53.260
+<v Matt Butcher>Tyler. And so we took a lot of time trying to figure out how to do Slack well. We started with
+
+351
+00:26:53.960 --> 00:26:59.140
+<v Matt Butcher>using SharePoint for all of our kind of team communication stuff and realized that was just
+
+352
+00:26:59.140 --> 00:27:03.220
+<v Matt Butcher>not working for us in spite of the fact that 10 of us were from Microsoft and used to it.
+
+353
+00:27:03.260 --> 00:27:09.280
+<v Matt Butcher>We switched to Notion, figuring out the right balance of doing live calls and recording things,
+
+354
+00:27:09.500 --> 00:27:14.020
+<v Matt Butcher>but only recording things that people wanted to hear about and then taking meeting notes.
+
+355
+00:27:14.020 --> 00:27:20.840
+<v Matt Butcher>And we ended up with a whole bunch of asynchronous processes that if we had come up with all of them at once would have felt overwhelming.
+
+356
+00:27:21.060 --> 00:27:31.840
+<v Matt Butcher>But because we kind of learned our way into them, it has seemed to kind of settle into a pattern that feels normal and productive, but not onerous or burdensome.
+
+357
+00:27:32.940 --> 00:27:42.860
+<v Matt Butcher>One place I worked in the past that was the most alienating thing I experienced there was I had a bad day and I didn't say anything in Slack and not a single person noticed or reached out or anything.
+
+358
+00:27:44.020 --> 00:27:46.280
+<v Matt Butcher>You know, got up to leave my desk at the end of that day.
+
+359
+00:27:46.340 --> 00:27:48.520
+<v Matt Butcher>And this was, I don't know, maybe five years ago or something.
+
+360
+00:27:48.780 --> 00:27:53.300
+<v Matt Butcher>Got up at the end of that day and went, wow, I just feel so unsupported.
+
+361
+00:27:53.440 --> 00:27:55.760
+<v Matt Butcher>And so I think, you know, as we've gotten going with Fermyon,
+
+362
+00:27:55.940 --> 00:28:00.180
+<v Matt Butcher>we tried to create environments where people could check in when their workday started
+
+363
+00:28:00.180 --> 00:28:02.920
+<v Matt Butcher>and at least have a couple of touch points through the day,
+
+364
+00:28:02.960 --> 00:28:06.640
+<v Matt Butcher>whether that's an in-person stand-up with the team that's time zone relevant to them,
+
+365
+00:28:06.740 --> 00:28:11.220
+<v Matt Butcher>or just a couple of interactions on Slack when they can't get on a video call for some reason.
+
+366
+00:28:11.220 --> 00:28:23.300
+<v Matt Butcher>And that kind of way of building culture is both, you know, good for where we are now, but also seems to be scaling up as we as we hire more people and hire people in different functions and in geographically sort of disparate locations.
+
+367
+00:28:24.400 --> 00:28:30.720
+<v Matt Butcher>Compared to that, scaling technology wise has been really easy because we're all a bunch of cloud engineers who are like, well, this is our bread and butter.
+
+368
+00:28:30.820 --> 00:28:36.260
+<v Matt Butcher>We know how to scale. And, you know, WebAssembly as a core technology is a very, very scalable, highly scalable technology.
+
+369
+00:28:36.260 --> 00:28:43.360
+<v Matt Butcher>technology. And, you know, for example, on an extra large virtual machine in AWS, if you were
+
+370
+00:28:43.360 --> 00:28:49.760
+<v Matt Butcher>running containers, you can run maybe 30 to 40 containerized applications on that extra large VM.
+
+371
+00:28:50.860 --> 00:28:56.860
+<v Matt Butcher>Open beta release, we were running 900 applications per extra large, and then we have gone up from
+
+372
+00:28:56.860 --> 00:29:00.940
+<v Matt Butcher>there since then. And we're not actually sure what the upper bound is, but we think it's somewhere
+
+373
+00:29:00.940 --> 00:29:06.740
+<v Matt Butcher>we're around 10,000. And so scalability on the tech side has been a much easier story for us.
+
+374
+00:29:08.840 --> 00:29:13.060
+<v Noah Labhart>Okay, so as you step out on the balcony, and you look across all that you've built,
+
+375
+00:29:13.180 --> 00:29:14.200
+<v Noah Labhart>what are you most proud of?
+
+376
+00:29:15.380 --> 00:29:20.060
+<v Matt Butcher>I am, and I do not want to understate the fact that I am really, really legitimately
+
+377
+00:29:21.620 --> 00:29:27.120
+<v Matt Butcher>enthusiastic about the technology that we built. I think it is a really first class technology that
+
+378
+00:29:27.120 --> 00:29:32.180
+<v Matt Butcher>really will over the next few years shake up the way we think about cloud and ultimately, you know,
+
+379
+00:29:32.220 --> 00:29:37.260
+<v Matt Butcher>cut costs and improve performance and make more developers and more platform engineers happier
+
+380
+00:29:37.260 --> 00:29:42.640
+<v Matt Butcher>people. I don't want to underplay all of that, but what I think I am most proud of is to work
+
+381
+00:29:42.640 --> 00:29:49.280
+<v Matt Butcher>together on a team of passionate people who really and legitimately are not just super smart
+
+382
+00:29:49.280 --> 00:29:56.060
+<v Matt Butcher>engineers and amazing marketing people, but people who are good to each other and who care deeply
+
+383
+00:29:57.140 --> 00:30:01.060
+<v Matt Butcher>emotional well-being of their peers, about whether or not we can build a fun workplace,
+
+384
+00:30:01.280 --> 00:30:06.360
+<v Matt Butcher>whether we can, you know, insert levity to the day-to-day tasks and reduce frustration.
+
+385
+00:30:06.740 --> 00:30:08.220
+<v Matt Butcher>That to me is the one thing.
+
+386
+00:30:08.280 --> 00:30:10.220
+<v Matt Butcher>And, you know, say what are you most proud of?
+
+387
+00:30:10.260 --> 00:30:15.120
+<v Matt Butcher>And honestly, I have to say, I can't say proud of that because pride sort of suggests that
+
+388
+00:30:15.120 --> 00:30:17.560
+<v Matt Butcher>somehow I had a strong causal role in that.
+
+389
+00:30:17.680 --> 00:30:19.980
+<v Matt Butcher>And, you know, again, we started with 10 people on day one.
+
+390
+00:30:20.180 --> 00:30:23.660
+<v Matt Butcher>And these are people that had already worked their way in and out of my life in a number
+
+391
+00:30:23.660 --> 00:30:24.160
+<v Matt Butcher>of ways.
+
+392
+00:30:24.000 --> 00:30:28.840
+<v Matt Butcher>And already I had learned a ton from them about how to be a good person and how to be a cooperative person.
+
+393
+00:30:28.960 --> 00:30:31.420
+<v Matt Butcher>So pride probably isn't the right word there.
+
+394
+00:30:31.560 --> 00:30:38.480
+<v Matt Butcher>If I were to survey over the balcony, it would be the thing that brings me joy or gives me the most satisfaction or just lights me up.
+
+395
+00:30:38.540 --> 00:30:41.680
+<v Matt Butcher>You know, my kids like to point to the sparkle heart emoji.
+
+396
+00:30:41.840 --> 00:30:49.980
+<v Matt Butcher>The thing that makes my heart sparkle, right, is the fact that I have just it is a phenomenal group of people to work with and to see them passionate,
+
+397
+00:30:49.980 --> 00:30:54.020
+<v Matt Butcher>not just about doing the day job and not just about taking care of each other as they are today,
+
+398
+00:30:54.160 --> 00:31:03.620
+<v Matt Butcher>but about welcoming new people as they come in and seeing how big we can scale this particular philosophy of team building and team collaboration.
+
+399
+00:31:05.800 --> 00:31:11.320
+<v Noah Labhart>Let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+400
+00:31:12.800 --> 00:31:17.440
+<v Matt Butcher>You know, we had our fair share of early hiccups as far as technology, right?
+
+401
+00:31:17.440 --> 00:31:20.720
+<v Matt Butcher>I think we all kind of have our technology missteps.
+
+402
+00:31:21.180 --> 00:31:25.480
+<v Matt Butcher>I think those are kind of uninteresting if we talk about them.
+
+403
+00:31:25.580 --> 00:31:31.840
+<v Matt Butcher>But I think when it comes to team building, where we are now, I'm really excited about.
+
+404
+00:31:31.920 --> 00:31:32.740
+<v Matt Butcher>I'm really proud of.
+
+405
+00:31:32.920 --> 00:31:41.280
+<v Matt Butcher>I think early on, my personal biggest mistake was to be a little bit hard-headed about things.
+
+406
+00:31:41.460 --> 00:31:44.680
+<v Matt Butcher>I think, you know, I've been the team leader for a long time, right?
+
+407
+00:31:44.680 --> 00:31:49.620
+<v Matt Butcher>So in a sense, I thought the transition from team leader to CEO was going to be pretty easy.
+
+408
+00:31:49.840 --> 00:31:51.540
+<v Matt Butcher>And instead, it has been hard.
+
+409
+00:31:51.600 --> 00:31:58.080
+<v Matt Butcher>And it's been hard for me to learn when I need to step back and say, I should not be the one making these decisions.
+
+410
+00:31:58.240 --> 00:32:03.120
+<v Matt Butcher>But also, I recognize that at the end of the day, I'm the one who has to cut the Gordian knot.
+
+411
+00:32:03.220 --> 00:32:07.500
+<v Matt Butcher>I'm the one who has to say, all right, based on everybody's input, this is how we're going to go.
+
+412
+00:32:07.740 --> 00:32:09.680
+<v Matt Butcher>And usually it arrives by consensus.
+
+413
+00:32:09.780 --> 00:32:12.760
+<v Matt Butcher>And very rarely is it the case that I have to kind of step in and say, OK,
+
+414
+00:32:14.680 --> 00:32:19.160
+<v Matt Butcher>rest of these things, but I'm just going to decide. But it took a little while for me to
+
+415
+00:32:19.820 --> 00:32:25.820
+<v Matt Butcher>embrace the fact that I was so far out of my expertise in so many different areas,
+
+416
+00:32:25.860 --> 00:32:31.160
+<v Matt Butcher>like finances and things like that, that I really, really needed to rely on a group of people beyond
+
+417
+00:32:31.160 --> 00:32:37.620
+<v Matt Butcher>just the immediate team. And Tim Enwall, again, you know, multi-time CEO who came in on day one
+
+418
+00:32:37.620 --> 00:32:41.800
+<v Matt Butcher>as a consultant and has since joined as the COO, you know, early on, he would say to me,
+
+419
+00:32:41.800 --> 00:32:43.300
+<v Matt Butcher>You need to reach out to these people.
+
+420
+00:32:43.340 --> 00:32:46.120
+<v Matt Butcher>You need to get connected with other CEOs because this job is isolating.
+
+421
+00:32:46.320 --> 00:32:48.960
+<v Matt Butcher>You need to talk to people who have done finance before.
+
+422
+00:32:49.080 --> 00:32:50.960
+<v Matt Butcher>You need to talk to people who have run successful companies.
+
+423
+00:32:51.060 --> 00:32:52.580
+<v Matt Butcher>You need to talk to people who have run failed companies.
+
+424
+00:32:52.820 --> 00:32:57.400
+<v Matt Butcher>And I think that if I had really taken him at his word right at the beginning and really
+
+425
+00:32:57.400 --> 00:33:03.980
+<v Matt Butcher>reached out and tried to form stronger bonds and also been a little more open even to hearing
+
+426
+00:33:03.980 --> 00:33:07.400
+<v Matt Butcher>what other people on the team had to say about, you should connect with my friend so-and-so,
+
+427
+00:33:07.400 --> 00:33:11.680
+<v Matt Butcher>So then those first three to four months would have been much, much smoother for us.
+
+428
+00:33:11.780 --> 00:33:14.340
+<v Matt Butcher>I think I just learned the hard way.
+
+429
+00:33:15.060 --> 00:33:21.800
+<v Matt Butcher>As the personal and the well-being of the company are so tied up when you're sitting in this particular chair,
+
+430
+00:33:22.260 --> 00:33:27.620
+<v Matt Butcher>that I look back on that and I think, man, I might have slowed the company down by weeks or months, you know,
+
+431
+00:33:27.660 --> 00:33:36.300
+<v Matt Butcher>in my reluctance to bring Adam Reynolds in earlier or in my defensiveness when other people said to me,
+
+432
+00:33:37.400 --> 00:33:42.780
+<v Matt Butcher>market fit a different way than the way you looked at Helm. But in the end, I think as I've learned
+
+433
+00:33:42.780 --> 00:33:48.560
+<v Matt Butcher>that and as I've learned the value of finding and building alliances with a lot of other people and
+
+434
+00:33:48.560 --> 00:33:54.120
+<v Matt Butcher>I've learned to listen better to the advice of people like Tim or the board of directors or,
+
+435
+00:33:54.260 --> 00:33:59.420
+<v Matt Butcher>you know, friends at other startups, it's helped, right? And I think I'm getting much better at it
+
+436
+00:33:59.420 --> 00:34:04.020
+<v Matt Butcher>now than I was before. You know, I mentioned that one of our core values was humility. And all of
+
+437
+00:34:04.020 --> 00:34:09.220
+<v Matt Butcher>our core values we put in place, not just because they were things that we felt like we had and we
+
+438
+00:34:09.220 --> 00:34:13.820
+<v Matt Butcher>wanted other new people to have too. They were things that we felt were aspirational to us. I
+
+439
+00:34:13.820 --> 00:34:18.080
+<v Matt Butcher>mean, I'm always going to end up talking a little bit about philosophy, but because that really is
+
+440
+00:34:18.080 --> 00:34:24.100
+<v Matt Butcher>my background. But, you know, Aristotle used to say, you know, ethics is living up to the virtues,
+
+441
+00:34:24.240 --> 00:34:30.800
+<v Matt Butcher>right? Is finding it so that you build the virtues until they, you build your own character until it
+
+442
+00:34:30.800 --> 00:34:32.980
+<v Matt Butcher>it becomes automatic for you to act virtuously.
+
+443
+00:34:33.060 --> 00:34:35.080
+<v Matt Butcher>That's the way Aristotle used to talk about, right?
+
+444
+00:34:35.340 --> 00:34:37.860
+<v Matt Butcher>Humility was an aspirational goal for us
+
+445
+00:34:37.860 --> 00:34:39.660
+<v Matt Butcher>and an aspirational goal for me.
+
+446
+00:34:39.840 --> 00:34:41.980
+<v Matt Butcher>How am I open to other people's input?
+
+447
+00:34:42.100 --> 00:34:43.780
+<v Matt Butcher>How am I continually learning?
+
+448
+00:34:44.000 --> 00:34:46.420
+<v Matt Butcher>How am I not putting my pride
+
+449
+00:34:46.420 --> 00:34:47.860
+<v Matt Butcher>ahead of somebody else's input?
+
+450
+00:34:48.360 --> 00:34:51.220
+<v Matt Butcher>That's one where I actually made a little bit of progress
+
+451
+00:34:51.220 --> 00:34:53.740
+<v Matt Butcher>and I'm excited to continue making progress
+
+452
+00:34:53.740 --> 00:34:56.400
+<v Matt Butcher>because it ends up being a much richer experience.
+
+453
+00:34:56.600 --> 00:35:00.020
+<v Matt Butcher>I end up feeling like I'm making better choices
+
+454
+00:35:00.700 --> 00:35:05.120
+<v Matt Butcher>choices. So that's one where I think for me personally, and in a way that impacted the
+
+455
+00:35:05.120 --> 00:35:10.080
+<v Matt Butcher>company, I made some mistakes and have tried to make some adjustments and I'm now kind of
+
+456
+00:35:10.080 --> 00:35:12.160
+<v Matt Butcher>at least on my way toward doing it better.
+
+457
+00:35:16.620 --> 00:35:21.280
+<v Noah Labhart>Let's switch to you. Who influences the way that you work? You know, name a person or many persons
+
+458
+00:35:21.280 --> 00:35:23.320
+<v Noah Labhart>or something that you look up to and why.
+
+459
+00:35:24.160 --> 00:35:27.700
+<v Matt Butcher>I have been very much, you know, I can't think of another
+
+460
+00:35:27.700 --> 00:35:31.100
+<v Matt Butcher>other word other than blessed in life, right? I mean, I started with the story about how I got
+
+461
+00:35:31.100 --> 00:35:36.000
+<v Matt Butcher>into technology, right? I just feel like I've been so fortunate to have been surrounded by
+
+462
+00:35:36.000 --> 00:35:43.060
+<v Matt Butcher>people who at the right times and at the right places managed to get me oriented in an eye
+
+463
+00:35:43.060 --> 00:35:47.700
+<v Matt Butcher>opening way. You know, Bob, the guy who was my first boss when I thought I was going to be mowing
+
+464
+00:35:47.700 --> 00:35:52.640
+<v Matt Butcher>lawns and ended up, you know, diving into technology, you know, having somebody like him
+
+465
+00:35:52.640 --> 00:35:57.780
+<v Matt Butcher>who said, you know, you can learn and you can learn fast and you can, and this is a new emerging
+
+466
+00:35:57.780 --> 00:36:03.420
+<v Matt Butcher>place. You can really do well. If you apply yourself here, you know, I worked at HP cloud
+
+467
+00:36:03.420 --> 00:36:07.940
+<v Matt Butcher>for a while and, and Biri Singh, who is the VP in charge of HP cloud was an amazing manager,
+
+468
+00:36:08.380 --> 00:36:17.240
+<v Matt Butcher>amazing VP, because he had that ability to, to get you rallied around a common goal and encouraged
+
+469
+00:36:17.240 --> 00:36:22.240
+<v Matt Butcher>while at the same time, very specifically saying, here's where we are today. And here's where we
+
+470
+00:36:22.640 --> 00:36:28.700
+<v Matt Butcher>You know, this whole kind of message of here's where we need to go and you can do it and this is how we're going to do it.
+
+471
+00:36:28.780 --> 00:36:35.640
+<v Matt Butcher>And, you know, that kind of combination of laying out the analytic and really getting morale boosted is something that I learned from him.
+
+472
+00:36:35.720 --> 00:36:41.780
+<v Matt Butcher>And, you know, often, very frequently look back on and say, you know, am I that kind of person?
+
+473
+00:36:41.860 --> 00:36:42.840
+<v Matt Butcher>Can I be that kind of person?
+
+474
+00:36:42.920 --> 00:36:48.060
+<v Matt Butcher>Because I know how important Biri was to me when I was first cutting my teeth in the early OpenStack.
+
+475
+00:36:48.060 --> 00:36:58.800
+<v Matt Butcher>More recently, you know, Gabe Monray, who is the CTO of of Deis and then ended up, you know, as we all moved into Microsoft, ended up leading substantial product teams inside of Microsoft.
+
+476
+00:36:59.140 --> 00:37:13.560
+<v Matt Butcher>You know, his ability to look at a landscape and say, OK, these people, these companies, these organizations might be our competitors, but they are also the people with whom if we work together and collaborate well, we can raise the floor.
+
+477
+00:37:13.640 --> 00:37:16.020
+<v Matt Butcher>Right. And we can make the ecosystem better for everybody.
+
+478
+00:37:16.020 --> 00:37:20.440
+<v Matt Butcher>And he was very actively engaged in that during the early container ecosystem.
+
+479
+00:37:20.620 --> 00:37:29.360
+<v Matt Butcher>I don't think he got nearly enough credit for the number of times he would say, call Solomon Hykes and say, I know you vented on Twitter and you're kind of alienating people.
+
+480
+00:37:29.440 --> 00:37:34.340
+<v Matt Butcher>And maybe let's go, you know, chat with some of the people at CoreOS and see if we can mend a couple of bridges.
+
+481
+00:37:34.340 --> 00:37:37.680
+<v Matt Butcher>is that kind of proactive engagement
+
+482
+00:37:38.660 --> 00:37:40.960
+<v Matt Butcher>in being able to look beyond competition
+
+483
+00:37:40.960 --> 00:37:42.420
+<v Matt Butcher>as the overriding factor
+
+484
+00:37:42.420 --> 00:37:43.880
+<v Matt Butcher>and look beyond that and say,
+
+485
+00:37:43.980 --> 00:37:46.440
+<v Matt Butcher>what are the collaborative benefits, right?
+
+486
+00:37:46.520 --> 00:37:48.840
+<v Matt Butcher>What good comes from us working together
+
+487
+00:37:48.840 --> 00:37:50.180
+<v Matt Butcher>while acknowledging that, yes,
+
+488
+00:37:50.180 --> 00:37:51.700
+<v Matt Butcher>we're still going to compete at the end of the day.
+
+489
+00:37:51.780 --> 00:37:54.460
+<v Matt Butcher>And there's nothing more powerful
+
+490
+00:37:54.460 --> 00:37:56.320
+<v Matt Butcher>in an open source ecosystem
+
+491
+00:37:56.320 --> 00:37:58.100
+<v Matt Butcher>than having that mentality.
+
+492
+00:37:58.320 --> 00:37:59.560
+<v Matt Butcher>But with Gabe, I really learned
+
+493
+00:37:59.560 --> 00:38:01.620
+<v Matt Butcher>that you didn't need to confine that
+
+494
+00:38:01.620 --> 00:38:08.700
+<v Matt Butcher>to within the team or within the people who are on your issue queue in your GitHub repo,
+
+495
+00:38:08.840 --> 00:38:13.840
+<v Matt Butcher>but that that was a characteristic or a mode of doing business, really, that you could
+
+496
+00:38:13.840 --> 00:38:18.820
+<v Matt Butcher>take all the way out into the marketplace and work together with a variety of different
+
+497
+00:38:18.820 --> 00:38:19.340
+<v Matt Butcher>companies.
+
+498
+00:38:19.700 --> 00:38:24.740
+<v Matt Butcher>I think a lot of the perspective he took in that way is really what, I'm going to be
+
+499
+00:38:24.740 --> 00:38:29.080
+<v Matt Butcher>audacious, I guess, in saying this, but I really think that by his focus and the focus
+
+500
+00:38:29.080 --> 00:38:33.680
+<v Matt Butcher>of a couple of other people in that early ecosystem, they set the stage for being able
+
+501
+00:38:33.680 --> 00:38:37.980
+<v Matt Butcher>to build something like CNCF that has been a very positive environment going forward.
+
+502
+00:38:38.140 --> 00:38:42.520
+<v Matt Butcher>I think they really kind of laid the foundations. And as we do this thing in the WebAssembly
+
+503
+00:38:42.520 --> 00:38:46.460
+<v Matt Butcher>ecosystem, we're once again doing the same kind of thing where there are a lot of companies in
+
+504
+00:38:46.460 --> 00:38:50.900
+<v Matt Butcher>the field and they range from big companies like Microsoft to small companies like Suborbital and
+
+505
+00:38:51.360 --> 00:38:56.280
+<v Matt Butcher>Cosmonic and we're somewhere in the middle. There's an opportunity, as I learned from Gabe,
+
+506
+00:38:56.280 --> 00:38:57.960
+<v Matt Butcher>to kind of build the ecosystem now.
+
+507
+00:38:58.240 --> 00:38:59.580
+<v Matt Butcher>So I think those are three people
+
+508
+00:38:59.580 --> 00:39:01.340
+<v Matt Butcher>that really I find a lot of inspiration from
+
+509
+00:39:01.340 --> 00:39:03.440
+<v Matt Butcher>when it comes to learning how to interact
+
+510
+00:39:03.440 --> 00:39:05.720
+<v Matt Butcher>with other human beings in the technology sphere.
+
+511
+00:39:07.560 --> 00:39:08.660
+<v Noah Labhart>Okay, last question.
+
+512
+00:39:08.880 --> 00:39:10.280
+<v Noah Labhart>So you're getting on a plane
+
+513
+00:39:10.280 --> 00:39:12.060
+<v Noah Labhart>and you're sitting next to a young entrepreneur
+
+514
+00:39:12.060 --> 00:39:13.320
+<v Noah Labhart>who's built the next big thing.
+
+515
+00:39:13.440 --> 00:39:14.560
+<v Noah Labhart>They're jazzed about it.
+
+516
+00:39:14.600 --> 00:39:15.740
+<v Noah Labhart>They can't wait to show it off to the world.
+
+517
+00:39:15.940 --> 00:39:17.780
+<v Noah Labhart>Can't wait to show it off to you right there on the plane.
+
+518
+00:39:18.140 --> 00:39:20.060
+<v Noah Labhart>What advice do you give that person
+
+519
+00:39:20.060 --> 00:39:21.360
+<v Noah Labhart>having gone down this road a bit?
+
+520
+00:39:21.560 --> 00:39:24.840
+<v Matt Butcher>This is gonna follow very naturally from the last question
+
+521
+00:39:26.280 --> 00:39:30.300
+<v Matt Butcher>really give is the advice I would just pass on from, you know, the Bob's,
+
+522
+00:39:30.340 --> 00:39:33.760
+<v Matt Butcher>Biri's and Gabe's of the world and say, you know, don't go it alone.
+
+523
+00:39:34.220 --> 00:39:36.660
+<v Matt Butcher>It's not even a matter of you don't have to go it alone.
+
+524
+00:39:37.000 --> 00:39:38.720
+<v Matt Butcher>It's don't go it alone. You only,
+
+525
+00:39:38.760 --> 00:39:41.500
+<v Matt Butcher>you only harm yourself and your potential, you know,
+
+526
+00:39:41.500 --> 00:39:44.820
+<v Matt Butcher>great idea and your potential future community and audience.
+
+527
+00:39:45.000 --> 00:39:48.500
+<v Matt Butcher>When you insist on going it alone, you know, bring people in,
+
+528
+00:39:48.580 --> 00:39:51.100
+<v Matt Butcher>bring in good colleagues that you work well with,
+
+529
+00:39:51.260 --> 00:39:54.460
+<v Matt Butcher>bring in great first community members who are passionate,
+
+530
+00:39:56.280 --> 00:40:01.000
+<v Matt Butcher>your good idea that you have bring in good advisors who have walked the path before bring
+
+531
+00:40:01.000 --> 00:40:03.100
+<v Matt Butcher>in mentors, you know, don't go it alone.
+
+532
+00:40:03.660 --> 00:40:06.080
+<v Noah Labhart>Fantastic advice. I love it. Well, Matt,
+
+533
+00:40:06.140 --> 00:40:10.080
+<v Noah Labhart>thank you for being on the show today. Thank you for telling the creation story of Fermyon.
+
+534
+00:40:10.200 --> 00:40:10.700
+<v Noah Labhart>Thanks
+
+535
+00:40:10.480 --> 00:40:12.280
+<v Matt Butcher>so much for having me. This has been a lot of fun.
+
+536
+00:40:15.160 --> 00:40:17.860
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+537
+00:40:20.580 --> 00:40:26.040
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts,
+
+538
+00:40:26.280 --> 00:40:28.420
+<v Noah Labhart>or the podcasting app of your choice.
+
+539
+00:40:29.060 --> 00:40:31.260
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+540
+00:40:31.560 --> 00:40:33.580
+<v Noah Labhart>Both things help us out tremendously.
+
+541
+00:40:35.880 --> 00:40:37.380
+<v Noah Labhart>And thanks again for listening.

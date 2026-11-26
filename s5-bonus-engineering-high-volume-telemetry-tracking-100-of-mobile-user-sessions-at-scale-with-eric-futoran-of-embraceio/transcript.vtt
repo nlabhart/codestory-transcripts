@@ -1,0 +1,1707 @@
+WEBVTT
+
+NOTE S5 Bonus: Engineering High-Volume Telemetry: Tracking 100% of Mobile User Sessions at Scale with Eric Futoran of Embrace.io
+
+1
+00:00:00.880 --> 00:00:16.920
+<v Eric Futoran>Eric Futoran, CEO, Embrace.io, The short and dirty of Embrace is we're a mobile infrastructure company, meaning that on behalf of our customers, whether it's like Wish or Hilton or Hyatt or Medtronic or Goat or OkCupid, like we collect data on their behalf.
+
+2
+00:00:17.140 --> 00:00:21.740
+<v Eric Futoran>And this is data that is kind of exhaust from mobile devices, including apps.
+
+3
+00:00:21.980 --> 00:00:24.740
+<v Eric Futoran>We transform it into an approach that's mobile first.
+
+4
+00:00:24.740 --> 00:00:36.480
+<v Eric Futoran>And then we help allow the teams within a company like at Hilton, both engineering QA, but also data science and marketing, understand that data and use it to drive business value.
+
+5
+00:00:38.260 --> 00:00:42.480
+<v Eric Futoran>I'm Eric Futoran. I'm the CEO and co-founder of Embrace.
+
+6
+00:00:47.400 --> 00:01:00.840
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share in the critical moments of what it takes to change an industry and build and lead a team that has your back.
+
+7
+00:01:02.280 --> 00:01:11.180
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Eric Futoran created the future of mobile data infrastructure and observability.
+
+8
+00:01:13.640 --> 00:01:16.020
+<v Noah Labhart>All this and more on Code Story.
+
+9
+00:01:19.760 --> 00:01:24.920
+<v Noah Labhart>A multi-startup founder, Eric Futoran, has always focused in on being a family man.
+
+10
+00:01:25.240 --> 00:01:31.300
+<v Noah Labhart>He considers himself a multi-hat wearing person, and though most entrepreneurs say that, Eric really means it.
+
+11
+00:01:31.620 --> 00:01:34.800
+<v Noah Labhart>He has four degrees. No, really, four.
+
+12
+00:01:35.320 --> 00:01:39.440
+<v Noah Labhart>One in electrical engineering, computer science, a JD, and an MBA.
+
+13
+00:01:39.660 --> 00:01:41.580
+<v Noah Labhart>He really likes to learn.
+
+14
+00:01:42.480 --> 00:01:45.740
+<v Noah Labhart>constantly reading and learning from people, books, and of course, his family.
+
+15
+00:01:46.280 --> 00:01:49.580
+<v Noah Labhart>He has found that his JD has really helped him understand the legal world,
+
+16
+00:01:49.660 --> 00:01:54.900
+<v Noah Labhart>as it applies to the startup world, specifically SPACs, Special Purpose Acquisition Groups.
+
+17
+00:01:55.360 --> 00:01:58.660
+<v Noah Labhart>He's digging into what the implications will be in the future for SPACs,
+
+18
+00:01:58.660 --> 00:02:00.520
+<v Noah Labhart>and he's got an interesting perspective on that.
+
+19
+00:02:01.140 --> 00:02:03.020
+<v Noah Labhart>He's got two young boys, five and eight,
+
+20
+00:02:03.080 --> 00:02:06.260
+<v Noah Labhart>and has felt the pains of many parents through the pandemic with kids being home.
+
+21
+00:02:06.740 --> 00:02:09.800
+<v Noah Labhart>Other than startups and school, he likes to get outdoors as much as he can,
+
+22
+00:02:09.800 --> 00:02:12.620
+<v Noah Labhart>doing some hiking or spending time at the beach.
+
+23
+00:02:13.660 --> 00:02:17.940
+<v Noah Labhart>During his past successes at Scopely, one of the largest game builders in the world,
+
+24
+00:02:18.000 --> 00:02:22.840
+<v Noah Labhart>he realized in the early innings of mobile that there were no mobile-first data sources,
+
+25
+00:02:23.160 --> 00:02:26.900
+<v Noah Labhart>enabling businesses to capture all mobile session data.
+
+26
+00:02:29.080 --> 00:02:31.880
+<v Noah Labhart>This is the creation story of Embrace.
+
+27
+00:02:34.800 --> 00:02:42.060
+<v Eric Futoran>The short and dirty of Embrace is we're a mobile infrastructure company, meaning that on behalf of
+
+28
+00:02:42.060 --> 00:02:49.640
+<v Eric Futoran>our customers, whether it's like Wish or Hilton or Hyatt or Medtronic or Goat or OkCupid, we collect
+
+29
+00:02:49.640 --> 00:02:55.720
+<v Eric Futoran>data on their behalf, and it's data that is kind of exhaust from mobile devices, including apps.
+
+30
+00:02:55.720 --> 00:03:01.240
+<v Eric Futoran>We transform it into an approach that's mobile first, and then we help allow the
+
+31
+00:03:01.240 --> 00:03:06.360
+<v Eric Futoran>teams within a company, like at Hilton, both engineering, QA, but also data
+
+32
+00:03:06.360 --> 00:03:10.480
+<v Eric Futoran>science and marketing understand that data and use it to drive business value.
+
+33
+00:03:10.480 --> 00:03:15.060
+<v Eric Futoran>The basis of the company started actually from my previous one. So I was a
+
+34
+00:03:15.060 --> 00:03:20.680
+<v Eric Futoran>co-founder of, knock on wood, the one of the largest mobile games company in North
+
+35
+00:03:20.680 --> 00:03:24.260
+<v Eric Futoran>America or the Western world. I was called Scopely. So I personally built
+
+36
+00:03:25.720 --> 00:03:29.000
+<v Eric Futoran>Walking Dead, I was involved in WWE, Wheel of Fortune,
+
+37
+00:03:29.200 --> 00:03:30.700
+<v Eric Futoran>and a ton of other ones.
+
+38
+00:03:30.860 --> 00:03:33.320
+<v Eric Futoran>I think six number one free to play mobile games.
+
+39
+00:03:33.700 --> 00:03:36.720
+<v Eric Futoran>I was fortunate to be early innings of mobile.
+
+40
+00:03:36.900 --> 00:03:39.240
+<v Eric Futoran>Like smartphones have really been only around
+
+41
+00:03:39.240 --> 00:03:40.740
+<v Eric Futoran>like our iPhones for 10 years,
+
+42
+00:03:41.320 --> 00:03:43.520
+<v Eric Futoran>which in the grand scheme is a pretty short period of time.
+
+43
+00:03:43.800 --> 00:03:45.460
+<v Eric Futoran>So there's been a lot of technology
+
+44
+00:03:45.460 --> 00:03:50.200
+<v Eric Futoran>and just core infrastructure, to use that word again,
+
+45
+00:03:50.300 --> 00:03:54.220
+<v Eric Futoran>required and not built for all the teams that I mentioned.
+
+46
+00:03:55.720 --> 00:04:01.700
+<v Eric Futoran>built it was literally this use case. So when we had a problem like for Walking Dead, like a frozen
+
+47
+00:04:01.700 --> 00:04:07.660
+<v Eric Futoran>startup or something that kind of exhibited itself like a crash but wasn't like an app just closing
+
+48
+00:04:08.260 --> 00:04:14.040
+<v Eric Futoran>and that technically can't be a crash for a Unity game or can but it's very rare. I just wanted to
+
+49
+00:04:14.040 --> 00:04:19.240
+<v Eric Futoran>literally look myself up and see what happened and that data was all over the place or not collected
+
+50
+00:04:19.240 --> 00:04:24.780
+<v Eric Futoran>at all. It would be super helpful to have all that data in one place and what that's turned into is a
+
+51
+00:04:25.840 --> 00:04:28.040
+<v Eric Futoran>observability and data play.
+
+52
+00:04:28.260 --> 00:04:29.620
+<v Eric Futoran>And that's Embrace.
+
+53
+00:04:29.780 --> 00:04:33.840
+<v Eric Futoran>So the ability to kind of collect every session about every user is super helpful
+
+54
+00:04:33.840 --> 00:04:39.640
+<v Eric Futoran>to drive observability for engineers all the way to data science,
+
+55
+00:04:39.920 --> 00:04:42.760
+<v Eric Futoran>being able to actually do real churn and LTV calculations
+
+56
+00:04:42.760 --> 00:04:48.600
+<v Eric Futoran>because no other tool has every session and is keyed on every user.
+
+57
+00:04:50.840 --> 00:04:53.380
+<v Noah Labhart>Well, let's jump into that part of the story then.
+
+58
+00:04:53.380 --> 00:05:00.560
+<v Noah Labhart>So tell me about that MVP, how you went up to it, how long it took you to build it, and what sort of tools you used to bring it to life.
+
+59
+00:05:03.020 --> 00:05:06.920
+<v Eric Futoran>I think a lot of founders make this mistake, so I'm pretty open about it.
+
+60
+00:05:07.200 --> 00:05:13.580
+<v Eric Futoran>I obviously had been in games and in mobile for a period for six or seven years at that point, and I built it for myself.
+
+61
+00:05:13.580 --> 00:05:20.400
+<v Eric Futoran>Like I was a product focused founder and the core that I needed in games was to
+
+62
+00:05:20.400 --> 00:05:27.700
+<v Eric Futoran>understand stability and optimization by cohort. Like pairs, clan leaders, new users
+
+63
+00:05:27.700 --> 00:05:31.380
+<v Eric Futoran>and understand where their experiences were failing or needed to be optimized
+
+64
+00:05:31.380 --> 00:05:35.280
+<v Eric Futoran>because the end of the day games is a really simple equation actually all
+
+65
+00:05:35.280 --> 00:05:40.760
+<v Eric Futoran>mobile apps it's the value of your user and it has to be greater than the cost
+
+66
+00:05:40.760 --> 00:05:47.380
+<v Eric Futoran>to acquiring. The problem with mobile is the workflow, the release times, they're all very
+
+67
+00:05:47.380 --> 00:05:52.800
+<v Eric Futoran>delayed by the nature of just the submission process if nothing else. Also it's compiled code
+
+68
+00:05:52.800 --> 00:05:58.840
+<v Eric Futoran>so the releases just take longer than on the web. Because of that delay often your LTV lowers before
+
+69
+00:05:58.840 --> 00:06:04.560
+<v Eric Futoran>you realize it and if it gets lower than CPI you often don't realize it when it happens which is a
+
+70
+00:06:04.560 --> 00:06:09.520
+<v Eric Futoran>very scary proposition. Your game is dead. It's a death spiral at that point. It's really hard to
+
+71
+00:06:12.160 --> 00:06:16.320
+<v Eric Futoran>And so I built something that allowed me to look at that, like collect every session.
+
+72
+00:06:16.680 --> 00:06:19.900
+<v Eric Futoran>So we wanted to make sure that we understood every user's experience.
+
+73
+00:06:20.860 --> 00:06:25.760
+<v Eric Futoran>And we wanted to make sure that from an MVP perspective, that was cost effective, which
+
+74
+00:06:25.760 --> 00:06:30.480
+<v Eric Futoran>I think historically hasn't been true, but the changes in the technology landscape has
+
+75
+00:06:30.480 --> 00:06:30.980
+<v Eric Futoran>made it true.
+
+76
+00:06:31.380 --> 00:06:33.220
+<v Eric Futoran>And then I made it by cohort.
+
+77
+00:06:33.480 --> 00:06:38.360
+<v Eric Futoran>And to be honest, when we started bringing this to non-games, our initial thesis was
+
+78
+00:06:38.360 --> 00:06:39.500
+<v Eric Futoran>let's go to the next wave.
+
+79
+00:06:40.760 --> 00:06:45.120
+<v Eric Futoran>e-commerce, media, and productivity apps, we were blowing people's minds.
+
+80
+00:06:45.240 --> 00:06:46.360
+<v Eric Futoran>It was way too detailed.
+
+81
+00:06:47.140 --> 00:06:51.900
+<v Eric Futoran>So our MVP was an MVP that quickly we killed and readjusted.
+
+82
+00:06:53.260 --> 00:06:57.320
+<v Noah Labhart>When you're building an MVP, you've got to make certain decisions and trade-offs, right?
+
+83
+00:06:57.680 --> 00:07:01.820
+<v Noah Labhart>Tell me about some of those decisions and trade-offs you had to make and how you cope
+
+84
+00:07:01.820 --> 00:07:02.320
+<v Noah Labhart>with them.
+
+85
+00:07:03.940 --> 00:07:08.880
+<v Eric Futoran>Yeah, the goal of any MVP, I mean, it's true whether it was ad tech, which I did before
+
+86
+00:07:10.760 --> 00:07:14.820
+<v Eric Futoran>good example because you have to get that game out as fast as you can into people's hands.
+
+87
+00:07:15.380 --> 00:07:20.360
+<v Eric Futoran>Otherwise, you could be building absolutely the wrong thing. Or in a SaaS business, same is true,
+
+88
+00:07:20.420 --> 00:07:25.580
+<v Eric Futoran>just a different time scale. You try to focus on the two to three questions and exclude everything
+
+89
+00:07:25.580 --> 00:07:32.180
+<v Eric Futoran>else, even if it's super painful. Like an embrace, I kind of alluded to it, but our number one
+
+90
+00:07:32.180 --> 00:07:37.720
+<v Eric Futoran>question was, could we collect every session cost effectively? So we built a lot of the infrastructure
+
+91
+00:07:37.720 --> 00:07:40.200
+<v Eric Futoran>structure that we wouldn't normally build ahead of time.
+
+92
+00:07:40.540 --> 00:07:43.140
+<v Eric Futoran>That kind of goes against the idea of a traditional MVP,
+
+93
+00:07:43.400 --> 00:07:47.020
+<v Eric Futoran>where you try to use this kind of quick acting technologies
+
+94
+00:07:47.680 --> 00:07:48.960
+<v Eric Futoran>to just get something out.
+
+95
+00:07:49.080 --> 00:07:50.620
+<v Eric Futoran>In our case, that wasn't the truth.
+
+96
+00:07:51.320 --> 00:07:53.420
+<v Eric Futoran>And then the second piece is, could we just
+
+97
+00:07:54.060 --> 00:07:55.980
+<v Eric Futoran>focus on one business use case?
+
+98
+00:07:56.460 --> 00:07:58.500
+<v Eric Futoran>I think with companies like Embrace,
+
+99
+00:07:58.500 --> 00:08:00.320
+<v Eric Futoran>where your intent is to be a data platform,
+
+100
+00:08:01.480 --> 00:08:03.640
+<v Eric Futoran>and you collect a lot of data, you can get really
+
+101
+00:08:04.420 --> 00:08:05.420
+<v Eric Futoran>stuck in the data.
+
+102
+00:08:05.420 --> 00:08:09.800
+<v Eric Futoran>and it's very common where you get so much data you almost have a hard time
+
+103
+00:08:09.800 --> 00:08:13.660
+<v Eric Futoran>deciding what to do with it and you get data paralysis and there's lots of
+
+104
+00:08:13.660 --> 00:08:17.040
+<v Eric Futoran>companies that at the end of the day say their data is valuable but it's not
+
+105
+00:08:17.040 --> 00:08:21.300
+<v Eric Futoran>because they haven't made it actionable. Collecting data for data's sake is
+
+106
+00:08:21.300 --> 00:08:26.380
+<v Eric Futoran>worthless. You have to create insights and actionability. So we focused on one
+
+107
+00:08:26.380 --> 00:08:33.560
+<v Eric Futoran>use case which was that could we segment users and show a stability metric for
+
+108
+00:08:35.420 --> 00:08:39.500
+<v Eric Futoran>only use case. There were lots of things we excluded initially. Like, could we just do
+
+109
+00:08:39.500 --> 00:08:43.960
+<v Eric Futoran>network monitoring, which no one was doing well on mobile, which is super impactful, but
+
+110
+00:08:43.960 --> 00:08:50.260
+<v Eric Futoran>indirectly related to the business case. We excluded crash reporting initially. Like, the world
+
+111
+00:08:50.260 --> 00:08:56.820
+<v Eric Futoran>on mobile, not just apps, but IoT and point of sale and cars, like anything running on Android
+
+112
+00:08:56.820 --> 00:09:04.900
+<v Eric Futoran>or iOS is overwhelmingly focused on code exceptions, probably to a fault. But we didn't
+
+113
+00:09:05.420 --> 00:09:07.460
+<v Eric Futoran>initially, because it was a loss of focus.
+
+114
+00:09:07.560 --> 00:09:09.680
+<v Eric Futoran>Like we knew the value wasn't necessarily there,
+
+115
+00:09:09.840 --> 00:09:11.280
+<v Eric Futoran>but if our business model worked,
+
+116
+00:09:11.360 --> 00:09:12.520
+<v Eric Futoran>we'd have to come back to it later.
+
+117
+00:09:13.000 --> 00:09:15.960
+<v Eric Futoran>And we had to, like about a year and a half later,
+
+118
+00:09:16.080 --> 00:09:20.160
+<v Eric Futoran>once we figured out our core use case and tested it,
+
+119
+00:09:20.280 --> 00:09:21.600
+<v Eric Futoran>we had to build crash reporting.
+
+120
+00:09:21.740 --> 00:09:23.440
+<v Eric Futoran>Like there was no go to market without it.
+
+121
+00:09:24.000 --> 00:09:26.600
+<v Eric Futoran>And so it was super painful to have to build something
+
+122
+00:09:26.600 --> 00:09:28.180
+<v Eric Futoran>that we knew wasn't necessarily driving
+
+123
+00:09:28.180 --> 00:09:29.140
+<v Eric Futoran>a ton of business value,
+
+124
+00:09:29.300 --> 00:09:31.140
+<v Eric Futoran>but we couldn't go to market without it.
+
+125
+00:09:32.600 --> 00:09:38.900
+<v Noah Labhart>So you got MVP, you, you're building a process around how you determine what's the next thing
+
+126
+00:09:38.900 --> 00:09:44.760
+<v Noah Labhart>to build. How did you progress the product from there and then continue building out your roadmap
+
+127
+00:09:44.760 --> 00:09:49.980
+<v Noah Labhart>and really, I'm interested how you decided what was the next most important thing to build?
+
+128
+00:09:50.640 --> 00:09:56.740
+<v Eric Futoran>I'm going to wax academic a little bit but it's not just those decisions it's how you gather the
+
+129
+00:09:56.740 --> 00:10:04.480
+<v Eric Futoran>feedback and it's kind of everybody says like use your customers as your feedback source but that's
+
+130
+00:10:04.480 --> 00:10:09.840
+<v Eric Futoran>really easy to say and it's really hard to implement. And so the way I think about it
+
+131
+00:10:10.580 --> 00:10:17.160
+<v Eric Futoran>is, what customers do I want? So you have to pick the customers, which is really hard. We had people
+
+132
+00:10:17.160 --> 00:10:21.460
+<v Eric Futoran>coming to us, like games initially, which we excluded, that wanted to use our product, and we
+
+133
+00:10:21.460 --> 00:10:25.720
+<v Eric Futoran>said, no, you're going to give us the wrong feedback. It's not going to be representative of the
+
+134
+00:10:26.900 --> 00:10:31.520
+<v Eric Futoran>So you pick your customers and you try to pick the profile that will give you the feedback
+
+135
+00:10:31.520 --> 00:10:35.540
+<v Eric Futoran>that will align you to the bet you're making and test the assumptions.
+
+136
+00:10:35.980 --> 00:10:40.100
+<v Eric Futoran>Number two is you have to structure your team around gathering that feedback.
+
+137
+00:10:41.080 --> 00:10:47.820
+<v Eric Futoran>So we purposefully built customer success early and we created a different profile for
+
+138
+00:10:47.820 --> 00:10:48.320
+<v Eric Futoran>them.
+
+139
+00:10:48.020 --> 00:10:50.540
+<v Eric Futoran>We actually made them data analysts because we're a data company.
+
+140
+00:10:50.960 --> 00:10:56.260
+<v Eric Futoran>So by doing that, they're not necessarily the best at traditional customer success like
+
+141
+00:10:56.740 --> 00:11:00.280
+<v Eric Futoran>management and generating upsells and resells and revenue,
+
+142
+00:11:00.560 --> 00:11:03.100
+<v Eric Futoran>but they're really good at looking at the data,
+
+143
+00:11:03.280 --> 00:11:06.160
+<v Eric Futoran>providing insights at every touch and creating feedback.
+
+144
+00:11:06.520 --> 00:11:08.700
+<v Eric Futoran>But we also, the lead of customer success
+
+145
+00:11:08.700 --> 00:11:10.000
+<v Eric Futoran>was also our head of product.
+
+146
+00:11:10.660 --> 00:11:12.740
+<v Eric Futoran>So part of the reason I even wanted to do
+
+147
+00:11:12.740 --> 00:11:15.880
+<v Eric Futoran>this business model in SaaS is because the product
+
+148
+00:11:15.880 --> 00:11:18.360
+<v Eric Futoran>to feedback loop could be zero.
+
+149
+00:11:18.580 --> 00:11:20.500
+<v Eric Futoran>By aligning product and CS together,
+
+150
+00:11:20.640 --> 00:11:22.880
+<v Eric Futoran>we actually made that loop instantaneous,
+
+151
+00:11:23.820 --> 00:11:25.460
+<v Eric Futoran>when if you split those two,
+
+152
+00:11:26.740 --> 00:11:31.540
+<v Eric Futoran>of friction for most SaaS companies. And in games it was delayed because of it, which was brutal.
+
+153
+00:11:32.420 --> 00:11:37.000
+<v Eric Futoran>And then the third, yeah, our product choices and how do you gather that feedback? And that's
+
+154
+00:11:37.000 --> 00:11:43.180
+<v Eric Futoran>the paradigm everybody talks about. But it's totally true when you're going after a mid-market
+
+155
+00:11:43.180 --> 00:11:48.760
+<v Eric Futoran>or bigger play for an infrastructure technology company like Embrace. We're not looking for
+
+156
+00:11:48.760 --> 00:11:53.080
+<v Eric Futoran>thousands of customers, we're looking for hundreds. We have every one of them on Slack.
+
+157
+00:11:53.080 --> 00:11:59.920
+<v Eric Futoran>I would constantly be traveling and getting beers with the personas, like the executives,
+
+158
+00:12:00.520 --> 00:12:06.020
+<v Eric Futoran>and getting their feedback and showing them the dashboard and asking about the data, like constant.
+
+159
+00:12:06.540 --> 00:12:10.980
+<v Eric Futoran>It irks me that we're almost reaching a stage where I'm going to start separating from that
+
+160
+00:12:10.980 --> 00:12:15.340
+<v Eric Futoran>and hiring people like product managers, which we already have, to gather that feedback.
+
+161
+00:12:15.520 --> 00:12:21.720
+<v Eric Futoran>But at the beginning, that is one of the primary roles of the founding team, especially the CEO.
+
+162
+00:12:23.080 --> 00:12:24.500
+<v Noah Labhart>Well, then let's switch to team.
+
+163
+00:12:24.680 --> 00:12:26.920
+<v Noah Labhart>So how did you go about building your team?
+
+164
+00:12:27.160 --> 00:12:32.780
+<v Noah Labhart>And what did you look for in those people to indicate that they were the winning horses to join you?
+
+165
+00:12:34.720 --> 00:12:43.360
+<v Eric Futoran>At Embrace, I think that the key was finding a co-founder who is technical, who had built data at scale.
+
+166
+00:12:44.100 --> 00:12:47.580
+<v Eric Futoran>So without that, there is absolutely no way we can build this business model.
+
+167
+00:12:48.300 --> 00:12:51.340
+<v Eric Futoran>but also somebody that kind of has this balance,
+
+168
+00:12:51.540 --> 00:12:54.200
+<v Eric Futoran>and I recommend this to anybody thinking about founding a company,
+
+169
+00:12:54.420 --> 00:12:56.200
+<v Eric Futoran>you're not looking for your best friend.
+
+170
+00:12:56.440 --> 00:12:57.740
+<v Eric Futoran>You're going to have fights.
+
+171
+00:12:58.980 --> 00:13:01.740
+<v Eric Futoran>So founding something with a best friend actually creates
+
+172
+00:13:01.740 --> 00:13:04.080
+<v Eric Futoran>really perverse incentives on how you talk.
+
+173
+00:13:04.260 --> 00:13:06.580
+<v Eric Futoran>But you do want somebody that obviously you can get along with
+
+174
+00:13:06.580 --> 00:13:11.000
+<v Eric Futoran>and you can have a fight and recover from it.
+
+175
+00:13:11.100 --> 00:13:15.780
+<v Eric Futoran>So we were friends, but we weren't close friends before Embrace.
+
+176
+00:13:17.580 --> 00:13:20.200
+<v Eric Futoran>him and started talking about ideas, he knew exactly what I was doing.
+
+177
+00:13:20.380 --> 00:13:23.460
+<v Eric Futoran>I was seeing if he wanted to co-found a company.
+
+178
+00:13:23.780 --> 00:13:24.940
+<v Eric Futoran>And it's been fantastic.
+
+179
+00:13:25.260 --> 00:13:27.380
+<v Eric Futoran>Like he built three mobile analytics companies.
+
+180
+00:13:27.580 --> 00:13:30.360
+<v Eric Futoran>He was the, he built the analytics of record for like Pokemon go.
+
+181
+00:13:30.500 --> 00:13:34.140
+<v Eric Futoran>So he knows scale at an absurd level, which we need.
+
+182
+00:13:34.360 --> 00:13:36.220
+<v Eric Futoran>And we're already past that scale.
+
+183
+00:13:36.920 --> 00:13:43.460
+<v Eric Futoran>So that's part one, find a good co-founder and prior prioritize the skill.
+
+184
+00:13:43.760 --> 00:13:46.940
+<v Eric Futoran>Like that was the skill we needed to make this company work.
+
+185
+00:13:47.580 --> 00:13:52.640
+<v Eric Futoran>And there are a lot of other things that I think, again, co-founders prioritize and shouldn't.
+
+186
+00:13:52.720 --> 00:13:54.560
+<v Eric Futoran>Like, both of you don't need to recruit well.
+
+187
+00:13:54.740 --> 00:13:57.280
+<v Eric Futoran>So don't look for somebody who matches your skill set.
+
+188
+00:13:58.200 --> 00:14:04.980
+<v Eric Futoran>Match based on the one thing that you think is absolutely important and make sure that you can work together and that you can fight and recover.
+
+189
+00:14:07.720 --> 00:14:13.300
+<v Eric Futoran>Yeah, so, I mean, in SaaS, the first thing is how do you get to the MVP, which is engineering talent.
+
+190
+00:14:13.300 --> 00:14:17.560
+<v Eric Futoran>And that can be both consulting, which is temporary, which can be helpful because it's
+
+191
+00:14:17.560 --> 00:14:19.740
+<v Eric Futoran>really hard to adjust when you hire full-time people.
+
+192
+00:14:20.500 --> 00:14:22.940
+<v Eric Futoran>You hire engineers first and foremost.
+
+193
+00:14:23.480 --> 00:14:27.940
+<v Eric Futoran>And then we started looking for data analysts because as a data company, we needed to dig
+
+194
+00:14:27.940 --> 00:14:32.740
+<v Eric Futoran>in the data so that we had the insights to build the product, as opposed to building
+
+195
+00:14:32.740 --> 00:14:35.680
+<v Eric Futoran>the product and trying to use that as the way to gather insights.
+
+196
+00:14:36.780 --> 00:14:39.160
+<v Eric Futoran>From a culture perspective, I'm keen.
+
+197
+00:14:39.160 --> 00:14:49.380
+<v Eric Futoran>So I was, I will again, date myself a little bit, but my first job out of college was at a company called Trilogy, which if you're over, I'd say 35, you're probably aware of.
+
+198
+00:14:49.520 --> 00:14:56.280
+<v Eric Futoran>They were really good at hiring on two axes and Google and a bunch of other companies actually use their framework.
+
+199
+00:14:56.940 --> 00:14:58.900
+<v Eric Futoran>One is culture and one is skill.
+
+200
+00:14:59.040 --> 00:15:05.300
+<v Eric Futoran>And I would highly recommend that no matter how good somebody is on the skill axis, if you don't get culture right, you're screwed.
+
+201
+00:15:06.240 --> 00:15:10.760
+<v Eric Futoran>You can over-engineer culture, which we do, but at the end of the day, it's the people
+
+202
+00:15:10.760 --> 00:15:14.020
+<v Eric Futoran>you hire that create the culture and it's moderately out of your control.
+
+203
+00:15:14.540 --> 00:15:17.660
+<v Eric Futoran>So we ding people all the time, purely on culture.
+
+204
+00:15:17.860 --> 00:15:21.740
+<v Eric Futoran>You have to really talk about it a lot and it feels really hokey because it's especially
+
+205
+00:15:21.740 --> 00:15:22.420
+<v Eric Futoran>for engineers.
+
+206
+00:15:23.280 --> 00:15:26.380
+<v Eric Futoran>Early on, we put the tenets down for our company.
+
+207
+00:15:26.580 --> 00:15:28.380
+<v Eric Futoran>It doesn't matter if they're right or wrong.
+
+208
+00:15:28.460 --> 00:15:30.960
+<v Eric Futoran>It's the exercise that's important and just writing them down.
+
+209
+00:15:30.960 --> 00:15:35.400
+<v Eric Futoran>And then we literally came up with questions that each person will test for each tenet.
+
+210
+00:15:35.700 --> 00:15:40.440
+<v Eric Futoran>And during the interview process, you're only allowed to focus on one tenet because otherwise
+
+211
+00:15:40.440 --> 00:15:44.360
+<v Eric Futoran>you're just overlapping and making less informed decisions as a team.
+
+212
+00:15:45.040 --> 00:15:49.200
+<v Eric Futoran>So each person has specific questions for each tenet and they focus on one.
+
+213
+00:15:49.960 --> 00:15:51.880
+<v Eric Futoran>And then you talk about them together.
+
+214
+00:15:52.080 --> 00:15:53.660
+<v Eric Futoran>It forces focus.
+
+215
+00:15:53.760 --> 00:15:54.900
+<v Eric Futoran>It forces the questions.
+
+216
+00:15:54.980 --> 00:15:56.880
+<v Eric Futoran>It forces you to benchmark across people.
+
+217
+00:15:57.440 --> 00:16:00.100
+<v Eric Futoran>The mistake people make is two things.
+
+218
+00:16:00.960 --> 00:16:03.880
+<v Eric Futoran>different questions to each candidate, and then there's no benchmark.
+
+219
+00:16:04.180 --> 00:16:07.280
+<v Eric Futoran>And then it becomes a gut feel, which you will always get wrong.
+
+220
+00:16:07.880 --> 00:16:11.880
+<v Eric Futoran>And then the two second thing is you will default into two psychological things.
+
+221
+00:16:12.140 --> 00:16:16.140
+<v Eric Futoran>One is if you don't have a framework, you will hire people like yourself,
+
+222
+00:16:16.520 --> 00:16:17.840
+<v Eric Futoran>which is death to a startup.
+
+223
+00:16:18.720 --> 00:16:21.800
+<v Eric Futoran>Uh, and two is you'll hire people that you want to go out and get beers with,
+
+224
+00:16:22.440 --> 00:16:24.220
+<v Eric Futoran>which is not what you want to build a team for.
+
+225
+00:16:24.280 --> 00:16:27.840
+<v Eric Futoran>You're not building teams for fun as much as you want to go out and get beers.
+
+226
+00:16:27.860 --> 00:16:29.860
+<v Eric Futoran>But not everybody's going to be your best friend.
+
+227
+00:16:31.140 --> 00:16:35.940
+<v Eric Futoran>So don't like it's great if they happen to be somebody you want to get a beer with, but that's not what you hire for.
+
+228
+00:16:40.160 --> 00:16:47.160
+<v Noah Labhart>Let's flip to scalability. Did you build this to scale efficiently from day one or are you kind of fighting this as you grew?
+
+229
+00:16:49.020 --> 00:16:57.060
+<v Eric Futoran>I think you have to fight it to some extent because you don't always predict the scale you're going to be at as soon as you are, if you're successful.
+
+230
+00:16:57.660 --> 00:17:02.800
+<v Eric Futoran>The second is there are always trade-offs, like even on scalability, like you have to
+
+231
+00:17:02.800 --> 00:17:06.400
+<v Eric Futoran>make choices and it's devils in the detail for tech scale.
+
+232
+00:17:06.920 --> 00:17:11.980
+<v Eric Futoran>Our premise for the company, as I mentioned, was could we collect every session for every
+
+233
+00:17:11.980 --> 00:17:17.160
+<v Eric Futoran>user and all the behavioral and technical data in those sessions, which think about
+
+234
+00:17:17.160 --> 00:17:19.680
+<v Eric Futoran>like an OkCupid, like that's massive amount of data.
+
+235
+00:17:19.740 --> 00:17:22.400
+<v Eric Futoran>That's probably more data about their app than they're collecting themselves.
+
+236
+00:17:22.400 --> 00:17:29.280
+<v Eric Futoran>themselves. So we built to be able to do that and then to transform it into a time-based way.
+
+237
+00:17:29.580 --> 00:17:35.940
+<v Eric Futoran>So getting technical, like we quickly jumped into the time-based database world, which four or five
+
+238
+00:17:35.940 --> 00:17:41.840
+<v Eric Futoran>years ago was kind of nascent. So we use a database called ClickHouse and it's matured a lot over the
+
+239
+00:17:41.840 --> 00:17:45.920
+<v Eric Futoran>last couple years and has been great, but we've definitely been on the ride for that one. And
+
+240
+00:17:45.920 --> 00:17:51.300
+<v Eric Futoran>it's not always great to, and I generally recommend not staking your company on an unproven technology,
+
+241
+00:17:52.400 --> 00:17:53.360
+<v Eric Futoran>In our case, we had no choice.
+
+242
+00:17:54.740 --> 00:17:56.800
+<v Eric Futoran>Like a lot of people, a lot of engineers specifically,
+
+243
+00:17:56.960 --> 00:17:58.740
+<v Eric Futoran>are like, let's build a mobile app.
+
+244
+00:17:58.900 --> 00:17:59.880
+<v Eric Futoran>I'm going to choose Flutter.
+
+245
+00:18:00.000 --> 00:18:01.920
+<v Eric Futoran>Well, we have Flutter's only been around for a year
+
+246
+00:18:01.920 --> 00:18:02.420
+<v Eric Futoran>and a half.
+
+247
+00:18:02.500 --> 00:18:04.300
+<v Eric Futoran>Only company that's ever used it scales Google,
+
+248
+00:18:04.520 --> 00:18:05.720
+<v Eric Futoran>and they're the ones that invented it.
+
+249
+00:18:06.340 --> 00:18:08.240
+<v Eric Futoran>They pick like Node.js.
+
+250
+00:18:08.360 --> 00:18:09.760
+<v Eric Futoran>I remember that at Scopely.
+
+251
+00:18:10.080 --> 00:18:11.740
+<v Eric Futoran>We're like, we'll build our backend in Node.
+
+252
+00:18:11.980 --> 00:18:14.560
+<v Eric Futoran>Well, it doesn't scale, and we're not the ones
+
+253
+00:18:14.560 --> 00:18:15.420
+<v Eric Futoran>that want to figure it out.
+
+254
+00:18:15.700 --> 00:18:17.840
+<v Eric Futoran>So then you have to switch to a new technology.
+
+255
+00:18:18.020 --> 00:18:19.620
+<v Eric Futoran>And those are choices you shouldn't be making.
+
+256
+00:18:19.740 --> 00:18:20.440
+<v Eric Futoran>They slow you down.
+
+257
+00:18:22.400 --> 00:18:27.280
+<v Eric Futoran>question for MVP, like the core question you're trying to answer in this case is,
+
+258
+00:18:27.280 --> 00:18:33.560
+<v Eric Futoran>can we store the data and analyze it at a cost-effective way? And scale is a
+
+259
+00:18:33.560 --> 00:18:39.640
+<v Eric Futoran>different question. Scale, in my mind, is not just cost, but its ability, obviously,
+
+260
+00:18:39.640 --> 00:18:45.180
+<v Eric Futoran>to take more, consume like, consume more and not have a linear equation on your
+
+261
+00:18:45.180 --> 00:18:48.820
+<v Eric Futoran>ability to reach a product, a better way to put it, like hit your KPIs and reach
+
+262
+00:18:48.820 --> 00:18:56.800
+<v Eric Futoran>your SLAs. So those types of things we continually refactor and work on as the company's grown and
+
+263
+00:18:56.800 --> 00:19:01.500
+<v Eric Futoran>scaled and we've added like companies like games companies whose session data is massive.
+
+264
+00:19:02.800 --> 00:19:12.240
+<v Eric Futoran>We recently signed a large like pre-IPO texting and calling company and that those numbers of
+
+265
+00:19:12.240 --> 00:19:17.060
+<v Eric Futoran>sessions like people are in and out of those apps like 20 to 30 times a day and each time they're
+
+266
+00:19:18.820 --> 00:19:19.320
+<v Eric Futoran>massive scale.
+
+267
+00:19:21.440 --> 00:19:26.120
+<v Noah Labhart>Well, as you step out on the balcony and you look across all that you've built, what are
+
+268
+00:19:26.120 --> 00:19:26.760
+<v Noah Labhart>you most proud of?
+
+269
+00:19:28.540 --> 00:19:32.600
+<v Eric Futoran>I think it would be cliche, but I'm an emotional founder.
+
+270
+00:19:33.620 --> 00:19:38.840
+<v Eric Futoran>Part of the reason I like being a small and growing company, and I've been lucky enough
+
+271
+00:19:38.840 --> 00:19:43.520
+<v Eric Futoran>to have companies that have reached massive scale, is that I get to have a personal relationship.
+
+272
+00:19:43.840 --> 00:19:47.020
+<v Eric Futoran>You hear the chatter in the office, you get to joke around.
+
+273
+00:19:48.820 --> 00:19:50.840
+<v Eric Futoran>which is, I'd say about 30 to 50 people.
+
+274
+00:19:51.000 --> 00:19:52.980
+<v Eric Futoran>Like I feel like it's happening,
+
+275
+00:19:53.000 --> 00:19:54.280
+<v Eric Futoran>it's happened at Embrace already.
+
+276
+00:19:54.980 --> 00:19:56.260
+<v Eric Futoran>Like we're now a manager
+
+277
+00:19:56.260 --> 00:19:58.680
+<v Eric Futoran>and then you reach like 50 to 100
+
+278
+00:19:58.680 --> 00:20:00.780
+<v Eric Futoran>and then you're only hanging out with the execs.
+
+279
+00:20:01.120 --> 00:20:03.800
+<v Eric Futoran>It's just natural human nature
+
+280
+00:20:03.800 --> 00:20:05.960
+<v Eric Futoran>and how new hires perceive you.
+
+281
+00:20:06.160 --> 00:20:07.820
+<v Eric Futoran>But I think what I'm most proud of
+
+282
+00:20:07.820 --> 00:20:10.480
+<v Eric Futoran>is that I've kept close to a lot of those people
+
+283
+00:20:10.480 --> 00:20:11.260
+<v Eric Futoran>over the years.
+
+284
+00:20:11.880 --> 00:20:13.060
+<v Eric Futoran>So I'm definitely proud of that.
+
+285
+00:20:13.260 --> 00:20:14.460
+<v Eric Futoran>Like it's a matter of integrity
+
+286
+00:20:14.460 --> 00:20:16.460
+<v Eric Futoran>and I call it the pillow test,
+
+287
+00:20:16.460 --> 00:20:18.600
+<v Eric Futoran>being able to go to bed at night and sleeping well.
+
+288
+00:20:20.040 --> 00:20:21.920
+<v Noah Labhart>Well, let's flip the script a little bit.
+
+289
+00:20:22.300 --> 00:20:26.420
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+290
+00:20:28.140 --> 00:20:33.740
+<v Eric Futoran>The biggest mistake I personally made, I think, is I'm generally pretty conservative on product market fit.
+
+291
+00:20:34.220 --> 00:20:37.640
+<v Eric Futoran>I definitely self-categorize myself as a paranoid founder.
+
+292
+00:20:38.780 --> 00:20:41.980
+<v Eric Futoran>And I'm laughing at myself right now. You can't see my face.
+
+293
+00:20:41.980 --> 00:20:46.820
+<v Eric Futoran>And a paranoid founder generally doesn't believe they get product market fit until it's like
+
+294
+00:20:46.820 --> 00:20:47.700
+<v Eric Futoran>in the rear view mirror.
+
+295
+00:20:48.360 --> 00:20:54.880
+<v Eric Futoran>But the hard part with a startup is you have to take bets before the foundation for those
+
+296
+00:20:54.880 --> 00:20:55.920
+<v Eric Futoran>bets have matured.
+
+297
+00:20:56.840 --> 00:20:58.560
+<v Eric Futoran>Momentum is king and you got to bet early.
+
+298
+00:20:58.960 --> 00:21:04.300
+<v Eric Futoran>And I think one of the things, it ended up being a good thing, which is cliche, but we
+
+299
+00:21:04.300 --> 00:21:08.200
+<v Eric Futoran>should have invested sooner in sales and marketing pre-COVID.
+
+300
+00:21:09.480 --> 00:21:11.560
+<v Eric Futoran>And that definitely slowed us down.
+
+301
+00:21:11.660 --> 00:21:14.800
+<v Eric Futoran>Like our growth rate declined because we weren't,
+
+302
+00:21:15.360 --> 00:21:17.980
+<v Eric Futoran>it still was good, but it wasn't as good as it could be,
+
+303
+00:21:18.060 --> 00:21:19.320
+<v Eric Futoran>which is obviously very important
+
+304
+00:21:19.320 --> 00:21:22.660
+<v Eric Futoran>in a growing startup world where you're going for it all,
+
+305
+00:21:23.420 --> 00:21:25.720
+<v Eric Futoran>go big or go home for this type of company.
+
+306
+00:21:26.060 --> 00:21:28.140
+<v Eric Futoran>And so by not doing that early enough,
+
+307
+00:21:28.180 --> 00:21:30.000
+<v Eric Futoran>we definitely hindered ourselves in the long,
+
+308
+00:21:30.120 --> 00:21:31.480
+<v Eric Futoran>like over that period of time.
+
+309
+00:21:32.360 --> 00:21:33.580
+<v Eric Futoran>And it's a hard bet to make.
+
+310
+00:21:33.840 --> 00:21:36.060
+<v Eric Futoran>Sales and marketing, you generally make mistakes on.
+
+311
+00:21:36.060 --> 00:21:39.420
+<v Eric Futoran>and like every SaaS company seems to screw up
+
+312
+00:21:39.420 --> 00:21:40.440
+<v Eric Futoran>on their first sales hire
+
+313
+00:21:40.440 --> 00:21:43.660
+<v Eric Futoran>because you learn about what you need by trial by fire.
+
+314
+00:21:44.000 --> 00:21:46.360
+<v Eric Futoran>So that's not really a mistake that I'd say is a bad thing,
+
+315
+00:21:46.420 --> 00:21:47.560
+<v Eric Futoran>the hiring of that salesperson.
+
+316
+00:21:47.660 --> 00:21:50.100
+<v Eric Futoran>The bad thing was we didn't hire that person fast enough.
+
+317
+00:21:51.080 --> 00:21:53.700
+<v Eric Futoran>We got lucky in some ways,
+
+318
+00:21:53.760 --> 00:21:55.140
+<v Eric Futoran>although no one can say it's lucky,
+
+319
+00:21:55.320 --> 00:21:57.700
+<v Eric Futoran>but I'm glad I didn't because when COVID hit,
+
+320
+00:21:57.820 --> 00:22:00.080
+<v Eric Futoran>we had to redo our entire go-to-market strategy.
+
+321
+00:22:00.520 --> 00:22:02.300
+<v Eric Futoran>Like our price points are large enough
+
+322
+00:22:02.300 --> 00:22:03.440
+<v Eric Futoran>that we need to be in person.
+
+323
+00:22:03.440 --> 00:22:06.260
+<v Eric Futoran>And obviously our go-to-market had to completely change.
+
+324
+00:22:06.480 --> 00:22:12.180
+<v Eric Futoran>So we switched to like an SDR model with an outbound and inbound strategy for marketing.
+
+325
+00:22:12.360 --> 00:22:19.400
+<v Eric Futoran>So we ended up hiring, we would have ended up hiring different people for sales and marketing post-COVID than we would have pre-COVID.
+
+326
+00:22:20.900 --> 00:22:24.400
+<v Noah Labhart>So what does the future look like for your product and for your team?
+
+327
+00:22:25.460 --> 00:22:34.760
+<v Eric Futoran>So from a team perspective, which I'm most proud of, is we're obviously growing at this point.
+
+328
+00:22:34.940 --> 00:22:37.900
+<v Eric Futoran>Like we are around 40 people now.
+
+329
+00:22:38.040 --> 00:22:41.760
+<v Eric Futoran>If we are not 70 to 100 by the end of the year, I'd be shocked.
+
+330
+00:22:42.340 --> 00:22:48.100
+<v Eric Futoran>We're feeling it on every axis, the pain of not having people, which is what you want to feel.
+
+331
+00:22:48.900 --> 00:22:52.700
+<v Eric Futoran>If people get sit pretty in a startup, you know you're not growing quick enough.
+
+332
+00:22:54.400 --> 00:22:59.820
+<v Eric Futoran>So from a team perspective, our goal is to keep the culture as tight as we can, but now
+
+333
+00:22:59.820 --> 00:23:00.860
+<v Eric Futoran>we're betting on the future.
+
+334
+00:23:01.220 --> 00:23:06.240
+<v Eric Futoran>Let's hire the roles we need for Q4 now so that they have a time to ramp up and make
+
+335
+00:23:06.240 --> 00:23:10.280
+<v Eric Futoran>the bet that we're going to achieve the goals that we need to in Q4, both revenue and net
+
+336
+00:23:10.280 --> 00:23:14.960
+<v Eric Futoran>retention and all the magic gross SaaS company metrics.
+
+337
+00:23:16.740 --> 00:23:23.000
+<v Eric Futoran>From a product perspective, we're in a fascinating point and I wish I had predicted a lot of
+
+338
+00:23:24.400 --> 00:23:32.240
+<v Eric Futoran>the Snowflake, Databricks, Azure, DataRobot world is crazy and has totally rocked everything that
+
+339
+00:23:32.240 --> 00:23:37.760
+<v Eric Futoran>tech is for the last two years. On the other axis, the observability world has been fantastic.
+
+340
+00:23:38.520 --> 00:23:46.140
+<v Eric Futoran>Like Datadog is a monster of a company. So we sit between those, like observability is our
+
+341
+00:23:46.140 --> 00:23:52.480
+<v Eric Futoran>real-time access to our data. Our roadmap is 100% leveraging that data for other teams.
+
+342
+00:23:54.500 --> 00:24:01.640
+<v Eric Futoran>the snowflake world, the BigQuery world, and allowing the transformed data that we have
+
+343
+00:24:01.640 --> 00:24:08.980
+<v Eric Futoran>already to be re-transformed from an ELT as opposed to ETL's perspective and used by data
+
+344
+00:24:08.980 --> 00:24:15.780
+<v Eric Futoran>science and the product analytics teams, whether with DataRobot or Looker or through our
+
+345
+00:24:15.780 --> 00:24:16.660
+<v Eric Futoran>own toolset.
+
+346
+00:24:17.540 --> 00:24:23.140
+<v Eric Futoran>I think if we can get those two pieces right, the full mobile infrastructure story, we're
+
+347
+00:24:24.900 --> 00:24:30.440
+<v Noah Labhart>me. Let's switch to you, Eric. Tell me who influences the way that you work. CEO, CTO,
+
+348
+00:24:30.660 --> 00:24:33.640
+<v Noah Labhart>really any person. Name a person that you look up to and why.
+
+349
+00:24:35.260 --> 00:24:37.200
+<v Eric Futoran>I wouldn't say look up to, but I
+
+350
+00:24:37.200 --> 00:24:43.180
+<v Eric Futoran>definitely, and he'll kill me for it, but he's a friend of mine. But I also think about like
+
+351
+00:24:43.880 --> 00:24:48.820
+<v Eric Futoran>archetypes that I've had historically that I think have been good at certain facets of their job that
+
+352
+00:24:48.820 --> 00:24:49.600
+<v Eric Futoran>that I'd like to pull in.
+
+353
+00:24:49.800 --> 00:24:54.640
+<v Eric Futoran>So I would be remiss in not mentioning my co-founder,
+
+354
+00:24:54.680 --> 00:24:58.520
+<v Eric Futoran>Scopely Walter, who's probably the best fundraiser
+
+355
+00:24:58.520 --> 00:24:59.560
+<v Eric Futoran>I will ever meet.
+
+356
+00:25:00.020 --> 00:25:03.960
+<v Eric Futoran>He is magical on understanding the story
+
+357
+00:25:03.960 --> 00:25:06.080
+<v Eric Futoran>that he needs to tell and matching it
+
+358
+00:25:06.080 --> 00:25:08.720
+<v Eric Futoran>to the actual roadmap the company is undergoing.
+
+359
+00:25:09.140 --> 00:25:11.080
+<v Eric Futoran>And being able to tell that story,
+
+360
+00:25:11.280 --> 00:25:12.520
+<v Eric Futoran>especially for somebody like me,
+
+361
+00:25:12.560 --> 00:25:16.420
+<v Eric Futoran>who's got an engineering background, is a learned skill.
+
+362
+00:25:16.420 --> 00:25:27.580
+<v Eric Futoran>So it's been great. It's been amazing to partner with him and see how he instruments that story and is very strategic about it and how he presents it and who he presents it to.
+
+363
+00:25:28.300 --> 00:25:32.880
+<v Eric Futoran>I think on the other end, I had an amazing manager once in my life.
+
+364
+00:25:33.540 --> 00:25:39.160
+<v Eric Futoran>I did a brief stint at IBM. I wasn't built for it, which he knew and laughed about.
+
+365
+00:25:39.820 --> 00:25:44.080
+<v Eric Futoran>But he he was a partner in the consulting services.
+
+366
+00:25:44.080 --> 00:25:48.180
+<v Eric Futoran>We did kind of a, I was part of like, kind of like the McKinsey of IBM.
+
+367
+00:25:48.320 --> 00:25:54.540
+<v Eric Futoran>And I have great stories of kind of office space type stories, uh, being in that role
+
+368
+00:25:54.540 --> 00:25:57.720
+<v Eric Futoran>at IBM, but he was amazing people manager.
+
+369
+00:25:58.240 --> 00:26:03.760
+<v Eric Futoran>Like he was extremely empathetic, but not to a place that would restrict his ability
+
+370
+00:26:03.760 --> 00:26:06.060
+<v Eric Futoran>to, to train and grow you.
+
+371
+00:26:06.420 --> 00:26:10.840
+<v Eric Futoran>Like you can be overly empathetic and then it makes it hard to create the friction that
+
+372
+00:26:10.840 --> 00:26:13.420
+<v Eric Futoran>you need for everybody to grow and to be successful.
+
+373
+00:26:14.080 --> 00:26:17.120
+<v Eric Futoran>And he told that line as good as I will ever see anybody.
+
+374
+00:26:17.500 --> 00:26:19.060
+<v Eric Futoran>So I give him huge kudos.
+
+375
+00:26:19.280 --> 00:26:22.460
+<v Eric Futoran>And I definitely think about his name's Patrick Antoine.
+
+376
+00:26:22.640 --> 00:26:23.440
+<v Eric Futoran>I think about him
+
+377
+00:26:23.440 --> 00:26:23.940
+<v Noah Labhart>a lot.
+
+378
+00:26:23.860 --> 00:26:24.460
+<v Noah Labhart>That's awesome.
+
+379
+00:26:24.500 --> 00:26:29.760
+<v Noah Labhart>I really like you talking about that balance between empathy and friction.
+
+380
+00:26:30.200 --> 00:26:39.560
+<v Noah Labhart>That's a really, really concise way to say that as far as what managers need to strive for.
+
+381
+00:26:39.680 --> 00:26:41.800
+<v Noah Labhart>So I definitely appreciate that.
+
+382
+00:26:42.820 --> 00:26:43.840
+<v Eric Futoran>It's a hard balance.
+
+383
+00:26:44.080 --> 00:26:49.580
+<v Eric Futoran>I think especially founders, most founders are overly friction and those are the horror stories that you hear.
+
+384
+00:26:51.180 --> 00:26:53.920
+<v Noah Labhart>We talked about mistakes, but a little bit different spin.
+
+385
+00:26:54.180 --> 00:26:59.180
+<v Noah Labhart>If you could go back to the beginning, what would you do differently or where would you consider taking a different approach?
+
+386
+00:27:00.960 --> 00:27:05.520
+<v Eric Futoran>There are always moments in your life that you wonder if you could have done them differently.
+
+387
+00:27:07.680 --> 00:27:12.000
+<v Eric Futoran>I think about the first role that I had a lot coming out of college.
+
+388
+00:27:12.000 --> 00:27:16.500
+<v Eric Futoran>And it's interesting coming out of college because you just don't even know what questions to ask.
+
+389
+00:27:16.640 --> 00:27:18.180
+<v Eric Futoran>You just haven't seen enough to benchmark.
+
+390
+00:27:18.900 --> 00:27:22.200
+<v Eric Futoran>And in some ways, that's just naivete, but natural.
+
+391
+00:27:22.960 --> 00:27:30.980
+<v Eric Futoran>So my first role, I didn't even realize that I was a sales engineer until I started hiring them at Embrace, like so many years later.
+
+392
+00:27:32.400 --> 00:27:38.540
+<v Eric Futoran>I think I wish that I had understood what product is at a tech company and sales
+
+393
+00:27:38.540 --> 00:27:43.240
+<v Eric Futoran>eng at a much deeper level and understood the career path that I would have taken.
+
+394
+00:27:43.840 --> 00:27:48.160
+<v Eric Futoran>The dots would have been shorter, like my path to the role that I'm now, which was
+
+395
+00:27:48.160 --> 00:27:50.940
+<v Eric Futoran>always my goal, would have been a hell of a lot shorter.
+
+396
+00:27:51.140 --> 00:27:55.880
+<v Eric Futoran>And I honestly would have had more companies to found and more shots at my goal if I had
+
+397
+00:27:55.880 --> 00:28:00.300
+<v Eric Futoran>understood at the beginning what roles were, what my skillset is and how it would have
+
+398
+00:28:02.060 --> 00:28:07.980
+<v Noah Labhart>Last question, Eric. So you're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+399
+00:28:08.160 --> 00:28:11.260
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world.
+
+400
+00:28:11.320 --> 00:28:13.300
+<v Noah Labhart>They can't wait to show it off to you right there on the plane.
+
+401
+00:28:13.460 --> 00:28:16.260
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+402
+00:28:19.180 --> 00:28:27.240
+<v Eric Futoran>So, well, if it's the next big thing and it's a potential to be a huge company and I believe in it, my best advice would be asking them for a job.
+
+403
+00:28:30.120 --> 00:28:35.340
+<v Eric Futoran>I'm not a bad hire and sometimes it's not so bad to take a backseat and be the one that
+
+404
+00:28:35.340 --> 00:28:40.980
+<v Eric Futoran>executes as opposed to the front and center founder. Just different mental states and
+
+405
+00:28:40.980 --> 00:28:46.080
+<v Eric Futoran>different responsibilities. I think the core, let's assume that the company is relatively
+
+406
+00:28:46.080 --> 00:28:53.160
+<v Eric Futoran>early on and that there's a lot of time ahead of it. I think the core advice that I would
+
+407
+00:28:53.160 --> 00:28:59.980
+<v Eric Futoran>give to any founder is make sure you love it and loving means the central piece of it like no
+
+408
+00:28:59.980 --> 00:29:05.600
+<v Eric Futoran>company ends where it starts, whether it's Facebook or Microsoft or whatever. Like they all say they do,
+
+409
+00:29:05.600 --> 00:29:11.760
+<v Eric Futoran>but the model changes. You have to love what is underlying it. Like for me, it's always been
+
+410
+00:29:11.760 --> 00:29:18.880
+<v Eric Futoran>something around data and grinding through it, whether it's games or, or Embrace or ad tech.
+
+411
+00:29:19.620 --> 00:29:25.680
+<v Eric Futoran>And if you don't love that, you're not going to be able to survive the length of time the company is going to take.
+
+412
+00:29:25.760 --> 00:29:33.260
+<v Eric Futoran>You have to assume this company is going to be around for over 10 years and you're going to be involved because you're a founder for that period of time.
+
+413
+00:29:33.640 --> 00:29:38.480
+<v Eric Futoran>And if you don't love it and you're not willing to breathe it every day, you're on the wrong path.
+
+414
+00:29:39.080 --> 00:29:39.940
+<v Noah Labhart>That's great advice.
+
+415
+00:29:40.640 --> 00:29:42.400
+<v Noah Labhart>Well, Eric, thank you for being on the show today.
+
+416
+00:29:42.600 --> 00:29:45.480
+<v Noah Labhart>Thank you for telling the creation story of Embrace.
+
+417
+00:29:47.020 --> 00:29:48.000
+<v Eric Futoran>Thanks for having me.
+
+418
+00:29:48.020 --> 00:29:48.520
+<v Eric Futoran>This was fun.
+
+419
+00:29:49.760 --> 00:29:52.760
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+420
+00:29:53.940 --> 00:29:55.520
+<v Eric Futoran>Thanks for having me. This was fun.
+
+421
+00:29:57.780 --> 00:30:00.720
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+422
+00:30:00.920 --> 00:30:05.680
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+423
+00:30:06.140 --> 00:30:11.180
+<v Noah Labhart>Support the show on patreon.com slash Code Story for just five to ten bucks a month.
+
+424
+00:30:11.560 --> 00:30:13.760
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+425
+00:30:14.060 --> 00:30:15.960
+<v Noah Labhart>Both things help us out tremendously.
+
+426
+00:30:18.880 --> 00:30:19.880
+<v Noah Labhart>And thanks again for listening.

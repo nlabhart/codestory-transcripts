@@ -1,0 +1,2415 @@
+WEBVTT
+
+NOTE S4 E4: Scaling FinTech Capital Engines: How Yieldstreet Built a Multi-Billion Dollar Investment Platform with CTO Hrishi Dixit
+
+1
+00:00:00.680 --> 00:00:06.660
+<v Hrishi Dixit>Sometimes you run into interesting conflicts like, you know, hey, we have this number of people to do the builds.
+
+2
+00:00:06.780 --> 00:00:13.880
+<v Hrishi Dixit>We have this set of goals for the quarter and we have these ideas that are really interesting and unique and no one's doing these.
+
+3
+00:00:14.160 --> 00:00:17.200
+<v Hrishi Dixit>How do we split up the time between those two? How do we prioritize?
+
+4
+00:00:17.440 --> 00:00:24.260
+<v Hrishi Dixit>And it just becomes this very passionate discussion and debate even, which are actually a lot of fun to be a part of.
+
+5
+00:00:24.900 --> 00:00:35.240
+<v Hrishi Dixit>We're constantly ordering and triaging and reordering things to make sure that at the end of the day, no one loses sight of the fact that whatever we do, the technology is a means.
+
+6
+00:00:35.420 --> 00:00:37.160
+<v Hrishi Dixit>We are trying to move the business forward.
+
+7
+00:00:38.120 --> 00:00:42.760
+<v Hrishi Dixit>My name is Hrishi Dixit, and I'm the Chief Technology Officer at Yieldstreet.
+
+8
+00:00:47.660 --> 00:00:54.400
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries who share
+
+9
+00:00:54.400 --> 00:01:00.040
+<v Noah Labhart>in the critical moments of what it takes to change an industry and build and lead a team
+
+10
+00:01:00.040 --> 00:01:00.900
+<v Noah Labhart>that has your back.
+
+11
+00:01:02.200 --> 00:01:08.280
+<v Noah Labhart>I'm your host, Noah Labhart, and today, how Hrishi Dixit architected a platform to change
+
+12
+00:01:08.280 --> 00:01:10.500
+<v Noah Labhart>the way that wealth is created.
+
+13
+00:01:13.620 --> 00:01:15.920
+<v Noah Labhart>All this and more on Code Story.
+
+14
+00:01:20.700 --> 00:01:22.940
+<v Noah Labhart>Hrishi Dixit was born and raised in India.
+
+15
+00:01:23.140 --> 00:01:27.600
+<v Noah Labhart>He wrote his first program when he was 13 years old, and then he was hooked on computers.
+
+16
+00:01:27.980 --> 00:01:32.040
+<v Noah Labhart>He comes from a family of teachers and bookstore owners, so he was kind of an outlier.
+
+17
+00:01:32.180 --> 00:01:35.700
+<v Noah Labhart>And as a kid, having a computer was a luxury that his family couldn't afford.
+
+18
+00:01:36.400 --> 00:01:40.980
+<v Noah Labhart>In his undergrad, he studied mechanical engineering, as computer science wasn't available.
+
+19
+00:01:42.760 --> 00:01:47.740
+<v Noah Labhart>as much as possible. His graduate studies were completed at Cornell, where he worked side by
+
+20
+00:01:47.740 --> 00:01:53.280
+<v Noah Labhart>side with Xerox scientists on interesting micro-mechanical system problems. Books have
+
+21
+00:01:53.280 --> 00:01:58.320
+<v Noah Labhart>always been a thing for Hrishi, loving the tactile sense of holding a book. He also enjoys a good
+
+22
+00:01:58.320 --> 00:02:03.500
+<v Noah Labhart>whiskey, along with traveling, and he'd love to retire living in Scotland within walking distance
+
+23
+00:02:03.500 --> 00:02:08.420
+<v Noah Labhart>of Lagavulin, if he can convince his wife to brave the winters in Scotland. He worked for
+
+24
+00:02:08.420 --> 00:02:12.560
+<v Noah Labhart>Schlumberger for a while on robotic drilling tools but then followed the activity in California
+
+25
+00:02:12.560 --> 00:02:17.140
+<v Noah Labhart>around the time where the internet was evolving and Google was taking shape. He wanted to be a
+
+26
+00:02:17.140 --> 00:02:22.160
+<v Noah Labhart>part of that. Towards the end of his time in San Fran, he worked in fintech, loving the connection
+
+27
+00:02:22.160 --> 00:02:27.580
+<v Noah Labhart>between math, science, and software. He was the founding CTO of LearnVest, which was sold to
+
+28
+00:02:27.580 --> 00:02:31.880
+<v Noah Labhart>Northwestern Mutual. And around this time of the sale, he met the founder of his current venture
+
+29
+00:02:31.880 --> 00:02:37.560
+<v Noah Labhart>and joined the team as a consultant and then following as an advisor. During that time,
+
+30
+00:02:38.480 --> 00:02:40.680
+<v Noah Labhart>makings of an alternative investment platform.
+
+31
+00:02:40.780 --> 00:02:42.320
+<v Noah Labhart>In fact, the first of its kind.
+
+32
+00:02:43.360 --> 00:02:46.180
+<v Noah Labhart>This is the creation story of Yieldstreet.
+
+33
+00:02:49.760 --> 00:02:54.680
+<v Hrishi Dixit>At the core of it, Yieldstreet is a kind of a first of its kind technology
+
+34
+00:02:54.680 --> 00:02:57.220
+<v Hrishi Dixit>platform for alternative investments.
+
+35
+00:02:57.460 --> 00:02:58.600
+<v Hrishi Dixit>What does that exactly mean?
+
+36
+00:02:58.700 --> 00:03:03.080
+<v Hrishi Dixit>So typically, as if you're a retail investor, like most of most of the
+
+37
+00:03:03.080 --> 00:03:07.420
+<v Hrishi Dixit>population here, our choices in terms of how we can grow our wealth or where we
+
+38
+00:03:08.420 --> 00:03:13.300
+<v Hrishi Dixit>money is limited to, like, your bank accounts, and then you have some fixed income investments, and
+
+39
+00:03:13.300 --> 00:03:18.060
+<v Hrishi Dixit>you have some, you know, maybe public equity investments in the stock market, whether it's
+
+40
+00:03:18.060 --> 00:03:23.420
+<v Hrishi Dixit>for short-term income or more commonly or most commonly for retirement. Those are the options
+
+41
+00:03:23.420 --> 00:03:28.880
+<v Hrishi Dixit>that have been traditionally available to retail investors. Now, if you are someone who can write
+
+42
+00:03:28.880 --> 00:03:32.960
+<v Hrishi Dixit>much bigger checks of like five ten million dollars you have a wealth of other opportunities
+
+43
+00:03:32.960 --> 00:03:37.620
+<v Hrishi Dixit>opportunities available to you in private credit, in asset-based investments, whether it's real
+
+44
+00:03:37.620 --> 00:03:41.980
+<v Hrishi Dixit>estate. Real estate is the only other asset class, if you will, that if you are at a certain point,
+
+45
+00:03:42.060 --> 00:03:46.980
+<v Hrishi Dixit>you have the ability to, whether you buy a house or get an investment property. But there is a
+
+46
+00:03:47.480 --> 00:03:53.240
+<v Hrishi Dixit>large space of possibility out there, which is available to bigger check writers or funds or
+
+47
+00:03:53.240 --> 00:03:58.080
+<v Hrishi Dixit>hedge funds or private equity firms. And Yieldstreet was born of an idea that this doesn't
+
+48
+00:03:58.080 --> 00:04:03.560
+<v Hrishi Dixit>need to be that way. These are viable diversification opportunities that should be available to
+
+49
+00:04:03.560 --> 00:04:11.380
+<v Hrishi Dixit>everyone, not just for the richest 1 or 0.1%. And especially coming out of 2007 and 8, when
+
+50
+00:04:11.380 --> 00:04:17.040
+<v Hrishi Dixit>we saw all of our portfolios take a 50% dip, it was that moment where Bevan, Milind and
+
+51
+00:04:17.420 --> 00:04:22.640
+<v Hrishi Dixit>Michael were telling me their vision for Yieldstreet. It's like, hey, now that the passage
+
+52
+00:04:22.640 --> 00:04:28.960
+<v Hrishi Dixit>of the JOBS Act in 2012 made it possible to open up these kinds of investments to a much more
+
+53
+00:04:28.960 --> 00:04:34.380
+<v Hrishi Dixit>general solicitation, we can actually leverage the power of technology to make these kinds of
+
+54
+00:04:34.380 --> 00:04:39.800
+<v Hrishi Dixit>investments available to a much, much broader audience. So that was the kind of the germ of
+
+55
+00:04:39.800 --> 00:04:45.140
+<v Hrishi Dixit>the idea that created the company. So what we do is we provide these opportunities in various asset
+
+56
+00:04:45.140 --> 00:04:52.100
+<v Hrishi Dixit>classes and real estate, in litigation finance and marine finance and art finance. We have built
+
+57
+00:04:52.640 --> 00:04:58.740
+<v Hrishi Dixit>platform that makes investing in these kinds of investment products as simple as you would,
+
+58
+00:04:58.840 --> 00:05:05.900
+<v Hrishi Dixit>you know, say, buy stock in Apple. So we wanted to level the playing field by using technology
+
+59
+00:05:05.900 --> 00:05:13.740
+<v Hrishi Dixit>and the change in legislation that made this possible. What I believe sets Yieldstreet apart
+
+60
+00:05:13.740 --> 00:05:22.080
+<v Hrishi Dixit>is we are not pinned to any particular kind of asset class, unlike many of the companies like
+
+61
+00:05:22.640 --> 00:05:28.460
+<v Hrishi Dixit>are great companies, Fundrise, RealtyShares, RealtyMogul. They tend to be focused in a
+
+62
+00:05:28.460 --> 00:05:34.920
+<v Hrishi Dixit>particular kind of asset like real estate. What we have built is the platform that is largely
+
+63
+00:05:34.920 --> 00:05:40.480
+<v Hrishi Dixit>agnostic to the underlying asset class from an investor standpoint. So you're able to come in
+
+64
+00:05:40.480 --> 00:05:46.160
+<v Hrishi Dixit>and invest in a variety of different kinds of asset classes and access the same kind of
+
+65
+00:05:46.160 --> 00:05:51.380
+<v Hrishi Dixit>opportunities that historically have only been available to bigger funds and more institutional
+
+66
+00:05:53.980 --> 00:05:55.280
+<v Noah Labhart>Tell me about the MVP.
+
+67
+00:05:55.620 --> 00:06:01.480
+<v Noah Labhart>So tell me about how long it took to build and what sort of tools you used to bring it to life.
+
+68
+00:06:02.740 --> 00:06:13.000
+<v Hrishi Dixit>From a coding and building standpoint, we had about a window of six to seven weeks from a blank slate, like no line of code written, to a launchable MVP.
+
+69
+00:06:13.320 --> 00:06:15.680
+<v Hrishi Dixit>So we started the brainstorming on the product.
+
+70
+00:06:15.680 --> 00:06:37.040
+<v Hrishi Dixit>So one of the things that Yieldstreet, and this is kind of like a, for me, having spent a good amount of time in the startup world, was really refreshing and not very common to find is we had a roadmap that Milind shared with me back in 2014 for what the platform can be over a span of like three, four or five years.
+
+71
+00:06:37.040 --> 00:06:41.460
+<v Hrishi Dixit>Here we are like almost six years in and that roadmap has not changed.
+
+72
+00:06:41.560 --> 00:06:42.540
+<v Hrishi Dixit>We haven't had to pivot.
+
+73
+00:06:42.620 --> 00:06:49.040
+<v Hrishi Dixit>There was such a clarity of a true north for the company that even my most recent pre-Yield
+
+74
+00:06:49.040 --> 00:06:51.660
+<v Hrishi Dixit>street experience with LearnVest, we didn't have that.
+
+75
+00:06:51.720 --> 00:06:56.440
+<v Hrishi Dixit>We had a mission, we had a goal, we had a vision, but the execution path was something
+
+76
+00:06:56.440 --> 00:07:00.400
+<v Hrishi Dixit>that we were often kind of like, you know, making some runtime decisions on.
+
+77
+00:07:00.800 --> 00:07:06.660
+<v Hrishi Dixit>From an MVP standpoint, we knew what we wanted to build and we had a very good sense of how
+
+78
+00:07:07.040 --> 00:07:10.040
+<v Hrishi Dixit>sequence it at least in the first year to two years.
+
+79
+00:07:10.580 --> 00:07:14.400
+<v Hrishi Dixit>Our beginning started with the whiteboard like many of us do,
+
+80
+00:07:14.520 --> 00:07:20.040
+<v Hrishi Dixit>but what drove the MVP or what goes into the MVP is what are
+
+81
+00:07:20.040 --> 00:07:21.080
+<v Hrishi Dixit>the signals you're trying to get.
+
+82
+00:07:21.720 --> 00:07:24.560
+<v Hrishi Dixit>If you look at Yieldstreet from a platform perspective,
+
+83
+00:07:24.920 --> 00:07:26.020
+<v Hrishi Dixit>they're effectively a marketplace.
+
+84
+00:07:26.220 --> 00:07:30.180
+<v Hrishi Dixit>We connect retail investors looking for alternative investments
+
+85
+00:07:30.180 --> 00:07:33.880
+<v Hrishi Dixit>with originators who are looking to raise capital to then
+
+86
+00:07:33.880 --> 00:07:35.120
+<v Hrishi Dixit>lend out to borrowers.
+
+87
+00:07:37.040 --> 00:07:39.140
+<v Hrishi Dixit>on the investors, which we did.
+
+88
+00:07:39.260 --> 00:07:43.000
+<v Hrishi Dixit>So what we wanted to build was a very streamlined,
+
+89
+00:07:43.420 --> 00:07:47.100
+<v Hrishi Dixit>easy to understand onboarding and journey experience
+
+90
+00:07:47.100 --> 00:07:48.400
+<v Hrishi Dixit>for our investors.
+
+91
+00:07:49.330 --> 00:07:51.040
+<v Hrishi Dixit>In kind of conjunction with that,
+
+92
+00:07:51.160 --> 00:07:55.020
+<v Hrishi Dixit>being as it was a slightly different kind of investment,
+
+93
+00:07:55.280 --> 00:07:57.860
+<v Hrishi Dixit>we wanted to build a content base,
+
+94
+00:07:57.900 --> 00:08:00.080
+<v Hrishi Dixit>a kind of like, we actually called it
+
+95
+00:08:00.080 --> 00:08:01.400
+<v Hrishi Dixit>Yieldstreet University back then,
+
+96
+00:08:01.540 --> 00:08:05.440
+<v Hrishi Dixit>an educational resource that informs potential users
+
+97
+00:08:07.040 --> 00:08:14.460
+<v Hrishi Dixit>of these? How do they work? So the MVP was kind of like very well shaped in terms of what can we
+
+98
+00:08:14.460 --> 00:08:21.520
+<v Hrishi Dixit>build in about six to no more than eight weeks that will not only provide a clear vision of
+
+99
+00:08:21.520 --> 00:08:27.720
+<v Hrishi Dixit>to investors of what it is that the platform does, but also give us the data collection and the
+
+100
+00:08:27.720 --> 00:08:34.520
+<v Hrishi Dixit>signals that we wanted to capture to figure out how the product roadmap evolves that point on.
+
+101
+00:08:34.520 --> 00:08:37.460
+<v Hrishi Dixit>Because there's a lot of different things that we can potentially build.
+
+102
+00:08:37.600 --> 00:08:42.680
+<v Hrishi Dixit>And obviously with the kind of like, you know, resource limitations that we have in those
+
+103
+00:08:42.680 --> 00:08:44.260
+<v Hrishi Dixit>early stages, we can't do it all.
+
+104
+00:08:44.380 --> 00:08:47.320
+<v Hrishi Dixit>It doesn't make even, doesn't even make sense to build it all at once.
+
+105
+00:08:47.540 --> 00:08:48.880
+<v Hrishi Dixit>So what is the right sequencing?
+
+106
+00:08:49.120 --> 00:08:53.660
+<v Hrishi Dixit>So we need to kind of capture the signals, the data, the insights that we want to glean
+
+107
+00:08:53.660 --> 00:08:56.980
+<v Hrishi Dixit>from that MVP to decide which way to evolve in.
+
+108
+00:08:57.240 --> 00:08:58.700
+<v Hrishi Dixit>So we focused on the investor.
+
+109
+00:08:58.800 --> 00:09:03.640
+<v Hrishi Dixit>We didn't, we kind of like put the back office automation stuff, which we knew we would build
+
+110
+00:09:04.520 --> 00:09:09.500
+<v Hrishi Dixit>scale, we could put that aside. Like, let's not worry about that right now. Let's just figure out
+
+111
+00:09:09.500 --> 00:09:15.800
+<v Hrishi Dixit>if you were an investor coming into this kind of somewhat new world of investing, what is it that
+
+112
+00:09:15.800 --> 00:09:22.520
+<v Hrishi Dixit>would get the user in, inform her, educate her on what this is, and provide a very smooth onboarding
+
+113
+00:09:22.520 --> 00:09:26.460
+<v Hrishi Dixit>and investing experience. And that's what we doubled down on. And that's exactly what we
+
+114
+00:09:26.460 --> 00:09:32.320
+<v Hrishi Dixit>launched with. We had a storefront with some initial investment offerings that we had already
+
+115
+00:09:32.320 --> 00:09:37.980
+<v Hrishi Dixit>already sourced and we built some content around it and we built a very streamlined
+
+116
+00:09:37.980 --> 00:09:42.440
+<v Hrishi Dixit>onboarding flow and an investment flow and everything else was offloaded to manual work
+
+117
+00:09:42.440 --> 00:09:43.760
+<v Hrishi Dixit>because it didn't have any scale.
+
+118
+00:09:44.240 --> 00:09:51.100
+<v Hrishi Dixit>What we benefited from was that clarity of where we want to end up in four to five years.
+
+119
+00:09:51.260 --> 00:09:54.120
+<v Hrishi Dixit>Having that clarity is both critical and rare.
+
+120
+00:09:54.300 --> 00:09:55.500
+<v Hrishi Dixit>It's hard to know.
+
+121
+00:09:55.500 --> 00:10:02.740
+<v Hrishi Dixit>We had a, and we continue to have a clear vision of where this can and should end up in five, six,
+
+122
+00:10:02.740 --> 00:10:08.620
+<v Hrishi Dixit>seven years. What that allowed us to do in the MVP, aside from building the very basic set of things
+
+123
+00:10:08.620 --> 00:10:14.320
+<v Hrishi Dixit>that we wanted to launch with, was building some abstractions into the platform at that point. By
+
+124
+00:10:14.320 --> 00:10:19.980
+<v Hrishi Dixit>which I mean, like, okay, well, at some point we want to automate the movement of funds. Okay, well, let's
+
+125
+00:10:19.980 --> 00:10:26.400
+<v Hrishi Dixit>build a provider type abstraction where we can plug in a sort of dummy provider to pretend like
+
+126
+00:10:26.400 --> 00:10:30.900
+<v Hrishi Dixit>the real thing is sitting behind it and moving the funds around. And then we actually eventually
+
+127
+00:10:30.900 --> 00:10:37.280
+<v Hrishi Dixit>integrated with a payment automation provider. We just kind of plugged in that library or that, that
+
+128
+00:10:37.280 --> 00:10:42.960
+<v Hrishi Dixit>service that we built into that provider abstraction. So we had some benefit there of
+
+129
+00:10:42.960 --> 00:10:48.900
+<v Hrishi Dixit>forward-looking clarity that allowed us to kind of put the breadcrumbs in the MVP that we knew
+
+130
+00:10:49.980 --> 00:10:52.200
+<v Hrishi Dixit>and build out a kind of window fully fleshed out way.
+
+131
+00:10:52.900 --> 00:10:53.800
+<v Noah Labhart>That makes sense.
+
+132
+00:10:53.860 --> 00:10:57.120
+<v Noah Labhart>You had the vision and you had also some experience
+
+133
+00:10:58.060 --> 00:11:01.380
+<v Noah Labhart>from creating software, building solutions and things.
+
+134
+00:11:01.420 --> 00:11:03.460
+<v Noah Labhart>You sort of knew how to lay the pieces out
+
+135
+00:11:03.460 --> 00:11:05.660
+<v Noah Labhart>and then you abstracted the things
+
+136
+00:11:05.660 --> 00:11:07.220
+<v Noah Labhart>that you thought you would need in the future.
+
+137
+00:11:07.760 --> 00:11:09.860
+<v Noah Labhart>Dive in a little bit to maybe one or two
+
+138
+00:11:09.860 --> 00:11:12.300
+<v Noah Labhart>of the decisions and trade-offs you had to make.
+
+139
+00:11:12.380 --> 00:11:14.940
+<v Noah Labhart>So maybe around some of those abstractions
+
+140
+00:11:14.940 --> 00:11:17.900
+<v Noah Labhart>that made life a little harder in the short term
+
+141
+00:11:17.900 --> 00:11:19.880
+<v Noah Labhart>and how did you cope with those decisions?
+
+142
+00:11:20.940 --> 00:11:24.080
+<v Hrishi Dixit>So let me take a very specific example.
+
+143
+00:11:24.520 --> 00:11:27.800
+<v Hrishi Dixit>The kind of investment products that Yieldstreet offers,
+
+144
+00:11:27.980 --> 00:11:29.980
+<v Hrishi Dixit>they are debt-based investment products, right?
+
+145
+00:11:30.040 --> 00:11:31.980
+<v Hrishi Dixit>So they're sort of fixed income products.
+
+146
+00:11:32.100 --> 00:11:34.580
+<v Hrishi Dixit>And like the public markets, which fluctuate,
+
+147
+00:11:34.640 --> 00:11:38.320
+<v Hrishi Dixit>you know, these provide a more or less fixed yield
+
+148
+00:11:38.320 --> 00:11:39.740
+<v Hrishi Dixit>over a certain period of time.
+
+149
+00:11:40.560 --> 00:11:42.340
+<v Hrishi Dixit>Obviously, like every investment,
+
+150
+00:11:42.400 --> 00:11:43.360
+<v Hrishi Dixit>there's risks and everything,
+
+151
+00:11:43.540 --> 00:11:46.160
+<v Hrishi Dixit>but the debt-based investments at the core of it,
+
+152
+00:11:46.200 --> 00:11:47.520
+<v Hrishi Dixit>you have an engine that is calculating
+
+153
+00:11:47.900 --> 00:11:52.340
+<v Hrishi Dixit>payment schedule, right? You put in a certain amount of money into an offering and you have a
+
+154
+00:11:52.340 --> 00:11:58.000
+<v Hrishi Dixit>payment schedule that defines how you would get payments based on the yield and term profile of
+
+155
+00:11:58.000 --> 00:12:03.480
+<v Hrishi Dixit>that offering. So we could have done the, let's say, quote unquote, wrong thing and built out
+
+156
+00:12:03.480 --> 00:12:09.500
+<v Hrishi Dixit>that entire engine for calculating the waterfall for the payments, but we didn't. We basically just
+
+157
+00:12:10.060 --> 00:12:17.260
+<v Hrishi Dixit>captured the base parameters and we provided a way to sort of upload an externally computed
+
+158
+00:12:18.220 --> 00:12:24.420
+<v Hrishi Dixit>waterfall into the system that could then be used to kind of drive the investment management part of
+
+159
+00:12:24.420 --> 00:12:31.980
+<v Hrishi Dixit>it. And at that point, we were launching a product that was relatively new and unknown to the
+
+160
+00:12:31.980 --> 00:12:37.060
+<v Hrishi Dixit>investment community, at least the retail investment community. We knew that at some point, if this
+
+161
+00:12:37.060 --> 00:12:43.660
+<v Hrishi Dixit>takes off, this is going to be a bottleneck in scale. What can we build in in the MVP that,
+
+162
+00:12:43.660 --> 00:12:46.460
+<v Hrishi Dixit>that knowing that this would need to be built out
+
+163
+00:12:46.460 --> 00:12:49.180
+<v Hrishi Dixit>and fleshed out as a fully automated engine at some point,
+
+164
+00:12:49.260 --> 00:12:52.320
+<v Hrishi Dixit>what can we, what are the kind of little bolts
+
+165
+00:12:52.320 --> 00:12:55.980
+<v Hrishi Dixit>and nuts that we can put in that would make it not easy,
+
+166
+00:12:56.080 --> 00:13:00.900
+<v Hrishi Dixit>but at least doable in a logical way.
+
+167
+00:13:01.400 --> 00:13:05.460
+<v Hrishi Dixit>So that was one of the early kind of cutting corners
+
+168
+00:13:05.460 --> 00:13:08.660
+<v Hrishi Dixit>sort of decisions that we made that as soon as we started
+
+169
+00:13:08.660 --> 00:13:11.380
+<v Hrishi Dixit>noticing the traction that we were getting on the platform,
+
+170
+00:13:11.380 --> 00:13:16.220
+<v Hrishi Dixit>we went through a significant build of the actual engine
+
+171
+00:13:16.780 --> 00:13:19.040
+<v Hrishi Dixit>that now powers all of our back office functions.
+
+172
+00:13:19.700 --> 00:13:23.420
+<v Hrishi Dixit>And there was an interesting challenge there
+
+173
+00:13:23.420 --> 00:13:25.720
+<v Hrishi Dixit>to build this at the same time,
+
+174
+00:13:25.740 --> 00:13:28.580
+<v Hrishi Dixit>kind of manage the growing scale of the investor base.
+
+175
+00:13:28.780 --> 00:13:32.540
+<v Hrishi Dixit>So, okay, we started off with like maybe whatever,
+
+176
+00:13:32.780 --> 00:13:35.220
+<v Hrishi Dixit>10, 15 investors, and now we're certainly scaling up
+
+177
+00:13:35.220 --> 00:13:36.980
+<v Hrishi Dixit>to post 100 investors.
+
+178
+00:13:37.520 --> 00:13:39.820
+<v Hrishi Dixit>Even with this engine, what is the minimal engine
+
+179
+00:13:41.380 --> 00:13:45.140
+<v Hrishi Dixit>this influx of people and then we can start building on top of it as the
+
+180
+00:13:45.140 --> 00:13:50.540
+<v Hrishi Dixit>offerings got more and more complex. There was a period of time
+
+181
+00:13:50.540 --> 00:13:54.240
+<v Hrishi Dixit>when we were building out the V1 of the engine where we were kind of balancing
+
+182
+00:13:54.240 --> 00:13:59.280
+<v Hrishi Dixit>out the actual tech effort required to build the engine and the back-office
+
+183
+00:13:59.280 --> 00:14:03.940
+<v Hrishi Dixit>manual effort that was required to handle the influx of investors that we
+
+184
+00:14:03.940 --> 00:14:08.040
+<v Hrishi Dixit>were getting. It all worked out eventually because we started off with
+
+185
+00:14:08.040 --> 00:14:10.160
+<v Hrishi Dixit>with some assumptions or some invariants
+
+186
+00:14:10.160 --> 00:14:12.600
+<v Hrishi Dixit>for the engine that we built in
+
+187
+00:14:12.600 --> 00:14:14.380
+<v Hrishi Dixit>that didn't cover the long tail,
+
+188
+00:14:14.500 --> 00:14:16.220
+<v Hrishi Dixit>but it covered the meaty part of the curve.
+
+189
+00:14:16.360 --> 00:14:19.320
+<v Hrishi Dixit>Like, you know, 90% of our offerings were addressable
+
+190
+00:14:19.320 --> 00:14:21.860
+<v Hrishi Dixit>by the V1 of the engine that we built.
+
+191
+00:14:22.020 --> 00:14:24.220
+<v Hrishi Dixit>And the other 10%, we would still kind of
+
+192
+00:14:24.220 --> 00:14:26.580
+<v Hrishi Dixit>sort of gracefully degrade to manual processing.
+
+193
+00:14:27.100 --> 00:14:30.380
+<v Hrishi Dixit>As we started sourcing more and more interesting
+
+194
+00:14:30.380 --> 00:14:32.240
+<v Hrishi Dixit>kind of products for our investors,
+
+195
+00:14:32.760 --> 00:14:34.520
+<v Hrishi Dixit>they started getting more and more complex.
+
+196
+00:14:34.720 --> 00:14:37.340
+<v Hrishi Dixit>And we actually had to go back to the drawing board
+
+197
+00:14:38.040 --> 00:14:43.520
+<v Hrishi Dixit>years ago to kind of redo it from ground up to handle, to add in those levers of flexibility that
+
+198
+00:14:43.520 --> 00:14:51.020
+<v Hrishi Dixit>we didn't have the time or the resources to build in, in the V1 of the engine. You can always, like,
+
+199
+00:14:51.020 --> 00:14:55.740
+<v Hrishi Dixit>in hindsight, you can always say, hey, if we'd made this configurable or that configurable, this would
+
+200
+00:14:55.740 --> 00:15:01.540
+<v Hrishi Dixit>have been a lot more, a lot easier. But sometimes you just kind of have to make a judgment call, you
+
+201
+00:15:01.540 --> 00:15:06.940
+<v Hrishi Dixit>know, like, you know, well, we don't have nearly the scale or the variety of offerings
+
+202
+00:15:08.040 --> 00:15:12.480
+<v Hrishi Dixit>expand the technical effort with the team of four or five engineers that we have? Does it make sense
+
+203
+00:15:12.480 --> 00:15:18.400
+<v Hrishi Dixit>to invest all that effort right now? Or should we just focus on growing our investor base and
+
+204
+00:15:18.400 --> 00:15:23.340
+<v Hrishi Dixit>stay with the kind of offerings that we currently have? So this is a balancing act that continues
+
+205
+00:15:23.340 --> 00:15:26.220
+<v Hrishi Dixit>today. It never really goes away and that's okay.
+
+206
+00:15:27.840 --> 00:15:30.600
+<v Noah Labhart>So you kind of touched on how you progress the
+
+207
+00:15:30.600 --> 00:15:36.580
+<v Noah Labhart>product, but how did you go about building the roadmap of what's the next most important thing
+
+208
+00:15:38.040 --> 00:15:40.380
+<v Noah Labhart>And was that a customer feedback thing?
+
+209
+00:15:40.560 --> 00:15:42.140
+<v Noah Labhart>Was it intuition?
+
+210
+00:15:42.420 --> 00:15:43.820
+<v Noah Labhart>Was it a balance of the two?
+
+211
+00:15:44.080 --> 00:15:45.340
+<v Noah Labhart>Walk me through that a little bit.
+
+212
+00:15:45.660 --> 00:15:46.180
+<v Hrishi Dixit>So
+
+213
+00:15:46.180 --> 00:15:48.420
+<v Hrishi Dixit>it's actually a combination of different things.
+
+214
+00:15:48.460 --> 00:15:52.860
+<v Hrishi Dixit>Ultimately, there's an underlying mantra that exists today and will exist forever.
+
+215
+00:15:53.160 --> 00:15:59.500
+<v Hrishi Dixit>And we're not blessed with Google or Facebook-sized teams that can work on many, many different things at once.
+
+216
+00:15:59.720 --> 00:16:02.240
+<v Hrishi Dixit>Mantra is always like, what moves the business forward?
+
+217
+00:16:02.460 --> 00:16:05.080
+<v Hrishi Dixit>And that seems kind of naive or simple enough.
+
+218
+00:16:05.080 --> 00:16:18.360
+<v Hrishi Dixit>But it's actually tricky to connect the dots and draw the line from what are the KPIs that drives a business forward, whether it's the AUM on the platform, the number of investors, the number of new investors.
+
+219
+00:16:18.820 --> 00:16:23.980
+<v Hrishi Dixit>What are we trying to hit on a quarterly or annual basis?
+
+220
+00:16:24.180 --> 00:16:28.780
+<v Hrishi Dixit>Like, what are the key numbers that will demonstrate a healthy and growing business?
+
+221
+00:16:29.140 --> 00:16:31.400
+<v Hrishi Dixit>And it kind of trickles down from there.
+
+222
+00:16:31.400 --> 00:16:37.220
+<v Hrishi Dixit>Let's say, so there is an inventory, there is a backlog of God knows at this point, like
+
+223
+00:16:37.220 --> 00:16:39.880
+<v Hrishi Dixit>close to two dozen different things that we want to build.
+
+224
+00:16:40.480 --> 00:16:45.500
+<v Hrishi Dixit>Each of those things can be looked at and should be looked at from the lens of what
+
+225
+00:16:45.500 --> 00:16:48.860
+<v Hrishi Dixit>number is this moving the needle on if we build this right now.
+
+226
+00:16:49.060 --> 00:16:53.440
+<v Hrishi Dixit>To take an example, right, you know, okay, well, we wanted to, let's say we, so right
+
+227
+00:16:53.440 --> 00:16:57.980
+<v Hrishi Dixit>now the platform is primarily for what's called accredited investors.
+
+228
+00:16:57.980 --> 00:17:03.980
+<v Hrishi Dixit>This is an SEC designation that requires you to have a certain financial situation, like
+
+229
+00:17:03.980 --> 00:17:06.500
+<v Hrishi Dixit>whether it's income or net worth.
+
+230
+00:17:06.800 --> 00:17:09.900
+<v Hrishi Dixit>Essentially it's built in for investor protection by the SEC.
+
+231
+00:17:10.180 --> 00:17:16.600
+<v Hrishi Dixit>So you need to make at least $200,000 in income on an annual basis for the last two years,
+
+232
+00:17:16.740 --> 00:17:21.820
+<v Hrishi Dixit>or you need to have a net worth of a million dollars to be able to invest in most, not
+
+233
+00:17:21.820 --> 00:17:23.200
+<v Hrishi Dixit>all, but most of our offerings today.
+
+234
+00:17:23.920 --> 00:17:25.560
+<v Hrishi Dixit>This is a friction point right now.
+
+235
+00:17:25.560 --> 00:17:33.880
+<v Hrishi Dixit>Now, if one of the metrics that we are trying to hit is the number of investors, repeat investments or new investors, what are the detractors from that?
+
+236
+00:17:34.200 --> 00:17:35.540
+<v Hrishi Dixit>It's a number of different things.
+
+237
+00:17:35.660 --> 00:17:48.140
+<v Hrishi Dixit>But there is a set of products that we are contemplating that will play, without going into too much detail, the accreditation verification is a somewhat friction-filled process.
+
+238
+00:17:48.620 --> 00:17:53.160
+<v Hrishi Dixit>It puts a bunch of requirements on the investor side to prove their accreditation.
+
+239
+00:17:53.160 --> 00:18:03.920
+<v Hrishi Dixit>Now, if we can figure out a way, which we have, if we can automate that part, if we take that friction point away, it will actually reduce the churn of investors.
+
+240
+00:18:04.180 --> 00:18:21.840
+<v Hrishi Dixit>So if we have a quarterly goal of increasing the number of active investors or reducing the churn in investors by X percent or having Y number of investors, we would prioritize this product that we know will directly impact that number.
+
+241
+00:18:23.160 --> 00:18:26.300
+<v Hrishi Dixit>it kind of boils down to what are the different products
+
+242
+00:18:26.300 --> 00:18:29.340
+<v Hrishi Dixit>that we can build that move the business forward.
+
+243
+00:18:29.760 --> 00:18:31.240
+<v Hrishi Dixit>That's one, that's a big one.
+
+244
+00:18:31.480 --> 00:18:34.600
+<v Hrishi Dixit>The second thing is unlike 2015 when we started,
+
+245
+00:18:34.780 --> 00:18:36.580
+<v Hrishi Dixit>there was a lot more players in this space now.
+
+246
+00:18:36.620 --> 00:18:37.580
+<v Hrishi Dixit>They're doing interesting things.
+
+247
+00:18:37.700 --> 00:18:38.460
+<v Hrishi Dixit>They're really good companies.
+
+248
+00:18:38.760 --> 00:18:42.640
+<v Hrishi Dixit>So how do we stay on the cutting edge
+
+249
+00:18:42.640 --> 00:18:43.900
+<v Hrishi Dixit>in terms of innovation?
+
+250
+00:18:44.220 --> 00:18:47.880
+<v Hrishi Dixit>So that is the other key driver to how we order
+
+251
+00:18:47.880 --> 00:18:49.740
+<v Hrishi Dixit>and prioritize our product roadmap.
+
+252
+00:18:50.160 --> 00:18:52.060
+<v Hrishi Dixit>Sometimes you run into interesting
+
+253
+00:18:53.160 --> 00:18:57.600
+<v Hrishi Dixit>conflicts. Like, you know, hey, we have this number of people to do the builds. We have this
+
+254
+00:18:57.600 --> 00:19:03.480
+<v Hrishi Dixit>set of goals for the quarter. And we have these ideas that are kind of like really interesting
+
+255
+00:19:03.480 --> 00:19:08.380
+<v Hrishi Dixit>and unique and no one's doing these. So how do we split up the time between those two? How do
+
+256
+00:19:08.380 --> 00:19:13.300
+<v Hrishi Dixit>we prioritize? And it just, it becomes this very passionate discussion and debate even,
+
+257
+00:19:13.420 --> 00:19:18.060
+<v Hrishi Dixit>which are actually a lot of fun to be a part of, where we decide, okay, well, this is going to take,
+
+258
+00:19:18.060 --> 00:19:24.480
+<v Hrishi Dixit>you know, this is a quick win that we can quickly roll out and we'll be able to kind of like create
+
+259
+00:19:24.480 --> 00:19:30.200
+<v Hrishi Dixit>this very interesting feature on this existing flow that will delight our investors. So it becomes
+
+260
+00:19:30.200 --> 00:19:34.100
+<v Hrishi Dixit>this math of like, what is the effort level and what is the impact, the perceived or expected
+
+261
+00:19:34.100 --> 00:19:40.320
+<v Hrishi Dixit>impact of that? And we do this on a quarterly basis. We do this on a sprint by sprint basis.
+
+262
+00:19:40.440 --> 00:19:45.380
+<v Hrishi Dixit>We're constantly kind of ordering and triaging and reordering things to make sure that at the
+
+263
+00:19:45.380 --> 00:19:50.940
+<v Hrishi Dixit>the end of the day, no one loses sight of the fact that whatever we do, the technology is a means.
+
+264
+00:19:51.700 --> 00:19:56.140
+<v Hrishi Dixit>We are trying to move the business forward and we are trying to serve our investors the best we can
+
+265
+00:19:56.140 --> 00:19:59.000
+<v Hrishi Dixit>and at the same time, stay ahead of our competition.
+
+266
+00:20:00.720 --> 00:20:02.680
+<v Noah Labhart>Let's switch over a bit to team.
+
+267
+00:20:02.880 --> 00:20:09.240
+<v Noah Labhart>Tell me about how you built your team and what you looked for in those people to indicate that they
+
+268
+00:20:09.240 --> 00:20:11.680
+<v Noah Labhart>or the winning horses to join you?
+
+269
+00:20:12.460 --> 00:20:13.460
+<v Hrishi Dixit>That's a great question.
+
+270
+00:20:13.600 --> 00:20:17.700
+<v Hrishi Dixit>And it's actually, I wish there was a nice 10 second soundbite answer,
+
+271
+00:20:17.800 --> 00:20:20.940
+<v Hrishi Dixit>but really my whole kind of outlook on this,
+
+272
+00:20:20.960 --> 00:20:24.020
+<v Hrishi Dixit>both not just in Yieldstreet, but even in past similar leadership roles
+
+273
+00:20:24.020 --> 00:20:27.580
+<v Hrishi Dixit>has been just hire people that are smarter than you,
+
+274
+00:20:27.660 --> 00:20:31.160
+<v Hrishi Dixit>you know, and smarter and not just in terms of technical skills.
+
+275
+00:20:31.640 --> 00:20:34.920
+<v Hrishi Dixit>Because at this point, I can safely say that the team
+
+276
+00:20:34.920 --> 00:20:37.240
+<v Hrishi Dixit>that we have built here at Yieldstreet,
+
+277
+00:20:39.240 --> 00:20:40.680
+<v Hrishi Dixit>individually much smarter than I am.
+
+278
+00:20:40.740 --> 00:20:41.540
+<v Hrishi Dixit>That's just the reality.
+
+279
+00:20:41.860 --> 00:20:44.260
+<v Hrishi Dixit>And beyond the raw technical skills,
+
+280
+00:20:44.520 --> 00:20:47.140
+<v Hrishi Dixit>they have this itch, this passion,
+
+281
+00:20:47.520 --> 00:20:50.700
+<v Hrishi Dixit>this constant desire and constant thirst
+
+282
+00:20:51.200 --> 00:20:54.160
+<v Hrishi Dixit>to know more, to learn more, to explore.
+
+283
+00:20:55.020 --> 00:20:58.160
+<v Hrishi Dixit>And if you get a set of people that embody
+
+284
+00:20:58.160 --> 00:21:01.700
+<v Hrishi Dixit>this almost yearning to get better all the time,
+
+285
+00:21:01.740 --> 00:21:04.400
+<v Hrishi Dixit>to constantly move their own knowledge
+
+286
+00:21:04.400 --> 00:21:06.120
+<v Hrishi Dixit>as well as the platform forward,
+
+287
+00:21:06.640 --> 00:21:09.080
+<v Hrishi Dixit>the next thing you do is simply get out of the way.
+
+288
+00:21:09.240 --> 00:21:11.340
+<v Hrishi Dixit>give them air cover and get out of the way.
+
+289
+00:21:11.580 --> 00:21:14.340
+<v Hrishi Dixit>The team at Yieldstreet started much similar
+
+290
+00:21:14.340 --> 00:21:15.820
+<v Hrishi Dixit>to many startups.
+
+291
+00:21:16.140 --> 00:21:18.900
+<v Hrishi Dixit>We started building out a team in Brazil,
+
+292
+00:21:20.040 --> 00:21:22.900
+<v Hrishi Dixit>which is still where we have the biggest chunk of our team.
+
+293
+00:21:23.160 --> 00:21:26.580
+<v Hrishi Dixit>Unlike a classic kind of outsourcing relationship
+
+294
+00:21:26.580 --> 00:21:28.480
+<v Hrishi Dixit>that typically companies tend to have,
+
+295
+00:21:28.560 --> 00:21:31.140
+<v Hrishi Dixit>certainly bigger companies, they are part of our team.
+
+296
+00:21:31.280 --> 00:21:34.000
+<v Hrishi Dixit>They are fully empowered to make decisions,
+
+297
+00:21:34.140 --> 00:21:36.340
+<v Hrishi Dixit>to provide input, not just on the technology,
+
+298
+00:21:36.340 --> 00:21:38.180
+<v Hrishi Dixit>but also on the product itself.
+
+299
+00:21:38.420 --> 00:21:40.580
+<v Hrishi Dixit>Like ask questions like, why are we building this?
+
+300
+00:21:40.640 --> 00:21:41.860
+<v Hrishi Dixit>Why are we building it this way?
+
+301
+00:21:41.940 --> 00:21:43.160
+<v Hrishi Dixit>Why can't we do it that way?
+
+302
+00:21:43.500 --> 00:21:45.760
+<v Hrishi Dixit>You get a set of really smart and driven people
+
+303
+00:21:45.760 --> 00:21:49.940
+<v Hrishi Dixit>and you give them, you empower them to have a voice
+
+304
+00:21:50.440 --> 00:21:52.240
+<v Hrishi Dixit>in the decisions that we make.
+
+305
+00:21:52.360 --> 00:21:55.020
+<v Hrishi Dixit>And you give them the space to do their best work.
+
+306
+00:21:55.480 --> 00:21:56.440
+<v Hrishi Dixit>Nothing beats that.
+
+307
+00:21:56.580 --> 00:21:59.040
+<v Hrishi Dixit>The amount of creativity that comes out of,
+
+308
+00:21:59.060 --> 00:22:00.940
+<v Hrishi Dixit>not just engineers, but you know, designers
+
+309
+00:22:00.940 --> 00:22:02.940
+<v Hrishi Dixit>and product people and data engineers.
+
+310
+00:22:02.940 --> 00:22:09.620
+<v Hrishi Dixit>And we have what we call a PDT complex here at Yieldstreet, which is really product design, data, and tech.
+
+311
+00:22:09.780 --> 00:22:12.000
+<v Hrishi Dixit>And they're all like this one symphony.
+
+312
+00:22:12.160 --> 00:22:21.980
+<v Hrishi Dixit>And me and my compadre on the product side, our chief product officer, our primary role is to provide some guidance, some direction, some rationale on where we're trying to go, what we're trying to do.
+
+313
+00:22:22.160 --> 00:22:29.860
+<v Hrishi Dixit>And then essentially empower them to make the decisions that need to be made to drive and build the platform and through the business forward.
+
+314
+00:22:30.720 --> 00:22:40.740
+<v Hrishi Dixit>Obviously, we need to establish the technical competencies that we have, our own coding challenges and our screening process to just gauge the tech skills and tech chops.
+
+315
+00:22:40.960 --> 00:22:43.940
+<v Hrishi Dixit>But beyond that, what we look for is like, hey, what do you do outside?
+
+316
+00:22:44.140 --> 00:22:51.320
+<v Hrishi Dixit>What are some of the most interesting things, products, systems that you build, that you've used, that you wish you had built?
+
+317
+00:22:51.640 --> 00:22:54.440
+<v Hrishi Dixit>Let's pick one of those and tell me what you like about it.
+
+318
+00:22:54.500 --> 00:22:57.180
+<v Hrishi Dixit>Tell me what you don't like about it and how would you rebuild it?
+
+319
+00:22:57.180 --> 00:23:07.980
+<v Hrishi Dixit>So kind of like tapping into that creative side of the team members and seeing what they can bring to the table beyond just the raw ability to design and code systems.
+
+320
+00:23:08.740 --> 00:23:10.780
+<v Hrishi Dixit>And it's worked out really well.
+
+321
+00:23:11.020 --> 00:23:20.840
+<v Hrishi Dixit>You know, if I look back on what I'm most proud of in terms of what I've built, certainly here at Yieldstreet and I would argue the same thing with LearnVest.
+
+322
+00:23:21.320 --> 00:23:25.340
+<v Hrishi Dixit>The platform is great. It's very forward looking. It's very scalable and all that.
+
+323
+00:23:27.180 --> 00:23:31.580
+<v Hrishi Dixit>really the team that we built here. They're the ones who move the company forward.
+
+324
+00:23:32.580 --> 00:23:38.460
+<v Noah Labhart>So let's talk about scalability then a little bit. Was this built to scale efficiently from
+
+325
+00:23:38.460 --> 00:23:41.200
+<v Noah Labhart>the beginning or is this something you're kind of fighting as you grow?
+
+326
+00:23:41.480 --> 00:23:42.040
+<v Hrishi Dixit>Of
+
+327
+00:23:42.040 --> 00:23:48.140
+<v Hrishi Dixit>course, we had microservices from day one and everything was just perfectly flowing between
+
+328
+00:23:48.140 --> 00:23:55.600
+<v Hrishi Dixit>different... I'm just kidding. Listen, I sort of benefited from some hindsight of mistakes that I
+
+329
+00:23:57.180 --> 00:23:59.920
+<v Hrishi Dixit>certainly at LearnVest days from a scalability standpoint.
+
+330
+00:24:00.060 --> 00:24:02.760
+<v Hrishi Dixit>So I was able to avoid a bunch of those,
+
+331
+00:24:03.420 --> 00:24:06.160
+<v Hrishi Dixit>just kind of bring those learnings from failures,
+
+332
+00:24:06.260 --> 00:24:08.220
+<v Hrishi Dixit>which are obviously the best teachers ever.
+
+333
+00:24:08.700 --> 00:24:11.020
+<v Hrishi Dixit>So was it built to be scalable from day one?
+
+334
+00:24:11.120 --> 00:24:13.980
+<v Hrishi Dixit>I wouldn't say that because I, honestly,
+
+335
+00:24:14.160 --> 00:24:18.180
+<v Hrishi Dixit>anyone who says that is probably embellishing the truth a little bit.
+
+336
+00:24:18.560 --> 00:24:21.580
+<v Hrishi Dixit>That said, there are certain touch points,
+
+337
+00:24:21.620 --> 00:24:26.400
+<v Hrishi Dixit>some invariants that will guarantee lack of scalability, right?
+
+338
+00:24:27.180 --> 00:24:33.540
+<v Hrishi Dixit>sure to avoid those to the extent possible. So if you think about scale, so there's two different
+
+339
+00:24:33.540 --> 00:24:38.140
+<v Hrishi Dixit>levels, actually three different levels of scale, but let's talk about the two main ones. One is
+
+340
+00:24:38.140 --> 00:24:44.800
+<v Hrishi Dixit>just the platform scale itself. Can it handle an ever increasing traffic? Is it built to go from
+
+341
+00:24:44.800 --> 00:24:49.760
+<v Hrishi Dixit>like a hundred investment requests coming in per second to a hundred thousand investment requests
+
+342
+00:24:49.760 --> 00:24:55.820
+<v Hrishi Dixit>coming in per second? Was it built to do that on day one? No, it wasn't. Did we know how to evolve
+
+343
+00:24:57.180 --> 00:25:10.260
+<v Hrishi Dixit>Yes. So we left some trail markers in the early builds of the software to kind of like make sure that, hey, if you get to this point, make sure that this thing gets split out into a separate service that is asynchronous.
+
+344
+00:25:10.680 --> 00:25:17.180
+<v Hrishi Dixit>So there are certain principles that we stood by, starting with the choice of the framework that we use.
+
+345
+00:25:17.280 --> 00:25:25.180
+<v Hrishi Dixit>So the platform is largely a Java and Scala platform on the core side and the data side is Python.
+
+346
+00:25:27.180 --> 00:25:30.660
+<v Hrishi Dixit>that some of the known bottlenecks to scale,
+
+347
+00:25:30.880 --> 00:25:33.460
+<v Hrishi Dixit>relational databases, blocking calls,
+
+348
+00:25:33.640 --> 00:25:37.560
+<v Hrishi Dixit>synchronous calls, were avoided as much as possible
+
+349
+00:25:37.560 --> 00:25:40.440
+<v Hrishi Dixit>and only resorted to when there was no other alternative.
+
+350
+00:25:40.740 --> 00:25:43.220
+<v Hrishi Dixit>Like, you know, okay, well, if you're logging in,
+
+351
+00:25:43.340 --> 00:25:45.240
+<v Hrishi Dixit>that call probably needs to be synchronous
+
+352
+00:25:45.240 --> 00:25:47.700
+<v Hrishi Dixit>just to know whether to let the user in or not.
+
+353
+00:25:48.240 --> 00:25:51.160
+<v Hrishi Dixit>Does anything else anywhere in the overall platform
+
+354
+00:25:51.160 --> 00:25:52.340
+<v Hrishi Dixit>need to be synchronous?
+
+355
+00:25:52.660 --> 00:25:53.720
+<v Hrishi Dixit>Most likely not.
+
+356
+00:25:53.720 --> 00:25:58.700
+<v Hrishi Dixit>So we put in a message broker from early days.
+
+357
+00:25:59.000 --> 00:26:02.880
+<v Hrishi Dixit>We built in asynchronous processing from the very beginning.
+
+358
+00:26:03.140 --> 00:26:07.620
+<v Hrishi Dixit>The way we did it evolved over time because, you know, aside from everything else,
+
+359
+00:26:07.760 --> 00:26:11.320
+<v Hrishi Dixit>new technology became available that wasn't available when we started building it.
+
+360
+00:26:11.640 --> 00:26:18.720
+<v Hrishi Dixit>But we put in the markers in the early builds to make sure it was built to eventually,
+
+361
+00:26:18.860 --> 00:26:21.760
+<v Hrishi Dixit>it could be evolved to a more scalable platform.
+
+362
+00:26:23.720 --> 00:26:38.180
+<v Hrishi Dixit>Yes and no. Some parts of it were, some parts we had to redo. But overall, I think we made some good choices early on from a framework and architecture standpoint that have benefited us today.
+
+363
+00:26:38.180 --> 00:26:48.040
+<v Hrishi Dixit>Others, we had to go through a bit of a rebuild, maybe about a year and a half ago, where we took this almost paradigm shift in the architecture itself.
+
+364
+00:26:48.360 --> 00:26:58.020
+<v Hrishi Dixit>Like we moved from having a more traditional kind of CRUD MVC sort of architecture to a more event-sourced reactive architecture.
+
+365
+00:26:58.420 --> 00:27:05.560
+<v Hrishi Dixit>We shifted the focus of the relational database away from being the source of truth to being a snapshot in time.
+
+366
+00:27:05.560 --> 00:27:11.120
+<v Hrishi Dixit>where, and the source of truth is now our event journal. So it's kind of like this, this very
+
+367
+00:27:11.120 --> 00:27:16.840
+<v Hrishi Dixit>beautiful concept, which frankly I was not fully exposed to. And then this, this kind of, it's an
+
+368
+00:27:16.840 --> 00:27:22.160
+<v Hrishi Dixit>interesting tie back to the team. Some of the more senior architects in our team actually did a bunch
+
+369
+00:27:22.160 --> 00:27:27.560
+<v Hrishi Dixit>of research, uh, and read up a bunch of interesting articles and said, hey, here's this framework that
+
+370
+00:27:27.560 --> 00:27:33.280
+<v Hrishi Dixit>is built on top of our existing framework that forces us to build things, you know, in an event
+
+371
+00:27:33.280 --> 00:27:34.240
+<v Hrishi Dixit>sourced reactively.
+
+372
+00:27:34.600 --> 00:27:35.640
+<v Hrishi Dixit>Let's switch to that
+
+373
+00:27:35.640 --> 00:27:37.840
+<v Hrishi Dixit>as we start rebuilding pieces of our platform.
+
+374
+00:27:38.440 --> 00:27:40.300
+<v Hrishi Dixit>We borrowed the time almost
+
+375
+00:27:40.300 --> 00:27:42.180
+<v Hrishi Dixit>from the product gods
+
+376
+00:27:42.180 --> 00:27:43.840
+<v Hrishi Dixit>and said, hey, give us a little time
+
+377
+00:27:43.840 --> 00:27:45.980
+<v Hrishi Dixit>to do a little bit of refactoring around here
+
+378
+00:27:45.980 --> 00:27:47.360
+<v Hrishi Dixit>so we can actually move
+
+379
+00:27:47.360 --> 00:27:48.700
+<v Hrishi Dixit>to this new paradigm of building.
+
+380
+00:27:48.880 --> 00:27:49.940
+<v Hrishi Dixit>And that will give us
+
+381
+00:27:49.940 --> 00:27:51.720
+<v Hrishi Dixit>the right kind of scalability,
+
+382
+00:27:52.000 --> 00:27:53.600
+<v Hrishi Dixit>which primarily translates
+
+383
+00:27:53.600 --> 00:27:55.760
+<v Hrishi Dixit>to being able to scale purely with hardware.
+
+384
+00:27:56.240 --> 00:27:57.640
+<v Hrishi Dixit>Software, if you cannot,
+
+385
+00:27:57.720 --> 00:27:59.960
+<v Hrishi Dixit>if your software is not scalable,
+
+386
+00:28:00.180 --> 00:28:02.500
+<v Hrishi Dixit>it doesn't matter how much you burn
+
+387
+00:28:03.280 --> 00:28:07.180
+<v Hrishi Dixit>monthly AWS costs, you're going to crash, which we did in 2017,
+
+388
+00:28:07.400 --> 00:28:11.580
+<v Hrishi Dixit>which was kind of like our inflection point for re-examining our platform
+
+389
+00:28:11.580 --> 00:28:13.900
+<v Hrishi Dixit>architecture and starting to make those structural changes.
+
+390
+00:28:14.320 --> 00:28:16.840
+<v Hrishi Dixit>And then the other kind of scale is just human scale.
+
+391
+00:28:16.960 --> 00:28:21.800
+<v Hrishi Dixit>Like we offloaded the building of back office software automation to a
+
+392
+00:28:21.800 --> 00:28:23.480
+<v Hrishi Dixit>later point of time and time.
+
+393
+00:28:23.780 --> 00:28:25.780
+<v Hrishi Dixit>Now we have tens of thousands of investors.
+
+394
+00:28:26.740 --> 00:28:29.800
+<v Hrishi Dixit>Obviously, we're not going to be able like, you know, we are at a
+
+395
+00:28:29.800 --> 00:28:36.800
+<v Hrishi Dixit>point where unless the back office systems are largely automated, if not fully automated,
+
+396
+00:28:37.060 --> 00:28:40.680
+<v Hrishi Dixit>we're not going to be able to handle that scale. So we actually started building out all of that
+
+397
+00:28:40.680 --> 00:28:45.740
+<v Hrishi Dixit>automation three years ago. And now we are able to scale. We were able to scale to our current
+
+398
+00:28:45.740 --> 00:28:50.820
+<v Hrishi Dixit>level and we'll be able to beyond this without having to scale our back office operations team
+
+399
+00:28:50.820 --> 00:28:55.440
+<v Hrishi Dixit>to, like, hundreds of thousands of people. We have two people in our investment operations group that
+
+400
+00:28:55.440 --> 00:29:00.160
+<v Hrishi Dixit>handle, you know, tens of thousands of investors and who knows how many millions of dollars in flow and
+
+401
+00:29:00.160 --> 00:29:06.720
+<v Hrishi Dixit>fund flows in, in all kinds of directions. So those were the things that we put in both from an
+
+402
+00:29:06.720 --> 00:29:12.160
+<v Hrishi Dixit>architecture standpoint as well as a product roadmap standpoint. So it's like, hey, when we hit
+
+403
+00:29:12.160 --> 00:29:15.980
+<v Hrishi Dixit>this inflection point, we should double down and start building out the automation, back office
+
+404
+00:29:15.980 --> 00:29:20.940
+<v Hrishi Dixit>automation for this, so we can handle the, the operational scale of the platform, not just the
+
+405
+00:29:20.940 --> 00:29:22.380
+<v Hrishi Dixit>the architectural scale itself.
+
+406
+00:29:24.400 --> 00:29:27.020
+<v Noah Labhart>So as you step out on the balcony,
+
+407
+00:29:27.200 --> 00:29:29.120
+<v Noah Labhart>you look across all that you've built,
+
+408
+00:29:29.180 --> 00:29:30.320
+<v Noah Labhart>what are you most proud of?
+
+409
+00:29:30.720 --> 00:29:31.220
+<v Hrishi Dixit>It's
+
+410
+00:29:31.200 --> 00:29:31.700
+<v Hrishi Dixit>my team.
+
+411
+00:29:31.900 --> 00:29:33.840
+<v Hrishi Dixit>You know, it's, I mean,
+
+412
+00:29:33.880 --> 00:29:36.480
+<v Hrishi Dixit>I really do like the state of the platform,
+
+413
+00:29:36.640 --> 00:29:37.660
+<v Hrishi Dixit>the way it is today.
+
+414
+00:29:37.760 --> 00:29:39.680
+<v Hrishi Dixit>It's a nice symphony of microservices
+
+415
+00:29:39.680 --> 00:29:41.500
+<v Hrishi Dixit>talking over Kafka and all of that,
+
+416
+00:29:41.520 --> 00:29:42.060
+<v Hrishi Dixit>which is great,
+
+417
+00:29:42.260 --> 00:29:44.860
+<v Hrishi Dixit>but it's all credit to the team that we've built here.
+
+418
+00:29:45.360 --> 00:29:49.220
+<v Hrishi Dixit>That's the one thing that I'll be more proud of
+
+419
+00:29:49.220 --> 00:29:50.200
+<v Hrishi Dixit>than anything else.
+
+420
+00:29:50.940 --> 00:30:04.580
+<v Hrishi Dixit>Because we are nothing without this team and not just their technical abilities, but their raw passion and desire to build the best platform there is.
+
+421
+00:30:04.800 --> 00:30:06.540
+<v Hrishi Dixit>You know, it all stems from there.
+
+422
+00:30:06.700 --> 00:30:14.800
+<v Hrishi Dixit>So I like to say that, like, you know, I've achieved, I'm close to achieving my goal of making myself largely redundant.
+
+423
+00:30:14.800 --> 00:30:38.720
+<v Hrishi Dixit>And if I can get to that point, I know I've done something right. Because now the team that's assembled is equally invested and equally excited about doing the build and evolving the platform. I don't need to drive them. They're self-driving. And I'm learning from them. I'm a much better engineer today because of the team that I've built. And I'm not even coding anymore.
+
+424
+00:30:39.820 --> 00:30:46.120
+<v Noah Labhart>Well, let's flip the script a little bit. Tell me about a mistake you made and how you and your team responded to it.
+
+425
+00:30:46.360 --> 00:30:57.920
+<v Hrishi Dixit>Well, we did use an OR mapping framework in the early days. And that's a little geek specific answer. It was actually true. It was a mistake that I made in the MVP.
+
+426
+00:30:57.920 --> 00:31:03.880
+<v Hrishi Dixit>despite having told myself to not do that because that's something that bit us in LearnVest days as well.
+
+427
+00:31:04.760 --> 00:31:14.740
+<v Hrishi Dixit>I think a key mistake that I would say that I wish I had addressed earlier is less about the technology and more on the team again.
+
+428
+00:31:15.420 --> 00:31:19.500
+<v Hrishi Dixit>As good as a team is, you're always going to have some misfits in the team, right?
+
+429
+00:31:19.620 --> 00:31:26.500
+<v Hrishi Dixit>You know, for various reasons, sometimes a competency gap, sometimes it's just not good team players.
+
+430
+00:31:27.920 --> 00:31:34.640
+<v Hrishi Dixit>a small number of those and I would say the mistake on my part was not addressing that
+
+431
+00:31:34.640 --> 00:31:40.020
+<v Hrishi Dixit>situation as promptly as I should have because you know it causes a general viscous drag on the
+
+432
+00:31:40.020 --> 00:31:46.460
+<v Hrishi Dixit>entire team like you know even if even a single underperformer or not so much a team player will
+
+433
+00:31:46.460 --> 00:31:51.500
+<v Hrishi Dixit>cause a drag on the team and that's that's kind of like that's like the biggest mistake I would
+
+434
+00:31:51.500 --> 00:31:55.960
+<v Hrishi Dixit>say from a Yieldstreet standpoint. In past lives I made much bigger technical mistakes, and but like
+
+435
+00:31:57.920 --> 00:32:01.200
+<v Hrishi Dixit>I was able to bring those learnings into Yieldstreet.
+
+436
+00:32:01.300 --> 00:32:07.200
+<v Hrishi Dixit>So thankfully, not too many big mistakes on the pure technical front so far.
+
+437
+00:32:07.320 --> 00:32:08.740
+<v Hrishi Dixit>Well, there's still time to make them.
+
+438
+00:32:09.700 --> 00:32:13.620
+<v Noah Labhart>So what does the future look like for the product and for your team?
+
+439
+00:32:14.160 --> 00:32:18.420
+<v Hrishi Dixit>We have our work cut out for us in many ways,
+
+440
+00:32:18.500 --> 00:32:21.100
+<v Hrishi Dixit>from a pure product and platform build-out standpoint.
+
+441
+00:32:21.280 --> 00:32:26.400
+<v Hrishi Dixit>So we started off the company with a mission and a vision
+
+442
+00:32:27.920 --> 00:32:29.780
+<v Hrishi Dixit>opportunities to a much broader audience.
+
+443
+00:32:30.020 --> 00:32:32.760
+<v Hrishi Dixit>Now, we barely scratched the surface of that right now.
+
+444
+00:32:32.820 --> 00:32:37.580
+<v Hrishi Dixit>Like I said, we primarily serve accredited investors, but we certainly do not want to stop there.
+
+445
+00:32:37.720 --> 00:32:43.720
+<v Hrishi Dixit>We want to expand it to an increasing investor base beyond just accredited investors.
+
+446
+00:32:44.180 --> 00:32:49.960
+<v Hrishi Dixit>So if you look at the financial typical financial life today in America, the point of time where you start
+
+447
+00:32:49.960 --> 00:32:56.500
+<v Hrishi Dixit>getting enough or you accumulate enough investable capital to invest in these kinds of offerings has been like,
+
+448
+00:32:57.920 --> 00:33:02.280
+<v Hrishi Dixit>Street or companies like Yieldstreet came around, it would be like, you know, in the 60s, like, you know,
+
+449
+00:33:02.320 --> 00:33:07.160
+<v Hrishi Dixit>when, you know, you're almost, you're close to retirement almost. The mission has always been
+
+450
+00:33:07.160 --> 00:33:14.300
+<v Hrishi Dixit>to pull that time in a person's age lower and make these available at an increasingly younger age,
+
+451
+00:33:14.440 --> 00:33:20.600
+<v Hrishi Dixit>so you can start growing wealth much sooner. And now how we achieve that is by expanding the suite
+
+452
+00:33:20.600 --> 00:33:26.880
+<v Hrishi Dixit>of our products beyond what we started off with. So that is an ongoing mission. And as we speak,
+
+453
+00:33:27.920 --> 00:33:33.620
+<v Hrishi Dixit>four or five which I'm not at liberty to talk about in too much detail but we are constantly
+
+454
+00:33:33.620 --> 00:33:39.440
+<v Hrishi Dixit>looking to expand the space of products from a point of view of what audience we want to serve
+
+455
+00:33:39.440 --> 00:33:44.680
+<v Hrishi Dixit>with those, what kind of diversification do we want to offer to our audience, like what kind of risk
+
+456
+00:33:44.680 --> 00:33:49.740
+<v Hrishi Dixit>aversion do we want to, do we want, what ranges of risk aversion do we want to provide across our
+
+457
+00:33:49.740 --> 00:33:54.480
+<v Hrishi Dixit>suite of products. So that's, that's kind of an ongoing thing, newer and newer products, new kind
+
+458
+00:33:54.480 --> 00:34:00.780
+<v Hrishi Dixit>of asset classes. Once we start building out these different kinds of products, the next thing to do
+
+459
+00:34:00.780 --> 00:34:04.880
+<v Hrishi Dixit>is start connecting the dots between those products, which so we kind of start segueing
+
+460
+00:34:04.880 --> 00:34:10.120
+<v Hrishi Dixit>into things like advisory financial planning or making it more automated and self-driving where
+
+461
+00:34:10.640 --> 00:34:15.440
+<v Hrishi Dixit>investors wouldn't necessarily have to make their own choices of whether we want to invest in this
+
+462
+00:34:15.440 --> 00:34:19.800
+<v Hrishi Dixit>art offering, that marine offering, but really more from a goal standpoint, like, you know, what,
+
+463
+00:34:19.800 --> 00:34:21.100
+<v Hrishi Dixit>What are you looking for?
+
+464
+00:34:21.180 --> 00:34:23.140
+<v Hrishi Dixit>Short-term income, long-term retirement,
+
+465
+00:34:23.360 --> 00:34:25.480
+<v Hrishi Dixit>and then coming up with, you know,
+
+466
+00:34:25.480 --> 00:34:26.760
+<v Hrishi Dixit>the kind of stuff that you see today
+
+467
+00:34:26.760 --> 00:34:27.720
+<v Hrishi Dixit>with things like Betterment,
+
+468
+00:34:27.800 --> 00:34:29.020
+<v Hrishi Dixit>like really bringing it
+
+469
+00:34:29.020 --> 00:34:30.360
+<v Hrishi Dixit>to the alternative investment space.
+
+470
+00:34:30.640 --> 00:34:32.140
+<v Hrishi Dixit>And from a team standpoint,
+
+471
+00:34:32.280 --> 00:34:35.500
+<v Hrishi Dixit>and of course we want to go beyond
+
+472
+00:34:35.500 --> 00:34:37.360
+<v Hrishi Dixit>serving just US-based investors,
+
+473
+00:34:37.980 --> 00:34:39.780
+<v Hrishi Dixit>but there's also the other parties
+
+474
+00:34:39.780 --> 00:34:41.240
+<v Hrishi Dixit>that the platform serves,
+
+475
+00:34:41.400 --> 00:34:42.080
+<v Hrishi Dixit>the originators,
+
+476
+00:34:42.140 --> 00:34:44.220
+<v Hrishi Dixit>our own internal stakeholders.
+
+477
+00:34:44.520 --> 00:34:45.660
+<v Hrishi Dixit>Like we build software
+
+478
+00:34:45.660 --> 00:34:47.260
+<v Hrishi Dixit>for not just our investors,
+
+479
+00:34:47.380 --> 00:34:49.300
+<v Hrishi Dixit>but also our investment operations group,
+
+480
+00:34:49.800 --> 00:34:50.640
+<v Hrishi Dixit>investor relations group.
+
+481
+00:34:51.040 --> 00:34:53.100
+<v Hrishi Dixit>There's a ton of homegrown software
+
+482
+00:34:53.100 --> 00:34:55.760
+<v Hrishi Dixit>that we built to serve our internal audiences.
+
+483
+00:34:55.980 --> 00:35:00.440
+<v Hrishi Dixit>And so we continue building on those increasingly automating
+
+484
+00:35:00.440 --> 00:35:04.500
+<v Hrishi Dixit>their life so that they're able to better serve our investors.
+
+485
+00:35:04.920 --> 00:35:08.760
+<v Hrishi Dixit>And all of this kind of translates into a scaling team
+
+486
+00:35:08.760 --> 00:35:11.480
+<v Hrishi Dixit>on the product and tech side, where we today
+
+487
+00:35:11.480 --> 00:35:12.760
+<v Hrishi Dixit>have a fairly lean team.
+
+488
+00:35:12.880 --> 00:35:15.200
+<v Hrishi Dixit>As our stakeholder space continues to grow,
+
+489
+00:35:15.780 --> 00:35:17.460
+<v Hrishi Dixit>we will need to build more and more software,
+
+490
+00:35:17.460 --> 00:35:21.980
+<v Hrishi Dixit>and we need to build teams that are kind of purpose-built for specific audiences.
+
+491
+00:35:22.360 --> 00:35:27.740
+<v Hrishi Dixit>There is a lot more build left and a lot more audiences and users to serve.
+
+492
+00:35:27.900 --> 00:35:32.140
+<v Hrishi Dixit>So I think we'll be fairly busy for the next three to four, even five years.
+
+493
+00:35:33.300 --> 00:35:34.580
+<v Noah Labhart>Let's switch to you, Hrishi.
+
+494
+00:35:34.700 --> 00:35:36.900
+<v Noah Labhart>Who influences the way that you work?
+
+495
+00:35:37.040 --> 00:35:40.680
+<v Noah Labhart>You know, a CEO, a CTO, architect, really any person.
+
+496
+00:35:40.800 --> 00:35:42.680
+<v Noah Labhart>Name a person you look up to and why.
+
+497
+00:35:42.680 --> 00:35:43.540
+<v Hrishi Dixit>Why really
+
+498
+00:35:43.540 --> 00:35:52.260
+<v Hrishi Dixit>the set of people that I'm the most awed by are really the creators of this tech world that we know and live in.
+
+499
+00:35:52.360 --> 00:35:56.760
+<v Hrishi Dixit>Like, you know, these are like unassuming geniuses that we really stand on their shoulders.
+
+500
+00:35:56.820 --> 00:36:00.160
+<v Hrishi Dixit>Like Brian Kernighan and Dennis Ritchie and Ken Thompson and Cerf.
+
+501
+00:36:00.560 --> 00:36:03.580
+<v Hrishi Dixit>They built the foundation. We would be nothing without them.
+
+502
+00:36:03.660 --> 00:36:10.380
+<v Hrishi Dixit>Like I was just recently hearing this podcast with Brian Kernighan, which frankly, I didn't even know he was still alive.
+
+503
+00:36:10.380 --> 00:36:13.160
+<v Hrishi Dixit>but it was fascinating to hear from him,
+
+504
+00:36:13.200 --> 00:36:16.740
+<v Hrishi Dixit>like the early story of how Unix was created.
+
+505
+00:36:16.980 --> 00:36:18.900
+<v Hrishi Dixit>And he just kind of like said it like,
+
+506
+00:36:18.900 --> 00:36:20.940
+<v Hrishi Dixit>yeah, he just made a cup of coffee.
+
+507
+00:36:21.100 --> 00:36:23.500
+<v Hrishi Dixit>You know, it's like so humble and unassuming
+
+508
+00:36:23.500 --> 00:36:24.940
+<v Hrishi Dixit>and like nothing would be possible
+
+509
+00:36:24.940 --> 00:36:28.080
+<v Hrishi Dixit>without the kind of work that these guys did
+
+510
+00:36:28.080 --> 00:36:29.460
+<v Hrishi Dixit>in the 60s and the 70s.
+
+511
+00:36:29.500 --> 00:36:31.660
+<v Hrishi Dixit>How it influences the way I work,
+
+512
+00:36:31.820 --> 00:36:35.740
+<v Hrishi Dixit>I mean, I certainly would be way, way too presumptuous
+
+513
+00:36:35.740 --> 00:36:37.780
+<v Hrishi Dixit>for me to kind of like draw any kind of line
+
+514
+00:36:37.780 --> 00:36:39.620
+<v Hrishi Dixit>between me and these giants,
+
+515
+00:36:40.380 --> 00:36:43.240
+<v Hrishi Dixit>But it really, it boils down to a simple thing.
+
+516
+00:36:43.340 --> 00:36:46.000
+<v Hrishi Dixit>You got to really, really passionately love what you do.
+
+517
+00:36:46.320 --> 00:36:50.420
+<v Hrishi Dixit>Everything else just kind of like naturally falls into place if you have that.
+
+518
+00:36:51.100 --> 00:36:52.740
+<v Hrishi Dixit>I don't even know what to say beyond that.
+
+519
+00:36:52.800 --> 00:36:58.160
+<v Hrishi Dixit>But like, you know, it's really like these are my almost heroes, you know.
+
+520
+00:37:00.080 --> 00:37:04.820
+<v Noah Labhart>So if you could go back to the beginning, what would you consider doing differently?
+
+521
+00:37:04.900 --> 00:37:07.200
+<v Noah Labhart>Or where would you consider taking a different approach?
+
+522
+00:37:08.080 --> 00:37:09.440
+<v Hrishi Dixit>I've thought about this a lot.
+
+523
+00:37:10.380 --> 00:37:23.340
+<v Hrishi Dixit>There is this paper, now it's kind of become a classic, but it was published in 2015, and it's called Immutability Changes Everything, which is a nice catchy, almost like clickbaity title.
+
+524
+00:37:23.540 --> 00:37:24.920
+<v Hrishi Dixit>But it's a brilliant paper.
+
+525
+00:37:25.140 --> 00:37:31.620
+<v Hrishi Dixit>What it talks about is really the shift in architectural paradigm that we introduced in the Yieldstreet platform not too long ago.
+
+526
+00:37:31.620 --> 00:37:43.040
+<v Hrishi Dixit>If I were to dial back to 2015 and start building this platform again, I would build it in this event-sourced, reactive way of building systems.
+
+527
+00:37:43.480 --> 00:37:45.180
+<v Hrishi Dixit>Like I was weaned on this, right?
+
+528
+00:37:45.300 --> 00:37:54.160
+<v Hrishi Dixit>You know, it's like I built software, I built web-based systems in the late 90s and early 2000s when all of this, these were the theoretical concepts.
+
+529
+00:37:54.500 --> 00:38:00.180
+<v Hrishi Dixit>No one had actually commoditized them to the point where we could start building real systems with those, or at least I wasn't aware of them.
+
+530
+00:38:01.620 --> 00:38:07.040
+<v Hrishi Dixit>I would love to rebuild the platform from the ground up to the way it's evolved right now,
+
+531
+00:38:07.140 --> 00:38:13.580
+<v Hrishi Dixit>where kind of like almost divorce the idea of your database, relational database being your source of truth.
+
+532
+00:38:13.880 --> 00:38:17.580
+<v Hrishi Dixit>If you'd said this to me five years ago, even it's like, what are you talking about?
+
+533
+00:38:17.660 --> 00:38:19.340
+<v Hrishi Dixit>Like, you know, what else can be the source of truth?
+
+534
+00:38:19.440 --> 00:38:23.520
+<v Hrishi Dixit>But if you think about it from if you think about systems from a real world perspective,
+
+535
+00:38:23.780 --> 00:38:29.720
+<v Hrishi Dixit>the immutable, unshakable truth is the time series of things that have happened.
+
+536
+00:38:31.620 --> 00:38:37.400
+<v Hrishi Dixit>change history, right? These events happen. The way things appear at any given point of time
+
+537
+00:38:37.400 --> 00:38:41.640
+<v Hrishi Dixit>are the consequence of a series of things that have happened to make it that way,
+
+538
+00:38:42.760 --> 00:38:48.360
+<v Hrishi Dixit>right? So if you think of a relational database, which is a snapshot in time of a state of a
+
+539
+00:38:48.360 --> 00:38:54.220
+<v Hrishi Dixit>system, and it's almost like counterintuitive now for me to think of that as the source of truth,
+
+540
+00:38:54.300 --> 00:38:58.660
+<v Hrishi Dixit>and in fact, the source of truth is not that. It's the series, the sequence of events that
+
+541
+00:38:58.660 --> 00:39:01.740
+<v Hrishi Dixit>that has led up to the database being in whatever state it is in.
+
+542
+00:39:02.080 --> 00:39:06.240
+<v Hrishi Dixit>So that sequence of events that log your time series of events
+
+543
+00:39:06.690 --> 00:39:10.760
+<v Hrishi Dixit>is your source of truth, and it has to be, and it is immutable.
+
+544
+00:39:11.000 --> 00:39:14.100
+<v Hrishi Dixit>And if you make that your source of truth, any snapshots in time
+
+545
+00:39:14.100 --> 00:39:16.700
+<v Hrishi Dixit>can be reconstituted, can be recomposed simply
+
+546
+00:39:16.700 --> 00:39:18.200
+<v Hrishi Dixit>by replaying a sequence of events.
+
+547
+00:39:18.500 --> 00:39:21.420
+<v Hrishi Dixit>So theoretically, I can blow away my entire database today
+
+548
+00:39:21.420 --> 00:39:23.440
+<v Hrishi Dixit>and replay the sequence of events from Kafka
+
+549
+00:39:23.890 --> 00:39:27.820
+<v Hrishi Dixit>and get it back to exactly the state it was in before it was blown away.
+
+550
+00:39:28.660 --> 00:39:33.780
+<v Hrishi Dixit>kind of like a new way of thinking about systems. It has the added benefit of actually, A, having
+
+551
+00:39:33.780 --> 00:39:39.220
+<v Hrishi Dixit>enough commoditized software that makes this possible with highly opinionated microservice
+
+552
+00:39:39.220 --> 00:39:47.020
+<v Hrishi Dixit>frameworks like Lagom and having a truly, truly industrial grade message broker like Kafka,
+
+553
+00:39:47.200 --> 00:39:50.900
+<v Hrishi Dixit>which is a lot more than a message broker, actually. It's possible to do that. And these
+
+554
+00:39:50.900 --> 00:39:56.060
+<v Hrishi Dixit>bits, the concept, these frameworks, these existed in 2015. I was simply unaware of them at that time.
+
+555
+00:39:56.060 --> 00:40:07.820
+<v Hrishi Dixit>So that's one thing I would redo because we are realizing the benefits of that architecture today, both from a point of view of scalability, observability, recovery from issues or failures.
+
+556
+00:40:08.100 --> 00:40:09.960
+<v Hrishi Dixit>And it's just a beautiful thing to see.
+
+557
+00:40:10.120 --> 00:40:12.400
+<v Hrishi Dixit>I wish I could do that right from the get go.
+
+558
+00:40:13.620 --> 00:40:18.400
+<v Noah Labhart>You're getting on a plane and you're sitting next to a young entrepreneur who's built the next big thing.
+
+559
+00:40:18.520 --> 00:40:21.360
+<v Noah Labhart>They're jazzed about it. They can't wait to show it off to the world.
+
+560
+00:40:21.420 --> 00:40:23.700
+<v Noah Labhart>They can't wait to show it off to you right there in the plane.
+
+561
+00:40:23.700 --> 00:40:28.440
+<v Noah Labhart>what advice do you give that person having gone down this road a bit you
+
+562
+00:40:28.440 --> 00:40:30.480
+<v Hrishi Dixit>know it seems a tad
+
+563
+00:40:30.480 --> 00:40:36.200
+<v Hrishi Dixit>presumptuous for me to give entrepreneurial advice to someone having not personally been
+
+564
+00:40:36.200 --> 00:40:40.920
+<v Hrishi Dixit>an entrepreneur but i have been in founding teams and i'll i'll give it a shot from that perspective
+
+565
+00:40:41.500 --> 00:40:48.420
+<v Hrishi Dixit>um there's two things really one is whatever it is that you're building you've got to want it like
+
+566
+00:40:48.420 --> 00:40:54.920
+<v Hrishi Dixit>wanted bad. Like this had the passion for building comes in many ways in large part from wanting to
+
+567
+00:40:54.920 --> 00:41:00.560
+<v Hrishi Dixit>use the product that you are building because it doesn't exist and you wish you had it. And this
+
+568
+00:41:00.560 --> 00:41:04.900
+<v Hrishi Dixit>is kind of like a slightly different way of saying love what you're doing but it's really about you
+
+569
+00:41:04.900 --> 00:41:10.300
+<v Hrishi Dixit>have to be your product's first user. It's not always possible if you're building an enterprise
+
+570
+00:41:10.300 --> 00:41:14.920
+<v Hrishi Dixit>product but I've mostly been in consumer facing products so that's kind of my perspective a little
+
+571
+00:41:14.920 --> 00:41:20.420
+<v Hrishi Dixit>bit if you feel that oh my god i wish i had this i wish i like i feel that way about LearnVest i feel
+
+572
+00:41:20.420 --> 00:41:27.280
+<v Hrishi Dixit>that way about Yieldstreet. I wish I had Yieldstreet in 20 2008 when my IRAs dropped. Let's say
+
+573
+00:41:27.280 --> 00:41:33.820
+<v Hrishi Dixit>that's a baseline that's table stakes right be very picky with your starting team you are not
+
+574
+00:41:33.820 --> 00:41:40.700
+<v Hrishi Dixit>going to have all the skills needed to build business and that's okay that's actually the way
+
+575
+00:41:40.700 --> 00:41:46.700
+<v Hrishi Dixit>it should be. You know your strengths, but also you know your gaps. And based on the product that
+
+576
+00:41:46.700 --> 00:41:54.100
+<v Hrishi Dixit>you're building, find true stars almost to fill in the gaps that you yourself have that you need
+
+577
+00:41:54.100 --> 00:41:59.220
+<v Hrishi Dixit>to fill to build their product. To give you an example, like, you know, if you're building an
+
+578
+00:41:59.220 --> 00:42:03.400
+<v Hrishi Dixit>API player, right, and you're not a technical person, but you realize the benefit of having
+
+579
+00:42:03.400 --> 00:42:10.260
+<v Hrishi Dixit>an API, the first person you probably want to hire in your founding team is a seasoned architect
+
+580
+00:42:10.700 --> 00:42:12.400
+<v Hrishi Dixit>or who can be a founding CTO.
+
+581
+00:42:12.620 --> 00:42:14.540
+<v Hrishi Dixit>You probably don't need a CMO right off the,
+
+582
+00:42:14.640 --> 00:42:16.420
+<v Hrishi Dixit>right in the starting team, but you know,
+
+583
+00:42:16.440 --> 00:42:20.060
+<v Hrishi Dixit>you definitely need that CTO who's built a SaaS product
+
+584
+00:42:20.060 --> 00:42:21.400
+<v Hrishi Dixit>or an API product before.
+
+585
+00:42:21.880 --> 00:42:22.900
+<v Hrishi Dixit>It's a lean team.
+
+586
+00:42:23.060 --> 00:42:25.020
+<v Hrishi Dixit>You're gonna have a short window of time
+
+587
+00:42:25.020 --> 00:42:28.380
+<v Hrishi Dixit>to demonstrate something to your audience,
+
+588
+00:42:28.480 --> 00:42:29.480
+<v Hrishi Dixit>to the capital markets, everything.
+
+589
+00:42:29.900 --> 00:42:32.820
+<v Hrishi Dixit>So be very, very choosy about your starting team.
+
+590
+00:42:32.980 --> 00:42:35.920
+<v Hrishi Dixit>And if you have a certain pool of money to spend,
+
+591
+00:42:35.920 --> 00:42:54.020
+<v Hrishi Dixit>And rather spend that on a really lean team of superstars who can help you realize your vision rather than just like, you know, getting a large team of engineers or designers that will build like, you know, something that will look good, but really they're not invested or passionate about what it is that you're trying to do.
+
+592
+00:42:54.420 --> 00:42:56.640
+<v Hrishi Dixit>Those are really like your starting team is everything.
+
+593
+00:42:56.900 --> 00:42:59.440
+<v Hrishi Dixit>You can make or break your enterprise.
+
+594
+00:43:00.060 --> 00:43:01.260
+<v Noah Labhart>That's fantastic advice.
+
+595
+00:43:01.860 --> 00:43:04.140
+<v Noah Labhart>Well, Hrishi, thank you for being on the show today.
+
+596
+00:43:05.920 --> 00:43:08.300
+<v Noah Labhart>story of Yieldstreet. Thank
+
+597
+00:43:08.300 --> 00:43:11.460
+<v Hrishi Dixit>you. This has been a really wonderful experience and I
+
+598
+00:43:11.460 --> 00:43:12.760
+<v Hrishi Dixit>really enjoyed chatting with you.
+
+599
+00:43:13.460 --> 00:43:16.580
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+600
+00:43:18.400 --> 00:43:24.620
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts, Spotify,
+
+601
+00:43:24.800 --> 00:43:31.240
+<v Noah Labhart>or the podcasting app of your choice. Support the show on patreon.com slash Code Story for just five
+
+602
+00:43:31.240 --> 00:43:36.600
+<v Noah Labhart>to 10 bucks a month. And when you get a chance, leave us a review. Both things help us out
+
+603
+00:43:36.600 --> 00:43:41.200
+<v Noah Labhart>tremendously. And thanks again for listening.

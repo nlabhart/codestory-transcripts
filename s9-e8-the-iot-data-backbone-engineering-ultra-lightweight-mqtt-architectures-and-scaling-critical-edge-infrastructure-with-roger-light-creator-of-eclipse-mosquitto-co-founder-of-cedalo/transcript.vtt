@@ -1,0 +1,1119 @@
+WEBVTT
+
+NOTE S9 E8: The IoT Data Backbone: Engineering Ultra-Lightweight MQTT Architectures and Scaling Critical Edge Infrastructure with Roger Light, Creator of Eclipse Mosquitto & Co-Founder of Cedalo
+
+1
+00:00:00.900 --> 00:00:07.580
+<v Roger Light>I went to a small unconference where one of the inventors of MQTT was giving a presentation
+
+2
+00:00:07.580 --> 00:00:14.700
+<v Roger Light>on MQTT and how he was using it. It was only possible because of this proprietary IBM server
+
+3
+00:00:14.700 --> 00:00:18.820
+<v Roger Light>that he had. And so someone in the audience said, this is great, it's the only option
+
+4
+00:00:18.820 --> 00:00:24.280
+<v Roger Light>to use this proprietary thing. And he said, yes, that is the case, but it's freely available
+
+5
+00:00:24.280 --> 00:00:29.100
+<v Roger Light>so you can use it. The specification's out there. So if anybody wants to implement an
+
+6
+00:00:30.000 --> 00:00:32.000
+<v Roger Light>and then they can go ahead and do that.
+
+7
+00:00:32.120 --> 00:00:34.400
+<v Roger Light>And I thought, okay, I'm looking for a project.
+
+8
+00:00:34.620 --> 00:00:37.400
+<v Roger Light>That seems like it might take a couple of months, maybe.
+
+9
+00:00:37.640 --> 00:00:39.480
+<v Roger Light>Here we are, 14 years later.
+
+10
+00:00:40.300 --> 00:00:43.660
+<v Roger Light>I'm Roger Light, co-founder and senior developer at Cedalo.
+
+11
+00:00:46.600 --> 00:00:48.300
+<v Clip>This is Code Story,
+
+12
+00:00:48.940 --> 00:00:52.220
+<v Noah Labhart>a podcast bringing you interviews with tech visionaries.
+
+13
+00:00:52.340 --> 00:00:53.680
+<v Clip>Six months moonlighting.
+
+14
+00:00:53.760 --> 00:00:55.200
+<v Clip>There's nothing like the bedcams.
+
+15
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+16
+00:00:58.320 --> 00:00:59.640
+<v Clip>I don't exactly know what to do.
+
+17
+00:01:00.000 --> 00:01:02.520
+<v Clip>Who built
+
+18
+00:01:02.520 --> 00:01:04.560
+<v Noah Labhart>the teams that have their back.
+
+19
+00:01:08.680 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+20
+00:01:14.860 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+21
+00:01:20.500 --> 00:01:25.860
+<v Noah Labhart>To ride the ups and downs of the startup life.
+
+22
+00:01:26.940 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+23
+00:01:29.060 --> 00:01:29.680
+<v Clip>All this and more.
+
+24
+00:01:30.000 --> 00:01:36.940
+<v Noah Labhart>on Code Story. I'm your host, Noah Labhart, and today, how Roger Light is building the
+
+25
+00:01:36.940 --> 00:01:42.340
+<v Noah Labhart>platform to empower everyone to work with data in real time.
+
+26
+00:01:48.360 --> 00:01:53.500
+<v Noah Labhart>Roger Light lives in the Midlands of the UK. He has a PhD in electrical engineering,
+
+27
+00:01:53.640 --> 00:01:59.200
+<v Noah Labhart>and post-graduating, he did research, then taught. But in parallel, he worked on hobby
+
+28
+00:02:00.000 --> 00:02:01.380
+<v Noah Labhart>eventually led him to a new venture.
+
+29
+00:02:01.920 --> 00:02:05.160
+<v Noah Labhart>Outside of tech, he's married with four young boys and a dog,
+
+30
+00:02:05.280 --> 00:02:07.620
+<v Noah Labhart>so he mentioned things get a little loud and crazy at home.
+
+31
+00:02:07.960 --> 00:02:10.640
+<v Noah Labhart>He loves spicy food, but has been enjoying the visit
+
+32
+00:02:10.640 --> 00:02:11.880
+<v Noah Labhart>to the local carvery lately.
+
+33
+00:02:13.960 --> 00:02:18.320
+<v Noah Labhart>In 2009, Roger attended a conference on IoT MQTT
+
+34
+00:02:18.320 --> 00:02:21.040
+<v Noah Labhart>and how it was being used to track electricity monitoring.
+
+35
+00:02:21.480 --> 00:02:24.060
+<v Noah Labhart>What he realized was that an open source version
+
+36
+00:02:24.060 --> 00:02:26.900
+<v Noah Labhart>of management software for this didn't exist.
+
+37
+00:02:27.540 --> 00:02:32.400
+<v Noah Labhart>He happened to be looking for a project at the time and thought, this should only take a couple of months.
+
+38
+00:02:34.620 --> 00:02:37.140
+<v Noah Labhart>This is the creation story of Cedalo.
+
+39
+00:02:41.680 --> 00:02:46.260
+<v Roger Light>The story of Mosquitto starts somewhat before Cedalo.
+
+40
+00:02:46.580 --> 00:02:51.500
+<v Roger Light>So Mosquitto MQTT Broker is one of the two products that we have.
+
+41
+00:02:51.640 --> 00:02:55.780
+<v Roger Light>The other one being StreamSheets, which is a no-code platform.
+
+42
+00:02:56.900 --> 00:03:01.980
+<v Roger Light>for dealing with MQTT and other inputs and outputs in a sort of spreadsheet interface.
+
+43
+00:03:02.800 --> 00:03:10.660
+<v Roger Light>Back in 2009, I went to a small unconference where one of the inventors of MQTT was giving
+
+44
+00:03:10.660 --> 00:03:16.720
+<v Roger Light>a presentation on essentially on MQTT and how he was using it. And at the time, all of that stuff
+
+45
+00:03:16.720 --> 00:03:20.700
+<v Roger Light>was particularly the electricity monitoring. There was lots of people interested in that sort of
+
+46
+00:03:20.700 --> 00:03:25.360
+<v Roger Light>thing, but there wasn't really anything out there that you could do that with. It was all going
+
+47
+00:03:26.900 --> 00:03:32.240
+<v Roger Light>nobody had heard of at that point. It was only possible because of this
+
+48
+00:03:32.240 --> 00:03:37.660
+<v Roger Light>proprietary IBM server that he had. So someone in the audience said this is
+
+49
+00:03:37.660 --> 00:03:41.340
+<v Roger Light>great, this is an open source conference, is the only option to use this
+
+50
+00:03:41.340 --> 00:03:46.520
+<v Roger Light>proprietary thing? And he said yes that is the case but it's freely available so
+
+51
+00:03:46.520 --> 00:03:50.520
+<v Roger Light>you can use it. The specifications are out there so if anybody wants to implement
+
+52
+00:03:50.520 --> 00:03:55.440
+<v Roger Light>an open source version then they can go ahead and do that. I thought okay I'm
+
+53
+00:03:56.900 --> 00:04:01.480
+<v Roger Light>That seems like it might take a couple of months maybe and then I'll be done with it.
+
+54
+00:04:02.600 --> 00:04:07.440
+<v Roger Light>Here we are 14 years later still working on that on the same project.
+
+55
+00:04:08.280 --> 00:04:12.260
+<v Roger Light>That part of it started, it got noticed by people.
+
+56
+00:04:12.500 --> 00:04:17.000
+<v Roger Light>One of the things that I was quite amazed with at the time and I guess I still am actually
+
+57
+00:04:17.000 --> 00:04:20.120
+<v Roger Light>is that companies started using it quite soon.
+
+58
+00:04:20.760 --> 00:04:26.440
+<v Roger Light>There was an electricity company in Iceland picked it up and started using that in their
+
+59
+00:04:26.440 --> 00:04:27.820
+<v Roger Light>product which was fantastic.
+
+60
+00:04:28.000 --> 00:04:31.760
+<v Roger Light>When this person started emailing me saying we're using this, we've found this problem,
+
+61
+00:04:31.820 --> 00:04:32.580
+<v Roger Light>can you help us out?
+
+62
+00:04:32.760 --> 00:04:34.020
+<v Roger Light>And we're great.
+
+63
+00:04:34.160 --> 00:04:36.040
+<v Roger Light>It's actually starting to see some traction.
+
+64
+00:04:37.240 --> 00:04:43.860
+<v Roger Light>Five years ago now I got contacted by one of the original people that started Cedalo
+
+65
+00:04:43.860 --> 00:04:49.140
+<v Roger Light>to say was I interested in coming along and helping build the company and developing Mosquitto
+
+66
+00:04:50.120 --> 00:04:54.680
+<v Roger Light>So the StreamSheets product that they were working on at that time uses Mosquitto.
+
+67
+00:04:54.760 --> 00:05:00.940
+<v Roger Light>So they wanted some extra control of that and to be able to further accelerate the development, basically.
+
+68
+00:05:01.500 --> 00:05:07.220
+<v Roger Light>And also, as I've said, that's turned into the main focus of the company.
+
+69
+00:05:09.980 --> 00:05:14.760
+<v Noah Labhart>So tell me about the MVP, so that first version of the product you built.
+
+70
+00:05:14.800 --> 00:05:18.920
+<v Noah Labhart>How long did it take to build and what sort of tools were you using to bring it to life?
+
+71
+00:05:20.120 --> 00:05:22.600
+<v Noah Labhart>is going to be a big part of it, but give me the story there.
+
+72
+00:05:23.760 --> 00:05:25.800
+<v Roger Light>I guess every developer does this.
+
+73
+00:05:25.880 --> 00:05:28.240
+<v Roger Light>You look back at the code that you wrote
+
+74
+00:05:28.760 --> 00:05:31.500
+<v Roger Light>and think just how astonishingly naive it is.
+
+75
+00:05:32.580 --> 00:05:36.260
+<v Roger Light>A couple of months I had essentially a client implementation,
+
+76
+00:05:36.680 --> 00:05:37.680
+<v Roger Light>client library implementation,
+
+77
+00:05:38.360 --> 00:05:41.400
+<v Roger Light>and a broker that could all communicate with itself,
+
+78
+00:05:41.700 --> 00:05:42.980
+<v Roger Light>with each other, I should say.
+
+79
+00:05:43.220 --> 00:05:46.280
+<v Roger Light>And since then, minimal feature sets,
+
+80
+00:05:46.280 --> 00:05:50.240
+<v Roger Light>but the basics of the MQTT communication all working
+
+81
+00:05:50.240 --> 00:05:52.840
+<v Roger Light>and then adding the extra functionality
+
+82
+00:05:52.840 --> 00:05:54.920
+<v Roger Light>that actually makes it useful.
+
+83
+00:05:55.620 --> 00:05:56.860
+<v Roger Light>So a couple of months for that.
+
+84
+00:05:56.900 --> 00:05:57.800
+<v Roger Light>What tools did I use?
+
+85
+00:05:57.980 --> 00:05:58.960
+<v Roger Light>It's written in C.
+
+86
+00:05:59.240 --> 00:06:00.760
+<v Roger Light>I guess I'm a bit old-fashioned.
+
+87
+00:06:00.940 --> 00:06:03.780
+<v Roger Light>I like using Vim for my editor and I can't buy it.
+
+88
+00:06:04.420 --> 00:06:08.880
+<v Roger Light>Very much basics rather than using full Visual Studio IDE
+
+89
+00:06:08.880 --> 00:06:10.120
+<v Roger Light>or something like that,
+
+90
+00:06:10.160 --> 00:06:11.620
+<v Roger Light>doing the development on Linux primarily.
+
+91
+00:06:12.400 --> 00:06:13.520
+<v Roger Light>That's the way I like it.
+
+92
+00:06:13.520 --> 00:06:14.020
+<v Roger Light>it.
+
+93
+00:06:14.800 --> 00:06:18.540
+<v Noah Labhart>Let's stay on the MVP for a minute. You got to make certain decisions and trade-offs when
+
+94
+00:06:18.540 --> 00:06:23.840
+<v Noah Labhart>you're building that first version of the product. Could be, you know, approach the technology you're
+
+95
+00:06:23.840 --> 00:06:28.580
+<v Noah Labhart>using. And I hear some of that, you know, keeping it basic and how you built it and the tools you're
+
+96
+00:06:28.580 --> 00:06:33.500
+<v Noah Labhart>using to build it. I'm curious about any sort of tough decisions and trade-offs you had to make
+
+97
+00:06:33.500 --> 00:06:36.400
+<v Noah Labhart>during that MVP process and how you cope with those decisions.
+
+98
+00:06:37.620 --> 00:06:41.160
+<v Roger Light>I came at this problem from the
+
+99
+00:06:41.160 --> 00:06:48.120
+<v Roger Light>the point of view of making a replacement for the small proprietary IBM implementation,
+
+100
+00:06:48.440 --> 00:06:55.040
+<v Roger Light>which was available. So a lot of the design decisions in the initial instance were driven
+
+101
+00:06:55.040 --> 00:07:02.240
+<v Roger Light>by wanting to replicate that. So the most obvious choice there being the very unstructured
+
+102
+00:07:02.240 --> 00:07:08.560
+<v Roger Light>config file format that it was using, which Mosquitto now still uses. That's something
+
+103
+00:07:08.560 --> 00:07:14.160
+<v Roger Light>that is, as I say, a bit of a regret because there are much better ways to
+
+104
+00:07:14.160 --> 00:07:20.900
+<v Roger Light>have done things. So having the model of an application already there in place to
+
+105
+00:07:20.900 --> 00:07:25.420
+<v Roger Light>build on gives you definite advantages because you can see the kind of features
+
+106
+00:07:25.420 --> 00:07:29.600
+<v Roger Light>that you might want to implement and you can focus on ones that you think are
+
+107
+00:07:29.600 --> 00:07:33.900
+<v Roger Light>more important. Leave the other ones till later but this idea of this unstructured
+
+108
+00:07:33.900 --> 00:07:37.580
+<v Roger Light>config file has definitely been a decision which was an easy short-term
+
+109
+00:07:38.560 --> 00:07:45.060
+<v Roger Light>something there to copy, but has been a bit of a long-term headache. In terms of coping with that
+
+110
+00:07:45.060 --> 00:07:54.060
+<v Roger Light>decision as a project, we have tried to get documentation as clear as possible. And at some
+
+111
+00:07:54.060 --> 00:07:59.020
+<v Roger Light>point, you've got to deal with that. I hope to change to a better config file format in the future.
+
+112
+00:08:00.140 --> 00:08:05.700
+<v Noah Labhart>So then you got the MVP, it's working. From that point, you start progressing and maturing the
+
+113
+00:08:05.700 --> 00:08:10.060
+<v Noah Labhart>the product tell me about that process and what I'm curious about is how you built your roadmap
+
+114
+00:08:10.060 --> 00:08:14.540
+<v Noah Labhart>and how you went about deciding okay this is the next most important thing to build or to
+
+115
+00:08:14.540 --> 00:08:15.880
+<v Noah Labhart>address with Cedalo.
+
+116
+00:08:16.620 --> 00:08:20.720
+<v Roger Light>So I think that's the good way of looking at it when we talk about it from
+
+117
+00:08:20.720 --> 00:08:27.360
+<v Roger Light>the Cedalo point of view. Prior to that there was not necessarily that much planning in terms of the
+
+118
+00:08:27.360 --> 00:08:33.440
+<v Roger Light>roadmap. It was a hobby project essentially something would be this is interesting or maybe
+
+119
+00:08:33.440 --> 00:08:38.860
+<v Roger Light>this is beneficial but no not necessarily as much direction as as you might hope for
+
+120
+00:08:39.670 --> 00:08:44.000
+<v Roger Light>When I started at Cedalo, we decided what the plan was going to be there.
+
+121
+00:08:44.720 --> 00:08:53.380
+<v Roger Light>The aim was really to improve the MQTT support, so get better coverage of the specs that are out
+
+122
+00:08:53.380 --> 00:08:58.260
+<v Roger Light>there, because they've been the new version 5 specification came out, which wasn't supported.
+
+123
+00:08:58.260 --> 00:09:08.040
+<v Roger Light>So that was a big focus, get that support properly into place and then to start to bring more user-friendly features in.
+
+124
+00:09:08.120 --> 00:09:17.300
+<v Roger Light>So really trying to make it a more pleasant experience for people to use, make it so that it's just easier to use, easier to manage more particularly.
+
+125
+00:09:17.300 --> 00:09:25.060
+<v Roger Light>So from the point of view of being able to make changes on the fly in terms of the authentication,
+
+126
+00:09:25.280 --> 00:09:32.100
+<v Roger Light>authorization and having a bit of a bigger picture of what that looks like and how to make that
+
+127
+00:09:32.100 --> 00:09:38.760
+<v Roger Light>nicer to use really. Since then we've been trying to put together features which are, I guess,
+
+128
+00:09:38.780 --> 00:09:44.280
+<v Roger Light>for the paid customers which are interesting for paid customers. So we're interested more on the
+
+129
+00:09:44.280 --> 00:09:50.300
+<v Roger Light>the enterprise side of things, monitoring, high availability. I've really tried to nail that
+
+130
+00:09:50.300 --> 00:09:57.360
+<v Roger Light>stability and reliability kind of things. That sort of, as I say, real enterprise-driven
+
+131
+00:09:57.360 --> 00:10:04.160
+<v Roger Light>side of things where it's not quite as interesting to the home market, but nevertheless is really
+
+132
+00:10:04.160 --> 00:10:04.780
+<v Roger Light>very important.
+
+133
+00:10:06.700 --> 00:10:13.020
+<v Noah Labhart>So I'm curious about team, Roger, and this will be interesting because I think,
+
+134
+00:10:14.280 --> 00:10:17.020
+<v Noah Labhart>Well, I won't make assumptions, but tell me about how you built your team.
+
+135
+00:10:17.100 --> 00:10:20.780
+<v Noah Labhart>And what do you look for in those people to indicate that they're the winning horses to join you?
+
+136
+00:10:22.000 --> 00:10:25.660
+<v Roger Light>I guess I'm a little bit of a different case to most of your guests,
+
+137
+00:10:25.740 --> 00:10:34.200
+<v Roger Light>because I've joined Cedalo as a co-founder rather than being either the founder or one of a couple of co-founders.
+
+138
+00:10:34.700 --> 00:10:41.920
+<v Roger Light>So there are a group of us, and I've really been very much focused on the development side of things
+
+139
+00:10:41.920 --> 00:10:48.320
+<v Roger Light>rather than on developing the company as an entity itself and developing the team.
+
+140
+00:10:48.480 --> 00:10:52.960
+<v Roger Light>Having said that, we have been growing, so we have been recruiting,
+
+141
+00:10:53.080 --> 00:11:01.320
+<v Roger Light>and generally our process has been to ensure that when we're recruiting onto a team,
+
+142
+00:11:01.640 --> 00:11:06.960
+<v Roger Light>we want to make sure that there's a good fit for everybody,
+
+143
+00:11:06.960 --> 00:11:12.920
+<v Roger Light>everybody, so we'll have technical interviews but also have a fit interview as possible
+
+144
+00:11:12.920 --> 00:11:17.580
+<v Roger Light>to ensure that people can get on and are going to be able to work well together.
+
+145
+00:11:17.840 --> 00:11:20.760
+<v Roger Light>I think that's worked quite well for us.
+
+146
+00:11:21.120 --> 00:11:26.460
+<v Roger Light>We have a few different teams, a couple of development teams and marketing sales, all
+
+147
+00:11:26.460 --> 00:11:27.820
+<v Roger Light>that kind of thing that you'd expect.
+
+148
+00:11:28.580 --> 00:11:34.760
+<v Roger Light>Either we've been very lucky and everybody's nice and productive or we've just got really
+
+149
+00:11:34.760 --> 00:11:36.180
+<v Roger Light>good processes to make sure that happens.
+
+150
+00:11:38.660 --> 00:11:41.220
+<v Noah Labhart>So let's talk about scalability.
+
+151
+00:11:41.520 --> 00:11:42.880
+<v Noah Labhart>This will be super interesting.
+
+152
+00:11:43.020 --> 00:11:48.200
+<v Noah Labhart>Was this built to scale efficiently from day one or with scale in mind, right?
+
+153
+00:11:48.300 --> 00:11:53.140
+<v Noah Labhart>Or have you been fighting this as you grow and gain traction in any sort of capacity?
+
+154
+00:11:54.940 --> 00:12:02.840
+<v Roger Light>I guess the answer there is that it's not really been built with the scale in mind in the first instance.
+
+155
+00:12:02.840 --> 00:12:10.200
+<v Roger Light>as I've suggested this was this started off as a side project where that wasn't really going to be
+
+156
+00:12:10.200 --> 00:12:18.880
+<v Roger Light>a consideration but it turns out that the design decisions that I took as part of that
+
+157
+00:12:18.880 --> 00:12:26.860
+<v Roger Light>as part of that process have been pretty efficient in terms of performance if you
+
+158
+00:12:26.860 --> 00:12:31.340
+<v Roger Light>You compare to similar MQTT brokers that are out there.
+
+159
+00:12:31.440 --> 00:12:37.220
+<v Roger Light>We do pretty well, actually, when you're comparing single instances against one another.
+
+160
+00:12:37.900 --> 00:12:44.460
+<v Roger Light>If you talk about scaling horizontally, so going into cluster mode,
+
+161
+00:12:44.740 --> 00:12:49.820
+<v Roger Light>then that's something that we are currently working on, but it's not there at the moment.
+
+162
+00:12:50.640 --> 00:12:58.060
+<v Roger Light>I've done benchmarks in the past and Mosquitto running on a single core compared to competitors
+
+163
+00:12:58.060 --> 00:13:06.240
+<v Roger Light>that are then running on six, seven, eight cores, and Mosquitto's outperforming it, outperforming them. We
+
+164
+00:13:06.240 --> 00:13:10.320
+<v Roger Light>don't have that scale in quite the same way but nevertheless what you're getting with the
+
+165
+00:13:10.320 --> 00:13:16.100
+<v Roger Light>performance of the broker is still outperforming other instances it's one of those things that
+
+166
+00:13:16.100 --> 00:13:24.240
+<v Roger Light>But for many of our customers, most of our customers, the kind of performance that we can offer is more than adequate.
+
+167
+00:13:24.540 --> 00:13:31.440
+<v Roger Light>It's one of those things that's really interesting, actually, when you talk to a customer as to what their expectations are in terms of performance.
+
+168
+00:13:31.520 --> 00:13:36.360
+<v Roger Light>Some people will come along and be saying, we've incredibly fast message rate we've got.
+
+169
+00:13:36.460 --> 00:13:43.680
+<v Roger Light>And it turns out in their industry that a thousand messages a second is like absolutely blistering.
+
+170
+00:13:43.680 --> 00:13:48.480
+<v Roger Light>And at that point then, you say, okay, fine, this is no problem, we can do that without breaking any
+
+171
+00:13:48.480 --> 00:13:53.180
+<v Roger Light>kind of sweat. We could do that on a Raspberry Pi. We're not going to, but we could do it on a
+
+172
+00:13:53.180 --> 00:14:00.220
+<v Roger Light>Raspberry Pi and it'd be fine. So as I say, we've got the plans for the cluster. We are have also got
+
+173
+00:14:00.220 --> 00:14:06.560
+<v Roger Light>plans for scaling to multi-thread, and at that point then we should absolutely knock everybody
+
+174
+00:14:06.560 --> 00:14:07.740
+<v Roger Light>else out of the water, I think.
+
+175
+00:14:07.740 --> 00:14:13.460
+<v Noah Labhart>so as you step out on the balcony and you look across all that you've
+
+176
+00:14:13.680 --> 00:14:14.720
+<v Noah Labhart>What are you most proud of?
+
+177
+00:14:15.720 --> 00:14:22.880
+<v Roger Light>I am astounded every day by how widespread Mosquitto use is.
+
+178
+00:14:23.160 --> 00:14:27.600
+<v Roger Light>As an open source project, there's so much interest out there.
+
+179
+00:14:27.780 --> 00:14:33.300
+<v Roger Light>And I've been to some trade shows and you talk to other companies there
+
+180
+00:14:33.300 --> 00:14:36.400
+<v Roger Light>and they let slip that they're using Mosquitto.
+
+181
+00:14:36.500 --> 00:14:37.940
+<v Roger Light>And OK, that's nice.
+
+182
+00:14:38.720 --> 00:14:43.360
+<v Roger Light>When you find out things that's being used in just really cool places,
+
+183
+00:14:43.680 --> 00:14:47.860
+<v Roger Light>It's just such a nice feeling to say, actually, that's the thing that I built.
+
+184
+00:14:48.000 --> 00:14:53.960
+<v Roger Light>So some of the signalling on the UK Rail network is running off Mosquitto, which is just awesome.
+
+185
+00:14:54.340 --> 00:14:57.600
+<v Roger Light>There's so many other things that people have told me that I can't remember.
+
+186
+00:14:57.640 --> 00:14:59.020
+<v Roger Light>There's so many cool things.
+
+187
+00:14:59.800 --> 00:15:07.620
+<v Roger Light>And then this is really trivial in some ways, but it made me so happy that I was away on a weekend with some friends.
+
+188
+00:15:07.700 --> 00:15:13.020
+<v Roger Light>And there's a group of people I play some sport with and some of them I don't know as well.
+
+189
+00:15:13.680 --> 00:15:20.960
+<v Roger Light>I was chatting to one of those guys, and he was mentioning how he was building some project or other, some electronic project.
+
+190
+00:15:21.280 --> 00:15:24.740
+<v Roger Light>And he got some sensors, and he was using this thing called Mosquitto.
+
+191
+00:15:25.440 --> 00:15:29.060
+<v Roger Light>And I was like, oh yeah, that's my project. I wrote that.
+
+192
+00:15:29.180 --> 00:15:31.540
+<v Roger Light>And he thought that was the most amazing thing ever.
+
+193
+00:15:31.720 --> 00:15:37.800
+<v Roger Light>And that kind of personal interaction that you can get unexpectedly someone's using your project is just so awesome.
+
+194
+00:15:37.940 --> 00:15:38.880
+<v Roger Light>Absolutely love that.
+
+195
+00:15:40.960 --> 00:15:42.440
+<v Noah Labhart>Let's flip the script a little bit.
+
+196
+00:15:43.680 --> 00:15:46.200
+<v Noah Labhart>you made and how you and your team responded to it.
+
+197
+00:15:47.100 --> 00:15:53.120
+<v Roger Light>So I've been thinking about this and already mentioned the big mistake of the design mistakes.
+
+198
+00:15:54.080 --> 00:15:59.440
+<v Roger Light>And in terms of Cedalo, I can't think that there's a particular big mistake that we've
+
+199
+00:15:59.440 --> 00:16:00.040
+<v Roger Light>made yet.
+
+200
+00:16:00.880 --> 00:16:05.560
+<v Roger Light>It must be coming around the corner at some point, but we've done okay so far.
+
+201
+00:16:06.620 --> 00:16:08.440
+<v Roger Light>Yeah, it's a bit of a tricky one to answer.
+
+202
+00:16:10.100 --> 00:16:11.240
+<v Noah Labhart>Okay, well, this will be fun.
+
+203
+00:16:11.240 --> 00:16:15.800
+<v Noah Labhart>Tell me what the future looks like for the product and for your team.
+
+204
+00:16:16.980 --> 00:16:17.480
+<v Roger Light>Busy.
+
+205
+00:16:18.060 --> 00:16:21.960
+<v Roger Light>I think that's something that is true.
+
+206
+00:16:22.220 --> 00:16:24.220
+<v Roger Light>We've got more and more customers coming through.
+
+207
+00:16:24.640 --> 00:16:29.480
+<v Roger Light>And if it's not every customer, it's certainly quite a few customers say,
+
+208
+00:16:30.120 --> 00:16:32.520
+<v Roger Light>oh, it'd be nice if we could do X, Y, Z.
+
+209
+00:16:32.720 --> 00:16:33.960
+<v Roger Light>Can we have that as well?
+
+210
+00:16:34.220 --> 00:16:37.560
+<v Roger Light>And maybe we have a bit of a chat about it internally and say,
+
+211
+00:16:38.080 --> 00:16:39.520
+<v Roger Light>actually, that would be a really useful feature.
+
+212
+00:16:39.600 --> 00:16:40.600
+<v Roger Light>We should definitely do that.
+
+213
+00:16:41.240 --> 00:16:44.700
+<v Roger Light>And so then it gets added to the list and we have our own plans, as I've said,
+
+214
+00:16:45.220 --> 00:16:48.300
+<v Roger Light>like the high performance kind of things, which is a quite a big topic.
+
+215
+00:16:48.360 --> 00:16:52.340
+<v Roger Light>So we want to focus on that, but it'll take quite a bit of time to get right.
+
+216
+00:16:53.240 --> 00:16:55.460
+<v Roger Light>And you've got these little interesting things that come along.
+
+217
+00:16:55.540 --> 00:16:58.080
+<v Roger Light>That was quite fun. I'd quite like to do that.
+
+218
+00:16:58.540 --> 00:17:03.300
+<v Roger Light>Can we almost just take a couple of days of time just to go and do that one, please?
+
+219
+00:17:03.400 --> 00:17:04.520
+<v Roger Light>Because that'd be quite good fun.
+
+220
+00:17:05.120 --> 00:17:08.520
+<v Roger Light>So, yeah, I mean, there's just so many things we want to do.
+
+221
+00:17:08.640 --> 00:17:10.680
+<v Roger Light>The high performance is a key thing.
+
+222
+00:17:11.240 --> 00:17:12.840
+<v Roger Light>that we want to work on.
+
+223
+00:17:13.220 --> 00:17:15.240
+<v Roger Light>Extending the idea that I already mentioned
+
+224
+00:17:15.240 --> 00:17:16.980
+<v Roger Light>of making things easier to use.
+
+225
+00:17:17.180 --> 00:17:19.300
+<v Roger Light>So adding in better controllability,
+
+226
+00:17:19.800 --> 00:17:23.440
+<v Roger Light>adding in more integrations to other platforms
+
+227
+00:17:23.440 --> 00:17:26.660
+<v Roger Light>so that you can get your data from the broker
+
+228
+00:17:26.660 --> 00:17:28.460
+<v Roger Light>to MongoDB, Kafka.
+
+229
+00:17:28.700 --> 00:17:30.420
+<v Roger Light>Those are things we've already got,
+
+230
+00:17:30.520 --> 00:17:31.720
+<v Roger Light>but that sort of thing.
+
+231
+00:17:32.120 --> 00:17:33.740
+<v Roger Light>The list is endless, really,
+
+232
+00:17:33.900 --> 00:17:35.980
+<v Roger Light>about what we could be working on.
+
+233
+00:17:37.140 --> 00:17:38.680
+<v Noah Labhart>Okay, let's switch to you, Roger.
+
+234
+00:17:38.780 --> 00:17:40.460
+<v Noah Labhart>Who influences the way that you work?
+
+235
+00:17:41.240 --> 00:17:43.640
+<v Noah Labhart>or many persons or something you look up to and why?
+
+236
+00:17:44.920 --> 00:17:49.180
+<v Roger Light>You look around and there's loads of inspiring people.
+
+237
+00:17:49.340 --> 00:17:53.380
+<v Roger Light>A lot of people who have done really impressive work
+
+238
+00:17:53.380 --> 00:17:57.120
+<v Roger Light>and produced something just very impressive.
+
+239
+00:17:57.800 --> 00:18:01.980
+<v Roger Light>The one that I would call out is Nick O'Leary,
+
+240
+00:18:02.660 --> 00:18:04.660
+<v Roger Light>who used to work at IBM.
+
+241
+00:18:05.620 --> 00:18:09.260
+<v Roger Light>And in his work at IBM, he was working in the MQTT
+
+242
+00:18:11.240 --> 00:18:16.940
+<v Roger Light>technologies he was in, the lab there. One of the things that he developed almost on the side as
+
+243
+00:18:16.940 --> 00:18:25.060
+<v Roger Light>well was Node-RED, which is the incredibly popular no-code tool for MQTT and Internet of Things.
+
+244
+00:18:25.320 --> 00:18:32.060
+<v Roger Light>And he's managed to turn that from being this side project into an incredibly popular project.
+
+245
+00:18:32.700 --> 00:18:39.660
+<v Roger Light>They have a conference for it. They've got their company, used to be called Flowforge,
+
+246
+00:18:41.880 --> 00:18:50.940
+<v Roger Light>Yeah, so he turned it into a company, had apparently really good success, and he's just a thoroughly nice guy and does a lot of good work, it seems.
+
+247
+00:18:51.160 --> 00:18:52.580
+<v Roger Light>And I'd like to be that good.
+
+248
+00:18:53.260 --> 00:18:53.980
+<v Roger Light>It'd be quite nice.
+
+249
+00:18:56.020 --> 00:18:57.380
+<v Noah Labhart>Okay, we've got one more question, Roger.
+
+250
+00:18:57.560 --> 00:19:01.660
+<v Noah Labhart>So you're getting on a plane, and you're sitting next to a young entrepreneur who's built the next big thing.
+
+251
+00:19:02.200 --> 00:19:03.120
+<v Noah Labhart>They're jazzed about it.
+
+252
+00:19:03.160 --> 00:19:04.240
+<v Noah Labhart>They can't wait to show it off to the world.
+
+253
+00:19:04.260 --> 00:19:05.740
+<v Noah Labhart>They can't wait to show it off to you right there on the plane.
+
+254
+00:19:06.340 --> 00:19:09.020
+<v Noah Labhart>What advice do you give that person, having gone down this road a bit?
+
+255
+00:19:10.400 --> 00:19:17.080
+<v Roger Light>Maybe I could answer a slightly different question, because I think the person who is
+
+256
+00:19:17.080 --> 00:19:23.220
+<v Roger Light>a young entrepreneur who's built the next big thing is already thinking about how they're
+
+257
+00:19:23.220 --> 00:19:28.340
+<v Roger Light>going to take that thing that they've built and go do something with it. And I think there are
+
+258
+00:19:28.340 --> 00:19:34.700
+<v Roger Light>probably a lot more people that are in the situation that they have built or have the
+
+259
+00:19:34.700 --> 00:19:41.560
+<v Roger Light>idea for something that they want to build, but that aren't necessarily looking to be an
+
+260
+00:19:41.560 --> 00:19:48.840
+<v Roger Light>entrepreneur in the first case. And that's, that was the situation that I was in. And if I was able to
+
+261
+00:19:48.840 --> 00:19:55.540
+<v Roger Light>go back then and say, how could I do this differently, I might go back and say, okay, maybe I ought to take
+
+262
+00:19:55.540 --> 00:20:01.740
+<v Roger Light>this idea that I've got and maybe try and start some of that commercialization myself and maybe
+
+263
+00:20:01.740 --> 00:20:06.280
+<v Roger Light>try and develop that a little bit. I might be in a different situation now
+
+264
+00:20:06.280 --> 00:20:11.160
+<v Roger Light>and so I would say to that person, not necessarily the entrepreneur, but the
+
+265
+00:20:11.160 --> 00:20:14.100
+<v Roger Light>person sitting next to me on the plane who says, look at this cool thing that I've made,
+
+266
+00:20:14.520 --> 00:20:18.820
+<v Roger Light>I would say maybe do consider taking that and trying to do something with it.
+
+267
+00:20:18.880 --> 00:20:22.920
+<v Roger Light>It might be that if it is the next big thing but you're not necessarily
+
+268
+00:20:22.920 --> 00:20:27.320
+<v Roger Light>thinking about it as that, you want to try and take advantage of that while you
+
+269
+00:20:27.320 --> 00:20:33.200
+<v Roger Light>you can. And if you put that effort in, you may get a lot more back out.
+
+270
+00:20:33.580 --> 00:20:38.160
+<v Noah Labhart>That's fantastic advice. Well, Roger, thank you for being on the show today. Thank you
+
+271
+00:20:38.160 --> 00:20:40.040
+<v Noah Labhart>for telling the creation story of Cedalo.
+
+272
+00:20:40.220 --> 00:20:40.740
+<v Noah Labhart>Thank
+
+273
+00:20:40.740 --> 00:20:41.240
+<v Roger Light>you very much.
+
+274
+00:20:43.320 --> 00:20:46.160
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+275
+00:20:51.300 --> 00:20:56.900
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart. Be sure to subscribe on Apple Podcasts,
+
+276
+00:20:57.320 --> 00:20:59.280
+<v Noah Labhart>or the podcasting app of your choice.
+
+277
+00:20:59.940 --> 00:21:02.100
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+278
+00:21:02.460 --> 00:21:04.300
+<v Noah Labhart>Both things help us out tremendously.
+
+279
+00:21:07.300 --> 00:21:08.720
+<v Noah Labhart>And thanks again for listening.

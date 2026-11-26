@@ -1,0 +1,1791 @@
+WEBVTT
+
+NOTE S12 E1: The Blast Radius Nightmare: Shifting from Blind Static Terraform Plans to Real-Time Predictive Change Intelligence with Dylan Ratcliffe, Founder & CEO of Overmind
+
+1
+00:00:00.000 --> 00:00:15.420
+<v Dylan Ratcliffe>I'd thought that if we could discover every dependency in real time with no input from the user, because of course if you expect the user to tell you where to look, then you're not going to find the things that are going to cause the actual problems, then this would solve the problem.
+
+2
+00:00:15.560 --> 00:00:23.260
+<v Dylan Ratcliffe>And so we built a real-time discovery engine that could do exactly that. Find every dependency within your cloud environment and show it to you.
+
+3
+00:00:23.260 --> 00:00:31.940
+<v Dylan Ratcliffe>It took about six or eight months for the back end. I wrote it all in Go, not because I knew how
+
+4
+00:00:31.940 --> 00:00:37.140
+<v Dylan Ratcliffe>to write Go. I didn't. I had to learn how to write Go, but because I knew that I would be able to hire
+
+5
+00:00:37.140 --> 00:00:43.740
+<v Dylan Ratcliffe>infrastructure people who knew Go. My name is Dylan Ratcliffe, and I'm the founder and CEO of Overmind.
+
+6
+00:00:46.440 --> 00:00:52.160
+<v Noah Labhart>this is Code Story a podcast bringing you interviews with tech visionaries
+
+7
+00:00:53.260 --> 00:00:53.760
+<v Clip>Moonlighting.
+
+8
+00:00:53.720 --> 00:00:55.220
+<v Clip>There's nothing on the back end.
+
+9
+00:00:55.460 --> 00:00:58.080
+<v Noah Labhart>Who share what it takes to change an industry.
+
+10
+00:00:58.260 --> 00:00:59.840
+<v Clip>I don't exactly know what to do next.
+
+11
+00:00:59.840 --> 00:01:01.240
+<v Clip>Who took many goes to get right.
+
+12
+00:01:01.880 --> 00:01:04.460
+<v Noah Labhart>Who built the teams that have their back.
+
+13
+00:01:04.560 --> 00:01:06.120
+<v Clip>A company is its people.
+
+14
+00:01:06.120 --> 00:01:07.500
+<v Clip>The teams help each other achieve more.
+
+15
+00:01:07.500 --> 00:01:08.580
+<v Clip>Most proud of our team.
+
+16
+00:01:08.920 --> 00:01:11.160
+<v Noah Labhart>Keeping scalability top of mind.
+
+17
+00:01:11.460 --> 00:01:12.880
+<v Clip>All that infrastructure was a pain.
+
+18
+00:01:12.880 --> 00:01:14.260
+<v Clip>Yes, we've been fighting it as we grow.
+
+19
+00:01:14.460 --> 00:01:15.300
+<v Clip>Total waste of time.
+
+20
+00:01:15.540 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+21
+00:01:18.260 --> 00:01:20.020
+<v Clip>It's not an easy thing to achieve, mind you.
+
+22
+00:01:20.020 --> 00:01:22.100
+<v Clip>Took it off the shelf and dusted it off and tried it again.
+
+23
+00:01:23.260 --> 00:01:25.840
+<v Noah Labhart>The ups and downs of the startup life.
+
+24
+00:01:26.020 --> 00:01:27.560
+<v Clip>You need to really want it.
+
+25
+00:01:27.640 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+26
+00:01:29.060 --> 00:01:31.020
+<v Noah Labhart>All this and more on Code Story.
+
+27
+00:01:32.560 --> 00:01:33.980
+<v Noah Labhart>I'm your host, Noah Labhart.
+
+28
+00:01:34.320 --> 00:01:40.280
+<v Noah Labhart>And today, how Dylan Ratcliffe is simulating incidents so you don't have to, and you can
+
+29
+00:01:40.280 --> 00:01:42.760
+<v Noah Labhart>focus on deploying your infrastructure.
+
+30
+00:01:49.280 --> 00:01:53.900
+<v Noah Labhart>Dylan Ratcliffe lives in San Francisco for less than a year, but grew up on a farm in
+
+31
+00:01:53.900 --> 00:01:56.820
+<v Noah Labhart>the bush in Australia riding motorbikes and playing video games.
+
+32
+00:01:57.120 --> 00:02:01.580
+<v Noah Labhart>He fondly remembers the days whenever you could get a free version of Age of Empires
+
+33
+00:02:01.580 --> 00:02:02.400
+<v Noah Labhart>from a cereal box.
+
+34
+00:02:02.740 --> 00:02:06.740
+<v Noah Labhart>He was always into computers and earned a scholarship to head into Melbourne for university.
+
+35
+00:02:06.980 --> 00:02:11.660
+<v Noah Labhart>He left his first job as an auditor with KPMG to join a startup called Puppet.
+
+36
+00:02:12.760 --> 00:02:15.940
+<v Noah Labhart>Outside of tech, he still rides motorbikes and has a super small one now.
+
+37
+00:02:16.060 --> 00:02:17.120
+<v Noah Labhart>It's actually meant for kids.
+
+38
+00:02:17.360 --> 00:02:20.840
+<v Noah Labhart>He loves all food, but prefers Asian and Indian cuisine.
+
+39
+00:02:23.460 --> 00:02:27.860
+<v Noah Labhart>Dylan was deploying Puppet at a financial services company and was pushing to get a
+
+40
+00:02:27.860 --> 00:02:28.360
+<v Noah Labhart>win.
+
+41
+00:02:28.380 --> 00:02:33.660
+<v Noah Labhart>When a late Friday afternoon deployment went haywire, he decided to leave his company and
+
+42
+00:02:33.660 --> 00:02:38.320
+<v Noah Labhart>set out to build something to automatically discover dependencies on a network to prevent
+
+43
+00:02:38.320 --> 00:02:39.540
+<v Noah Labhart>deployment outages.
+
+44
+00:02:41.440 --> 00:02:43.980
+<v Noah Labhart>This is the creation story of Overmind.
+
+45
+00:02:43.980 --> 00:02:44.480
+<v Noah Labhart>remind.
+
+46
+00:02:47.980 --> 00:02:55.000
+<v Dylan Ratcliffe>As a company, our mission is to remove the dread that people feel when they have to press
+
+47
+00:02:55.000 --> 00:02:57.480
+<v Dylan Ratcliffe>the button to deploy to production.
+
+48
+00:02:57.740 --> 00:03:04.680
+<v Dylan Ratcliffe>We do that by simulating your infrastructure changes against your real-time actual production
+
+49
+00:03:04.680 --> 00:03:09.280
+<v Dylan Ratcliffe>infrastructure before you make those changes and therefore preventing
+
+50
+00:03:09.540 --> 00:03:15.820
+<v Dylan Ratcliffe>any outages before they happen. I started building it because I'd seen this dread before. I'd
+
+51
+00:03:15.820 --> 00:03:20.600
+<v Dylan Ratcliffe>experienced the dread before because very often when you're deploying, especially infrastructure
+
+52
+00:03:20.600 --> 00:03:26.720
+<v Dylan Ratcliffe>changes, which is what my background is and what we focus on, things can go wrong for reasons that
+
+53
+00:03:26.720 --> 00:03:32.980
+<v Dylan Ratcliffe>are entirely not your fault. And being afraid to press that deploy button, especially if you work
+
+54
+00:03:32.980 --> 00:03:37.420
+<v Dylan Ratcliffe>in a big company with big complex infrastructure, which is built by people who've since left,
+
+55
+00:03:37.420 --> 00:03:43.440
+<v Dylan Ratcliffe>left, being afraid to press that button is like a good survival instinct. The thing that actually
+
+56
+00:03:43.440 --> 00:03:50.260
+<v Dylan Ratcliffe>got me started in quitting my job was a particular incident with a printer. So I was working at a
+
+57
+00:03:50.260 --> 00:03:56.380
+<v Dylan Ratcliffe>financial services company in London, which will remain nameless. And we were deploying Puppet. We
+
+58
+00:03:56.380 --> 00:04:01.620
+<v Dylan Ratcliffe>had a week to do it. We'd done everything we needed to do. We wanted to get a big win in before the
+
+59
+00:04:01.620 --> 00:04:08.260
+<v Dylan Ratcliffe>end of the week. And so we had this change in the pipeline ready to go, which was instead of having
+
+60
+00:04:08.740 --> 00:04:14.040
+<v Dylan Ratcliffe>one password for all of their systems, which I realize is terrible, and that's why we're getting
+
+61
+00:04:14.040 --> 00:04:19.500
+<v Dylan Ratcliffe>rid of it. People would instead log in with their username and password. And so this is like a Linux
+
+62
+00:04:20.020 --> 00:04:24.860
+<v Dylan Ratcliffe>back-end server fleet, so you use SSSD to set all this up. And so this change would move from
+
+63
+00:04:24.860 --> 00:04:29.840
+<v Dylan Ratcliffe>there being one password, which was like written down in sticky notes around the office, to actually
+
+64
+00:04:31.620 --> 00:04:34.720
+<v Dylan Ratcliffe>So when they quit the company, we could delete them and all kinds of stuff.
+
+65
+00:04:34.840 --> 00:04:36.180
+<v Dylan Ratcliffe>And we had done all the testing.
+
+66
+00:04:36.440 --> 00:04:38.500
+<v Dylan Ratcliffe>We tested it in the dev environment.
+
+67
+00:04:38.680 --> 00:04:39.800
+<v Dylan Ratcliffe>We got all the approvals.
+
+68
+00:04:40.100 --> 00:04:41.960
+<v Dylan Ratcliffe>It was absolutely ready to go.
+
+69
+00:04:42.120 --> 00:04:48.560
+<v Dylan Ratcliffe>And we were ready at 3 p.m. on Friday to press the button and just get a big win in before
+
+70
+00:04:48.560 --> 00:04:49.440
+<v Dylan Ratcliffe>the end of the engagement.
+
+71
+00:04:49.600 --> 00:04:53.600
+<v Dylan Ratcliffe>The 3 p.m. on Friday thing should be foreshadowing to anyone who's ever worked with infrastructure.
+
+72
+00:04:53.980 --> 00:04:59.180
+<v Dylan Ratcliffe>It's a bad idea to press that button at 3 p.m. on a Friday, especially when you're supposed
+
+73
+00:04:59.180 --> 00:05:03.720
+<v Dylan Ratcliffe>supposed to turn into a pumpkin at 5 p.m. because the engagement is over and they're no longer
+
+74
+00:05:03.720 --> 00:05:10.420
+<v Dylan Ratcliffe>paying you. But we did it anyway because we were legitimately confident. And the phone rang. Or it
+
+75
+00:05:10.420 --> 00:05:15.300
+<v Dylan Ratcliffe>didn't ring initially. Initially, everything was fine. And then the phone rang and somebody said,
+
+76
+00:05:15.300 --> 00:05:21.980
+<v Dylan Ratcliffe>Hey, our entire department is at a standstill because we can't save PDFs, and we need to save
+
+77
+00:05:21.980 --> 00:05:28.680
+<v Dylan Ratcliffe>PDFs to do our job. And I was like, that couldn't have been us. There's no way that the change to
+
+78
+00:05:29.180 --> 00:05:35.600
+<v Dylan Ratcliffe>back-end authentication for logging into Linux servers could have affected your ability on your
+
+79
+00:05:35.600 --> 00:05:41.840
+<v Dylan Ratcliffe>Windows laptop to save a PDF. That couldn't have been us. But by the same token, nobody else would
+
+80
+00:05:41.840 --> 00:05:47.440
+<v Dylan Ratcliffe>have been stupid enough to deploy a change at 3 p.m. on a Friday, so it probably was us. We ended
+
+81
+00:05:47.440 --> 00:05:53.800
+<v Dylan Ratcliffe>up investigating and found that we said, what do you mean? Tell me what you do when you save a PDF.
+
+82
+00:05:53.800 --> 00:05:56.580
+<v Dylan Ratcliffe>And they said, I go file, print, PDF printer, print.
+
+83
+00:05:56.780 --> 00:06:00.840
+<v Dylan Ratcliffe>And I was like, don't you mean file, print, save as PDF, save?
+
+84
+00:06:01.200 --> 00:06:04.020
+<v Dylan Ratcliffe>And they were like, no, file, print, PDF printer, print.
+
+85
+00:06:04.160 --> 00:06:09.160
+<v Dylan Ratcliffe>And it turns out that at this company, there's a list of printers, most of which are physical printers in the office.
+
+86
+00:06:09.180 --> 00:06:12.200
+<v Dylan Ratcliffe>And one of which is a printer called PDF printer.
+
+87
+00:06:12.780 --> 00:06:14.440
+<v Dylan Ratcliffe>And we've somehow broken that.
+
+88
+00:06:14.740 --> 00:06:17.920
+<v Dylan Ratcliffe>We checked their CMDB because they have everything in their CMDB.
+
+89
+00:06:18.340 --> 00:06:19.540
+<v Dylan Ratcliffe>And it wasn't in there.
+
+90
+00:06:19.680 --> 00:06:23.200
+<v Dylan Ratcliffe>And then we checked their wiki, like the team's wiki.
+
+91
+00:06:23.800 --> 00:06:28.260
+<v Dylan Ratcliffe>And the team had been around for ages. Nobody knew what it was, but the wiki had been around for ages
+
+92
+00:06:28.260 --> 00:06:33.100
+<v Dylan Ratcliffe>and it wasn't in the wiki. And the only piece of information we had was the IP address of this
+
+93
+00:06:33.100 --> 00:06:40.700
+<v Dylan Ratcliffe>thing. And so we tried to just log into it and we got presented with a blinking password prompt, and
+
+94
+00:06:40.700 --> 00:06:47.260
+<v Dylan Ratcliffe>so we put in the password for everything and it let us in. And so what proceeded then was a whole
+
+95
+00:06:47.260 --> 00:06:52.200
+<v Dylan Ratcliffe>bunch of infrastructure paleontology. We were trying to work out how the bones of this thing
+
+96
+00:06:53.800 --> 00:06:59.320
+<v Dylan Ratcliffe>And it turns out that this is a physical server which was put into the data center about 10 years ago.
+
+97
+00:06:59.520 --> 00:07:03.260
+<v Dylan Ratcliffe>And its purpose in life is to pretend to be a printer.
+
+98
+00:07:03.380 --> 00:07:13.440
+<v Dylan Ratcliffe>And when someone prints to it, it saves that as a PDF and puts it in a folder and then runs a script which moves it from that folder to another folder.
+
+99
+00:07:13.660 --> 00:07:18.500
+<v Dylan Ratcliffe>That folder is mounted to a network share, which is mounted to your laptop.
+
+100
+00:07:18.740 --> 00:07:22.840
+<v Dylan Ratcliffe>So when the user presses the button, they get a PDF on their laptop.
+
+101
+00:07:23.800 --> 00:07:27.560
+<v Dylan Ratcliffe>What happens is this horrible dance all the way around the network and back again, and we had broken
+
+102
+00:07:27.560 --> 00:07:34.400
+<v Dylan Ratcliffe>that somehow. It turns out that the fix was to update about 30,000 permissions on the network
+
+103
+00:07:34.400 --> 00:07:39.220
+<v Dylan Ratcliffe>share, which by the point at which we realized, everybody had gone home anyway, and we weren't
+
+104
+00:07:39.220 --> 00:07:46.440
+<v Dylan Ratcliffe>going to make it any worse, so we did, and it fixed it. But that was the moment that I decided to quit
+
+105
+00:07:46.440 --> 00:07:51.920
+<v Dylan Ratcliffe>my job, because it just cemented in my mind that it is totally reasonable to be afraid of pressing
+
+106
+00:07:53.800 --> 00:07:59.300
+<v Dylan Ratcliffe>to go wrong in a way that is straightforward. It's always going to be something that you didn't know,
+
+107
+00:07:59.300 --> 00:08:04.020
+<v Dylan Ratcliffe>you didn't know, something that was built by someone who's since left. Nobody knew this thing
+
+108
+00:08:04.020 --> 00:08:08.660
+<v Dylan Ratcliffe>existed. If they did know it existed, you wouldn't got yourself into this situation. And so that sort
+
+109
+00:08:08.660 --> 00:08:14.240
+<v Dylan Ratcliffe>of gave me the realization that we have to be able to discover this automatically with no input from
+
+110
+00:08:14.240 --> 00:08:19.860
+<v Dylan Ratcliffe>anyone. And if we could do that, we could prevent this outage. Not that'll ever happen to anyone
+
+111
+00:08:19.860 --> 00:08:26.220
+<v Dylan Ratcliffe>again. It's so bloody niche. But that type of thing happens to people all the time. And so we
+
+112
+00:08:26.220 --> 00:08:30.920
+<v Dylan Ratcliffe>will be able to prevent that if we can go and discover every dependency with no input from the
+
+113
+00:08:30.920 --> 00:08:33.800
+<v Dylan Ratcliffe>user. And so I decided to quit my job and go and build that.
+
+114
+00:08:36.000 --> 00:08:38.080
+<v Noah Labhart>Let's dive into what you would consider
+
+115
+00:08:38.080 --> 00:08:42.480
+<v Noah Labhart>the MVP for Overmind. How long did it take you to build and what sort of tools were you using to
+
+116
+00:08:42.480 --> 00:08:43.080
+<v Noah Labhart>bring it to life?
+
+117
+00:08:43.660 --> 00:08:49.620
+<v Dylan Ratcliffe>So the MVP started on a piece of paper and continued on a piece of paper for
+
+118
+00:08:49.860 --> 00:08:57.600
+<v Dylan Ratcliffe>pretty long time, like months probably, before I bought a laptop to actually work on it,
+
+119
+00:08:57.640 --> 00:09:02.580
+<v Dylan Ratcliffe>to actually write the first piece of code. The MVP was pretty unrecognizable to the product
+
+120
+00:09:02.580 --> 00:09:08.140
+<v Dylan Ratcliffe>that we have today from an actual product perspective. But surprisingly, some of the tech,
+
+121
+00:09:08.260 --> 00:09:12.780
+<v Dylan Ratcliffe>actually a lot of the tech, is still there. To my shame, some of the code is even still there.
+
+122
+00:09:13.300 --> 00:09:17.440
+<v Dylan Ratcliffe>People have to read it. People have to read what it was like when I was first learning Go.
+
+123
+00:09:17.440 --> 00:09:20.480
+<v Dylan Ratcliffe>oh, it is obvious that I was very new to Go.
+
+124
+00:09:20.660 --> 00:09:22.140
+<v Dylan Ratcliffe>But anyway, some of it's still there
+
+125
+00:09:22.140 --> 00:09:24.340
+<v Dylan Ratcliffe>because the tech actually still underlies the product.
+
+126
+00:09:25.140 --> 00:09:27.960
+<v Dylan Ratcliffe>But the product itself was totally different.
+
+127
+00:09:28.020 --> 00:09:30.800
+<v Dylan Ratcliffe>As I said, I'd thought that if we could discover
+
+128
+00:09:30.800 --> 00:09:34.520
+<v Dylan Ratcliffe>every dependency in real time with no input from the user,
+
+129
+00:09:34.700 --> 00:09:37.000
+<v Dylan Ratcliffe>because of course, if you expect the user
+
+130
+00:09:37.000 --> 00:09:38.080
+<v Dylan Ratcliffe>to tell you where to look,
+
+131
+00:09:38.220 --> 00:09:39.440
+<v Dylan Ratcliffe>then you're not going to find the things
+
+132
+00:09:39.440 --> 00:09:41.420
+<v Dylan Ratcliffe>that are going to cause the actual problems,
+
+133
+00:09:41.580 --> 00:09:43.500
+<v Dylan Ratcliffe>then this would solve the problem.
+
+134
+00:09:43.620 --> 00:09:45.700
+<v Dylan Ratcliffe>And so we built a real-time discovery engine
+
+135
+00:09:45.700 --> 00:09:47.220
+<v Dylan Ratcliffe>that could do exactly that.
+
+136
+00:09:47.440 --> 00:09:55.780
+<v Dylan Ratcliffe>find every dependency within your cloud environment and show it to you. It took about six or eight
+
+137
+00:09:55.780 --> 00:10:02.060
+<v Dylan Ratcliffe>months to get this built. In terms of tooling, I chose my tooling based on what I thought it
+
+138
+00:10:02.060 --> 00:10:09.480
+<v Dylan Ratcliffe>would be easiest to hire for. So for the backend, I wrote it all in Go, not because I knew how to
+
+139
+00:10:09.480 --> 00:10:14.260
+<v Dylan Ratcliffe>write Go. I didn't. I had to learn how to write Go, but because I knew that I would be able to
+
+140
+00:10:14.260 --> 00:10:16.500
+<v Dylan Ratcliffe>to hire infrastructure people who knew Go
+
+141
+00:10:16.500 --> 00:10:18.660
+<v Dylan Ratcliffe>and Go engineers who knew infrastructure.
+
+142
+00:10:19.040 --> 00:10:21.400
+<v Dylan Ratcliffe>There's a massive overlap between the type of people
+
+143
+00:10:21.400 --> 00:10:23.940
+<v Dylan Ratcliffe>who've had these sorts of deploying on a Friday problems
+
+144
+00:10:23.940 --> 00:10:25.420
+<v Dylan Ratcliffe>and people who know Go.
+
+145
+00:10:25.640 --> 00:10:28.840
+<v Dylan Ratcliffe>And so that was what made the decision on the language
+
+146
+00:10:28.840 --> 00:10:30.020
+<v Dylan Ratcliffe>and the tool set for the backend.
+
+147
+00:10:30.440 --> 00:10:32.700
+<v Dylan Ratcliffe>For the frontend, I chose Angular
+
+148
+00:10:32.700 --> 00:10:34.600
+<v Dylan Ratcliffe>because I knew nothing about frontends
+
+149
+00:10:34.600 --> 00:10:35.860
+<v Dylan Ratcliffe>and it looked good to me.
+
+150
+00:10:36.180 --> 00:10:39.380
+<v Dylan Ratcliffe>My first hire for frontend said,
+
+151
+00:10:39.460 --> 00:10:41.480
+<v Dylan Ratcliffe>this is terrible, let's rewrite it with Next.
+
+152
+00:10:41.680 --> 00:10:43.660
+<v Dylan Ratcliffe>And they were absolutely right to do that.
+
+153
+00:10:44.280 --> 00:10:47.000
+<v Dylan Ratcliffe>And so none of that remains to this day, which is good.
+
+154
+00:10:48.180 --> 00:10:52.240
+<v Noah Labhart>Maybe tell me about a decision or trade-off you had to make in building that early version.
+
+155
+00:10:52.320 --> 00:10:53.920
+<v Noah Labhart>It could be technical decisions, right?
+
+156
+00:10:54.000 --> 00:10:56.980
+<v Noah Labhart>And you kind of talked through a little bit of that at a high level, but maybe around
+
+157
+00:10:56.980 --> 00:11:02.240
+<v Noah Labhart>our approach and maybe future limitation or technical debt acceptance, any of those things
+
+158
+00:11:02.240 --> 00:11:03.440
+<v Noah Labhart>and how you cope with those decisions.
+
+159
+00:11:04.220 --> 00:11:12.280
+<v Dylan Ratcliffe>In terms of trade-offs, I made like remarkably few in those first eight months, mostly because
+
+160
+00:11:14.260 --> 00:11:19.240
+<v Dylan Ratcliffe>own salary. I didn't have a board to report to. I didn't have any customers. I was just building a
+
+161
+00:11:19.240 --> 00:11:23.720
+<v Dylan Ratcliffe>cool thing because I wanted to. I knew the people that I wanted to help. I knew the problem I wanted
+
+162
+00:11:23.720 --> 00:11:28.440
+<v Dylan Ratcliffe>to solve, and so I could build a cool thing. And because of that it meant that I didn't actually
+
+163
+00:11:28.440 --> 00:11:36.380
+<v Dylan Ratcliffe>need to make all that many trade-offs. For example, it's always been a supported feature from day one
+
+164
+00:11:36.380 --> 00:11:44.480
+<v Dylan Ratcliffe>that we can discover dependencies both within a single account in the cloud and across accounts
+
+165
+00:11:44.480 --> 00:11:52.200
+<v Dylan Ratcliffe>and across different clouds and between on-prem and cloud instances, despite the fact that all of
+
+166
+00:11:52.200 --> 00:11:56.620
+<v Dylan Ratcliffe>the things that do the gathering of that need to be installed in different locations. They need to
+
+167
+00:11:56.620 --> 00:12:01.040
+<v Dylan Ratcliffe>be highly available. They need to have different authentication. All of that has always been a
+
+168
+00:12:01.040 --> 00:12:06.340
+<v Dylan Ratcliffe>feature. Like, the first demo I did had the ability to do all of that, which is massive overkill and
+
+169
+00:12:06.340 --> 00:12:12.140
+<v Dylan Ratcliffe>totally unnecessary, but I didn't have too much time pressure and I wanted it to be that way.
+
+170
+00:12:12.140 --> 00:12:17.280
+<v Dylan Ratcliffe>And I had just come from working with, like, massive banks and things like that, so I knew that
+
+171
+00:12:17.280 --> 00:12:21.420
+<v Dylan Ratcliffe>at some point we were going to need those features. So I didn't actually make that many trade-offs. I
+
+172
+00:12:21.420 --> 00:12:27.320
+<v Dylan Ratcliffe>basically built it the way I wanted it to be built. And amazingly, very few of those things have come
+
+173
+00:12:27.320 --> 00:12:31.960
+<v Dylan Ratcliffe>come back to bite me. The fact like those features, especially the fact that we support
+
+174
+00:12:31.960 --> 00:12:37.220
+<v Dylan Ratcliffe>high availability out of the box, the fact that we can bridge different clouds and stuff like that
+
+175
+00:12:37.220 --> 00:12:41.460
+<v Dylan Ratcliffe>are now becoming extremely useful as our customers get bigger and more complicated.
+
+176
+00:12:41.980 --> 00:12:47.800
+<v Dylan Ratcliffe>And it's the same code that I wrote right at the very beginning. Nowadays, we have to make way more
+
+177
+00:12:47.800 --> 00:12:53.260
+<v Dylan Ratcliffe>trade-offs. I have customers and investors and a board and we need to be moving way more quickly
+
+178
+00:12:53.260 --> 00:12:56.140
+<v Dylan Ratcliffe>than we did when it was just me sitting in my room.
+
+179
+00:12:56.180 --> 00:12:58.680
+<v Dylan Ratcliffe>I can't afford to go and sit in my room for eight months
+
+180
+00:12:58.680 --> 00:12:59.600
+<v Dylan Ratcliffe>and come up with something.
+
+181
+00:12:59.820 --> 00:13:03.220
+<v Dylan Ratcliffe>And so we are making a hell of a lot more trade-offs now
+
+182
+00:13:03.220 --> 00:13:06.000
+<v Dylan Ratcliffe>in terms of getting things shipped,
+
+183
+00:13:06.160 --> 00:13:08.280
+<v Dylan Ratcliffe>getting feedback on them and being able to iterate
+
+184
+00:13:08.280 --> 00:13:09.520
+<v Dylan Ratcliffe>than I did in the beginning.
+
+185
+00:13:09.800 --> 00:13:11.980
+<v Dylan Ratcliffe>But yeah, remarkably, I don't regret
+
+186
+00:13:11.980 --> 00:13:13.460
+<v Dylan Ratcliffe>not making those trade-offs.
+
+187
+00:13:15.380 --> 00:13:18.380
+<v Noah Labhart>So now I'm curious to move into what you mentioned
+
+188
+00:13:18.380 --> 00:13:19.480
+<v Noah Labhart>in progressing the product,
+
+189
+00:13:19.560 --> 00:13:21.280
+<v Noah Labhart>maybe making the trade-offs here,
+
+190
+00:13:23.260 --> 00:13:26.840
+<v Noah Labhart>it. And I think to wrap in a box, though, what I'm looking for is how you built your roadmap,
+
+191
+00:13:26.960 --> 00:13:31.500
+<v Noah Labhart>how you went about deciding that, okay, this is the next most important thing to build or to
+
+192
+00:13:31.500 --> 00:13:32.420
+<v Noah Labhart>address with Overmind.
+
+193
+00:13:33.240 --> 00:13:37.080
+<v Dylan Ratcliffe>Yeah, so while I didn't make too many trade-offs in terms of the architecture
+
+194
+00:13:37.080 --> 00:13:43.720
+<v Dylan Ratcliffe>and engineering, we've made loads from the product side of things. When we started, we were wrong
+
+195
+00:13:44.440 --> 00:13:49.320
+<v Dylan Ratcliffe>about what would be helpful. And we realized that pretty quickly. So the first iteration of the
+
+196
+00:13:49.320 --> 00:13:54.840
+<v Dylan Ratcliffe>the product could discover all of the dependencies within your cloud infrastructure and show them to
+
+197
+00:13:54.840 --> 00:13:58.660
+<v Dylan Ratcliffe>you and we thought that would be incredibly helpful and while it's information that people
+
+198
+00:13:58.660 --> 00:14:04.560
+<v Dylan Ratcliffe>didn't have before it's also work they didn't have to do before and so people would look at that and
+
+199
+00:14:04.560 --> 00:14:09.680
+<v Dylan Ratcliffe>go are you telling me i have to review these 500 different things to see how my change is going to
+
+200
+00:14:09.680 --> 00:14:14.900
+<v Dylan Ratcliffe>affect them that is that's terrible that doesn't help me at all and so that was a pretty big
+
+201
+00:14:14.900 --> 00:14:20.320
+<v Dylan Ratcliffe>big realization that the whole thing that we had built, the whole real-time discovery engine
+
+202
+00:14:21.040 --> 00:14:26.960
+<v Dylan Ratcliffe>was not helpful. In fact, actively unhelpful to show to a human. It was, we were actually in
+
+203
+00:14:26.960 --> 00:14:31.160
+<v Dylan Ratcliffe>Greece at the time. The team is fully remote, but we get together every now and again,
+
+204
+00:14:31.660 --> 00:14:35.440
+<v Dylan Ratcliffe>and like a few times a year, and we're all in Greece at the time. And GPT-3 had just,
+
+205
+00:14:35.520 --> 00:14:39.780
+<v Dylan Ratcliffe>we just got API access. We'd been on the wait list for quite a long time.
+
+206
+00:14:39.780 --> 00:14:45.320
+<v Dylan Ratcliffe>and we were doing a bunch of experimentation with what you could do with the data set that
+
+207
+00:14:45.320 --> 00:14:50.780
+<v Dylan Ratcliffe>we already had the features that we already had that we realized that nobody wanted because it
+
+208
+00:14:50.780 --> 00:14:57.980
+<v Dylan Ratcliffe>wasn't actively unhelpful, and what can an LLM do with that? And it turns out that having a directed
+
+209
+00:14:57.980 --> 00:15:02.260
+<v Dylan Ratcliffe>graph that it can traverse in real time of all of the dependencies and having certainty of it
+
+210
+00:15:02.260 --> 00:15:06.840
+<v Dylan Ratcliffe>is the perfect thing for backing an LLM. It means that it's not possible for it to hallucinate
+
+211
+00:15:06.840 --> 00:15:08.940
+<v Dylan Ratcliffe>because we're telling it what the dependencies are,
+
+212
+00:15:09.020 --> 00:15:14.420
+<v Dylan Ratcliffe>but it can still reason about impact and risks and things like that.
+
+213
+00:15:14.680 --> 00:15:17.280
+<v Dylan Ratcliffe>And so when we had that realization,
+
+214
+00:15:17.600 --> 00:15:20.160
+<v Dylan Ratcliffe>our roadmap was suddenly we are going to build a product
+
+215
+00:15:20.160 --> 00:15:22.580
+<v Dylan Ratcliffe>that tells you what the risks of your deployments are.
+
+216
+00:15:22.800 --> 00:15:26.460
+<v Dylan Ratcliffe>And that was the first feature that gave us sort of commercial traction.
+
+217
+00:15:26.620 --> 00:15:31.360
+<v Dylan Ratcliffe>And it was still like the original product is still the underlying thing,
+
+218
+00:15:31.440 --> 00:15:33.300
+<v Dylan Ratcliffe>but it's now pretty much entirely in the backend
+
+219
+00:15:33.300 --> 00:15:38.820
+<v Dylan Ratcliffe>end, and it serves the LLM and the LLM serves everything else. And at this point we were now
+
+220
+00:15:38.820 --> 00:15:43.840
+<v Dylan Ratcliffe>basically an AI native company. Like, none of the things that we did we could do without AI.
+
+221
+00:15:43.840 --> 00:15:50.560
+<v Dylan Ratcliffe>It meant that you can't build a two-year roadmap, especially when GPT-3.5 was just coming out. Like
+
+222
+00:15:50.560 --> 00:15:56.680
+<v Dylan Ratcliffe>every six weeks the costs would halve and the performance would double and so we continued to
+
+223
+00:15:56.680 --> 00:16:02.280
+<v Dylan Ratcliffe>do that in-person event and then work for three months and then in-person event and work for three
+
+224
+00:16:03.300 --> 00:16:07.620
+<v Dylan Ratcliffe>Our roadmap was very driven by those in-person events.
+
+225
+00:16:07.800 --> 00:16:13.120
+<v Dylan Ratcliffe>We would do a whole bunch of engineering proof of concepts to work out, okay, what is now
+
+226
+00:16:13.120 --> 00:16:13.620
+<v Dylan Ratcliffe>possible?
+
+227
+00:16:13.700 --> 00:16:18.940
+<v Dylan Ratcliffe>And invariably, what we achieved each time would have been impossible to achieve the
+
+228
+00:16:18.940 --> 00:16:21.380
+<v Dylan Ratcliffe>previous time because it was just coming forward so quickly.
+
+229
+00:16:21.580 --> 00:16:26.640
+<v Dylan Ratcliffe>And so you can really trace the product and the company and the roadmap to those in-person
+
+230
+00:16:26.640 --> 00:16:30.400
+<v Dylan Ratcliffe>sessions where we would all make a decision on, okay, we've got a proof of concept.
+
+231
+00:16:30.480 --> 00:16:31.220
+<v Dylan Ratcliffe>We know it works.
+
+232
+00:16:31.220 --> 00:16:35.160
+<v Dylan Ratcliffe>in the next three months we're going to turn it into a product we're going to ship it and then
+
+233
+00:16:35.160 --> 00:16:39.180
+<v Dylan Ratcliffe>we're going to meet up again and make that same decision again. Not to say that we don't have an
+
+234
+00:16:39.180 --> 00:16:45.440
+<v Dylan Ratcliffe>overarching direction of what way we want to go. I want to remove the fear of pressing that deploy
+
+235
+00:16:45.440 --> 00:16:51.260
+<v Dylan Ratcliffe>button. I want us to be better than a human at making those decisions. But exactly how we get
+
+236
+00:16:51.260 --> 00:16:56.480
+<v Dylan Ratcliffe>there from a product perspective, like where it integrates into your workflow, what we show you,
+
+237
+00:16:56.480 --> 00:17:01.660
+<v Dylan Ratcliffe>all that sort of stuff, and also from an engineering perspective of how we achieve going from the first
+
+238
+00:17:01.660 --> 00:17:05.940
+<v Dylan Ratcliffe>version which was like speculating about what might happen to the current version which is now
+
+239
+00:17:05.940 --> 00:17:11.980
+<v Dylan Ratcliffe>actually simulating the entire change 10 levels deep. It has all been keyframed on those in-person
+
+240
+00:17:11.980 --> 00:17:14.920
+<v Dylan Ratcliffe>events. So
+
+241
+00:17:14.920 --> 00:17:19.540
+<v Noah Labhart>I'm curious about team, right? During your description I heard you saying we, and how
+
+242
+00:17:19.540 --> 00:17:23.320
+<v Noah Labhart>you approached it tell me about how you built that team and what do you look for in those people to
+
+243
+00:17:23.320 --> 00:17:25.340
+<v Noah Labhart>indicate that they are the winning horses to join you.
+
+244
+00:17:26.060 --> 00:17:29.540
+<v Dylan Ratcliffe>The most important thing to me when I'm
+
+245
+00:17:29.540 --> 00:17:35.720
+<v Dylan Ratcliffe>hiring is a sense of ownership of what you've built. I want people who will argue with me
+
+246
+00:17:35.720 --> 00:17:40.900
+<v Dylan Ratcliffe>about the right way to do things, about what's most important for our customers, about what font
+
+247
+00:17:40.900 --> 00:17:46.200
+<v Dylan Ratcliffe>we should use on our website, about the color of our logo. I want people who will argue with me
+
+248
+00:17:46.200 --> 00:17:52.080
+<v Dylan Ratcliffe>about all of that stuff. The people who I hire should not look at a problem and say,
+
+249
+00:17:52.200 --> 00:17:59.700
+<v Dylan Ratcliffe>we should fix this. They say, I intend to fix this. The difference sounds small, but the actual
+
+250
+00:17:59.700 --> 00:18:05.760
+<v Dylan Ratcliffe>difference in practice is huge. And for me, it's the most important element in hiring. I want
+
+251
+00:18:05.760 --> 00:18:12.360
+<v Dylan Ratcliffe>everybody to be able to look at anything within the product and say, this sucks. I intend to fix
+
+252
+00:18:12.360 --> 00:18:18.760
+<v Dylan Ratcliffe>exit and then go and do it. In terms of where I've been able to find that approach, it's everywhere.
+
+253
+00:18:18.920 --> 00:18:24.040
+<v Dylan Ratcliffe>Some of the team are ex-colleagues from Puppet. Some came through normal interview processes,
+
+254
+00:18:24.240 --> 00:18:30.580
+<v Dylan Ratcliffe>from referrals, from contractors who were fantastic and we converted them to permanent.
+
+255
+00:18:30.860 --> 00:18:36.480
+<v Dylan Ratcliffe>And our team is all over the place. We have people in Romania, Austria, France, the UK,
+
+256
+00:18:36.480 --> 00:18:44.000
+<v Dylan Ratcliffe>K and San Francisco. But the thing that ties it all together is everybody says, I intend to, rather than
+
+257
+00:18:44.000 --> 00:18:49.360
+<v Dylan Ratcliffe>we should. Let's
+
+258
+00:18:49.360 --> 00:18:55.020
+<v Noah Labhart>move into scalability. This will, this will be interesting. Um, you know, given what
+
+259
+00:18:55.020 --> 00:18:59.940
+<v Noah Labhart>problem you're solving i'm curious how you approach scale from the beginning and if there's
+
+260
+00:18:59.940 --> 00:19:02.260
+<v Noah Labhart>been interesting areas where you've had to fight it as you've grown?
+
+261
+00:19:03.440 --> 00:19:05.880
+<v Dylan Ratcliffe>I have not planned for
+
+262
+00:19:05.880 --> 00:19:13.040
+<v Dylan Ratcliffe>scalability from day one, mostly deliberately, because we need to move quickly, we need to get
+
+263
+00:19:13.040 --> 00:19:18.880
+<v Dylan Ratcliffe>feedback quickly, and we need to make decisions quickly. And I would much rather outgrow five or
+
+264
+00:19:18.880 --> 00:19:24.320
+<v Dylan Ratcliffe>10 different processes than have one process that will serve us for the next 10 years, but for the
+
+265
+00:19:24.320 --> 00:19:28.460
+<v Dylan Ratcliffe>first three years will slow us down. Because if we get slowed down in the first three years, we
+
+266
+00:19:30.220 --> 00:19:43.200
+<v Dylan Ratcliffe>So we have definitely scaled inefficiently and then thrown away processes and tools and meetings and all kinds of stuff has been created to solve a problem and then realized that we've outgrown it and thrown it away.
+
+267
+00:19:43.580 --> 00:19:50.580
+<v Dylan Ratcliffe>And we recently, some of the big examples recently were we moved from GitHub to Linear.
+
+268
+00:19:50.820 --> 00:19:55.300
+<v Dylan Ratcliffe>We did that actually in a week on one of those team events.
+
+269
+00:19:55.400 --> 00:19:58.620
+<v Dylan Ratcliffe>We got to a team event and someone said, hey, I intend to try Linear.
+
+270
+00:19:59.940 --> 00:20:05.760
+<v Dylan Ratcliffe>end of the week we had completely migrated to that. We've got rid of stand-ups because, which was a
+
+271
+00:20:05.760 --> 00:20:10.180
+<v Dylan Ratcliffe>weird thing to get rid of. It's such a normal, like, part of your day. In the morning you get up and do
+
+272
+00:20:10.180 --> 00:20:14.060
+<v Dylan Ratcliffe>stand-up. We got rid of that because it just wasn't working for us. The team was getting further
+
+273
+00:20:14.060 --> 00:20:19.920
+<v Dylan Ratcliffe>distributed in terms of time zones, and Linear gave us a bunch of abilities with their Pulse and stuff
+
+274
+00:20:19.920 --> 00:20:26.760
+<v Dylan Ratcliffe>like that to, to not need that anymore. So we are constantly changing the way we do things to scale
+
+275
+00:20:26.760 --> 00:20:29.300
+<v Dylan Ratcliffe>for the next three to six months,
+
+276
+00:20:29.420 --> 00:20:33.900
+<v Dylan Ratcliffe>but I'm not trying to over-invest in process
+
+277
+00:20:33.900 --> 00:20:36.560
+<v Dylan Ratcliffe>and things like that to scale for years and years
+
+278
+00:20:36.560 --> 00:20:38.500
+<v Dylan Ratcliffe>because we need to move quickly.
+
+279
+00:20:40.100 --> 00:20:42.080
+<v Noah Labhart>So as you step out on the balcony
+
+280
+00:20:42.080 --> 00:20:44.880
+<v Noah Labhart>and you look across all that you've built with Overmind,
+
+281
+00:20:45.020 --> 00:20:46.020
+<v Noah Labhart>what are you most proud of?
+
+282
+00:20:46.600 --> 00:20:48.340
+<v Dylan Ratcliffe>It's definitely a 50-50 split
+
+283
+00:20:48.340 --> 00:20:49.660
+<v Dylan Ratcliffe>between the technical results
+
+284
+00:20:49.660 --> 00:20:52.260
+<v Dylan Ratcliffe>of what the product actually does
+
+285
+00:20:52.260 --> 00:20:56.600
+<v Dylan Ratcliffe>and the growth in the people who have built it.
+
+286
+00:20:56.760 --> 00:21:01.860
+<v Dylan Ratcliffe>From a technical perspective, the simulation model, it is amazing.
+
+287
+00:21:02.100 --> 00:21:05.340
+<v Dylan Ratcliffe>And I'm really proud to be looking at it.
+
+288
+00:21:05.380 --> 00:21:09.780
+<v Dylan Ratcliffe>And it's something that we invented and that nobody is doing currently.
+
+289
+00:21:09.920 --> 00:21:10.960
+<v Dylan Ratcliffe>Nobody was doing before.
+
+290
+00:21:11.380 --> 00:21:13.280
+<v Dylan Ratcliffe>And it kicks ass.
+
+291
+00:21:13.720 --> 00:21:22.740
+<v Dylan Ratcliffe>We've been doing tests internally where it's able to correctly predict the impact of a change 10 layers deep
+
+292
+00:21:22.740 --> 00:21:26.540
+<v Dylan Ratcliffe>through like hundreds and hundreds of interdependent pieces of infrastructure.
+
+293
+00:21:26.760 --> 00:21:33.240
+<v Dylan Ratcliffe>400 things and 2000 relationships and it's doing it perfectly. And the magic definitely hasn't
+
+294
+00:21:33.240 --> 00:21:36.920
+<v Dylan Ratcliffe>been lost on me. Every time I test it, I'm like, God, this kicks ass. It's fantastic.
+
+295
+00:21:37.260 --> 00:21:41.600
+<v Dylan Ratcliffe>And it continues to not be lost on it. I'm always excited about the product,
+
+296
+00:21:41.640 --> 00:21:46.280
+<v Dylan Ratcliffe>watching the product do what it does because it is awesome. And the other thing is the team.
+
+297
+00:21:46.440 --> 00:21:52.020
+<v Dylan Ratcliffe>It's really important to me that the people who work for me leave in a better situation than they
+
+298
+00:21:52.020 --> 00:22:03.520
+<v Dylan Ratcliffe>They came in and I've been able to watch the team grow in terms of size, but also individuals stepping up and taking on new responsibilities and learning and growing and getting better at their jobs and taking on new jobs.
+
+299
+00:22:03.660 --> 00:22:06.480
+<v Dylan Ratcliffe>And that has been extremely satisfying.
+
+300
+00:22:06.720 --> 00:22:09.260
+<v Dylan Ratcliffe>It's probably 50-50, but it's really important to me.
+
+301
+00:22:10.560 --> 00:22:12.240
+<v Noah Labhart>Let's flip the script a little bit, Dylan.
+
+302
+00:22:12.300 --> 00:22:15.720
+<v Noah Labhart>Tell me about a mistake you made and how you and your team responded to it.
+
+303
+00:22:16.360 --> 00:22:22.020
+<v Dylan Ratcliffe>The thing that has surprised me most, actually, in terms of things that I've been wrong about
+
+304
+00:22:23.080 --> 00:22:29.940
+<v Dylan Ratcliffe>is, and it's more the team saving me from a mistake, but so that first trip in Greece when GPT-3 first
+
+305
+00:22:29.940 --> 00:22:35.440
+<v Dylan Ratcliffe>came out, we were trying two things. I wanted to see whether it was possible for us to determine
+
+306
+00:22:35.440 --> 00:22:40.660
+<v Dylan Ratcliffe>the routineness of a change so that we could say, hey, you do this all the time, don't worry about it,
+
+307
+00:22:40.660 --> 00:22:45.960
+<v Dylan Ratcliffe>or, hey, you've never done this before, this is a problem. The other thing we wanted to see whether
+
+308
+00:22:45.960 --> 00:22:52.100
+<v Dylan Ratcliffe>we could do was to assess the risks of a change, of if you do this, could go wrong. I was totally
+
+309
+00:22:52.100 --> 00:22:57.140
+<v Dylan Ratcliffe>convinced that the risks would not work. I was like, there's no way that's going to work. The
+
+310
+00:22:57.140 --> 00:23:02.600
+<v Dylan Ratcliffe>routineness thing is definitely going to be way easier. And by the end of the week, we could not
+
+311
+00:23:02.600 --> 00:23:08.240
+<v Dylan Ratcliffe>get the routineness thing working, and the risks was amazing. Looking back, it was terrible compared
+
+312
+00:23:08.240 --> 00:23:08.960
+<v Dylan Ratcliffe>compared to what we have now.
+
+313
+00:23:09.080 --> 00:23:11.840
+<v Dylan Ratcliffe>But given that this was the first time anyone had ever seen this,
+
+314
+00:23:11.900 --> 00:23:12.500
+<v Dylan Ratcliffe>it was amazing.
+
+315
+00:23:12.740 --> 00:23:16.680
+<v Dylan Ratcliffe>And so I was totally wrong about the roadmap of what we...
+
+316
+00:23:16.680 --> 00:23:21.420
+<v Dylan Ratcliffe>I absolutely had planned out building out the routineness feature.
+
+317
+00:23:21.600 --> 00:23:22.620
+<v Dylan Ratcliffe>Now we have that feature now.
+
+318
+00:23:22.700 --> 00:23:24.000
+<v Dylan Ratcliffe>We finally worked out how to do it.
+
+319
+00:23:24.040 --> 00:23:26.640
+<v Dylan Ratcliffe>But at the time, I'd already made a roadmap for that.
+
+320
+00:23:26.780 --> 00:23:29.360
+<v Dylan Ratcliffe>And it was absolutely not the right thing to do.
+
+321
+00:23:29.440 --> 00:23:30.860
+<v Dylan Ratcliffe>And that's happened more than once.
+
+322
+00:23:30.980 --> 00:23:33.200
+<v Dylan Ratcliffe>In fact, last time...
+
+323
+00:23:33.200 --> 00:23:36.540
+<v Dylan Ratcliffe>I think the last trip I was right in my prediction of where...
+
+324
+00:23:38.240 --> 00:23:40.740
+<v Dylan Ratcliffe>that we came into there to test we were going to do.
+
+325
+00:23:40.940 --> 00:23:44.160
+<v Dylan Ratcliffe>But I think every other time I've been wrong
+
+326
+00:23:44.160 --> 00:23:46.460
+<v Dylan Ratcliffe>in that I've been overruled by the team has said,
+
+327
+00:23:46.500 --> 00:23:48.600
+<v Dylan Ratcliffe>no, we don't think that this is the right way.
+
+328
+00:23:48.680 --> 00:23:49.560
+<v Dylan Ratcliffe>And I've been convinced.
+
+329
+00:23:49.940 --> 00:23:54.200
+<v Dylan Ratcliffe>And in hindsight, it has always been the correct choice.
+
+330
+00:23:54.300 --> 00:23:56.600
+<v Dylan Ratcliffe>Looking back at some of the features that we nearly built,
+
+331
+00:23:56.680 --> 00:23:59.480
+<v Dylan Ratcliffe>I'm like, God, I'm glad we didn't waste three months building that.
+
+332
+00:23:59.780 --> 00:24:03.780
+<v Dylan Ratcliffe>The team has prevented me from making a good number of mistakes.
+
+333
+00:24:04.060 --> 00:24:05.680
+<v Dylan Ratcliffe>A couple of times I've been right.
+
+334
+00:24:05.680 --> 00:24:13.680
+<v Dylan Ratcliffe>A couple of times I've pushed through things that have been the right call, but very often they've pushed for what they thought was the best thing.
+
+335
+00:24:13.680 --> 00:24:18.340
+<v Dylan Ratcliffe>And most of the time, more than half of the time, they've been dead right.
+
+336
+00:24:18.660 --> 00:24:24.480
+<v Dylan Ratcliffe>I still get the credit for hiring them, but they definitely get the credit for talking me off a number of ledges.
+
+337
+00:24:27.600 --> 00:24:29.920
+<v Noah Labhart>Okay, let's move forward then. This will be fun.
+
+338
+00:24:30.120 --> 00:24:35.080
+<v Noah Labhart>What does the future look like for Overmind for the product, the platform, and for your team?
+
+339
+00:24:35.680 --> 00:24:36.180
+<v Noah Labhart>The
+
+340
+00:24:36.020 --> 00:24:40.560
+<v Dylan Ratcliffe>ability for us to simulate what is going to happen is continuing to push forward.
+
+341
+00:24:41.760 --> 00:24:45.580
+<v Dylan Ratcliffe>We've always been getting feedback of this is the right thing to do.
+
+342
+00:24:45.880 --> 00:24:47.660
+<v Dylan Ratcliffe>This is what we need to be doing.
+
+343
+00:24:47.700 --> 00:24:49.360
+<v Dylan Ratcliffe>And this all needs to be getting better and better at.
+
+344
+00:24:49.480 --> 00:24:55.880
+<v Dylan Ratcliffe>We're now at the point where we can simulate up to 10 layers deep with an unlimited number
+
+345
+00:24:55.880 --> 00:25:00.500
+<v Dylan Ratcliffe>of dependencies in between those 10 layers, which is awesome.
+
+346
+00:25:00.660 --> 00:25:02.460
+<v Dylan Ratcliffe>But that is going to keep changing.
+
+347
+00:25:02.500 --> 00:25:05.240
+<v Dylan Ratcliffe>This is the sixth complete rewrite of that process.
+
+348
+00:25:05.680 --> 00:25:09.280
+<v Dylan Ratcliffe>And there will be a seventh and I already know what some of those features are going to be.
+
+349
+00:25:09.360 --> 00:25:15.040
+<v Dylan Ratcliffe>So working on the core of the product is always just a never ending thing.
+
+350
+00:25:15.120 --> 00:25:19.160
+<v Dylan Ratcliffe>It is never done because it needs to be vastly better than a human.
+
+351
+00:25:19.280 --> 00:25:21.000
+<v Dylan Ratcliffe>And so it's never ending.
+
+352
+00:25:21.160 --> 00:25:31.960
+<v Dylan Ratcliffe>But the other thing that we need to do now is that where we've gone from having a few smaller customers to working with some very large regulated businesses,
+
+353
+00:25:31.960 --> 00:25:41.500
+<v Dylan Ratcliffe>We're now a mandatory step in the production process, the go-to-production process for regulated financial institutions.
+
+354
+00:25:42.480 --> 00:25:48.000
+<v Dylan Ratcliffe>We're assessing the impact on stuff that processes millions of dollars a minute in terms of transaction volume.
+
+355
+00:25:48.300 --> 00:25:50.760
+<v Dylan Ratcliffe>Things are starting to get more serious.
+
+356
+00:25:50.880 --> 00:25:55.580
+<v Dylan Ratcliffe>And that's one of the things that dictates the future of what the product looks like and what the team looks like.
+
+357
+00:25:55.640 --> 00:25:59.640
+<v Dylan Ratcliffe>Because these companies are getting bigger and bigger, it's not really my choice.
+
+358
+00:25:59.640 --> 00:26:07.840
+<v Dylan Ratcliffe>It's more the market is telling me that I need to be going after these bigger companies because they just feel this problem most acutely.
+
+359
+00:26:07.960 --> 00:26:13.200
+<v Dylan Ratcliffe>It means, though, that we need to expand our feature set of what we support.
+
+360
+00:26:13.500 --> 00:26:14.980
+<v Dylan Ratcliffe>We started just with AWS.
+
+361
+00:26:15.180 --> 00:26:16.600
+<v Dylan Ratcliffe>We recently launched GCP.
+
+362
+00:26:16.700 --> 00:26:18.120
+<v Dylan Ratcliffe>We're working on Azure at the moment.
+
+363
+00:26:18.160 --> 00:26:24.980
+<v Dylan Ratcliffe>We currently support Terraform, but we also are building Pulumi and Argo CD and even supporting manual changes.
+
+364
+00:26:24.980 --> 00:26:30.940
+<v Dylan Ratcliffe>The bigger the companies get, the more guaranteed it is that they will use every single tool in existence.
+
+365
+00:26:31.260 --> 00:26:45.560
+<v Dylan Ratcliffe>And so if you need to go after those bigger companies, if you want to be able to be mandatory in the sort of massive heterogeneous workflows that they have, you need to support every possible way of doing an infrastructure deployment.
+
+366
+00:26:45.560 --> 00:26:55.520
+<v Dylan Ratcliffe>And so that is what is next for the team is going as broad as possible so that we can support all of the different ways that people make changes to infrastructure.
+
+367
+00:26:55.700 --> 00:27:05.040
+<v Dylan Ratcliffe>It's one of our core values that users don't have to change their workflow in order to use our product, which means we need to take on the work of supporting every possible way that they could do it.
+
+368
+00:27:05.120 --> 00:27:09.540
+<v Dylan Ratcliffe>And now that the customers are getting bigger and bigger, that is becoming more and more important.
+
+369
+00:27:09.540 --> 00:27:13.320
+<v Dylan Ratcliffe>and it's more and more, there's more and more different ways of people doing things,
+
+370
+00:27:13.320 --> 00:27:19.300
+<v Dylan Ratcliffe>doing authentication, doing workflow, all that sort of stuff. And the team's growing up as well in terms
+
+371
+00:27:19.300 --> 00:27:25.020
+<v Dylan Ratcliffe>of the team is expanding. We need to be supporting people around the clock. We need, we've got SOC 2
+
+372
+00:27:25.020 --> 00:27:30.140
+<v Dylan Ratcliffe>and ISO 27001 certification, which means you can't just push to main with nobody reviewing it.
+
+373
+00:27:30.140 --> 00:27:35.560
+<v Dylan Ratcliffe>So we are, not that we did that very often even from the beginning, but we've had to grow up and
+
+374
+00:27:35.560 --> 00:27:36.500
+<v Dylan Ratcliffe>And we're going to have to continue to.
+
+375
+00:27:37.660 --> 00:27:40.080
+<v Noah Labhart>I like you threw that out at the end.
+
+376
+00:27:40.180 --> 00:27:40.940
+<v Noah Labhart>That's very cool.
+
+377
+00:27:41.400 --> 00:27:42.480
+<v Noah Labhart>Dylan, let's switch to you.
+
+378
+00:27:42.580 --> 00:27:44.360
+<v Noah Labhart>Who influences the way that you work?
+
+379
+00:27:44.540 --> 00:27:47.460
+<v Noah Labhart>Name a person or many persons or something you look up to and why.
+
+380
+00:27:48.200 --> 00:27:54.360
+<v Dylan Ratcliffe>I think the person who most influenced me was my first manager at Puppet.
+
+381
+00:27:54.380 --> 00:27:57.280
+<v Dylan Ratcliffe>When I first joined, I was an associate, which was like the lowest.
+
+382
+00:27:57.420 --> 00:28:04.000
+<v Dylan Ratcliffe>In fact, they had to create a new level of professional services engineer because they didn't have one junior enough for me.
+
+383
+00:28:05.560 --> 00:28:12.820
+<v Dylan Ratcliffe>Navy submariner, and he was serious and angry and professional and disciplined and caring, and I
+
+384
+00:28:12.820 --> 00:28:18.140
+<v Dylan Ratcliffe>think he probably agree with most of those assessments, but he would literally put his
+
+385
+00:28:18.140 --> 00:28:24.980
+<v Dylan Ratcliffe>career on the line because someone working in a bank in Singapore couldn't do something they
+
+386
+00:28:24.980 --> 00:28:31.280
+<v Dylan Ratcliffe>needed to do because of a bug in our software. He would absolutely go to bat with engineering,
+
+387
+00:28:31.280 --> 00:28:36.620
+<v Dylan Ratcliffe>the end with product, and he would make, he would be a pain in the ass. I'm sure he was the absolute
+
+388
+00:28:36.620 --> 00:28:41.040
+<v Dylan Ratcliffe>bane of their existence, and I'm certain they would have considered firing him multiple times
+
+389
+00:28:41.040 --> 00:28:46.980
+<v Dylan Ratcliffe>because of how much of an incredible pain in the ass he was. And he would get stuff fixed. He could
+
+390
+00:28:46.980 --> 00:28:52.700
+<v Dylan Ratcliffe>get things moved up the priority ladder because, hey, it's affecting this one sysadmin, and it'd get
+
+391
+00:28:52.700 --> 00:28:56.880
+<v Dylan Ratcliffe>fixed. And then the next week he'd do it again. There'd be some other sysadmin with no real
+
+392
+00:28:56.880 --> 00:29:04.460
+<v Dylan Ratcliffe>no real influence sitting in, like, a not a very nice office in an industrial estate somewhere,
+
+393
+00:29:04.460 --> 00:29:10.520
+<v Dylan Ratcliffe>working on infrastructure, who is blocked because of a bug. And the next week he would go out and
+
+394
+00:29:10.520 --> 00:29:14.900
+<v Dylan Ratcliffe>put his entire career on the line again, getting on calls with product and telling them they have
+
+395
+00:29:14.900 --> 00:29:23.020
+<v Dylan Ratcliffe>to fix this. And that was very formative for me, putting your whole, because he could have been
+
+396
+00:29:23.020 --> 00:29:26.960
+<v Dylan Ratcliffe>like, oh, this person's, it's not going to jeopardize the deal, the person doesn't have that much
+
+397
+00:29:26.960 --> 00:29:31.160
+<v Dylan Ratcliffe>influence, they can just live with that. But he never once did, and he would put his own career
+
+398
+00:29:31.160 --> 00:29:36.200
+<v Dylan Ratcliffe>on the line for it. And that's what I've been doing ever since. Every decision I made, including
+
+399
+00:29:36.200 --> 00:29:40.840
+<v Dylan Ratcliffe>starting Overmind, has been putting my career on the line. Especially starting Overmind, actually. I
+
+400
+00:29:40.840 --> 00:29:46.520
+<v Dylan Ratcliffe>was definitely putting my career on the line doing that, and all of the decisions since. I'm betting my
+
+401
+00:29:46.520 --> 00:29:52.900
+<v Dylan Ratcliffe>my entire career on because I know that there are people out there having a shit time being scared
+
+402
+00:29:52.900 --> 00:29:57.660
+<v Dylan Ratcliffe>of pressing the deploy button and having to deal with outages that they could never have possibly
+
+403
+00:29:57.660 --> 00:30:02.260
+<v Dylan Ratcliffe>predicted because it was too complicated, they didn't know it existed, and I know that's still
+
+404
+00:30:02.260 --> 00:30:07.860
+<v Dylan Ratcliffe>happening every single day. And so I'm doing what he did, which is putting my career on the line
+
+405
+00:30:07.860 --> 00:30:12.520
+<v Dylan Ratcliffe>every single time I make a decision until it's fixed. Okay.
+
+406
+00:30:12.520 --> 00:30:14.580
+<v Noah Labhart>Dylan last question so you're getting
+
+407
+00:30:16.660 --> 00:30:20.260
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+408
+00:30:20.260 --> 00:30:22.980
+<v Noah Labhart>show it off to the world. And can we show it off to you right there on the plane?
+
+409
+00:30:23.300 --> 00:30:26.600
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+410
+00:30:27.340 --> 00:30:31.380
+<v Dylan Ratcliffe>I don't know. I think if I was in that, I've been in that situation and I think I would have
+
+411
+00:30:31.380 --> 00:30:37.580
+<v Dylan Ratcliffe>ignored a great majority. I did ignore a fair bit of the advice given to me. Nobody who's giving you
+
+412
+00:30:38.240 --> 00:30:43.300
+<v Dylan Ratcliffe>reasonable, pragmatic advice would tell you to quit your job and go and found a startup because
+
+413
+00:30:43.300 --> 00:30:46.460
+<v Dylan Ratcliffe>because it's not a reasonable or pragmatic thing to do.
+
+414
+00:30:46.600 --> 00:30:49.280
+<v Dylan Ratcliffe>And even the people who would give you that advice,
+
+415
+00:30:49.400 --> 00:30:52.280
+<v Dylan Ratcliffe>yeah, go for it, go and quit your job and go and do this thing,
+
+416
+00:30:52.380 --> 00:30:54.140
+<v Dylan Ratcliffe>they will give you conflicting advice.
+
+417
+00:30:54.380 --> 00:30:56.740
+<v Dylan Ratcliffe>If there's anything I've learned about being a founder,
+
+418
+00:30:56.800 --> 00:30:59.460
+<v Dylan Ratcliffe>it is that you can get advice that will tell you
+
+419
+00:30:59.460 --> 00:31:01.360
+<v Dylan Ratcliffe>every possible different way of doing things,
+
+420
+00:31:01.420 --> 00:31:04.940
+<v Dylan Ratcliffe>and eventually you just need to stop asking for advice
+
+421
+00:31:04.940 --> 00:31:07.740
+<v Dylan Ratcliffe>and start making your own decisions.
+
+422
+00:31:08.040 --> 00:31:12.200
+<v Dylan Ratcliffe>So I think the only advice I could realistically give to somebody like that
+
+423
+00:31:13.300 --> 00:31:18.620
+<v Dylan Ratcliffe>to put too much weight in advice. I got when I was first getting started, I got advice that was like,
+
+424
+00:31:18.620 --> 00:31:23.500
+<v Dylan Ratcliffe>you're doing it wrong, you will, you won't succeed. And I don't even know why I asked for the advice
+
+425
+00:31:23.500 --> 00:31:28.200
+<v Dylan Ratcliffe>because, to be perfectly, I did not take it on board. And, and I don't, in hindsight, I don't know
+
+426
+00:31:28.200 --> 00:31:33.560
+<v Dylan Ratcliffe>why I bothered asking, because, I like, unless they said yes, keep going, I was not going to make a
+
+427
+00:31:33.560 --> 00:31:37.200
+<v Dylan Ratcliffe>different decision. That the person sitting on a plane who's really excited about that probably
+
+428
+00:31:37.200 --> 00:31:41.940
+<v Dylan Ratcliffe>isn't going to change what they do no matter what I say. So I think I'd say just don't put too much
+
+429
+00:31:43.300 --> 00:31:49.420
+<v Dylan Ratcliffe>own decisions. But you do need to start going to the gym. You will, this is going to be a marathon,
+
+430
+00:31:49.420 --> 00:31:56.020
+<v Dylan Ratcliffe>and if you, even if you don't need it now, you will need to be fit at some point. It is, it's hard on
+
+431
+00:31:56.020 --> 00:32:00.500
+<v Dylan Ratcliffe>you. It's a big job. It's hard on you. It's hard on your body, and the last thing you want is to be
+
+432
+00:32:00.980 --> 00:32:05.820
+<v Dylan Ratcliffe>not healthy. You need to be healthy so that you can put as much work into it as it requires.
+
+433
+00:32:05.820 --> 00:32:09.700
+<v Dylan Ratcliffe>so that's probably the only thing i would actually try to convince someone to do
+
+434
+00:32:09.700 --> 00:32:12.760
+<v Dylan Ratcliffe>Otherwise, they're already convinced and they should go for it.
+
+435
+00:32:12.840 --> 00:32:13.680
+<v Noah Labhart>I love it.
+
+436
+00:32:13.700 --> 00:32:15.920
+<v Noah Labhart>I think that's both pieces of fantastic advice.
+
+437
+00:32:16.120 --> 00:32:17.980
+<v Noah Labhart>Well, Dylan, thank you for being on the show today.
+
+438
+00:32:18.060 --> 00:32:20.400
+<v Noah Labhart>And thanks for telling the creation story of Overmind.
+
+439
+00:32:20.700 --> 00:32:21.200
+<v Noah Labhart>No
+
+440
+00:32:21.160 --> 00:32:21.660
+<v Dylan Ratcliffe>problem.
+
+441
+00:32:21.520 --> 00:32:22.300
+<v Dylan Ratcliffe>Thanks for having me, Noah.
+
+442
+00:32:24.700 --> 00:32:27.440
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+443
+00:32:32.440 --> 00:32:35.460
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+444
+00:32:35.460 --> 00:32:40.360
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify, or the podcasting app of your choice.
+
+445
+00:32:41.000 --> 00:32:43.180
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+446
+00:32:43.500 --> 00:32:45.380
+<v Noah Labhart>Both things help us out tremendously.
+
+447
+00:32:48.360 --> 00:32:49.820
+<v Noah Labhart>And thanks again for listening.

@@ -1,0 +1,1267 @@
+WEBVTT
+
+NOTE S8 Bonus: The WebRTC Blueprint: Engineering Ultra-Low Latency Video and Voice Infrastructure for AI Agents with Kwindla Kramer, Co-Founder & CEO of Daily
+
+1
+00:00:00.000 --> 00:00:29.980
+<v Kwindla Kramer>Definitely we have, you know, non-trivial amounts of technical debt. I actually don't really think there's a way around that in the real world. So it's just how you box up and how you manage technical debt over time. That's the hard thing. But other people have other approaches that I think also work really well. I have a funny story about a core technology choice and how that evolved for us. We built the very first MVP on top of Firebase for part of our network layer. And by the time we had a few hundred
+
+2
+00:00:30.000 --> 00:00:35.460
+<v Kwindla Kramer>users, Firebase was the single most painful thing in our DevOps and customer support world,
+
+3
+00:00:35.580 --> 00:00:39.360
+<v Kwindla Kramer>including all of the super immature WebRTC stuff we had written ourselves.
+
+4
+00:00:40.400 --> 00:00:43.400
+<v Kwindla Kramer>I'm Kwindla Kramer. I'm one of the founders of Daily.
+
+5
+00:00:46.600 --> 00:00:52.220
+<v Noah Labhart>This is Code Story, a podcast bringing you interviews with tech visionaries.
+
+6
+00:00:52.340 --> 00:00:53.680
+<v Clip>It's six months moonlighting.
+
+7
+00:00:53.720 --> 00:00:55.200
+<v Clip>There's nothing on the bedpans.
+
+8
+00:00:55.460 --> 00:00:58.100
+<v Noah Labhart>Who share what it takes to change an industry.
+
+9
+00:00:58.300 --> 00:00:59.840
+<v Clip>I don't exactly know what to do.
+
+10
+00:01:00.000 --> 00:01:02.520
+<v Clip>Who built
+
+11
+00:01:02.520 --> 00:01:04.560
+<v Noah Labhart>the teams that have their back.
+
+12
+00:01:08.680 --> 00:01:11.180
+<v Noah Labhart>Keeping scalability top of mind.
+
+13
+00:01:14.860 --> 00:01:17.820
+<v Noah Labhart>The stories you don't read in the headlines.
+
+14
+00:01:18.260 --> 00:01:19.820
+<v Clip>It's not an easy thing to achieve.
+
+15
+00:01:22.120 --> 00:01:25.840
+<v Noah Labhart>Dry the ups and downs of the startup life.
+
+16
+00:01:26.940 --> 00:01:28.940
+<v Clip>It's not just about technology.
+
+17
+00:01:30.000 --> 00:01:36.940
+<v Noah Labhart>on Code Story. I'm your host Noah Labhart and today how Kwindla Kramer developed the
+
+18
+00:01:36.940 --> 00:01:42.800
+<v Noah Labhart>next generation video SDK using WebRTC and global infrastructure.
+
+19
+00:01:47.380 --> 00:01:51.960
+<v Noah Labhart>Kwindla Kramer has always been interested in building things and his parents gave him lots
+
+20
+00:01:51.960 --> 00:01:56.960
+<v Noah Labhart>of opportunity. He spent his early days learning to program on the Commodore 64 and playing old
+
+21
+00:01:56.960 --> 00:02:02.520
+<v Noah Labhart>games like Lode Runner. He was super interested in the internet while in college, and in 1996,
+
+22
+00:02:02.740 --> 00:02:08.980
+<v Noah Labhart>he got the opportunity to be a part of the MIT Media Lab. Outside of tech, he is a quasi-vegan
+
+23
+00:02:08.980 --> 00:02:12.600
+<v Noah Labhart>and enjoys foggy beach living on the western edge of San Francisco.
+
+24
+00:02:14.020 --> 00:02:19.120
+<v Noah Labhart>After exiting his last startup, Kwin took some time to figure out what he wanted to do next.
+
+25
+00:02:19.600 --> 00:02:23.740
+<v Noah Labhart>During that time, he just started coding on projects and came across WebRTC,
+
+26
+00:02:23.740 --> 00:02:26.420
+<v Noah Labhart>which allowed real-time communication for the web.
+
+27
+00:02:27.220 --> 00:02:30.140
+<v Noah Labhart>This tech catalyzed a tipping point in his mind
+
+28
+00:02:30.140 --> 00:02:33.340
+<v Noah Labhart>and led him to build video experiments on top of it.
+
+29
+00:02:35.100 --> 00:02:37.740
+<v Noah Labhart>This is the creation story of Daily.
+
+30
+00:02:42.160 --> 00:02:45.320
+<v Kwindla Kramer>Daily makes developer tools for video and audio.
+
+31
+00:02:45.540 --> 00:02:48.940
+<v Kwindla Kramer>Our roots are in real-time video and audio,
+
+32
+00:02:48.940 --> 00:02:54.240
+<v Kwindla Kramer>So a standard called WebRTC is what we build a lot of our stuff on top of.
+
+33
+00:02:54.420 --> 00:02:59.660
+<v Kwindla Kramer>And we really think of ourselves as building the infrastructure for the future of video on the Internet.
+
+34
+00:03:00.360 --> 00:03:06.140
+<v Kwindla Kramer>Our job is to make it really easy for engineers to add video and audio to any website or app.
+
+35
+00:03:06.300 --> 00:03:14.980
+<v Kwindla Kramer>And we try hard to handle all the networking, latency, scaling, cross-platform implementation issues that just come with video and audio.
+
+36
+00:03:14.980 --> 00:03:20.980
+<v Kwindla Kramer>Our biggest customers do things like telehealth and online education, workplace collaboration.
+
+37
+00:03:21.820 --> 00:03:25.800
+<v Kwindla Kramer>If you want to build a Zoom-like experience into an app, we make that really easy.
+
+38
+00:03:25.980 --> 00:03:33.300
+<v Kwindla Kramer>If you want to develop something kind of mind-blowing and new that looks totally different from a video call, we try to make that possible too.
+
+39
+00:03:34.420 --> 00:03:40.700
+<v Kwindla Kramer>I'm especially excited about a lot of the new things we see our customers building that feel like the future to us.
+
+40
+00:03:40.700 --> 00:03:46.360
+<v Kwindla Kramer>the kind of social media and gaming and some robotics and things like live commerce.
+
+41
+00:03:46.920 --> 00:03:51.060
+<v Kwindla Kramer>I've always been really interested in digital video and online video,
+
+42
+00:03:51.160 --> 00:03:54.240
+<v Kwindla Kramer>and it feels to me like we've hit escape velocity
+
+43
+00:03:54.240 --> 00:03:57.640
+<v Kwindla Kramer>and how much video is part of all of our lives online.
+
+44
+00:03:58.500 --> 00:04:02.440
+<v Kwindla Kramer>I had a couple of years, or I ended up taking a couple of years
+
+45
+00:04:02.440 --> 00:04:08.620
+<v Kwindla Kramer>between exiting my last startup and deciding whether I really wanted to do another startup.
+
+46
+00:04:08.620 --> 00:04:14.500
+<v Kwindla Kramer>of. So I just wrote a lot of code for a couple of years and I've always really liked building
+
+47
+00:04:14.500 --> 00:04:21.180
+<v Kwindla Kramer>large scale networking stuff and video stuff in particular. That itch didn't go away. So I was
+
+48
+00:04:21.180 --> 00:04:25.180
+<v Kwindla Kramer>still sort of scratching an itch I'd been, you know, happy to work on for a long time.
+
+49
+00:04:25.580 --> 00:04:30.080
+<v Kwindla Kramer>And at that time, this was like 2014, 2015, there was a new standard called WebRTC
+
+50
+00:04:30.880 --> 00:04:35.140
+<v Kwindla Kramer>that Google and Cisco and a bunch of other companies were starting to get serious about
+
+51
+00:04:35.140 --> 00:04:39.700
+<v Kwindla Kramer>about supporting that was going to allow real-time video and other interesting stuff to happen
+
+52
+00:04:39.700 --> 00:04:46.320
+<v Kwindla Kramer>inside a web browser with no additional downloads. And that just seemed to me like one of those
+
+53
+00:04:46.320 --> 00:04:51.380
+<v Kwindla Kramer>things that catalyze that tipping point. If you could just open a web page and you could have
+
+54
+00:04:51.380 --> 00:04:59.020
+<v Kwindla Kramer>a video call or a large-scale, very low-latency broadcast or an audio conversation, that just
+
+55
+00:04:59.020 --> 00:05:05.040
+<v Kwindla Kramer>lowers the barrier to entry and kind of changes the dynamic around distributing these new pieces
+
+56
+00:05:05.140 --> 00:05:10.000
+<v Kwindla Kramer>of software, new user behaviors, new capabilities. And I also thought the WebRTC standard was pretty
+
+57
+00:05:10.000 --> 00:05:16.000
+<v Kwindla Kramer>technically interesting. So I built a bunch of experiments on top of WebRTC and became convinced
+
+58
+00:05:16.000 --> 00:05:21.680
+<v Kwindla Kramer>that it was a piece of the future, an interesting piece of the future. And so we started building a
+
+59
+00:05:21.680 --> 00:05:28.540
+<v Kwindla Kramer>tech stack and thinking about kind of the first product we could ship on top of WebRTC.
+
+60
+00:05:30.780 --> 00:05:35.840
+<v Noah Labhart>Tell me about the MVP for Daily, that first version of the product you built.
+
+61
+00:05:35.900 --> 00:05:38.600
+<v Noah Labhart>How long did it take you to build and what sort of tools did you use?
+
+62
+00:05:38.960 --> 00:05:42.800
+<v Noah Labhart>Maybe even including WebRTC, but give me all that too.
+
+63
+00:05:43.080 --> 00:05:47.200
+<v Noah Labhart>And how long did it take you to build and what sort of tools you used to bring it to life?
+
+64
+00:05:49.260 --> 00:05:52.620
+<v Kwindla Kramer>How long the MVP took depends on when you start the clock.
+
+65
+00:05:52.620 --> 00:06:01.920
+<v Kwindla Kramer>I mean, there are some aspects of, you know, what we shipped when we shipped our first product that went back a couple of years of my kind of experimenting.
+
+66
+00:06:02.560 --> 00:06:05.840
+<v Kwindla Kramer>Like, I think the MVP probably took us about six or seven months to put together.
+
+67
+00:06:05.980 --> 00:06:10.700
+<v Kwindla Kramer>And what we settled on when we settled on a product direction was actually a little hardware appliance.
+
+68
+00:06:11.180 --> 00:06:16.120
+<v Kwindla Kramer>And that's kind of surprising sometimes to people who think of us today as a developer tools company.
+
+69
+00:06:16.120 --> 00:06:31.740
+<v Kwindla Kramer>But WebRTC was so new that to give people something that would really work in the real world, we kind of needed to control the whole thing we gave them, like all the way from the CPU and the GPU up through the UX.
+
+70
+00:06:31.740 --> 00:06:36.420
+<v Kwindla Kramer>like the web browser's implementation of WebRTC, which was kind of the point and what we all
+
+71
+00:06:36.420 --> 00:06:41.100
+<v Kwindla Kramer>thought we were aiming at was just not very stable. And, you know, it worked okay if you
+
+72
+00:06:41.100 --> 00:06:46.040
+<v Kwindla Kramer>were a contributor to the libwebrtc standard implementation at Google and you had a super
+
+73
+00:06:46.040 --> 00:06:51.300
+<v Kwindla Kramer>high-end machine and a really fast network connection. But if you tried to give a WebRTC
+
+74
+00:06:51.300 --> 00:06:56.460
+<v Kwindla Kramer>based experience to people in the real world on real world laptops and whatever version of Chrome
+
+75
+00:06:56.460 --> 00:06:58.740
+<v Kwindla Kramer>they were stuck on at the time.
+
+76
+00:06:58.940 --> 00:07:01.840
+<v Kwindla Kramer>Just that was a recipe for lots and lots of pain
+
+77
+00:07:01.840 --> 00:07:02.520
+<v Kwindla Kramer>for everybody involved.
+
+78
+00:07:03.680 --> 00:07:06.080
+<v Kwindla Kramer>We thought we could enable screen sharing
+
+79
+00:07:06.080 --> 00:07:08.860
+<v Kwindla Kramer>and video calls for small business conference rooms
+
+80
+00:07:08.860 --> 00:07:10.860
+<v Kwindla Kramer>at a price point nobody had done before.
+
+81
+00:07:11.140 --> 00:07:12.880
+<v Kwindla Kramer>And we could do that by designing
+
+82
+00:07:12.880 --> 00:07:13.900
+<v Kwindla Kramer>these little pieces of hardware
+
+83
+00:07:13.900 --> 00:07:15.740
+<v Kwindla Kramer>and choosing off the shelf,
+
+84
+00:07:15.840 --> 00:07:17.860
+<v Kwindla Kramer>small form factor computer components
+
+85
+00:07:17.860 --> 00:07:19.920
+<v Kwindla Kramer>and assembling them in small batches.
+
+86
+00:07:19.960 --> 00:07:20.980
+<v Kwindla Kramer>And we did that.
+
+87
+00:07:21.380 --> 00:07:22.680
+<v Kwindla Kramer>And that was really fun.
+
+88
+00:07:22.820 --> 00:07:24.640
+<v Kwindla Kramer>I really like building hardware in a garage.
+
+89
+00:07:26.460 --> 00:07:33.120
+<v Kwindla Kramer>product let us get our tech stack into many thousands of people's hands and collect a ton
+
+90
+00:07:33.120 --> 00:07:37.760
+<v Kwindla Kramer>of data about what was good and what wasn't working about what we built and about the
+
+91
+00:07:37.760 --> 00:07:44.320
+<v Kwindla Kramer>broader space of kind of real-time video for end users, consumers of all kinds. We eventually
+
+92
+00:07:44.320 --> 00:07:50.120
+<v Kwindla Kramer>decided that hardware was painful enough that it wasn't going to be the core of our venture scale
+
+93
+00:07:50.120 --> 00:07:54.860
+<v Kwindla Kramer>efforts. But I'm actually really glad we did a hardware product initially. And the reason for
+
+94
+00:07:56.460 --> 00:08:03.400
+<v Kwindla Kramer>think it helped us understand these real world pain points much more deeply. We benchmark really
+
+95
+00:08:03.400 --> 00:08:09.060
+<v Kwindla Kramer>heavily against all our competitors and basically every adjacent kind of solution in the market.
+
+96
+00:08:09.320 --> 00:08:15.320
+<v Kwindla Kramer>And we're super proud of our tech stack's ability to deal with real world networking issues,
+
+97
+00:08:15.560 --> 00:08:20.080
+<v Kwindla Kramer>plus a whole bunch of other stuff that real world users face like camera and mic permissions.
+
+98
+00:08:20.080 --> 00:08:36.420
+<v Kwindla Kramer>And I think the reason we have that DNA that we are, I think, very hard to beat in terms of actually working on real-world devices for real-world users is because we started by shipping a product that we supported for real-world end users.
+
+99
+00:08:38.200 --> 00:08:40.140
+<v Noah Labhart>So then you've got your MVP.
+
+100
+00:08:40.400 --> 00:08:44.380
+<v Noah Labhart>It's working and you're feeling those pain points you're learning.
+
+101
+00:08:44.620 --> 00:08:46.320
+<v Noah Labhart>How did you progress it from there?
+
+102
+00:08:46.320 --> 00:08:50.980
+<v Noah Labhart>Tell me about how you matured it and, you know, went towards where you are today.
+
+103
+00:08:51.120 --> 00:08:58.500
+<v Noah Labhart>And I'm curious about how you built your roadmap, how you went about deciding, OK, this is the next most important thing to build or to address with Daily.
+
+104
+00:09:00.420 --> 00:09:03.100
+<v Kwindla Kramer>So we had a few thousand users of hardware.
+
+105
+00:09:03.220 --> 00:09:08.600
+<v Kwindla Kramer>We knew we could keep growing that user base, but hardware is super hard in a bunch of ways.
+
+106
+00:09:08.740 --> 00:09:10.160
+<v Kwindla Kramer>And I really love hardware.
+
+107
+00:09:10.260 --> 00:09:12.280
+<v Kwindla Kramer>So I think I'm like wired to forget that.
+
+108
+00:09:12.280 --> 00:09:30.440
+<v Kwindla Kramer>But we were definitely sort of seeing what the economics were going to look like of trying to scale a hardware business and thinking that there were a bunch of things that were kind of separate from the core video infrastructure and tech stack that was in some ways the most interesting thing to us and the motivation for us of building Daily.
+
+109
+00:09:30.860 --> 00:09:41.220
+<v Kwindla Kramer>So we had a decision to make about whether we wanted to keep pushing on the hardware product or whether we thought there was kind of a broader market software only approach that made more sense.
+
+110
+00:09:42.280 --> 00:09:46.200
+<v Kwindla Kramer>bunch of experiments, including a bunch of experiments kind of opening up our capabilities
+
+111
+00:09:46.200 --> 00:09:52.620
+<v Kwindla Kramer>to developers in various ways, and got some really interesting traction and use cases going for the
+
+112
+00:09:52.620 --> 00:09:57.020
+<v Kwindla Kramer>developer components that we were kind of throwing out into the world little by little.
+
+113
+00:09:57.320 --> 00:10:03.560
+<v Kwindla Kramer>During that kind of period of experimentation, Apple finally supported WebRTC pretty well in
+
+114
+00:10:03.560 --> 00:10:09.920
+<v Kwindla Kramer>Safari, which opened up kind of the rest of the market of, you know, web browsers and particularly
+
+115
+00:10:09.920 --> 00:10:14.720
+<v Kwindla Kramer>particularly important on mobile, obviously, because the default browser on iOS is Safari.
+
+116
+00:10:15.000 --> 00:10:19.560
+<v Kwindla Kramer>So we felt like, OK, we've got this tech stack we're proud of that we think we can make great.
+
+117
+00:10:19.680 --> 00:10:25.280
+<v Kwindla Kramer>And we've got a lot of experience helping developers at this point kind of build on top of our stuff.
+
+118
+00:10:25.460 --> 00:10:28.060
+<v Kwindla Kramer>And we've got a vision for where the world is going.
+
+119
+00:10:28.200 --> 00:10:30.280
+<v Kwindla Kramer>And now we can target any browser.
+
+120
+00:10:30.460 --> 00:10:32.460
+<v Kwindla Kramer>We should really be a DevTools company.
+
+121
+00:10:32.940 --> 00:10:37.680
+<v Kwindla Kramer>And in some ways, that was an easy decision because it's super fun as a programmer to support other programmers.
+
+122
+00:10:37.680 --> 00:10:48.060
+<v Kwindla Kramer>And once we kind of built a model or a vision for how big we thought the market would be for video-oriented developer tools, we felt like we had a good direction to go in.
+
+123
+00:10:49.080 --> 00:10:56.500
+<v Kwindla Kramer>We'd always believed video is going to be everywhere and it's going to be a huge part of what we all do every day with our digital devices.
+
+124
+00:10:56.920 --> 00:11:00.800
+<v Kwindla Kramer>And enabling that for other developers felt like a clear path.
+
+125
+00:11:00.800 --> 00:11:11.880
+<v Kwindla Kramer>I mean, we explain that to investors as we make it easy to add audio and video features to any website or app in the same way that Stripe makes it easy to add payments to any website or app.
+
+126
+00:11:12.060 --> 00:11:17.440
+<v Kwindla Kramer>So I think end of 2018, we decided to end of life the hardware product.
+
+127
+00:11:17.880 --> 00:11:25.500
+<v Kwindla Kramer>We supported it for a long time for the customers who had it, but we knew that our future was DevTools.
+
+128
+00:11:27.560 --> 00:11:29.440
+<v Noah Labhart>Okay, let's switch to team then.
+
+129
+00:11:30.800 --> 00:11:35.340
+<v Noah Labhart>about building your team? And what did you look for in those people to indicate that they were
+
+130
+00:11:35.340 --> 00:11:36.540
+<v Noah Labhart>the winning horses to join
+
+131
+00:11:36.540 --> 00:11:42.220
+<v Kwindla Kramer>you? We stayed super small all the time we were kind of experimenting
+
+132
+00:11:42.220 --> 00:11:49.460
+<v Kwindla Kramer>towards product market fit. And it wasn't until kind of end of 2019, I think, before we decided
+
+133
+00:11:49.460 --> 00:11:55.640
+<v Kwindla Kramer>we were really ready to grow. End of 2019, we started calling friends we'd worked with before
+
+134
+00:11:55.640 --> 00:11:59.140
+<v Kwindla Kramer>and said, you know, we're doing something I think you'd find really fun.
+
+135
+00:11:59.400 --> 00:12:00.620
+<v Kwindla Kramer>What are you doing now?
+
+136
+00:12:01.320 --> 00:12:04.540
+<v Kwindla Kramer>And made a few hires in 2020, early 2020,
+
+137
+00:12:04.720 --> 00:12:07.620
+<v Kwindla Kramer>and then COVID hit and changed the landscape
+
+138
+00:12:07.620 --> 00:12:10.560
+<v Kwindla Kramer>for what we were doing overnight almost.
+
+139
+00:12:11.000 --> 00:12:14.440
+<v Kwindla Kramer>And it was just a scramble to build out our infrastructure,
+
+140
+00:12:14.660 --> 00:12:18.220
+<v Kwindla Kramer>keep adding servers sort of every night to our AWS clusters,
+
+141
+00:12:18.340 --> 00:12:24.080
+<v Kwindla Kramer>and get really serious about recruiting super senior experienced people
+
+142
+00:12:25.740 --> 00:12:33.140
+<v Kwindla Kramer>gaps we knew we had in terms of expertise in. I've been doing this long enough that I feel like I
+
+143
+00:12:33.140 --> 00:12:40.460
+<v Kwindla Kramer>have learned so much and templating on my own experience. We felt like our first 20, call it,
+
+144
+00:12:40.520 --> 00:12:45.220
+<v Kwindla Kramer>engineering hires should just be people who had built some version of what they would be building
+
+145
+00:12:45.220 --> 00:12:51.780
+<v Kwindla Kramer>here at Daily at least once and ideally twice before. And that's worked out really well. We
+
+146
+00:12:51.780 --> 00:12:57.480
+<v Kwindla Kramer>We scaled with pretty experienced folks up to probably 35 or 40 people.
+
+147
+00:13:00.020 --> 00:13:03.000
+<v Noah Labhart>You just said the word, scalability, right?
+
+148
+00:13:03.100 --> 00:13:04.440
+<v Noah Labhart>And you're hitting the tipping point.
+
+149
+00:13:04.560 --> 00:13:11.180
+<v Noah Labhart>COVID hits and you need the scalability to start being triggered with team, with technology.
+
+150
+00:13:12.040 --> 00:13:15.640
+<v Noah Labhart>Was this built with scale in mind from day one?
+
+151
+00:13:15.640 --> 00:13:19.220
+<v Noah Labhart>or is it at that point or many points
+
+152
+00:13:19.220 --> 00:13:21.740
+<v Noah Labhart>where you are having to fight this as you grow?
+
+153
+00:13:23.100 --> 00:13:24.880
+<v Kwindla Kramer>I think it's a super interesting question
+
+154
+00:13:24.880 --> 00:13:26.900
+<v Kwindla Kramer>and I've really learned a lot from listening to people
+
+155
+00:13:26.900 --> 00:13:29.160
+<v Kwindla Kramer>on your podcast answer that question.
+
+156
+00:13:29.720 --> 00:13:33.640
+<v Kwindla Kramer>What it looks like to me is kind of what I try to use
+
+157
+00:13:33.640 --> 00:13:35.920
+<v Kwindla Kramer>as a framing for that when we're making decisions
+
+158
+00:13:35.920 --> 00:13:40.180
+<v Kwindla Kramer>is ideally we pick tooling and make platform choices
+
+159
+00:13:40.180 --> 00:13:42.560
+<v Kwindla Kramer>and architecture choices that can scale.
+
+160
+00:13:42.840 --> 00:13:45.260
+<v Kwindla Kramer>But at the same time, the stuff we build
+
+161
+00:13:45.640 --> 00:13:49.940
+<v Kwindla Kramer>day in and day out, we build really as quickly as possible so that we can ship and iterate.
+
+162
+00:13:50.120 --> 00:13:54.900
+<v Kwindla Kramer>Because it doesn't really matter how you build something if you don't ship and iterate. You just
+
+163
+00:13:54.900 --> 00:13:59.160
+<v Kwindla Kramer>can't really learn what you need to learn unless you put stuff out there into the world. So it just
+
+164
+00:13:59.160 --> 00:14:04.620
+<v Kwindla Kramer>can't take that long. So that like get the low level choices right and then build quickly on
+
+165
+00:14:04.620 --> 00:14:08.900
+<v Kwindla Kramer>top of those, even if you're accumulating a lot of technical debt. That's kind of my approach.
+
+166
+00:14:09.500 --> 00:14:14.400
+<v Kwindla Kramer>But definitely we have, you know, non-trivial amounts of technical debt. I actually don't
+
+167
+00:14:15.640 --> 00:14:20.400
+<v Kwindla Kramer>that in the real world. So it's just how you box up and how you manage technical debt over time.
+
+168
+00:14:20.560 --> 00:14:25.620
+<v Kwindla Kramer>That's the hard thing. But other people have other approaches that I think also work really well.
+
+169
+00:14:26.160 --> 00:14:32.600
+<v Kwindla Kramer>I have a funny story about a core technology choice and how that evolved for us that it's
+
+170
+00:14:32.600 --> 00:14:40.000
+<v Kwindla Kramer>a big part of our engineering culture because of kind of how much the funny path-dependent things
+
+171
+00:14:40.000 --> 00:14:43.600
+<v Kwindla Kramer>that happen when you make certain choices kind of reverberate for years and years.
+
+172
+00:14:43.600 --> 00:14:49.540
+<v Kwindla Kramer>we built the very first MVP on top of Firebase for part of our network layer.
+
+173
+00:14:49.620 --> 00:14:54.860
+<v Kwindla Kramer>We needed a distributed state with pretty rapid updates, kind of pub-subby.
+
+174
+00:14:55.160 --> 00:14:56.500
+<v Kwindla Kramer>It seemed pretty standard.
+
+175
+00:14:56.740 --> 00:14:58.680
+<v Kwindla Kramer>It had a lot of respect for the Firebase product.
+
+176
+00:14:59.020 --> 00:15:01.900
+<v Kwindla Kramer>It sure looked on paper like Firebase could do exactly what we needed,
+
+177
+00:15:01.980 --> 00:15:03.720
+<v Kwindla Kramer>and that was something we did not have to build ourselves.
+
+178
+00:15:04.140 --> 00:15:06.000
+<v Kwindla Kramer>And by the time we had a few hundred users,
+
+179
+00:15:06.220 --> 00:15:11.140
+<v Kwindla Kramer>Firebase was the single most painful thing in our DevOps and customer support world,
+
+180
+00:15:11.140 --> 00:15:15.200
+<v Kwindla Kramer>including all of the super immature WebRTC stuff we had written ourselves.
+
+181
+00:15:15.640 --> 00:15:18.700
+<v Kwindla Kramer>We just spent so much time dealing with Firebase issues.
+
+182
+00:15:18.980 --> 00:15:21.720
+<v Kwindla Kramer>And we're in Silicon Valley, small world,
+
+183
+00:15:21.780 --> 00:15:24.000
+<v Kwindla Kramer>so kind of knew the Firebase founders just a little bit.
+
+184
+00:15:24.020 --> 00:15:26.800
+<v Kwindla Kramer>We had really good access to their engineering and support teams.
+
+185
+00:15:27.220 --> 00:15:30.660
+<v Kwindla Kramer>And despite the fact that they would make special shards for us,
+
+186
+00:15:30.740 --> 00:15:32.860
+<v Kwindla Kramer>move us around, help us debug in real time,
+
+187
+00:15:33.020 --> 00:15:35.540
+<v Kwindla Kramer>we just never managed to get past the Firebase issues.
+
+188
+00:15:35.540 --> 00:15:42.360
+<v Kwindla Kramer>were just outside of the core Firebase user base enough at that time that just didn't work for us.
+
+189
+00:15:42.600 --> 00:15:48.160
+<v Kwindla Kramer>I think we were very different maybe in ways that were not obvious to any of us going into it
+
+190
+00:15:48.160 --> 00:15:51.420
+<v Kwindla Kramer>from their kind of mobile gaming core user base.
+
+191
+00:15:52.180 --> 00:15:55.840
+<v Kwindla Kramer>And state updates would just back up and nobody could debug why.
+
+192
+00:15:56.060 --> 00:16:02.900
+<v Kwindla Kramer>And WebSockets would disconnect with no kind of library level or application level ability to manage that.
+
+193
+00:16:02.900 --> 00:16:10.180
+<v Kwindla Kramer>And what we needed were very long running, very reliable, relatively simple, but sub-second distributed state updates.
+
+194
+00:16:10.940 --> 00:16:13.020
+<v Kwindla Kramer>And I really, really, really didn't want to build that.
+
+195
+00:16:13.160 --> 00:16:15.480
+<v Kwindla Kramer>It seemed like it should be a solved problem.
+
+196
+00:16:15.760 --> 00:16:28.460
+<v Kwindla Kramer>But I built a prototype version of our kind of signaling layer on top of two different AWS products, Pusher, and I think a couple other kind of platform as a service implementations.
+
+197
+00:16:29.160 --> 00:16:36.480
+<v Kwindla Kramer>they all had roughly the same issues that firebase did for us so finally i blocked out two weeks over
+
+198
+00:16:36.480 --> 00:16:42.060
+<v Kwindla Kramer>christmas because we knew that customer support would be light and we wouldn't be onboarding new
+
+199
+00:16:42.060 --> 00:16:48.400
+<v Kwindla Kramer>customers and i built exactly what we needed on top of the most boring technologies we could
+
+200
+00:16:48.400 --> 00:16:56.960
+<v Kwindla Kramer>possibly imagine so a sql database and http polling and i built it and debugged it and we
+
+201
+00:16:58.460 --> 00:17:10.700
+<v Kwindla Kramer>And the reason that was possible is we had used all of those technologies, HTTP polling and SQL databases and the kind of application level shared state merges for 15 years professionally.
+
+202
+00:17:10.980 --> 00:17:13.760
+<v Kwindla Kramer>We knew where the scaling issues were going to be.
+
+203
+00:17:13.900 --> 00:17:18.480
+<v Kwindla Kramer>We knew where the kind of pain points developing the user level code would be for that kind of thing.
+
+204
+00:17:18.760 --> 00:17:21.620
+<v Kwindla Kramer>It's not super easy, but it's not super hard either.
+
+205
+00:17:21.620 --> 00:17:29.260
+<v Kwindla Kramer>And we called that library kitchen sink S-Y-N-C because we knew we were going to use it for all of our shared state stuff.
+
+206
+00:17:29.480 --> 00:17:31.340
+<v Kwindla Kramer>And engineers like puns.
+
+207
+00:17:31.560 --> 00:17:33.680
+<v Kwindla Kramer>And we still use kitchen sink today.
+
+208
+00:17:35.120 --> 00:17:45.380
+<v Kwindla Kramer>And I'm 100% sure that we would have had more technical issues if we'd built on top of somebody else's system that we didn't have as much control over.
+
+209
+00:17:47.360 --> 00:17:52.720
+<v Noah Labhart>So, Kwin, as you step out on the balcony and you look across all that you've built, what are you most proud of?
+
+210
+00:17:53.760 --> 00:18:15.640
+<v Kwindla Kramer>You know, I really am proud of this technology stack that spans a whole bunch of pretty sophisticated UDP packet routing for audio and video, all the way up through client-side libraries that I think mostly make it really easy for developers to do super interesting things without needing to know how all of those low-level details work.
+
+211
+00:18:15.640 --> 00:18:18.920
+<v Kwindla Kramer>and the fact that it's really a full tech stack
+
+212
+00:18:18.920 --> 00:18:20.900
+<v Kwindla Kramer>from the backend all the way up
+
+213
+00:18:20.900 --> 00:18:23.040
+<v Kwindla Kramer>through multi-platform client libraries.
+
+214
+00:18:23.260 --> 00:18:24.800
+<v Kwindla Kramer>I am really proud of that.
+
+215
+00:18:24.900 --> 00:18:27.640
+<v Kwindla Kramer>And that's not my code.
+
+216
+00:18:27.700 --> 00:18:29.080
+<v Kwindla Kramer>That's now, you know,
+
+217
+00:18:29.080 --> 00:18:30.980
+<v Kwindla Kramer>code from many, many other engineers
+
+218
+00:18:30.980 --> 00:18:31.840
+<v Kwindla Kramer>who work here at Daily
+
+219
+00:18:31.840 --> 00:18:34.680
+<v Kwindla Kramer>and do things that I could never have done
+
+220
+00:18:34.680 --> 00:18:37.320
+<v Kwindla Kramer>writing those pieces of the system myself.
+
+221
+00:18:37.740 --> 00:18:40.260
+<v Kwindla Kramer>But I do think it's tied together by this idea
+
+222
+00:18:40.260 --> 00:18:42.480
+<v Kwindla Kramer>that we support our customers
+
+223
+00:18:42.480 --> 00:18:45.380
+<v Kwindla Kramer>all the way through to their customer's experience.
+
+224
+00:18:45.660 --> 00:18:49.100
+<v Kwindla Kramer>Like our customer's customer matters to us.
+
+225
+00:18:50.120 --> 00:18:53.240
+<v Kwindla Kramer>We enable video and audio calls to work
+
+226
+00:18:53.240 --> 00:18:56.180
+<v Kwindla Kramer>as much as they possibly can on every device
+
+227
+00:18:56.180 --> 00:18:59.080
+<v Kwindla Kramer>anywhere in the world, on any network in the world.
+
+228
+00:18:59.280 --> 00:19:02.640
+<v Kwindla Kramer>And for me as an engineer, that's a really cool thing.
+
+229
+00:19:04.760 --> 00:19:06.260
+<v Noah Labhart>Let's flip the script a little bit.
+
+230
+00:19:06.440 --> 00:19:08.160
+<v Noah Labhart>Tell me about a mistake you made
+
+231
+00:19:08.160 --> 00:19:10.320
+<v Noah Labhart>and how you and your team responded to it.
+
+232
+00:19:10.320 --> 00:19:12.500
+<v Noah Labhart>and maybe it's around the Firebase area,
+
+233
+00:19:12.600 --> 00:19:14.060
+<v Noah Labhart>but I want to know if you have a different story too.
+
+234
+00:19:15.520 --> 00:19:18.040
+<v Kwindla Kramer>Oh man, so many mistakes.
+
+235
+00:19:18.360 --> 00:19:21.640
+<v Kwindla Kramer>Like life is just an opportunity to make more mistakes.
+
+236
+00:19:22.880 --> 00:19:25.640
+<v Kwindla Kramer>It's okay to be wrong and it's okay to make mistakes
+
+237
+00:19:25.640 --> 00:19:26.520
+<v Kwindla Kramer>because it has to be
+
+238
+00:19:26.520 --> 00:19:27.980
+<v Kwindla Kramer>because both of those things are inevitable.
+
+239
+00:19:28.680 --> 00:19:30.580
+<v Kwindla Kramer>It's a good rule of thumb to try
+
+240
+00:19:30.580 --> 00:19:32.500
+<v Kwindla Kramer>not to stay wrong for too long
+
+241
+00:19:32.500 --> 00:19:34.920
+<v Kwindla Kramer>and not to make the same mistake more than once.
+
+242
+00:19:35.060 --> 00:19:37.320
+<v Kwindla Kramer>But those things happen too and that's okay.
+
+243
+00:19:37.320 --> 00:19:47.220
+<v Kwindla Kramer>I think that the single biggest mistake we have made as a company, and this is totally on me, is it took us a long time to really focus on building native mobile libraries.
+
+244
+00:19:47.960 --> 00:19:57.520
+<v Kwindla Kramer>I personally have done a whole lot of large-scale backend stuff and a whole lot of web stuff and relatively little native mobile stuff in my own career.
+
+245
+00:19:57.580 --> 00:20:03.360
+<v Kwindla Kramer>So it was sort of easy for me to focus on the web front end and the big infrastructure stuff on the backend.
+
+246
+00:20:03.360 --> 00:20:19.920
+<v Kwindla Kramer>But so many interesting use cases are mobile first these days. And we really missed out, I think, on a lot of interesting customers and interesting customer discovery by being slow to fully support native mobile as much as we have the web platform.
+
+247
+00:20:19.920 --> 00:20:35.220
+<v Kwindla Kramer>We fixed that now, but for probably a year and a half longer than we should have, we kind of supported mobile as mostly a mobile browser experience and not mostly really, really terrific libraries you could build into native mobile apps.
+
+248
+00:20:35.360 --> 00:20:43.780
+<v Kwindla Kramer>If we could go back and redo that, that's probably the biggest thing I would change about how we focused and what our roadmap and trajectory were at Daily.
+
+249
+00:20:45.740 --> 00:20:47.340
+<v Noah Labhart>So this will be fun, Kwin.
+
+250
+00:20:47.340 --> 00:20:50.660
+<v Noah Labhart>What does the future look like for Daily the product and for your team?
+
+251
+00:20:52.000 --> 00:20:58.200
+<v Kwindla Kramer>I mean, the fun thing about working on something you really enjoy is there's just no shortage of things to build.
+
+252
+00:20:58.260 --> 00:21:03.080
+<v Kwindla Kramer>Both things that customers ask us for, but also things that are just sort of our vision about the world.
+
+253
+00:21:03.420 --> 00:21:08.120
+<v Kwindla Kramer>Our bet has always been that video is just going to get more and more important and more and more ubiquitous.
+
+254
+00:21:08.120 --> 00:21:20.780
+<v Kwindla Kramer>And I think we see that today. TikTok largely replacing Twitter, for example, for mass user audiences just to use those two experiences as stand-ins for kind of larger user behaviors.
+
+255
+00:21:20.780 --> 00:21:39.040
+<v Kwindla Kramer>So what we see a lot at Daily is people building really amazing co-watching of sports or live commerce or really funny gaming experiences that combine video with metaverse or contest type dynamics.
+
+256
+00:21:39.300 --> 00:21:49.100
+<v Kwindla Kramer>And I just think there's going to be an incredible amount of innovation around how we all experience these kind of video heavy use cases over the next few years.
+
+257
+00:21:50.780 --> 00:21:58.300
+<v Kwindla Kramer>the surface. And as much as something like TikTok has changed the landscape, it's inning one of a
+
+258
+00:21:58.300 --> 00:22:03.080
+<v Kwindla Kramer>nine inning baseball game. And our goal is to support all those new use cases. We love supporting
+
+259
+00:22:03.680 --> 00:22:09.460
+<v Kwindla Kramer>telehealth and education use cases because they feel like they really make a difference in people's
+
+260
+00:22:09.460 --> 00:22:14.140
+<v Kwindla Kramer>lives. And that's really important to us on top of kind of the engineering stuff that we enjoy doing.
+
+261
+00:22:14.460 --> 00:22:18.780
+<v Kwindla Kramer>But it's also super fun to think about, okay, what's the world going to look like in 10 years
+
+262
+00:22:20.820 --> 00:22:27.500
+<v Kwindla Kramer>more kind of core to everything we do on our phones and our TVs and our laptops every day.
+
+263
+00:22:27.560 --> 00:22:31.380
+<v Kwindla Kramer>And I think we got some good ideas about that. And in particular, I think we're building a bunch
+
+264
+00:22:31.380 --> 00:22:37.100
+<v Kwindla Kramer>of toolkits that make it super easy to do like these really hybrid experiences where you might
+
+265
+00:22:37.100 --> 00:22:43.480
+<v Kwindla Kramer>have a hundred thousand people in a video live stream, and some of them might participate ad hoc
+
+266
+00:22:43.480 --> 00:22:50.960
+<v Kwindla Kramer>in the experience and then you record and clip the most fun parts out of that large live experience
+
+267
+00:22:50.960 --> 00:22:56.800
+<v Kwindla Kramer>and post them later and remix them and then do it all again tomorrow. Okay.
+
+268
+00:22:56.800 --> 00:22:58.060
+<v Noah Labhart>Kwin, let's switch to you.
+
+269
+00:22:58.060 --> 00:23:03.740
+<v Noah Labhart>Who influences the way that you work? Name a person or many persons or something you look up to
+
+270
+00:23:03.740 --> 00:23:04.420
+<v Noah Labhart>and why?
+
+271
+00:23:04.420 --> 00:23:10.720
+<v Kwindla Kramer>I just feel really lucky to get to work with the colleagues that I work with every day
+
+272
+00:23:10.720 --> 00:23:17.660
+<v Kwindla Kramer>at Daily. I think if we do our job right, and this is something we say a lot when we're hiring,
+
+273
+00:23:17.840 --> 00:23:23.020
+<v Kwindla Kramer>because I think it helps us stay focused on what our goals are for the longer term as a company,
+
+274
+00:23:23.100 --> 00:23:28.360
+<v Kwindla Kramer>in terms of being a great place to work for as long as any of us remain excited about what we're
+
+275
+00:23:28.360 --> 00:23:35.600
+<v Kwindla Kramer>doing together. If we feel like everybody at the company has and is excited about teaching things
+
+276
+00:23:35.600 --> 00:23:41.080
+<v Kwindla Kramer>to the rest of us and equally excited about learning things, then that's the right kind
+
+277
+00:23:41.080 --> 00:23:47.380
+<v Kwindla Kramer>of mindset to have for what we want to do together. And I truly feel like that. Like I learn so much
+
+278
+00:23:47.380 --> 00:23:52.300
+<v Kwindla Kramer>every day from everybody I work with, from engineers who've been doing this stuff a very
+
+279
+00:23:52.300 --> 00:23:58.680
+<v Kwindla Kramer>long time, like I have to some of the slightly earlier career engineers who bring their own
+
+280
+00:23:58.680 --> 00:24:05.720
+<v Kwindla Kramer>perspective on newer things to people in the other disciplines that we've added in addition
+
+281
+00:24:05.720 --> 00:24:11.060
+<v Kwindla Kramer>to engineering as we've grown. I just learned so much from everybody at Daily. And I think that's
+
+282
+00:24:11.060 --> 00:24:16.160
+<v Kwindla Kramer>a huge part of what makes the journey of growing a company together fulfilling.
+
+283
+00:24:17.920 --> 00:24:22.580
+<v Noah Labhart>Okay, Kwin. So last question. You're getting on a plane and you're sitting next to a young
+
+284
+00:24:22.580 --> 00:24:26.660
+<v Noah Labhart>entrepreneur who's built the next big thing. They're jazzed about it. They can't wait to
+
+285
+00:24:26.660 --> 00:24:29.180
+<v Noah Labhart>show it off to the world and can't wait to show it off to you right there on the plane.
+
+286
+00:24:29.620 --> 00:24:32.600
+<v Noah Labhart>What advice do you give that person having gone down this road a bit?
+
+287
+00:24:34.140 --> 00:24:41.680
+<v Kwindla Kramer>You know, I think it's funny. I think it depends on kind of what world you're living in. I have a
+
+288
+00:24:41.680 --> 00:24:46.560
+<v Kwindla Kramer>lot of experience with venture-backed technology companies. And it's a very particular business
+
+289
+00:24:46.560 --> 00:24:52.640
+<v Kwindla Kramer>model. You raise money that you could not raise in any other sector of the economy because the
+
+290
+00:24:52.640 --> 00:24:57.580
+<v Kwindla Kramer>the risk is way out of proportion that you're just going to go out of business in a couple of years
+
+291
+00:24:57.580 --> 00:25:02.720
+<v Kwindla Kramer>because you're swinging for the fences. But the flip side of that is that a small percentage of
+
+292
+00:25:02.720 --> 00:25:10.240
+<v Kwindla Kramer>venture-backed companies accomplish unpredictably amazing things. So if somebody's built some
+
+293
+00:25:10.240 --> 00:25:16.460
+<v Kwindla Kramer>technology artifact that you need to continue to invest in before it's going to get the kind
+
+294
+00:25:16.460 --> 00:25:21.940
+<v Kwindla Kramer>of traction that can support a bunch of people's salaries, then the venture-backed tech route is
+
+295
+00:25:22.640 --> 00:25:31.420
+<v Kwindla Kramer>And I have a ton of advice about that in terms of how to think about technology company roadmaps and how to talk to investors and what all the tradeoffs are along the way.
+
+296
+00:25:31.720 --> 00:25:38.560
+<v Kwindla Kramer>But I also think it's worth thinking at the beginning about whether raising money from professional tech investors is the right path.
+
+297
+00:25:38.700 --> 00:25:52.040
+<v Kwindla Kramer>Because you can also build sort of smaller companies that are just as exciting to work at if you are one of the people who is excited about what that company is doing over the long term without necessarily raising from traditional tech investors.
+
+298
+00:25:52.640 --> 00:25:54.540
+<v Kwindla Kramer>So maybe there's that fork in the road early on.
+
+299
+00:25:54.700 --> 00:25:59.040
+<v Kwindla Kramer>Is this thing you've built the seed of a venture scale company?
+
+300
+00:25:59.440 --> 00:26:00.860
+<v Kwindla Kramer>And that's not a value judgment.
+
+301
+00:26:00.900 --> 00:26:03.240
+<v Kwindla Kramer>It's just something you should kind of think hard about.
+
+302
+00:26:03.760 --> 00:26:10.120
+<v Kwindla Kramer>And if it is, do you personally want to not just build something you're interested in building,
+
+303
+00:26:10.300 --> 00:26:15.980
+<v Kwindla Kramer>but then turn that into a company and try to attract a bunch of other people to be as excited about it as you are?
+
+304
+00:26:15.980 --> 00:26:22.680
+<v Kwindla Kramer>and probably eventually transition a bit from actually building that level of artifact to
+
+305
+00:26:22.680 --> 00:26:29.140
+<v Kwindla Kramer>managing people and managing relationships with investors as a company grows. Because if you
+
+306
+00:26:29.140 --> 00:26:33.820
+<v Kwindla Kramer>grow a company, the job, the one thing that's true is that the job changes every quarter.
+
+307
+00:26:34.260 --> 00:26:38.940
+<v Noah Labhart>That's fantastic advice. Well, Kwin, thank you for being on the show today. And thank you for
+
+308
+00:26:38.940 --> 00:26:40.780
+<v Noah Labhart>for telling the creation story of Daily.
+
+309
+00:26:41.180 --> 00:26:41.960
+<v Noah Labhart>Thank you.
+
+310
+00:26:43.520 --> 00:26:46.360
+<v Noah Labhart>And this concludes another chapter of Code Story.
+
+311
+00:26:51.940 --> 00:26:55.040
+<v Noah Labhart>Code Story is hosted and produced by Noah Labhart.
+
+312
+00:26:55.180 --> 00:26:57.840
+<v Noah Labhart>Be sure to subscribe on Apple Podcasts, Spotify,
+
+313
+00:26:58.020 --> 00:26:59.960
+<v Noah Labhart>or the podcasting app of your choice.
+
+314
+00:27:00.540 --> 00:27:02.780
+<v Noah Labhart>And when you get a chance, leave us a review.
+
+315
+00:27:03.040 --> 00:27:05.000
+<v Noah Labhart>Both things help us out tremendously.
+
+316
+00:27:05.000 --> 00:27:09.420
+<v Noah Labhart>tremendously. And thanks again for listening.
